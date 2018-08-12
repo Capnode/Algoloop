@@ -212,18 +212,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Charts\ChartDefinition.cs" />
-    <Compile Include="Charts\Geometries.cs" />
-    <Compile Include="Charts\GridPoint.cs" />
-    <Compile Include="Charts\GridSerie.cs" />
-    <Compile Include="Charts\IChartParser.cs" />
-    <Compile Include="Charts\IChartView.cs" />
-    <Compile Include="Charts\IInstantChartPoint.cs" />
-    <Compile Include="Charts\InstantChartPoint.cs" />
-    <Compile Include="Charts\InstantChartPointMapper.cs" />
-    <Compile Include="Charts\IResolutionSource.cs" />
-    <Compile Include="Charts\OhlcInstantChartPoint.cs" />
-    <Compile Include="Charts\OhlcInstantChartPointMapper.cs" />
+    <Compile Include="Chart\ChartDefinition.cs" />
+    <Compile Include="Chart\Geometries.cs" />
+    <Compile Include="Chart\GridPoint.cs" />
+    <Compile Include="Chart\GridSerie.cs" />
+    <Compile Include="Chart\IChartParser.cs" />
+    <Compile Include="Chart\IChartView.cs" />
+    <Compile Include="Chart\IInstantChartPoint.cs" />
+    <Compile Include="Chart\InstantChartPoint.cs" />
+    <Compile Include="Chart\InstantChartPointMapper.cs" />
+    <Compile Include="Chart\IResolutionSource.cs" />
+    <Compile Include="Chart\OhlcInstantChartPoint.cs" />
+    <Compile Include="Chart\OhlcInstantChartPointMapper.cs" />
     <Compile Include="Model\AccountModel.cs" />
     <Compile Include="Model\AccountsModel.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
@@ -232,9 +232,9 @@
     <Compile Include="ViewModel\PositionViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
     <Compile Include="ViewSupport\ResolutionConverter.cs" />
-    <Compile Include="Charts\ResultMapper.cs" />
-    <Compile Include="Charts\SeriesChartComponent.cs" />
-    <Compile Include="Charts\SeriesDefinition.cs" />
+    <Compile Include="Chart\ResultMapper.cs" />
+    <Compile Include="Chart\SeriesChartComponent.cs" />
+    <Compile Include="Chart\SeriesDefinition.cs" />
     <Compile Include="Model\ParameterModel.cs" />
     <Compile Include="Service\BacktestResultHandler.cs" />
     <Compile Include="Service\LeanEngine.cs" />
@@ -427,7 +427,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Algoloop.ico" />
-    <Content Include="Alphas\PairsTradingAlphaModel.py" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
