@@ -88,14 +88,15 @@ namespace QuantConnect.Brokerages.Fxcm
                 throw new TimeoutException(string.Format("FxcmBrokerage.LoadAccounts(): Operation took longer than {0} seconds.", (decimal)ResponseTimeout / 1000));
 
             if (!_accounts.ContainsKey(_accountId))
-                throw new ArgumentException("FxcmBrokerage.LoadAccounts(): The account id is invalid: " + _accountId);
+//                throw new ArgumentException("FxcmBrokerage.LoadAccounts(): The account id is invalid: " + _accountId);
+                throw new ArgumentException("FxcmBrokerage.LoadAccounts(): The account id is invalid: " + _accountId + " Valid: " + string.Join(",", _accounts.Keys.ToList()));
 
             // Hedging MUST be disabled on the account
-            if (_accounts[_accountId].getParties().getFXCMPositionMaintenance() == "Y")
-            {
-                throw new NotSupportedException("FxcmBrokerage.LoadAccounts(): The Lean engine does not support accounts with Hedging enabled. " +
-                                                "Please contact FXCM Active Trader support to disable Hedging. They can be reached at 646.432.2970 or by email, activetrader@fxcm.com.");
-            }
+            //if (_accounts[_accountId].getParties().getFXCMPositionMaintenance() == "Y")
+            //{
+            //    throw new NotSupportedException("FxcmBrokerage.LoadAccounts(): The Lean engine does not support accounts with Hedging enabled. " +
+            //                                    "Please contact FXCM Active Trader support to disable Hedging. They can be reached at 646.432.2970 or by email, activetrader@fxcm.com.");
+            //}
         }
 
         private void LoadOpenOrders()
