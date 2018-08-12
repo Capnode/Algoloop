@@ -48,7 +48,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Algorithm.Pyth
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.ToolBox", "ToolBox\QuantConnect.ToolBox.csproj", "{AC9A142C-B485-44D7-91FF-015C22C43D05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.VisualStudioPlugin", "VisualStudioPlugin\QuantConnect.VisualStudio17Plugin.csproj", "{5326A9FB-0270-4647-8C43-20C5607DB529}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.VisualStudio17Plugin", "VisualStudioPlugin\QuantConnect.VisualStudio17Plugin.csproj", "{5326A9FB-0270-4647-8C43-20C5607DB529}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Jupyter", "Jupyter\QuantConnect.Jupyter.csproj", "{9561D14A-467E-40AD-928E-EE9F758D7D98}"
 EndProject
@@ -57,6 +57,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Algorithm.Framework", "Algorithm.Framework\QuantConnect.Algorithm.Framework.csproj", "{75981418-7246-4B91-B136-482728E02901}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "QuantConnect.PythonToolbox", "PythonToolbox\QuantConnect.PythonToolbox.pyproj", "{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Algorithm.CSharp", "Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj", "{37F5493C-79FF-4532-B7C5-FEDE03196E67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Lean", "Algoloop.Lean\Algoloop.Lean.csproj", "{F65DA573-DB1B-4524-A254-2034954CAE66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -218,8 +222,27 @@ Global
 		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|x64.ActiveCfg = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|x64.Build.0 = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|x64.ActiveCfg = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|x64.Build.0 = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|x64.Build.0 = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|x64.ActiveCfg = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {52BD8E74-8EAA-4F3E-9113-598D7602ADAC}
 	EndGlobalSection
 EndGlobal

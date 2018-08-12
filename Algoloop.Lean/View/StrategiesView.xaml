@@ -1,0 +1,176 @@
+﻿<UserControl x:Class="Algoloop.Lean.View.StrategiesView"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:sys="clr-namespace:System;assembly=mscorlib"
+  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+  xmlns:viewsupport="clr-namespace:Algoloop.Lean.ViewSupport"
+  xmlns:vm="clr-namespace:Algoloop.Lean.ViewModel"
+  xmlns:view="clr-namespace:Algoloop.Lean.View"
+  xmlns:properties="clr-namespace:Algoloop.Lean.Properties"
+  DataContext="{Binding Source={StaticResource Locator}, Path=StrategiesViewModel}" 
+  mc:Ignorable="d" 
+  d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ObjectDataProvider
+      x:Key="settings"
+      ObjectInstance="{x:Static properties:Settings.Default}"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Source={StaticResource settings}, Path=StrategyViewSplitter, Mode=TwoWay, Converter={viewsupport:Int32FromGridLengthConverter}}"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <GridSplitter
+         Grid.Column="1"
+         HorizontalAlignment="Left"
+         Margin="0"
+         Width="5"
+         Height="Auto"
+         VerticalAlignment="Stretch" />
+        <TreeView
+            Name="treeView"
+            Grid.Column="0"
+            ItemsSource="{Binding Strategies}"
+            BorderThickness="0">
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem
+                        Header="Add Strategy"
+                        Command="{Binding AddStrategyCommand}" />
+                </ContextMenu>
+            </TreeView.ContextMenu>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Jobs}">
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding Model.Enabled}" />
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{} {0} ({1})">
+                                    <Binding Path="Model.Name"/>
+                                    <Binding Path="Jobs.Count"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                            <TextBlock.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem
+                                        Header="Delete Strategy"
+                                        Command="{Binding DeleteStrategyCommand}" />
+                                    <MenuItem
+                                        Header="Run Backtest"
+                                        Command="{Binding RunBacktestCommand}" />
+                                </ContextMenu>
+                            </TextBlock.ContextMenu>
+                        </TextBlock>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type vm:StrategyJobViewModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Model.Name}" />
+                        <StackPanel.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem
+                                    Header="Delete Job"
+                                    Command="{Binding DeleteJobCommand}" />
+                            </ContextMenu>
+                        </StackPanel.ContextMenu>
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <ContentControl
+            Grid.Column="1"
+            Margin="7,0,0,0"
+            Content="{Binding Path=SelectedItem, ElementName=treeView}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type vm:StrategyViewModel}">
+                    <TabControl>
+                        <TabItem Header="Configuration">
+                            <ScrollViewer>
+                                <xctk:PropertyGrid
+                                    DockPanel.Dock="Top"
+                                    ShowTitle="False"
+                                    SelectedObject="{Binding Model}">
+                                </xctk:PropertyGrid>
+                            </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                            <ListBox
+                                SelectionMode="Extended"
+                                DockPanel.Dock="Bottom"
+                                ItemsSource="{Binding Symbols}">
+                                <ListBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem
+                                            Header="Add Symbol"
+                                            Command="{Binding AddSymbolCommand}" />
+                                        <MenuItem
+                                            Header="Import Symbol list..."
+                                            Command="{Binding ImportSymbolsCommand}" />
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
+                                <ListBox.Resources>
+                                    <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox IsChecked="{Binding Model.Enabled}" />
+                                            <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
+                                                <TextBox.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem
+                                                            Header="Delete Symbol"
+                                                            Command="{Binding DeleteSymbolCommand}" />
+                                                    </ContextMenu>
+                                                </TextBox.ContextMenu>
+                                            </TextBox>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.Resources>
+                            </ListBox>
+                        </TabItem>
+                        <TabItem Header="{Binding Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
+                            <DataGrid
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                AutoGenerateColumns="False"
+                                IsReadOnly="False"
+                                GridLinesVisibility="None"
+                                ItemsSource="{Binding Parameters}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn IsReadOnly="False" Header="Name" Binding="{Binding Model.Name, Mode=TwoWay}" />
+                                    <DataGridTextColumn IsReadOnly="False" Header="Value" Binding="{Binding Model.Value, Mode=TwoWay}" />
+                                </DataGrid.Columns>
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem
+                                            Header="Add Parameter"
+                                            Command="{Binding AddParameterCommand}" />
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                                <DataGrid.Resources>
+                                    <ContextMenu
+                                        x:Key="RowMenu"
+                                        DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                        <MenuItem
+                                            Header="Delete Parameter"
+                                            Command="{Binding DeleteParameterCommand}" />
+                                    </ContextMenu>
+                                </DataGrid.Resources>
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow" >
+                                        <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
+                                    </Style>
+                                </DataGrid.RowStyle>
+                            </DataGrid>
+                        </TabItem>
+                    </TabControl>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:StrategyJobViewModel}">
+                  <view:StrategyJobView />
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+    </Grid>
+</UserControl>
