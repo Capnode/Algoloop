@@ -124,8 +124,8 @@ namespace Algoloop.ViewModel
             Markets.Clear();
             foreach (MarketModel market in Model.Markets)
             {
-                var loginViewModel = new MarketViewModel(this, market);
-                Markets.Add(loginViewModel);
+                var viewModel = new MarketViewModel(this, market);
+                Markets.Add(viewModel);
             }
         }
     }

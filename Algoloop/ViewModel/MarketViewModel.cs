@@ -16,10 +16,9 @@ using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using QuantConnect;
-using QuantConnect.Brokerages;
 using QuantConnect.Brokerages.Fxcm;
 using QuantConnect.Logging;
+using QuantConnect.ToolBox.FxcmDownloader;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -95,59 +94,19 @@ namespace Algoloop.ViewModel
 
         private void StartTask(CancellationToken cancel)
         {
-            Brokerage brokerage = null;
             try
             {
+
                 var brokerageFactory = new FxcmBrokerageFactory();
-                var data = brokerageFactory.BrokerageData;
-                brokerage = new FxcmBrokerage(null, null, data["fxcm-server"], data["fxcm-terminal"], Model.Login, Model.Password, Model.Id);
-                brokerage.Connect();
+                var brokerageData = brokerageFactory.BrokerageData;
+                FxcmDataDownloader downloader = new FxcmDataDownloader(brokerageData["fxcm-server"], brokerageData["fxcm-terminal"], Model.Login, Model.Password);
 
-                List<QuantConnect.Orders.Order> orders = brokerage.GetOpenOrders();
+                IList<string> tickers = new List<string>() { "EURUSD" };
+                var startDate = new DateTime(2018, 8, 1);
+                var endDate = new DateTime(2018, 8, 10);
 
-                bool stop = false;
-                while (!stop)
-                {
-                    // Set Positions
-                    List<Holding> holdings = brokerage.GetAccountHoldings();
-                    if (Positions.Count != holdings.Count)
-                    {
-                        Positions.Clear();
-                        holdings.ForEach(m => Positions.Add(new PositionViewModel(m)));
-                    }
-                    else
-                    {
-                        int i = 0;
-                        foreach (var holding in holdings)
-                        {
-                            Positions[i++].Update(holding);
-                        }
-                    }
+                FxcmDownloaderProgram.FxcmDownloader(tickers, "all", startDate, endDate);
 
-                    // Set Balance
-                    List<QuantConnect.Securities.Cash> balances = brokerage.GetCashBalance();
-                    if (Balances.Count != balances.Count)
-                    {
-                        Balances.Clear();
-                        balances.ForEach(m => Balances.Add(new BalanceViewModel(m)));
-                    }
-                    else
-                    {
-                        int i = 0;
-                        foreach (var balance in balances)
-                        {
-                            Balances[i++].Update(balance);
-                        }
-                    }
-
-                    // Tick data
-
-                    stop = cancel.WaitHandle.WaitOne(1000);
-                }
-
-                brokerage.Disconnect();
-                Positions.Clear();
-                Balances.Clear();
                 Enabled = false;
 
             }
@@ -155,10 +114,6 @@ namespace Algoloop.ViewModel
             {
                 Log.Error($"{ex.GetType()}: {ex.Message}");
                 Enabled = false;
-                if (brokerage != null)
-                {
-                    brokerage.Disconnect();
-                }
             }
         }
     }
