@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F65DA573-DB1B-4524-A254-2034954CAE66}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Algoloop.Lean</RootNamespace>
-    <AssemblyName>Algoloop.Lean</AssemblyName>
+    <RootNamespace>Algoloop</RootNamespace>
+    <AssemblyName>Algoloop</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -226,9 +226,13 @@
     <Compile Include="Chart\OhlcInstantChartPointMapper.cs" />
     <Compile Include="Model\AccountModel.cs" />
     <Compile Include="Model\AccountsModel.cs" />
+    <Compile Include="Model\MarketModel.cs" />
+    <Compile Include="Model\MarketsModel.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />
     <Compile Include="ViewModel\BalanceViewModel.cs" />
+    <Compile Include="ViewModel\MarketsViewModel.cs" />
+    <Compile Include="ViewModel\MarketViewModel.cs" />
     <Compile Include="ViewModel\PositionViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
     <Compile Include="ViewSupport\ResolutionConverter.cs" />
@@ -266,6 +270,9 @@
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AccountsView.xaml.cs">
       <DependentUpon>AccountsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MarketsView.xaml.cs">
+      <DependentUpon>MarketsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\StrategiesView.xaml.cs">
       <DependentUpon>StrategiesView.xaml</DependentUpon>
@@ -305,6 +312,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="View\MarketsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\StrategiesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

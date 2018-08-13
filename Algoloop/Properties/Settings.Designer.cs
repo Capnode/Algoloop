@@ -58,5 +58,17 @@ namespace Algoloop.Properties {
                 this["AccountViewSplitter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("160")]
+        public int MarketViewSplitter {
+            get {
+                return ((int)(this["MarketViewSplitter"]));
+            }
+            set {
+                this["MarketViewSplitter"] = value;
+            }
+        }
     }
 }

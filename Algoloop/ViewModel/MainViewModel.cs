@@ -42,6 +42,7 @@ namespace Algoloop.ViewModel
         public RelayCommand RunCommand { get; }
 
         public LogViewModel LogViewModel { get; }
+        public MarketsViewModel MarketsViewModel { get; }
         public AccountsViewModel AccountsViewModel { get; }
         public StrategiesViewModel StrategiesViewModel { get; }
 
@@ -78,12 +79,13 @@ namespace Algoloop.ViewModel
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(ILeanEngineService leanEngineService, LogViewModel logViewModel, AccountsViewModel loginsViewModel, StrategiesViewModel strategiesViewModel)
+        public MainViewModel(ILeanEngineService leanEngineService, MarketsViewModel marketsViewModel, AccountsViewModel accountsViewModel, StrategiesViewModel strategiesViewModel, LogViewModel logViewModel)
         {
             _leanEngineService = leanEngineService;
-            LogViewModel = logViewModel;
-            AccountsViewModel = loginsViewModel;
+            MarketsViewModel = marketsViewModel;
+            AccountsViewModel = accountsViewModel;
             StrategiesViewModel = strategiesViewModel;
+            LogViewModel = logViewModel;
 
             OpenCommand = new RelayCommand(() => OpenFile(), () => !IsBusy);
             SaveCommand = new RelayCommand(() => SaveFile(), () => !IsBusy && !string.IsNullOrEmpty(FileName) );
@@ -176,6 +178,7 @@ namespace Algoloop.ViewModel
         private void ReadConfig()
         {
             string appData = GetAppDataFolder();
+            MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
             AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
             StrategiesViewModel.Read(Path.Combine(appData, "Strategies.json"));
         }
@@ -188,6 +191,7 @@ namespace Algoloop.ViewModel
                 Directory.CreateDirectory(appData);
             }
 
+            MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
             AccountsViewModel.Save(Path.Combine(appData, "Accounts.json"));
             StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));
         }

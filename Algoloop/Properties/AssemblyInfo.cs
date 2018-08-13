@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Algoloop Lean")]
+[assembly: AssemblyTitle("Algoloop")]
 [assembly: AssemblyDescription("Desktop trading platform")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Capnode AB")]
-[assembly: AssemblyProduct("AlgoloopLean")]
+[assembly: AssemblyProduct("Algoloop")]
 [assembly: AssemblyCopyright("Copyright ©  2018 Capnode AB")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -9,7 +9,7 @@
     DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}"
     Closing="Window_Closing"
     mc:Ignorable="d"
-    Title="Algoloop Lean" Height="450" Width="800">
+    Title="Algoloop" Height="450" Width="800">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -64,6 +64,9 @@
         <TabControl
             HorizontalAlignment="Stretch"
             DockPanel.Dock="Top">
+            <TabItem Header="{Binding MarketsViewModel.Markets.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Markets ({0}), FallbackValue=Markets}">
+                <view:MarketsView />
+            </TabItem>
             <TabItem Header="{Binding AccountsViewModel.Accounts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Accounts ({0}), FallbackValue=Accounts}">
                 <view:AccountsView />
             </TabItem>
