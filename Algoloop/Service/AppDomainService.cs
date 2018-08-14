@@ -23,13 +23,13 @@ using System.Threading;
 
 namespace Algoloop.Service
 {
-    internal class LeanEngineService : ILeanEngineService
+    internal class AppDomainService : IAppDomainService
     {
         private string _callingDomainName;
         private string _exeAssembly;
         private AppDomainSetup _ads;
 
-        public LeanEngineService()
+        public AppDomainService()
         {
             _callingDomainName = Thread.GetDomain().FriendlyName;
             //Console.WriteLine(callingDomainName);

@@ -35,15 +35,15 @@ namespace Algoloop.ViewModel
     public class StrategyJobViewModel: ViewModelBase
     {
         private StrategyViewModel _parent;
-        private ILeanEngineService _leanEngineService;
+        private IAppDomainService _appDomainService;
         private CancellationTokenSource _cancel = new CancellationTokenSource();
         private LiveCharts.Wpf.Series _selectedSeries;
 
-        public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, ILeanEngineService leanEngineService)
+        public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, IAppDomainService appDomainService)
         {
             _parent = parent;
             Model = model;
-            _leanEngineService = leanEngineService;
+            _appDomainService = appDomainService;
 
             DeleteJobCommand = new RelayCommand(() => DeleteJob(), true);
 
@@ -90,7 +90,7 @@ namespace Algoloop.ViewModel
         {
             Log.Trace("Start Backtest: " + Model.AlgorithmName, true);
             DataToModel();
-            await Task.Run(() => _leanEngineService.Run(Model), _cancel.Token);
+            await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
             DataFromModel();
             Log.Trace("Stop Backtest: " + Model.AlgorithmName, true);
         }

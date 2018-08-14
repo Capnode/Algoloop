@@ -24,7 +24,7 @@ namespace Algoloop.ViewModel
     public class StrategyViewModel
     {
         private StrategiesViewModel _parent;
-        private ILeanEngineService _leanEngineService;
+        private IAppDomainService _appDomainService;
 
         public StrategyModel Model { get; }
 
@@ -44,11 +44,11 @@ namespace Algoloop.ViewModel
 
         public RelayCommand AddParameterCommand { get; }
 
-        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, ILeanEngineService leanEngineService)
+        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, IAppDomainService appDomainService)
         {
             _parent = parent;
             Model = model;
-            _leanEngineService = leanEngineService;
+            _appDomainService = appDomainService;
 
             DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
@@ -92,7 +92,7 @@ namespace Algoloop.ViewModel
         private void RunBacktest()
         {
             DataToModel();
-            var job = new StrategyJobViewModel(this, new StrategyJobModel("Backtest", Model), _leanEngineService);
+            var job = new StrategyJobViewModel(this, new StrategyJobModel("Backtest", Model), _appDomainService);
             Jobs.Add(job);
             job.Start();
         }
@@ -138,7 +138,7 @@ namespace Algoloop.ViewModel
             Jobs.Clear();
             foreach (StrategyJobModel strategyJobModel in Model.Jobs)
             {
-                var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _leanEngineService);
+                var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _appDomainService);
                 Jobs.Add(strategyJobViewModel);
             }
         }

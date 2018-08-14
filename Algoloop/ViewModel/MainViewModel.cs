@@ -30,7 +30,7 @@ namespace Algoloop.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        private readonly ILeanEngineService _leanEngineService;
+        private readonly IAppDomainService _appDomainService;
         private bool _isBusy;
         private string _fileName;
 
@@ -79,9 +79,9 @@ namespace Algoloop.ViewModel
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(ILeanEngineService leanEngineService, MarketsViewModel marketsViewModel, AccountsViewModel accountsViewModel, StrategiesViewModel strategiesViewModel, LogViewModel logViewModel)
+        public MainViewModel(IAppDomainService appDomainService, MarketsViewModel marketsViewModel, AccountsViewModel accountsViewModel, StrategiesViewModel strategiesViewModel, LogViewModel logViewModel)
         {
-            _leanEngineService = leanEngineService;
+            _appDomainService = appDomainService;
             MarketsViewModel = marketsViewModel;
             AccountsViewModel = accountsViewModel;
             StrategiesViewModel = strategiesViewModel;

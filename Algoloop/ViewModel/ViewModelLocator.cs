@@ -63,7 +63,7 @@ namespace Algoloop.ViewModel
             SimpleIoc.Default.Register<MarketsViewModel>();
             SimpleIoc.Default.Register<AccountsViewModel>();
             SimpleIoc.Default.Register<StrategiesViewModel>();
-            SimpleIoc.Default.Register<ILeanEngineService, LeanEngineService>();
+            SimpleIoc.Default.Register<IAppDomainService, AppDomainService>();
 
             // Register QuantConnect types
             SimpleIoc.Default.Register(

@@ -26,7 +26,7 @@ namespace Algoloop.ViewModel
 {
     public class StrategiesViewModel
     {
-        private readonly ILeanEngineService _leanEngineService;
+        private readonly IAppDomainService _appDomainService;
 
         public StrategiesModel Model { get; private set; }
 
@@ -34,10 +34,10 @@ namespace Algoloop.ViewModel
 
         public RelayCommand AddStrategyCommand { get; }
 
-        public StrategiesViewModel(StrategiesModel model, ILeanEngineService leanEngineService)
+        public StrategiesViewModel(StrategiesModel model, IAppDomainService appDomainService)
         {
             Model = model;
-            _leanEngineService = leanEngineService;
+            _appDomainService = appDomainService;
 
             AddStrategyCommand = new RelayCommand(() => AddStrategy(), true);
 
@@ -102,7 +102,7 @@ namespace Algoloop.ViewModel
             Strategies.Clear();
             foreach (StrategyModel strategyModel in Model.Strategies)
             {
-                var strategyViewModel = new StrategyViewModel(this, strategyModel, _leanEngineService);
+                var strategyViewModel = new StrategyViewModel(this, strategyModel, _appDomainService);
                 Strategies.Add(strategyViewModel);
             }
         }
@@ -116,7 +116,7 @@ namespace Algoloop.ViewModel
 
         private void AddStrategy()
         {
-            var strategy = new StrategyViewModel(this, new StrategyModel(), _leanEngineService);
+            var strategy = new StrategyViewModel(this, new StrategyModel(), _appDomainService);
             Strategies.Add(strategy);
         }
     }

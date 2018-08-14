@@ -16,7 +16,7 @@ using Algoloop.Model;
 
 namespace Algoloop.Service
 {
-    public interface ILeanEngineService
+    public interface IAppDomainService
     {
         void Run(StrategyJobModel jobModel);
     }
