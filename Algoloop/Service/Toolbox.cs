@@ -15,37 +15,49 @@
 using Algoloop.Model;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
+using QuantConnect.ToolBox.FxcmDownloader;
 using QuantConnect.Util;
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Algoloop.Service
 {
     public class Toolbox : MarshalByRefObject
     {
-        public bool Run(MarketModel marketModel)
+        public string Run(MarketModel marketModel)
         {
             if (!SetConfig(marketModel))
             {
-                return false;
+                return "Toolbox.Run: SetConfig failed";
             }
 
             Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "CompositeLogHandler"));
+            Log.Trace("Start Toolbox");
 
             try
             {
+                using (var writer = new StringWriter())
+                {
+                    Console.SetOut(writer);
+                    IList<string> list = new List<string>() { "EURUSD" };
+                    FxcmDownloaderProgram.FxcmDownloader(list, "Hour", new DateTime(2018, 08, 1), new DateTime(2018, 08, 4));
 
+                    writer.Flush(); // when you're done, make sure everything is written out
+                    var console = writer.GetStringBuilder().ToString();
+                    return console;
+                }
             }
             catch (Exception ex)
             {
-                Log.LogHandler.Error("{0}: {1}", ex.GetType(), ex.Message);
-                return false;
+                string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
+                Log.LogHandler.Error(log);
+                return log;
             }
             finally
             {
                 Log.LogHandler.Dispose();
             }
-
-            return true;
         }
 
         private bool SetConfig(MarketModel marketModel)

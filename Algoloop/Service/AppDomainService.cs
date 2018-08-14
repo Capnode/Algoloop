@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using GalaSoft.MvvmLight.Messaging;
+using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -69,6 +70,7 @@ namespace Algoloop.Service
             LeanEngine leanEngine = (LeanEngine)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(LeanEngine).FullName);
             (jobModel.Result, jobModel.Logs) = leanEngine.Run(jobModel, account);
             jobModel.Completed = true;
+            Log.Error(jobModel.Logs);
         }
 
         public void Run(MarketModel marketModel)
@@ -80,7 +82,9 @@ namespace Algoloop.Service
             // Create an instance of MarshalbyRefType in the second AppDomain. 
             // A proxy to the object is returned.
             Toolbox toolbox = (Toolbox)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(Toolbox).FullName);
-            marketModel.Completed = toolbox.Run(marketModel);
+            string log = toolbox.Run(marketModel);
+            marketModel.Completed = true;
+            Log.Error(log);
         }
     }
 }
