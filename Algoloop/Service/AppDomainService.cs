@@ -70,5 +70,17 @@ namespace Algoloop.Service
             (jobModel.Result, jobModel.Logs) = leanEngine.Run(jobModel, account);
             jobModel.Completed = true;
         }
+
+        public void Run(MarketModel marketModel)
+        {
+            // Create the second AppDomain.
+            var name = Guid.NewGuid().ToString("x");
+            AppDomain ad = AppDomain.CreateDomain(name, null, _ads);
+
+            // Create an instance of MarshalbyRefType in the second AppDomain. 
+            // A proxy to the object is returned.
+            Toolbox toolbox = (Toolbox)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(Toolbox).FullName);
+            marketModel.Completed = toolbox.Run(marketModel);
+        }
     }
 }

@@ -13,15 +13,10 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using QuantConnect.Brokerages.Fxcm;
-using QuantConnect.Logging;
-using QuantConnect.ToolBox.FxcmDownloader;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,13 +25,13 @@ namespace Algoloop.ViewModel
     public class MarketViewModel : ViewModelBase
     {
         private MarketsViewModel _parent;
-        private Task _task;
-        private CancellationTokenSource _cancel;
+        private CancellationTokenSource _cancel = new CancellationTokenSource();
 
-        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel)
+        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, IAppDomainService appDomainService)
         {
             _parent = marketsViewModel;
             Model = marketModel;
+            _appDomainService = appDomainService;
 
             DeleteMarketCommand = new RelayCommand(() => _parent?.DeleteMarket(this), true);
             EnabledCommand = new RelayCommand(() => ProcessMarket(Model.Enabled), true);
@@ -46,10 +41,11 @@ namespace Algoloop.ViewModel
 
         ~MarketViewModel()
         {
-            StopTask();
         }
 
         public MarketModel Model { get; }
+
+        private IAppDomainService _appDomainService;
 
         public RelayCommand DeleteMarketCommand { get; }
 
@@ -68,53 +64,22 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
 
-        private void ProcessMarket(bool value)
+        private async void ProcessMarket(bool enabled)
         {
-            Log.Trace($"ConnectMarket {value}");
-            if (!value)
+            if (enabled)
             {
-                StopTask();
-                return;
-            }
-
-            _cancel = new CancellationTokenSource();
-            _task = Task.Run(() => StartTask(_cancel.Token), _cancel.Token);
-        }
-
-        private void StopTask()
-        {
-            if (_task != null && _task.Status.Equals(TaskStatus.Running))
-            {
-                _cancel.Cancel();
-                _task.Wait();
-                Debug.Assert(_task.IsCompleted);
-                _task = null;
+                DataToModel();
+                await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
+                DataFromModel();
             }
         }
 
-        private void StartTask(CancellationToken cancel)
+        internal void DataToModel()
         {
-            try
-            {
+        }
 
-                var brokerageFactory = new FxcmBrokerageFactory();
-                var brokerageData = brokerageFactory.BrokerageData;
-                FxcmDataDownloader downloader = new FxcmDataDownloader(brokerageData["fxcm-server"], brokerageData["fxcm-terminal"], Model.Login, Model.Password);
-
-                IList<string> tickers = new List<string>() { "EURUSD" };
-                var startDate = new DateTime(2018, 8, 1);
-                var endDate = new DateTime(2018, 8, 10);
-
-                FxcmDownloaderProgram.FxcmDownloader(tickers, "all", startDate, endDate);
-
-                Enabled = false;
-
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"{ex.GetType()}: {ex.Message}");
-                Enabled = false;
-            }
+        internal void DataFromModel()
+        {
         }
     }
 }

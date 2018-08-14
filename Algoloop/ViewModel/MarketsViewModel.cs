@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -30,13 +31,17 @@ namespace Algoloop.ViewModel
     {
         public MarketsModel Model { get; private set; }
 
+        private readonly IAppDomainService _appDomainService;
+
         public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
 
         public RelayCommand AddMarketCommand { get; }
 
-        public MarketsViewModel(MarketsModel model)
+        public MarketsViewModel(MarketsModel model, IAppDomainService appDomainService)
         {
             Model = model;
+            _appDomainService = appDomainService;
+
             AddMarketCommand = new RelayCommand(() => AddMarket(), true);
             Messenger.Default.Register<NotificationMessageAction<List<MarketModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
@@ -63,7 +68,7 @@ namespace Algoloop.ViewModel
 
         private void AddMarket()
         {
-            var loginViewModel = new MarketViewModel(this, new MarketModel());
+            var loginViewModel = new MarketViewModel(this, new MarketModel(), _appDomainService);
             Markets.Add(loginViewModel);
         }
 
@@ -124,7 +129,7 @@ namespace Algoloop.ViewModel
             Markets.Clear();
             foreach (MarketModel market in Model.Markets)
             {
-                var viewModel = new MarketViewModel(this, market);
+                var viewModel = new MarketViewModel(this, market, _appDomainService);
                 Markets.Add(viewModel);
             }
         }

@@ -49,9 +49,8 @@ namespace Algoloop.Model
         [DataMember]
         public string Password { get; set; } = string.Empty;
 
-        [DisplayName("Market number")]
-        [Description("Market number.")]
+        [Browsable(false)]
         [DataMember]
-        public string Id { get; set; } = string.Empty;
+        public bool Completed { get; set; }
     }
 }

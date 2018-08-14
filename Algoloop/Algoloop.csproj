@@ -228,6 +228,7 @@
     <Compile Include="Model\AccountsModel.cs" />
     <Compile Include="Model\MarketModel.cs" />
     <Compile Include="Model\MarketsModel.cs" />
+    <Compile Include="Service\Toolbox.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />
     <Compile Include="ViewModel\BalanceViewModel.cs" />

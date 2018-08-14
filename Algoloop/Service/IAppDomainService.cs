@@ -19,5 +19,6 @@ namespace Algoloop.Service
     public interface IAppDomainService
     {
         void Run(StrategyJobModel jobModel);
+        void Run(MarketModel marketModel);
     }
 }
