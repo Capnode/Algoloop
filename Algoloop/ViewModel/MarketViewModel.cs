@@ -40,6 +40,8 @@ namespace Algoloop.ViewModel
             DeleteMarketCommand = new RelayCommand(() => _parent?.DeleteMarket(this), true);
             EnabledCommand = new RelayCommand(() => ProcessMarket(Model.Enabled), true);
 
+            DataFromModel();
+
             ProcessMarket(Model.Enabled);
         }
 
@@ -58,9 +60,6 @@ namespace Algoloop.ViewModel
         public RelayCommand DeleteMarketCommand { get; }
 
         public RelayCommand EnabledCommand { get; }
-
-        public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
-        public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
 
         public bool Enabled
         {

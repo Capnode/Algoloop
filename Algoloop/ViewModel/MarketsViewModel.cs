@@ -121,6 +121,7 @@ namespace Algoloop.ViewModel
             foreach (MarketViewModel market in Markets)
             {
                 Model.Markets.Add(market.Model);
+                market.DataToModel();
             }
         }
 

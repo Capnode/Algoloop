@@ -155,7 +155,7 @@ namespace QuantConnect.ToolBox.FxcmDownloader
             do // 
             {
                 //show progress
-//                progressBar(Math.Abs((end - endUtc).Ticks), totalTicks, Console.WindowWidth / 2,'█');
+                progressBar(Math.Abs((end - endUtc).Ticks), totalTicks, Console.WindowWidth / 2,'█');
                 _currentBaseData.Clear();
 
                 var mdr = new MarketDataRequest();

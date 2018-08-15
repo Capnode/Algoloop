@@ -20,6 +20,7 @@ using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Algoloop.Service
 {
@@ -40,7 +41,7 @@ namespace Algoloop.Service
                 using (var writer = new StringWriter())
                 {
                     Console.SetOut(writer);
-                    IList<string> list = new List<string>() { "EURUSD" };
+                    IList<string> list = marketModel.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
                     FxcmDownloaderProgram.FxcmDownloader(list, "Hour", new DateTime(2018, 08, 1), new DateTime(2018, 08, 4));
 
                     writer.Flush(); // when you're done, make sure everything is written out
