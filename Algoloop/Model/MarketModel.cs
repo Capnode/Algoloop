@@ -13,6 +13,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -48,6 +49,10 @@ namespace Algoloop.Model
         [PasswordPropertyText(true)]
         [DataMember]
         public string Password { get; set; } = string.Empty;
+
+        [Browsable(false)]
+        [DataMember]
+        public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
 
         [Browsable(false)]
         [DataMember]

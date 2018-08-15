@@ -67,59 +67,6 @@
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:MarketViewModel}">
                     <TabControl>
-                        <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}">
-                            <DataGrid
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                AutoGenerateColumns="False"
-                                IsReadOnly="False"
-                                GridLinesVisibility="None"
-                                ItemsSource="{Binding Positions}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
-                                    <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
-                                    <DataGridTextColumn Header="Currency" Binding="{Binding CurrencySymbol}" />
-                                    <DataGridTextColumn Header="AveragePrice" Binding="{Binding AveragePrice}" />
-                                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" />
-                                    <DataGridTextColumn Header="MarketPrice" Binding="{Binding MarketPrice}" />
-                                    <DataGridTextColumn Header="ConversionRate" Binding="{Binding ConversionRate}" />
-                                    <DataGridTextColumn Header="MarketValue" Binding="{Binding MarketValue}" />
-                                    <DataGridTextColumn Header="UnrealizedPnL" Binding="{Binding UnrealizedPnL}" />
-                                </DataGrid.Columns>
-                                <DataGrid.Resources>
-                                    <ContextMenu
-                                        x:Key="RowMenu"
-                                        DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                        <MenuItem
-                                            Header="Close position"
-                                            Command="{Binding ClosePositionCommand}" />
-                                    </ContextMenu>
-                                </DataGrid.Resources>
-                                <DataGrid.RowStyle>
-                                    <Style TargetType="DataGridRow" >
-                                        <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
-                                    </Style>
-                                </DataGrid.RowStyle>
-                            </DataGrid>
-                        </TabItem>
-                        <TabItem Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}">
-                            <DataGrid
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                AutoGenerateColumns="False"
-                                IsReadOnly="False"
-                                GridLinesVisibility="None"
-                                ItemsSource="{Binding Balances}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
-                                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
-                                    <DataGridTextColumn Header="ConversionRate" Binding="{Binding ConversionRate}" />
-                                    <DataGridTextColumn Header="CurrencySymbol" Binding="{Binding CurrencySymbol}" />
-                                    <DataGridTextColumn Header="SecuritySymbol" Binding="{Binding SecuritySymbol}" />
-                                    <DataGridTextColumn Header="ConversionRateSecurity" Binding="{Binding ConversionRateSecurity}" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </TabItem>
                         <TabItem Header="Settings">
                             <ScrollViewer>
                                 <xctk:PropertyGrid
@@ -132,6 +79,39 @@
                                     SelectedObject="{Binding Model}">
                                 </xctk:PropertyGrid>
                             </ScrollViewer>
+                        </TabItem>
+                        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                            <ListBox
+                                SelectionMode="Extended"
+                                DockPanel.Dock="Bottom"
+                                ItemsSource="{Binding Symbols}">
+                                <ListBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem
+                                            Header="Add Symbol"
+                                            Command="{Binding AddSymbolCommand}" />
+                                        <MenuItem
+                                            Header="Import Symbol list..."
+                                            Command="{Binding ImportSymbolsCommand}" />
+                                    </ContextMenu>
+                                </ListBox.ContextMenu>
+                                <ListBox.Resources>
+                                    <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox IsChecked="{Binding Model.Enabled}" />
+                                            <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
+                                                <TextBox.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem
+                                                            Header="Delete Symbol"
+                                                            Command="{Binding DeleteSymbolCommand}" />
+                                                    </ContextMenu>
+                                                </TextBox.ContextMenu>
+                                            </TextBox>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.Resources>
+                            </ListBox>
                         </TabItem>
                     </TabControl>
                 </DataTemplate>

@@ -15,13 +15,14 @@
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Diagnostics;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyViewModel
+    public class StrategyViewModel : ViewModelBase
     {
         private StrategiesViewModel _parent;
         private IAppDomainService _appDomainService;
@@ -83,6 +84,7 @@ namespace Algoloop.ViewModel
             var symbol = new SymbolViewModel(this, new SymbolModel());
             Symbols.Add(symbol);
         }
+
         private void AddParameter()
         {
             var parameter = new ParameterViewModel(this, new ParameterModel());

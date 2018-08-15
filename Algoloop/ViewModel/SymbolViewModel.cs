@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using System.ComponentModel;
 
@@ -20,20 +21,25 @@ namespace Algoloop.ViewModel
 {
     public class SymbolViewModel
     {
-        private StrategyViewModel _parent;
+        private ViewModelBase _parent;
 
         public SymbolModel Model { get; }
 
         [Browsable(false)]
         public RelayCommand DeleteSymbolCommand { get; }
 
-        public SymbolViewModel(StrategyViewModel parent, SymbolModel model)
+        public SymbolViewModel(ViewModelBase parent, SymbolModel model)
         {
             _parent = parent;
             Model = model;
 
-            DeleteSymbolCommand = new RelayCommand(() => _parent?.DeleteSymbol(this), true);
+            DeleteSymbolCommand = new RelayCommand(() => DeleteSymbol(this), true);
         }
 
+        private void DeleteSymbol(SymbolViewModel symbol)
+        {
+            (_parent as StrategyViewModel)?.DeleteSymbol(this);
+            (_parent as MarketViewModel)?.DeleteSymbol(this);
+        }
     }
 }

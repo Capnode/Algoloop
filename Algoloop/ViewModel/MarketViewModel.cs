@@ -17,6 +17,7 @@ using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,8 @@ namespace Algoloop.ViewModel
 {
     public class MarketViewModel : ViewModelBase
     {
-        private MarketsViewModel _parent;
+        private readonly MarketsViewModel _parent;
+        private readonly IAppDomainService _appDomainService;
         private CancellationTokenSource _cancel = new CancellationTokenSource();
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, IAppDomainService appDomainService)
@@ -33,6 +35,8 @@ namespace Algoloop.ViewModel
             Model = marketModel;
             _appDomainService = appDomainService;
 
+            AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
+            ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             DeleteMarketCommand = new RelayCommand(() => _parent?.DeleteMarket(this), true);
             EnabledCommand = new RelayCommand(() => ProcessMarket(Model.Enabled), true);
 
@@ -45,9 +49,18 @@ namespace Algoloop.ViewModel
 
         public MarketModel Model { get; }
 
-        private IAppDomainService _appDomainService;
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
+
+        public RelayCommand AddSymbolCommand { get; }
+
+        public RelayCommand ImportSymbolsCommand { get; }
 
         public RelayCommand DeleteMarketCommand { get; }
+
+        public RelayCommand EnabledCommand { get; }
+
+        public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
+        public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
 
         public bool Enabled
         {
@@ -59,11 +72,40 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public RelayCommand EnabledCommand { get; }
+        private void AddSymbol()
+        {
+            var symbol = new SymbolViewModel(this, new SymbolModel());
+            Symbols.Add(symbol);
+        }
 
-        public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
-        public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
+        private void ImportSymbols()
+        {
+            throw new NotImplementedException();
+        }
 
+        internal bool DeleteSymbol(SymbolViewModel symbol)
+        {
+            return Symbols.Remove(symbol);
+        }
+
+        internal void DataToModel()
+        {
+            Model.Symbols.Clear();
+            foreach (SymbolViewModel symbol in Symbols)
+            {
+                Model.Symbols.Add(symbol.Model);
+            }
+        }
+
+        internal void DataFromModel()
+        {
+            Symbols.Clear();
+            foreach (SymbolModel symbolModel in Model.Symbols)
+            {
+                var symbolViewModel = new SymbolViewModel(this, symbolModel);
+                Symbols.Add(symbolViewModel);
+            }
+        }
         private async void ProcessMarket(bool enabled)
         {
             if (enabled)
@@ -72,14 +114,6 @@ namespace Algoloop.ViewModel
                 await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
                 DataFromModel();
             }
-        }
-
-        internal void DataToModel()
-        {
-        }
-
-        internal void DataFromModel()
-        {
         }
     }
 }
