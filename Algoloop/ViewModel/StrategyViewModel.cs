@@ -37,6 +37,10 @@ namespace Algoloop.ViewModel
 
         public RelayCommand DeleteStrategyCommand { get; }
 
+        internal void Refresh(SymbolViewModel symbolViewModel)
+        {
+        }
+
         public RelayCommand AddSymbolCommand { get; }
 
         public RelayCommand RunBacktestCommand { get; }

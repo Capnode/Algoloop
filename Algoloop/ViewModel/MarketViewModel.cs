@@ -20,6 +20,7 @@ using GalaSoft.MvvmLight.Command;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
@@ -42,6 +43,17 @@ namespace Algoloop.ViewModel
 
             DataFromModel();
 
+            ActiveSymbols.Filter += (object sender, FilterEventArgs e) =>
+            {
+                SymbolViewModel symbol = e.Item as SymbolViewModel;
+                if (symbol != null)
+                {
+                    e.Accepted = symbol.Model.Enabled;
+                }
+            };
+
+            ActiveSymbols.Source = Symbols;
+
             ProcessMarket(Model.Enabled);
         }
 
@@ -52,6 +64,8 @@ namespace Algoloop.ViewModel
         public MarketModel Model { get; }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
+
+        public CollectionViewSource ActiveSymbols { get; } = new CollectionViewSource();
 
         public RelayCommand AddSymbolCommand { get; }
 
@@ -69,6 +83,11 @@ namespace Algoloop.ViewModel
                 Model.Enabled = value;
                 RaisePropertyChanged(() => Enabled);
             }
+        }
+
+        internal void Refresh(SymbolViewModel symbolViewModel)
+        {
+            ActiveSymbols.View.Refresh();
         }
 
         private void AddSymbol()

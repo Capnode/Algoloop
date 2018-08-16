@@ -42,7 +42,7 @@
                 </ContextMenu>
             </TreeView.ContextMenu>
             <TreeView.Resources>
-                <DataTemplate DataType="{x:Type vm:MarketViewModel}" >
+                <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding ActiveSymbols.View}" >
                     <StackPanel Orientation="Horizontal">
                         <CheckBox
                             IsChecked="{Binding Enabled}"
@@ -56,6 +56,11 @@
                                 </ContextMenu>
                             </TextBlock.ContextMenu>
                         </TextBlock>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Model.Name}" />
                     </StackPanel>
                 </DataTemplate>
             </TreeView.Resources>
@@ -98,7 +103,7 @@
                                 <ListBox.Resources>
                                     <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                                         <StackPanel Orientation="Horizontal">
-                                            <CheckBox IsChecked="{Binding Model.Enabled}" />
+                                            <CheckBox IsChecked="{Binding Enabled}" />
                                             <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
                                                 <TextBox.ContextMenu>
                                                     <ContextMenu>

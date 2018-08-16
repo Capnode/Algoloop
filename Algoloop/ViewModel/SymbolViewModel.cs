@@ -19,14 +19,9 @@ using System.ComponentModel;
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolViewModel
+    public class SymbolViewModel : ViewModelBase
     {
         private ViewModelBase _parent;
-
-        public SymbolModel Model { get; }
-
-        [Browsable(false)]
-        public RelayCommand DeleteSymbolCommand { get; }
 
         public SymbolViewModel(ViewModelBase parent, SymbolModel model)
         {
@@ -34,6 +29,23 @@ namespace Algoloop.ViewModel
             Model = model;
 
             DeleteSymbolCommand = new RelayCommand(() => DeleteSymbol(this), true);
+        }
+
+        public SymbolModel Model { get; }
+
+        [Browsable(false)]
+        public RelayCommand DeleteSymbolCommand { get; }
+
+        public bool Enabled
+        {
+            get => Model.Enabled;
+            set
+            {
+                Model.Enabled = value;
+                RaisePropertyChanged(() => Enabled);
+                (_parent as StrategyViewModel)?.Refresh(this);
+                (_parent as MarketViewModel)?.Refresh(this);
+            }
         }
 
         private void DeleteSymbol(SymbolViewModel symbol)
