@@ -17,6 +17,7 @@ using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using QuantConnect.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -128,9 +129,20 @@ namespace Algoloop.ViewModel
         {
             if (enabled)
             {
+                Log.Trace($"FXCM Download {Model.FromDate:d}");
                 DataToModel();
                 await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
+                if (Model.Completed)
+                {
+                    Model.FromDate.AddDays(1);
+                }
+                else
+                {
+                    Log.Trace($"FXCM Download {Model.FromDate:d} failed");
+                }
                 DataFromModel();
+
+                Log.Trace($"FXCM Download completed");
             }
         }
     }

@@ -152,10 +152,21 @@ namespace QuantConnect.ToolBox.FxcmDownloader
 
             var end = endUtc;
 
+            // Check if Console has defined width
+            long barSize = 0;
+            try
+            {
+                barSize = Console.WindowWidth / 2;
+            }
+            catch (System.IO.IOException ex)
+            {
+                barSize = 0;
+            }
+
             do // 
             {
                 //show progress
-                progressBar(Math.Abs((end - endUtc).Ticks), totalTicks, Console.WindowWidth / 2,'█');
+                progressBar(Math.Abs((end - endUtc).Ticks), totalTicks, barSize, '█');
                 _currentBaseData.Clear();
 
                 var mdr = new MarketDataRequest();
@@ -367,13 +378,14 @@ namespace QuantConnect.ToolBox.FxcmDownloader
         /// <param name="progressCharacter"></param>
         private static void progressBar(long complete, long maxVal, long barSize, char progressCharacter)
         {
-          
+            if (barSize == 0)
+                return;
+
             decimal p   = (decimal)complete / (decimal)maxVal;
             int chars   = (int)Math.Floor(p / ((decimal)1 / (decimal)barSize));
             string bar = string.Empty;
             bar = bar.PadLeft(chars, progressCharacter);
             bar = bar.PadRight(Convert.ToInt32(barSize)-1);
-            
             Console.Write(string.Format("\r[{0}] {1}%", bar, (p * 100).ToString("N2")));           
         }
 

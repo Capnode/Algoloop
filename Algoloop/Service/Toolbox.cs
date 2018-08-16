@@ -26,11 +26,11 @@ namespace Algoloop.Service
 {
     public class Toolbox : MarshalByRefObject
     {
-        public string Run(MarketModel marketModel)
+        public bool Run(MarketModel marketModel)
         {
             if (!SetConfig(marketModel))
             {
-                return "Toolbox.Run: SetConfig failed";
+                return false;
             }
 
             Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "CompositeLogHandler"));
@@ -42,18 +42,19 @@ namespace Algoloop.Service
                 {
                     Console.SetOut(writer);
                     IList<string> list = marketModel.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
-                    FxcmDownloaderProgram.FxcmDownloader(list, "Hour", new DateTime(2018, 08, 1), new DateTime(2018, 08, 4));
+                    FxcmDownloaderProgram.FxcmDownloader(list, "all", marketModel.FromDate, marketModel.FromDate);
 
                     writer.Flush(); // when you're done, make sure everything is written out
                     var console = writer.GetStringBuilder().ToString();
-                    return console;
+                    Log.LogHandler.Trace(console);
+                    return true;
                 }
             }
             catch (Exception ex)
             {
                 string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
                 Log.LogHandler.Error(log);
-                return log;
+                return false;
             }
             finally
             {

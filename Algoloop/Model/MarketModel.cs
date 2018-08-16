@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.ViewSupport;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,6 +50,12 @@ namespace Algoloop.Model
         [PasswordPropertyText(true)]
         [DataMember]
         public string Password { get; set; } = string.Empty;
+
+        [Category("Time")]
+        [DisplayName("From date")]
+        [Editor(typeof(DateEditor), typeof(DateEditor))]
+        [DataMember]
+        public DateTime FromDate { get; set; } = DateTime.Today;
 
         [Browsable(false)]
         [DataMember]

@@ -71,7 +71,6 @@ namespace Algoloop.ViewModel
 
         private void ProcessAccount(bool value)
         {
-            Log.Trace($"ConnectAccount {value}");
             if (!value)
             {
                 StopTask();
@@ -79,6 +78,7 @@ namespace Algoloop.ViewModel
             }
 
             _cancel = new CancellationTokenSource();
+            Log.Trace($"Connect Account {Model.Name}");
             _task = Task.Run(() => StartTask(_cancel.Token), _cancel.Token);
         }
 

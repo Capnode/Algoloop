@@ -82,9 +82,7 @@ namespace Algoloop.Service
             // Create an instance of MarshalbyRefType in the second AppDomain. 
             // A proxy to the object is returned.
             Toolbox toolbox = (Toolbox)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(Toolbox).FullName);
-            string log = toolbox.Run(marketModel);
-            marketModel.Completed = true;
-            Log.Error(log);
+            marketModel.Completed = toolbox.Run(marketModel);
         }
     }
 }
