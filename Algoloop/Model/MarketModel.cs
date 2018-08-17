@@ -13,6 +13,7 @@
  */
 
 using Algoloop.ViewSupport;
+using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,28 +25,36 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketModel
     {
+        public enum DataProvider { Fxcm };
+
         public enum MarketType { Demo, Real };
 
+        [Category("Data provider")]
         [DisplayName("Market name")]
         [Description("Name of the market.")]
         [DataMember]
         public string Name { get; set; } = "Market";
 
-        [Browsable(false)]
+        [Category("Data provider")]
+        [DisplayName("Provider")]
+        [Description("Name of data provider.")]
         [DataMember]
-        public bool Enabled { get; set; }
+        public DataProvider Provider { get; set; }
 
-        [DataMember]
+        [Category("Data provider")]
         [DisplayName("Market type")]
         [Description("Market type.")]
+        [DataMember]
         public MarketType Type { get; set; }
 
+        [Category("Data provider")]
         [DisplayName("Login")]
         [Description("User login.")]
         [DataMember]
         public string Login { get; set; } = string.Empty;
 
         [DisplayName("Password")]
+        [Category("Data provider")]
         [Description("User login password.")]
         [PasswordPropertyText(true)]
         [DataMember]
@@ -56,6 +65,15 @@ namespace Algoloop.Model
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [DataMember]
         public DateTime FromDate { get; set; } = DateTime.Today;
+
+        [Category("Time")]
+        [DisplayName("Resolution")]
+        [DataMember]
+        public Resolution Resolution { get; set; }
+
+        [Browsable(false)]
+        [DataMember]
+        public bool Enabled { get; set; }
 
         [Browsable(false)]
         [DataMember]

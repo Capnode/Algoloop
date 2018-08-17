@@ -29,7 +29,8 @@ namespace Algoloop.ViewModel
     {
         private readonly MarketsViewModel _parent;
         private readonly IAppDomainService _appDomainService;
-        private CancellationTokenSource _cancel = new CancellationTokenSource();
+        private CancellationTokenSource _cancel;
+        private MarketModel _model;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, IAppDomainService appDomainService)
         {
@@ -62,8 +63,6 @@ namespace Algoloop.ViewModel
         {
         }
 
-        public MarketModel Model { get; }
-
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
 
         public CollectionViewSource ActiveSymbols { get; } = new CollectionViewSource();
@@ -84,6 +83,12 @@ namespace Algoloop.ViewModel
                 Model.Enabled = value;
                 RaisePropertyChanged(() => Enabled);
             }
+        }
+
+        public MarketModel Model
+        {
+            get => _model;
+            set => Set(ref _model, value);
         }
 
         internal void Refresh(SymbolViewModel symbolViewModel)
@@ -129,20 +134,37 @@ namespace Algoloop.ViewModel
         {
             if (enabled)
             {
-                Log.Trace($"FXCM Download {Model.FromDate:d}");
+                _cancel = new CancellationTokenSource();
                 DataToModel();
-                await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
-                if (Model.Completed)
+                Model.FromDate = new DateTime(Model.FromDate.Year, Model.FromDate.Month, Model.FromDate.Day); // Remove time part
+                while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Today)
                 {
-                    Model.FromDate.AddDays(1);
-                }
-                else
-                {
-                    Log.Trace($"FXCM Download {Model.FromDate:d} failed");
-                }
-                DataFromModel();
+                    Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
+                    await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
+                    if (!Model.Completed)
+                    {
+                        Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d} failed");
+                    }
 
-                Log.Trace($"FXCM Download completed");
+                    Model.FromDate = Model.FromDate.AddDays(1);
+
+                    // Update view
+                    MarketModel model = Model;
+                    Model = null;
+                    Model = model;
+                }
+
+                DataFromModel();
+                Log.Trace($"{Model.Provider} download complete");
+                _cancel = null;
+                Enabled = false;
+            }
+            else
+            {
+                if (_cancel != null)
+                {
+                    _cancel.Cancel();
+                }
             }
         }
     }

@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using QuantConnect.ToolBox.FxcmDownloader;
@@ -26,50 +27,49 @@ namespace Algoloop.Service
 {
     public class Toolbox : MarshalByRefObject
     {
-        public bool Run(MarketModel marketModel)
+        public bool Run(MarketModel model)
         {
-            if (!SetConfig(marketModel))
-            {
-                return false;
-            }
-
-            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "CompositeLogHandler"));
-            Log.Trace("Start Toolbox");
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-folder", "../../../Data/");
 
             try
             {
                 using (var writer = new StringWriter())
                 {
                     Console.SetOut(writer);
-                    IList<string> list = marketModel.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
-                    FxcmDownloaderProgram.FxcmDownloader(list, "all", marketModel.FromDate, marketModel.FromDate);
+                    IList<string> list = model.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
+                    if (list.Any())
+                    {
+                        switch (model.Provider)
+                        {
+                            case MarketModel.DataProvider.Fxcm:
+                                FxcmDownloader(model, list);
+                                break;
+                        }
+                    }
 
-                    writer.Flush(); // when you're done, make sure everything is written out
+                    writer.Flush();
                     var console = writer.GetStringBuilder().ToString();
-                    Log.LogHandler.Trace(console);
+                    Log.Trace(console);
                     return true;
                 }
             }
             catch (Exception ex)
             {
                 string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
-                Log.LogHandler.Error(log);
+                Log.Error(log);
                 return false;
-            }
-            finally
-            {
-                Log.LogHandler.Dispose();
             }
         }
 
-        private bool SetConfig(MarketModel marketModel)
+        private static void FxcmDownloader(MarketModel marketModel, IList<string> symbols)
         {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-folder", "../../../Data/");
             Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), marketModel.Type));
             Config.Set("fxcm-user-name", marketModel.Login);
             Config.Set("fxcm-password", marketModel.Password);
-            return true;
+
+            string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
+            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
         }
     }
 }
