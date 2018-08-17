@@ -137,13 +137,18 @@ namespace Algoloop.ViewModel
                 _cancel = new CancellationTokenSource();
                 DataToModel();
                 Model.FromDate = new DateTime(Model.FromDate.Year, Model.FromDate.Month, Model.FromDate.Day); // Remove time part
-                while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Today)
+                while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Now)
                 {
                     Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
                     await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
                     if (!Model.Completed)
                     {
                         Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d} failed");
+                    }
+
+                    if (Model.FromDate >= DateTime.Today)
+                    {
+                        break;
                     }
 
                     Model.FromDate = Model.FromDate.AddDays(1);
