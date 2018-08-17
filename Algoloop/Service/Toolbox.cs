@@ -30,7 +30,7 @@ namespace Algoloop.Service
         public bool Run(MarketModel model)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-folder", "../../../Data/");
+            Log.Trace($"Toolbox.Run {model.Provider} {model.Resolution} {model.FromDate:d}");
 
             try
             {
@@ -64,6 +64,7 @@ namespace Algoloop.Service
 
         private static void FxcmDownloader(MarketModel marketModel, IList<string> symbols)
         {
+//            Config.Set("data-folder", "../../../Data/");
             Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), marketModel.Type));
             Config.Set("fxcm-user-name", marketModel.Login);
             Config.Set("fxcm-password", marketModel.Password);

@@ -122,17 +122,14 @@
                             </DataGrid>
                         </TabItem>
                         <TabItem Header="Settings">
-                            <ScrollViewer>
-                                <xctk:PropertyGrid
-                                    DockPanel.Dock="Top"
-                                    ShowTitle="False"
-                                    ShowSearchBox="False"
-                                    ShowSummary="True"
-                                    ShowAdvancedOptions="False"
-                                    ShowSortOptions="False"
-                                    SelectedObject="{Binding Model}">
-                                </xctk:PropertyGrid>
-                            </ScrollViewer>
+                            <xctk:PropertyGrid
+                                ShowTitle="False"
+                                ShowSearchBox="False"
+                                ShowSummary="True"
+                                ShowAdvancedOptions="False"
+                                ShowSortOptions="False"
+                                SelectedObject="{Binding Model}">
+                            </xctk:PropertyGrid>
                         </TabItem>
                     </TabControl>
                 </DataTemplate>

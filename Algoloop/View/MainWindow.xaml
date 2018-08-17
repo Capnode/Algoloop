@@ -23,42 +23,6 @@
     </Window.Cursor>
 
     <DockPanel>
-        <Menu Width="Auto" DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem
-                    Header="Open..."
-                    Command="{Binding OpenCommand}" />
-                <MenuItem
-                    Header="Save"
-                    Command="{Binding SaveCommand}" />
-                <MenuItem
-                    Header="Save As..."
-                    Command="{Binding SaveAsCommand}" />
-                <MenuItem
-                    Header="E_xit"
-                    Command="{Binding ExitCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
-            </MenuItem>
-            <MenuItem Header="_View">
-            </MenuItem>
-            <MenuItem Header="_Tools">
-            </MenuItem>
-            <MenuItem Header="_Help">
-                <MenuItem Header="_About" Command="{Binding AboutCommand}"/>
-            </MenuItem>
-        </Menu>
-
-        <ToolBarTray IsLocked="True" HorizontalAlignment="Stretch" DockPanel.Dock="Top">
-            <ToolBar>
-                <Button
-                    Command="{Binding RunCommand}"
-                    IsEnabled="False"
-                    ToolTip="Run backtest">
-                    <Image Source="/Algoloop;component/Resources/Run.png" Width="16" Height="16"/>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
-
         <StatusBar Height="23" Name="statusBar" Width="Auto" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" />
 
         <TabControl

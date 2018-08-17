@@ -89,13 +89,14 @@
                 <DataTemplate DataType="{x:Type vm:StrategyViewModel}">
                     <TabControl>
                         <TabItem Header="Configuration">
-                            <ScrollViewer>
-                                <xctk:PropertyGrid
-                                    DockPanel.Dock="Top"
-                                    ShowTitle="False"
-                                    SelectedObject="{Binding Model}">
-                                </xctk:PropertyGrid>
-                            </ScrollViewer>
+                            <xctk:PropertyGrid
+                                ShowTitle="False"
+                                ShowSearchBox="False"
+                                ShowSummary="True"
+                                ShowAdvancedOptions="False"
+                                ShowSortOptions="False"
+                                SelectedObject="{Binding Model}">
+                            </xctk:PropertyGrid>
                         </TabItem>
                         <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                             <ListBox
