@@ -16,6 +16,7 @@ using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
+using QuantConnect.ToolBox.DukascopyDownloader;
 using QuantConnect.ToolBox.FxcmDownloader;
 using QuantConnect.ToolBox.FxcmVolumeDownload;
 using QuantConnect.Util;
@@ -47,6 +48,9 @@ namespace Algoloop.Service
                                 break;
                             case MarketModel.DataProvider.FxcmVolume:
                                 FxcmVolumeDownload(model, list);
+                                break;
+                            case MarketModel.DataProvider.DukasCopy:
+                                DukascopyDownloader(model, list);
                                 break;
                         }
                     }
@@ -86,6 +90,14 @@ namespace Algoloop.Service
 
             string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
+        }
+
+        private static void DukascopyDownloader(MarketModel marketModel, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+
+            string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
+            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
         }
     }
 }
