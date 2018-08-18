@@ -107,7 +107,7 @@ namespace QuantConnect.ToolBox
             var requestedData = new List<BaseData>();
             var lines = RequestData(symbol, resolution, startUtc, endUtc);
 
-            do
+            while (obsTime.Date <= endUtc.Date && idx < lines.Length)
             {
                 var line = lines[idx++];
                 var obs = line.Split(';');
@@ -124,7 +124,7 @@ namespace QuantConnect.ToolBox
                     Value = volume,
                     Transactions = transactions
                 });
-            } while (obsTime.Date <= endUtc.Date && idx < lines.Length - 1);
+            }
             return requestedData.Where(o => o.Time.Date >= startUtc.Date && o.Time.Date <= endUtc.Date);
         }
 
@@ -145,13 +145,12 @@ namespace QuantConnect.ToolBox
             var intermediateStartDate = startUtc;
             var intermediateEndDate = endUtc;
 
-            if (update)
+            var updatedStartDate = FxcmVolumeAuxiliaryMethods.GetLastAvailableDateOfData(symbol, resolution, writer.FolderPath);
+            if (updatedStartDate != null)
             {
-                var updatedStartDate = FxcmVolumeAuxiliaryMethods.GetLastAvailableDateOfData(symbol, resolution, writer.FolderPath);
-                if (updatedStartDate == null) return;
-
-                intermediateStartDate = ((DateTime) updatedStartDate).AddDays(value: -1);
+                intermediateStartDate = ((DateTime)updatedStartDate).AddDays(value: -1);
                 intermediateEndDate = DateTime.Today;
+                update = true;
             }
 
             // As the responses has a Limit of 10000 lines, hourly data the minute data request should be sliced.
@@ -185,7 +184,7 @@ namespace QuantConnect.ToolBox
                     writer.Write(data);
                     data.Clear();
                 }
-            } while (intermediateEndDate != endUtc);
+            } while (intermediateEndDate < endUtc);
 
             writer.Write(data, update);
         }

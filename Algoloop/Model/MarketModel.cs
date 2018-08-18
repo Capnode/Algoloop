@@ -25,7 +25,7 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketModel
     {
-        public enum DataProvider { Fxcm };
+        public enum DataProvider { Fxcm, FxcmVolume };
 
         public enum MarketType { Demo, Real };
 

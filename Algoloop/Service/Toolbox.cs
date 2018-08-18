@@ -17,6 +17,7 @@ using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using QuantConnect.ToolBox.FxcmDownloader;
+using QuantConnect.ToolBox.FxcmVolumeDownload;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,6 @@ namespace Algoloop.Service
     {
         public bool Run(MarketModel model)
         {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Log.Trace($"Toolbox.Run {model.Provider} {model.Resolution} {model.FromDate:d}");
 
             try
@@ -44,6 +44,9 @@ namespace Algoloop.Service
                         {
                             case MarketModel.DataProvider.Fxcm:
                                 FxcmDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.FxcmVolume:
+                                FxcmVolumeDownload(model, list);
                                 break;
                         }
                     }
@@ -64,13 +67,25 @@ namespace Algoloop.Service
 
         private static void FxcmDownloader(MarketModel marketModel, IList<string> symbols)
         {
-//            Config.Set("data-folder", "../../../Data/");
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            //            Config.Set("data-folder", "../../../Data/");
             Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), marketModel.Type));
             Config.Set("fxcm-user-name", marketModel.Login);
             Config.Set("fxcm-password", marketModel.Password);
 
             string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
             FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
+        }
+
+        private static void FxcmVolumeDownload(MarketModel marketModel, IList<string> symbols)
+        {
+            Config.Set("data-directory", "../../../Data/");
+            Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), marketModel.Type));
+            Config.Set("fxcm-user-name", marketModel.Login);
+            Config.Set("fxcm-password", marketModel.Password);
+
+            string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
+            FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
         }
     }
 }

@@ -136,7 +136,7 @@ namespace Algoloop.ViewModel
             {
                 _cancel = new CancellationTokenSource();
                 DataToModel();
-                Model.FromDate = new DateTime(Model.FromDate.Year, Model.FromDate.Month, Model.FromDate.Day); // Remove time part
+                Model.FromDate = Model.FromDate.Date; // Remove time part
                 while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Now)
                 {
                     Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");

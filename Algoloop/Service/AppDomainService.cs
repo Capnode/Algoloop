@@ -83,6 +83,7 @@ namespace Algoloop.Service
             // A proxy to the object is returned.
             Toolbox toolbox = (Toolbox)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(Toolbox).FullName);
             marketModel.Completed = toolbox.Run(marketModel);
+            AppDomain.Unload(ad);
         }
     }
 }
