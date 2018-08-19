@@ -14,17 +14,16 @@
 
 using System.Windows;
 
-namespace Algoloop
+namespace Algoloop.View
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for SettingsView.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class SettingsView : Window
     {
-        protected override void OnStartup(StartupEventArgs e)
+        public SettingsView()
         {
-            base.OnStartup(e);
-            Algoloop.Properties.Settings.Default.Reload();
+            InitializeComponent();
         }
     }
 }

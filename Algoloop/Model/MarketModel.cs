@@ -25,7 +25,7 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketModel
     {
-        public enum DataProvider { Fxcm, FxcmVolume, DukasCopy };
+        public enum DataProvider { CryptoIQ, DukasCopy, Fxcm, FxcmVolume, Gdax, Google, IB, IEX, Kraken, Oanda, QuandBitfinex, Yahoo };
 
         public enum MarketType { Demo, Real };
 
@@ -74,6 +74,10 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public bool Enabled { get; set; }
+
+        [Browsable(false)]
+        [DataMember]
+        public string DataFolder { get; set; }
 
         [Browsable(false)]
         [DataMember]

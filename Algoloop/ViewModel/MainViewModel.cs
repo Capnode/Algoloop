@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using Algoloop.Properties;
 using Algoloop.Service;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
@@ -32,14 +33,10 @@ namespace Algoloop.ViewModel
     {
         private readonly IAppDomainService _appDomainService;
         private bool _isBusy;
-        private string _fileName;
 
-        public RelayCommand OpenCommand { get; }
-        public RelayCommand SaveCommand { get; }
-        public RelayCommand SaveAsCommand { get; }
+        public RelayCommand SettingsCommand { get; }
         public RelayCommand<Window> ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
-        public RelayCommand RunCommand { get; }
 
         public LogViewModel LogViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
@@ -56,23 +53,6 @@ namespace Algoloop.ViewModel
             {
                 _isBusy = value;
                 RaisePropertyChanged("IsBusy");
-                RunCommand.RaiseCanExecuteChanged();
-            }
-        }
-
-        /// <summary>
-        /// Stategies filename
-        /// </summary>
-        public string FileName
-        {
-            get { return _fileName; }
-            set
-            {
-                _fileName = value;
-                RaisePropertyChanged("FileName");
-                OpenCommand.RaiseCanExecuteChanged();
-                SaveCommand.RaiseCanExecuteChanged();
-                SaveAsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -87,12 +67,9 @@ namespace Algoloop.ViewModel
             StrategiesViewModel = strategiesViewModel;
             LogViewModel = logViewModel;
 
-            OpenCommand = new RelayCommand(() => OpenFile(), () => !IsBusy);
-            SaveCommand = new RelayCommand(() => SaveFile(), () => !IsBusy && !string.IsNullOrEmpty(FileName) );
-            SaveAsCommand = new RelayCommand(() => SaveAsFile(), () => !IsBusy);
-            ExitCommand = new RelayCommand<Window>(window => Close(window), window => !IsBusy);
-            AboutCommand = new RelayCommand(() => About(), () => !IsBusy);
-            RunCommand = new RelayCommand(() => RunBacktest(), () => !IsBusy);
+            SettingsCommand = new RelayCommand(() => DoSettings(), () => !IsBusy);
+            ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
+            AboutCommand = new RelayCommand(() => DoAbout(), () => !IsBusy);
 
             ReadConfig();
         }
@@ -102,37 +79,7 @@ namespace Algoloop.ViewModel
             SaveConfig();
         }
 
-        private void OpenFile()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = @"c:\temp\";
-            openFileDialog.Filter = "Algoloop file (*.alp)|*.alp|All files (*.*)|*.*";
-            if (openFileDialog.ShowDialog() == true)
-            {
-                FileName = openFileDialog.FileName;
-                StrategiesViewModel.Read(FileName);
-            }
-        }
-
-        private void SaveFile()
-        {
-            Debug.Assert(!string.IsNullOrEmpty(FileName));
-            StrategiesViewModel.Save(FileName);
-        }
-
-        private void SaveAsFile()
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = @"c:\temp\";
-            saveFileDialog.Filter = "Algoloop file (*.alp)|*.alp|All files (*.*)|*.*";
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                FileName = saveFileDialog.FileName;
-                StrategiesViewModel.Save(FileName);
-            }
-        }
-
-        private void Close(Window window)
+        private void DoExit(Window window)
         {
             Debug.Assert(window != null);
 
@@ -141,16 +88,19 @@ namespace Algoloop.ViewModel
             IsBusy = false;
         }
 
-        private void About()
+        private void DoSettings()
+        {
+            var settings = new SettingsView();
+            if ((bool)settings.ShowDialog())
+            {
+                Settings.Default.Save();
+            }
+        }
+
+        private void DoAbout()
         {
             var about = new About();
             about.ShowDialog();
-        }
-
-        private void RunBacktest()
-        {
-            IsBusy = true;
-            IsBusy = false;
         }
 
         private string GetAppDataFolder()

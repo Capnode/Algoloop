@@ -185,6 +185,7 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.4.1\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -235,7 +236,9 @@
     <Compile Include="ViewModel\MarketsViewModel.cs" />
     <Compile Include="ViewModel\MarketViewModel.cs" />
     <Compile Include="ViewModel\PositionViewModel.cs" />
+    <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
+    <Compile Include="ViewSupport\FolderEditor.cs" />
     <Compile Include="ViewSupport\ResolutionConverter.cs" />
     <Compile Include="Chart\ResultMapper.cs" />
     <Compile Include="Chart\SeriesChartComponent.cs" />
@@ -275,6 +278,9 @@
     <Compile Include="View\MarketsView.xaml.cs">
       <DependentUpon>MarketsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\StrategiesView.xaml.cs">
       <DependentUpon>StrategiesView.xaml</DependentUpon>
     </Compile>
@@ -282,7 +288,7 @@
     <Compile Include="View\StrategyJobView.xaml.cs">
       <DependentUpon>StrategyJobView.xaml</DependentUpon>
     </Compile>
-    <Page Include="View\About.xaml">
+    <Page Include="View\AboutView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -302,8 +308,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="View\About.xaml.cs">
-      <DependentUpon>About.xaml</DependentUpon>
+    <Compile Include="View\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\LogView.xaml.cs">
       <DependentUpon>LogView.xaml</DependentUpon>
@@ -314,6 +320,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\MarketsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -19,6 +19,13 @@ using QuantConnect.Logging;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using QuantConnect.ToolBox.FxcmDownloader;
 using QuantConnect.ToolBox.FxcmVolumeDownload;
+using QuantConnect.ToolBox.GoogleDownloader;
+using QuantConnect.ToolBox.IBDownloader;
+using QuantConnect.ToolBox.IEX;
+using QuantConnect.ToolBox.KrakenDownloader;
+using QuantConnect.ToolBox.OandaDownloader;
+using QuantConnect.ToolBox.QuandlBitfinexDownloader;
+using QuantConnect.ToolBox.YahooDownloader;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
@@ -43,14 +50,41 @@ namespace Algoloop.Service
                     {
                         switch (model.Provider)
                         {
+                            case MarketModel.DataProvider.CryptoIQ:
+                                CryptoIQDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.DukasCopy:
+                                DukascopyDownloader(model, list);
+                                break;
                             case MarketModel.DataProvider.Fxcm:
                                 FxcmDownloader(model, list);
                                 break;
                             case MarketModel.DataProvider.FxcmVolume:
                                 FxcmVolumeDownload(model, list);
                                 break;
-                            case MarketModel.DataProvider.DukasCopy:
-                                DukascopyDownloader(model, list);
+                            case MarketModel.DataProvider.Gdax:
+                                GdaxDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.Google:
+                                GoogleDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.IB:
+                                IBDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.IEX:
+                                IEXDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.Kraken:
+                                KrakenDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.Oanda:
+                                OandaDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.QuandBitfinex:
+                                QuandBitfinexDownloader(model, list);
+                                break;
+                            case MarketModel.DataProvider.Yahoo:
+                                YahooDownloader(model, list);
                                 break;
                         }
                     }
@@ -69,35 +103,109 @@ namespace Algoloop.Service
             }
         }
 
-        private static void FxcmDownloader(MarketModel marketModel, IList<string> symbols)
+        private void CryptoIQDownloader(MarketModel model, IList<string> list)
         {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            //            Config.Set("data-folder", "../../../Data/");
-            Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), marketModel.Type));
-            Config.Set("fxcm-user-name", marketModel.Login);
-            Config.Set("fxcm-password", marketModel.Password);
-
-            string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
-            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
+            throw new NotImplementedException();
         }
 
-        private static void FxcmVolumeDownload(MarketModel marketModel, IList<string> symbols)
-        {
-            Config.Set("data-directory", "../../../Data/");
-            Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), marketModel.Type));
-            Config.Set("fxcm-user-name", marketModel.Login);
-            Config.Set("fxcm-password", marketModel.Password);
-
-            string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
-            FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
-        }
-
-        private static void DukascopyDownloader(MarketModel marketModel, IList<string> symbols)
+        private static void DukascopyDownloader(MarketModel model, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
 
-            string resolution = marketModel.Resolution.Equals(Resolution.Tick) ? "all" : marketModel.Resolution.ToString();
-            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, marketModel.FromDate, marketModel.FromDate);
+            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
+            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private static void FxcmDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+            Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), model.Type));
+            Config.Set("fxcm-user-name", model.Login);
+            Config.Set("fxcm-password", model.Password);
+
+            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
+            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("data-directory", model.DataFolder);
+            Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), model.Type));
+            Config.Set("fxcm-user-name", model.Login);
+            Config.Set("fxcm-password", model.Password);
+
+            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
+            FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private void GdaxDownloader(MarketModel model, IList<string> list)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void GoogleDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+
+            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
+            GoogleDownloaderProgram.GoogleDownloader(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private void IBDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+
+            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
+            IBDownloaderProgram.IBDownloader(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private void IEXDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+
+            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
+            IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private void KrakenDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+
+            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
+            KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private void OandaDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+
+            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
+            OandaDownloaderProgram.OandaDownloader(symbols, resolution, model.FromDate, model.FromDate);
+        }
+
+        private void QuandBitfinexDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+
+            string apiKey = ""; // TODO:
+            QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.FromDate, apiKey);
+        }
+
+        private static void YahooDownloader(MarketModel model, IList<string> symbols)
+        {
+            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("data-directory", model.DataFolder);
+
+            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
+            YahooDownloaderProgram.YahooDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
     }
 }

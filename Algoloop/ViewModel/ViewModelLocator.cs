@@ -42,11 +42,12 @@ namespace Algoloop.ViewModel
     public class ViewModelLocator
     {
         public MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
-        public LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
-        public AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
-        public StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
-        public AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
         public MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
+        public AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
+        public StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
+        public LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
+        public SettingsViewModel SettingsViewModel => SimpleIoc.Default.GetInstance<SettingsViewModel>();
+        public AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
 
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
@@ -58,11 +59,12 @@ namespace Algoloop.ViewModel
             SimpleIoc.Default.Register<AccountsModel>();
             SimpleIoc.Default.Register<StrategiesModel>();
             SimpleIoc.Default.Register<MainViewModel>();
-            SimpleIoc.Default.Register<AboutViewModel>();
-            SimpleIoc.Default.Register<LogViewModel>();
             SimpleIoc.Default.Register<MarketsViewModel>();
             SimpleIoc.Default.Register<AccountsViewModel>();
             SimpleIoc.Default.Register<StrategiesViewModel>();
+            SimpleIoc.Default.Register<LogViewModel>();
+            SimpleIoc.Default.Register<SettingsViewModel>();
+            SimpleIoc.Default.Register<AboutViewModel>();
             SimpleIoc.Default.Register<IAppDomainService, AppDomainService>();
 
             // Register QuantConnect types

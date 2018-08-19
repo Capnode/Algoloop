@@ -23,6 +23,21 @@
     </Window.Cursor>
 
     <DockPanel>
+        <Menu Width="Auto" DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem
+                    Header="Settings..."
+                    Command="{Binding SettingsCommand}" />
+                <MenuItem
+                    Header="E_xit"
+                    Command="{Binding ExitCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Command="{Binding AboutCommand}" />
+            </MenuItem>
+        </Menu>
+
         <StatusBar Height="23" Name="statusBar" Width="Auto" DockPanel.Dock="Bottom" VerticalAlignment="Bottom" />
 
         <TabControl
@@ -41,6 +56,5 @@
                 <view:LogView />
             </TabItem>
         </TabControl>
-
     </DockPanel>
 </Window>

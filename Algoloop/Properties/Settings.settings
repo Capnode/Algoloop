@@ -14,5 +14,8 @@
     <Setting Name="MarketViewSplitter" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">160</Value>
     </Setting>
+    <Setting Name="DataFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/Market</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
