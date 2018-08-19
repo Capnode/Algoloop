@@ -16,6 +16,7 @@
 using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
+using System;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -38,8 +39,19 @@ namespace Algoloop.Algorithm.CSharp
             SetEndDate(2014, 5, 15);    //Set End Date
             SetCash(100000);             //Set Strategy Cash
             // Find more symbols here: http://quantconnect.com/data
-            AddForex("EURUSD");
-            AddForex("NZDUSD");
+            //AddForex("EURUSD");
+            //AddForex("NZDUSD");
+            string symbols = GetParameter("symbols");
+            string resolution = GetParameter("resolution");
+            string market = GetParameter("market");
+            Resolution res;
+            if (Enum.TryParse(resolution, out res))
+            {
+                foreach (string symbol in symbols.Split(';'))
+                {
+                    AddForex(symbol, res, market);
+                }
+            }
 
             var dailyHistory = History(5, Resolution.Daily);
             var hourHistory = History(5, Resolution.Hour);

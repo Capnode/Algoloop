@@ -99,6 +99,10 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
+        public string DataFolder { get; set; }
+
+        [Browsable(false)]
+        [DataMember]
         public bool Completed { get; set; }
 
         [Browsable(false)]

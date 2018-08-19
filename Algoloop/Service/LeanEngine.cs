@@ -69,7 +69,7 @@ namespace Algoloop.Service
             return (null, null);
         }
 
-        private bool SetConfig(StrategyJobModel jobModel, AccountModel account)
+        private bool SetConfig(StrategyJobModel model, AccountModel account)
         {
             if (account == null)
             {
@@ -123,17 +123,19 @@ namespace Algoloop.Service
             }
 
             Config.Set("algorithm-language", "CSharp");
-            Config.Set("data-folder", "../../../Data/");
-            Config.Set("algorithm-location", jobModel.AlgorithmLocation);
-            Config.Set("algorithm-type-name", jobModel.AlgorithmName);
+            Config.Set("data-folder", model.DataFolder);
+            Config.Set("data-directory", model.DataFolder);
+            Config.Set("cache-location", model.DataFolder);
+            Config.Set("algorithm-location", model.AlgorithmLocation);
+            Config.Set("algorithm-type-name", model.AlgorithmName);
 
             // Set parameters
             var parameters = new Dictionary<string, string>();
             parameters.Add(
                 "symbols",
-                string.Join(";", jobModel.Symbols.Where(p => p.Enabled).Select(m => m.Name)));
-            parameters.Add("resolution", jobModel.Resolution.ToString());
-            foreach (ParameterModel parameter in jobModel.Parameters)
+                string.Join(";", model.Symbols.Where(p => p.Enabled).Select(m => m.Name)));
+            parameters.Add("resolution", model.Resolution.ToString());
+            foreach (ParameterModel parameter in model.Parameters)
             {
                 string value;
                 if (!parameters.TryGetValue(parameter.Name, out value))

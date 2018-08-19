@@ -105,6 +105,8 @@ namespace Algoloop.ViewModel
 
         internal void DataToModel()
         {
+            Model.DataFolder = Properties.Settings.Default.DataFolder;
+
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {

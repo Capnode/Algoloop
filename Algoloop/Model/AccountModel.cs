@@ -53,5 +53,9 @@ namespace Algoloop.Model
         [Description("Account number.")]
         [DataMember]
         public string Id { get; set; } = string.Empty;
+
+        [Browsable(false)]
+        [DataMember]
+        public string DataFolder { get; set; }
     }
 }
