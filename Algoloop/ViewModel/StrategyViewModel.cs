@@ -98,7 +98,7 @@ namespace Algoloop.ViewModel
         private void RunBacktest()
         {
             DataToModel();
-            var job = new StrategyJobViewModel(this, new StrategyJobModel("Backtest", Model), _appDomainService);
+            var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, Model), _appDomainService);
             Jobs.Add(job);
             job.Start();
         }
