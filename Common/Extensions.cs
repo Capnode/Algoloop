@@ -331,20 +331,10 @@ namespace QuantConnect
         /// <returns>A list of the csv pieces</returns>
         public static List<string> ToCsv(this string str, int size = 4)
         {
-            int last = 0;
-            var csv = new List<string>(size);
-            for (int i = 0; i < str.Length; i++)
-            {
-                if (str[i] == ',')
-                {
-                    if (last != 0) last = last + 1;
-                    csv.Add(str.Substring(last, i - last));
-                    last = i;
-                }
-            }
-            if (last != 0) last = last + 1;
-            csv.Add(str.Substring(last));
-            return csv;
+            string[] list = str.Split(new[] { ',' }, size);
+            string[] csv = Enumerable.Range(0, size).Select(n => string.Empty).ToArray();
+            list.CopyTo(csv, 0);
+            return csv.ToList();
         }
 
         /// <summary>
