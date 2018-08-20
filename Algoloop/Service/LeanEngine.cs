@@ -131,10 +131,15 @@ namespace Algoloop.Service
 
             // Set parameters
             var parameters = new Dictionary<string, string>();
+            parameters.Add("startdate", model.StartDate.ToString());
+            parameters.Add("enddate", model.EndDate.ToString());
+            parameters.Add("cash", model.InitialCapital.ToString());
+            parameters.Add("resolution", model.Resolution.ToString());
+            parameters.Add("market", model.Provider.ToString());
             parameters.Add(
                 "symbols",
                 string.Join(";", model.Symbols.Where(p => p.Enabled).Select(m => m.Name)));
-            parameters.Add("resolution", model.Resolution.ToString());
+
             foreach (ParameterModel parameter in model.Parameters)
             {
                 string value;

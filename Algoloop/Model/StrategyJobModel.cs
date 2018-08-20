@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using static Algoloop.Model.MarketModel;
 
 namespace Algoloop.Model
 {
@@ -31,6 +32,12 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [DataMember]
         public string Name { get; set; } = "Job";
+
+        [Category("Broker")]
+        [DisplayName("Data provider")]
+        [Description("History data provider")]
+        [DataMember]
+        public DataProvider Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
@@ -49,14 +56,14 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [DataMember]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
-        public DateTime FromDate { get; set; } = DateTime.Now;
+        public DateTime StartDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("To date")]
         [ReadOnly(true)]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [DataMember]
-        public DateTime ToDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("Resolution")]
@@ -121,9 +128,10 @@ namespace Algoloop.Model
         {
             Name = name;
             Account = strategy.Account;
+            Provider = strategy.Provider;
             BarsBack = strategy.BarsBack;
-            FromDate = strategy.FromDate;
-            ToDate = strategy.ToDate;
+            StartDate = strategy.StartDate;
+            EndDate = strategy.EndDate;
             InitialCapital = strategy.InitialCapital;
             PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
             AlgorithmLocation = strategy.AlgorithmLocation;

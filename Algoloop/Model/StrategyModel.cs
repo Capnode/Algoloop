@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using static Algoloop.Model.MarketModel;
 
 namespace Algoloop.Model
 {
@@ -33,6 +34,12 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public bool Enabled { get; set; } = true;
+
+        [Category("Broker")]
+        [DisplayName("Data provider")]
+        [Description("History data provider")]
+        [DataMember]
+        public DataProvider Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
@@ -51,13 +58,13 @@ namespace Algoloop.Model
         [DisplayName("From date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [DataMember]
-        public DateTime FromDate { get; set; } = DateTime.Now;
+        public DateTime StartDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("To date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [DataMember]
-        public DateTime ToDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("Resolution")]

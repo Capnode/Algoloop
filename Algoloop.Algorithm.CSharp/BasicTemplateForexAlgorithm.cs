@@ -35,9 +35,27 @@ namespace Algoloop.Algorithm.CSharp
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2014, 5, 7);  //Set Start Date
-            SetEndDate(2014, 5, 15);    //Set End Date
-            SetCash(100000);             //Set Strategy Cash
+            // SetStartDate(2014, 5, 7);  //Set Start DateSetCa
+            DateTime startdate;
+            if (DateTime.TryParse(GetParameter("startdate"), out startdate))
+            {
+                SetStartDate(startdate);
+            }
+
+            // SetEndDate(2014, 5, 15);    //Set End Date
+            DateTime enddate;
+            if (DateTime.TryParse(GetParameter("enddate"), out enddate))
+            {
+                SetEndDate(enddate);
+            }
+
+            // SetCash(100000);             //Set Strategy Cash
+            decimal cash;
+            if (decimal.TryParse(GetParameter("cash"), out cash))
+            {
+                SetCash(cash);
+            }
+
             // Find more symbols here: http://quantconnect.com/data
             //AddForex("EURUSD");
             //AddForex("NZDUSD");
