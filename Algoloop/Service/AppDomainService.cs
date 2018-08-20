@@ -70,7 +70,8 @@ namespace Algoloop.Service
             LeanEngine leanEngine = (LeanEngine)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(LeanEngine).FullName);
             (jobModel.Result, jobModel.Logs) = leanEngine.Run(jobModel, account);
             jobModel.Completed = true;
-            Log.Error(jobModel.Logs);
+            Log.Trace(jobModel.Logs);
+            AppDomain.Unload(ad);
         }
 
         public void Run(MarketModel marketModel)

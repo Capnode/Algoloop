@@ -35,6 +35,8 @@ namespace Algoloop.Algorithm.CSharp
         /// </summary>
         public override void Initialize()
         {
+            Log("BasicTemplateForexAlgorithm.Initialize()");
+
             // SetStartDate(2014, 5, 7);  //Set Start DateSetCa
             DateTime startdate;
             if (DateTime.TryParse(GetParameter("startdate"), out startdate))
@@ -95,7 +97,7 @@ namespace Algoloop.Algorithm.CSharp
             if (!Portfolio.Invested)
             {
                 SetHoldings("EURUSD", .5);
-                SetHoldings("NZDUSD", .5);
+//                SetHoldings("NZDUSD", .5);
                 Log(string.Join(", ", data.Values));
             }
         }
