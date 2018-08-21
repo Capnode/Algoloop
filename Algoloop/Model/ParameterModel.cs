@@ -21,6 +21,16 @@ namespace Algoloop.Model
     [DataContract]
     public class ParameterModel
     {
+        public ParameterModel()
+        {
+        }
+
+        public ParameterModel(ParameterModel model)
+        {
+           Name = model.Name;
+           Value = model.Value;
+        }
+
         [DataMember]
         public string Name { get; set; } = string.Empty;
 

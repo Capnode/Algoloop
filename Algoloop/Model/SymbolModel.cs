@@ -21,6 +21,16 @@ namespace Algoloop.Model
     [DataContract]
     public class SymbolModel
     {
+        public SymbolModel()
+        {
+
+        }
+        public SymbolModel(SymbolModel model)
+        {
+            Name = model.Name;
+            Enabled = model.Enabled;
+        }
+
         [DataMember]
         public string Name { get; set; } = "EURUSD";
 

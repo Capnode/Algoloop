@@ -17,6 +17,7 @@ using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 using static Algoloop.Model.MarketModel;
 
@@ -25,6 +26,28 @@ namespace Algoloop.Model
     [DataContract]
     public class StrategyModel
     {
+        public StrategyModel()
+        {
+        }
+
+        public StrategyModel(StrategyModel model)
+        {
+            Name = model.Name;
+            Enabled = model.Enabled;
+            Provider = model.Provider;
+            Account = model.Account;
+            BarsBack = model.BarsBack;
+            StartDate = model.StartDate;
+            EndDate = model.EndDate;
+            Resolution = model.Resolution;
+            InitialCapital = model.InitialCapital;
+            PcntCapitalPerPosition = model.PcntCapitalPerPosition;
+            AlgorithmLocation = model.AlgorithmLocation;
+            AlgorithmName = model.AlgorithmName;
+            Symbols = model.Symbols.Select(m => new SymbolModel(m)).ToList();
+            Parameters = model.Parameters.Select(m => new ParameterModel(m)).ToList();
+        }
+
         [Category("Information")]
         [DisplayName("Name")]
         [Description("Name of the strategy.")]

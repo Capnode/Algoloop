@@ -35,11 +35,11 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
 
-        public RelayCommand DeleteStrategyCommand { get; }
+        public RelayCommand CloneStrategyCommand { get; }
 
-        internal void Refresh(SymbolViewModel symbolViewModel)
-        {
-        }
+        public RelayCommand SaveStrategyCommand { get; }
+
+        public RelayCommand DeleteStrategyCommand { get; }
 
         public RelayCommand AddSymbolCommand { get; }
 
@@ -55,6 +55,8 @@ namespace Algoloop.ViewModel
             Model = model;
             _appDomainService = appDomainService;
 
+            CloneStrategyCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
+            SaveStrategyCommand = new RelayCommand(() => _parent?.SaveStrategy(this), true);
             DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
@@ -81,6 +83,10 @@ namespace Algoloop.ViewModel
             bool ok = Jobs.Remove(job);
             Debug.Assert(ok);
             return ok;
+        }
+
+        internal void Refresh(SymbolViewModel symbolViewModel)
+        {
         }
 
         private void AddSymbol()

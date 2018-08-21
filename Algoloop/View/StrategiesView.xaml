@@ -25,12 +25,12 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <GridSplitter
-         Grid.Column="1"
-         HorizontalAlignment="Left"
-         Margin="0"
-         Width="5"
-         Height="Auto"
-         VerticalAlignment="Stretch" />
+             Grid.Column="1"
+             HorizontalAlignment="Left"
+             Margin="0"
+             Width="5"
+             Height="Auto"
+             VerticalAlignment="Stretch" />
         <TreeView
             Name="treeView"
             Grid.Column="0"
@@ -41,6 +41,9 @@
                     <MenuItem
                         Header="Add Strategy"
                         Command="{Binding AddStrategyCommand}" />
+                    <MenuItem
+                        Header="Read Strategy..."
+                        Command="{Binding ReadStrategyCommand}" />
                 </ContextMenu>
             </TreeView.ContextMenu>
             <TreeView.Resources>
@@ -57,8 +60,14 @@
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem
+                                        Header="Clone Strategy"
+                                        Command="{Binding CloneStrategyCommand}" />
+                                    <MenuItem
                                         Header="Delete Strategy"
                                         Command="{Binding DeleteStrategyCommand}" />
+                                    <MenuItem
+                                        Header="Save Strategy..."
+                                        Command="{Binding SaveStrategyCommand}" />
                                     <MenuItem
                                         Header="Run Backtest"
                                         Command="{Binding RunBacktestCommand}" />

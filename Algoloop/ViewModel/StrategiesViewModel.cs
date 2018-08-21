@@ -20,6 +20,7 @@ using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 
 namespace Algoloop.ViewModel
@@ -33,6 +34,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
 
         public RelayCommand AddStrategyCommand { get; }
+        public RelayCommand ReadStrategyCommand { get; }
 
         public StrategiesViewModel(StrategiesModel model, IAppDomainService appDomainService)
         {
@@ -40,6 +42,7 @@ namespace Algoloop.ViewModel
             _appDomainService = appDomainService;
 
             AddStrategyCommand = new RelayCommand(() => AddStrategy(), true);
+            ReadStrategyCommand = new RelayCommand(() => ReadStrategy(), true);
 
             DataFromModel();
         }
@@ -87,6 +90,64 @@ namespace Algoloop.ViewModel
             }
         }
 
+        internal void CloneStrategy(StrategyViewModel strategyViewModel)
+        {
+            strategyViewModel.DataToModel();
+            var strategyModel = new StrategyModel(strategyViewModel.Model);
+            var strategy = new StrategyViewModel(this, strategyModel, _appDomainService);
+            Strategies.Add(strategy);
+        }
+
+        private void ReadStrategy()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+//            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+            openFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string fileName = openFileDialog.FileName;
+                try
+                {
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        string json = r.ReadToEnd();
+                        StrategyModel strategy = JsonConvert.DeserializeObject<StrategyModel>(json);
+                        Model.Strategies.Add(strategy);
+                    }
+
+                    DataFromModel();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                }
+            }
+        }
+
+        internal void SaveStrategy(StrategyViewModel strategyViewModel)
+        {
+            strategyViewModel.DataToModel();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+//            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    string fileName = saveFileDialog.FileName;
+                    using (StreamWriter file = File.CreateText(fileName))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        serializer.Serialize(file, strategyViewModel.Model);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                }
+            }
+        }
+
         private void DataToModel()
         {
             Model.Strategies.Clear();
@@ -110,7 +171,7 @@ namespace Algoloop.ViewModel
         internal bool DeleteStrategy(StrategyViewModel strategy)
         {
             bool ok = Strategies.Remove(strategy);
-            Debug.Assert(ok);
+            DataToModel();
             return ok;
         }
 
