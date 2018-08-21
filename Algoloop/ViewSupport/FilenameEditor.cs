@@ -12,7 +12,9 @@
  * limitations under the License.
 */
 
+using System;
 using System.IO;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -66,11 +68,50 @@ namespace Algoloop.ViewSupport
 
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             string path = item.Value?.ToString();
-            dlg.InitialDirectory = Path.GetDirectoryName(path);
+            string fullPath = Path.GetFullPath(path); // full path relative current directory
+            dlg.InitialDirectory = Path.GetDirectoryName(fullPath);
             if ((bool)dlg.ShowDialog())
             {
-                item.Value = dlg.FileName;
+                string currentFolder = Directory.GetCurrentDirectory();
+                item.Value = RelativePath(currentFolder, dlg.FileName);
             }
+        }
+
+        public static string RelativePath(string absPath, string relTo)
+        {
+            string[] absDirs = absPath.Split('\\');
+            string[] relDirs = relTo.Split('\\');
+            // Get the shortest of the two paths 
+            int len = absDirs.Length < relDirs.Length ? absDirs.Length : relDirs.Length;
+            // Use to determine where in the loop we exited 
+            int lastCommonRoot = -1; int index;
+            // Find common root 
+            for (index = 0; index < len; index++)
+            {
+                if (absDirs[index] == relDirs[index])
+                    lastCommonRoot = index;
+                else break;
+            }
+            // If we didn't find a common prefix then throw 
+            if (lastCommonRoot == -1)
+            {
+                // Paths do not have a common base
+                return absPath;
+            }
+            // Build up the relative path 
+            StringBuilder relativePath = new StringBuilder();
+            // Add on the .. 
+            for (index = lastCommonRoot + 1; index < absDirs.Length; index++)
+            {
+                if (absDirs[index].Length > 0) relativePath.Append("..\\");
+            }
+            // Add on the folders 
+            for (index = lastCommonRoot + 1; index < relDirs.Length - 1; index++)
+            {
+                relativePath.Append(relDirs[index] + "\\");
+            }
+            relativePath.Append(relDirs[relDirs.Length - 1]);
+            return relativePath.ToString();
         }
     }
 }

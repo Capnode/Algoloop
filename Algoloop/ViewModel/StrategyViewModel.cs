@@ -37,7 +37,7 @@ namespace Algoloop.ViewModel
 
         public RelayCommand CloneStrategyCommand { get; }
 
-        public RelayCommand SaveStrategyCommand { get; }
+        public RelayCommand ExportStrategyCommand { get; }
 
         public RelayCommand DeleteStrategyCommand { get; }
 
@@ -56,7 +56,7 @@ namespace Algoloop.ViewModel
             _appDomainService = appDomainService;
 
             CloneStrategyCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
-            SaveStrategyCommand = new RelayCommand(() => _parent?.SaveStrategy(this), true);
+            ExportStrategyCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
             DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);

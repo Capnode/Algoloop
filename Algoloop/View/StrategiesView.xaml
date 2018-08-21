@@ -42,8 +42,8 @@
                         Header="Add Strategy"
                         Command="{Binding AddStrategyCommand}" />
                     <MenuItem
-                        Header="Read Strategy..."
-                        Command="{Binding ReadStrategyCommand}" />
+                        Header="Import Strategies..."
+                        Command="{Binding ImportStrategyCommand}" />
                 </ContextMenu>
             </TreeView.ContextMenu>
             <TreeView.Resources>
@@ -66,8 +66,8 @@
                                         Header="Delete Strategy"
                                         Command="{Binding DeleteStrategyCommand}" />
                                     <MenuItem
-                                        Header="Save Strategy..."
-                                        Command="{Binding SaveStrategyCommand}" />
+                                        Header="Export Strategy..."
+                                        Command="{Binding ExportStrategyCommand}" />
                                     <MenuItem
                                         Header="Run Backtest"
                                         Command="{Binding RunBacktestCommand}" />
