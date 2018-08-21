@@ -238,6 +238,7 @@
     <Compile Include="ViewModel\PositionViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
+    <Compile Include="ViewSupport\ExtendedTreeView.cs" />
     <Compile Include="ViewSupport\FolderEditor.cs" />
     <Compile Include="ViewSupport\ResolutionConverter.cs" />
     <Compile Include="Chart\ResultMapper.cs" />
