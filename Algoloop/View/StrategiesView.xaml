@@ -49,7 +49,9 @@
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Jobs}">
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding Model.Enabled}" />
+                        <CheckBox
+                            IsChecked="{Binding Enabled}"
+                            Command="{Binding EnabledCommand}" />
                         <TextBlock>
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{} {0} ({1})">
@@ -68,9 +70,6 @@
                                     <MenuItem
                                         Header="Export Strategy..."
                                         Command="{Binding ExportStrategyCommand}" />
-                                    <MenuItem
-                                        Header="Run Backtest"
-                                        Command="{Binding RunBacktestCommand}" />
                                 </ContextMenu>
                             </TextBlock.ContextMenu>
                         </TextBlock>

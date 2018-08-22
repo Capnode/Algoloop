@@ -36,7 +36,7 @@ namespace Algoloop.ViewModel
     {
         private StrategyViewModel _parent;
         private IAppDomainService _appDomainService;
-        private CancellationTokenSource _cancel = new CancellationTokenSource();
+        private CancellationTokenSource _cancel;
         private LiveCharts.Wpf.Series _selectedSeries;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, IAppDomainService appDomainService)
@@ -86,8 +86,9 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal async void Start()
+        internal async Task Start(CancellationTokenSource cancel)
         {
+            _cancel = cancel;
             Log.Trace("Start Backtest: " + Model.AlgorithmName, true);
             DataToModel();
             await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
