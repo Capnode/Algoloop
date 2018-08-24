@@ -72,6 +72,16 @@ namespace Algoloop.ViewModel
 
         public RelayCommand DeleteJobCommand { get; }
 
+        public string Logs
+        {
+            get => Model.Logs;
+        }
+
+        public int Loglines
+        {
+            get => Logs.Count(m => m.Equals('\n'));
+        }
+
         public LiveCharts.Wpf.Series SelectedChart
         {
             get { return _selectedSeries; }
@@ -93,12 +103,15 @@ namespace Algoloop.ViewModel
             DataToModel();
             await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
             DataFromModel();
+            RaisePropertyChanged(() => Logs);
+            RaisePropertyChanged(() => Loglines);
             Log.Trace("Stop Backtest: " + Model.AlgorithmName, true);
+            _parent.Enabled = false;
         }
 
         private void DeleteJob()
         {
-            _cancel.Cancel();
+            _cancel?.Cancel();
             ChartCollection = null;
             SelectedCollection = null;
             _parent?.DeleteJob(this);

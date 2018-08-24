@@ -113,5 +113,11 @@
                 </lvc:CartesianChart>
             </Grid>
         </TabItem>
+        <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
+            <TextBox
+                Text="{Binding Logs, Mode=OneWay}"
+                IsReadOnly="True"
+                VerticalScrollBarVisibility="Auto" />
+        </TabItem>
     </TabControl>
 </UserControl>

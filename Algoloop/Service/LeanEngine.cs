@@ -30,13 +30,13 @@ namespace Algoloop.Service
     {
         public (string, string) Run(StrategyJobModel jobModel, AccountModel account)
         {
-            if (!SetConfig(jobModel, account))
-            {
-                return (null, null);
-            }
+            SetConfig(jobModel, account);
 
-            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "CompositeLogHandler"));
+            QueueLogHandler logHandler = new QueueLogHandler();
+            Log.LogHandler = logHandler;
             var liveMode = Config.GetBool("live-mode");
+            string result = null;
+            string logs = string.Empty;
 
             Log.Trace("LeanEngine: Memory " + OS.ApplicationMemoryUsed + "Mb-App  " + +OS.TotalPhysicalMemoryUsed + "Mb-Used  " + OS.TotalPhysicalMemory + "Mb-Total");
 
@@ -54,29 +54,31 @@ namespace Algoloop.Service
                     engine.Run(job, algorithmManager, assemblyPath);
                     systemHandlers.JobQueue.AcknowledgeJob(job);
                     BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
-                    return (resultHandler?.JsonResult, resultHandler?.Logs);
+                    result = resultHandler?.JsonResult;
+                    logs = resultHandler?.Logs + Environment.NewLine + Environment.NewLine;
                 }
             }
             catch (Exception ex)
             {
                 Log.LogHandler.Error("{0}: {1}", ex.GetType(), ex.Message);
             }
-            finally
+
+            foreach (LogEntry log in logHandler.Logs)
             {
-                Log.LogHandler.Dispose();
+                logs += log.ToString() + Environment.NewLine;
             }
 
-            return (null, null);
+            Log.LogHandler.Dispose();
+            return (result, logs);
         }
 
-        private bool SetConfig(StrategyJobModel model, AccountModel account)
+        private void SetConfig(StrategyJobModel model, AccountModel account)
         {
             if (account == null)
             {
                 Config.Set("environment", "backtesting");
                 Config.Set("live-mode", "false");
 
-                Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
                 Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
                 Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
                 Config.Set("api-handler", "QuantConnect.Api.Api");
@@ -98,7 +100,6 @@ namespace Algoloop.Service
                 Config.Set("environment", "live");
                 Config.Set("live-mode", "true");
 
-                Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
                 Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
                 Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
                 Config.Set("api-handler", "QuantConnect.Api.Api");
@@ -151,7 +152,6 @@ namespace Algoloop.Service
 
             string parametersConfigString = JsonConvert.SerializeObject(parameters);
             Config.Set("parameters", parametersConfigString);
-            return true;
         }
     }
 }
