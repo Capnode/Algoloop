@@ -90,12 +90,22 @@ namespace Algoloop.Service
                             case MarketModel.DataProvider.Yahoo:
                                 YahooDownloader(model, list);
                                 break;
+                            default:
+                                Log.Trace($"Market Provider not supported: {model.Provider}");
+                                break;
                         }
+                    }
+                    else
+                    {
+                        Log.Trace($"No symbols selected");
                     }
 
                     writer.Flush();
                     var console = writer.GetStringBuilder().ToString();
-                    Log.Trace(console);
+                    if (!string.IsNullOrEmpty(console))
+                    {
+                        Log.Trace(console);
+                    }
                 }
             }
             catch (Exception ex)

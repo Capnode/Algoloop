@@ -11,7 +11,7 @@ using System.Windows;
 [assembly: AssemblyDescription("Desktop trading platform")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Capnode AB")]
-[assembly: AssemblyProduct("AlgoloopLean")]
+[assembly: AssemblyProduct("Algoloop.Lean")]
 [assembly: AssemblyCopyright("Copyright ©  2018 Capnode AB")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

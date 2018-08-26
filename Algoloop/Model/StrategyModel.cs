@@ -56,7 +56,7 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
 
         [Category("Broker")]
         [DisplayName("Data provider")]

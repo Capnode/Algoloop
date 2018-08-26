@@ -68,11 +68,21 @@ namespace Algoloop.ViewSupport
 
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             string path = item.Value?.ToString();
-            string fullPath = Path.GetFullPath(path); // full path relative current directory
-            dlg.InitialDirectory = Path.GetDirectoryName(fullPath);
+            string currentFolder = Directory.GetCurrentDirectory();
+            string folder;
+            if (path == null)
+            {
+                folder = currentFolder;
+            }
+            else
+            {
+                string fullPath = Path.GetFullPath(path);
+                folder = Path.GetDirectoryName(fullPath);
+            }
+
+            dlg.InitialDirectory = folder;
             if ((bool)dlg.ShowDialog())
             {
-                string currentFolder = Directory.GetCurrentDirectory();
                 item.Value = RelativePath(currentFolder, dlg.FileName);
             }
         }

@@ -47,7 +47,7 @@ namespace Algoloop.ViewModel
 
         ~AccountViewModel()
         {
-            StopTask();
+//            StopTask();
         }
 
         public AccountModel Model { get; }
