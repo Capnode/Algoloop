@@ -36,8 +36,10 @@ namespace Algoloop.Service
 {
     public class Toolbox : MarshalByRefObject
     {
-        public bool Run(MarketModel model)
+        public string Run(MarketModel model)
         {
+            QueueLogHandler logHandler = new QueueLogHandler();
+            Log.LogHandler = logHandler;
             Log.Trace($"Toolbox.Run {model.Provider} {model.Resolution} {model.FromDate:d}");
 
             PrepareDataFolder(model.DataFolder);
@@ -94,15 +96,22 @@ namespace Algoloop.Service
                     writer.Flush();
                     var console = writer.GetStringBuilder().ToString();
                     Log.Trace(console);
-                    return true;
                 }
             }
             catch (Exception ex)
             {
                 string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
                 Log.Error(log);
-                return false;
             }
+
+            string logs = string.Empty;
+            foreach (LogEntry log in logHandler.Logs)
+            {
+                logs += log.ToString() + Environment.NewLine;
+            }
+
+            Log.LogHandler.Dispose();
+            return logs;
         }
 
         private void PrepareDataFolder(string dataFolder)

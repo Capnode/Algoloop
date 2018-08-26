@@ -79,7 +79,7 @@ namespace Algoloop.ViewModel
 
         public int Loglines
         {
-            get => Logs.Count(m => m.Equals('\n'));
+            get => Logs == null ? 0 :  Logs.Count(m => m.Equals('\n'));
         }
 
         public LiveCharts.Wpf.Series SelectedChart
@@ -103,8 +103,6 @@ namespace Algoloop.ViewModel
             DataToModel();
             await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
             DataFromModel();
-            RaisePropertyChanged(() => Logs);
-            RaisePropertyChanged(() => Loglines);
             Log.Trace("Stop Backtest: " + Model.AlgorithmName, true);
             _parent.Enabled = false;
         }
@@ -179,6 +177,9 @@ namespace Algoloop.ViewModel
 
                 ParseCharts(result.Charts.MapToChartDefinitionDictionary());
             }
+
+            RaisePropertyChanged(() => Logs);
+            RaisePropertyChanged(() => Loglines);
         }
 
         private void ParseCharts(Dictionary<string, ChartDefinition> charts)

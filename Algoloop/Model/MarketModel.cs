@@ -85,6 +85,6 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public bool Completed { get; set; }
+        public string Logs { get; set; }
     }
 }

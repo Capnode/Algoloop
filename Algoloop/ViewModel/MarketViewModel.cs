@@ -19,6 +19,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using QuantConnect.Logging;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -91,6 +92,16 @@ namespace Algoloop.ViewModel
             set => Set(ref _model, value);
         }
 
+        public string Logs
+        {
+            get => Model.Logs;
+        }
+
+        public int Loglines
+        {
+            get => Logs == null ? 0 : Logs.Count(m => m.Equals('\n'));
+        }
+
         internal void Refresh(SymbolViewModel symbolViewModel)
         {
             ActiveSymbols.View.Refresh();
@@ -115,12 +126,16 @@ namespace Algoloop.ViewModel
         internal void DataToModel()
         {
             Model.DataFolder = Properties.Settings.Default.DataFolder;
+            Model.Logs = string.Empty;
 
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
                 Model.Symbols.Add(symbol.Model);
             }
+
+            RaisePropertyChanged(() => Logs);
+            RaisePropertyChanged(() => Loglines);
         }
 
         internal void DataFromModel()
@@ -131,7 +146,11 @@ namespace Algoloop.ViewModel
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
             }
+
+            RaisePropertyChanged(() => Logs);
+            RaisePropertyChanged(() => Loglines);
         }
+
         private async void ProcessMarket(bool enabled)
         {
             if (enabled)
@@ -143,10 +162,7 @@ namespace Algoloop.ViewModel
                 {
                     Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
                     await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
-                    if (!Model.Completed)
-                    {
-                        Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d} failed");
-                    }
+                    DataFromModel();
 
                     if (Model.FromDate >= DateTime.Today)
                     {
@@ -161,7 +177,6 @@ namespace Algoloop.ViewModel
                     Model = model;
                 }
 
-                DataFromModel();
                 Log.Trace($"{Model.Provider} download complete");
                 _cancel = null;
                 Enabled = false;

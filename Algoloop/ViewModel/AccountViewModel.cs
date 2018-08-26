@@ -153,7 +153,6 @@ namespace Algoloop.ViewModel
                 Positions.Clear();
                 Balances.Clear();
                 Enabled = false;
-
             }
             catch (Exception ex)
             {
