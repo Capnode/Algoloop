@@ -17,7 +17,6 @@ using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using QuantConnect.Logging;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -29,8 +28,6 @@ namespace Algoloop.ViewModel
     {
         private StrategiesViewModel _parent;
         private IAppDomainService _appDomainService;
-        private Task _task;
-        private CancellationTokenSource _cancel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, IAppDomainService appDomainService)
         {
@@ -38,17 +35,15 @@ namespace Algoloop.ViewModel
             Model = model;
             _appDomainService = appDomainService;
 
+            RunStrategyCommand = new RelayCommand(() => RunStrategy(), true);
             CloneStrategyCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportStrategyCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
             DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             AddParameterCommand = new RelayCommand(() => AddParameter(), true);
-            EnabledCommand = new RelayCommand(() => OnEnable(Model.Enabled), true);
 
             DataFromModel();
-
-//            OnEnable(Model.Enabled);
         }
 
         public StrategyModel Model { get; }
@@ -58,6 +53,8 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
 
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
+
+        public RelayCommand RunStrategyCommand { get; }
 
         public RelayCommand CloneStrategyCommand { get; }
 
@@ -72,16 +69,6 @@ namespace Algoloop.ViewModel
         public RelayCommand ImportSymbolsCommand { get; }
 
         public RelayCommand AddParameterCommand { get; }
-
-        public bool Enabled
-        {
-            get => Model.Enabled;
-            set
-            {
-                Model.Enabled = value;
-                RaisePropertyChanged(() => Enabled);
-            }
-        }
 
         internal bool DeleteSymbol(SymbolViewModel symbol)
         {
@@ -118,30 +105,12 @@ namespace Algoloop.ViewModel
             Parameters.Add(parameter);
         }
 
-        private void OnEnable(bool value)
+        private async void RunStrategy()
         {
-            if (!value)
-            {
-                StopTask();
-                return;
-            }
-
-            _cancel = new CancellationTokenSource();
             DataToModel();
             var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, Model), _appDomainService);
             Jobs.Add(job);
-            _task = job.Start(_cancel);
-        }
-
-        private void StopTask()
-        {
-            if (_task != null && _task.Status.Equals(TaskStatus.Running))
-            {
-                _cancel.Cancel();
-                _task.Wait();
-                Debug.Assert(_task.IsCompleted);
-                _task = null;
-            }
+            await job.StartTaskAsync();
         }
 
         internal void DataToModel()

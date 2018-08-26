@@ -49,9 +49,6 @@
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Jobs}">
                     <StackPanel Orientation="Horizontal">
-                        <CheckBox
-                            IsChecked="{Binding Enabled}"
-                            Command="{Binding EnabledCommand}" />
                         <TextBlock>
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{} {0} ({1})">
@@ -61,6 +58,9 @@
                             </TextBlock.Text>
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
+                                    <MenuItem
+                                        Header="Run Strategy"
+                                        Command="{Binding RunStrategyCommand}" />
                                     <MenuItem
                                         Header="Clone Strategy"
                                         Command="{Binding CloneStrategyCommand}" />
@@ -77,6 +77,9 @@
                 </HierarchicalDataTemplate>
                 <DataTemplate DataType="{x:Type vm:StrategyJobViewModel}">
                     <StackPanel Orientation="Horizontal">
+                        <CheckBox
+                            IsChecked="{Binding Enabled}"
+                            Command="{Binding EnabledCommand}" />
                         <TextBlock Text="{Binding Model.Name}" />
                         <StackPanel.ContextMenu>
                             <ContextMenu>

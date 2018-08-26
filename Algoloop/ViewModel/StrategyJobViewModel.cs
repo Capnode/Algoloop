@@ -46,6 +46,7 @@ namespace Algoloop.ViewModel
             _appDomainService = appDomainService;
 
             DeleteJobCommand = new RelayCommand(() => DeleteJob(), true);
+            EnabledCommand = new RelayCommand(() => OnEnable(Model.Enabled), true);
 
             DataFromModel();
         }
@@ -72,6 +73,8 @@ namespace Algoloop.ViewModel
 
         public RelayCommand DeleteJobCommand { get; }
 
+        public RelayCommand EnabledCommand { get; }
+
         public string Logs
         {
             get => Model.Logs;
@@ -82,6 +85,17 @@ namespace Algoloop.ViewModel
             get => Logs == null ? 0 :  Logs.Count(m => m.Equals('\n'));
         }
 
+
+        public bool Enabled
+        {
+            get => Model.Enabled;
+            set
+            {
+                Model.Enabled = value;
+                RaisePropertyChanged(() => Enabled);
+            }
+        }
+
         public LiveCharts.Wpf.Series SelectedChart
         {
             get { return _selectedSeries; }
@@ -89,22 +103,47 @@ namespace Algoloop.ViewModel
             {
                 _selectedSeries = value;
                 RaisePropertyChanged();
+                if (SelectedCollection != null)
+                {
+                    SelectedCollection.Clear();
+                    if (value != null)
+                    {
+                        SelectedCollection.Add(value);
+                    }
 
-                SelectedCollection.Clear();
-                SelectedCollection.Add(value);
-                RaisePropertyChanged(() => SelectedCollection);
+                    RaisePropertyChanged(() => SelectedCollection);
+                }
             }
         }
 
-        internal async Task Start(CancellationTokenSource cancel)
+        private async void OnEnable(bool value)
         {
-            _cancel = cancel;
-            Log.Trace("Start Backtest: " + Model.AlgorithmName, true);
+            if (value)
+            {
+                await StartTaskAsync();
+            }
+            else
+            {
+                StopTask();
+            }
+        }
+
+        internal async Task StartTaskAsync()
+        {
+            _cancel = new CancellationTokenSource();
             DataToModel();
-            await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
+            await Task.Run(() =>_appDomainService.Run(Model), _cancel.Token);
             DataFromModel();
-            Log.Trace("Stop Backtest: " + Model.AlgorithmName, true);
-            _parent.Enabled = false;
+            _cancel = null;
+            Enabled = false;
+        }
+
+        private void StopTask()
+        {
+            if (_cancel != null)
+            {
+                _cancel.Cancel();
+            }
         }
 
         private void DeleteJob()
@@ -150,9 +189,12 @@ namespace Algoloop.ViewModel
 
             Statistics.Clear();
             Orders.Clear();
-            ChartCollection.Clear();
+
             YAxesCollection.Clear();
             VisualElementsCollection.Clear();
+            SelectedCollection.Clear();
+            ChartCollection.Clear();
+
             if (Model.Result != null)
             {
                 // Allow proper decoding of orders.

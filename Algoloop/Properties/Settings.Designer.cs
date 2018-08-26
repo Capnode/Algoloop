@@ -37,7 +37,7 @@ namespace Algoloop.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("160")]
+        [global::System.Configuration.DefaultSettingValueAttribute("220")]
         public int StrategyViewSplitter {
             get {
                 return ((int)(this["StrategyViewSplitter"]));

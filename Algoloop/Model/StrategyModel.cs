@@ -33,7 +33,6 @@ namespace Algoloop.Model
         public StrategyModel(StrategyModel model)
         {
             Name = model.Name;
-            Enabled = model.Enabled;
             Provider = model.Provider;
             Account = model.Account;
             BarsBack = model.BarsBack;
@@ -53,10 +52,6 @@ namespace Algoloop.Model
         [Description("Name of the strategy.")]
         [DataMember]
         public string Name { get; set; } = "Strategy";
-
-        [Browsable(false)]
-        [DataMember]
-        public bool Enabled { get; set; } = false;
 
         [Category("Broker")]
         [DisplayName("Data provider")]

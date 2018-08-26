@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="StrategyViewSplitter" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">160</Value>
+      <Value Profile="(Default)">220</Value>
     </Setting>
     <Setting Name="AccountViewSplitter" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">160</Value>

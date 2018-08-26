@@ -110,7 +110,6 @@ namespace Algoloop.Charts
                         Configuration = new InstantChartPointMapper(),
                         StrokeThickness = 1,
                     };
-
                     break;
 
                 default:

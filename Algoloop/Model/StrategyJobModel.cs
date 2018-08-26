@@ -98,6 +98,10 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
+        public bool Enabled { get; set; } = true;
+
+        [Browsable(false)]
+        [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
 
         [Browsable(false)]
