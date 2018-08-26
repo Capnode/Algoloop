@@ -34,28 +34,6 @@ namespace Algoloop.ViewModel
         private readonly IAppDomainService _appDomainService;
         private bool _isBusy;
 
-        public RelayCommand SettingsCommand { get; }
-        public RelayCommand<Window> ExitCommand { get; }
-        public RelayCommand AboutCommand { get; }
-
-        public LogViewModel LogViewModel { get; }
-        public MarketsViewModel MarketsViewModel { get; }
-        public AccountsViewModel AccountsViewModel { get; }
-        public StrategiesViewModel StrategiesViewModel { get; }
-
-        /// <summary>
-        /// Mark ongoing operation
-        /// </summary>
-        public bool IsBusy
-        {
-            get { return _isBusy; }
-            set
-            {
-                _isBusy = value;
-                RaisePropertyChanged("IsBusy");
-            }
-        }
-
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -77,6 +55,33 @@ namespace Algoloop.ViewModel
         ~MainViewModel()
         {
             SaveConfig();
+        }
+
+        public RelayCommand SettingsCommand { get; }
+        public RelayCommand<Window> ExitCommand { get; }
+        public RelayCommand AboutCommand { get; }
+
+        public LogViewModel LogViewModel { get; }
+        public MarketsViewModel MarketsViewModel { get; }
+        public AccountsViewModel AccountsViewModel { get; }
+        public StrategiesViewModel StrategiesViewModel { get; }
+
+        public string Title
+        {
+            get => AboutViewModel.AssemblyTitle;
+        }
+
+        /// <summary>
+        /// Mark ongoing operation
+        /// </summary>
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                RaisePropertyChanged("IsBusy");
+            }
         }
 
         private void DoExit(Window window)

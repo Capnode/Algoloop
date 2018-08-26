@@ -31,7 +31,7 @@ namespace Algoloop.ViewModel
         public string Copyright { get; private set; }
         public string Description { get; private set; }
 
-        public string AssemblyTitle
+        public static string AssemblyTitle
         {
             get
             {
@@ -49,7 +49,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string AssemblyVersion
+        public static string AssemblyVersion
         {
             get
             {
@@ -57,7 +57,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string AssemblyBuild
+        public static string AssemblyBuild
         {
             get
             {
@@ -65,7 +65,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string AssemblyDescription
+        public static string AssemblyDescription
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string AssemblyProduct
+        public static string AssemblyProduct
         {
             get
             {
@@ -93,7 +93,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string AssemblyCopyright
+        public static string AssemblyCopyright
         {
             get
             {
@@ -107,7 +107,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string AssemblyCompany
+        public static string AssemblyCompany
         {
             get
             {
