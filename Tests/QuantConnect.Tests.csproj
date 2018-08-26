@@ -629,7 +629,7 @@
       <Name>QuantConnect.Queues</Name>
     </ProjectReference>
     <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj">
-      <Project>{AC9A142C-B485-44D7-91FF-015C22C43D05}</Project>
+      <Project>{ac9a142c-b485-44d7-91ff-015c22c43d05}</Project>
       <Name>QuantConnect.ToolBox</Name>
     </ProjectReference>
   </ItemGroup>
