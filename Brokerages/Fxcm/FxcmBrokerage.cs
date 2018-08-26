@@ -342,7 +342,6 @@ namespace QuantConnect.Brokerages.Fxcm
         /// <returns>The open orders returned from FXCM</returns>
         public override List<Order> GetOpenOrders()
         {
-            Log.Trace(string.Format("FxcmBrokerage.GetOpenOrders(): Located {0} orders", _openOrders.Count));
             var orders = _openOrders.Values.ToList()
                 .Where(x => OrderIsOpen(x.getFXCMOrdStatus().getCode()))
                 .Select(ConvertOrder)
@@ -356,8 +355,6 @@ namespace QuantConnect.Brokerages.Fxcm
         /// <returns>The current holdings from the account</returns>
         public override List<Holding> GetAccountHoldings()
         {
-            Log.Trace("FxcmBrokerage.GetAccountHoldings()");
-
             // FXCM maintains multiple positions per symbol, so we aggregate them by symbol.
             // The average price for the aggregated position is the quantity weighted average price.
             var holdings = _openPositions.Values
@@ -402,7 +399,6 @@ namespace QuantConnect.Brokerages.Fxcm
         /// <returns>The current cash balance for each currency available for trading</returns>
         public override List<Cash> GetCashBalance()
         {
-            Log.Trace("FxcmBrokerage.GetCashBalance()");
             var cashBook = new List<Cash>();
 
             //Adds the account currency USD to the cashbook.
