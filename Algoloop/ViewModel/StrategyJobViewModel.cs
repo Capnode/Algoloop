@@ -19,6 +19,7 @@ using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using LiveCharts;
+using LiveCharts.Charts;
 using LiveCharts.Wpf;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
@@ -192,6 +193,16 @@ namespace Algoloop.ViewModel
 
             YAxesCollection.Clear();
             VisualElementsCollection.Clear();
+
+            // Create dummy chart to avoid error
+            foreach (var series in ChartCollection)
+            {
+                if (series.Model.Chart == null)
+                {
+                    var chart = new CartesianChart();
+                    series.Model.Chart = chart.Model;
+                }
+            }
             SelectedCollection.Clear();
             ChartCollection.Clear();
 
