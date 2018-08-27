@@ -32,6 +32,7 @@ namespace Algoloop.ViewModel
         private readonly IAppDomainService _appDomainService;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
+        private AppDomain _appDomain;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, IAppDomainService appDomainService)
         {
@@ -42,7 +43,7 @@ namespace Algoloop.ViewModel
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             DeleteMarketCommand = new RelayCommand(() => _parent?.DeleteMarket(this), true);
-            EnabledCommand = new RelayCommand(() => ProcessMarket(Model.Enabled), true);
+            EnabledCommand = new RelayCommand(() => OnEnable(Model.Enabled), true);
 
             DataFromModel();
 
@@ -56,12 +57,7 @@ namespace Algoloop.ViewModel
             };
 
             ActiveSymbols.Source = Symbols;
-
-            ProcessMarket(Model.Enabled);
-        }
-
-        ~MarketViewModel()
-        {
+            OnEnable(Model.Enabled);
         }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -100,6 +96,18 @@ namespace Algoloop.ViewModel
         public int Loglines
         {
             get => Logs == null ? 0 : Logs.Count(m => m.Equals('\n'));
+        }
+
+        private async void OnEnable(bool value)
+        {
+            if (value)
+            {
+                await StartTaskAsync();
+            }
+            else
+            {
+                StopTask();
+            }
         }
 
         internal void Refresh(SymbolViewModel symbolViewModel)
@@ -151,42 +159,61 @@ namespace Algoloop.ViewModel
             RaisePropertyChanged(() => Loglines);
         }
 
-        private async void ProcessMarket(bool enabled)
+        private async Task StartTaskAsync()
         {
-            if (enabled)
+            _cancel = new CancellationTokenSource();
+            DataToModel();
+            Model.FromDate = Model.FromDate.Date; // Remove time part
+            while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Now)
             {
-                _cancel = new CancellationTokenSource();
-                DataToModel();
-                Model.FromDate = Model.FromDate.Date; // Remove time part
-                while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Now)
+                Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
+                try
                 {
-                    Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
-                    await Task.Run(() => _appDomainService.Run(Model), _cancel.Token);
-                    DataFromModel();
-
-                    if (Model.FromDate >= DateTime.Today)
-                    {
-                        break;
-                    }
-
-                    Model.FromDate = Model.FromDate.AddDays(1);
-
-                    // Update view
-                    MarketModel model = Model;
-                    Model = null;
-                    Model = model;
+                    _appDomain = _appDomainService.CreateAppDomain();
+                    Toolbox toolbox = _appDomainService.CreateInstance<Toolbox>(_appDomain);
+                    _cancel = new CancellationTokenSource();
+                    await Task.Run(() => Model.Logs += toolbox.Run(Model), _cancel.Token);
+                    AppDomain.Unload(_appDomain);
+                }
+                catch (AppDomainUnloadedException)
+                {
+                    Log.Trace($"Market {Model.Name} canceled by user");
+                }
+                catch (Exception ex)
+                {
+                    Log.Trace($"{ex.GetType()}: {ex.Message}");
                 }
 
-                Log.Trace($"{Model.Provider} download complete");
-                _cancel = null;
-                Enabled = false;
+                DataFromModel();
+
+                if (Model.FromDate >= DateTime.Today)
+                {
+                    break;
+                }
+
+                Model.FromDate = Model.FromDate.AddDays(1);
+
+                // Update view
+                MarketModel model = Model;
+                Model = null;
+                Model = model;
             }
-            else
+
+            Log.Trace($"{Model.Provider} download complete");
+            _cancel = null;
+            Enabled = false;
+        }
+
+        private void StopTask()
+        {
+            if (_cancel != null)
             {
-                if (_cancel != null)
-                {
-                    _cancel.Cancel();
-                }
+                _cancel.Cancel();
+            }
+
+            if (_appDomain != null)
+            {
+                AppDomain.Unload(_appDomain);
             }
         }
     }

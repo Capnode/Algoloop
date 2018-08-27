@@ -15,8 +15,12 @@
         <TabItem Header="Configuration">
             <ScrollViewer>
                 <xctk:PropertyGrid
-                    DockPanel.Dock="Top"
                     ShowTitle="False"
+                    ShowSearchBox="False"
+                    ShowSummary="True"
+                    ShowAdvancedOptions="False"
+                    ShowSortOptions="False"
+                    IsReadOnly="True"
                     SelectedObject="{Binding Model}">
                 </xctk:PropertyGrid>
             </ScrollViewer>

@@ -18,6 +18,7 @@ using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using LiveCharts;
 using LiveCharts.Charts;
 using LiveCharts.Wpf;
@@ -27,6 +28,7 @@ using QuantConnect.Orders;
 using QuantConnect.Packets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,6 +41,7 @@ namespace Algoloop.ViewModel
         private IAppDomainService _appDomainService;
         private CancellationTokenSource _cancel;
         private LiveCharts.Wpf.Series _selectedSeries;
+        private AppDomain _appDomain;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, IAppDomainService appDomainService)
         {
@@ -50,6 +53,7 @@ namespace Algoloop.ViewModel
             EnabledCommand = new RelayCommand(() => OnEnable(Model.Enabled), true);
 
             DataFromModel();
+            OnEnable(Model.Enabled);
         }
 
         public StrategyJobModel Model { get; }
@@ -131,11 +135,41 @@ namespace Algoloop.ViewModel
 
         internal async Task StartTaskAsync()
         {
-            _cancel = new CancellationTokenSource();
+            ClearRunData();
             DataToModel();
-            await Task.Run(() =>_appDomainService.Run(Model), _cancel.Token);
-            DataFromModel();
+
+            // Get account
+            AccountModel account = null;
+            if (!string.IsNullOrEmpty(Model.Account))
+            {
+                IReadOnlyList<AccountModel> accounts = null;
+                var message = new NotificationMessageAction<List<AccountModel>>(Model.Account, m => accounts = m);
+                Messenger.Default.Send(message);
+                Debug.Assert(accounts != null);
+                account = accounts.FirstOrDefault();
+            }
+
+            try
+            {
+                _appDomain = _appDomainService.CreateAppDomain();
+                LeanEngine leanEngine = _appDomainService.CreateInstance<LeanEngine>(_appDomain);
+                _cancel = new CancellationTokenSource();
+                await Task.Run(() => (Model.Result, Model.Logs) = leanEngine.Run(Model, account), _cancel.Token);
+                Model.Completed = true;
+                AppDomain.Unload(_appDomain);
+                DataFromModel();
+            }
+            catch (AppDomainUnloadedException)
+            {
+                Log.Trace($"Strategy {Model.Name} canceled by user");
+            }
+            catch (Exception ex)
+            {
+                Log.Trace($"{ex.GetType()}: {ex.Message}");
+            }
+
             _cancel = null;
+            _appDomain = null;
             Enabled = false;
         }
 
@@ -144,6 +178,11 @@ namespace Algoloop.ViewModel
             if (_cancel != null)
             {
                 _cancel.Cancel();
+            }
+
+            if (_appDomain != null)
+            {
+                AppDomain.Unload(_appDomain);
             }
         }
 
@@ -210,26 +249,56 @@ namespace Algoloop.ViewModel
             {
                 // Allow proper decoding of orders.
                 var result = JsonConvert.DeserializeObject<BacktestResult>(Model.Result, new[] { new OrderJsonConverter() });
-
-                foreach (var item in result.Statistics)
+                if (result != null)
                 {
-                    var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
-                    Statistics.Add(statisticViewModel);
-                }
+                    foreach (var item in result.Statistics)
+                    {
+                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
+                        Statistics.Add(statisticViewModel);
+                    }
 
-                foreach (var item in result.RuntimeStatistics)
-                {
-                    var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
-                    Statistics.Add(statisticViewModel);
-                }
+                    foreach (var item in result.RuntimeStatistics)
+                    {
+                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
+                        Statistics.Add(statisticViewModel);
+                    }
 
-                foreach (var order in result.Orders.OrderBy(o => o.Key))
-                {
-                    Orders.Add(order.Value);
-                }
+                    foreach (var order in result.Orders.OrderBy(o => o.Key))
+                    {
+                        Orders.Add(order.Value);
+                    }
 
-                ParseCharts(result.Charts.MapToChartDefinitionDictionary());
+                    ParseCharts(result.Charts.MapToChartDefinitionDictionary());
+                }
             }
+
+            RaisePropertyChanged(() => Logs);
+            RaisePropertyChanged(() => Loglines);
+        }
+
+        private void ClearRunData()
+        {
+            Model.Completed = false;
+            Model.Logs = null;
+            Model.Result = null;
+
+            Statistics.Clear();
+            Orders.Clear();
+
+            YAxesCollection.Clear();
+            VisualElementsCollection.Clear();
+
+            // Create dummy chart to avoid error
+            foreach (var series in ChartCollection)
+            {
+                if (series.Model.Chart == null)
+                {
+                    var chart = new CartesianChart();
+                    series.Model.Chart = chart.Model;
+                }
+            }
+            SelectedCollection.Clear();
+            ChartCollection.Clear();
 
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);

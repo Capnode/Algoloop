@@ -12,13 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
-using GalaSoft.MvvmLight.Messaging;
-using QuantConnect.Logging;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -48,42 +42,15 @@ namespace Algoloop.Service
             _ads.ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
         }
 
-        public void Run(StrategyJobModel jobModel)
+        public AppDomain CreateAppDomain()
         {
-            // Get account
-            AccountModel account = null;
-            if (!string.IsNullOrEmpty(jobModel.Account))
-            {
-                IReadOnlyList<AccountModel> accounts = null;
-                var message = new NotificationMessageAction<List<AccountModel>>(jobModel.Account, m => accounts = m);
-                Messenger.Default.Send(message);
-                Debug.Assert(accounts != null);
-                account = accounts.FirstOrDefault();
-            }
-
-            // Create the second AppDomain.
             var name = Guid.NewGuid().ToString("x");
-            AppDomain ad = AppDomain.CreateDomain(name, null, _ads);
-
-            // Create an instance of MarshalbyRefType in the second AppDomain. 
-            // A proxy to the object is returned.
-            LeanEngine leanEngine = (LeanEngine)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(LeanEngine).FullName);
-            (jobModel.Result, jobModel.Logs) = leanEngine.Run(jobModel, account);
-            jobModel.Completed = true;
-            AppDomain.Unload(ad);
+            return AppDomain.CreateDomain(name, null, _ads);
         }
 
-        public void Run(MarketModel marketModel)
+        public T CreateInstance<T>(AppDomain ad)
         {
-            // Create the second AppDomain.
-            var name = Guid.NewGuid().ToString("x");
-            AppDomain ad = AppDomain.CreateDomain(name, null, _ads);
-
-            // Create an instance of MarshalbyRefType in the second AppDomain. 
-            // A proxy to the object is returned.
-            Toolbox toolbox = (Toolbox)ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(Toolbox).FullName);
-            marketModel.Logs += toolbox.Run(marketModel);
-            AppDomain.Unload(ad);
+            return(T) ad.CreateInstanceAndUnwrap(_exeAssembly, typeof(T).FullName);
         }
     }
 }

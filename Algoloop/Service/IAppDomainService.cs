@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using System;
 
 namespace Algoloop.Service
 {
     public interface IAppDomainService
     {
-        void Run(StrategyJobModel jobModel);
-        void Run(MarketModel marketModel);
+        AppDomain CreateAppDomain();
+        T CreateInstance<T>(AppDomain ad);
     }
 }
