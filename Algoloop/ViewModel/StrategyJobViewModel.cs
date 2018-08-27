@@ -268,7 +268,14 @@ namespace Algoloop.ViewModel
                         Orders.Add(order.Value);
                     }
 
-                    ParseCharts(result.Charts.MapToChartDefinitionDictionary());
+                    try
+                    {
+                        ParseCharts(result.Charts.MapToChartDefinitionDictionary());
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Trace($"Strategy {Model.Name} {ex.GetType()}: {ex.Message}");
+                    }
                 }
             }
 
