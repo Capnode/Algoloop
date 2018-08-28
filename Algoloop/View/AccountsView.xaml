@@ -23,12 +23,12 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <GridSplitter
-         Grid.Column="1"
-         HorizontalAlignment="Left"
-         Margin="0"
-         Width="5"
-         Height="Auto"
-         VerticalAlignment="Stretch" />
+            Grid.Column="1"
+            HorizontalAlignment="Left"
+            Margin="0"
+            Width="5"
+            Height="Auto"
+            VerticalAlignment="Stretch" />
         <TreeView
             Name="treeView"
             Grid.Column="0"
@@ -38,7 +38,11 @@
                 <ContextMenu>
                     <MenuItem
                         Header="Add Account"
-                        Command="{Binding AddAccountCommand}" />
+                        Command="{Binding AddAccountCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </TreeView.ContextMenu>
             <TreeView.Resources>
@@ -52,7 +56,11 @@
                                 <ContextMenu>
                                     <MenuItem
                                         Header="Delete Account"
-                                        Command="{Binding DeleteAccountCommand}" />
+                                        Command="{Binding DeleteAccountCommand}">
+                                        <MenuItem.Icon>
+                                            <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                 </ContextMenu>
                             </TextBlock.ContextMenu>
                         </TextBlock>
@@ -81,12 +89,12 @@
                         <TabControl>
                             <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}">
                                 <DataGrid
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                AutoGenerateColumns="False"
-                                IsReadOnly="False"
-                                GridLinesVisibility="None"
-                                ItemsSource="{Binding Positions}">
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    ItemsSource="{Binding Positions}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
                                         <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
@@ -100,11 +108,15 @@
                                     </DataGrid.Columns>
                                     <DataGrid.Resources>
                                         <ContextMenu
-                                        x:Key="RowMenu"
-                                        DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            x:Key="RowMenu"
+                                            DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                             <MenuItem
-                                            Header="Close position"
-                                            Command="{Binding ClosePositionCommand}" />
+                                                Header="Close position"
+                                                Command="{Binding ClosePositionCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                         </ContextMenu>
                                     </DataGrid.Resources>
                                     <DataGrid.RowStyle>
@@ -116,12 +128,12 @@
                             </TabItem>
                             <TabItem Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}">
                                 <DataGrid
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                AutoGenerateColumns="False"
-                                IsReadOnly="False"
-                                GridLinesVisibility="None"
-                                ItemsSource="{Binding Balances}">
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    ItemsSource="{Binding Balances}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
                                         <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
@@ -135,12 +147,12 @@
                             </TabItem>
                             <TabItem Header="Settings">
                                 <xctk:PropertyGrid
-                                ShowTitle="False"
-                                ShowSearchBox="False"
-                                ShowSummary="True"
-                                ShowAdvancedOptions="False"
-                                ShowSortOptions="False"
-                                SelectedObject="{Binding Model}">
+                                    ShowTitle="False"
+                                    ShowSearchBox="False"
+                                    ShowSummary="True"
+                                    ShowAdvancedOptions="False"
+                                    ShowSortOptions="False"
+                                    SelectedObject="{Binding Model}">
                                 </xctk:PropertyGrid>
                             </TabItem>
                         </TabControl>

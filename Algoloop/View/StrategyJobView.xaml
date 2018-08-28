@@ -27,21 +27,21 @@
             <TabItem Header="Configuration">
                 <ScrollViewer>
                     <xctk:PropertyGrid
-                    ShowTitle="False"
-                    ShowSearchBox="False"
-                    ShowSummary="True"
-                    ShowAdvancedOptions="False"
-                    ShowSortOptions="False"
-                    IsReadOnly="True"
-                    SelectedObject="{Binding Model}">
+                        ShowTitle="False"
+                        ShowSearchBox="False"
+                        ShowSummary="True"
+                        ShowAdvancedOptions="False"
+                        ShowSortOptions="False"
+                        IsReadOnly="True"
+                        SelectedObject="{Binding Model}">
                     </xctk:PropertyGrid>
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                 <ListBox
-                SelectionMode="Extended"
-                DockPanel.Dock="Bottom"
-                ItemsSource="{Binding Symbols}">
+                    SelectionMode="Extended"
+                    DockPanel.Dock="Bottom"
+                    ItemsSource="{Binding Symbols}">
                     <ListBox.Resources>
                         <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                             <StackPanel Orientation="Horizontal">
@@ -54,11 +54,11 @@
             </TabItem>
             <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
                 <DataGrid HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                AutoGenerateColumns="False"
-                GridLinesVisibility="None"
-                IsReadOnly="True"
-                ItemsSource="{Binding Parameters}">
+                    VerticalAlignment="Stretch"
+                    AutoGenerateColumns="False"
+                    GridLinesVisibility="None"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding Parameters}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
                         <DataGridTextColumn Header="Value" Binding="{Binding Model.Value}" />
@@ -67,11 +67,11 @@
             </TabItem>
             <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
                 <DataGrid HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                AutoGenerateColumns="False"
-                GridLinesVisibility="None"
-                IsReadOnly="True"
-                ItemsSource="{Binding Statistics}">
+                    VerticalAlignment="Stretch"
+                    AutoGenerateColumns="False"
+                    GridLinesVisibility="None"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding Statistics}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
@@ -80,10 +80,10 @@
             </TabItem>
             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
                 <DataGrid
-                IsReadOnly="True"
-                GridLinesVisibility="None"
-                AutoGenerateColumns="False"
-                ItemsSource="{Binding Orders}">
+                    IsReadOnly="True"
+                    GridLinesVisibility="None"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding Orders}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
@@ -104,23 +104,22 @@
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-
                     <StackPanel Margin="4" Orientation="Horizontal">
                         <ComboBox
-                        MinWidth="100"
-                        DisplayMemberPath="Title"
-                        ItemsSource="{Binding ChartCollection}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
+                            MinWidth="100"
+                            DisplayMemberPath="Title"
+                            ItemsSource="{Binding ChartCollection}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
                     </StackPanel>
                     <lvc:CartesianChart
                     Grid.Row="1"
                     Series="{Binding SelectedCollection}" >
                         <lvc:CartesianChart.AxisX>
                             <lvc:DateAxis
-                            ShowLabels="true"
-                            Position="LeftBottom"
-                            Period = "{Binding Model.Resolution, Mode=OneWay, Converter={viewsupport:ResolutionConverter}}"
-                            HeaderFontWeight="Normal"
-                            InitialDateTime="{Binding InitialDateTime, Mode=OneWay}" >
+                                ShowLabels="true"
+                                Position="LeftBottom"
+                                Period = "{Binding Model.Resolution, Mode=OneWay, Converter={viewsupport:ResolutionConverter}}"
+                                HeaderFontWeight="Normal"
+                                InitialDateTime="{Binding InitialDateTime, Mode=OneWay}" >
                                 <lvc:DateAxis.Separator>
                                     <lvc:Separator/>
                                 </lvc:DateAxis.Separator>
@@ -131,9 +130,9 @@
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox
-                Text="{Binding Logs, Mode=OneWay}"
-                IsReadOnly="True"
-                VerticalScrollBarVisibility="Auto" />
+                    Text="{Binding Logs, Mode=OneWay}"
+                    IsReadOnly="True"
+                    VerticalScrollBarVisibility="Auto" />
             </TabItem>
         </TabControl>
     </DockPanel>

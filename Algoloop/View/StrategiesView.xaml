@@ -1,22 +1,22 @@
 ﻿<UserControl x:Class="Algoloop.View.StrategiesView"
-  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-  xmlns:sys="clr-namespace:System;assembly=mscorlib"
-  xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-  xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
-  xmlns:vm="clr-namespace:Algoloop.ViewModel"
-  xmlns:view="clr-namespace:Algoloop.View"
-  xmlns:properties="clr-namespace:Algoloop.Properties"
-  DataContext="{Binding Source={StaticResource Locator}, Path=StrategiesViewModel}" 
-  mc:Ignorable="d" 
-  d:DesignHeight="450" d:DesignWidth="800">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
+    xmlns:vm="clr-namespace:Algoloop.ViewModel"
+    xmlns:view="clr-namespace:Algoloop.View"
+    xmlns:properties="clr-namespace:Algoloop.Properties"
+    DataContext="{Binding Source={StaticResource Locator}, Path=StrategiesViewModel}" 
+    mc:Ignorable="d" 
+    d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
         <ObjectDataProvider
-      x:Key="settings"
-      ObjectInstance="{x:Static properties:Settings.Default}"/>
+            x:Key="settings"
+            ObjectInstance="{x:Static properties:Settings.Default}"/>
     </UserControl.Resources>
 
     <Grid>
@@ -40,7 +40,11 @@
                 <ContextMenu>
                     <MenuItem
                         Header="Add Strategy"
-                        Command="{Binding AddStrategyCommand}" />
+                        Command="{Binding AddStrategyCommand}">
+                        <MenuItem.Icon>
+                            <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem
                         Header="Import Strategies..."
                         Command="{Binding ImportStrategyCommand}" />
@@ -60,13 +64,25 @@
                                 <ContextMenu>
                                     <MenuItem
                                         Header="Run Strategy"
-                                        Command="{Binding RunStrategyCommand}" />
+                                        Command="{Binding RunStrategyCommand}">
+                                        <MenuItem.Icon>
+                                            <Image Source="/Resources/Run.png" Width="16" Height="16"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem
                                         Header="Clone Strategy"
-                                        Command="{Binding CloneStrategyCommand}" />
+                                        Command="{Binding CloneStrategyCommand}">
+                                        <MenuItem.Icon>
+                                            <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem
                                         Header="Delete Strategy"
-                                        Command="{Binding DeleteStrategyCommand}" />
+                                        Command="{Binding DeleteStrategyCommand}">
+                                        <MenuItem.Icon>
+                                            <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                     <MenuItem
                                         Header="Export Strategy..."
                                         Command="{Binding ExportStrategyCommand}" />
@@ -85,7 +101,11 @@
                             <ContextMenu>
                                 <MenuItem
                                     Header="Delete Job"
-                                    Command="{Binding DeleteJobCommand}" />
+                                    Command="{Binding DeleteJobCommand}">
+                                    <MenuItem.Icon>
+                                        <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                    </MenuItem.Icon>
+                                </MenuItem>
                             </ContextMenu>
                         </StackPanel.ContextMenu>
                     </StackPanel>
@@ -110,27 +130,31 @@
                         <TabControl>
                             <TabItem Header="Configuration">
                                 <xctk:PropertyGrid
-                                ShowTitle="False"
-                                ShowSearchBox="False"
-                                ShowSummary="True"
-                                ShowAdvancedOptions="False"
-                                ShowSortOptions="False"
-                                SelectedObject="{Binding Model}">
+                                    ShowTitle="False"
+                                    ShowSearchBox="False"
+                                    ShowSummary="True"
+                                    ShowAdvancedOptions="False"
+                                    ShowSortOptions="False"
+                                    SelectedObject="{Binding Model}">
                                 </xctk:PropertyGrid>
                             </TabItem>
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                                 <ListBox
-                                SelectionMode="Extended"
-                                DockPanel.Dock="Bottom"
-                                ItemsSource="{Binding Symbols}">
+                                    SelectionMode="Extended"
+                                    DockPanel.Dock="Bottom"
+                                    ItemsSource="{Binding Symbols}">
                                     <ListBox.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem
-                                            Header="Add Symbol"
-                                            Command="{Binding AddSymbolCommand}" />
+                                                Header="Add Symbol"
+                                                Command="{Binding AddSymbolCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                             <MenuItem
-                                            Header="Import Symbol list..."
-                                            Command="{Binding ImportSymbolsCommand}" />
+                                                Header="Import Symbol list..."
+                                                Command="{Binding ImportSymbolsCommand}" />
                                         </ContextMenu>
                                     </ListBox.ContextMenu>
                                     <ListBox.Resources>
@@ -141,8 +165,12 @@
                                                     <TextBox.ContextMenu>
                                                         <ContextMenu>
                                                             <MenuItem
-                                                            Header="Delete Symbol"
-                                                            Command="{Binding DeleteSymbolCommand}" />
+                                                                Header="Delete Symbol"
+                                                                Command="{Binding DeleteSymbolCommand}">
+                                                                <MenuItem.Icon>
+                                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                                </MenuItem.Icon>
+                                                            </MenuItem>
                                                         </ContextMenu>
                                                     </TextBox.ContextMenu>
                                                 </TextBox>
@@ -153,12 +181,12 @@
                             </TabItem>
                             <TabItem Header="{Binding Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
                                 <DataGrid
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Stretch"
-                                AutoGenerateColumns="False"
-                                IsReadOnly="False"
-                                GridLinesVisibility="None"
-                                ItemsSource="{Binding Parameters}">
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    ItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn IsReadOnly="False" Header="Name" Binding="{Binding Model.Name, Mode=TwoWay}" />
                                         <DataGridTextColumn IsReadOnly="False" Header="Value" Binding="{Binding Model.Value, Mode=TwoWay}" />
@@ -166,17 +194,25 @@
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem
-                                            Header="Add Parameter"
-                                            Command="{Binding AddParameterCommand}" />
+                                                Header="Add Parameter"
+                                                Command="{Binding AddParameterCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                         </ContextMenu>
                                     </DataGrid.ContextMenu>
                                     <DataGrid.Resources>
                                         <ContextMenu
-                                        x:Key="RowMenu"
-                                        DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            x:Key="RowMenu"
+                                            DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
                                             <MenuItem
-                                            Header="Delete Parameter"
-                                            Command="{Binding DeleteParameterCommand}" />
+                                                Header="Delete Parameter"
+                                                Command="{Binding DeleteParameterCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                         </ContextMenu>
                                     </DataGrid.Resources>
                                     <DataGrid.RowStyle>
@@ -190,7 +226,7 @@
                     </DockPanel>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:StrategyJobViewModel}">
-                  <view:StrategyJobView />
+                    <view:StrategyJobView />
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>
