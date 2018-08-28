@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
@@ -31,7 +30,6 @@ namespace Algoloop.ViewModel
     public class AccountViewModel : ViewModelBase
     {
         private AccountsViewModel _parent;
-        private Task _task;
         private CancellationTokenSource _cancel;
 
         public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel)
@@ -39,19 +37,19 @@ namespace Algoloop.ViewModel
             _parent = accountsViewModel;
             Model = accountModel;
 
-            DeleteAccountCommand = new RelayCommand(() => _parent?.DeleteAccount(this), true);
-            EnabledCommand = new RelayCommand(() => ProcessAccount(Model.Enabled), true);
+            EnabledCommand = new RelayCommand(() => OnEnabledCommand(Model.Enabled), true);
+            StartAccountCommand = new RelayCommand(() => OnStartAccountCommand(), () => !Enabled);
+            StopAccountCommand = new RelayCommand(() => StopTask(), () => Enabled);
+            DeleteAccountCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Enabled);
 
-            ProcessAccount(Model.Enabled);
-        }
-
-        ~AccountViewModel()
-        {
-//            StopTask();
+            OnEnabledCommand(Model.Enabled);
         }
 
         public AccountModel Model { get; }
 
+        public RelayCommand EnabledCommand { get; }
+        public RelayCommand StartAccountCommand { get; }
+        public RelayCommand StopAccountCommand { get; }
         public RelayCommand DeleteAccountCommand { get; }
 
         public bool Enabled
@@ -61,39 +59,52 @@ namespace Algoloop.ViewModel
             {
                 Model.Enabled = value;
                 RaisePropertyChanged(() => Enabled);
+                StartAccountCommand.RaiseCanExecuteChanged();
+                StopAccountCommand.RaiseCanExecuteChanged();
+                DeleteAccountCommand.RaiseCanExecuteChanged();
             }
         }
-
-        public RelayCommand EnabledCommand { get; }
 
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
 
-        private void ProcessAccount(bool value)
+        private void OnEnabledCommand(bool value)
         {
-            if (!value)
+            if (value)
+            {
+                StartTask();
+            }
+            else
             {
                 StopTask();
-                return;
             }
+        }
 
-            _cancel = new CancellationTokenSource();
+        private void OnStartAccountCommand()
+        {
+            Enabled = true;
+            StartTask();
+        }
+
+        private async void StartTask()
+        {
             Log.Trace($"Connect Account {Model.Name}");
-            _task = Task.Run(() => StartTask(_cancel.Token), _cancel.Token);
+            _cancel = new CancellationTokenSource();
+            await Task.Run(() => StartFxcm(_cancel.Token), _cancel.Token);
+            _cancel = null;
+            Log.Trace($"Disconnect Account {Model.Name}");
+            Enabled = false;
         }
 
         private void StopTask()
         {
-            if (_task != null && _task.Status.Equals(TaskStatus.Running))
+            if (_cancel != null)
             {
                 _cancel.Cancel();
-                _task.Wait();
-                Debug.Assert(_task.IsCompleted);
-                _task = null;
             }
         }
 
-        private void StartTask(CancellationToken cancel)
+        private void StartFxcm(CancellationToken cancel)
         {
             Brokerage brokerage = null;
             try
@@ -152,12 +163,10 @@ namespace Algoloop.ViewModel
                 brokerage.Disconnect();
                 Positions.Clear();
                 Balances.Clear();
-                Enabled = false;
             }
             catch (Exception ex)
             {
                 Log.Error($"{ex.GetType()}: {ex.Message}");
-                Enabled = false;
                 if (brokerage != null)
                 {
                     brokerage.Disconnect();

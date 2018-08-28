@@ -42,8 +42,10 @@ namespace Algoloop.ViewModel
 
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
-            DeleteMarketCommand = new RelayCommand(() => _parent?.DeleteMarket(this), true);
-            EnabledCommand = new RelayCommand(() => OnEnable(Model.Enabled), true);
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !Enabled);
+            EnableCommand = new RelayCommand(() => OnEnableCommand(Model.Enabled), true);
+            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Enabled);
+            StopCommand = new RelayCommand(() => OnStopCommand(), () => Enabled);
 
             DataFromModel();
 
@@ -57,7 +59,7 @@ namespace Algoloop.ViewModel
             };
 
             ActiveSymbols.Source = Symbols;
-            OnEnable(Model.Enabled);
+            OnEnableCommand(Model.Enabled);
         }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -68,9 +70,11 @@ namespace Algoloop.ViewModel
 
         public RelayCommand ImportSymbolsCommand { get; }
 
-        public RelayCommand DeleteMarketCommand { get; }
+        public RelayCommand DeleteCommand { get; }
 
-        public RelayCommand EnabledCommand { get; }
+        public RelayCommand EnableCommand { get; }
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
 
         public bool Enabled
         {
@@ -79,6 +83,9 @@ namespace Algoloop.ViewModel
             {
                 Model.Enabled = value;
                 RaisePropertyChanged(() => Enabled);
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -98,7 +105,7 @@ namespace Algoloop.ViewModel
             get => Logs == null ? 0 : Logs.Count(m => m.Equals('\n'));
         }
 
-        private async void OnEnable(bool value)
+        private async void OnEnableCommand(bool value)
         {
             if (value)
             {
@@ -108,6 +115,18 @@ namespace Algoloop.ViewModel
             {
                 StopTask();
             }
+        }
+
+        private async void OnStartCommand()
+        {
+            Enabled = true;
+            await StartTaskAsync();
+        }
+
+        private void OnStopCommand()
+        {
+            StopTask();
+            Enabled = false;
         }
 
         internal void Refresh(SymbolViewModel symbolViewModel)

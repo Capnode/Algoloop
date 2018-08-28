@@ -49,11 +49,13 @@ namespace Algoloop.ViewModel
             Model = model;
             _appDomainService = appDomainService;
 
-            DeleteJobCommand = new RelayCommand(() => DeleteJob(), true);
-            EnabledCommand = new RelayCommand(() => OnEnable(Model.Enabled), true);
+            StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Enabled);
+            StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Enabled);
+            DeleteJobCommand = new RelayCommand(() => DeleteJob(), () => !Enabled);
+            EnabledCommand = new RelayCommand(() => OnEnableCommand(Model.Enabled), true);
 
             DataFromModel();
-            OnEnable(Model.Enabled);
+            OnEnableCommand(Model.Enabled);
         }
 
         public StrategyJobModel Model { get; }
@@ -75,6 +77,10 @@ namespace Algoloop.ViewModel
         public AxesCollection YAxesCollection { get; } = new AxesCollection();
 
         public VisualElementsCollection VisualElementsCollection { get; } = new VisualElementsCollection();
+
+        public RelayCommand StartJobCommand { get; }
+
+        public RelayCommand StopJobCommand { get; }
 
         public RelayCommand DeleteJobCommand { get; }
 
@@ -98,6 +104,9 @@ namespace Algoloop.ViewModel
             {
                 Model.Enabled = value;
                 RaisePropertyChanged(() => Enabled);
+                StartJobCommand.RaiseCanExecuteChanged();
+                StopJobCommand.RaiseCanExecuteChanged();
+                DeleteJobCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -118,18 +127,6 @@ namespace Algoloop.ViewModel
 
                     RaisePropertyChanged(() => SelectedCollection);
                 }
-            }
-        }
-
-        private async void OnEnable(bool value)
-        {
-            if (value)
-            {
-                await StartTaskAsync();
-            }
-            else
-            {
-                StopTask();
             }
         }
 
@@ -170,6 +167,30 @@ namespace Algoloop.ViewModel
 
             _cancel = null;
             _appDomain = null;
+            Enabled = false;
+        }
+
+        private async void OnEnableCommand(bool value)
+        {
+            if (value)
+            {
+                await StartTaskAsync();
+            }
+            else
+            {
+                StopTask();
+            }
+        }
+
+        private async void OnStartJobCommand()
+        {
+            Enabled = true;
+            await StartTaskAsync();
+        }
+
+        private void OnStopJobCommand(bool v)
+        {
+            StopTask();
             Enabled = false;
         }
 

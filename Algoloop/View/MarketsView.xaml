@@ -46,13 +46,13 @@
                     <StackPanel Orientation="Horizontal">
                         <CheckBox
                             IsChecked="{Binding Enabled}"
-                            Command="{Binding EnabledCommand}" />
+                            Command="{Binding EnableCommand}" />
                         <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem
                                         Header="Delete Market"
-                                        Command="{Binding DeleteMarketCommand}" />
+                                        Command="{Binding DeleteCommand}" />
                                 </ContextMenu>
                             </TextBlock.ContextMenu>
                         </TextBlock>
@@ -71,57 +71,70 @@
             Content="{Binding Path=SelectedItem, ElementName=treeView}">
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:MarketViewModel}">
-                    <TabControl>
-                        <TabItem Header="Settings">
-                            <xctk:PropertyGrid
+                    <DockPanel>
+                        <ToolBar DockPanel.Dock="Top">
+                            <Button ToolTip="Start market" Command="{Binding StartCommand}">
+                                <Image Source="/Resources/Run.png" Width="16" Height="16"/>
+                            </Button>
+                            <Button ToolTip="Stop market" Command="{Binding StopCommand}">
+                                <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
+                            </Button>
+                            <Button ToolTip="Delete market" Command="{Binding DeleteCommand}">
+                                <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                            </Button>
+                        </ToolBar>
+                        <TabControl>
+                            <TabItem Header="Settings">
+                                <xctk:PropertyGrid
                                 ShowTitle="False"
                                 ShowSearchBox="False"
                                 ShowSummary="True"
                                 ShowAdvancedOptions="False"
                                 ShowSortOptions="False"
                                 SelectedObject="{Binding Model}">
-                            </xctk:PropertyGrid>
-                        </TabItem>
-                        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
-                            <ListBox
+                                </xctk:PropertyGrid>
+                            </TabItem>
+                            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                                <ListBox
                                 SelectionMode="Extended"
                                 DockPanel.Dock="Bottom"
                                 ItemsSource="{Binding Symbols}">
-                                <ListBox.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem
+                                    <ListBox.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem
                                             Header="Add Symbol"
                                             Command="{Binding AddSymbolCommand}" />
-                                        <MenuItem
+                                            <MenuItem
                                             Header="Import Symbol list..."
                                             Command="{Binding ImportSymbolsCommand}" />
-                                    </ContextMenu>
-                                </ListBox.ContextMenu>
-                                <ListBox.Resources>
-                                    <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <CheckBox IsChecked="{Binding Enabled}" />
-                                            <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
-                                                <TextBox.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem
+                                        </ContextMenu>
+                                    </ListBox.ContextMenu>
+                                    <ListBox.Resources>
+                                        <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <CheckBox IsChecked="{Binding Enabled}" />
+                                                <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
+                                                    <TextBox.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem
                                                             Header="Delete Symbol"
                                                             Command="{Binding DeleteSymbolCommand}" />
-                                                    </ContextMenu>
-                                                </TextBox.ContextMenu>
-                                            </TextBox>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.Resources>
-                            </ListBox>
-                        </TabItem>
-                        <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
-                            <TextBox
+                                                        </ContextMenu>
+                                                    </TextBox.ContextMenu>
+                                                </TextBox>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.Resources>
+                                </ListBox>
+                            </TabItem>
+                            <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
+                                <TextBox
                                 Text="{Binding Logs, Mode=OneWay}"
                                 IsReadOnly="True"
                                 VerticalScrollBarVisibility="Auto" />
-                        </TabItem>
-                    </TabControl>
+                            </TabItem>
+                        </TabControl>
+                    </DockPanel>
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

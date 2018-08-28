@@ -11,10 +11,22 @@
     xmlns:properties="clr-namespace:Algoloop.Properties"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
-    <TabControl>
-        <TabItem Header="Configuration">
-            <ScrollViewer>
-                <xctk:PropertyGrid
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <Button ToolTip="Restart strategy" Command="{Binding StartJobCommand}">
+                <Image Source="/Resources/Run.png" Width="16" Height="16"/>
+            </Button>
+            <Button ToolTip="Stop strategy" Command="{Binding StopJobCommand}">
+                <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
+            </Button>
+            <Button ToolTip="Delete strategy" Command="{Binding DeleteJobCommand}">
+                <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+            </Button>
+        </ToolBar>
+        <TabControl>
+            <TabItem Header="Configuration">
+                <ScrollViewer>
+                    <xctk:PropertyGrid
                     ShowTitle="False"
                     ShowSearchBox="False"
                     ShowSummary="True"
@@ -22,106 +34,107 @@
                     ShowSortOptions="False"
                     IsReadOnly="True"
                     SelectedObject="{Binding Model}">
-                </xctk:PropertyGrid>
-            </ScrollViewer>
-        </TabItem>
-        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
-            <ListBox
+                    </xctk:PropertyGrid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                <ListBox
                 SelectionMode="Extended"
                 DockPanel.Dock="Bottom"
                 ItemsSource="{Binding Symbols}">
-                <ListBox.Resources>
-                    <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding Model.Enabled}" IsEnabled="False"/>
-                            <TextBlock Text="{Binding Model.Name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.Resources>
-            </ListBox>
-        </TabItem>
-        <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
-            <DataGrid HorizontalAlignment="Stretch"
+                    <ListBox.Resources>
+                        <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Model.Enabled}" IsEnabled="False"/>
+                                <TextBlock Text="{Binding Model.Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.Resources>
+                </ListBox>
+            </TabItem>
+            <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
+                <DataGrid HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 AutoGenerateColumns="False"
                 GridLinesVisibility="None"
                 IsReadOnly="True"
                 ItemsSource="{Binding Parameters}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
-                    <DataGridTextColumn Header="Value" Binding="{Binding Model.Value}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </TabItem>
-        <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
-            <DataGrid HorizontalAlignment="Stretch"
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
+                        <DataGridTextColumn Header="Value" Binding="{Binding Model.Value}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
+                <DataGrid HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 AutoGenerateColumns="False"
                 GridLinesVisibility="None"
                 IsReadOnly="True"
                 ItemsSource="{Binding Statistics}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </TabItem>
-        <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
-            <DataGrid
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
+                <DataGrid
                 IsReadOnly="True"
                 GridLinesVisibility="None"
                 AutoGenerateColumns="False"
                 ItemsSource="{Binding Orders}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
-                    <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
-                    <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
-                    <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}"/>
-                    <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
-                    <DataGridTextColumn Header="Value" Binding="{Binding Value}"/>
-                    <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
-                    <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
-                    <DataGridTextColumn Header="Tag" Binding="{Binding Tag}"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </TabItem>
-        <TabItem Header="{Binding ChartCollection.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+                        <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
+                        <DataGridTextColumn Header="Value" Binding="{Binding Value}"/>
+                        <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
+                        <DataGridTextColumn Header="Tag" Binding="{Binding Tag}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="{Binding ChartCollection.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
 
-                <StackPanel Margin="4" Orientation="Horizontal">
-                    <ComboBox
+                    <StackPanel Margin="4" Orientation="Horizontal">
+                        <ComboBox
                         MinWidth="100"
                         DisplayMemberPath="Title"
                         ItemsSource="{Binding ChartCollection}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
-                </StackPanel>
-                <lvc:CartesianChart
+                    </StackPanel>
+                    <lvc:CartesianChart
                     Grid.Row="1"
                     Series="{Binding SelectedCollection}" >
-                    <lvc:CartesianChart.AxisX>
-                        <lvc:DateAxis
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:DateAxis
                             ShowLabels="true"
                             Position="LeftBottom"
                             Period = "{Binding Model.Resolution, Mode=OneWay, Converter={viewsupport:ResolutionConverter}}"
                             HeaderFontWeight="Normal"
                             InitialDateTime="{Binding InitialDateTime, Mode=OneWay}" >
-                            <lvc:DateAxis.Separator>
-                                <lvc:Separator/>
-                            </lvc:DateAxis.Separator>
-                        </lvc:DateAxis>
-                    </lvc:CartesianChart.AxisX>
-                </lvc:CartesianChart>
-            </Grid>
-        </TabItem>
-        <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
-            <TextBox
+                                <lvc:DateAxis.Separator>
+                                    <lvc:Separator/>
+                                </lvc:DateAxis.Separator>
+                            </lvc:DateAxis>
+                        </lvc:CartesianChart.AxisX>
+                    </lvc:CartesianChart>
+                </Grid>
+            </TabItem>
+            <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
+                <TextBox
                 Text="{Binding Logs, Mode=OneWay}"
                 IsReadOnly="True"
                 VerticalScrollBarVisibility="Auto" />
-        </TabItem>
-    </TabControl>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </UserControl>
