@@ -38,9 +38,9 @@ namespace Algoloop.ViewModel
             Model = accountModel;
 
             EnabledCommand = new RelayCommand(() => OnEnabledCommand(Model.Enabled), true);
-            StartAccountCommand = new RelayCommand(() => OnStartAccountCommand(), () => !Enabled);
-            StopAccountCommand = new RelayCommand(() => StopTask(), () => Enabled);
-            DeleteAccountCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Enabled);
+            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Enabled);
+            StopCommand = new RelayCommand(() => StopTask(), () => Enabled);
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Enabled);
 
             OnEnabledCommand(Model.Enabled);
         }
@@ -48,9 +48,9 @@ namespace Algoloop.ViewModel
         public AccountModel Model { get; }
 
         public RelayCommand EnabledCommand { get; }
-        public RelayCommand StartAccountCommand { get; }
-        public RelayCommand StopAccountCommand { get; }
-        public RelayCommand DeleteAccountCommand { get; }
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
+        public RelayCommand DeleteCommand { get; }
 
         public bool Enabled
         {
@@ -59,9 +59,9 @@ namespace Algoloop.ViewModel
             {
                 Model.Enabled = value;
                 RaisePropertyChanged(() => Enabled);
-                StartAccountCommand.RaiseCanExecuteChanged();
-                StopAccountCommand.RaiseCanExecuteChanged();
-                DeleteAccountCommand.RaiseCanExecuteChanged();
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -80,7 +80,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void OnStartAccountCommand()
+        private void OnStartCommand()
         {
             Enabled = true;
             StartTask();

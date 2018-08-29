@@ -20,26 +20,49 @@ using System.Linq;
 using System.Windows;
 using Algoloop.Model;
 using Algoloop.ViewSupport;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
 
 namespace Algoloop.ViewModel
 {
-    public class AccountsViewModel
+    public class AccountsViewModel : ViewModelBase
     {
-        public AccountsModel Model { get; private set; }
-
-        public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
-
-        public RelayCommand AddAccountCommand { get; }
+        private AccountViewModel _selectedItem;
 
         public AccountsViewModel(AccountsModel model)
         {
             Model = model;
-            AddAccountCommand = new RelayCommand(() => AddAccount(), true);
+            AddCommand = new RelayCommand(() => AddAccount(), true);
+            DeleteCommand = new RelayCommand<AccountViewModel>((account) => DeleteAccount(account), (account) => account != null);
+            SelectedChangedCommand = new RelayCommand<AccountViewModel>((market) => OnSelectedChanged(market), (market) => market != null);
             Messenger.Default.Register<NotificationMessageAction<List<AccountModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
+        }
+
+        public AccountsModel Model { get; private set; }
+
+        public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
+
+        public RelayCommand AddCommand { get; }
+
+        public RelayCommand<AccountViewModel> DeleteCommand { get; }
+        public RelayCommand<AccountViewModel> SelectedChangedCommand { get; }
+
+        public AccountViewModel SelectedItem
+        {
+            get => _selectedItem;
+            set
+            {
+                Set(ref _selectedItem, value);
+                DeleteCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void OnSelectedChanged(AccountViewModel account)
+        {
+            SelectedItem = account;
         }
 
         private void OnNotificationMessage(NotificationMessageAction<List<AccountModel>> message)
@@ -54,17 +77,17 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DeleteAccount(AccountViewModel loginViewModel)
-        {
-            bool ok = Accounts.Remove(loginViewModel);
-            Debug.Assert(ok);
-            return ok;
-        }
-
         private void AddAccount()
         {
             var loginViewModel = new AccountViewModel(this, new AccountModel());
             Accounts.Add(loginViewModel);
+        }
+
+        internal bool DeleteAccount(AccountViewModel account)
+        {
+            Debug.Assert(account != null);
+            SelectedItem = null;
+            return Accounts.Remove(account);
         }
 
         internal bool Read(string fileName)

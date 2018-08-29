@@ -35,10 +35,10 @@ namespace Algoloop.ViewModel
             Model = model;
             _appDomainService = appDomainService;
 
-            RunStrategyCommand = new RelayCommand(() => RunStrategy(), true);
-            CloneStrategyCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
-            ExportStrategyCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
-            DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
+            RunCommand = new RelayCommand(() => RunStrategy(), true);
+            CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
+            ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             AddParameterCommand = new RelayCommand(() => AddParameter(), true);
@@ -54,13 +54,13 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
 
-        public RelayCommand RunStrategyCommand { get; }
+        public RelayCommand RunCommand { get; }
 
-        public RelayCommand CloneStrategyCommand { get; }
+        public RelayCommand CloneCommand { get; }
 
-        public RelayCommand ExportStrategyCommand { get; }
+        public RelayCommand ExportCommand { get; }
 
-        public RelayCommand DeleteStrategyCommand { get; }
+        public RelayCommand DeleteCommand { get; }
 
         public RelayCommand AddSymbolCommand { get; }
 

@@ -15,6 +15,7 @@
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
@@ -27,24 +28,44 @@ using System.Windows;
 
 namespace Algoloop.ViewModel
 {
-    public class MarketsViewModel
+    public class MarketsViewModel : ViewModelBase
     {
-        public MarketsModel Model { get; private set; }
-
-        private readonly IAppDomainService _appDomainService;
-
-        public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
-
-        public RelayCommand AddMarketCommand { get; }
-
         public MarketsViewModel(MarketsModel model, IAppDomainService appDomainService)
         {
             Model = model;
             _appDomainService = appDomainService;
 
-            AddMarketCommand = new RelayCommand(() => AddMarket(), true);
+            AddCommand = new RelayCommand(() => AddMarket(), true);
+            DeleteCommand = new RelayCommand<MarketViewModel>((market) => DeleteMarket(market), (market) => market != null);
+            SelectedChangedCommand = new RelayCommand<MarketViewModel>((market) => OnSelectedChanged(market), (market) => market != null);
             Messenger.Default.Register<NotificationMessageAction<List<MarketModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
+        }
+
+        public MarketsModel Model { get; private set; }
+
+        private readonly IAppDomainService _appDomainService;
+        private MarketViewModel _selectedItem;
+
+        public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
+
+        public RelayCommand AddCommand { get; }
+        public RelayCommand<MarketViewModel> DeleteCommand { get; }
+        public RelayCommand<MarketViewModel> SelectedChangedCommand { get; }
+
+        public MarketViewModel SelectedItem
+        {
+            get => _selectedItem;
+            set
+            {
+                Set(ref _selectedItem, value);
+                DeleteCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void OnSelectedChanged(MarketViewModel market)
+        {
+            SelectedItem = market;
         }
 
         private void OnNotificationMessage(NotificationMessageAction<List<MarketModel>> message)
@@ -59,17 +80,17 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DeleteMarket(MarketViewModel loginViewModel)
-        {
-            bool ok = Markets.Remove(loginViewModel);
-            Debug.Assert(ok);
-            return ok;
-        }
-
         private void AddMarket()
         {
             var loginViewModel = new MarketViewModel(this, new MarketModel(), _appDomainService);
             Markets.Add(loginViewModel);
+        }
+
+        internal bool DeleteMarket(MarketViewModel market)
+        {
+            Debug.Assert(market != null);
+            SelectedItem = null;
+            return Markets.Remove(market);
         }
 
         internal bool Read(string fileName)

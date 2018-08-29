@@ -19,32 +19,76 @@ using System.Windows;
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategiesViewModel
+    public class StrategiesViewModel : ViewModelBase
     {
         private readonly IAppDomainService _appDomainService;
-
-        public StrategiesModel Model { get; private set; }
-
-        public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
-
-        public RelayCommand AddStrategyCommand { get; }
-        public RelayCommand ImportStrategyCommand { get; }
+        private ViewModelBase _selectedItem;
 
         public StrategiesViewModel(StrategiesModel model, IAppDomainService appDomainService)
         {
             Model = model;
             _appDomainService = appDomainService;
 
-            AddStrategyCommand = new RelayCommand(() => AddStrategy(), true);
-            ImportStrategyCommand = new RelayCommand(() => ImportStrategy(), true);
+            AddCommand = new RelayCommand(() => AddStrategy(), true);
+            DeleteCommand = new RelayCommand<StrategyViewModel>((strategy) => DeleteStrategy(strategy), (strategy) => strategy != null);
+            SelectedChangedCommand = new RelayCommand<ViewModelBase>((strategy) => OnSelectedChanged(strategy), (strategy) => strategy != null);
+            ImportCommand = new RelayCommand(() => ImportStrategy(), true);
 
             DataFromModel();
+        }
+
+        public StrategiesModel Model { get; private set; }
+
+        public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
+
+        public RelayCommand AddCommand { get; }
+        public RelayCommand<StrategyViewModel> DeleteCommand { get; }
+        public RelayCommand<ViewModelBase> SelectedChangedCommand { get; }
+        public RelayCommand ImportCommand { get; }
+
+        public ViewModelBase SelectedItem
+        {
+            get => _selectedItem;
+            set
+            {
+                Set(ref _selectedItem, value);
+                DeleteCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        private void OnSelectedChanged(ViewModelBase strategy)
+        {
+            SelectedItem = strategy;
+        }
+
+        private void AddStrategy()
+        {
+            var strategy = new StrategyViewModel(this, new StrategyModel(), _appDomainService);
+            Strategies.Add(strategy);
+        }
+
+        internal bool DeleteStrategy(StrategyViewModel strategy)
+        {
+            Debug.Assert(strategy != null);
+            bool ok = Strategies.Remove(strategy);
+            DataToModel();
+            SelectedItem = null;
+            return ok;
+        }
+
+        internal void CloneStrategy(StrategyViewModel strategyViewModel)
+        {
+            strategyViewModel.DataToModel();
+            var strategyModel = new StrategyModel(strategyViewModel.Model);
+            var strategy = new StrategyViewModel(this, strategyModel, _appDomainService);
+            Strategies.Add(strategy);
         }
 
         internal bool Read(string fileName)
@@ -88,14 +132,6 @@ namespace Algoloop.ViewModel
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
-        }
-
-        internal void CloneStrategy(StrategyViewModel strategyViewModel)
-        {
-            strategyViewModel.DataToModel();
-            var strategyModel = new StrategyModel(strategyViewModel.Model);
-            var strategy = new StrategyViewModel(this, strategyModel, _appDomainService);
-            Strategies.Add(strategy);
         }
 
         private void ImportStrategy()
@@ -170,19 +206,6 @@ namespace Algoloop.ViewModel
                 var strategyViewModel = new StrategyViewModel(this, strategyModel, _appDomainService);
                 Strategies.Add(strategyViewModel);
             }
-        }
-
-        internal bool DeleteStrategy(StrategyViewModel strategy)
-        {
-            bool ok = Strategies.Remove(strategy);
-            DataToModel();
-            return ok;
-        }
-
-        private void AddStrategy()
-        {
-            var strategy = new StrategyViewModel(this, new StrategyModel(), _appDomainService);
-            Strategies.Add(strategy);
         }
     }
 }

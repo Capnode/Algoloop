@@ -4,6 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
     xmlns:properties="clr-namespace:Algoloop.Properties"
@@ -29,54 +30,69 @@
              Width="5"
              Height="Auto"
              VerticalAlignment="Stretch" />
-        <TreeView
-            Name="treeView"
-            Grid.Column="0"
-            ItemsSource="{Binding Markets}"
-            BorderThickness="0">
-            <TreeView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem
-                        Header="Add Market"
-                        Command="{Binding AddMarketCommand}">
-                        <MenuItem.Icon>
-                            <Image Source="/Resources/Add.png" Width="16" Height="16"/>
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-            </TreeView.ContextMenu>
-            <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding ActiveSymbols.View}" >
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox
-                            IsChecked="{Binding Enabled}"
-                            Command="{Binding EnableCommand}" />
-                        <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
-                            <TextBlock.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem
-                                        Header="Delete Market"
-                                        Command="{Binding DeleteCommand}" >
-                                        <MenuItem.Icon>
-                                            <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
-                                        </MenuItem.Icon>
-                                    </MenuItem>
-                                </ContextMenu>
-                            </TextBlock.ContextMenu>
-                        </TextBlock>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Model.Name}" />
-                    </StackPanel>
-                </DataTemplate>
-            </TreeView.Resources>
-        </TreeView>
+        <DockPanel Grid.Column="0">
+            <ToolBar DockPanel.Dock="Top">
+                <Button ToolTip="Add market" Command="{Binding AddCommand}">
+                    <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                </Button>
+                <Button ToolTip="Delete market" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedItem}">
+                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                </Button>
+            </ToolBar>
+            <TreeView
+                ItemsSource="{Binding Markets}"
+                BorderThickness="0">
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Header="Add Market"
+                            Command="{Binding AddCommand}">
+                            <MenuItem.Icon>
+                                <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:InvokeCommandAction
+                            Command="{Binding SelectedChangedCommand}"
+                            CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding ActiveSymbols.View}" >
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox
+                                IsChecked="{Binding Enabled}"
+                                Command="{Binding EnableCommand}" />
+                            <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem
+                                            Header="Delete Market"
+                                            Command="{Binding DeleteCommand}" >
+                                            <MenuItem.Icon>
+                                                <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Model.Name}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+        </DockPanel>
         <ContentControl
             Grid.Column="1"
             Margin="7,0,0,0"
-            Content="{Binding Path=SelectedItem, ElementName=treeView}">
+            Content="{Binding Path=SelectedItem}">
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:MarketViewModel}">
                     <DockPanel>
@@ -86,9 +102,6 @@
                             </Button>
                             <Button ToolTip="Stop market" Command="{Binding StopCommand}">
                                 <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
-                            </Button>
-                            <Button ToolTip="Delete market" Command="{Binding DeleteCommand}">
-                                <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                             </Button>
                         </ToolBar>
                         <TabControl>
