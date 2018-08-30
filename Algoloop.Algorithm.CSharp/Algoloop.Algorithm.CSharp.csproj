@@ -65,6 +65,11 @@
     <Compile Include="BasicTemplateAlgorithm.cs" />
     <Compile Include="BasicTemplateDailyAlgorithm.cs" />
     <Compile Include="BasicTemplateForexAlgorithm.cs" />
+    <Compile Include="CustomChartingAlgorithm.cs" />
+    <Compile Include="MACDTrendAlgorithm.cs" />
+    <Compile Include="MovingAverageCrossAlgorithm.cs" />
+    <Compile Include="OpeningBreakoutAlgorithm.cs" />
+    <Compile Include="ParameterizedAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
