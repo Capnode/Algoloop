@@ -60,7 +60,7 @@
                         </MenuItem>
                         <MenuItem
                             Header="Import Strategies..."
-                            Command="{Binding ImportStrategyCommand}" />
+                            Command="{Binding ImportCommand}" />
                     </ContextMenu>
                 </TreeView.ContextMenu>
                 <i:Interaction.Triggers>
@@ -83,29 +83,29 @@
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem
-                                        Header="Run Strategy"
-                                        Command="{Binding RunCommand}">
+                                            Header="Run Strategy"
+                                            Command="{Binding RunCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Run.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                        Header="Clone Strategy"
-                                        Command="{Binding CloneCommand}">
+                                            Header="Clone Strategy"
+                                            Command="{Binding CloneCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                        Header="Delete Strategy"
-                                        Command="{Binding DeleteCommand}">
+                                            Header="Delete Strategy"
+                                            Command="{Binding DeleteCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                        Header="Export Strategy..."
-                                        Command="{Binding ExportCommand}" />
+                                            Header="Export Strategy..."
+                                            Command="{Binding ExportCommand}" />
                                     </ContextMenu>
                                 </TextBlock.ContextMenu>
                             </TextBlock>
