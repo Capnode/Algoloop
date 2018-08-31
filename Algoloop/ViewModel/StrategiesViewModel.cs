@@ -15,6 +15,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
 using Algoloop.Service;
@@ -105,6 +106,7 @@ namespace Algoloop.ViewModel
                 }
 
                 DataFromModel();
+                StartTasks();
                 return true;
             }
             catch (Exception ex)
@@ -150,6 +152,11 @@ namespace Algoloop.ViewModel
                         {
                             string json = r.ReadToEnd();
                             StrategyModel strategy = JsonConvert.DeserializeObject<StrategyModel>(json);
+                            foreach (StrategyJobModel job in strategy.Jobs)
+                            {
+                                job.Enabled = false;
+                            }
+
                             Model.Strategies.Add(strategy);
                         }
                     }
@@ -205,6 +212,20 @@ namespace Algoloop.ViewModel
             {
                 var strategyViewModel = new StrategyViewModel(this, strategyModel, _appDomainService);
                 Strategies.Add(strategyViewModel);
+            }
+        }
+
+        private void StartTasks()
+        {
+            foreach (StrategyViewModel strategy in Strategies)
+            {
+                foreach (StrategyJobViewModel job in strategy.Jobs)
+                {
+                    if (job.Enabled)
+                    {
+                        Task task = job.StartTaskAsync();
+                    }
+                }
             }
         }
     }

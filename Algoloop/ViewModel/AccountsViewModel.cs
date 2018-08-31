@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
 using Algoloop.ViewSupport;
@@ -104,6 +105,7 @@ namespace Algoloop.ViewModel
                 }
 
                 DataFromModel();
+                StartTasks();
                 return true;
             }
             catch (Exception ex)
@@ -149,6 +151,17 @@ namespace Algoloop.ViewModel
             {
                 var loginViewModel = new AccountViewModel(this, account);
                 Accounts.Add(loginViewModel);
+            }
+        }
+
+        private void StartTasks()
+        {
+            foreach (AccountViewModel account in Accounts)
+            {
+                if (account.Enabled)
+                {
+                    Task task = account.StartTask();
+                }
             }
         }
     }

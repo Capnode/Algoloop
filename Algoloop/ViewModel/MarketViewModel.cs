@@ -59,7 +59,6 @@ namespace Algoloop.ViewModel
             };
 
             ActiveSymbols.Source = Symbols;
-            OnEnableCommand(Model.Enabled);
         }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -105,49 +104,9 @@ namespace Algoloop.ViewModel
             get => Logs == null ? 0 : Logs.Count(m => m.Equals('\n'));
         }
 
-        private async void OnEnableCommand(bool value)
-        {
-            if (value)
-            {
-                await StartTaskAsync();
-            }
-            else
-            {
-                StopTask();
-            }
-        }
-
-        private async void OnStartCommand()
-        {
-            Enabled = true;
-            await StartTaskAsync();
-        }
-
-        private void OnStopCommand()
-        {
-            StopTask();
-            Enabled = false;
-        }
-
         internal void Refresh(SymbolViewModel symbolViewModel)
         {
             ActiveSymbols.View.Refresh();
-        }
-
-        private void AddSymbol()
-        {
-            var symbol = new SymbolViewModel(this, new SymbolModel());
-            Symbols.Add(symbol);
-        }
-
-        private void ImportSymbols()
-        {
-            throw new NotImplementedException();
-        }
-
-        internal bool DeleteSymbol(SymbolViewModel symbol)
-        {
-            return Symbols.Remove(symbol);
         }
 
         internal void DataToModel()
@@ -178,7 +137,12 @@ namespace Algoloop.ViewModel
             RaisePropertyChanged(() => Loglines);
         }
 
-        private async Task StartTaskAsync()
+        internal bool DeleteSymbol(SymbolViewModel symbol)
+        {
+            return Symbols.Remove(symbol);
+        }
+
+        internal async Task StartTaskAsync()
         {
             _cancel = new CancellationTokenSource();
             DataToModel();
@@ -234,6 +198,41 @@ namespace Algoloop.ViewModel
             {
                 AppDomain.Unload(_appDomain);
             }
+        }
+
+        private async void OnEnableCommand(bool value)
+        {
+            if (value)
+            {
+                await StartTaskAsync();
+            }
+            else
+            {
+                StopTask();
+            }
+        }
+
+        private async void OnStartCommand()
+        {
+            Enabled = true;
+            await StartTaskAsync();
+        }
+
+        private void OnStopCommand()
+        {
+            StopTask();
+            Enabled = false;
+        }
+
+        private void AddSymbol()
+        {
+            var symbol = new SymbolViewModel(this, new SymbolModel());
+            Symbols.Add(symbol);
+        }
+
+        private void ImportSymbols()
+        {
+            throw new NotImplementedException();
         }
     }
 }

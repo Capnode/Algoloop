@@ -41,8 +41,6 @@ namespace Algoloop.ViewModel
             StartCommand = new RelayCommand(() => OnStartCommand(), () => !Enabled);
             StopCommand = new RelayCommand(() => StopTask(), () => Enabled);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Enabled);
-
-            OnEnabledCommand(Model.Enabled);
         }
 
         public AccountModel Model { get; }
@@ -68,25 +66,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
 
-        private void OnEnabledCommand(bool value)
-        {
-            if (value)
-            {
-                StartTask();
-            }
-            else
-            {
-                StopTask();
-            }
-        }
-
-        private void OnStartCommand()
-        {
-            Enabled = true;
-            StartTask();
-        }
-
-        private async void StartTask()
+        internal async Task StartTask()
         {
             Log.Trace($"Connect Account {Model.Name}");
             _cancel = new CancellationTokenSource();
@@ -96,12 +76,30 @@ namespace Algoloop.ViewModel
             Enabled = false;
         }
 
-        private void StopTask()
+        internal void StopTask()
         {
             if (_cancel != null)
             {
                 _cancel.Cancel();
             }
+        }
+
+        private async void OnEnabledCommand(bool value)
+        {
+            if (value)
+            {
+                await StartTask();
+            }
+            else
+            {
+                StopTask();
+            }
+        }
+
+        private async void OnStartCommand()
+        {
+            Enabled = true;
+            await StartTask();
         }
 
         private void StartFxcm(CancellationToken cancel)

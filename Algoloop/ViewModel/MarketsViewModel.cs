@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Algoloop.ViewModel
@@ -153,6 +154,17 @@ namespace Algoloop.ViewModel
             {
                 var viewModel = new MarketViewModel(this, market, _appDomainService);
                 Markets.Add(viewModel);
+            }
+        }
+
+        private void StartTasks()
+        {
+            foreach (MarketViewModel market in Markets)
+            {
+                if (market.Enabled)
+                {
+                    Task task = market.StartTaskAsync();
+                }
             }
         }
     }

@@ -55,7 +55,6 @@ namespace Algoloop.ViewModel
             EnabledCommand = new RelayCommand(() => OnEnableCommand(Model.Enabled), true);
 
             DataFromModel();
-            OnEnableCommand(Model.Enabled);
         }
 
         public StrategyJobModel Model { get; }
