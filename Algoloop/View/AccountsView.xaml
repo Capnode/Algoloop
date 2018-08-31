@@ -31,7 +31,9 @@
             Height="Auto"
             VerticalAlignment="Stretch" />
         <DockPanel Grid.Column="0">
-            <ToolBar DockPanel.Dock="Top">
+            <ToolBar
+                DockPanel.Dock="Top"
+                ToolBarTray.IsLocked="True">
                 <Button
                     ToolTip="Add account"
                     Command="{Binding AddCommand}">
@@ -95,7 +97,9 @@
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:AccountViewModel}">
                     <DockPanel>
-                        <ToolBar DockPanel.Dock="Top">
+                        <ToolBar
+                            DockPanel.Dock="Top"
+                            ToolBarTray.IsLocked="True">
                             <Button ToolTip="Start account" Command="{Binding StartCommand}">
                                 <Image Source="/Resources/Run.png" Width="16" Height="16"/>
                             </Button>

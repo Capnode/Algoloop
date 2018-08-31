@@ -33,7 +33,9 @@
              Height="Auto"
              VerticalAlignment="Stretch" />
         <DockPanel>
-            <ToolBar DockPanel.Dock="Top">
+            <ToolBar
+                DockPanel.Dock="Top"
+                ToolBarTray.IsLocked="True">
                 <Button
                     ToolTip="Add strategy"
                     Command="{Binding AddCommand}">
@@ -140,7 +142,9 @@
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:StrategyViewModel}">
                     <DockPanel>
-                        <ToolBar DockPanel.Dock="Top">
+                        <ToolBar
+                            DockPanel.Dock="Top"
+                            ToolBarTray.IsLocked="True">
                             <Button ToolTip="Run strategy" Command="{Binding RunCommand}">
                                 <Image Source="/Resources/Run.png" Width="16" Height="16"/>
                             </Button>
