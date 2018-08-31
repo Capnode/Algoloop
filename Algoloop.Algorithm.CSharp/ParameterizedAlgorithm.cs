@@ -20,6 +20,7 @@ using QuantConnect.Parameters;
 using QuantConnect.Interfaces;
 using QuantConnect.Algorithm;
 using QuantConnect;
+using System;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -39,8 +40,16 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("ema-slow")]
         public int SlowPeriod = 200;
 
+        [Parameter("resolution")]
+        string resolution = "Minute";
+
+        [Parameter("symbols")]
+        string symbols = "SPY";
+
         public ExponentialMovingAverage Fast;
         public ExponentialMovingAverage Slow;
+
+        private string _symbol;
 
         public override void Initialize()
         {
@@ -48,10 +57,16 @@ namespace Algoloop.Algorithm.CSharp
             SetEndDate(2013, 10, 11);
             SetCash(100*1000);
 
-            AddSecurity(SecurityType.Equity, "SPY");
+            _symbol = symbols.Split(';')[0];
 
-            Fast = EMA("SPY", FastPeriod);
-            Slow = EMA("SPY", SlowPeriod);
+            Resolution res;
+            if (Enum.TryParse(resolution, out res))
+            {
+                AddEquity(_symbol, res);
+            }
+
+            Fast = EMA(_symbol, FastPeriod);
+            Slow = EMA(_symbol, SlowPeriod);
         }
 
         public void OnData(TradeBars data)
@@ -61,11 +76,11 @@ namespace Algoloop.Algorithm.CSharp
 
             if (Fast > Slow*1.001m)
             {
-                SetHoldings("SPY", 1);
+                SetHoldings(_symbol, 1);
             }
             else if (Fast < Slow*0.999m)
             {
-                Liquidate("SPY");
+                Liquidate(_symbol);
             }
         }
 

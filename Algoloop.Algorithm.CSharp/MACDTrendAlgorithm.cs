@@ -20,6 +20,7 @@ using QuantConnect.Algorithm;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
 using QuantConnect.Interfaces;
+using QuantConnect.Parameters;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -31,9 +32,24 @@ namespace Algoloop.Algorithm.CSharp
     /// <meta name="tag" content="plotting indicators" />
     public class MACDTrendAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        [Parameter("fast-period")]
+        private int _fastPeriod = 12;
+
+        [Parameter("slow-period")]
+        private int _slowPeriod = 26;
+
+        [Parameter("signal-period")]
+        private int _signalPeriod = 9;
+
+        [Parameter("symbols")]
+        private string _symbols = "EURUSD";
+
+        [Parameter("resolution")]
+        private string _resolution = "Minute";
+
         private DateTime _previous;
         private MovingAverageConvergenceDivergence _macd;
-        private readonly string _symbol = "SPY";
+        private string _symbol;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
@@ -43,10 +59,16 @@ namespace Algoloop.Algorithm.CSharp
             SetStartDate(2004, 01, 01);
             SetEndDate(2015, 01, 01);
 
-            AddSecurity(SecurityType.Equity, _symbol, Resolution.Daily);
+            _symbol = _symbols.Split(';')[0];
+
+            Resolution res;
+            if (Enum.TryParse(_resolution, out res))
+            {
+                AddForex(_symbol, res);
+            }
 
             // define our daily macd(12,26) with a 9 day signal
-            _macd = MACD(_symbol, 12, 26, 9, MovingAverageType.Exponential, Resolution.Daily);
+            _macd = MACD(_symbol, _fastPeriod, _slowPeriod, _signalPeriod, MovingAverageType.Exponential, Resolution.Daily);
         }
 
         /// <summary>
