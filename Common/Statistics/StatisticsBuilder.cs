@@ -271,6 +271,10 @@ namespace QuantConnect.Statistics
             var dtPrevious = new DateTime();
 
             var listBenchmark = new List<double>();
+            if (!equity.Any())
+            {
+                return listBenchmark;
+            }
 
             var minDate = equity.Keys.FirstOrDefault().AddDays(-1);
             var maxDate = equity.Keys.LastOrDefault();
