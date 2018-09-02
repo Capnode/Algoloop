@@ -47,6 +47,15 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("resolution")]
         private string _resolution = "Minute";
 
+        [Parameter("market")]
+        private string _market = "fxcm";
+
+        [Parameter("startdate")]
+        private string _startdate;
+
+        [Parameter("enddate")]
+        private string _enddate;
+
         private DateTime _previous;
         private MovingAverageConvergenceDivergence _macd;
         private string _symbol;
@@ -56,15 +65,24 @@ namespace Algoloop.Algorithm.CSharp
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2004, 01, 01);
-            SetEndDate(2015, 01, 01);
+            DateTime startdate;
+            if (DateTime.TryParse(_startdate, out startdate))
+            {
+                SetStartDate(startdate);
+            }
+
+            DateTime enddate;
+            if (DateTime.TryParse(_enddate, out enddate))
+            {
+                SetEndDate(enddate);
+            }
 
             _symbol = _symbols.Split(';')[0];
 
             Resolution res;
             if (Enum.TryParse(_resolution, out res))
             {
-                AddForex(_symbol, res);
+                AddForex(_symbol, res, _market);
             }
 
             // define our daily macd(12,26) with a 9 day signal
@@ -84,8 +102,8 @@ namespace Algoloop.Algorithm.CSharp
 
             var holding = Portfolio[_symbol];
 
-            var signalDeltaPercent = (_macd - _macd.Signal)/_macd.Fast;
-            var tolerance = 0.0025m;
+            var signalDeltaPercent = _macd - _macd.Signal;
+            var tolerance = 0m;
 
             // if our macd is greater than our signal, then let's go long
             if (holding.Quantity <= 0 && signalDeltaPercent > tolerance) // 0.01%
@@ -96,7 +114,7 @@ namespace Algoloop.Algorithm.CSharp
             // of our macd is less than our signal, then let's go short
             else if (holding.Quantity >= 0 && signalDeltaPercent < -tolerance)
             {
-                Liquidate(_symbol);
+                SetHoldings(_symbol, -1.0);
             }
 
             // plot both lines
