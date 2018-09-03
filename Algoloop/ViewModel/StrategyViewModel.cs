@@ -25,12 +25,14 @@ namespace Algoloop.ViewModel
     public class StrategyViewModel : ViewModelBase
     {
         private StrategiesViewModel _parent;
-        private IAppDomainService _appDomainService;
+        private readonly SettingsModel _settingsModel;
+        private readonly IAppDomainService _appDomainService;
 
-        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, IAppDomainService appDomainService)
+        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel, IAppDomainService appDomainService)
         {
             _parent = parent;
             Model = model;
+            _settingsModel = settingsModel;
             _appDomainService = appDomainService;
 
             RunCommand = new RelayCommand(() => RunStrategy(), true);
@@ -106,7 +108,7 @@ namespace Algoloop.ViewModel
         private async void RunStrategy()
         {
             DataToModel();
-            var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, Model), _appDomainService);
+            var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, Model), _settingsModel, _appDomainService);
             Jobs.Add(job);
             await job.StartTaskAsync();
         }
@@ -152,7 +154,7 @@ namespace Algoloop.ViewModel
             Jobs.Clear();
             foreach (StrategyJobModel strategyJobModel in Model.Jobs)
             {
-                var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _appDomainService);
+                var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _settingsModel, _appDomainService);
                 Jobs.Add(strategyJobViewModel);
             }
         }

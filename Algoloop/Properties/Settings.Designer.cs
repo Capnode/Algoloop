@@ -70,17 +70,5 @@ namespace Algoloop.Properties {
                 this["MarketViewSplitter"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("../../../Data/")]
-        public string DataFolder {
-            get {
-                return ((string)(this["DataFolder"]));
-            }
-            set {
-                this["DataFolder"] = value;
-            }
-        }
     }
 }

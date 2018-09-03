@@ -12,35 +12,82 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewSupport;
+using Algoloop.Model;
 using GalaSoft.MvvmLight.Command;
-using System.ComponentModel;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Windows;
 
 namespace Algoloop.ViewModel
 {
     public class SettingsViewModel
     {
-        public SettingsViewModel()
+        public SettingsViewModel(SettingsModel model)
         {
+            Model = model;
             OkCommand = new RelayCommand<Window>(window => OnOk(window));
-
-            DataFolder = Properties.Settings.Default.DataFolder;
         }
 
-        [DisplayName("Data folder")]
-        [Description("Data folder location.")]
-        [Editor(typeof(FolderEditor), typeof(FolderEditor))]
-        public string DataFolder { get; set; }
+        public SettingsModel Model { get; private set; }
 
-        [Browsable(false)]
         public RelayCommand<Window> OkCommand { get; private set; }
 
         void OnOk(Window window)
         {
-            Properties.Settings.Default.DataFolder = DataFolder;
-
+            window.DialogResult = true;
             window.Close();
+        }
+
+        internal bool Read(string fileName)
+        {
+            if (!File.Exists(fileName))
+                return false;
+
+            try
+            {
+                using (StreamReader r = new StreamReader(fileName))
+                {
+                    string json = r.ReadToEnd();
+                    Model = JsonConvert.DeserializeObject<SettingsModel>(json);
+                }
+
+                DataFromModel();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                return false;
+            }
+        }
+
+        internal bool Save(string fileName)
+        {
+            try
+            {
+                DataToModel();
+
+                using (StreamWriter file = File.CreateText(fileName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(file, Model);
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                return false;
+            }
+        }
+
+        private void DataToModel()
+        {
+        }
+
+        private void DataFromModel()
+        {
         }
     }
 }

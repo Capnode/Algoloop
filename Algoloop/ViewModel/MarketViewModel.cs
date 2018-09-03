@@ -30,14 +30,16 @@ namespace Algoloop.ViewModel
     {
         private readonly MarketsViewModel _parent;
         private readonly IAppDomainService _appDomainService;
+        private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
         private AppDomain _appDomain;
 
-        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, IAppDomainService appDomainService)
+        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel, IAppDomainService appDomainService)
         {
             _parent = marketsViewModel;
             Model = marketModel;
+            _settingsModel = settingsModel;
             _appDomainService = appDomainService;
 
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
@@ -111,7 +113,7 @@ namespace Algoloop.ViewModel
 
         internal void DataToModel()
         {
-            Model.DataFolder = Properties.Settings.Default.DataFolder;
+            Model.DataFolder = _settingsModel.DataFolder;
             Model.Logs = string.Empty;
 
             Model.Symbols.Clear();

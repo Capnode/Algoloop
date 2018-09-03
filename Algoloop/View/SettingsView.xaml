@@ -28,7 +28,7 @@
             ShowSummary="True"
             ShowAdvancedOptions="False"
             ShowSortOptions="False"
-            SelectedObject="{Binding}">
+            SelectedObject="{Binding Model}">
         </xctk:PropertyGrid>
         <DockPanel
             Grid.Row="1"

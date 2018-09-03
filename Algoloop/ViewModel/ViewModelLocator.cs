@@ -55,6 +55,7 @@ namespace Algoloop.ViewModel
         public ViewModelLocator()
         {
             // Register Algoloop types
+            SimpleIoc.Default.Register<SettingsModel>();
             SimpleIoc.Default.Register<MarketsModel>();
             SimpleIoc.Default.Register<AccountsModel>();
             SimpleIoc.Default.Register<StrategiesModel>();

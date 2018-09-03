@@ -17,12 +17,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
-using Algoloop.Properties;
+using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Win32;
 
 namespace Algoloop.ViewModel
 {
@@ -37,9 +36,16 @@ namespace Algoloop.ViewModel
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel(IAppDomainService appDomainService, MarketsViewModel marketsViewModel, AccountsViewModel accountsViewModel, StrategiesViewModel strategiesViewModel, LogViewModel logViewModel)
+        public MainViewModel(
+            IAppDomainService appDomainService,
+            SettingsViewModel settingsViewModel,
+            MarketsViewModel marketsViewModel,
+            AccountsViewModel accountsViewModel,
+            StrategiesViewModel strategiesViewModel,
+            LogViewModel logViewModel)
         {
             _appDomainService = appDomainService;
+            SettingsViewModel = settingsViewModel;
             MarketsViewModel = marketsViewModel;
             AccountsViewModel = accountsViewModel;
             StrategiesViewModel = strategiesViewModel;
@@ -61,6 +67,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<Window> ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
 
+        public SettingsViewModel SettingsViewModel { get; }
         public LogViewModel LogViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
         public AccountsViewModel AccountsViewModel { get; }
@@ -95,10 +102,15 @@ namespace Algoloop.ViewModel
 
         private void DoSettings()
         {
+            SettingsModel oldSettings = SettingsViewModel.Model;
             var settings = new SettingsView();
             if ((bool)settings.ShowDialog())
             {
-                Settings.Default.Save();
+                SaveConfig();
+            }
+            else
+            {
+                SettingsViewModel.Model.Copy(oldSettings);
             }
         }
 
@@ -133,6 +145,7 @@ namespace Algoloop.ViewModel
         private void ReadConfig()
         {
             string appData = GetAppDataFolder();
+            SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
             MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
             AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
             StrategiesViewModel.Read(Path.Combine(appData, "Strategies.json"));
@@ -146,6 +159,7 @@ namespace Algoloop.ViewModel
                 Directory.CreateDirectory(appData);
             }
 
+            SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
             MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
             AccountsViewModel.Save(Path.Combine(appData, "Accounts.json"));
             StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));

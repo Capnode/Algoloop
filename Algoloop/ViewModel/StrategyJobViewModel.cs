@@ -20,7 +20,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using LiveCharts;
-using LiveCharts.Charts;
 using LiveCharts.Wpf;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
@@ -38,15 +37,17 @@ namespace Algoloop.ViewModel
     public class StrategyJobViewModel: ViewModelBase
     {
         private StrategyViewModel _parent;
-        private IAppDomainService _appDomainService;
+        private readonly SettingsModel _settingsModel;
+        private readonly IAppDomainService _appDomainService;
         private CancellationTokenSource _cancel;
         private LiveCharts.Wpf.Series _selectedSeries;
         private AppDomain _appDomain;
 
-        public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, IAppDomainService appDomainService)
+        public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel, IAppDomainService appDomainService)
         {
             _parent = parent;
             Model = model;
+            _settingsModel = settingsModel;
             _appDomainService = appDomainService;
 
             StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Enabled);
@@ -216,7 +217,7 @@ namespace Algoloop.ViewModel
 
         internal void DataToModel()
         {
-            Model.DataFolder = Properties.Settings.Default.DataFolder;
+            Model.DataFolder = _settingsModel.DataFolder;
 
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
