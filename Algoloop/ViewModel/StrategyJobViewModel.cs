@@ -72,6 +72,11 @@ namespace Algoloop.ViewModel
 
         public SeriesCollection SelectedCollection { get; private set; } = new SeriesCollection();
 
+        public Func<double, string> Formatter { get; set; } = value => 
+        {
+            return new DateTime((long)value).ToString("yyyy-MM:dd HH:mm:ss");
+        };
+
         public DateTime InitialDateTime { get; set; }
 
         public AxesCollection YAxesCollection { get; } = new AxesCollection();

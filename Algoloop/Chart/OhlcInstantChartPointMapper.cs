@@ -20,7 +20,7 @@ namespace Algoloop.Charts
     {
         public OhlcInstantChartPointMapper()
         {
-            X((value, index) => index); //use the index as X
+            X((value, index) => value.X.Ticks);
             Open(m => m.Open);
             Close(m => m.Close);
             High(m => m.High);

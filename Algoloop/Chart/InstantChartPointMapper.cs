@@ -20,7 +20,7 @@ namespace Algoloop.Charts
     {
         public InstantChartPointMapper()
         {
-            X((value, index) => index); //use the index as X
+            X((value, index) => value.X.Ticks); //use the datetime as X
             Y((value, index) => (double)value.Y); //use the value as Y
         }
     }

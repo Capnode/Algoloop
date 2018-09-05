@@ -113,19 +113,18 @@
                             ItemsSource="{Binding ChartCollection}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
                     </StackPanel>
                     <lvc:CartesianChart
-                    Grid.Row="1"
-                    Series="{Binding SelectedCollection}" >
+                        Grid.Row="1"
+                        Series="{Binding SelectedCollection}" >
                         <lvc:CartesianChart.AxisX>
-                            <lvc:DateAxis
-                                ShowLabels="true"
-                                Position="LeftBottom"
-                                Period = "{Binding Model.Resolution, Mode=OneWay, Converter={viewsupport:ResolutionConverter}}"
-                                HeaderFontWeight="Normal"
-                                InitialDateTime="{Binding InitialDateTime, Mode=OneWay}" >
-                                <lvc:DateAxis.Separator>
-                                    <lvc:Separator/>
-                                </lvc:DateAxis.Separator>
-                            </lvc:DateAxis>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}">
+                                <lvc:Axis.Separator>
+                                    <lvc:Separator StrokeThickness="1" StrokeDashArray="2">
+                                        <lvc:Separator.Stroke>
+                                            <SolidColorBrush Color="#404F56" />
+                                        </lvc:Separator.Stroke>
+                                    </lvc:Separator>
+                                </lvc:Axis.Separator>
+                            </lvc:Axis>
                         </lvc:CartesianChart.AxisX>
                     </lvc:CartesianChart>
                 </Grid>
