@@ -49,7 +49,8 @@ namespace Algoloop.ViewModel
                 using (StreamReader r = new StreamReader(fileName))
                 {
                     string json = r.ReadToEnd();
-                    Model = JsonConvert.DeserializeObject<SettingsModel>(json);
+                    SettingsModel settings = JsonConvert.DeserializeObject<SettingsModel>(json);
+                    Model.Copy(settings);
                 }
 
                 DataFromModel();
