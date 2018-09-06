@@ -24,5 +24,11 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public List<MarketModel> Markets { get; } = new List<MarketModel>();
+
+        internal void Copy(MarketsModel marketsModel)
+        {
+            Markets.Clear();
+            Markets.AddRange(marketsModel.Markets);
+        }
     }
 }

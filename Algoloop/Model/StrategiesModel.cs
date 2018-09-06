@@ -24,5 +24,11 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public List<StrategyModel> Strategies { get; } = new List<StrategyModel>();
+
+        internal void Copy(StrategiesModel strategiesModel)
+        {
+            Strategies.Clear();
+            Strategies.AddRange(strategiesModel.Strategies);
+        }
     }
 }

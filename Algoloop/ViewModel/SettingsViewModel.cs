@@ -29,7 +29,7 @@ namespace Algoloop.ViewModel
             OkCommand = new RelayCommand<Window>(window => OnOk(window));
         }
 
-        public SettingsModel Model { get; private set; }
+        public SettingsModel Model { get; }
 
         public RelayCommand<Window> OkCommand { get; private set; }
 

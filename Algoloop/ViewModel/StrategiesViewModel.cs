@@ -47,7 +47,7 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
-        public StrategiesModel Model { get; private set; }
+        public StrategiesModel Model { get; }
 
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
 
@@ -104,7 +104,7 @@ namespace Algoloop.ViewModel
                 using (StreamReader r = new StreamReader(fileName))
                 {
                     string json = r.ReadToEnd();
-                    Model = JsonConvert.DeserializeObject<StrategiesModel>(json);
+                    Model.Copy(JsonConvert.DeserializeObject<StrategiesModel>(json));
                 }
 
                 DataFromModel();

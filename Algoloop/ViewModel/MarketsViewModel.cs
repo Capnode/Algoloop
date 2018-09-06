@@ -48,7 +48,7 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
-        public MarketsModel Model { get; private set; }
+        public MarketsModel Model { get; }
 
         public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
 
@@ -106,7 +106,7 @@ namespace Algoloop.ViewModel
                 using (StreamReader r = new StreamReader(fileName))
                 {
                     string json = r.ReadToEnd();
-                    Model = JsonConvert.DeserializeObject<MarketsModel>(json);
+                    Model.Copy(JsonConvert.DeserializeObject<MarketsModel>(json));
                 }
 
                 DataFromModel();

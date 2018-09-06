@@ -24,5 +24,11 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public List<AccountModel> Accounts { get; } = new List<AccountModel>();
+
+        internal void Copy(AccountsModel accountsModel)
+        {
+            Accounts.Clear();
+            Accounts.AddRange(accountsModel.Accounts);
+        }
     }
 }

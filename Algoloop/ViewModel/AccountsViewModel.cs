@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
-        public AccountsModel Model { get; private set; }
+        public AccountsModel Model { get; }
 
         public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
 
@@ -101,7 +101,7 @@ namespace Algoloop.ViewModel
                 using (StreamReader r = new StreamReader(fileName))
                 {
                     string json = r.ReadToEnd();
-                    Model = JsonConvert.DeserializeObject<AccountsModel>(json);
+                    Model.Copy(JsonConvert.DeserializeObject<AccountsModel>(json));
                 }
 
                 DataFromModel();
