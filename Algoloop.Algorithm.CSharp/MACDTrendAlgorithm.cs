@@ -95,6 +95,7 @@ namespace Algoloop.Algorithm.CSharp
         /// <param name="data">TradeBars IDictionary object with your stock data</param>
         public void OnData(TradeBars data)
         {
+//            Log($"OnData() {Time}");
             // only once per day
             if (_previous.Date == Time.Date) return;
 
@@ -123,6 +124,12 @@ namespace Algoloop.Algorithm.CSharp
             Plot(_symbol, _macd.Fast, _macd.Slow);
 
             _previous = Time;
+        }
+
+        public override void OnEndOfAlgorithm()
+        {
+            Log($"OnEndOfAlgorithm() {Time}");
+            base.OnEndOfAlgorithm();
         }
 
         /// <summary>
