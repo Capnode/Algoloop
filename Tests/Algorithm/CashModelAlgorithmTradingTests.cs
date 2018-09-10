@@ -21,6 +21,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Securities;
 using Moq;
 using QuantConnect.Brokerages;
+using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Lean.Engine.TransactionHandlers;
 using QuantConnect.Orders;
 using QuantConnect.Tests.Common.Securities;
@@ -58,7 +59,7 @@ namespace QuantConnect.Tests.Algorithm
 
             Assert.IsTrue(security.BuyingPowerModel.HasSufficientBuyingPowerForOrder(algo.Portfolio, security,
                 new MarketOrder(_symbol, actual, DateTime.UtcNow)).IsSufficient);
-            // $100k total value * 0.5 target * 0.9975 SetHoldingsBuffer / 25 ~= 1995 - fees
+            // $100k total value * 0.5 target * 0.9975 FreePortfolioValuePercentage / 25 ~= 1995 - fees
             Assert.AreEqual(1994.96m, actual);
         }
 
@@ -72,7 +73,7 @@ namespace QuantConnect.Tests.Algorithm
             Assert.IsTrue(security.BuyingPowerModel.HasSufficientBuyingPowerForOrder(algo.Portfolio, security,
                 new MarketOrder(_symbol, actual, DateTime.UtcNow)).IsSufficient);
             // 10k in fees = 400 shares (400*25)
-            // $100k total value * 0.5 target * 0.9975 SetHoldingsBuffer / 25 ~= 1995 - 400 because of fees
+            // $100k total value * 0.5 target * 0.9975 FreePortfolioValuePercentage / 25 ~= 1995 - 400 because of fees
             Assert.AreEqual(1595m, actual);
         }
 
@@ -669,6 +670,7 @@ namespace QuantConnect.Tests.Algorithm
             SymbolCache.Clear();
             // Initialize algorithm
             var algo = new QCAlgorithm();
+            algo.SubscriptionManager.SetDataManager(new DataManager());
             algo.SetCash(100000);
             algo.SetBrokerageModel(BrokerageName.GDAX, AccountType.Cash);
             algo.Transactions.SetOrderProcessor(new FakeOrderProcessor());

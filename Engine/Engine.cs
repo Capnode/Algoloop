@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using QuantConnect.Brokerages;
 using QuantConnect.Configuration;
@@ -124,8 +123,13 @@ namespace QuantConnect.Lean.Engine
                     IBrokerageFactory factory;
                     brokerage = _algorithmHandlers.Setup.CreateBrokerage(job, algorithm, out factory);
 
+                    var dataManager = new DataManager();
+
+                    algorithm.SubscriptionManager.SetDataManager(dataManager);
+
                     // Initialize the data feed before we initialize so he can intercept added securities/universes via events
-                    _algorithmHandlers.DataFeed.Initialize(algorithm, job, _algorithmHandlers.Results, _algorithmHandlers.MapFileProvider, _algorithmHandlers.FactorFileProvider, _algorithmHandlers.DataProvider);
+                    _algorithmHandlers.DataFeed.Initialize(algorithm, job, _algorithmHandlers.Results, _algorithmHandlers.MapFileProvider,
+                                                            _algorithmHandlers.FactorFileProvider, _algorithmHandlers.DataProvider, dataManager);
 
                     // set the order processor on the transaction manager (needs to be done before initializing BrokerageHistoryProvider)
                     algorithm.Transactions.SetOrderProcessor(_algorithmHandlers.Transactions);
@@ -185,8 +189,8 @@ namespace QuantConnect.Lean.Engine
                 catch (Exception err)
                 {
                     Log.Error(err);
-                    var runtimeMessage = "Algorithm.Initialize() Error: " + err.Message + " Stack Trace: " + err.StackTrace;
-                    _algorithmHandlers.Results.RuntimeError(runtimeMessage, err.StackTrace);
+                    var runtimeMessage = "Algorithm.Initialize() Error: " + err.Message + " Stack Trace: " + err;
+                    _algorithmHandlers.Results.RuntimeError(runtimeMessage, err.ToString());
                     _systemHandlers.Api.SetAlgorithmStatus(job.AlgorithmId, AlgorithmStatus.RuntimeError, runtimeMessage);
                 }
 
@@ -199,11 +203,11 @@ namespace QuantConnect.Lean.Engine
                 Log.Trace("         Results:      " + _algorithmHandlers.Results.GetType().FullName);
                 Log.Trace("         Transactions: " + _algorithmHandlers.Transactions.GetType().FullName);
                 Log.Trace("         Alpha:        " + _algorithmHandlers.Alphas.GetType().FullName);
-                if (algorithm != null && algorithm.HistoryProvider != null)
+                if (algorithm?.HistoryProvider != null)
                 {
                     Log.Trace("         History Provider:     " + algorithm.HistoryProvider.GetType().FullName);
                 }
-                if (job is LiveNodePacket) Log.Trace("         Brokerage:      " + brokerage.GetType().FullName);
+                if (job is LiveNodePacket) Log.Trace("         Brokerage:      " + brokerage?.GetType().FullName);
 
                 //-> Using the job + initialization: load the designated handlers:
                 if (initializeComplete)
