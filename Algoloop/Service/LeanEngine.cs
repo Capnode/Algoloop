@@ -28,16 +28,12 @@ namespace Algoloop.Service
 {
     public class LeanEngine : MarshalByRefObject
     {
-        public (string, string) Run(StrategyJobModel jobModel, AccountModel account)
+        public StrategyJobModel Run(StrategyJobModel model, AccountModel account, HostDomainLogger logger)
         {
-            SetConfig(jobModel, account);
+            Log.LogHandler = logger;
+            SetConfig(model, account);
 
-            QueueLogHandler logHandler = new QueueLogHandler();
-            Log.LogHandler = logHandler;
             var liveMode = Config.GetBool("live-mode");
-            string result = null;
-            string logs = string.Empty;
-
             Log.Trace("LeanEngine: Memory " + OS.ApplicationMemoryUsed + "Mb-App  " + +OS.TotalPhysicalMemoryUsed + "Mb-Used  " + OS.TotalPhysicalMemory + "Mb-Total");
 
             try
@@ -54,22 +50,17 @@ namespace Algoloop.Service
                     engine.Run(job, algorithmManager, assemblyPath);
                     systemHandlers.JobQueue.AcknowledgeJob(job);
                     BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
-                    result = resultHandler?.JsonResult;
-                    logs = resultHandler?.Logs + Environment.NewLine + Environment.NewLine;
+                    model.Result = resultHandler?.JsonResult;
+                    model.Logs = resultHandler?.Logs;
                 }
             }
             catch (Exception ex)
             {
-                Log.LogHandler.Error("{0}: {1}", ex.GetType(), ex.Message);
-            }
-
-            foreach (LogEntry log in logHandler.Logs)
-            {
-                logs += log.ToString() + Environment.NewLine;
+                Log.Error("{0}: {1}", ex.GetType(), ex.Message);
             }
 
             Log.LogHandler.Dispose();
-            return (result, logs);
+            return model;
         }
 
         private void SetConfig(StrategyJobModel model, AccountModel account)

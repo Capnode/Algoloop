@@ -19,7 +19,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using QuantConnect.Logging;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -29,18 +28,16 @@ namespace Algoloop.ViewModel
     public class MarketViewModel : ViewModelBase
     {
         private readonly MarketsViewModel _parent;
-        private readonly IAppDomainService _appDomainService;
         private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
         private Isolated<Toolbox> _toolbox;
 
-        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel, IAppDomainService appDomainService)
+        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel)
         {
             _parent = marketsViewModel;
             Model = marketModel;
             _settingsModel = settingsModel;
-            _appDomainService = appDomainService;
 
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
@@ -129,9 +126,9 @@ namespace Algoloop.ViewModel
 
         internal async Task StartTaskAsync()
         {
+            DataToModel();
             MarketModel model = Model;
             _cancel = new CancellationTokenSource();
-            DataToModel();
             Model.FromDate = Model.FromDate.Date; // Remove time part
             Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
             try

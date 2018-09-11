@@ -66,7 +66,6 @@ namespace Algoloop.ViewModel
             SimpleIoc.Default.Register<LogViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<AboutViewModel>();
-            SimpleIoc.Default.Register<IAppDomainService, AppDomainService>();
 
             // Register QuantConnect types
             SimpleIoc.Default.Register(

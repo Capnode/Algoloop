@@ -136,7 +136,7 @@ namespace Algoloop.Service
                             YahooDownloader(model, list);
                             break;
                         default:
-                            Log.Trace($"Market Provider not supported: {model.Provider}");
+                            Log.Error($"Market Provider not supported: {model.Provider}");
                             break;
                     }
                 }

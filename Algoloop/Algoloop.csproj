@@ -270,8 +270,6 @@
     <Compile Include="Model\LogItem.cs" />
     <Compile Include="Service\ILogItemHandler.cs" />
     <Compile Include="Service\LogItemHandler.cs" />
-    <Compile Include="Service\IAppDomainService.cs" />
-    <Compile Include="Service\AppDomainService.cs" />
     <Compile Include="ViewModel\AboutViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\StrategiesViewModel.cs" />

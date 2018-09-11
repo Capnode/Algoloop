@@ -18,7 +18,6 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using Algoloop.Model;
-using Algoloop.Service;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -30,21 +29,18 @@ namespace Algoloop.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        private readonly IAppDomainService _appDomainService;
         private bool _isBusy;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
         public MainViewModel(
-            IAppDomainService appDomainService,
             SettingsViewModel settingsViewModel,
             MarketsViewModel marketsViewModel,
             AccountsViewModel accountsViewModel,
             StrategiesViewModel strategiesViewModel,
             LogViewModel logViewModel)
         {
-            _appDomainService = appDomainService;
             SettingsViewModel = settingsViewModel;
             MarketsViewModel = marketsViewModel;
             AccountsViewModel = accountsViewModel;

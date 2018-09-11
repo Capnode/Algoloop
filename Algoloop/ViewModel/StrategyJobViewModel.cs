@@ -38,17 +38,16 @@ namespace Algoloop.ViewModel
     {
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
-        private readonly IAppDomainService _appDomainService;
         private CancellationTokenSource _cancel;
         private LiveCharts.Wpf.Series _selectedSeries;
-        private AppDomain _appDomain;
+        private Isolated<LeanEngine> _leanEngine;
+        private StrategyJobModel _model;
 
-        public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel, IAppDomainService appDomainService)
+        public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
             _parent = parent;
             Model = model;
             _settingsModel = settingsModel;
-            _appDomainService = appDomainService;
 
             StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Enabled);
             StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Enabled);
@@ -58,7 +57,11 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
-        public StrategyJobModel Model { get; }
+        public StrategyJobModel Model
+        {
+            get => _model;
+            set => Set(ref _model, value);
+        }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
 
@@ -151,15 +154,14 @@ namespace Algoloop.ViewModel
                 account = accounts.FirstOrDefault();
             }
 
+            StrategyJobModel model = Model;
             try
             {
-                _appDomain = _appDomainService.CreateAppDomain();
-                LeanEngine leanEngine = _appDomainService.CreateInstance<LeanEngine>(_appDomain);
+                _leanEngine = new Isolated<LeanEngine>();
                 _cancel = new CancellationTokenSource();
-                await Task.Run(() => (Model.Result, Model.Logs) = leanEngine.Run(Model, account), _cancel.Token);
+                await Task.Run(() => model = _leanEngine.Value.Run(Model, account, new HostDomainLogger()), _cancel.Token);
+                _leanEngine.Dispose();
                 Model.Completed = true;
-                AppDomain.Unload(_appDomain);
-                DataFromModel();
             }
             catch (AppDomainUnloadedException)
             {
@@ -168,10 +170,16 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 Log.Trace($"{ex.GetType()}: {ex.Message}");
+                _leanEngine.Dispose();
             }
 
+            // Update view
+            Model = null;
+            Model = model;
+
+            DataFromModel();
             _cancel = null;
-            _appDomain = null;
+            _leanEngine = null;
             Enabled = false;
         }
 
@@ -206,9 +214,10 @@ namespace Algoloop.ViewModel
                 _cancel.Cancel();
             }
 
-            if (_appDomain != null)
+            if (_leanEngine != null)
             {
-                AppDomain.Unload(_appDomain);
+                _leanEngine.Dispose();
+                _leanEngine = null;
             }
         }
 

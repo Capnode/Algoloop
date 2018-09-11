@@ -18,7 +18,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
-using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -30,14 +29,12 @@ namespace Algoloop.ViewModel
     public class StrategiesViewModel : ViewModelBase
     {
         private readonly SettingsModel _settingsModel;
-        private readonly IAppDomainService _appDomainService;
         private ViewModelBase _selectedItem;
 
-        public StrategiesViewModel(StrategiesModel model, SettingsModel settingsModel, IAppDomainService appDomainService)
+        public StrategiesViewModel(StrategiesModel model, SettingsModel settingsModel)
         {
             Model = model;
             _settingsModel = settingsModel;
-            _appDomainService = appDomainService;
 
             AddCommand = new RelayCommand(() => AddStrategy(), true);
             DeleteCommand = new RelayCommand<StrategyViewModel>((strategy) => DeleteStrategy(strategy), (strategy) => strategy != null);
@@ -73,7 +70,7 @@ namespace Algoloop.ViewModel
 
         private void AddStrategy()
         {
-            var strategy = new StrategyViewModel(this, new StrategyModel(), _settingsModel, _appDomainService);
+            var strategy = new StrategyViewModel(this, new StrategyModel(), _settingsModel);
             Strategies.Add(strategy);
         }
 
@@ -90,7 +87,7 @@ namespace Algoloop.ViewModel
         {
             strategyViewModel.DataToModel();
             var strategyModel = new StrategyModel(strategyViewModel.Model);
-            var strategy = new StrategyViewModel(this, strategyModel, _settingsModel, _appDomainService);
+            var strategy = new StrategyViewModel(this, strategyModel, _settingsModel);
             Strategies.Add(strategy);
         }
 
@@ -212,7 +209,7 @@ namespace Algoloop.ViewModel
             Strategies.Clear();
             foreach (StrategyModel strategyModel in Model.Strategies)
             {
-                var strategyViewModel = new StrategyViewModel(this, strategyModel, _settingsModel, _appDomainService);
+                var strategyViewModel = new StrategyViewModel(this, strategyModel, _settingsModel);
                 Strategies.Add(strategyViewModel);
             }
         }

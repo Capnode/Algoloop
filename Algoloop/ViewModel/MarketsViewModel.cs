@@ -32,14 +32,12 @@ namespace Algoloop.ViewModel
     public class MarketsViewModel : ViewModelBase
     {
         private readonly SettingsModel _settingsModel;
-        private readonly IAppDomainService _appDomainService;
         private MarketViewModel _selectedItem;
 
-        public MarketsViewModel(MarketsModel model, SettingsModel settingsModel, IAppDomainService appDomainService)
+        public MarketsViewModel(MarketsModel model, SettingsModel settingsModel)
         {
             Model = model;
             _settingsModel = settingsModel;
-            _appDomainService = appDomainService;
 
             AddCommand = new RelayCommand(() => AddMarket(), true);
             DeleteCommand = new RelayCommand<MarketViewModel>((market) => DeleteMarket(market), (market) => market != null);
@@ -85,7 +83,7 @@ namespace Algoloop.ViewModel
 
         private void AddMarket()
         {
-            var loginViewModel = new MarketViewModel(this, new MarketModel(), _settingsModel, _appDomainService);
+            var loginViewModel = new MarketViewModel(this, new MarketModel(), _settingsModel);
             Markets.Add(loginViewModel);
         }
 
@@ -154,7 +152,7 @@ namespace Algoloop.ViewModel
             Markets.Clear();
             foreach (MarketModel market in Model.Markets)
             {
-                var viewModel = new MarketViewModel(this, market, _settingsModel, _appDomainService);
+                var viewModel = new MarketViewModel(this, market, _settingsModel);
                 Markets.Add(viewModel);
             }
         }
