@@ -82,9 +82,5 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
-
-        [Browsable(false)]
-        [DataMember]
-        public string Logs { get; set; }
     }
 }

@@ -31,87 +31,42 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Algoloop.Service
 {
     public class Toolbox : MarshalByRefObject
     {
-        public string Run(MarketModel model, HostDomainLogger logger)
+        public MarketModel Run(MarketModel model, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
             Log.Trace($"Toolbox.Run {model.Provider} {model.Resolution} {model.FromDate:d}");
 
             PrepareDataFolder(model.DataFolder);
 
-            string console;
             using (var writer = new StringWriter())
             {
-                try
+                Console.SetOut(writer);
+                Task task = Task.Run(() => MarketDownloader(model));
+                bool loop = true;
+                while (loop)
                 {
-                    Console.SetOut(writer);
-                    IList<string> list = model.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
-                    if (list.Any())
+                    task.Wait(100);
+                    loop = !task.IsCompleted && !task.IsCanceled && !task.IsFaulted;
+                    writer.Flush();
+                    string console = writer.GetStringBuilder().ToString();
+                    foreach (string line in console.Split('\n'))
                     {
-                        switch (model.Provider)
+                        if (!string.IsNullOrEmpty(line))
                         {
-                            case MarketModel.DataProvider.CryptoIQ:
-                                CryptoIQDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.DukasCopy:
-                                DukascopyDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.Fxcm:
-                                FxcmDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.FxcmVolume:
-                                FxcmVolumeDownload(model, list);
-                                break;
-                            case MarketModel.DataProvider.Gdax:
-                                GdaxDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.Google:
-                                GoogleDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.IB:
-                                IBDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.IEX:
-                                IEXDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.Kraken:
-                                KrakenDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.Oanda:
-                                OandaDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.QuandBitfinex:
-                                QuandBitfinexDownloader(model, list);
-                                break;
-                            case MarketModel.DataProvider.Yahoo:
-                                YahooDownloader(model, list);
-                                break;
-                            default:
-                                Log.Trace($"Market Provider not supported: {model.Provider}");
-                                break;
+                            Log.Trace(line.Replace("\r", ""));
                         }
                     }
-                    else
-                    {
-                        Log.Trace($"No symbols selected");
-                    }
                 }
-                catch (Exception ex)
-                {
-                    string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
-                    Log.Error(log);
-                }
-
-                writer.Flush();
-                console = writer.GetStringBuilder().ToString();
             }
 
             Log.LogHandler.Dispose();
-            return console;
+            return model;
         }
 
         private void PrepareDataFolder(string dataFolder)
@@ -135,6 +90,68 @@ namespace Algoloop.Service
             }
         }
 
+        private void MarketDownloader(MarketModel model)
+        {
+            try
+            {
+                IList<string> list = model.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
+                if (list.Any())
+                {
+                    switch (model.Provider)
+                    {
+                        case MarketModel.DataProvider.CryptoIQ:
+                            CryptoIQDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.DukasCopy:
+                            DukascopyDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.Fxcm:
+                            FxcmDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.FxcmVolume:
+                            FxcmVolumeDownload(model, list);
+                            break;
+                        case MarketModel.DataProvider.Gdax:
+                            GdaxDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.Google:
+                            GoogleDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.IB:
+                            IBDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.IEX:
+                            IEXDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.Kraken:
+                            KrakenDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.Oanda:
+                            OandaDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.QuandBitfinex:
+                            QuandBitfinexDownloader(model, list);
+                            break;
+                        case MarketModel.DataProvider.Yahoo:
+                            YahooDownloader(model, list);
+                            break;
+                        default:
+                            Log.Trace($"Market Provider not supported: {model.Provider}");
+                            break;
+                    }
+                }
+                else
+                {
+                    Log.Trace($"No symbols selected");
+                }
+            }
+            catch (Exception ex)
+            {
+                string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
+                Log.Error(log);
+            }
+        }
+
         private void CryptoIQDownloader(MarketModel model, IList<string> list)
         {
             throw new NotImplementedException();
@@ -146,7 +163,9 @@ namespace Algoloop.Service
             Config.Set("data-directory", model.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, model.FromDate, model.FromDate);
+            DateTime nextTime = DateTime.Today.AddMilliseconds(-1);
+            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, model.FromDate, nextTime);
+            model.FromDate = nextTime;
         }
 
         private static void FxcmDownloader(MarketModel model, IList<string> symbols)

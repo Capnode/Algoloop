@@ -96,16 +96,6 @@ namespace Algoloop.ViewModel
             set => Set(ref _model, value);
         }
 
-        public string Logs
-        {
-            get => Model.Logs;
-        }
-
-        public int Loglines
-        {
-            get => Logs == null ? 0 : Logs.Count(m => m.Equals('\n'));
-        }
-
         internal void Refresh(SymbolViewModel symbolViewModel)
         {
             ActiveSymbols.View.Refresh();
@@ -114,16 +104,12 @@ namespace Algoloop.ViewModel
         internal void DataToModel()
         {
             Model.DataFolder = _settingsModel.DataFolder;
-            Model.Logs = string.Empty;
 
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
                 Model.Symbols.Add(symbol.Model);
             }
-
-            RaisePropertyChanged(() => Logs);
-            RaisePropertyChanged(() => Loglines);
         }
 
         internal void DataFromModel()
@@ -134,9 +120,6 @@ namespace Algoloop.ViewModel
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
             }
-
-            RaisePropertyChanged(() => Logs);
-            RaisePropertyChanged(() => Loglines);
         }
 
         internal bool DeleteSymbol(SymbolViewModel symbol)
@@ -146,45 +129,37 @@ namespace Algoloop.ViewModel
 
         internal async Task StartTaskAsync()
         {
+            MarketModel model = Model;
             _cancel = new CancellationTokenSource();
             DataToModel();
             Model.FromDate = Model.FromDate.Date; // Remove time part
-            while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Now)
+            Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
+            try
             {
-                Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
-                try
-                {
-                     _toolbox = new Isolated<Toolbox>();
-                     _cancel = new CancellationTokenSource();
-                     await Task.Run(() => Model.Logs += _toolbox.Value.Run(Model, new HostDomainLogger()), _cancel.Token);
-                    _toolbox.Dispose();
-                    _toolbox = null;
-                }
-                catch (AppDomainUnloadedException)
-                {
-                    Log.Trace($"Market {Model.Name} canceled by user");
-                }
-                catch (Exception ex)
-                {
-                    Log.Trace($"{ex.GetType()}: {ex.Message}");
-                    _toolbox.Dispose();
-                    _toolbox = null;
-                }
-
-                DataFromModel();
-
-                if (Model.FromDate >= DateTime.Today)
-                {
-                    break;
-                }
-
-                Model.FromDate = Model.FromDate.AddDays(1);
-
-                // Update view
-                MarketModel model = Model;
-                Model = null;
-                Model = model;
+                _toolbox = new Isolated<Toolbox>();
+                _cancel = new CancellationTokenSource();
+                DateTime nextTime = DateTime.Now;
+                await Task.Run(() => model = _toolbox.Value.Run(Model, new HostDomainLogger()), _cancel.Token);
+                _toolbox.Dispose();
+                _toolbox = null;
+                Model.FromDate = nextTime;
             }
+            catch (AppDomainUnloadedException)
+            {
+                Log.Trace($"Market {Model.Name} canceled by user");
+            }
+            catch (Exception ex)
+            {
+                Log.Trace($"{ex.GetType()}: {ex.Message}");
+                _toolbox.Dispose();
+                _toolbox = null;
+            }
+
+            DataFromModel();
+
+            // Update view
+            Model = null;
+            Model = model;
 
             Log.Trace($"{Model.Provider} download complete");
             _cancel = null;
