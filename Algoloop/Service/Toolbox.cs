@@ -36,17 +36,17 @@ namespace Algoloop.Service
 {
     public class Toolbox : MarshalByRefObject
     {
-        public string Run(MarketModel model)
+        public string Run(MarketModel model, HostDomainLogger logger)
         {
-            QueueLogHandler logHandler = new QueueLogHandler();
-            Log.LogHandler = logHandler;
+            Log.LogHandler = logger;
             Log.Trace($"Toolbox.Run {model.Provider} {model.Resolution} {model.FromDate:d}");
 
             PrepareDataFolder(model.DataFolder);
 
-            try
+            string console;
+            using (var writer = new StringWriter())
             {
-                using (var writer = new StringWriter())
+                try
                 {
                     Console.SetOut(writer);
                     IList<string> list = model.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
@@ -99,29 +99,19 @@ namespace Algoloop.Service
                     {
                         Log.Trace($"No symbols selected");
                     }
-
-                    writer.Flush();
-                    var console = writer.GetStringBuilder().ToString();
-                    if (!string.IsNullOrEmpty(console))
-                    {
-                        Log.Trace(console);
-                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
-                Log.Error(log);
-            }
+                catch (Exception ex)
+                {
+                    string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
+                    Log.Error(log);
+                }
 
-            string logs = string.Empty;
-            foreach (LogEntry log in logHandler.Logs)
-            {
-                logs += log.ToString() + Environment.NewLine;
+                writer.Flush();
+                console = writer.GetStringBuilder().ToString();
             }
 
             Log.LogHandler.Dispose();
-            return logs;
+            return console;
         }
 
         private void PrepareDataFolder(string dataFolder)

@@ -230,6 +230,8 @@
     <Compile Include="Model\MarketModel.cs" />
     <Compile Include="Model\MarketsModel.cs" />
     <Compile Include="Model\SettingsModel.cs" />
+    <Compile Include="Service\Isolated.cs" />
+    <Compile Include="Service\HostDomainLogger.cs" />
     <Compile Include="Service\Toolbox.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />

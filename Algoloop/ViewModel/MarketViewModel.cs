@@ -33,7 +33,7 @@ namespace Algoloop.ViewModel
         private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
-        private AppDomain _appDomain;
+        private Isolated<Toolbox> _toolbox;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel, IAppDomainService appDomainService)
         {
@@ -154,11 +154,11 @@ namespace Algoloop.ViewModel
                 Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
                 try
                 {
-                    _appDomain = _appDomainService.CreateAppDomain();
-                    Toolbox toolbox = _appDomainService.CreateInstance<Toolbox>(_appDomain);
-                    _cancel = new CancellationTokenSource();
-                    await Task.Run(() => Model.Logs += toolbox.Run(Model), _cancel.Token);
-                    AppDomain.Unload(_appDomain);
+                     _toolbox = new Isolated<Toolbox>();
+                     _cancel = new CancellationTokenSource();
+                     await Task.Run(() => Model.Logs += _toolbox.Value.Run(Model, new HostDomainLogger()), _cancel.Token);
+                    _toolbox.Dispose();
+                    _toolbox = null;
                 }
                 catch (AppDomainUnloadedException)
                 {
@@ -167,6 +167,8 @@ namespace Algoloop.ViewModel
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
+                    _toolbox.Dispose();
+                    _toolbox = null;
                 }
 
                 DataFromModel();
@@ -196,9 +198,9 @@ namespace Algoloop.ViewModel
                 _cancel.Cancel();
             }
 
-            if (_appDomain != null)
+            if (_toolbox != null)
             {
-                AppDomain.Unload(_appDomain);
+                _toolbox.Dispose();
             }
         }
 
