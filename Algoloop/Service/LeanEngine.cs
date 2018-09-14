@@ -108,11 +108,29 @@ namespace Algoloop.Service
                 Config.Set("live-mode-brokerage", "FxcmBrokerage");
                 Config.Set("data-queue-handler", "FxcmBrokerage");
 
+                Config.Set("force-exchange-always-open", "false");
                 Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), account.Type));
                 Config.Set("fxcm-user-name", account.Login);
                 Config.Set("fxcm-password", account.Password);
                 Config.Set("fxcm-account-id", account.Id);
             }
+
+            Config.Set("api-access-token", "");
+            Config.Set("job-user-id", "0");
+            Config.Set("job-project-id", "0");
+            Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
+            Config.Set("regression-update-statistics", "false");
+            Config.Set("algorithm-manager-time-loop-maximum", "20");
+            Config.Set("symbol-minute-limit", "10000");
+            Config.Set("symbol-second-limit", "10000");
+            Config.Set("symbol-tick-limit", "10000");
+            Config.Set("maximum-data-points-per-chart-series", "4000");
+            Config.Set("version-id", "");
+            Config.Set("security-data-feeds", "");
+            Config.Set("forward-console-messages", "true");
+            Config.Set("send-via-api", "false");
+            Config.Set("lean-manager-type", "LocalLeanManager");
+            Config.Set("transaction-log", "");
 
             Config.Set("algorithm-language", "CSharp");
             Config.Set("data-folder", model.DataFolder);

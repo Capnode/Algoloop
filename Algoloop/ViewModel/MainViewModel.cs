@@ -21,6 +21,7 @@ using Algoloop.Model;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using QuantConnect.Configuration;
 
 namespace Algoloop.ViewModel
 {
@@ -50,6 +51,8 @@ namespace Algoloop.ViewModel
             SettingsCommand = new RelayCommand(() => DoSettings(), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             AboutCommand = new RelayCommand(() => DoAbout(), () => !IsBusy);
+
+            Config.Set("map-file-provider", "LocalDiskMapFileProvider");
 
             ReadConfig();
         }
