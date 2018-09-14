@@ -94,11 +94,21 @@ namespace Algoloop.Algorithm.CSharp
         /// <param name="data">Slice object keyed by symbol containing the stock data</param>
         public override void OnData(Slice data)
         {
-            if (!Portfolio.Invested)
+            if (Portfolio.Invested)
             {
-                SetHoldings("EURUSD", .5);
-//                SetHoldings("NZDUSD", .5);
-                Log(string.Join(", ", data.Values));
+                if (Time.Hour % 2 == 1)
+                {
+                    Log($"Close {string.Join(", ", data.Values)}");
+                    Liquidate("EURUSD");
+                }
+            }
+            else
+            {
+                if (Time.Hour % 2 == 0)
+                {
+                    Log($"Open {string.Join(", ", data.Values)}");
+                    SetHoldings("EURUSD", .5);
+                }
             }
         }
     }
