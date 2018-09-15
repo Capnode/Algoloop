@@ -96,7 +96,7 @@ namespace Algoloop.Algorithm.CSharp
         {
             if (Portfolio.Invested)
             {
-                if (Time.Hour % 2 == 1)
+                if (Time.Minute/10 % 2 == 1)
                 {
                     Log($"Close {string.Join(", ", data.Values)}");
                     Liquidate("EURUSD");
@@ -104,7 +104,7 @@ namespace Algoloop.Algorithm.CSharp
             }
             else
             {
-                if (Time.Hour % 2 == 0)
+                if (Time.Minute/10 % 2 == 0)
                 {
                     Log($"Open {string.Join(", ", data.Values)}");
                     SetHoldings("EURUSD", .5);
