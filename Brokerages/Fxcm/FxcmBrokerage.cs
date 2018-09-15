@@ -365,7 +365,7 @@ namespace QuantConnect.Brokerages.Fxcm
                 {
                     Symbol = group.Key,
                     Type = group.First().Type,
-                    AveragePrice = group.Sum(x => x.AveragePrice * x.Quantity) / group.Sum(x => x.Quantity),
+                    AveragePrice = group.Sum(x => x.AveragePrice * Math.Abs(x.Quantity)) / group.Sum(x => Math.Abs(x.Quantity)),
                     ConversionRate = group.First().ConversionRate,
                     CurrencySymbol = group.First().CurrencySymbol,
                     Quantity = group.Sum(x => x.Quantity)
