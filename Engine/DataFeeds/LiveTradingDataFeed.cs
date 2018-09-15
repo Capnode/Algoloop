@@ -44,7 +44,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
     /// </summary>
     public class LiveTradingDataFeed : IDataFeed
     {
-        private SecurityChanges _changes = SecurityChanges.None;
         private static readonly Symbol DataQueueHandlerSymbol = Symbol.Create("data-queue-handler-symbol", SecurityType.Base, Market.USA);
 
         private LiveNodePacket _job;
@@ -191,13 +190,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 _dataQueueHandler.Subscribe(_job, new[] {request.Security.Symbol});
             }
 
-            // keep track of security changes, we emit these to the algorithm
-            // as notifications, used in universe selection
-            if (!request.IsUniverseSubscription)
-            {
-                _changes += SecurityChanges.Added(request.Security);
-            }
-
             return true;
         }
 
@@ -251,13 +243,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             }
             subscription.Dispose();
 
-            // keep track of security changes, we emit these to the algorithm
-            // as notications, used in universe selection
-            if (!subscription.IsUniverseSelectionSubscription)
-            {
-                _changes += SecurityChanges.Removed(security);
-            }
-
             Log.Trace("LiveTradingDataFeed.RemoveSubscription(): Removed " + configuration);
 
             return true;
@@ -275,6 +260,13 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             // the last emit time, and if we pass this time, we'll emit even with no data
             var nextEmit = DateTime.MinValue;
 
+            var syncer = new SubscriptionSynchronizer(_universeSelection, _algorithm.TimeZone, _algorithm.Portfolio.CashBook, _frontierTimeProvider);
+            syncer.SubscriptionFinished += (sender, subscription) =>
+            {
+                RemoveSubscription(subscription.Configuration);
+                Log.Debug($"LiveTradingDataFeed.SubscriptionFinished(): Finished subscription: {subscription.Configuration} at {_algorithm.UtcTime} UTC");
+            };
+
             try
             {
                 while (!_cancellationTokenSource.IsCancellationRequested)
@@ -283,77 +275,25 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     _frontierUtc = _timeProvider.GetUtcNow();
                     _frontierTimeProvider.SetCurrentTime(_frontierUtc);
 
-                    var data = new List<DataFeedPacket>();
-
-                    // NOTE: Tight coupling in UniverseSelection.ApplyUniverseSelection
-                    var universeData = new Dictionary<Universe, BaseDataCollection>();
-                    foreach (var subscription in Subscriptions)
+                    // always wait for other thread to sync up
+                    if (!_bridge.WaitHandle.WaitOne(Timeout.Infinite, _cancellationTokenSource.Token))
                     {
-                        var config = subscription.Configuration;
-                        var packet = new DataFeedPacket(subscription.Security, config, subscription.RemovedFromUniverse);
-
-                        // dequeue data that is time stamped at or before this frontier
-                        while (subscription.MoveNext() && subscription.Current != null)
-                        {
-                            packet.Add(subscription.Current.Data);
-                        }
-
-                        // if we have data, add it to be added to the bridge
-                        if (packet.Count > 0) data.Add(packet);
-
-                        // we have new universe data to select based on
-                        if (subscription.IsUniverseSelectionSubscription)
-                        {
-                            if (packet.Count > 0)
-                            {
-                                var universe = subscription.Universe;
-
-                                // always wait for other thread to sync up
-                                if (!_bridge.WaitHandle.WaitOne(Timeout.Infinite, _cancellationTokenSource.Token))
-                                {
-                                    break;
-                                }
-
-                                // assume that if the first item is a base data collection then the enumerator handled the aggregation,
-                                // otherwise, load all the the data into a new collection instance
-                                var collection = packet.Data[0] as BaseDataCollection ?? new BaseDataCollection(_frontierUtc, config.Symbol, packet.Data);
-
-                                BaseDataCollection existingCollection;
-                                if (universeData.TryGetValue(universe, out existingCollection))
-                                {
-                                    existingCollection.Data.AddRange(collection.Data);
-                                }
-                                else
-                                {
-                                    universeData[universe] = collection;
-                                }
-
-                                _changes += _universeSelection.ApplyUniverseSelection(universe, _frontierUtc, collection);
-                            }
-
-                            // remove subscription for universe data if disposal requested AFTER time sync
-                            // this ensures we get any security changes from removing the universe and its children
-                            if (subscription.Universe.DisposeRequested)
-                            {
-                                RemoveSubscription(subscription.Configuration);
-                            }
-                        }
+                        break;
                     }
+
+                    var timeSlice = syncer.Sync(Subscriptions);
 
                     // check for cancellation
                     if (_cancellationTokenSource.IsCancellationRequested) return;
 
-                    // emit on data or if we've elapsed a full second since last emit
-                    if (data.Count != 0 || _frontierUtc >= nextEmit)
+                    // emit on data or if we've elapsed a full second since last emit or there are security changes
+                    if (timeSlice.SecurityChanges != SecurityChanges.None || timeSlice.Data.Count != 0 || _frontierUtc >= nextEmit)
                     {
-                        _bridge.Add(TimeSlice.Create(_frontierUtc, _algorithm.TimeZone, _algorithm.Portfolio.CashBook, data, _changes, universeData), _cancellationTokenSource.Token);
+                        _bridge.Add(timeSlice, _cancellationTokenSource.Token);
 
                         // force emitting every second
                         nextEmit = _frontierUtc.RoundDown(Time.OneSecond).Add(Time.OneSecond);
                     }
-
-                    // reset our security changes
-                    _changes = SecurityChanges.None;
 
                     // take a short nap
                     Thread.Sleep(1);
@@ -419,6 +359,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// <returns>The loaded <see cref="IDataQueueHandler"/></returns>
         protected virtual IDataQueueHandler GetDataQueueHandler()
         {
+            Log.Trace($"LiveTradingDataFeed.GetDataQueueHandler(): will use {_job.DataQueueHandler}");
             return Composer.Instance.GetExportedValueByTypeName<IDataQueueHandler>(_job.DataQueueHandler);
         }
 
