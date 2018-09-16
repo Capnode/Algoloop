@@ -64,7 +64,7 @@
   <ItemGroup>
     <Compile Include="BasicTemplateAlgorithm.cs" />
     <Compile Include="BasicTemplateDailyAlgorithm.cs" />
-    <Compile Include="BasicTemplateForexAlgorithm.cs" />
+    <Compile Include="ForexSchedule.cs" />
     <Compile Include="CustomChartingAlgorithm.cs" />
     <Compile Include="MACDTrendAlgorithm.cs" />
     <Compile Include="MovingAverageCrossAlgorithm.cs" />

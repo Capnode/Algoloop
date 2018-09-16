@@ -33,7 +33,7 @@ namespace Algoloop.Algorithm.CSharp
         private Resolution _resolution = Resolution.Hour;
 
         [Parameter("market")]
-        private string __market = "fxcm";
+        private string __market = Market.FXCM;
 
         [Parameter("startdate")]
         private string __startdate = "20180101 00:00:00";

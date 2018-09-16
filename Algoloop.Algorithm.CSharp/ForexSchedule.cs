@@ -16,6 +16,7 @@
 using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
+using QuantConnect.Parameters;
 using System;
 
 namespace Algoloop.Algorithm.CSharp
@@ -28,64 +29,46 @@ namespace Algoloop.Algorithm.CSharp
     /// <meta name="tag" content="history and warm up" />
     /// <meta name="tag" content="history" />
     /// <meta name="tag" content="forex" />
-    public class BasicTemplateForexAlgorithm : QCAlgorithm
+    public class ForexSchedule : QCAlgorithm
     {
+        [Parameter("symbols")]
+        private string __symbols = "EURUSD";
+        private string _symbol;
+
+        [Parameter("resolution")]
+        private string __resolution;
+        private Resolution _resolution = Resolution.Hour;
+
+        [Parameter("market")]
+        private string __market = Market.FXCM;
+
+        [Parameter("startdate")]
+        private string __startdate = "20180101 00:00:00";
+        private DateTime _startdate;
+
+        [Parameter("enddate")]
+        private string __enddate = "20180901 00:00:00";
+        private DateTime _enddate;
+
+        [Parameter("cash")]
+        private string __cash = "100000";
+        private int _cash;
+
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
         public override void Initialize()
         {
-            Log("BasicTemplateForexAlgorithm.Initialize()");
+            _startdate = DateTime.Parse(__startdate);
+            _enddate = DateTime.Parse(__enddate);
+            _symbol = __symbols.Split(';')[0];
+            Enum.TryParse(__resolution, out _resolution);
+            _cash = int.Parse(__cash);
 
-            // SetStartDate(2014, 5, 7);  //Set Start DateSetCa
-            DateTime startdate;
-            if (DateTime.TryParse(GetParameter("startdate"), out startdate))
-            {
-                SetStartDate(startdate);
-            }
-
-            // SetEndDate(2014, 5, 15);    //Set End Date
-            DateTime enddate;
-            if (DateTime.TryParse(GetParameter("enddate"), out enddate))
-            {
-                SetEndDate(enddate);
-            }
-
-            // SetCash(100000);             //Set Strategy Cash
-            decimal cash;
-            if (decimal.TryParse(GetParameter("cash"), out cash))
-            {
-                SetCash(cash);
-            }
-
-            // Find more symbols here: http://quantconnect.com/data
-            //AddForex("EURUSD");
-            //AddForex("NZDUSD");
-            string symbols = GetParameter("symbols");
-            string resolution = GetParameter("resolution");
-            string market = GetParameter("market");
-            Resolution res;
-            if (Enum.TryParse(resolution, out res))
-            {
-                foreach (string symbol in symbols.Split(';'))
-                {
-                    AddForex(symbol, res, market);
-                }
-            }
-
-            var dailyHistory = History(5, Resolution.Daily);
-            var hourHistory = History(5, Resolution.Hour);
-            var minuteHistory = History(5, Resolution.Minute);
-            var secondHistory = History(5, Resolution.Second);
-
-            // Log values from history request of second-resolution data
-            foreach (var data in secondHistory)
-            {
-                foreach (var key in data.Keys)
-                {
-                    Log(key.Value + ": " + data.Time + " > " + data[key].Value);
-                }
-            }
+            SetStartDate(_startdate);
+            SetEndDate(_enddate);
+            SetCash(_cash);
+            AddForex(_symbol, _resolution, __market);
         }
 
         /// <summary>
