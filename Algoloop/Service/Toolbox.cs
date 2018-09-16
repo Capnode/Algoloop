@@ -31,7 +31,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Algoloop.Service
 {
@@ -41,28 +40,12 @@ namespace Algoloop.Service
         {
             Log.LogHandler = logger;
             Log.Trace($"Toolbox.Run {model.Provider} {model.Resolution} {model.FromDate:d}");
-
             PrepareDataFolder(model.DataFolder);
 
-            using (var writer = new StringWriter())
+            using (var writer = new StreamLogger(logger))
             {
                 Console.SetOut(writer);
-                Task task = Task.Run(() => MarketDownloader(model));
-                bool loop = true;
-                while (loop)
-                {
-                    task.Wait(100);
-                    loop = !task.IsCompleted && !task.IsCanceled && !task.IsFaulted;
-                    writer.Flush();
-                    string console = writer.GetStringBuilder().ToString();
-                    foreach (string line in console.Split('\n'))
-                    {
-                        if (!string.IsNullOrEmpty(line))
-                        {
-                            Log.Trace(line.Replace("\r", ""));
-                        }
-                    }
-                }
+                MarketDownloader(model);
             }
 
             Log.LogHandler.Dispose();
@@ -176,8 +159,10 @@ namespace Algoloop.Service
             Config.Set("fxcm-user-name", model.Login);
             Config.Set("fxcm-password", model.Password);
 
+            DateTime nextTime = DateTime.Today.AddMilliseconds(-1);
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, model.FromDate, model.FromDate);
+            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, model.FromDate, nextTime);
+            model.FromDate = nextTime;
         }
 
         private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)
