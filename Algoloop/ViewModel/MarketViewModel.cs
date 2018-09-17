@@ -111,6 +111,7 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
+            Enabled = Model.Enabled;
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -129,8 +130,7 @@ namespace Algoloop.ViewModel
             DataToModel();
             MarketModel model = Model;
             _cancel = new CancellationTokenSource();
-            Model.FromDate = Model.FromDate.Date; // Remove time part
-            while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Now)
+            while (!_cancel.Token.IsCancellationRequested && Model.Enabled)
             {
                 Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
                 try
@@ -144,31 +144,25 @@ namespace Algoloop.ViewModel
                 catch (AppDomainUnloadedException)
                 {
                     Log.Trace($"Market {Model.Name} canceled by user");
+                    _toolbox = null;
+                    Enabled = false;
                 }
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
                     _toolbox.Dispose();
                     _toolbox = null;
+                    Enabled = false;
                 }
-
-                DataFromModel();
-                if (Model.FromDate >= DateTime.Today)
-                {
-                    break;
-                }
-
-                Model.FromDate = Model.FromDate.AddDays(1);
 
                 // Update view
-                model = Model;
                 Model = null;
                 Model = model;
+                DataFromModel();
             }
 
             Log.Trace($"{Model.Provider} download complete");
             _cancel = null;
-            Enabled = false;
         }
 
         private void StopTask()

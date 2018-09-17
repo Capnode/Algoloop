@@ -52,7 +52,7 @@ namespace Algoloop.ViewModel
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             AboutCommand = new RelayCommand(() => DoAbout(), () => !IsBusy);
 
-            Config.Set("map-file-provider", "LocalDiskMapFileProvider");
+            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
 
             ReadConfig();
         }

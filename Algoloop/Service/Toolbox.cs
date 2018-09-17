@@ -39,7 +39,6 @@ namespace Algoloop.Service
         public MarketModel Run(MarketModel model, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
-            Log.Trace($"Toolbox.Run {model.Provider} {model.Resolution} {model.FromDate:d}");
             PrepareDataFolder(model.DataFolder);
 
             using (var writer = new StreamLogger(logger))
@@ -120,18 +119,20 @@ namespace Algoloop.Service
                             break;
                         default:
                             Log.Error($"Market Provider not supported: {model.Provider}");
+                            model.Enabled = false;
                             break;
                     }
                 }
                 else
                 {
                     Log.Trace($"No symbols selected");
+                    model.Enabled = false;
                 }
             }
             catch (Exception ex)
             {
-                string log = string.Format("{0}: {1}", ex.GetType(), ex.Message);
-                Log.Error(log);
+                Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
+                model.Enabled = false;
             }
         }
 
@@ -142,23 +143,37 @@ namespace Algoloop.Service
 
         private static void DukascopyDownloader(MarketModel model, IList<string> symbols)
         {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", model.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, model.FromDate, model.FromDate);
+            DateTime fromDate = model.FromDate.Date;
+            if (fromDate < DateTime.Today)
+            {
+                DateTime nextDate = fromDate.AddDays(1);
+                DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, nextDate.AddMilliseconds(-1));
+                model.FromDate = nextDate;
+            }
+            model.Enabled = model.FromDate < DateTime.Today;
         }
 
         private static void FxcmDownloader(MarketModel model, IList<string> symbols)
         {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
+            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", model.DataFolder);
             Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), model.Type));
             Config.Set("fxcm-user-name", model.Login);
             Config.Set("fxcm-password", model.Password);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, model.FromDate, model.FromDate);
+            DateTime fromDate = model.FromDate.Date;
+            if (fromDate < DateTime.Today)
+            {
+                FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, fromDate, fromDate);
+                model.FromDate = fromDate.AddDays(1);
+            }
+
+            model.Enabled = model.FromDate < DateTime.Today;
         }
 
         private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)
