@@ -130,33 +130,41 @@ namespace Algoloop.ViewModel
             MarketModel model = Model;
             _cancel = new CancellationTokenSource();
             Model.FromDate = Model.FromDate.Date; // Remove time part
-            Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
-            try
+            while (!_cancel.Token.IsCancellationRequested && Model.FromDate < DateTime.Now)
             {
-                _toolbox = new Isolated<Toolbox>();
-                _cancel = new CancellationTokenSource();
-                DateTime nextTime = DateTime.Now;
-                await Task.Run(() => model = _toolbox.Value.Run(Model, new HostDomainLogger()), _cancel.Token);
-                _toolbox.Dispose();
-                _toolbox = null;
-                Model.FromDate = nextTime;
-            }
-            catch (AppDomainUnloadedException)
-            {
-                Log.Trace($"Market {Model.Name} canceled by user");
-            }
-            catch (Exception ex)
-            {
-                Log.Trace($"{ex.GetType()}: {ex.Message}");
-                _toolbox.Dispose();
-                _toolbox = null;
-            }
+                Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
+                try
+                {
+                    _toolbox = new Isolated<Toolbox>();
+                    _cancel = new CancellationTokenSource();
+                    await Task.Run(() => model = _toolbox.Value.Run(Model, new HostDomainLogger()), _cancel.Token);
+                    _toolbox.Dispose();
+                    _toolbox = null;
+                }
+                catch (AppDomainUnloadedException)
+                {
+                    Log.Trace($"Market {Model.Name} canceled by user");
+                }
+                catch (Exception ex)
+                {
+                    Log.Trace($"{ex.GetType()}: {ex.Message}");
+                    _toolbox.Dispose();
+                    _toolbox = null;
+                }
 
-            DataFromModel();
+                DataFromModel();
+                if (Model.FromDate >= DateTime.Today)
+                {
+                    break;
+                }
 
-            // Update view
-            Model = null;
-            Model = model;
+                Model.FromDate = Model.FromDate.AddDays(1);
+
+                // Update view
+                model = Model;
+                Model = null;
+                Model = model;
+            }
 
             Log.Trace($"{Model.Provider} download complete");
             _cancel = null;

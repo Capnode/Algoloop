@@ -146,9 +146,7 @@ namespace Algoloop.Service
             Config.Set("data-directory", model.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DateTime nextTime = DateTime.Today.AddMilliseconds(-1);
-            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, model.FromDate, nextTime);
-            model.FromDate = nextTime;
+            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
 
         private static void FxcmDownloader(MarketModel model, IList<string> symbols)
@@ -159,10 +157,8 @@ namespace Algoloop.Service
             Config.Set("fxcm-user-name", model.Login);
             Config.Set("fxcm-password", model.Password);
 
-            DateTime nextTime = DateTime.Today.AddMilliseconds(-1);
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, model.FromDate, nextTime);
-            model.FromDate = nextTime;
+            FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
 
         private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)
