@@ -137,7 +137,6 @@ namespace QuantConnect.ToolBox.DukascopyDownloader
         /// <returns>An enumerable of ticks</returns>
         private IEnumerable<Tick> DownloadTicks(Symbol symbol, DateTime date)
         {
-            Log.Trace($"Dukascopy download {symbol} {date:d}");
             var dukascopySymbol = _symbolMapper.GetBrokerageSymbol(symbol);
             var pointValue = _symbolMapper.GetPointValue(symbol);
 
