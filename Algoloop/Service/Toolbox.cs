@@ -87,10 +87,12 @@ namespace Algoloop.Service
                         case MarketModel.DataProvider.DukasCopy:
                             DukascopyDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.Fxcm:
+                        case MarketModel.DataProvider.Fxcm_Demo:
+                        case MarketModel.DataProvider.Fxcm_Real:
                             FxcmDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.FxcmVolume:
+                        case MarketModel.DataProvider.FxcmVolume_Demo:
+                        case MarketModel.DataProvider.FxcmVolume_Real:
                             FxcmVolumeDownload(model, list);
                             break;
                         case MarketModel.DataProvider.Gdax:
@@ -161,7 +163,17 @@ namespace Algoloop.Service
         {
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", model.DataFolder);
-            Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), model.Type));
+            switch (model.Provider)
+            {
+                case MarketModel.DataProvider.Fxcm_Demo:
+                    Config.Set("fxcm-terminal", "Demo");
+                    break;
+
+                case MarketModel.DataProvider.Fxcm_Real:
+                    Config.Set("fxcm-terminal", "Real");
+                    break;
+            }
+
             Config.Set("fxcm-user-name", model.Login);
             Config.Set("fxcm-password", model.Password);
 
@@ -179,7 +191,17 @@ namespace Algoloop.Service
         private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)
         {
             Config.Set("data-directory", model.DataFolder);
-            Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), model.Type));
+            switch (model.Provider)
+            {
+                case MarketModel.DataProvider.FxcmVolume_Demo:
+                    Config.Set("fxcm-terminal", "Demo");
+                    break;
+
+                case MarketModel.DataProvider.FxcmVolume_Real:
+                    Config.Set("fxcm-terminal", "Real");
+                    break;
+            }
+
             Config.Set("fxcm-user-name", model.Login);
             Config.Set("fxcm-password", model.Password);
 

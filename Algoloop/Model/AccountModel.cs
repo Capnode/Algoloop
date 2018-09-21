@@ -22,7 +22,7 @@ namespace Algoloop.Model
     [DataContract]
     public class AccountModel
     {
-        public enum AccountType { Demo, Real };
+        public enum BrokerName { Paper, Fxcm_Demo, Fxmc_Real };
 
         [DisplayName("Account name")]
         [Description("Name of the account.")]
@@ -33,10 +33,10 @@ namespace Algoloop.Model
         [DataMember]
         public bool Enabled { get; set; }
 
+        [DisplayName("Broker")]
+        [Description("Name of the broker.")]
         [DataMember]
-        [DisplayName("Account type")]
-        [Description("Account type.")]
-        public AccountType Type { get; set; }
+        public BrokerName Broker { get; set; }
 
         [DisplayName("Login")]
         [Description("User login.")]

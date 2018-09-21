@@ -25,9 +25,7 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketModel
     {
-        public enum DataProvider { None, CryptoIQ, DukasCopy, Fxcm, FxcmVolume, Gdax, Google, IB, IEX, Kraken, Oanda, QuandBitfinex, Yahoo };
-
-        public enum MarketType { Demo, Real };
+        public enum DataProvider { None, CryptoIQ, DukasCopy, Fxcm_Demo, Fxcm_Real, FxcmVolume_Demo, FxcmVolume_Real, Gdax, Google, IB, IEX, Kraken, Oanda, QuandBitfinex, Yahoo };
 
         [Category("Data provider")]
         [DisplayName("Market name")]
@@ -40,12 +38,6 @@ namespace Algoloop.Model
         [Description("Name of data provider.")]
         [DataMember]
         public DataProvider Provider { get; set; }
-
-        [Category("Data provider")]
-        [DisplayName("Market type")]
-        [Description("Market type.")]
-        [DataMember]
-        public MarketType Type { get; set; }
 
         [Category("Data provider")]
         [DisplayName("Login")]

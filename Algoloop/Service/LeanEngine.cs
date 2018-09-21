@@ -65,20 +65,21 @@ namespace Algoloop.Service
 
         private void SetConfig(StrategyJobModel model, AccountModel account)
         {
+            Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
+            Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
+            Config.Set("api-handler", "QuantConnect.Api.Api");
+            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+            Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
+            Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
+            Config.Set("alpha-handler", "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler");
+
             if (account == null)
             {
                 Config.Set("environment", "backtesting");
                 Config.Set("live-mode", "false");
 
-                Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
-                Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
-                Config.Set("api-handler", "QuantConnect.Api.Api");
-                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-                Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
-                Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
-                Config.Set("alpha-handler", "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler");
-
-                Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
+                Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler");
+//                Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
                 Config.Set("result-handler", "Algoloop.Service.BacktestResultHandler");
                 //            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.BacktestingResultHandler");
                 Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed");
@@ -86,18 +87,21 @@ namespace Algoloop.Service
                 Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             }
-            else
+            else if (account.Broker.Equals(AccountModel.BrokerName.Paper))
+            {
+                Config.Set("live-mode", "true");
+                Config.Set("live-mode-brokerage", "PaperBrokerage");
+                Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler");
+                Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler");
+                Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed");
+                Config.Set("data-queue-handler", "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue");
+                Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
+                Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
+            }
+            else if (account.Broker.Equals(AccountModel.BrokerName.Fxcm_Demo) || account.Broker.Equals(AccountModel.BrokerName.Fxmc_Real))
             {
                 Config.Set("environment", "live");
                 Config.Set("live-mode", "true");
-
-                Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
-                Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
-                Config.Set("api-handler", "QuantConnect.Api.Api");
-                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-                Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
-                Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
-                Config.Set("alpha-handler", "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler");
 
                 Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler");
                 Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler");
@@ -109,7 +113,17 @@ namespace Algoloop.Service
                 Config.Set("data-queue-handler", "FxcmBrokerage");
 
                 Config.Set("force-exchange-always-open", "false");
-                Config.Set("fxcm-terminal", Enum.GetName(typeof(AccountModel.AccountType), account.Type));
+                switch (account.Broker)
+                {
+                    case AccountModel.BrokerName.Fxcm_Demo:
+                        Config.Set("fxcm-terminal", "Demo");
+                        break;
+
+                    case AccountModel.BrokerName.Fxmc_Real:
+                        Config.Set("fxcm-terminal", "Real");
+                        break;
+                }
+
                 Config.Set("fxcm-user-name", account.Login);
                 Config.Set("fxcm-password", account.Password);
                 Config.Set("fxcm-account-id", account.Id);
