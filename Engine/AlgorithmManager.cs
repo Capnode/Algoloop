@@ -127,7 +127,7 @@ namespace QuantConnect.Lean.Engine
         /// </summary>
         /// <param name="job">Algorithm job</param>
         /// <param name="algorithm">Algorithm instance</param>
-        /// <param name="feed">Datafeed object</param>
+        /// <param name="dataManager">DataManager object</param>
         /// <param name="transactions">Transaction manager object</param>
         /// <param name="results">Result handler object</param>
         /// <param name="realtime">Realtime processing object</param>
@@ -135,7 +135,7 @@ namespace QuantConnect.Lean.Engine
         /// <param name="alphas">Alpha handler used to process algorithm generated insights</param>
         /// <param name="token">Cancellation token</param>
         /// <remarks>Modify with caution</remarks>
-        public void Run(AlgorithmNodePacket job, IAlgorithm algorithm, IDataFeed feed, ITransactionHandler transactions, IResultHandler results, IRealTimeHandler realtime, ILeanManager leanManager, IAlphaHandler alphas, CancellationToken token)
+        public void Run(AlgorithmNodePacket job, IAlgorithm algorithm, IDataManager dataManager, ITransactionHandler transactions, IResultHandler results, IRealTimeHandler realtime, ILeanManager leanManager, IAlphaHandler alphas, CancellationToken token)
         {
             //Initialize:
             _dataPointCount = 0;
@@ -203,7 +203,7 @@ namespace QuantConnect.Lean.Engine
 
             //Loop over the queues: get a data collection, then pass them all into relevent methods in the algorithm.
             Log.Trace("AlgorithmManager.Run(): Begin DataStream - Start: " + algorithm.StartDate + " Stop: " + algorithm.EndDate);
-            foreach (var timeSlice in Stream(algorithm, feed, results, token))
+            foreach (var timeSlice in Stream(algorithm, dataManager, results, token))
             {
                 // reset our timer on each loop
                 _currentTimeStepTime = DateTime.UtcNow;
@@ -468,8 +468,21 @@ namespace QuantConnect.Lean.Engine
                 // apply dividends
                 foreach (var dividend in timeSlice.Slice.Dividends.Values)
                 {
-                    Log.Debug($"AlgorithmManager.Run(): {algorithm.Time}: Applying Dividend for {dividend.Symbol}");
+                    Log.Debug($"AlgorithmManager.Run(): {algorithm.Time}: Applying Dividend: {dividend}");
+
+                    Security security = null;
+                    if (_liveMode && algorithm.Securities.TryGetValue(dividend.Symbol, out security))
+                    {
+                        Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Pre-Dividend: {dividend}. Security Holdings: {security.Holdings.Quantity} Account Currency Holdings: {algorithm.Portfolio.CashBook[CashBook.AccountCurrency].Amount}");
+                    }
+
+                    // apply the dividend event to the portfolio
                     algorithm.Portfolio.ApplyDividend(dividend);
+
+                    if (_liveMode && security != null)
+                    {
+                        Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Post-Dividend: {dividend}. Security Holdings: {security.Holdings.Quantity} Account Currency Holdings: {algorithm.Portfolio.CashBook[CashBook.AccountCurrency].Amount}");
+                    }
                 }
 
                 // apply splits
@@ -484,7 +497,21 @@ namespace QuantConnect.Lean.Engine
                         }
 
                         Log.Debug($"AlgorithmManager.Run(): {algorithm.Time}: Applying Split for {split.Symbol}");
+
+                        Security security = null;
+                        if (_liveMode && algorithm.Securities.TryGetValue(split.Symbol, out security))
+                        {
+                            Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Pre-Split for {split}. Security Price: {security.Price} Holdings: {security.Holdings.Quantity}");
+                        }
+
+                        // apply the split event to the portfolio
                         algorithm.Portfolio.ApplySplit(split);
+
+                        if (_liveMode && security != null)
+                        {
+                            Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Post-Split for {split}. Security Price: {security.Price} Holdings: {security.Holdings.Quantity}");
+                        }
+
                         // apply the split to open orders as well in raw mode, all other modes are split adjusted
                         if (_liveMode || algorithm.Securities[split.Symbol].DataNormalizationMode == DataNormalizationMode.Raw)
                         {
@@ -742,7 +769,7 @@ namespace QuantConnect.Lean.Engine
             }
         }
 
-        private IEnumerable<TimeSlice> Stream(IAlgorithm algorithm, IDataFeed feed, IResultHandler results, CancellationToken cancellationToken)
+        private IEnumerable<TimeSlice> Stream(IAlgorithm algorithm, IDataManager dataManager, IResultHandler results, CancellationToken cancellationToken)
         {
             bool setStartTime = false;
             var timeZone = algorithm.TimeZone;
@@ -804,7 +831,6 @@ namespace QuantConnect.Lean.Engine
 
                 // trigger universe selection in order to add all required internal feeds,
                 // this is needed to have non-zero currency conversion rates during warmup
-                var us = new UniverseSelection(feed, algorithm);
                 foreach (var universe in algorithm.UniverseManager.Values)
                 {
                     BaseDataCollection dataCollection;
@@ -820,7 +846,7 @@ namespace QuantConnect.Lean.Engine
                             dataCollection = new BaseDataCollection();
                             break;
                     }
-                    us.ApplyUniverseSelection(universe, new DateTime(start), dataCollection);
+                    dataManager.UniverseSelection.ApplyUniverseSelection(universe, new DateTime(start), dataCollection);
                 }
 
                 // make the history request and build time slices
@@ -904,7 +930,7 @@ namespace QuantConnect.Lean.Engine
                 }
             }
 
-            foreach (var timeSlice in feed)
+            foreach (var timeSlice in dataManager.StreamData())
             {
                 if (!setStartTime)
                 {
@@ -1110,7 +1136,7 @@ namespace QuantConnect.Lean.Engine
             {
                 if (split.Type != SplitType.Warning)
                 {
-                    Log.Trace($"AlgorithmManager.Run() Security split occurred: {split}");
+                    Log.Trace($"AlgorithmManager.Run() Security split occurred: Split Factor: {split} Reference Price: {split.ReferencePrice}");
                     continue;
                 }
 

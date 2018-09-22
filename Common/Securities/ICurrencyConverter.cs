@@ -11,24 +11,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
 
-namespace QuantConnect.Lean.Engine.DataFeeds
+namespace QuantConnect.Securities
 {
     /// <summary>
-    /// DataFeedSubscriptionManager interface will manage the subscriptions for the Data Feed
+    /// Provides the ability to convert cash amounts to the account currency
     /// </summary>
-    public interface IDataFeedSubscriptionManager
+    public interface ICurrencyConverter
     {
         /// <summary>
-        /// Gets the data feed subscription collection
+        /// Converts a cash amount to the account currency
         /// </summary>
-        SubscriptionCollection DataFeedSubscriptions { get; }
-
-        /// <summary>
-        /// Get the universe selection instance
-        /// </summary>
-        UniverseSelection UniverseSelection { get; }
+        /// <param name="cashAmount">The <see cref="CashAmount"/> instance to convert</param>
+        /// <returns>A new <see cref="CashAmount"/> instance denominated in the account currency</returns>
+        CashAmount ConvertToAccountCurrency(CashAmount cashAmount);
     }
 }
