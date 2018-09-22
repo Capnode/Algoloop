@@ -37,7 +37,7 @@ namespace Algoloop.Algorithm.CSharp
 
         [Parameter("resolution")]
         private string __resolution;
-        private Resolution _resolution = Resolution.Hour;
+        private Resolution _resolution = Resolution.Minute;
 
         [Parameter("market")]
         private string __market = Market.FXCM;
