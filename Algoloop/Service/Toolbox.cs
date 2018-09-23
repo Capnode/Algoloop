@@ -81,42 +81,40 @@ namespace Algoloop.Service
                 {
                     switch (model.Provider)
                     {
-                        case MarketModel.DataProvider.CryptoIQ:
+                        case MarketModel.MarketType.CryptoIQ:
                             CryptoIQDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.DukasCopy:
+                        case MarketModel.MarketType.Dukascopy:
                             DukascopyDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.Fxcm_Demo:
-                        case MarketModel.DataProvider.Fxcm_Real:
+                        case MarketModel.MarketType.Fxcm:
                             FxcmDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.FxcmVolume_Demo:
-                        case MarketModel.DataProvider.FxcmVolume_Real:
+                        case MarketModel.MarketType.FxcmVolume:
                             FxcmVolumeDownload(model, list);
                             break;
-                        case MarketModel.DataProvider.Gdax:
+                        case MarketModel.MarketType.Gdax:
                             GdaxDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.Google:
+                        case MarketModel.MarketType.Google:
                             GoogleDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.IB:
+                        case MarketModel.MarketType.IB:
                             IBDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.IEX:
+                        case MarketModel.MarketType.IEX:
                             IEXDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.Kraken:
+                        case MarketModel.MarketType.Kraken:
                             KrakenDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.Oanda:
+                        case MarketModel.MarketType.Oanda:
                             OandaDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.QuandBitfinex:
+                        case MarketModel.MarketType.QuandBitfinex:
                             QuandBitfinexDownloader(model, list);
                             break;
-                        case MarketModel.DataProvider.Yahoo:
+                        case MarketModel.MarketType.Yahoo:
                             YahooDownloader(model, list);
                             break;
                         default:
@@ -163,13 +161,13 @@ namespace Algoloop.Service
         {
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", model.DataFolder);
-            switch (model.Provider)
+            switch (model.Access)
             {
-                case MarketModel.DataProvider.Fxcm_Demo:
+                case MarketModel.AccessType.Demo:
                     Config.Set("fxcm-terminal", "Demo");
                     break;
 
-                case MarketModel.DataProvider.Fxcm_Real:
+                case MarketModel.AccessType.Real:
                     Config.Set("fxcm-terminal", "Real");
                     break;
             }
@@ -191,13 +189,13 @@ namespace Algoloop.Service
         private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)
         {
             Config.Set("data-directory", model.DataFolder);
-            switch (model.Provider)
+            switch (model.Access)
             {
-                case MarketModel.DataProvider.FxcmVolume_Demo:
+                case MarketModel.AccessType.Demo:
                     Config.Set("fxcm-terminal", "Demo");
                     break;
 
-                case MarketModel.DataProvider.FxcmVolume_Real:
+                case MarketModel.AccessType.Real:
                     Config.Set("fxcm-terminal", "Real");
                     break;
             }

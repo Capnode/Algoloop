@@ -54,14 +54,14 @@ namespace Algoloop.Model
         public string Name { get; set; } = "Strategy";
 
         [Category("Broker")]
-        [DisplayName("Data provider")]
-        [Description("History data provider")]
+        [DisplayName("Backtest data")]
+        [Description("History backtest data provider")]
         [DataMember]
-        public DataProvider Provider { get; set; }
+        public MarketType Provider { get; set; }
 
         [Category("Broker")]
-        [DisplayName("Account")]
-        [Description("Trading account name.")]
+        [DisplayName("Trading account")]
+        [Description("Trading account for live or paper trading.")]
         [RefreshProperties(RefreshProperties.Repaint)]
         [TypeConverter(typeof(AccountNameConverter))]
         [DataMember]

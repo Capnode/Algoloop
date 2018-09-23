@@ -22,7 +22,8 @@ namespace Algoloop.Model
     [DataContract]
     public class AccountModel
     {
-        public enum BrokerName { Paper, Fxcm_Demo, Fxmc_Real };
+        public enum AccountType { Paper, Fxcm };
+        public enum AccessType { No_login, Demo, Real };
 
         [DisplayName("Account name")]
         [Description("Name of the account.")]
@@ -33,22 +34,32 @@ namespace Algoloop.Model
         [DataMember]
         public bool Enabled { get; set; }
 
-        [DisplayName("Broker")]
+        [Category("Account")]
+        [DisplayName("Account provider")]
         [Description("Name of the broker.")]
         [DataMember]
-        public BrokerName Broker { get; set; }
+        public AccountType Account { get; set; }
 
+        [Category("Account")]
+        [DisplayName("Access type")]
+        [Description("Type of login account at the broker.")]
+        [DataMember]
+        public AccessType Access { get; set; }
+
+        [Category("Account")]
         [DisplayName("Login")]
         [Description("User login.")]
         [DataMember]
         public string Login { get; set; } = string.Empty;
 
+        [Category("Account")]
         [DisplayName("Password")]
         [Description("User login password.")]
         [PasswordPropertyText(true)]
         [DataMember]
         public string Password { get; set; } = string.Empty;
 
+        [Category("Account")]
         [DisplayName("Account number")]
         [Description("Account number.")]
         [DataMember]

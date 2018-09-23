@@ -87,7 +87,7 @@ namespace Algoloop.Service
                 Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             }
-            else if (account.Broker.Equals(AccountModel.BrokerName.Paper))
+            else if (account.Account.Equals(AccountModel.AccountType.Paper))
             {
                 Config.Set("live-mode", "true");
                 Config.Set("live-mode-brokerage", "PaperBrokerage");
@@ -98,7 +98,7 @@ namespace Algoloop.Service
                 Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             }
-            else if (account.Broker.Equals(AccountModel.BrokerName.Fxcm_Demo) || account.Broker.Equals(AccountModel.BrokerName.Fxmc_Real))
+            else if (account.Account.Equals(AccountModel.AccountType.Fxcm))
             {
                 Config.Set("environment", "live");
                 Config.Set("live-mode", "true");
@@ -113,13 +113,13 @@ namespace Algoloop.Service
                 Config.Set("data-queue-handler", "FxcmBrokerage");
 
                 Config.Set("force-exchange-always-open", "false");
-                switch (account.Broker)
+                switch (account.Access)
                 {
-                    case AccountModel.BrokerName.Fxcm_Demo:
+                    case AccountModel.AccessType.Demo:
                         Config.Set("fxcm-terminal", "Demo");
                         break;
 
-                    case AccountModel.BrokerName.Fxmc_Real:
+                    case AccountModel.AccessType.Real:
                         Config.Set("fxcm-terminal", "Real");
                         break;
                 }

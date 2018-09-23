@@ -37,7 +37,7 @@ namespace Algoloop.Model
         [DisplayName("Data provider")]
         [Description("History data provider")]
         [DataMember]
-        public DataProvider Provider { get; set; }
+        public MarketType Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
