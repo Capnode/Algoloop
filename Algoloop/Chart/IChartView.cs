@@ -17,11 +17,11 @@ using System.Collections.Generic;
 
 namespace Algoloop.Charts
 {
-    public interface IChartView : IResolutionSource, IChartParser
+    public interface IChartView : IChartParser
     {
         /// <summary>
         /// Gets the dictionary containing the Last Update instant for a specific series
-        /// </summary>
+        /// </summary>§
         Dictionary<string, DateTime> LastUpdates { get; }
 
         /// <summary>

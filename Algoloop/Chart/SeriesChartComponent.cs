@@ -98,8 +98,8 @@ namespace Algoloop.Charts
                     series = new CandleSeries
                     {
                         Configuration = new OhlcInstantChartPointMapper(),
-                        IncreaseBrush = Brushes.Aquamarine,
-                        DecreaseBrush = Brushes.LightCoral,
+                        IncreaseBrush = Brushes.Green,
+                        DecreaseBrush = Brushes.Red,
                         Fill = Brushes.Transparent
                     };
                     break;

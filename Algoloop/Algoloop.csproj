@@ -222,7 +222,6 @@
     <Compile Include="Chart\IInstantChartPoint.cs" />
     <Compile Include="Chart\InstantChartPoint.cs" />
     <Compile Include="Chart\InstantChartPointMapper.cs" />
-    <Compile Include="Chart\IResolutionSource.cs" />
     <Compile Include="Chart\OhlcInstantChartPoint.cs" />
     <Compile Include="Chart\OhlcInstantChartPointMapper.cs" />
     <Compile Include="Model\AccountModel.cs" />
