@@ -17,6 +17,7 @@ using QuantConnect.Algorithm;
 using QuantConnect.Data.Market;
 using QuantConnect.Parameters;
 using System;
+using System.Globalization;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -25,35 +26,35 @@ namespace Algoloop.Algorithm.CSharp
         private enum MarketSide { Buy, Sell };
 
         [Parameter("symbols")]
-        private string __symbols = "EURUSD";
+        private string _symbols = "EURUSD";
         private string _symbol;
 
         [Parameter("resolution")]
-        private string __resolution;
-        private Resolution _resolution = Resolution.Hour;
+        private string _resolution = "Minute";
 
         [Parameter("market")]
-        private string __market = Market.FXCM;
+        private string _market = Market.FXCM;
 
         [Parameter("startdate")]
-        private string __startdate = "20180101 00:00:00";
-        private DateTime _startdate;
+        private string _startdate = "2018-01-01 00:00:00";
 
         [Parameter("enddate")]
-        private string __enddate = "20180901 00:00:00";
-        private DateTime _enddate;
+        private string _enddate = "2018-09-01 00:00:00";
+
+        [Parameter("cash")]
+        private string _cash = "100000";
 
         [Parameter("opentime")]
-        private string __opentime = "01:00:00";
-        private DateTime _opentime;
+        private string _opentime = "01:00:00";
+        private DateTime __opentime;
 
         [Parameter("closetime")]
-        private string __closetime = "03:00:00";
-        private DateTime _closetime;
+        private string _closetime = "03:00:00";
+        private DateTime __closetime;
 
         [Parameter("side")]
-        private string __side;
-        private MarketSide _side = MarketSide.Buy;
+        private string _side = "Buy";
+        private MarketSide __side = MarketSide.Buy;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash
@@ -61,17 +62,23 @@ namespace Algoloop.Algorithm.CSharp
         /// </summary>
         public override void Initialize()
         {
-            _startdate = DateTime.Parse(__startdate);
-            _enddate = DateTime.Parse(__enddate);
-            _opentime = DateTime.Parse(__opentime);
-            _closetime = DateTime.Parse(__closetime);
-            _symbol = __symbols.Split(';')[0];
-            Enum.TryParse(__resolution, out _resolution);
-            Enum.TryParse(__side, out _side);
+            // Standard parameters
+            SetStartDate(DateTime.Parse(_startdate, CultureInfo.InvariantCulture));
+            SetEndDate(DateTime.Parse(_enddate, CultureInfo.InvariantCulture));
+            SetCash(int.Parse(_cash));
 
-            SetStartDate(_startdate);
-            SetEndDate(_enddate);
-            AddForex(_symbol, _resolution, __market);
+            Resolution resolution = Resolution.Hour;
+            Enum.TryParse(_resolution, out resolution);
+            _symbol = _symbols.Split(';')[0];
+            AddForex(_symbol, resolution, _market);
+
+            // Algorithm parameters
+            __opentime = DateTime.Parse(_opentime, CultureInfo.InvariantCulture);
+            __closetime = DateTime.Parse(_closetime, CultureInfo.InvariantCulture);
+            Enum.TryParse(_side, out __side);
+
+            SetTimeZone(NodaTime.DateTimeZone.Utc);
+            Log($"Timezone {TimeZone}");
         }
 
         /// <summary>
@@ -83,23 +90,23 @@ namespace Algoloop.Algorithm.CSharp
         {
             if (Portfolio.Invested)
             {
-                if (Time.TimeOfDay >= _closetime.TimeOfDay || Time.TimeOfDay < _opentime.TimeOfDay)
+                if (Time.TimeOfDay >= __closetime.TimeOfDay || Time.TimeOfDay < __opentime.TimeOfDay)
                 {
                     Log($"Close {_symbol}");
                     Liquidate(_symbol);
                 }
             }
-            else if (_side.Equals(MarketSide.Buy))
+            else if (__side.Equals(MarketSide.Buy))
             {
-                if (Time.TimeOfDay >= _opentime.TimeOfDay && Time.TimeOfDay < _closetime.TimeOfDay)
+                if (Time.TimeOfDay >= __opentime.TimeOfDay && Time.TimeOfDay < __closetime.TimeOfDay)
                 {
                     Log($"Buy {_symbol}");
                     SetHoldings(_symbol, 0.5);
                 }
             }
-            else if (_side.Equals(MarketSide.Sell))
+            else if (__side.Equals(MarketSide.Sell))
             {
-                if (Time.TimeOfDay >= _opentime.TimeOfDay && Time.TimeOfDay < _closetime.TimeOfDay)
+                if (Time.TimeOfDay >= __opentime.TimeOfDay && Time.TimeOfDay < __closetime.TimeOfDay)
                 {
                     Log($"Sell {_symbol}");
                     SetHoldings(_symbol, -0.5);
