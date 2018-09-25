@@ -108,7 +108,7 @@ namespace Algoloop.Charts
                     series = new ScatterSeries
                     {
                         Configuration = new InstantChartPointMapper(),
-                        StrokeThickness = 1,
+                        StrokeThickness = 1
                     };
                     break;
 
