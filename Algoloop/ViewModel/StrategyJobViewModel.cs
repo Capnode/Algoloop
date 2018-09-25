@@ -42,6 +42,9 @@ namespace Algoloop.ViewModel
         private LiveCharts.Wpf.Series _selectedSeries;
         private Isolated<LeanEngine> _leanEngine;
         private StrategyJobModel _model;
+        private double _timeFrom;
+        private double _timeTo;
+        private double _unit;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -74,6 +77,7 @@ namespace Algoloop.ViewModel
         public SeriesCollection ChartCollection { get; private set; } = new SeriesCollection();
 
         public SeriesCollection SelectedCollection { get; private set; } = new SeriesCollection();
+        public SeriesCollection ScrollSeriesCollection { get; private set; } = new SeriesCollection();
 
         public Func<double, string> Formatter { get; set; } = value => 
         {
@@ -104,7 +108,6 @@ namespace Algoloop.ViewModel
             get => Logs == null ? 0 :  Logs.Count(m => m.Equals('\n'));
         }
 
-
         public bool Enabled
         {
             get => Model.Enabled;
@@ -115,6 +118,33 @@ namespace Algoloop.ViewModel
                 StartJobCommand.RaiseCanExecuteChanged();
                 StopJobCommand.RaiseCanExecuteChanged();
                 DeleteJobCommand.RaiseCanExecuteChanged();
+            }
+        }
+
+        public double TimeFrom
+        {
+            get => _timeFrom;
+            set
+            {
+                Set(ref _timeFrom, value);
+            }
+        }
+
+        public double TimeTo
+        {
+            get => _timeTo;
+            set
+            {
+                Set(ref _timeTo, value);
+            }
+        }
+
+        public double Unit
+        {
+            get => _unit;
+            set
+            {
+                Set(ref _unit, value);
             }
         }
 
@@ -352,18 +382,26 @@ namespace Algoloop.ViewModel
 
             try
             {
+                double from = DateTime.MaxValue.Ticks;
+                double to = DateTime.MinValue.Ticks;
+
                 foreach (var chart in charts)
                 {
                     foreach (var series in chart.Value.Series)
                     {
-                        InstantChartPoint a = series.Value.Values.FirstOrDefault();
-                        InitialDateTime = a.X;
-                        LiveCharts.Wpf.Series scrollSeries = chartParser.BuildSeries(series.Value);
-                        chartParser.UpdateSeries(scrollSeries, series.Value);
-                        ChartCollection.Add(scrollSeries);
+                        InstantChartPoint first = series.Value.Values.FirstOrDefault();
+                        from = Math.Min(first.X.Ticks, from);
+                        InstantChartPoint last = series.Value.Values.LastOrDefault();
+                        to = Math.Max(last.X.Ticks, to);
+                        LiveCharts.Wpf.Series buildSeries = chartParser.BuildSeries(series.Value);
+                        chartParser.UpdateSeries(buildSeries, series.Value);
+                        ChartCollection.Add(buildSeries);
                     }
                 }
 
+                Unit = TimeSpan.FromDays(1).Ticks;
+                TimeFrom = from;
+                TimeTo = to;
                 SelectedChart = ChartCollection.FirstOrDefault() as LiveCharts.Wpf.Series;
             }
             catch (Exception e)
