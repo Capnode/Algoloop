@@ -19,10 +19,8 @@ using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using LiveCharts;
 using LiveCharts.Wpf;
 using Newtonsoft.Json;
-using QuantConnect;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
@@ -40,12 +38,9 @@ namespace Algoloop.ViewModel
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
-        private LiveCharts.Wpf.Series _selectedSeries;
         private Isolated<LeanEngine> _leanEngine;
         private StrategyJobModel _model;
-        private double _timeFrom;
-        private double _timeTo;
-        private double _unit;
+        public ChartViewModel _selectedChart;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -75,21 +70,12 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
-        public SeriesCollection ChartCollection { get; private set; } = new SeriesCollection();
-
-        public SeriesCollection SelectedCollection { get; private set; } = new SeriesCollection();
-        public SeriesCollection ScrollCollection { get; private set; } = new SeriesCollection();
+        public SyncObservableCollection<ChartViewModel> Charts { get; } = new SyncObservableCollection<ChartViewModel>();
 
         public Func<double, string> Formatter { get; set; } = value => 
         {
             return new DateTime((long)value).ToString("yyyy-MM:dd HH:mm:ss");
         };
-
-        public DateTime InitialDateTime { get; set; }
-
-        public AxesCollection YAxesCollection { get; } = new AxesCollection();
-
-        public VisualElementsCollection VisualElementsCollection { get; } = new VisualElementsCollection();
 
         public RelayCommand StartJobCommand { get; }
 
@@ -122,50 +108,12 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public double TimeFrom
+        public ChartViewModel SelectedChart
         {
-            get => _timeFrom;
+            get => _selectedChart;
             set
             {
-                Set(ref _timeFrom, value);
-            }
-        }
-
-        public double TimeTo
-        {
-            get => _timeTo;
-            set
-            {
-                Set(ref _timeTo, value);
-            }
-        }
-
-        public double Unit
-        {
-            get => _unit;
-            set
-            {
-                Set(ref _unit, value);
-            }
-        }
-
-        public LiveCharts.Wpf.Series SelectedChart
-        {
-            get { return _selectedSeries; }
-            set
-            {
-                _selectedSeries = value;
-                RaisePropertyChanged();
-                if (SelectedCollection != null)
-                {
-                    SelectedCollection.Clear();
-                    if (value != null)
-                    {
-                        SelectedCollection.Add(value);
-                    }
-
-                    RaisePropertyChanged(() => SelectedCollection);
-                }
+                Set(ref _selectedChart, value);
             }
         }
 
@@ -254,9 +202,9 @@ namespace Algoloop.ViewModel
 
         private void DeleteJob()
         {
+            SelectedChart = null;
+            Charts.Clear();
             _cancel?.Cancel();
-            ChartCollection = null;
-            SelectedCollection = null;
             _parent?.DeleteJob(this);
         }
 
@@ -296,20 +244,8 @@ namespace Algoloop.ViewModel
             Statistics.Clear();
             Orders.Clear();
 
-            YAxesCollection.Clear();
-            VisualElementsCollection.Clear();
-
-            // Create dummy chart to avoid error
-            foreach (var series in ChartCollection)
-            {
-                if (series.Model.Chart == null)
-                {
-                    var chart = new CartesianChart();
-                    series.Model.Chart = chart.Model;
-                }
-            }
-            SelectedCollection.Clear();
-            ChartCollection.Clear();
+            SelectedChart = null;
+            Charts.Clear();
 
             if (Model.Result != null)
             {
@@ -355,24 +291,11 @@ namespace Algoloop.ViewModel
             Model.Logs = null;
             Model.Result = null;
 
+            SelectedChart = null;
+            Charts.Clear();
+
             Statistics.Clear();
             Orders.Clear();
-
-            YAxesCollection.Clear();
-            VisualElementsCollection.Clear();
-
-            // Create dummy chart to avoid error
-            foreach (var series in ChartCollection)
-            {
-                if (series.Model.Chart == null)
-                {
-                    var chart = new CartesianChart();
-                    series.Model.Chart = chart.Model;
-                }
-            }
-            SelectedCollection.Clear();
-            ChartCollection.Clear();
-            ScrollCollection.Clear();
 
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
@@ -388,31 +311,21 @@ namespace Algoloop.ViewModel
                 {
                     foreach (var series in chart.Value.Series)
                     {
-                        LiveCharts.Wpf.Series buildSeries = chartParser.BuildSeries(series.Value);
-                        chartParser.UpdateSeries(buildSeries, series.Value);
-                        ChartCollection.Add(buildSeries);
-                    }
+                        InstantChartPoint first = series.Value.Values.FirstOrDefault();
+                        InstantChartPoint last = series.Value.Values.LastOrDefault();
 
-                    if (!ScrollCollection.Any())
-                    {
-                        var sourceScrollSeries = chart.Value.Series
-                            .Select(s => s.Value)
-                            .OrderByDescending(s => s.SeriesType == SeriesType.Line)
-                            .ThenByDescending(s => s.SeriesType == SeriesType.Candle)
-                            .First(s => s.Index == 0);
+                        Series chartSeries = chartParser.BuildSeries(series.Value);
+                        chartParser.UpdateSeries(chartSeries, series.Value);
 
-                        Unit = TimeSpan.FromDays(1).Ticks;
-                        InstantChartPoint first = sourceScrollSeries.Values.FirstOrDefault();
-                        TimeFrom = first.X.Ticks;
-                        InstantChartPoint last = sourceScrollSeries.Values.LastOrDefault();
-                        TimeTo = last.X.Ticks;
-                        LiveCharts.Wpf.Series buildSeries = chartParser.BuildSeries(sourceScrollSeries);
-                        chartParser.UpdateSeries(buildSeries, sourceScrollSeries);
-                        ScrollCollection.Add(buildSeries);
+                        Series scrollSeries = chartParser.BuildSeries(series.Value);
+                        chartParser.UpdateSeries(scrollSeries, series.Value);
+
+                        var viewModel = new ChartViewModel(chartSeries.Title, chartSeries, scrollSeries, first.X, last.X, TimeSpan.FromDays(1));
+                        Charts.Add(viewModel);
                     }
                 }
 
-                SelectedChart = ChartCollection.FirstOrDefault() as LiveCharts.Wpf.Series;
+                SelectedChart = Charts.FirstOrDefault();
             }
             catch (Exception e)
             {

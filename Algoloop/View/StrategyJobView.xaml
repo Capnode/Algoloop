@@ -100,7 +100,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            <TabItem Header="{Binding ChartCollection.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
+            <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"></RowDefinition>
@@ -111,17 +111,17 @@
                         <ComboBox
                             MinWidth="100"
                             DisplayMemberPath="Title"
-                            ItemsSource="{Binding ChartCollection}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
+                            ItemsSource="{Binding Charts}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
                     </StackPanel>
                     <lvc:CartesianChart
                         Grid.Row="1"
                         Zoom="X"
-                        Series="{Binding SelectedCollection}" >
+                        Series="{Binding SelectedChart.Chart}" >
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis
-                                Unit="{Binding Unit}"
-                                MinValue="{Binding TimeFrom, Mode=TwoWay}"
-                                MaxValue="{Binding TimeTo, Mode=TwoWay}"
+                                Unit="{Binding SelectedChart.Unit}"
+                                MinValue="{Binding SelectedChart.TimeFrom, Mode=TwoWay}"
+                                MaxValue="{Binding SelectedChart.TimeTo, Mode=TwoWay}"
                                 LabelFormatter="{Binding Formatter}"
                                 Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
                             </lvc:Axis>
@@ -132,14 +132,14 @@
                     <lvc:CartesianChart
                         Grid.Row="2" 
                         ScrollMode="X"
-                        ScrollHorizontalFrom="{Binding TimeFrom, Mode=TwoWay}"
-                        ScrollHorizontalTo="{Binding TimeTo, Mode=TwoWay}"
+                        ScrollHorizontalFrom="{Binding SelectedChart.TimeFrom, Mode=TwoWay}"
+                        ScrollHorizontalTo="{Binding SelectedChart.TimeTo, Mode=TwoWay}"
                         DisableAnimations="True" 
-                        Series="{Binding ScrollCollection}"
+                        Series="{Binding SelectedChart.Scroll}"
                         DataTooltip="{x:Null}">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis
-                                Unit="{Binding Unit}"
+                                Unit="{Binding SelectedChart.Unit}"
                                 LabelFormatter="{Binding Formatter}"
                                 Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
                             </lvc:Axis>
