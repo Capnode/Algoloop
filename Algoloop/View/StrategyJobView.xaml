@@ -122,15 +122,14 @@
                                 Unit="{Binding SelectedChart.Unit}"
                                 MinValue="{Binding SelectedChart.TimeFrom, Mode=TwoWay}"
                                 MaxValue="{Binding SelectedChart.TimeTo, Mode=TwoWay}"
-                                LabelFormatter="{Binding Formatter}"
-                                Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
-                            </lvc:Axis>
+                                LabelFormatter="{Binding SelectedChart.Formatter}"
+                                Separator="{x:Static lvc:DefaultAxes.CleanSeparator}" />
                         </lvc:CartesianChart.AxisX>
                     </lvc:CartesianChart>
 
                     <!-- Scroll chart -->
                     <lvc:CartesianChart
-                        Grid.Row="2" 
+                        Grid.Row="2"
                         ScrollMode="X"
                         ScrollHorizontalFrom="{Binding SelectedChart.TimeFrom, Mode=TwoWay}"
                         ScrollHorizontalTo="{Binding SelectedChart.TimeTo, Mode=TwoWay}"
@@ -140,9 +139,8 @@
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis
                                 Unit="{Binding SelectedChart.Unit}"
-                                LabelFormatter="{Binding Formatter}"
-                                Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
-                            </lvc:Axis>
+                                LabelFormatter="{Binding SelectedChart.Formatter}"
+                                Separator="{x:Static lvc:DefaultAxes.CleanSeparator}" />
                         </lvc:CartesianChart.AxisX>
                         <lvc:CartesianChart.AxisY>
                             <lvc:Axis ShowLabels="False" />

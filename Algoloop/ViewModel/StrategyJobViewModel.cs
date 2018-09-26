@@ -19,8 +19,8 @@ using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using LiveCharts.Wpf;
 using Newtonsoft.Json;
+using QuantConnect;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
@@ -71,11 +71,6 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
         public SyncObservableCollection<ChartViewModel> Charts { get; } = new SyncObservableCollection<ChartViewModel>();
-
-        public Func<double, string> Formatter { get; set; } = value => 
-        {
-            return new DateTime((long)value).ToString("yyyy-MM:dd HH:mm:ss");
-        };
 
         public RelayCommand StartJobCommand { get; }
 
@@ -303,7 +298,7 @@ namespace Algoloop.ViewModel
 
         private void ParseCharts(Dictionary<string, ChartDefinition> charts)
         {
-            var chartParser = new SeriesChartComponent(Model.Resolution);
+            var chartParser = new SeriesChartComponent();
 
             try
             {
@@ -314,13 +309,14 @@ namespace Algoloop.ViewModel
                         InstantChartPoint first = series.Value.Values.FirstOrDefault();
                         InstantChartPoint last = series.Value.Values.LastOrDefault();
 
-                        Series chartSeries = chartParser.BuildSeries(series.Value);
+                        LiveCharts.Wpf.Series chartSeries = chartParser.BuildSeries(series.Value);
                         chartParser.UpdateSeries(chartSeries, series.Value);
 
-                        Series scrollSeries = chartParser.BuildSeries(series.Value);
+                        LiveCharts.Wpf.Series scrollSeries = chartParser.BuildSeries(series.Value);
                         chartParser.UpdateSeries(scrollSeries, series.Value);
 
-                        var viewModel = new ChartViewModel(chartSeries.Title, chartSeries, scrollSeries, first.X, last.X, TimeSpan.FromDays(1));
+                        Resolution resolution = SeriesChartComponent.DetectResolution(series.Value);
+                        var viewModel = new ChartViewModel(chartSeries.Title, chartSeries, scrollSeries, first.X, last.X, resolution);
                         Charts.Add(viewModel);
                     }
                 }

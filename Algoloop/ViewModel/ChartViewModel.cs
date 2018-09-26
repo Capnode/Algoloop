@@ -14,7 +14,7 @@
 
 using GalaSoft.MvvmLight;
 using LiveCharts;
-using LiveCharts.Wpf;
+using QuantConnect;
 using System;
 
 public class ChartViewModel : ViewModelBase
@@ -22,7 +22,7 @@ public class ChartViewModel : ViewModelBase
     private double _timeFrom;
     private double _timeTo;
 
-    public ChartViewModel(string title, Series chart, Series scroll, DateTime first, DateTime last, TimeSpan unit)
+    public ChartViewModel(string title, LiveCharts.Wpf.Series chart, LiveCharts.Wpf.Series scroll, DateTime first, DateTime last, Resolution resolution)
     {
 //        Debug.WriteLine($"{title} chart={chart.Values.Count} scroll={scroll.Values.Count} {first} {last} {unit}");
 
@@ -31,13 +31,44 @@ public class ChartViewModel : ViewModelBase
         Scroll.Add(scroll);
         TimeFrom = first.Ticks;
         TimeTo = last.Ticks;
-        Unit = unit.Ticks;
+
+        string format = "G";
+        switch (resolution)
+        {
+            case Resolution.Daily:
+                Unit = TimeSpan.FromDays(1).Ticks;
+                format = "d";
+                break;
+            case Resolution.Hour:
+                Unit = TimeSpan.FromHours(1).Ticks;
+                format = "g";
+                break;
+            case Resolution.Minute:
+                Unit = TimeSpan.FromMinutes(1).Ticks;
+                format = "G";
+                break;
+            case Resolution.Second:
+                Unit = TimeSpan.FromSeconds(1).Ticks;
+                format = "G";
+                break;
+            case Resolution.Tick:
+                Unit = TimeSpan.FromTicks(1).Ticks;
+                format = "G";
+                break;
+        }
+
+        Formatter = value =>
+        {
+            return new DateTime((long)value).ToString(format);
+        };
+
     }
 
     public string Title { get; }
     public SeriesCollection Chart { get; } = new SeriesCollection();
     public SeriesCollection Scroll { get; } = new SeriesCollection();
     public double Unit { get; }
+    public Func<double, string> Formatter { get; set; }
     public double TimeFrom
     {
         get => _timeFrom;

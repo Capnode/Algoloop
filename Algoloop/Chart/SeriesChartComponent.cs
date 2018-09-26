@@ -29,17 +29,11 @@ namespace Algoloop.Charts
     /// </summary>
     public class SeriesChartComponent
     {
-        private Resolution _resolution;
         private readonly List<Color> _defaultColors = new List<Color>
         {
             Color.FromArgb(0, 0, 0, 0),
             Color.FromArgb(255, 0, 0, 0)
         };
-
-        public SeriesChartComponent(Resolution resolution)
-        {
-            _resolution = resolution;
-        }
 
         public static Resolution DetectResolution(SeriesDefinition series)
         {
@@ -143,11 +137,6 @@ namespace Algoloop.Charts
 
         public void UpdateSeries(ISeriesView targetSeries, SeriesDefinition sourceSeries)
         {
-            // Detect the data resolution of the source series.
-            // Use it as chart resolution if needed.
-            var detectedResolution = DetectResolution(sourceSeries);
-            if (_resolution > detectedResolution) _resolution = detectedResolution;           
-
             // QuantChart series are unix timestamp
             switch (sourceSeries.SeriesType)
             {
