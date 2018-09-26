@@ -22,6 +22,7 @@ using GalaSoft.MvvmLight.Messaging;
 using LiveCharts;
 using LiveCharts.Wpf;
 using Newtonsoft.Json;
+using QuantConnect;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
@@ -77,7 +78,7 @@ namespace Algoloop.ViewModel
         public SeriesCollection ChartCollection { get; private set; } = new SeriesCollection();
 
         public SeriesCollection SelectedCollection { get; private set; } = new SeriesCollection();
-        public SeriesCollection ScrollSeriesCollection { get; private set; } = new SeriesCollection();
+        public SeriesCollection ScrollCollection { get; private set; } = new SeriesCollection();
 
         public Func<double, string> Formatter { get; set; } = value => 
         {
@@ -371,6 +372,7 @@ namespace Algoloop.ViewModel
             }
             SelectedCollection.Clear();
             ChartCollection.Clear();
+            ScrollCollection.Clear();
 
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
@@ -382,26 +384,34 @@ namespace Algoloop.ViewModel
 
             try
             {
-                double from = DateTime.MaxValue.Ticks;
-                double to = DateTime.MinValue.Ticks;
-
                 foreach (var chart in charts)
                 {
                     foreach (var series in chart.Value.Series)
                     {
-                        InstantChartPoint first = series.Value.Values.FirstOrDefault();
-                        from = Math.Min(first.X.Ticks, from);
-                        InstantChartPoint last = series.Value.Values.LastOrDefault();
-                        to = Math.Max(last.X.Ticks, to);
                         LiveCharts.Wpf.Series buildSeries = chartParser.BuildSeries(series.Value);
                         chartParser.UpdateSeries(buildSeries, series.Value);
                         ChartCollection.Add(buildSeries);
                     }
+
+                    if (!ScrollCollection.Any())
+                    {
+                        var sourceScrollSeries = chart.Value.Series
+                            .Select(s => s.Value)
+                            .OrderByDescending(s => s.SeriesType == SeriesType.Line)
+                            .ThenByDescending(s => s.SeriesType == SeriesType.Candle)
+                            .First(s => s.Index == 0);
+
+                        Unit = TimeSpan.FromDays(1).Ticks;
+                        InstantChartPoint first = sourceScrollSeries.Values.FirstOrDefault();
+                        TimeFrom = first.X.Ticks;
+                        InstantChartPoint last = sourceScrollSeries.Values.LastOrDefault();
+                        TimeTo = last.X.Ticks;
+                        LiveCharts.Wpf.Series buildSeries = chartParser.BuildSeries(sourceScrollSeries);
+                        chartParser.UpdateSeries(buildSeries, sourceScrollSeries);
+                        ScrollCollection.Add(buildSeries);
+                    }
                 }
 
-                Unit = TimeSpan.FromDays(1).Ticks;
-                TimeFrom = from;
-                TimeTo = to;
                 SelectedChart = ChartCollection.FirstOrDefault() as LiveCharts.Wpf.Series;
             }
             catch (Exception e)

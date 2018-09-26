@@ -128,14 +128,14 @@
                         </lvc:CartesianChart.AxisX>
                     </lvc:CartesianChart>
 
-                    <!-- Overview chart -->
+                    <!-- Scroll chart -->
                     <lvc:CartesianChart
                         Grid.Row="2" 
                         ScrollMode="X"
                         ScrollHorizontalFrom="{Binding TimeFrom, Mode=TwoWay}"
                         ScrollHorizontalTo="{Binding TimeTo, Mode=TwoWay}"
                         DisableAnimations="True" 
-                        Series="{Binding SelectedCollection}"
+                        Series="{Binding ScrollCollection}"
                         DataTooltip="{x:Null}">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis
