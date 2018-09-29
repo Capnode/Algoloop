@@ -31,6 +31,7 @@ namespace Algoloop.ViewModel
     {
         private AccountsViewModel _parent;
         private CancellationTokenSource _cancel;
+        private const string FxcmServer = "http://www.fxcorporate.com/Hosts.jsp";
 
         public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel)
         {
@@ -107,9 +108,7 @@ namespace Algoloop.ViewModel
             Brokerage brokerage = null;
             try
             {
-                var brokerageFactory = new FxcmBrokerageFactory();
-                var data = brokerageFactory.BrokerageData;
-                brokerage = new FxcmBrokerage(null, null, data["fxcm-server"], data["fxcm-terminal"], Model.Login, Model.Password, Model.Id);
+                brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
                 brokerage.AccountChanged += OnAccountChanged;
                 brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
                 brokerage.OrderStatusChanged += OnOrderStatusChanged;
