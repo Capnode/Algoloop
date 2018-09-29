@@ -140,38 +140,19 @@ namespace QuantConnect.Util
 
                         case Resolution.Second:
                         case Resolution.Minute:
-                            // forex and cfd data can be quote or trade bars
-                            var quoteBar = data as QuoteBar;
-                            if (quoteBar != null)
-                            {
-                                return ToCsv(milliseconds,
-                                    ToNonScaledCsv(quoteBar.Bid), quoteBar.LastBidSize,
-                                    ToNonScaledCsv(quoteBar.Ask), quoteBar.LastAskSize);
-                            }
-                            var tradeBar = data as TradeBar;
-                            if (tradeBar != null)
-                            {
-                                return ToCsv(milliseconds,
-                                             tradeBar.Open, tradeBar.High, tradeBar.Low, tradeBar.Close, tradeBar.Volume);
-                            }
-                            break;
+                            var bar = data as QuoteBar;
+                            if (bar == null) throw new NullReferenceException("bar");
+                            return ToCsv(milliseconds,
+                                ToNonScaledCsv(bar.Bid), bar.LastBidSize,
+                                ToNonScaledCsv(bar.Ask), bar.LastAskSize);
 
                         case Resolution.Hour:
                         case Resolution.Daily:
-                            // forex and cfd data can be quote or trade bars
-                            var bigQuoteBar = data as QuoteBar;
-                            if (bigQuoteBar != null)
-                            {
-                                return ToCsv(longTime,
-                                    ToNonScaledCsv(bigQuoteBar.Bid), bigQuoteBar.LastBidSize,
-                                    ToNonScaledCsv(bigQuoteBar.Ask), bigQuoteBar.LastAskSize);
-                            }
-                            var bigTradeBar = data as TradeBar;
-                            if (bigTradeBar != null)
-                            {
-                                return ToCsv(longTime, ToNonScaledCsv(bigTradeBar), bigTradeBar.Volume);
-                            }
-                            break;
+                            var bigBar = data as QuoteBar;
+                            if (bigBar == null) throw new NullReferenceException("big bar");
+                            return ToCsv(longTime,
+                                ToNonScaledCsv(bigBar.Bid), bigBar.LastBidSize,
+                                ToNonScaledCsv(bigBar.Ask), bigBar.LastAskSize);
                     }
                     break;
 
