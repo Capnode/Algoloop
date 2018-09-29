@@ -40,7 +40,6 @@ namespace QuantConnect.Tests.Common.Securities
     [TestFixture]
     public class SecurityPortfolioManagerTests
     {
-        private static readonly AlgorithmSettings AlgorithmSettings = new AlgorithmSettings();
         private static readonly SecurityExchangeHours SecurityExchangeHours = SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork);
         private static readonly Symbol CASH = new Symbol(SecurityIdentifier.GenerateBase("CASH", Market.USA), "CASH");
         private static readonly Symbol MCHJWB = new Symbol(SecurityIdentifier.GenerateForex("MCHJWB", Market.FXCM), "MCHJWB");
@@ -86,7 +85,7 @@ namespace QuantConnect.Tests.Common.Securities
             Assert.AreEqual(fills.Count + 1, equity.Count);
 
             // we're going to process fills and very our equity after each fill
-            var subscriptions = new SubscriptionManager(AlgorithmSettings, TimeKeeper, new DataManagerStub());
+            var subscriptions = new SubscriptionManager(TimeKeeper, new DataManagerStub());
             var securities = new SecurityManager(TimeKeeper);
             var security = new Security(SecurityExchangeHours, subscriptions.Add(CASH, Resolution.Daily, TimeZones.NewYork, TimeZones.NewYork), new Cash(CashBook.AccountCurrency, 0, 1m), SymbolProperties.GetDefault(CashBook.AccountCurrency));
             security.SetLeverage(10m);
@@ -149,7 +148,7 @@ namespace QuantConnect.Tests.Common.Securities
             Assert.AreEqual(fills.Count + 1, equity.Count);
 
             // we're going to process fills and very our equity after each fill
-            var subscriptions = new SubscriptionManager(AlgorithmSettings, TimeKeeper, new DataManagerStub());
+            var subscriptions = new SubscriptionManager(TimeKeeper, new DataManagerStub());
             var securities = new SecurityManager(TimeKeeper);
             var transactions = new SecurityTransactionManager(null, securities);
             var portfolio = new SecurityPortfolioManager(securities, transactions);
@@ -1485,6 +1484,56 @@ namespace QuantConnect.Tests.Common.Securities
 
             // and short put option position still exists in the portfolio
             Assert.AreEqual(-1, securities[Symbols.SPY_P_192_Feb19_2016].Holdings.Quantity);
+        }
+
+        [Test]
+        [TestCase(DataNormalizationMode.Adjusted)]
+        [TestCase(DataNormalizationMode.Raw)]
+        [TestCase(DataNormalizationMode.SplitAdjusted)]
+        [TestCase(DataNormalizationMode.TotalReturn)]
+        public void AlwaysAppliesSplitInLiveMode(DataNormalizationMode mode)
+        {
+            var algorithm = new QCAlgorithm();
+            algorithm.SubscriptionManager.SetDataManager(new DataManagerStub(algorithm));
+            algorithm.SetLiveMode(true);
+            var initialCash = algorithm.Portfolio.CashBook.TotalValueInAccountCurrency;
+
+            var spy = algorithm.AddEquity("SPY");
+            spy.SetMarketPrice(new Tick(new DateTime(2000, 01, 01), Symbols.SPY, 100m, 99m, 101m));
+            spy.Holdings.SetHoldings(100m, 100);
+
+            var split = new Split(Symbols.SPY, new DateTime(2000, 01, 01), 100, 0.5m, SplitType.SplitOccurred);
+            algorithm.Portfolio.ApplySplit(split, algorithm.LiveMode);
+
+            // confirm the split was properly applied to our holdings, no left over cash from split
+            Assert.AreEqual(50m, spy.Price);
+            Assert.AreEqual(200, spy.Holdings.Quantity);
+            Assert.AreEqual(initialCash, algorithm.Portfolio.CashBook.TotalValueInAccountCurrency);
+        }
+
+        [Test]
+        [TestCase(DataNormalizationMode.Adjusted)]
+        [TestCase(DataNormalizationMode.Raw)]
+        [TestCase(DataNormalizationMode.SplitAdjusted)]
+        [TestCase(DataNormalizationMode.TotalReturn)]
+        public void NeverAppliesDividendInLiveMode(DataNormalizationMode mode)
+        {
+            var algorithm = new QCAlgorithm();
+            algorithm.SubscriptionManager.SetDataManager(new DataManagerStub(algorithm));
+            algorithm.SetLiveMode(true);
+            var initialCash = algorithm.Portfolio.CashBook.TotalValueInAccountCurrency;
+
+            var spy = algorithm.AddEquity("SPY");
+            spy.SetMarketPrice(new Tick(new DateTime(2000, 01, 01), Symbols.SPY, 100m, 99m, 101m));
+            spy.Holdings.SetHoldings(100m, 100);
+
+            var dividend = new Dividend(Symbols.SPY, new DateTime(2000, 01, 01), 100, 0.5m);
+            algorithm.Portfolio.ApplyDividend(dividend, algorithm.LiveMode);
+
+            // confirm no changes were made
+            Assert.AreEqual(100m, spy.Price);
+            Assert.AreEqual(100, spy.Holdings.Quantity);
+            Assert.AreEqual(initialCash, algorithm.Portfolio.CashBook.TotalValueInAccountCurrency);
         }
 
         private SubscriptionDataConfig CreateTradeBarDataConfig(SecurityType type, Symbol symbol)
