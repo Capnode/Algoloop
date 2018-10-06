@@ -35,13 +35,13 @@ namespace Algoloop.Model
 
         [Category("Broker")]
         [DisplayName("Data provider")]
-        [Description("History data provider")]
+        [Description("Market data provider")]
         [DataMember]
         public MarketType Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
-        [Description("Trading account name.")]
+        [Description("Trading account for live or paper trading.")]
         [DataMember]
         public string Account { get; set; }
 
