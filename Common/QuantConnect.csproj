@@ -182,7 +182,11 @@
     <Compile Include="Chart.cs" />
     <Compile Include="ChartPoint.cs" />
     <Compile Include="Interfaces\IAlgorithmSubscriptionManager.cs" />
+    <Compile Include="Interfaces\ISubscriptionDataConfigService.cs" />
+    <Compile Include="Interfaces\ITimeKeeper.cs" />
+    <Compile Include="IsolatorLimitResult.cs" />
     <Compile Include="Python\MarginCallModelPythonWrapper.cs" />
+    <Compile Include="Python\PythonInitializer.cs" />
     <Compile Include="Securities\ICurrencyConverter.cs" />
     <Compile Include="Python\BuyingPowerModelPythonWrapper.cs" />
     <Compile Include="Securities\CashAmount.cs" />
@@ -212,6 +216,7 @@
     <Compile Include="Interfaces\IRegressionAlgorithmDefinition.cs" />
     <Compile Include="Interfaces\ITimeInForceHandler.cs" />
     <Compile Include="Orders\Fees\BitfinexFeeModel.cs" />
+    <Compile Include="Orders\Fills\FillModel.cs" />
     <Compile Include="Orders\Fills\LatestPriceFillModel.cs" />
     <Compile Include="Orders\BitfinexOrderProperties.cs" />
     <Compile Include="Orders\GDAXOrderProperties.cs" />

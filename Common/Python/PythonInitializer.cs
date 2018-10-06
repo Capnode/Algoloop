@@ -1,4 +1,4 @@
-/*
+﻿/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -11,14 +11,35 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
 
-namespace QuantConnect.Orders.Fills
+using Python.Runtime;
+
+namespace QuantConnect.Python
 {
     /// <summary>
-    /// Represents the default fill model used to simulate order fills
+    /// Helper class for Python initialization
     /// </summary>
-    public class ImmediateFillModel : FillModel
+    public static class PythonInitializer
     {
+        // Used to allow multiple Python unit and regression tests to be run in the same test run
+        private static bool _isBeginAllowThreadsCalled;
+
+        /// <summary>
+        /// Initialize the Python.NET library
+        /// </summary>
+        public static void Initialize()
+        {
+            if (!_isBeginAllowThreadsCalled)
+            {
+                PythonEngine.Initialize();
+
+                // required for multi-threading usage
+                PythonEngine.BeginAllowThreads();
+
+                _isBeginAllowThreadsCalled = true;
+            }
+        }
     }
 }

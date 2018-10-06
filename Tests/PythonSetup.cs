@@ -32,7 +32,8 @@ namespace QuantConnect.Tests
                 "./Risk",
                 "./Selection",
                 "./RegressionAlgorithms",
-                "./Jupyter/RegressionScripts");
+                "./Jupyter/RegressionScripts",
+                "../../../Algorithm.Python");
 
             Environment.SetEnvironmentVariable("PYTHONPATH", pythonPath);
         }
