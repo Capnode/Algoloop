@@ -17,6 +17,7 @@ using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 using static Algoloop.Model.MarketModel;
 
@@ -143,6 +144,10 @@ namespace Algoloop.Model
             Resolution = strategy.Resolution;
             Symbols.AddRange(strategy.Symbols);
             Parameters.AddRange(strategy.Parameters);
+            if (strategy.Parameters.Count > 0)
+            {
+                Name = string.Join(" ", strategy.Parameters.Select(m => m.Value));
+            }
         }
     }
 }
