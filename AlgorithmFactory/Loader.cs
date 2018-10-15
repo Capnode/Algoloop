@@ -195,40 +195,9 @@ namespace QuantConnect.AlgorithmFactory
 
             try
             {
-                byte[] debugInformationBytes = null;
-
-                // if the assembly is located in the base directory then don't bother loading the pdbs
-                // manually, they'll be loaded automatically by the .NET runtime.
-                var directoryName = new FileInfo(assemblyPath).DirectoryName;
-                if (directoryName != null && directoryName.TrimEnd(Path.DirectorySeparatorChar) != AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar))
-                {
-                    // see if the pdb exists
-                    var mdbFilename = assemblyPath + ".mdb";
-                    var pdbFilename = assemblyPath.Substring(0, assemblyPath.Length - 4) + ".pdb";
-                    if (File.Exists(pdbFilename))
-                    {
-                        debugInformationBytes = File.ReadAllBytes(pdbFilename);
-                    }
-                    // see if the mdb exists
-                    if (File.Exists(mdbFilename))
-                    {
-                        debugInformationBytes = File.ReadAllBytes(mdbFilename);
-                    }
-                }
-
                 //Load the assembly:
-                Assembly assembly;
-                if (debugInformationBytes == null)
-                {
-                    Log.Trace("Loader.TryCreateILAlgorithm(): Loading only the algorithm assembly");
-                    assembly = Assembly.LoadFrom(assemblyPath);
-                }
-                else
-                {
-                    Log.Trace("Loader.TryCreateILAlgorithm(): Loading debug information with algorithm");
-                    var assemblyBytes = File.ReadAllBytes(assemblyPath);
-                    assembly = Assembly.Load(assemblyBytes, debugInformationBytes);
-                }
+                Log.Trace("Loader.TryCreateILAlgorithm(): Loading only the algorithm assembly");
+                Assembly assembly = Assembly.LoadFrom(assemblyPath);
                 if (assembly == null)
                 {
                     errorMessage = "Assembly is null.";
