@@ -23,8 +23,11 @@ namespace Algoloop.Service
 
         public Isolated()
         {
-            _domain = AppDomain.CreateDomain("Isolated:" + Guid.NewGuid(),
-               null, AppDomain.CurrentDomain.SetupInformation);
+            string name = "Isolated:" + Guid.NewGuid();
+            _domain = AppDomain.CreateDomain(
+                name, 
+                AppDomain.CurrentDomain.Evidence,
+                AppDomain.CurrentDomain.SetupInformation);
 
             Type type = typeof(T);
 
