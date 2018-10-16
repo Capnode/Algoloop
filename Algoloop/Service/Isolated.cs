@@ -23,13 +23,21 @@ namespace Algoloop.Service
 
         public Isolated()
         {
+            Type type = typeof(T);
+
+            AppDomainSetup appSetup = new AppDomainSetup()
+            {
+                ApplicationName = type.Name,
+                ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
+                PrivateBinPath = @".",
+                ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile
+            };
+
             string name = "Isolated:" + Guid.NewGuid();
             _domain = AppDomain.CreateDomain(
                 name, 
                 AppDomain.CurrentDomain.Evidence,
-                AppDomain.CurrentDomain.SetupInformation);
-
-            Type type = typeof(T);
+                appSetup);
 
             _value = (T)_domain.CreateInstanceAndUnwrap(type.Assembly.FullName, type.FullName);
         }

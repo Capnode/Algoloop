@@ -54,12 +54,18 @@ namespace Algoloop.ViewModel
 
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
 
-            ReadConfig();
+            // Set working directory
+            string appData = GetAppDataFolder();
+            Directory.SetCurrentDirectory(appData);
+
+            // Read configuration
+            ReadConfig(appData);
         }
 
         ~MainViewModel()
         {
-            SaveConfig();
+            string appData = GetAppDataFolder();
+            SaveConfig(appData);
         }
 
         public RelayCommand SettingsCommand { get; }
@@ -105,7 +111,8 @@ namespace Algoloop.ViewModel
             var settings = new SettingsView();
             if ((bool)settings.ShowDialog())
             {
-                SaveConfig();
+                string appData = GetAppDataFolder();
+                SaveConfig(appData);
             }
             else
             {
@@ -141,18 +148,16 @@ namespace Algoloop.ViewModel
             return Path.Combine(appData, company, product);
         }
 
-        private void ReadConfig()
+        private void ReadConfig(string appData)
         {
-            string appData = GetAppDataFolder();
             SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
             MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
             AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
             StrategiesViewModel.Read(Path.Combine(appData, "Strategies.json"));
         }
 
-        private void SaveConfig()
+        private void SaveConfig(string appData)
         {
-            string appData = GetAppDataFolder();
             if (!Directory.Exists(appData))
             {
                 Directory.CreateDirectory(appData);

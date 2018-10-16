@@ -1,4 +1,7 @@
 ﻿{
+    "log-handler": "Algoloop.Service.LogItemHandler",
     "debug-mode": true,
-    "debug-level":  0
+    "debug-level": 0,
+    "composer-dll-directory": ".",
+    "plugin-directory": "."
 }

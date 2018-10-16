@@ -22,6 +22,7 @@ using QuantConnect.Packets;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Algoloop.Service
@@ -150,7 +151,11 @@ namespace Algoloop.Service
             Config.Set("data-folder", model.DataFolder);
             Config.Set("data-directory", model.DataFolder);
             Config.Set("cache-location", model.DataFolder);
-            Config.Set("algorithm-location", model.AlgorithmLocation);
+            string fullPath = Path.GetFullPath(model.AlgorithmLocation);
+            Config.Set("algorithm-location", fullPath);
+            string fullFolder = Path.GetDirectoryName(fullPath);
+            Config.Set("plugin-directory", fullFolder);
+            Config.Set("composer-dll-directory", fullFolder);
             Config.Set("algorithm-type-name", model.AlgorithmName);
 
             // Set parameters
