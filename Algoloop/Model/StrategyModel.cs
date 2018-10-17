@@ -14,10 +14,12 @@
 
 using Algoloop.ViewSupport;
 using QuantConnect;
+using QuantConnect.Parameters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using static Algoloop.Model.MarketModel;
 
@@ -26,6 +28,8 @@ namespace Algoloop.Model
     [DataContract]
     public class StrategyModel
     {
+        private string _algorithmName;
+
         public StrategyModel()
         {
         }
@@ -110,7 +114,15 @@ namespace Algoloop.Model
         [DisplayName("Algorithm name")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
         [DataMember]
-        public string AlgorithmName { get; set; }
+        public string AlgorithmName
+        {
+            get { return _algorithmName; }
+            set
+            {
+                _algorithmName = value;
+                LoadParameters(AlgorithmLocation, _algorithmName);
+            }
+        }
 
         [Browsable(false)]
         [DataMember]
@@ -123,5 +135,23 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public List<StrategyJobModel> Jobs { get; } = new List<StrategyJobModel>();
+
+        private void LoadParameters(string algorithmLocation, string algorithmName)
+        {
+            Assembly assembly = Assembly.LoadFrom(algorithmLocation);
+            if (assembly == null)
+            {
+                return;
+            }
+
+            IEnumerable<Type> type = assembly.GetTypes().Where(m => m.Name.Equals(algorithmName));
+            if (type == null || type.Count() == 0)
+            {
+                return;
+            }
+
+            var list = ParameterAttribute.GetParametersFromType(type.First());
+
+        }
     }
 }
