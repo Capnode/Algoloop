@@ -63,7 +63,7 @@ namespace Algoloop.ViewSupport
                 return;
             }
 
-            System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
+            var dlg = new System.Windows.Forms.FolderBrowserDialog();
             dlg.Description = "Select data folder";
             dlg.SelectedPath = item.Value?.ToString();
             dlg.ShowNewFolderButton = true;

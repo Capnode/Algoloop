@@ -66,13 +66,12 @@ namespace Algoloop.ViewSupport
                 return;
             }
 
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            var dlg = new Microsoft.Win32.OpenFileDialog();
             string path = item.Value?.ToString();
-            string currentFolder = Directory.GetCurrentDirectory();
             string folder;
             if (path == null)
             {
-                folder = currentFolder;
+                folder = Directory.GetCurrentDirectory();
             }
             else
             {
