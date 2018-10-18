@@ -27,14 +27,26 @@ namespace Algoloop.Model
 
         public ParameterModel(ParameterModel model)
         {
-           Name = model.Name;
-           Value = model.Value;
+            Enabled = model.Enabled;
+            Name = model.Name;
+            Value = model.Value;
+            Multiple = model.Multiple;
+            Range = model.Range;
         }
+
+        [DataMember]
+        public bool Enabled { get; set; } = true;
 
         [DataMember]
         public string Name { get; set; } = string.Empty;
 
         [DataMember]
         public string Value { get; set; } = string.Empty;
+
+        [DataMember]
+        public bool Multiple { get; set; }
+
+        [DataMember]
+        public string Range { get; set; } = string.Empty;
     }
 }

@@ -13,17 +13,22 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using QuantConnect.Parameters;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 
 namespace Algoloop.ViewModel
 {
     public class StrategyViewModel : ViewModelBase
     {
+        private readonly string[] exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
+
         private StrategiesViewModel _parent;
         private readonly SettingsModel _settingsModel;
 
@@ -39,7 +44,7 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
-            AddParameterCommand = new RelayCommand(() => AddParameter(), true);
+            Model.AlgorithmNameChanged += UpdateParameters;
 
             DataFromModel();
         }
@@ -66,18 +71,11 @@ namespace Algoloop.ViewModel
 
         public RelayCommand ImportSymbolsCommand { get; }
 
-        public RelayCommand AddParameterCommand { get; }
-
         internal bool DeleteSymbol(SymbolViewModel symbol)
         {
             bool ok = Symbols.Remove(symbol);
             Debug.Assert(ok);
             return ok;
-        }
-
-        internal void DeleteParameter(ParameterViewModel parameter)
-        {
-            Parameters.Remove(parameter);
         }
 
         internal bool DeleteJob(StrategyJobViewModel job)
@@ -95,12 +93,6 @@ namespace Algoloop.ViewModel
         {
             var symbol = new SymbolViewModel(this, new SymbolModel());
             Symbols.Add(symbol);
-        }
-
-        private void AddParameter()
-        {
-            var parameter = new ParameterViewModel(this, new ParameterModel());
-            Parameters.Add(parameter);
         }
 
         private async void RunStrategy()
@@ -149,6 +141,8 @@ namespace Algoloop.ViewModel
                 Parameters.Add(parameterViewModel);
             }
 
+            UpdateParameters(Model.AlgorithmName);
+
             Jobs.Clear();
             foreach (StrategyJobModel strategyJobModel in Model.Jobs)
             {
@@ -160,6 +154,40 @@ namespace Algoloop.ViewModel
         private void ImportSymbols()
         {
             throw new NotImplementedException();
+        }
+
+        private void UpdateParameters(string algorithmName)
+        {
+            Assembly assembly = Assembly.LoadFrom(Model.AlgorithmLocation);
+            if (assembly == null)
+                return;
+
+            IEnumerable<Type> type = assembly.GetTypes().Where(m => m.Name.Equals(algorithmName));
+            if (type == null || type.Count() == 0)
+                return;
+
+            List<ParameterViewModel> parameters = Parameters.ToList();
+            Parameters.Clear();
+
+            foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
+            {
+                string parameterName = parameter.Key;
+                string parameterType = parameter.Value;
+
+                if (exclude.Contains(parameterName))
+                    continue;
+
+                ParameterViewModel parameterViewModel = parameters.FirstOrDefault(m => m.Model.Name.Equals(parameterName));
+                if (parameterViewModel == null)
+                {
+                    var parameterModel = new ParameterModel() { Name = parameterName };
+                    parameterViewModel = new ParameterViewModel(this, parameterModel);
+                }
+
+               Parameters.Add(parameterViewModel);
+            }
+
+            RaisePropertyChanged(() => Parameters);
         }
     }
 }

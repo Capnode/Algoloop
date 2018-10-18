@@ -20,17 +20,13 @@ namespace Algoloop.ViewModel
     public class ParameterViewModel
     {
         private StrategyViewModel _parent;
-        public ParameterModel Model { get; }
-        public RelayCommand DeleteParameterCommand { get; }
 
+        public ParameterModel Model { get; }
 
         public ParameterViewModel(StrategyViewModel parent, ParameterModel model)
         {
             _parent = parent;
             Model = model;
-
-            DeleteParameterCommand = new RelayCommand(() => _parent.DeleteParameter(this), true);
         }
-
     }
 }

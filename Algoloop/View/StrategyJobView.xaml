@@ -62,8 +62,11 @@
                     IsReadOnly="True"
                     ItemsSource="{Binding Parameters}">
                     <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Header="Use" Binding="{Binding Model.Enabled}" />
                         <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
                         <DataGridTextColumn Header="Value" Binding="{Binding Model.Value}" />
+                        <DataGridCheckBoxColumn Header="Use range" Binding="{Binding Model.Multiple}" />
+                        <DataGridTextColumn Header="Range" Binding="{Binding Model.Range}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
