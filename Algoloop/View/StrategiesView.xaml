@@ -211,7 +211,7 @@
                                     ItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
                                         <DataGridCheckBoxColumn IsReadOnly="False" Header="Use" Binding="{Binding Model.Enabled, Mode=TwoWay}" />
-                                        <DataGridTextColumn IsReadOnly="False" Header="Name" Binding="{Binding Model.Name, Mode=TwoWay}" />
+                                        <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Model.Name}" />
                                         <DataGridTextColumn IsReadOnly="False" Header="Value" Binding="{Binding Model.Value, Mode=TwoWay}" />
                                         <DataGridCheckBoxColumn IsReadOnly="False" Header="Use range" Binding="{Binding Model.Multiple, Mode=TwoWay}" />
                                         <DataGridTextColumn IsReadOnly="False" Header="Range" Binding="{Binding Model.Range, Mode=TwoWay}" />

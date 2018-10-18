@@ -27,7 +27,7 @@ namespace Algoloop.Model
 
         public ParameterModel(ParameterModel model)
         {
-            Enabled = model.Enabled;
+            Enabled = model.Enabled && !string.IsNullOrWhiteSpace(model.Value);
             Name = model.Name;
             Value = model.Value;
             Multiple = model.Multiple;
@@ -35,7 +35,7 @@ namespace Algoloop.Model
         }
 
         [DataMember]
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; }
 
         [DataMember]
         public string Name { get; set; } = string.Empty;

@@ -44,7 +44,7 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
-            Model.AlgorithmNameChanged += UpdateParameters;
+            Model.AlgorithmNameChanged += UpdateParametersFromModel;
 
             DataFromModel();
         }
@@ -134,14 +134,7 @@ namespace Algoloop.ViewModel
                 Symbols.Add(symbolViewModel);
             }
 
-            Parameters.Clear();
-            foreach (ParameterModel parameterModel in Model.Parameters)
-            {
-                var parameterViewModel = new ParameterViewModel(this, parameterModel);
-                Parameters.Add(parameterViewModel);
-            }
-
-            UpdateParameters(Model.AlgorithmName);
+            UpdateParametersFromModel(Model.AlgorithmName);
 
             Jobs.Clear();
             foreach (StrategyJobModel strategyJobModel in Model.Jobs)
@@ -156,8 +149,11 @@ namespace Algoloop.ViewModel
             throw new NotImplementedException();
         }
 
-        private void UpdateParameters(string algorithmName)
+        private void UpdateParametersFromModel(string algorithmName)
         {
+            if (string.IsNullOrEmpty(Model.AlgorithmLocation) || string.IsNullOrEmpty(algorithmName))
+                return;
+
             Assembly assembly = Assembly.LoadFrom(Model.AlgorithmLocation);
             if (assembly == null)
                 return;
@@ -166,9 +162,7 @@ namespace Algoloop.ViewModel
             if (type == null || type.Count() == 0)
                 return;
 
-            List<ParameterViewModel> parameters = Parameters.ToList();
             Parameters.Clear();
-
             foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
             {
                 string parameterName = parameter.Key;
@@ -177,14 +171,14 @@ namespace Algoloop.ViewModel
                 if (exclude.Contains(parameterName))
                     continue;
 
-                ParameterViewModel parameterViewModel = parameters.FirstOrDefault(m => m.Model.Name.Equals(parameterName));
-                if (parameterViewModel == null)
+                ParameterModel parameterModel = Model.Parameters.FirstOrDefault(m => m.Name.Equals(parameterName));
+                if (parameterModel == null)
                 {
-                    var parameterModel = new ParameterModel() { Name = parameterName };
-                    parameterViewModel = new ParameterViewModel(this, parameterModel);
+                    parameterModel = new ParameterModel() { Name = parameterName };
                 }
 
-               Parameters.Add(parameterViewModel);
+                var parameterViewModel = new ParameterViewModel(this, parameterModel);
+                Parameters.Add(parameterViewModel);
             }
 
             RaisePropertyChanged(() => Parameters);

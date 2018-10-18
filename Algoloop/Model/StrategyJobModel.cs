@@ -142,11 +142,18 @@ namespace Algoloop.Model
             AlgorithmLocation = strategy.AlgorithmLocation;
             AlgorithmName = strategy.AlgorithmName;
             Resolution = strategy.Resolution;
-            Symbols.AddRange(strategy.Symbols);
-            Parameters.AddRange(strategy.Parameters);
-            if (strategy.Parameters.Count > 0)
+
+            // Clone symbols
+            Symbols.AddRange(strategy.Symbols.Select(m => new SymbolModel(m)));
+
+            // Clone parameters
+            Parameters.AddRange(strategy.Parameters.Select(m => new ParameterModel(m)));
+    
+            // Use paramerter list as job name
+            string parameters = string.Join(" ", Parameters.Where(m => m.Enabled).Select(m => m.Value));
+            if (!string.IsNullOrWhiteSpace(parameters))
             {
-                Name = string.Join(" ", strategy.Parameters.Select(m => m.Value));
+                Name = parameters;
             }
         }
     }

@@ -37,14 +37,12 @@ namespace Algoloop.ViewSupport
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
             var model = context.Instance as StrategyModel;
-            if (model == null)
-            {
+            string assemblyPath = model?.AlgorithmLocation;
+            if (string.IsNullOrEmpty(assemblyPath))
                 return null;
-            }
 
             try
             {
-                string assemblyPath = model.AlgorithmLocation;
                 Assembly assembly = Assembly.LoadFrom(assemblyPath);
 
                 //Get the list of extention classes in the library: 
