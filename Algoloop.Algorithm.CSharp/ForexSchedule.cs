@@ -54,6 +54,10 @@ namespace Algoloop.Algorithm.CSharp
         private string __cash = "100000";
         private int _cash;
 
+        [Parameter("period")]
+        private string __period = "10";
+        private int _period;
+
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
@@ -64,6 +68,8 @@ namespace Algoloop.Algorithm.CSharp
             _symbol = __symbols.Split(';')[0];
             Enum.TryParse(__resolution, out _resolution);
             _cash = int.Parse(__cash);
+            _period = int.Parse(__period);
+            Log($"Period: {_period}");
 
             SetStartDate(_startdate);
             SetEndDate(_enddate);
@@ -79,17 +85,17 @@ namespace Algoloop.Algorithm.CSharp
         {
             if (Portfolio.Invested)
             {
-                if (Time.Minute/10 % 2 == 1)
+                if (Time.Minute/_period % 2 == 1)
                 {
-                    Log($"Close {string.Join(", ", data.Values)}");
+//                    Log($"Close {string.Join(", ", data.Values)}");
                     Liquidate("EURUSD");
                 }
             }
             else
             {
-                if (Time.Minute/10 % 2 == 0)
+                if (Time.Minute/_period % 2 == 0)
                 {
-                    Log($"Open {string.Join(", ", data.Values)}");
+//                    Log($"Open {string.Join(", ", data.Values)}");
                     SetHoldings("EURUSD", .5);
                 }
             }

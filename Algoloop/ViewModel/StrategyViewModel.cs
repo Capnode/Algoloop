@@ -98,9 +98,46 @@ namespace Algoloop.ViewModel
         private async void RunStrategy()
         {
             DataToModel();
-            var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, Model), _settingsModel);
-            Jobs.Add(job);
-            await job.StartTaskAsync();
+            foreach (StrategyModel model in GridOptimizerModels(Model))
+            {
+                var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, model), _settingsModel);
+                Jobs.Add(job);
+                await job.StartTaskAsync();
+            }
+        }
+
+        private IEnumerable<StrategyModel> GridOptimizerModels(StrategyModel rawModel)
+        {
+            var model = new StrategyModel(rawModel);
+            bool isMultiple = false;
+            foreach (ParameterModel parameter in model.Parameters)
+            {
+                if (!parameter.Enabled)
+                    continue;
+
+                if (parameter.Multiple)
+                {
+                    isMultiple = true;
+                    foreach (string value in SplitRange(parameter.Range))
+                    {
+                        parameter.Value = value;
+                        yield return model;
+                    }
+                }
+            }
+
+            if (!isMultiple)
+            {
+                yield return model;
+            }
+        }
+
+        private IEnumerable<string> SplitRange(string range)
+        {
+            foreach (string value in range.Split(','))
+            {
+                yield return value;
+            }
         }
 
         internal void DataToModel()
