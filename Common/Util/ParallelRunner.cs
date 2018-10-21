@@ -94,7 +94,11 @@ namespace QuantConnect.Util
             Task.Run(() =>
             {
                 WaitHandle.WaitAll(waitHandles);
-                _waitHandle.Set();
+                if (_waitHandle != null && !_waitHandle.SafeWaitHandle.IsClosed)
+                {
+                    _waitHandle.Set();
+                }
+
                 lock (_sync)
                 {
                     for (int i = 0; i < _threadCount; i++)
