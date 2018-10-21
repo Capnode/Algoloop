@@ -106,7 +106,7 @@ namespace Algoloop.ViewModel
             foreach (StrategyModel model in models)
             {
                 count++;
-                Log.Trace($"{Model.AlgorithmName} {count}({total})");
+                Log.Trace($"Strategy {model.AlgorithmName} {model.Name} {count}({total})");
                 var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, model), _settingsModel);
                 Jobs.Add(job);
                 await job.StartTaskAsync();

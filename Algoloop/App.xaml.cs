@@ -12,6 +12,9 @@
  * limitations under the License.
  */
 
+using Algoloop.ViewModel;
+using System;
+using System.Diagnostics;
 using System.Windows;
 
 namespace Algoloop
@@ -25,6 +28,25 @@ namespace Algoloop
         {
             base.OnStartup(e);
             Algoloop.Properties.Settings.Default.Reload();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            ViewModelLocator locator = Resources["Locator"] as ViewModelLocator;
+            Debug.Assert(locator != null);
+            locator.MainViewModel.SaveAll();
+            Algoloop.Properties.Settings.Default.Save();
+            base.OnExit(e);
+        }
+
+        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs ex)
+        {
+            Debug.WriteLine("Exception {0} - {1} - {2}", ex.GetType(), ex.Exception.Message, ex.Exception.ToString());
+            Exception iex = ex.Exception.InnerException;
+            if (iex != null)
+                Debug.WriteLine("Exception inner {0} - {1}", iex.GetType(), iex.Message);
+
+            ex.Handled = true; // Continue processing
         }
     }
 }

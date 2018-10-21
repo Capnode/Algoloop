@@ -62,12 +62,6 @@ namespace Algoloop.ViewModel
             ReadConfig(appData);
         }
 
-        ~MainViewModel()
-        {
-            string appData = GetAppDataFolder();
-            SaveConfig(appData);
-        }
-
         public RelayCommand SettingsCommand { get; }
         public RelayCommand<Window> ExitCommand { get; }
         public RelayCommand AboutCommand { get; }
@@ -96,6 +90,12 @@ namespace Algoloop.ViewModel
             }
         }
 
+        public void SaveAll()
+        {
+            string appData = GetAppDataFolder();
+            SaveConfig(appData);
+        }
+
         private void DoExit(Window window)
         {
             Debug.Assert(window != null);
@@ -111,8 +111,7 @@ namespace Algoloop.ViewModel
             var settings = new SettingsView();
             if ((bool)settings.ShowDialog())
             {
-                string appData = GetAppDataFolder();
-                SaveConfig(appData);
+                SaveAll();
             }
             else
             {

@@ -32,7 +32,6 @@ namespace Algoloop.View
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             Settings.Default.MainWindowPlacement = this.GetPlacement();
-            Settings.Default.Save();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
