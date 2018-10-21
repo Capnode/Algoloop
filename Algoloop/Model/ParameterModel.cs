@@ -27,24 +27,24 @@ namespace Algoloop.Model
 
         public ParameterModel(ParameterModel model)
         {
-            Enabled = model.Enabled && !string.IsNullOrWhiteSpace(model.Value);
             Name = model.Name;
+            UseValue = model.UseValue && !string.IsNullOrWhiteSpace(model.Value);
             Value = model.Value;
-            Multiple = model.Multiple;
+            UseRange = model.UseRange;
             Range = model.Range;
         }
-
-        [DataMember]
-        public bool Enabled { get; set; }
 
         [DataMember]
         public string Name { get; set; } = string.Empty;
 
         [DataMember]
+        public bool UseValue { get; set; }
+
+        [DataMember]
         public string Value { get; set; } = string.Empty;
 
         [DataMember]
-        public bool Multiple { get; set; }
+        public bool UseRange { get; set; }
 
         [DataMember]
         public string Range { get; set; } = string.Empty;

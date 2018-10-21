@@ -210,10 +210,10 @@
                                     GridLinesVisibility="None"
                                     ItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
-                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use" Binding="{Binding Model.Enabled, Mode=TwoWay}" />
                                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Model.Name}" />
+                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use" Binding="{Binding Model.UseValue, Mode=TwoWay}" />
                                         <DataGridTextColumn IsReadOnly="False" Header="Value" Binding="{Binding Model.Value, Mode=TwoWay}" />
-                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use range" Binding="{Binding Model.Multiple, Mode=TwoWay}" />
+                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use range" Binding="{Binding Model.UseRange, Mode=TwoWay}" />
                                         <DataGridTextColumn IsReadOnly="False" Header="Range" Binding="{Binding Model.Range, Mode=TwoWay}" />
                                     </DataGrid.Columns>
                                     <DataGrid.ContextMenu>

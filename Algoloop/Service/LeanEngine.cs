@@ -174,7 +174,7 @@ namespace Algoloop.Service
                 string value;
                 if (!parameters.TryGetValue(parameter.Name, out value))
                 {
-                    if (parameter.Enabled)
+                    if (parameter.UseValue)
                     {
                         parameters.Add(parameter.Name, parameter.Value);
                     }

@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using QuantConnect.Logging;
 using QuantConnect.Parameters;
 using System;
 using System.Collections.Generic;
@@ -98,38 +99,48 @@ namespace Algoloop.ViewModel
         private async void RunStrategy()
         {
             DataToModel();
-            foreach (StrategyModel model in GridOptimizerModels(Model))
+
+            var models = GridOptimizerModels(Model, 0);
+            int count = 0;
+            int total = models.Count;
+            foreach (StrategyModel model in models)
             {
+                count++;
+                Log.Trace($"{Model.AlgorithmName} {count}({total})");
                 var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, model), _settingsModel);
                 Jobs.Add(job);
                 await job.StartTaskAsync();
             }
         }
 
-        private IEnumerable<StrategyModel> GridOptimizerModels(StrategyModel rawModel)
+        private List<StrategyModel> GridOptimizerModels(StrategyModel rawModel, int index)
         {
             var model = new StrategyModel(rawModel);
-            bool isMultiple = false;
-            foreach (ParameterModel parameter in model.Parameters)
-            {
-                if (!parameter.Enabled)
-                    continue;
 
-                if (parameter.Multiple)
+            var list = new List<StrategyModel>();
+            if (index < model.Parameters.Count)
+            {
+                var parameter = model.Parameters[index];
+                if (parameter.UseRange)
                 {
-                    isMultiple = true;
                     foreach (string value in SplitRange(parameter.Range))
                     {
                         parameter.Value = value;
-                        yield return model;
+                        parameter.UseValue = true;
+                        list.AddRange(GridOptimizerModels(model, index + 1));
                     }
                 }
+                else
+                {
+                    list.AddRange(GridOptimizerModels(model, index + 1));
+                }
+            }
+            else
+            {
+                list.Add(model);
             }
 
-            if (!isMultiple)
-            {
-                yield return model;
-            }
+            return list;
         }
 
         private IEnumerable<string> SplitRange(string range)

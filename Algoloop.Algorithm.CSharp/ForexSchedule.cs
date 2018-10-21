@@ -58,6 +58,14 @@ namespace Algoloop.Algorithm.CSharp
         private string __period = "10";
         private int _period;
 
+        [Parameter("period2")]
+        private string __period2 = "10";
+        private int _period2;
+
+        [Parameter("period3")]
+        private string __period3 = "10";
+        private int _period3;
+
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
@@ -69,7 +77,9 @@ namespace Algoloop.Algorithm.CSharp
             Enum.TryParse(__resolution, out _resolution);
             _cash = int.Parse(__cash);
             _period = int.Parse(__period);
-            Log($"Period: {_period}");
+            _period2 = int.Parse(__period2);
+            _period3 = int.Parse(__period3);
+            Log($"Period: {_period} {_period2} {_period3} ");
 
             SetStartDate(_startdate);
             SetEndDate(_enddate);
