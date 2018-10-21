@@ -28,13 +28,13 @@ namespace Algoloop.Model
         public SymbolModel(SymbolModel model)
         {
             Name = model.Name;
-            Enabled = model.Enabled;
+            Active = model.Active;
         }
 
         [DataMember]
         public string Name { get; set; } = "EURUSD";
 
         [DataMember]
-        public bool Enabled { get; set; } = true;
+        public bool Active { get; set; } = true;
     }
 }

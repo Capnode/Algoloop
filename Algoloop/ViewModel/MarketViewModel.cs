@@ -41,10 +41,10 @@ namespace Algoloop.ViewModel
 
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
-            DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !Enabled);
-            EnableCommand = new RelayCommand(() => OnEnableCommand(Model.Enabled), true);
-            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Enabled);
-            StopCommand = new RelayCommand(() => OnStopCommand(), () => Enabled);
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !Active);
+            ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
+            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Active);
+            StopCommand = new RelayCommand(() => OnStopCommand(), () => Active);
 
             DataFromModel();
 
@@ -53,7 +53,7 @@ namespace Algoloop.ViewModel
                 SymbolViewModel symbol = e.Item as SymbolViewModel;
                 if (symbol != null)
                 {
-                    e.Accepted = symbol.Model.Enabled;
+                    e.Accepted = symbol.Model.Active;
                 }
             };
 
@@ -70,17 +70,17 @@ namespace Algoloop.ViewModel
 
         public RelayCommand DeleteCommand { get; }
 
-        public RelayCommand EnableCommand { get; }
+        public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
 
-        public bool Enabled
+        public bool Active
         {
-            get => Model.Enabled;
+            get => Model.Active;
             set
             {
-                Model.Enabled = value;
-                RaisePropertyChanged(() => Enabled);
+                Model.Active = value;
+                RaisePropertyChanged(() => Active);
                 StartCommand.RaiseCanExecuteChanged();
                 StopCommand.RaiseCanExecuteChanged();
                 DeleteCommand.RaiseCanExecuteChanged();
@@ -111,7 +111,7 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
-            Enabled = Model.Enabled;
+            Active = Model.Active;
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -130,7 +130,7 @@ namespace Algoloop.ViewModel
             DataToModel();
             MarketModel model = Model;
             _cancel = new CancellationTokenSource();
-            while (!_cancel.Token.IsCancellationRequested && Model.Enabled)
+            while (!_cancel.Token.IsCancellationRequested && Model.Active)
             {
                 Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
                 try
@@ -145,14 +145,14 @@ namespace Algoloop.ViewModel
                 {
                     Log.Trace($"Market {Model.Name} canceled by user");
                     _toolbox = null;
-                    Enabled = false;
+                    Active = false;
                 }
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
                     _toolbox.Dispose();
                     _toolbox = null;
-                    Enabled = false;
+                    Active = false;
                 }
 
                 // Update view
@@ -178,7 +178,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async void OnEnableCommand(bool value)
+        private async void OnActiveCommand(bool value)
         {
             if (value)
             {
@@ -192,14 +192,14 @@ namespace Algoloop.ViewModel
 
         private async void OnStartCommand()
         {
-            Enabled = true;
+            Active = true;
             await StartTaskAsync();
         }
 
         private void OnStopCommand()
         {
             StopTask();
-            Enabled = false;
+            Active = false;
         }
 
         private void AddSymbol()

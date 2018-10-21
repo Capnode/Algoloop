@@ -19,6 +19,7 @@ using GalaSoft.MvvmLight.Command;
 using QuantConnect.Logging;
 using QuantConnect.Parameters;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -33,6 +34,7 @@ namespace Algoloop.ViewModel
         private readonly string[] exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
 
         private StrategiesViewModel _parent;
+        private IList _selection;
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -41,10 +43,12 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
+            SelectionChangedCommand = new RelayCommand<IList>(m => SelectionChanged(m));
             RunCommand = new RelayCommand(() => RunStrategy(), true);
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
-            DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
+            DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
+            DeleteSelectedJobsCommand = new RelayCommand(() => DeleteSelectedJobs(), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
@@ -60,17 +64,19 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
 
+        public RelayCommand<IList> SelectionChangedCommand { get; }
         public RelayCommand RunCommand { get; }
 
         public RelayCommand CloneCommand { get; }
 
         public RelayCommand ExportCommand { get; }
 
-        public RelayCommand DeleteCommand { get; }
+        public RelayCommand DeleteStrategyCommand { get; }
+        public RelayCommand DeleteSelectedJobsCommand { get; }
 
         public RelayCommand AddSymbolCommand { get; }
 
-        public RelayCommand EnabledCommand { get; }
+        public RelayCommand ActiveCommand { get; }
 
         public RelayCommand ImportSymbolsCommand { get; }
 
@@ -86,6 +92,24 @@ namespace Algoloop.ViewModel
             bool ok = Jobs.Remove(job);
             Debug.Assert(ok);
             return ok;
+        }
+
+        private void SelectionChanged(IList selection)
+        {
+            _selection = selection;
+        }
+
+        internal void DeleteSelectedJobs()
+        {
+            if (_selection == null)
+                return;
+
+            foreach (object item in _selection)
+            {
+                
+
+            }
+
         }
 
         internal void Refresh(SymbolViewModel symbolViewModel)

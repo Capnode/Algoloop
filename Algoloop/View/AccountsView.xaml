@@ -70,8 +70,8 @@
                     <DataTemplate DataType="{x:Type vm:AccountViewModel}" >
                         <StackPanel Orientation="Horizontal">
                             <CheckBox
-                                IsChecked="{Binding Enabled}"
-                                Command="{Binding EnabledCommand}" />
+                                IsChecked="{Binding Active}"
+                                Command="{Binding ActiveCommand}" />
                             <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>

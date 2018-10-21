@@ -161,7 +161,7 @@ namespace Algoloop.ViewModel
         {
             foreach (MarketViewModel market in Markets)
             {
-                if (market.Enabled)
+                if (market.Active)
                 {
                     Task task = market.StartTaskAsync();
                 }

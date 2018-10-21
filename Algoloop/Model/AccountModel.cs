@@ -32,7 +32,7 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public bool Enabled { get; set; }
+        public bool Active { get; set; }
 
         [Category("Account")]
         [DisplayName("Account provider")]

@@ -158,7 +158,7 @@ namespace Algoloop.ViewModel
         {
             foreach (AccountViewModel account in Accounts)
             {
-                if (account.Enabled)
+                if (account.Active)
                 {
                     Task task = account.StartTask();
                 }

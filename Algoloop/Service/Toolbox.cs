@@ -76,7 +76,7 @@ namespace Algoloop.Service
         {
             try
             {
-                IList<string> list = model.Symbols.Where(m => m.Enabled).Select(m => m.Name).ToList();
+                IList<string> list = model.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
                 if (list.Any())
                 {
                     switch (model.Provider)
@@ -119,20 +119,20 @@ namespace Algoloop.Service
                             break;
                         default:
                             Log.Error($"Market Provider not supported: {model.Provider}");
-                            model.Enabled = false;
+                            model.Active = false;
                             break;
                     }
                 }
                 else
                 {
                     Log.Trace($"No symbols selected");
-                    model.Enabled = false;
+                    model.Active = false;
                 }
             }
             catch (Exception ex)
             {
                 Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
-                model.Enabled = false;
+                model.Active = false;
             }
         }
 
@@ -154,7 +154,7 @@ namespace Algoloop.Service
                 DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, nextDate.AddMilliseconds(-1));
                 model.FromDate = nextDate;
             }
-            model.Enabled = model.FromDate < DateTime.Today;
+            model.Active = model.FromDate < DateTime.Today;
         }
 
         private static void FxcmDownloader(MarketModel model, IList<string> symbols)
@@ -183,7 +183,7 @@ namespace Algoloop.Service
                 model.FromDate = fromDate.AddDays(1);
             }
 
-            model.Enabled = model.FromDate < DateTime.Today;
+            model.Active = model.FromDate < DateTime.Today;
         }
 
         private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)

@@ -68,8 +68,8 @@
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction
-                        Command="{Binding SelectedChangedCommand}"
-                        CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
+                            Command="{Binding SelectedChangedCommand}"
+                            CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
@@ -115,9 +115,7 @@
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type vm:StrategyJobViewModel}">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox
-                                IsChecked="{Binding Enabled}"
-                                Command="{Binding EnabledCommand}" />
+                            <CheckBox IsChecked="{Binding Active}" />
                             <TextBlock Text="{Binding Model.Name}" />
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
@@ -182,7 +180,7 @@
                                     <ListBox.Resources>
                                         <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                                             <StackPanel Orientation="Horizontal">
-                                                <CheckBox IsChecked="{Binding Model.Enabled}" />
+                                                <CheckBox IsChecked="{Binding Model.Active}" />
                                                 <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
                                                     <TextBox.ContextMenu>
                                                         <ContextMenu>
@@ -211,10 +209,10 @@
                                     ItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Model.Name}" />
-                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use" Binding="{Binding Model.UseValue, Mode=TwoWay}" />
-                                        <DataGridTextColumn IsReadOnly="False" Header="Value" Binding="{Binding Model.Value, Mode=TwoWay}" />
-                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use range" Binding="{Binding Model.UseRange, Mode=TwoWay}" />
-                                        <DataGridTextColumn IsReadOnly="False" Header="Range" Binding="{Binding Model.Range, Mode=TwoWay}" />
+                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use" Binding="{Binding Model.UseValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <DataGridTextColumn IsReadOnly="False" Header="Value" Binding="{Binding Model.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Use range" Binding="{Binding Model.UseRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <DataGridTextColumn IsReadOnly="False" Header="Range" Binding="{Binding Model.Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     </DataGrid.Columns>
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
@@ -245,6 +243,39 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
+                                </DataGrid>
+                            </TabItem>
+                            <TabItem Header="{Binding Jobs.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
+                                <DataGrid
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    ItemsSource="{Binding Jobs}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="SelectionChanged">
+                                            <i:InvokeCommandAction
+                                                Command="{Binding SelectionChangedCommand}"
+                                                CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                    <DataGrid.Columns>
+                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Active" Binding="{Binding Active, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        <DataGridTextColumn IsReadOnly="True" Header="Algorithm" Binding="{Binding Model.AlgorithmName}" />
+                                        <DataGridTextColumn IsReadOnly="True" Header="Parameters" Binding="{Binding Model.Name}" />
+                                    </DataGrid.Columns>
+                                    <DataGrid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem
+                                                Header="Delete Jobs"
+                                                Command="{Binding DeleteSelectedJobsCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </DataGrid.ContextMenu>
                                 </DataGrid>
                             </TabItem>
                         </TabControl>

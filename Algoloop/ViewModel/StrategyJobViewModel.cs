@@ -48,10 +48,9 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Enabled);
-            StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Enabled);
-            DeleteJobCommand = new RelayCommand(() => DeleteJob(), () => !Enabled);
-            EnabledCommand = new RelayCommand(() => OnEnableCommand(Model.Enabled), true);
+            StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Active);
+            StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Active);
+            DeleteJobCommand = new RelayCommand(() => DeleteJob(), () => !Active);
 
             DataFromModel();
         }
@@ -78,7 +77,7 @@ namespace Algoloop.ViewModel
 
         public RelayCommand DeleteJobCommand { get; }
 
-        public RelayCommand EnabledCommand { get; }
+        public RelayCommand ActiveCommand { get; }
 
         public string Logs
         {
@@ -90,16 +89,25 @@ namespace Algoloop.ViewModel
             get => Logs == null ? 0 :  Logs.Count(m => m.Equals('\n'));
         }
 
-        public bool Enabled
+        public bool Active
         {
-            get => Model.Enabled;
+            get => Model.Active;
             set
             {
-                Model.Enabled = value;
-                RaisePropertyChanged(() => Enabled);
+                Model.Active = value;
+                RaisePropertyChanged(() => Active);
                 StartJobCommand.RaiseCanExecuteChanged();
                 StopJobCommand.RaiseCanExecuteChanged();
                 DeleteJobCommand.RaiseCanExecuteChanged();
+                if (value)
+                {
+                    StartTaskAsync();
+                }
+                else
+                {
+                    StopTask();
+                }
+
             }
         }
 
@@ -154,31 +162,19 @@ namespace Algoloop.ViewModel
             DataFromModel();
             _cancel = null;
             _leanEngine = null;
-            Enabled = false;
-        }
-
-        private async void OnEnableCommand(bool value)
-        {
-            if (value)
-            {
-                await StartTaskAsync();
-            }
-            else
-            {
-                StopTask();
-            }
+            Active = false;
         }
 
         private async void OnStartJobCommand()
         {
-            Enabled = true;
+            Active = true;
             await StartTaskAsync();
         }
 
         private void OnStopJobCommand(bool v)
         {
             StopTask();
-            Enabled = false;
+            Active = false;
         }
 
         private void StopTask()

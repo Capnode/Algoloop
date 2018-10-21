@@ -99,7 +99,7 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public bool Enabled { get; set; } = true;
+        public bool Active { get; set; } = true;
 
         [Browsable(false)]
         [DataMember]

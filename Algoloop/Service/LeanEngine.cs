@@ -167,7 +167,7 @@ namespace Algoloop.Service
             parameters.Add("market", model.Provider.ToString());
             parameters.Add(
                 "symbols",
-                string.Join(";", model.Symbols.Where(p => p.Enabled).Select(m => m.Name)));
+                string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Name)));
 
             foreach (ParameterModel parameter in model.Parameters)
             {

@@ -38,26 +38,26 @@ namespace Algoloop.ViewModel
             _parent = accountsViewModel;
             Model = accountModel;
 
-            EnabledCommand = new RelayCommand(() => OnEnabledCommand(Model.Enabled), true);
-            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Enabled);
-            StopCommand = new RelayCommand(() => StopTask(), () => Enabled);
-            DeleteCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Enabled);
+            ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
+            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Active);
+            StopCommand = new RelayCommand(() => StopTask(), () => Active);
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Active);
         }
 
         public AccountModel Model { get; }
 
-        public RelayCommand EnabledCommand { get; }
+        public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
         public RelayCommand DeleteCommand { get; }
 
-        public bool Enabled
+        public bool Active
         {
-            get => Model.Enabled;
+            get => Model.Active;
             set
             {
-                Model.Enabled = value;
-                RaisePropertyChanged(() => Enabled);
+                Model.Active = value;
+                RaisePropertyChanged(() => Active);
                 StartCommand.RaiseCanExecuteChanged();
                 StopCommand.RaiseCanExecuteChanged();
                 DeleteCommand.RaiseCanExecuteChanged();
@@ -74,7 +74,7 @@ namespace Algoloop.ViewModel
             await Task.Run(() => StartFxcm(_cancel.Token), _cancel.Token);
             _cancel = null;
             Log.Trace($"Disconnect Account {Model.Name}");
-            Enabled = false;
+            Active = false;
         }
 
         internal void StopTask()
@@ -85,7 +85,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async void OnEnabledCommand(bool value)
+        private async void OnActiveCommand(bool value)
         {
             if (value)
             {
@@ -99,7 +99,7 @@ namespace Algoloop.ViewModel
 
         private async void OnStartCommand()
         {
-            Enabled = true;
+            Active = true;
             await StartTask();
         }
 

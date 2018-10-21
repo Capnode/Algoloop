@@ -66,8 +66,8 @@
                     <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding ActiveSymbols.View}" >
                         <StackPanel Orientation="Horizontal">
                             <CheckBox
-                                IsChecked="{Binding Enabled}"
-                                Command="{Binding EnableCommand}" />
+                                IsChecked="{Binding Active}"
+                                Command="{Binding ActiveCommand}" />
                             <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
@@ -141,7 +141,7 @@
                                     <ListBox.Resources>
                                         <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                                             <StackPanel Orientation="Horizontal">
-                                                <CheckBox IsChecked="{Binding Enabled}" />
+                                                <CheckBox IsChecked="{Binding Active}" />
                                                 <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
                                                     <TextBox.ContextMenu>
                                                         <ContextMenu>

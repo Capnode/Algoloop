@@ -47,7 +47,7 @@
                     <ListBox.Resources>
                         <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                             <StackPanel Orientation="Horizontal">
-                                <CheckBox IsChecked="{Binding Model.Enabled}" IsEnabled="False"/>
+                                <CheckBox IsChecked="{Binding Model.Active}" IsEnabled="False"/>
                                 <TextBlock Text="{Binding Model.Name}" />
                             </StackPanel>
                         </DataTemplate>

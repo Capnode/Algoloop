@@ -36,13 +36,13 @@ namespace Algoloop.ViewModel
         [Browsable(false)]
         public RelayCommand DeleteSymbolCommand { get; }
 
-        public bool Enabled
+        public bool Active
         {
-            get => Model.Enabled;
+            get => Model.Active;
             set
             {
-                Model.Enabled = value;
-                RaisePropertyChanged(() => Enabled);
+                Model.Active = value;
+                RaisePropertyChanged(() => Active);
                 (_parent as StrategyViewModel)?.Refresh(this);
                 (_parent as MarketViewModel)?.Refresh(this);
             }
