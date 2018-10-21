@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
@@ -100,16 +102,25 @@ namespace Algoloop.ViewModel
         {
             DataToModel();
 
-            var models = GridOptimizerModels(Model, 0);
             int count = 0;
+            var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
-            foreach (StrategyModel model in models)
+            var tasks = new List<Task>();
+            using (var throttler = new SemaphoreSlim(Environment.ProcessorCount))
             {
-                count++;
-                Log.Trace($"Strategy {model.AlgorithmName} {model.Name} {count}({total})");
-                var job = new StrategyJobViewModel(this, new StrategyJobModel(Model.AlgorithmName, model), _settingsModel);
-                Jobs.Add(job);
-                await job.StartTaskAsync();
+                foreach (StrategyModel model in models)
+                {
+                    await throttler.WaitAsync();
+                    count++;
+                    var jobModel = new StrategyJobModel(model.AlgorithmName, model);
+                    Log.Trace($"Strategy {jobModel.AlgorithmName} {jobModel.Name} {count}({total})");
+                    var job = new StrategyJobViewModel(this, jobModel, _settingsModel);
+                    Jobs.Add(job);
+                    Task task =  job.StartTaskAsync().ContinueWith(m => { throttler.Release(); });
+                    tasks.Add(task);
+                }
+
+                await Task.WhenAll(tasks);
             }
         }
 

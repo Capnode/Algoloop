@@ -54,7 +54,13 @@ namespace Algoloop.Service
         {
             if (_domain != null)
             {
-                AppDomain.Unload(_domain);
+                try
+                {
+                    AppDomain.Unload(_domain);
+                }
+                catch
+                {
+                }
 
                 _domain = null;
             }
