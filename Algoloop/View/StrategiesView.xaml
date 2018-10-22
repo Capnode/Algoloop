@@ -47,9 +47,10 @@
                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
-            <TreeView
+            <viewsupport:ExtendedTreeView
                 Grid.Column="0"
                 ItemsSource="{Binding Strategies}"
+                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                 BorderThickness="0">
                 <TreeView.ContextMenu>
                     <ContextMenu>
@@ -65,13 +66,6 @@
                             Command="{Binding ImportCommand}" />
                     </ContextMenu>
                 </TreeView.ContextMenu>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectedItemChanged">
-                        <i:InvokeCommandAction
-                            Command="{Binding SelectedChangedCommand}"
-                            CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Jobs}">
                         <StackPanel Orientation="Horizontal">
@@ -131,7 +125,7 @@
                         </StackPanel>
                     </DataTemplate>
                 </TreeView.Resources>
-            </TreeView>
+            </viewsupport:ExtendedTreeView>
         </DockPanel>
         <ContentControl
             Grid.Column="1"
@@ -258,6 +252,11 @@
                                             <i:InvokeCommandAction
                                                 Command="{Binding TaskSelectionChangedCommand}"
                                                 CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseDoubleClick">
+                                            <i:InvokeCommandAction
+                                            Command="{Binding TaskDoubleClickCommand}"
+                                            CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <DataGrid.Columns>

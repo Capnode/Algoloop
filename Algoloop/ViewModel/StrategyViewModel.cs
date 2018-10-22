@@ -44,6 +44,7 @@ namespace Algoloop.ViewModel
             _settingsModel = settingsModel;
 
             TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
+            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => parent.SelectedItem = m);
             RunCommand = new RelayCommand(() => RunStrategy(), true);
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
@@ -65,6 +66,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
 
         public RelayCommand<IList> TaskSelectionChangedCommand { get; }
+        public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
         public RelayCommand RunCommand { get; }
 
         public RelayCommand CloneCommand { get; }
