@@ -254,7 +254,7 @@
                                     GridLinesVisibility="None"
                                     ItemsSource="{Binding Jobs}">
                                     <i:Interaction.Triggers>
-                                        <i:EventTrigger>
+                                        <i:EventTrigger EventName="SelectionChanged">
                                             <i:InvokeCommandAction
                                                 Command="{Binding TaskSelectionChangedCommand}"
                                                 CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
