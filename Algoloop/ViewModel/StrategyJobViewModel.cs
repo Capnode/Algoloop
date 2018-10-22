@@ -120,6 +120,14 @@ namespace Algoloop.ViewModel
             }
         }
 
+        public void DeleteJob()
+        {
+            SelectedChart = null;
+            Charts.Clear();
+            _cancel?.Cancel();
+            _parent?.DeleteJob(this);
+        }
+
         internal async Task StartTaskAsync()
         {
             ClearRunData();
@@ -189,14 +197,6 @@ namespace Algoloop.ViewModel
                 _leanEngine.Dispose();
                 _leanEngine = null;
             }
-        }
-
-        private void DeleteJob()
-        {
-            SelectedChart = null;
-            Charts.Clear();
-            _cancel?.Cancel();
-            _parent?.DeleteJob(this);
         }
 
         internal void DataToModel()

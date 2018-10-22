@@ -34,7 +34,7 @@ namespace Algoloop.ViewModel
         private readonly string[] exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
 
         private StrategiesViewModel _parent;
-        private IList _selection;
+        private IList _taskSelection;
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -43,12 +43,12 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            SelectionChangedCommand = new RelayCommand<IList>(m => SelectionChanged(m));
+            TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
             RunCommand = new RelayCommand(() => RunStrategy(), true);
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
             DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
-            DeleteSelectedJobsCommand = new RelayCommand(() => DeleteSelectedJobs(), true);
+            DeleteSelectedJobsCommand = new RelayCommand(() => DeleteSelectedTasks(), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
@@ -64,7 +64,7 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
 
-        public RelayCommand<IList> SelectionChangedCommand { get; }
+        public RelayCommand<IList> TaskSelectionChangedCommand { get; }
         public RelayCommand RunCommand { get; }
 
         public RelayCommand CloneCommand { get; }
@@ -94,22 +94,16 @@ namespace Algoloop.ViewModel
             return ok;
         }
 
-        private void SelectionChanged(IList selection)
+        internal void DeleteSelectedTasks()
         {
-            _selection = selection;
-        }
-
-        internal void DeleteSelectedJobs()
-        {
-            if (_selection == null)
+            if (_taskSelection == null)
                 return;
 
-            foreach (object item in _selection)
+            List<StrategyJobViewModel> list = _taskSelection.Cast<StrategyJobViewModel>().ToList();
+            foreach (StrategyJobViewModel job in list)
             {
-                
-
+                job.DeleteJob();
             }
-
         }
 
         internal void Refresh(SymbolViewModel symbolViewModel)
