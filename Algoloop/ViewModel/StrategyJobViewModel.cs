@@ -27,6 +27,7 @@ using QuantConnect.Packets;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -144,6 +145,13 @@ namespace Algoloop.ViewModel
                 account = accounts.FirstOrDefault();
             }
 
+            // Set search path if not base directory
+            string folder = Path.GetDirectoryName(Model.AlgorithmLocation);
+            if (!AppDomain.CurrentDomain.BaseDirectory.Equals(folder))
+            {
+                AddPath(folder);
+            }
+
             StrategyJobModel model = Model;
             try
             {
@@ -171,6 +179,16 @@ namespace Algoloop.ViewModel
             _cancel = null;
             _leanEngine = null;
             Active = false;
+        }
+
+        private static void AddPath(string path)
+        {
+            string pathValue = Environment.GetEnvironmentVariable("PATH");
+            if (pathValue.Contains(path))
+                return;
+
+            pathValue += ";" + path;
+            Environment.SetEnvironmentVariable("PATH", pathValue);
         }
 
         private async void OnStartJobCommand()
