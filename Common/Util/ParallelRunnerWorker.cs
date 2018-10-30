@@ -100,7 +100,14 @@ namespace QuantConnect.Util
             }
             finally
             {
-                _waitHandle.Set();
+                try
+                {
+                    _waitHandle.Set();
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"{ex.GetType()}: {ex.Message}");
+                }
             }
         }
 
