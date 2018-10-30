@@ -114,10 +114,17 @@
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem
-                                    Header="Delete Job"
-                                    Command="{Binding DeleteJobCommand}">
+                                        Header="Delete Job"
+                                        Command="{Binding DeleteJobCommand}">
                                         <MenuItem.Icon>
                                             <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem
+                                        Header="Use Parameters"
+                                        Command="{Binding UseParametersCommand}">
+                                        <MenuItem.Icon>
+                                            <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
                                         </MenuItem.Icon>
                                     </MenuItem>
                                 </ContextMenu>
@@ -271,6 +278,13 @@
                                                 Command="{Binding DeleteSelectedJobsCommand}">
                                                 <MenuItem.Icon>
                                                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem
+                                                Header="Use Parameters"
+                                                Command="{Binding UseParametersCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                         </ContextMenu>

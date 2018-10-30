@@ -49,9 +49,11 @@ namespace Algoloop.ViewModel
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
             DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
-            DeleteSelectedJobsCommand = new RelayCommand(() => DeleteSelectedTasks(), true);
+            DeleteSelectedJobsCommand = new RelayCommand(() => DeleteTasks(_taskSelection), true);
+            UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
+
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
 
             DataFromModel();
@@ -75,6 +77,7 @@ namespace Algoloop.ViewModel
 
         public RelayCommand DeleteStrategyCommand { get; }
         public RelayCommand DeleteSelectedJobsCommand { get; }
+        public RelayCommand UseParametersCommand { get; }
 
         public RelayCommand AddSymbolCommand { get; }
 
@@ -96,12 +99,12 @@ namespace Algoloop.ViewModel
             return ok;
         }
 
-        internal void DeleteSelectedTasks()
+        internal void DeleteTasks(IList selected)
         {
-            if (_taskSelection == null)
+            if (selected == null)
                 return;
 
-            List<StrategyJobViewModel> list = _taskSelection.Cast<StrategyJobViewModel>().ToList();
+            List<StrategyJobViewModel> list = selected.Cast<StrategyJobViewModel>().ToList();
             foreach (StrategyJobViewModel job in list)
             {
                 job.DeleteJob();
@@ -112,10 +115,53 @@ namespace Algoloop.ViewModel
         {
         }
 
+        internal void UseParameters(StrategyJobViewModel job)
+        {
+            if (job == null)
+                return;
+
+            Parameters.Clear();
+            foreach (ParameterViewModel parameter in job.Parameters)
+            {
+                Parameters.Add(parameter);
+            }
+        }
+
+        internal void DataToModel()
+        {
+            Model.Symbols.Clear();
+            foreach (SymbolViewModel symbol in Symbols)
+            {
+                Model.Symbols.Add(symbol.Model);
+            }
+
+            Model.Parameters.Clear();
+            foreach (ParameterViewModel parameter in Parameters)
+            {
+                Model.Parameters.Add(parameter.Model);
+            }
+
+            Model.Jobs.Clear();
+            foreach (StrategyJobViewModel job in Jobs)
+            {
+                Model.Jobs.Add(job.Model);
+                job.DataToModel();
+            }
+        }
+
         private void AddSymbol()
         {
             var symbol = new SymbolViewModel(this, new SymbolModel());
             Symbols.Add(symbol);
+        }
+
+        private void UseParameters(IList selected)
+        {
+            if (selected == null)
+                return;
+
+            List<StrategyJobViewModel> list = selected.Cast<StrategyJobViewModel>().ToList();
+            UseParameters(list.FirstOrDefault());
         }
 
         private async void RunStrategy()
@@ -182,29 +228,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal void DataToModel()
-        {
-            Model.Symbols.Clear();
-            foreach (SymbolViewModel symbol in Symbols)
-            {
-                Model.Symbols.Add(symbol.Model);
-            }
-
-            Model.Parameters.Clear();
-            foreach (ParameterViewModel parameter in Parameters)
-            {
-                Model.Parameters.Add(parameter.Model);
-            }
-
-            Model.Jobs.Clear();
-            foreach (StrategyJobViewModel job in Jobs)
-            {
-                Model.Jobs.Add(job.Model);
-                job.DataToModel();
-            }
-        }
-
-        internal void DataFromModel()
+        private void DataFromModel()
         {
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)

@@ -52,6 +52,7 @@ namespace Algoloop.ViewModel
             StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Active);
             StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Active);
             DeleteJobCommand = new RelayCommand(() => DeleteJob(), () => !Active);
+            UseParametersCommand = new RelayCommand(() => UseParameters(), () => !Active);
 
             DataFromModel();
         }
@@ -77,6 +78,7 @@ namespace Algoloop.ViewModel
         public RelayCommand StopJobCommand { get; }
 
         public RelayCommand DeleteJobCommand { get; }
+        public RelayCommand UseParametersCommand { get; }
 
         public RelayCommand ActiveCommand { get; }
 
@@ -179,6 +181,11 @@ namespace Algoloop.ViewModel
             _cancel = null;
             _leanEngine = null;
             Active = false;
+        }
+
+        private void UseParameters()
+        {
+            _parent?.UseParameters(this);
         }
 
         private static void AddPath(string path)
