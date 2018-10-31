@@ -27,6 +27,7 @@ using QuantConnect.Packets;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -116,7 +117,56 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string Trades => Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
+        public decimal Trades
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
+                return decimal.Parse(value);
+            }
+        }
+
+        public decimal Drawdown
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Drawdown"))?.Value;
+                value = value.Replace("%", "");
+                return decimal.Parse(value, CultureInfo.InvariantCulture);
+            }
+        }
+
+        public decimal NetProfit
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Net Profit"))?.Value;
+                value = value.Replace("%", "");
+                return decimal.Parse(value, CultureInfo.InvariantCulture);
+            }
+        }
+
+        public decimal SharpeRatio
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Sharpe Ratio"))?.Value;
+                return decimal.Parse(value, CultureInfo.InvariantCulture);
+            }
+        }
+
+        public decimal Ratio
+        {
+            get
+            {
+                decimal drawdown = Drawdown;
+                if (drawdown == 0)
+                    return 0;
+
+                decimal ratio = NetProfit / drawdown;
+                return decimal.Round(ratio, 2);
+            }
+        }
 
         public void DeleteJob()
         {
@@ -251,6 +301,11 @@ namespace Algoloop.ViewModel
                 }
             }
 
+            RaisePropertyChanged(() => Trades);
+            RaisePropertyChanged(() => Drawdown);
+            RaisePropertyChanged(() => SharpeRatio);
+            RaisePropertyChanged(() => NetProfit);
+            RaisePropertyChanged(() => Ratio);
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
         }
