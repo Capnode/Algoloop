@@ -82,15 +82,9 @@ namespace Algoloop.ViewModel
 
         public RelayCommand ActiveCommand { get; }
 
-        public string Logs
-        {
-            get => Model.Logs;
-        }
+        public string Logs => Model.Logs;
 
-        public int Loglines
-        {
-            get => Logs == null ? 0 :  Logs.Count(m => m.Equals('\n'));
-        }
+        public int Loglines => Logs == null ? 0 : Logs.Count(m => m.Equals('\n'));
 
         public bool Active
         {
@@ -110,7 +104,6 @@ namespace Algoloop.ViewModel
                 {
                     StopTask();
                 }
-
             }
         }
 
@@ -122,6 +115,8 @@ namespace Algoloop.ViewModel
                 Set(ref _selectedChart, value);
             }
         }
+
+        public string Trades => Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
 
         public void DeleteJob()
         {
@@ -181,47 +176,6 @@ namespace Algoloop.ViewModel
             _cancel = null;
             _leanEngine = null;
             Active = false;
-        }
-
-        private void UseParameters()
-        {
-            _parent?.UseParameters(this);
-        }
-
-        private static void AddPath(string path)
-        {
-            string pathValue = Environment.GetEnvironmentVariable("PATH");
-            if (pathValue.Contains(path))
-                return;
-
-            pathValue += ";" + path;
-            Environment.SetEnvironmentVariable("PATH", pathValue);
-        }
-
-        private async void OnStartJobCommand()
-        {
-            Active = true;
-            await StartTaskAsync();
-        }
-
-        private void OnStopJobCommand(bool v)
-        {
-            StopTask();
-            Active = false;
-        }
-
-        private void StopTask()
-        {
-            if (_cancel != null)
-            {
-                _cancel.Cancel();
-            }
-
-            if (_leanEngine != null)
-            {
-                _leanEngine.Dispose();
-                _leanEngine = null;
-            }
         }
 
         internal void DataToModel()
@@ -299,6 +253,47 @@ namespace Algoloop.ViewModel
 
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
+        }
+
+        private void UseParameters()
+        {
+            _parent?.UseParameters(this);
+        }
+
+        private static void AddPath(string path)
+        {
+            string pathValue = Environment.GetEnvironmentVariable("PATH");
+            if (pathValue.Contains(path))
+                return;
+
+            pathValue += ";" + path;
+            Environment.SetEnvironmentVariable("PATH", pathValue);
+        }
+
+        private async void OnStartJobCommand()
+        {
+            Active = true;
+            await StartTaskAsync();
+        }
+
+        private void OnStopJobCommand(bool v)
+        {
+            StopTask();
+            Active = false;
+        }
+
+        private void StopTask()
+        {
+            if (_cancel != null)
+            {
+                _cancel.Cancel();
+            }
+
+            if (_leanEngine != null)
+            {
+                _leanEngine.Dispose();
+                _leanEngine = null;
+            }
         }
 
         private void ClearRunData()

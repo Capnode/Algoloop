@@ -148,7 +148,7 @@ namespace Algoloop.Model
 
             // Clone parameters
             Parameters.AddRange(strategy.Parameters.Select(m => new ParameterModel(m)));
-    
+
             // Use paramerter list as job name
             string parameters = string.Join(" ", Parameters.Where(m => m.UseValue).Select(m => m.Value));
             if (!string.IsNullOrWhiteSpace(parameters))

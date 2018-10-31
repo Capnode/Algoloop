@@ -254,6 +254,11 @@
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
                                     ItemsSource="{Binding Jobs}">
+                                    <DataGrid.Resources>
+                                        <Style x:Key="cellRight" TargetType="TextBlock">
+                                            <Setter Property="TextAlignment" Value="Right"></Setter>
+                                        </Style>
+                                    </DataGrid.Resources>
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="SelectionChanged">
                                             <i:InvokeCommandAction
@@ -270,6 +275,7 @@
                                         <DataGridCheckBoxColumn IsReadOnly="False" Header="Active" Binding="{Binding Active, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                         <DataGridTextColumn IsReadOnly="True" Header="Algorithm" Binding="{Binding Model.AlgorithmName}" />
                                         <DataGridTextColumn IsReadOnly="True" Header="Parameters" Binding="{Binding Model.Name}" />
+                                        <DataGridTextColumn IsReadOnly="True" Header="Trades" Binding="{Binding Trades}" ElementStyle="{StaticResource cellRight}"/>
                                     </DataGrid.Columns>
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
