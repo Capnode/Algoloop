@@ -35,6 +35,8 @@ namespace Algoloop.ViewModel
 
         private StrategiesViewModel _parent;
         private IList _taskSelection;
+        private bool _isSelected;
+        private bool _isExpanded;
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -44,7 +46,7 @@ namespace Algoloop.ViewModel
             _settingsModel = settingsModel;
 
             TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
-            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => parent.SelectedItem = m);
+            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => OnSelectItem(m));
             RunCommand = new RelayCommand(() => RunStrategy(), true);
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
@@ -60,30 +62,33 @@ namespace Algoloop.ViewModel
         }
 
         public StrategyModel Model { get; }
-
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
 
         public RelayCommand<IList> TaskSelectionChangedCommand { get; }
         public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
         public RelayCommand RunCommand { get; }
-
         public RelayCommand CloneCommand { get; }
-
         public RelayCommand ExportCommand { get; }
-
         public RelayCommand DeleteStrategyCommand { get; }
         public RelayCommand DeleteSelectedJobsCommand { get; }
         public RelayCommand UseParametersCommand { get; }
-
         public RelayCommand AddSymbolCommand { get; }
-
         public RelayCommand ActiveCommand { get; }
-
         public RelayCommand ImportSymbolsCommand { get; }
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => Set(ref _isSelected, value);
+        }
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => Set(ref _isExpanded, value);
+        }
 
         internal bool DeleteSymbol(SymbolViewModel symbol)
         {
@@ -147,6 +152,13 @@ namespace Algoloop.ViewModel
                 Model.Jobs.Add(job.Model);
                 job.DataToModel();
             }
+        }
+
+        private void OnSelectItem(StrategyJobViewModel job)
+        {
+            job.IsSelected = true;
+            _parent.SelectedItem = job;
+            IsExpanded = true;
         }
 
         private void AddSymbol()

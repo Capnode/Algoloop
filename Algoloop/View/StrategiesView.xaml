@@ -47,11 +47,22 @@
                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
-            <viewsupport:ExtendedTreeView
+            <TreeView
                 Grid.Column="0"
                 ItemsSource="{Binding Strategies}"
-                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                 BorderThickness="0">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                        <Setter Property="FontWeight" Value="Normal" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TreeView.ItemContainerStyle>
                 <TreeView.ContextMenu>
                     <ContextMenu>
                         <MenuItem
@@ -66,6 +77,13 @@
                             Command="{Binding ImportCommand}" />
                     </ContextMenu>
                 </TreeView.ContextMenu>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:InvokeCommandAction
+                            Command="{Binding SelectedChangedCommand}"
+                            CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Jobs}">
                         <StackPanel Orientation="Horizontal">
@@ -132,7 +150,7 @@
                         </StackPanel>
                     </DataTemplate>
                 </TreeView.Resources>
-            </viewsupport:ExtendedTreeView>
+            </TreeView>
         </DockPanel>
         <ContentControl
             Grid.Column="1"

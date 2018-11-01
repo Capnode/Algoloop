@@ -39,6 +39,7 @@ namespace Algoloop.ViewModel
             AddCommand = new RelayCommand(() => AddStrategy(), true);
             DeleteCommand = new RelayCommand<StrategyViewModel>((strategy) => DeleteStrategy(strategy), (strategy) => strategy != null);
             ImportCommand = new RelayCommand(() => ImportStrategy(), true);
+            SelectedChangedCommand = new RelayCommand<ViewModelBase>((vm) => OnSelectedChanged(vm), (vm) => vm != null);
 
             DataFromModel();
         }
@@ -127,6 +128,11 @@ namespace Algoloop.ViewModel
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
+        }
+
+        private void OnSelectedChanged(ViewModelBase vm)
+        {
+            SelectedItem = vm;
         }
 
         private void ImportStrategy()

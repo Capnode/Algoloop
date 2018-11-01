@@ -42,7 +42,9 @@ namespace Algoloop.ViewModel
         private CancellationTokenSource _cancel;
         private Isolated<LeanEngine> _leanEngine;
         private StrategyJobModel _model;
-        public ChartViewModel _selectedChart;
+        private ChartViewModel _selectedChart;
+        private bool _isSelected;
+        private bool _isExpanded;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -83,6 +85,18 @@ namespace Algoloop.ViewModel
 
         public RelayCommand ActiveCommand { get; }
 
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set => Set(ref _isSelected, value);
+        }
+
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set => Set(ref _isExpanded, value);
+        }
+
         public string Logs => Model.Logs;
 
         public int Loglines => Logs == null ? 0 : Logs.Count(m => m.Equals('\n'));
@@ -122,6 +136,9 @@ namespace Algoloop.ViewModel
             get
             {
                 string value = Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
+                if (value == null)
+                    return 0;
+
                 return decimal.Parse(value);
             }
         }
@@ -131,6 +148,9 @@ namespace Algoloop.ViewModel
             get
             {
                 string value = Statistics.FirstOrDefault(m => m.Name.Equals("Drawdown"))?.Value;
+                if (value == null)
+                    return 0;
+
                 value = value.Replace("%", "");
                 return decimal.Parse(value, CultureInfo.InvariantCulture);
             }
@@ -141,6 +161,9 @@ namespace Algoloop.ViewModel
             get
             {
                 string value = Statistics.FirstOrDefault(m => m.Name.Equals("Net Profit"))?.Value;
+                if (value == null)
+                    return 0;
+
                 value = value.Replace("%", "");
                 return decimal.Parse(value, CultureInfo.InvariantCulture);
             }
@@ -151,6 +174,9 @@ namespace Algoloop.ViewModel
             get
             {
                 string value = Statistics.FirstOrDefault(m => m.Name.Equals("Sharpe Ratio"))?.Value;
+                if (value == null)
+                    return 0;
+
                 return decimal.Parse(value, CultureInfo.InvariantCulture);
             }
         }
