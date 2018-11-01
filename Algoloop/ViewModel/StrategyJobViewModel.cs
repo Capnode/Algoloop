@@ -30,6 +30,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,6 +46,7 @@ namespace Algoloop.ViewModel
         private ChartViewModel _selectedChart;
         private bool _isSelected;
         private bool _isExpanded;
+        private decimal _extra;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -194,6 +196,12 @@ namespace Algoloop.ViewModel
             }
         }
 
+        public decimal Extra
+        {
+            get => _extra;
+            private set => Set(ref _extra, value);
+        }
+
         public void DeleteJob()
         {
             SelectedChart = null;
@@ -327,6 +335,8 @@ namespace Algoloop.ViewModel
                 }
             }
 
+            Extra = ExtractExtraFromString(Model.Logs);
+
             RaisePropertyChanged(() => Trades);
             RaisePropertyChanged(() => Drawdown);
             RaisePropertyChanged(() => SharpeRatio);
@@ -424,6 +434,17 @@ namespace Algoloop.ViewModel
             {
                 Log.Error($"{e.GetType()}: {e.Message}");
             }
+        }
+
+        public static Decimal ExtractExtraFromString(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return 0m;
+
+            Regex digits = new Regex(@"^Extra:((-?(\d+(\.\d+)?))|(-?\.\d+)).*");
+            Match mx = digits.Match(str);
+
+            return mx.Success ? Convert.ToDecimal(mx.Groups[1].Value) : 0;
         }
     }
 }

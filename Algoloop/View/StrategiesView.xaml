@@ -298,6 +298,7 @@
                                         <DataGridTextColumn IsReadOnly="True" Header="Net Profit%" Binding="{Binding NetProfit}" ElementStyle="{StaticResource cellRight}"/>
                                         <DataGridTextColumn IsReadOnly="True" Header="Drawdown%" Binding="{Binding Drawdown}" ElementStyle="{StaticResource cellRight}"/>
                                         <DataGridTextColumn IsReadOnly="True" Header="Trades" Binding="{Binding Trades}" ElementStyle="{StaticResource cellRight}"/>
+                                        <DataGridTextColumn IsReadOnly="True" Header="Extra" Binding="{Binding Extra}" ElementStyle="{StaticResource cellRight}"/>
                                     </DataGrid.Columns>
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
