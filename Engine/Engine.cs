@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -357,12 +358,18 @@ namespace QuantConnect.Lean.Engine
                                                 (algorithm.Portfolio.TotalPortfolioValue - _algorithmHandlers.Setup.StartingPortfolioValue) / _algorithmHandlers.Setup.StartingPortfolioValue
                                                 : 0;
 
+                                //Get the runtime statistics from the user algorithm:
+                                foreach (var pair in algorithm.RuntimeStatistics)
+                                {
+                                    banner.Add(pair.Key, pair.Value);
+                                }
+
                                 //Add other fixed parameters.
-                                banner.Add("Unrealized", "$" + algorithm.Portfolio.TotalUnrealizedProfit.ToString("N2"));
-                                banner.Add("Fees", "-$" + algorithm.Portfolio.TotalFees.ToString("N2"));
-                                banner.Add("Net Profit", "$" + algorithm.Portfolio.TotalProfit.ToString("N2"));
-                                banner.Add("Return", netReturn.ToString("P"));
-                                banner.Add("Equity", "$" + algorithm.Portfolio.TotalPortfolioValue.ToString("N2"));
+                                banner.Add("Unrealized", "$" + algorithm.Portfolio.TotalUnrealizedProfit.ToString("N2", CultureInfo.InvariantCulture));
+                                banner.Add("Fees", "-$" + algorithm.Portfolio.TotalFees.ToString("N2", CultureInfo.InvariantCulture));
+                                banner.Add("Net Profit", "$" + algorithm.Portfolio.TotalProfit.ToString("N2", CultureInfo.InvariantCulture));
+                                banner.Add("Return", netReturn.ToString("P", CultureInfo.InvariantCulture));
+                                banner.Add("Equity", "$" + algorithm.Portfolio.TotalPortfolioValue.ToString("N2", CultureInfo.InvariantCulture));
                             }
                         }
                         catch (Exception err)
