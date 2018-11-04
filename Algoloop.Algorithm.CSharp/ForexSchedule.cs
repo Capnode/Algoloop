@@ -95,20 +95,25 @@ namespace Algoloop.Algorithm.CSharp
         {
             if (Portfolio.Invested)
             {
-                if (Time.Minute/_period % 2 == 1)
+                if (Time.Minute / _period % 2 == 1)
                 {
-//                    Log($"Close {string.Join(", ", data.Values)}");
+                    //                    Log($"Close {string.Join(", ", data.Values)}");
                     Liquidate("EURUSD");
                 }
             }
             else
             {
-                if (Time.Minute/_period % 2 == 0)
+                if (Time.Minute / _period % 2 == 0)
                 {
-//                    Log($"Open {string.Join(", ", data.Values)}");
+                    //                    Log($"Open {string.Join(", ", data.Values)}");
                     SetHoldings("EURUSD", .5);
                 }
             }
+        }
+
+        public override void OnEndOfAlgorithm()
+        {
+            SetRuntimeStatistic("period", __period);
         }
     }
 }
