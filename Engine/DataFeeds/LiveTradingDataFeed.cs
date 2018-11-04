@@ -15,7 +15,6 @@
 */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -50,28 +49,14 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         private IAlgorithm _algorithm;
         // used to get current time
         private ITimeProvider _timeProvider;
-        // used to keep time constant during a time sync iteration
-        private ManualTimeProvider _frontierTimeProvider;
+        private ITimeProvider _frontierTimeProvider;
         private IDataProvider _dataProvider;
-        private SingleEntryDataCacheProvider _dataCacheProvider;
-
-        private IResultHandler _resultHandler;
         private IDataQueueHandler _dataQueueHandler;
         private BaseDataExchange _exchange;
         private BaseDataExchange _customExchange;
         private SubscriptionCollection _subscriptions;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private UniverseSelection _universeSelection;
-        private DateTime _frontierUtc;
-
-
-        /// <summary>
-        /// Gets all of the current subscriptions this data feed is processing
-        /// </summary>
-        public IEnumerable<Subscription> Subscriptions
-        {
-            get { return _subscriptions; }
-        }
 
         /// <summary>
         /// Public flag indicator that the thread is still busy.
@@ -84,9 +69,14 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// <summary>
         /// Initializes the data feed for the specified job and algorithm
         /// </summary>
-        public void Initialize(IAlgorithm algorithm, AlgorithmNodePacket job, IResultHandler resultHandler,
-                               IMapFileProvider mapFileProvider, IFactorFileProvider factorFileProvider,
-                               IDataProvider dataProvider, IDataFeedSubscriptionManager subscriptionManager)
+        public void Initialize(IAlgorithm algorithm,
+            AlgorithmNodePacket job,
+            IResultHandler resultHandler,
+            IMapFileProvider mapFileProvider,
+            IFactorFileProvider factorFileProvider,
+            IDataProvider dataProvider,
+            IDataFeedSubscriptionManager subscriptionManager,
+            IDataFeedTimeProvider dataFeedTimeProvider)
         {
             if (!(job is LiveNodePacket))
             {
@@ -97,13 +87,12 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
             _algorithm = algorithm;
             _job = (LiveNodePacket) job;
-            _resultHandler = resultHandler;
-            _timeProvider = GetTimeProvider();
+
+            _timeProvider = dataFeedTimeProvider.TimeProvider;
             _dataQueueHandler = GetDataQueueHandler();
             _dataProvider = dataProvider;
-            _dataCacheProvider = new SingleEntryDataCacheProvider(dataProvider);
 
-            _frontierTimeProvider = new ManualTimeProvider(_timeProvider.GetUtcNow());
+            _frontierTimeProvider = dataFeedTimeProvider.FrontierTimeProvider;
             _customExchange = new BaseDataExchange("CustomDataExchange") {SleepInterval = 10};
             // sleep is controlled on this exchange via the GetNextTicksEnumerator
             _exchange = new BaseDataExchange("DataQueueExchange"){SleepInterval = 0};
@@ -117,116 +106,40 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             Task.Run(() => _customExchange.Start(_cancellationTokenSource.Token));
 
             IsActive = true;
-            // wire ourselves up to receive notifications when universes are added/removed
-            var start = _timeProvider.GetUtcNow();
-            algorithm.UniverseManager.CollectionChanged += (sender, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var universe in args.NewItems.OfType<Universe>())
-                        {
-                            var config = universe.Configuration;
-                            var marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
-                            var exchangeHours = marketHoursDatabase.GetExchangeHours(config);
-
-                            Security security;
-                            if (!_algorithm.Securities.TryGetValue(config.Symbol, out security))
-                            {
-                                // create a canonical security object
-                                security = new Security(
-                                    exchangeHours,
-                                    config,
-                                    _algorithm.Portfolio.CashBook[CashBook.AccountCurrency],
-                                    SymbolProperties.GetDefault(CashBook.AccountCurrency),
-                                    _algorithm.Portfolio.CashBook
-                                );
-                            }
-
-                            AddSubscription(new SubscriptionRequest(true, universe, security, config, start, Time.EndOfTime));
-                        }
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var universe in args.OldItems.OfType<Universe>())
-                        {
-                            RemoveSubscription(universe.Configuration);
-                        }
-                        break;
-
-                    default:
-                        throw new NotImplementedException("The specified action is not implemented: " + args.Action);
-                }
-            };
         }
 
         /// <summary>
-        /// Adds a new subscription to provide data for the specified security.
+        /// Creates a new subscription to provide data for the specified security.
         /// </summary>
         /// <param name="request">Defines the subscription to be added, including start/end times the universe and security</param>
-        /// <returns>True if the subscription was created and added successfully, false otherwise</returns>
-        public bool AddSubscription(SubscriptionRequest request)
+        /// <returns>The created <see cref="Subscription"/> if successful, null otherwise</returns>
+        public Subscription CreateSubscription(SubscriptionRequest request)
         {
-            if (_subscriptions.Contains(request.Configuration))
-            {
-                // duplicate subscription request
-                return false;
-            }
-
             // create and add the subscription to our collection
             var subscription = request.IsUniverseSubscription
                 ? CreateUniverseSubscription(request)
-                : CreateSubscription(request);
+                : CreateDataSubscription(request);
 
-            // for some reason we couldn't create the subscription
-            if (subscription == null)
+            // check if we could create the subscription
+            if (subscription != null)
             {
-                Log.Trace("Unable to add subscription for: " + request.Configuration);
-                return false;
+                // send the subscription for the new symbol through to the data queuehandler
+                // unless it is custom data, custom data is retrieved using the same as backtest
+                if (!subscription.Configuration.IsCustomData)
+                {
+                    _dataQueueHandler.Subscribe(_job, new[] { request.Security.Symbol });
+                }
             }
 
-            Log.Trace("LiveTradingDataFeed.AddSubscription(): Added " + request.Configuration);
-
-            _subscriptions.TryAdd(subscription);
-            // send the subscription for the new symbol through to the data queuehandler
-            // unless it is custom data, custom data is retrieved using the same as backtest
-            if (!subscription.Configuration.IsCustomData)
-            {
-                _dataQueueHandler.Subscribe(_job, new[] {request.Security.Symbol});
-            }
-
-            return true;
+            return subscription;
         }
 
         /// <summary>
         /// Removes the subscription from the data feed, if it exists
         /// </summary>
-        /// <param name="configuration">The configuration of the subscription to remove</param>
-        /// <returns>True if the subscription was successfully removed, false otherwise</returns>
-        public bool RemoveSubscription(SubscriptionDataConfig configuration)
+        /// <param name="subscription">The subscription to remove</param>
+        public void RemoveSubscription(Subscription subscription)
         {
-            // remove the subscription from our collection
-            Subscription subscription;
-            if (!_subscriptions.TryGetValue(configuration, out subscription))
-            {
-                Log.Error($"LiveTradingDataFeed.RemoveSubscription(): Unable to locate: {configuration}");
-            }
-
-            // don't remove universe subscriptions immediately, instead mark them as disposed
-            // so we can turn the crank one more time to ensure we emit security changes properly
-            if (subscription.IsUniverseSelectionSubscription && subscription.Universe.DisposeRequested)
-            {
-                // subscription syncer will dispose the universe AFTER we've run selection a final time
-                // and then will invoke SubscriptionFinished which will remove the universe subscription
-                return false;
-            }
-
-            if (!_subscriptions.TryRemove(configuration, out subscription))
-            {
-                Log.Error($"LiveTradingDataFeed.RemoveSubscription(): Unable to remove: {configuration}");
-                return false;
-            }
-
             var security = subscription.Security;
 
             // remove the subscriptions
@@ -240,17 +153,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 _dataQueueHandler.Unsubscribe(_job, new[] { security.Symbol });
                 _exchange.RemoveDataHandler(security.Symbol);
             }
-
-            // if the security is no longer a member of the universe, then mark the subscription properly
-            if (subscription.Universe != null && !subscription.Universe.Members.ContainsKey(configuration.Symbol))
-            {
-                subscription.MarkAsRemovedFromUniverse();
-            }
-            subscription.Dispose();
-
-            Log.Trace("LiveTradingDataFeed.RemoveSubscription(): Removed " + configuration);
-
-            return true;
         }
 
         /// <summary>
@@ -265,22 +167,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 _cancellationTokenSource.Cancel();
                 _exchange?.Stop();
                 _customExchange?.Stop();
-
-                if (_subscriptions != null)
-                {
-                    // remove each subscription from our collection
-                    foreach (var subscription in Subscriptions)
-                    {
-                        try
-                        {
-                            RemoveSubscription(subscription.Configuration);
-                        }
-                        catch (Exception err)
-                        {
-                            Log.Error(err, "Error removing: " + subscription.Configuration);
-                        }
-                    }
-                }
                 Log.Trace("LiveTradingDataFeed.Exit(): Exit Finished.");
             }
         }
@@ -297,22 +183,11 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         }
 
         /// <summary>
-        /// Gets the <see cref="ITimeProvider"/> to use. By default this will load the
-        /// <see cref="RealTimeProvider"/> which use's the system's <see cref="DateTime.UtcNow"/>
-        /// for the current time
-        /// </summary>
-        /// <returns>he loaded <see cref="ITimeProvider"/></returns>
-        protected virtual ITimeProvider GetTimeProvider()
-        {
-            return new RealTimeProvider();
-        }
-
-        /// <summary>
         /// Creates a new subscription for the specified security
         /// </summary>
         /// <param name="request">The subscription request</param>
         /// <returns>A new subscription instance of the specified security</returns>
-        protected Subscription CreateSubscription(SubscriptionRequest request)
+        protected Subscription CreateDataSubscription(SubscriptionRequest request)
         {
             Subscription subscription = null;
             try
@@ -495,13 +370,14 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                             args.Action == NotifyCollectionChangedAction.Add ? args.NewItems :
                             args.Action == NotifyCollectionChangedAction.Remove ? args.OldItems : null;
 
-                        if (items == null || _frontierUtc == DateTime.MinValue) return;
+                        var currentFrontierUtcTime = _frontierTimeProvider.GetUtcNow();
+                        if (items == null || currentFrontierUtcTime == DateTime.MinValue) return;
 
                         var symbol = items.OfType<Symbol>().FirstOrDefault();
                         if (symbol == null) return;
 
-                        var collection = new BaseDataCollection(_frontierUtc, symbol);
-                        var changes = _universeSelection.ApplyUniverseSelection(userDefined, _frontierUtc, collection);
+                        var collection = new BaseDataCollection(currentFrontierUtcTime, symbol);
+                        var changes = _universeSelection.ApplyUniverseSelection(userDefined, currentFrontierUtcTime, collection);
                         _algorithm.OnSecuritiesChanged(changes);
                     };
                 }
@@ -623,85 +499,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
             Log.Trace("LiveTradingDataFeed.GetNextTicksEnumerator(): Exiting enumerator thread...");
         }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
-        /// </returns>
-        /// <filterpriority>1</filterpriority>
-        public IEnumerator<TimeSlice> GetEnumerator()
-        {
-            var shouldSendExtraEmptyPacket = false;
-            // we want to emit to the bridge minimally once a second since the data feed is
-            // the heartbeat of the application, so this value will contain a second after
-            // the last emit time, and if we pass this time, we'll emit even with no data
-            var nextEmit = DateTime.MinValue;
-            var syncer = new SubscriptionSynchronizer(_universeSelection, _algorithm.TimeZone, _algorithm.Portfolio.CashBook, _frontierTimeProvider);
-            syncer.SubscriptionFinished += (sender, subscription) =>
-            {
-                RemoveSubscription(subscription.Configuration);
-                Log.Debug($"LiveTradingDataFeed.SubscriptionFinished(): Finished subscription: {subscription.Configuration} at {_algorithm.UtcTime} UTC");
-            };
-            while (!_cancellationTokenSource.IsCancellationRequested)
-            {
-                // perform sleeps to wake up on the second?
-                _frontierUtc = _timeProvider.GetUtcNow();
-                _frontierTimeProvider.SetCurrentTime(_frontierUtc);
-                TimeSlice timeSlice;
-                try
-                {
-                    timeSlice = syncer.Sync(Subscriptions);
-                }
-                catch (Exception err)
-                {
-                    Log.Error(err);
-                    // notify the algorithm about the error, so it can be reported to the user
-                    _algorithm.RunTimeError = err;
-                    _algorithm.Status = AlgorithmStatus.RuntimeError;
-                    shouldSendExtraEmptyPacket = true;
-                    break;
-                }
-                // check for cancellation
-                if (_cancellationTokenSource.IsCancellationRequested) break;
-                // emit on data or if we've elapsed a full second since last emit or there are security changes
-                if (timeSlice.SecurityChanges != SecurityChanges.None || timeSlice.Data.Count != 0 || _frontierUtc >= nextEmit)
-                {
-                    yield return timeSlice;
-                    // force emitting every second
-                    nextEmit = _frontierUtc.RoundDown(Time.OneSecond).Add(Time.OneSecond);
-                }
-                // take a short nap
-                Thread.Sleep(1);
-            }
-            if (shouldSendExtraEmptyPacket)
-            {
-                // send last empty packet list before terminating,
-                // so the algorithm manager has a chance to detect the runtime error
-                // and exit showing the correct error instead of a timeout
-                nextEmit = _frontierUtc.RoundDown(Time.OneSecond).Add(Time.OneSecond);
-                if (!_cancellationTokenSource.IsCancellationRequested)
-                {
-                    var timeSlice = TimeSlice.Create(nextEmit, _algorithm.TimeZone, _algorithm.Portfolio.CashBook, new List<DataFeedPacket>(), SecurityChanges.None, new Dictionary<Universe, BaseDataCollection>());
-                    yield return timeSlice;
-                }
-            }
-            Log.Trace("LiveTradingDataFeed.GetEnumerator(): Exited thread.");
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through a collection.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
 
         /// <summary>
         /// Overrides methods of the base data exchange implementation

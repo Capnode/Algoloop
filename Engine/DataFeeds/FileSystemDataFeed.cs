@@ -15,7 +15,6 @@
 */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -49,16 +48,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         private SubscriptionCollection _subscriptions;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private UniverseSelection _universeSelection;
-        private SubscriptionDataReaderSubscriptionEnumeratorFactory _subscriptionfactory;
-        private IDataFeedSubscriptionManager _subscriptionManager;
-
-        /// <summary>
-        /// Gets all of the current subscriptions this data feed is processing
-        /// </summary>
-        public IEnumerable<Subscription> Subscriptions
-        {
-            get { return _subscriptions; }
-        }
+        private SubscriptionDataReaderSubscriptionEnumeratorFactory _subscriptionFactory;
 
         /// <summary>
         /// Flag indicating the hander thread is completely finished and ready to dispose.
@@ -68,72 +58,32 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// <summary>
         /// Initializes the data feed for the specified job and algorithm
         /// </summary>
-        public void Initialize(IAlgorithm algorithm, AlgorithmNodePacket job, IResultHandler resultHandler,
-                               IMapFileProvider mapFileProvider, IFactorFileProvider factorFileProvider,
-                               IDataProvider dataProvider, IDataFeedSubscriptionManager subscriptionManager)
+        public void Initialize(IAlgorithm algorithm,
+            AlgorithmNodePacket job,
+            IResultHandler resultHandler,
+            IMapFileProvider mapFileProvider,
+            IFactorFileProvider factorFileProvider,
+            IDataProvider dataProvider,
+            IDataFeedSubscriptionManager subscriptionManager,
+            IDataFeedTimeProvider dataFeedTimeProvider)
         {
             _algorithm = algorithm;
             _resultHandler = resultHandler;
             _mapFileProvider = mapFileProvider;
             _factorFileProvider = factorFileProvider;
             _dataProvider = dataProvider;
-            _subscriptionManager = subscriptionManager;
             _subscriptions = subscriptionManager.DataFeedSubscriptions;
             _universeSelection = subscriptionManager.UniverseSelection;
             _cancellationTokenSource = new CancellationTokenSource();
-            _subscriptionfactory = new SubscriptionDataReaderSubscriptionEnumeratorFactory(_resultHandler, _mapFileProvider, _factorFileProvider, _dataProvider, false, true);
+            _subscriptionFactory = new SubscriptionDataReaderSubscriptionEnumeratorFactory(_resultHandler, _mapFileProvider, _factorFileProvider, _dataProvider, false, true);
 
             IsActive = true;
             var threadCount = Math.Max(1, Math.Min(4, Environment.ProcessorCount - 3));
             _controller = new ParallelRunnerController(threadCount);
             _controller.Start(_cancellationTokenSource.Token);
-
-            // wire ourselves up to receive notifications when universes are added/removed
-            algorithm.UniverseManager.CollectionChanged += (sender, args) =>
-            {
-                switch (args.Action)
-                {
-                    case NotifyCollectionChangedAction.Add:
-                        foreach (var universe in args.NewItems.OfType<Universe>())
-                        {
-                            var config = universe.Configuration;
-                            var start = _algorithm.UtcTime;
-
-                            var marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
-                            var exchangeHours = marketHoursDatabase.GetExchangeHours(config);
-
-                            Security security;
-                            if (!_algorithm.Securities.TryGetValue(config.Symbol, out security))
-                            {
-                                // create a canonical security object if it doesn't exist
-                                security = new Security(
-                                    exchangeHours,
-                                    config,
-                                    _algorithm.Portfolio.CashBook[CashBook.AccountCurrency],
-                                    SymbolProperties.GetDefault(CashBook.AccountCurrency),
-                                    _algorithm.Portfolio.CashBook
-                                );
-                            }
-
-                            var end = _algorithm.EndDate.ConvertToUtc(_algorithm.TimeZone);
-                            AddSubscription(new SubscriptionRequest(true, universe, security, config, start, end));
-                        }
-                        break;
-
-                    case NotifyCollectionChangedAction.Remove:
-                        foreach (var universe in args.OldItems.OfType<Universe>())
-                        {
-                            RemoveSubscription(universe.Configuration);
-                        }
-                        break;
-
-                    default:
-                        throw new NotImplementedException("The specified action is not implemented: " + args.Action);
-                }
-            };
         }
 
-        private Subscription CreateSubscription(SubscriptionRequest request)
+        private Subscription CreateDataSubscription(SubscriptionRequest request)
         {
             // ReSharper disable once PossibleMultipleEnumeration
             if (!request.TradableDays.Any())
@@ -211,104 +161,23 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         }
 
         /// <summary>
-        /// Adds a new subscription to provide data for the specified security.
+        /// Creates a new subscription to provide data for the specified security.
         /// </summary>
         /// <param name="request">Defines the subscription to be added, including start/end times the universe and security</param>
-        /// <returns>True if the subscription was created and added successfully, false otherwise</returns>
-        public bool AddSubscription(SubscriptionRequest request)
+        /// <returns>The created <see cref="Subscription"/> if successful, null otherwise</returns>
+        public Subscription CreateSubscription(SubscriptionRequest request)
         {
-            if (_subscriptions.Contains(request.Configuration))
-            {
-                // duplicate subscription request
-                return false;
-            }
-
-            var subscription = request.IsUniverseSubscription
+            return request.IsUniverseSubscription
                 ? CreateUniverseSubscription(request)
-                : CreateSubscription(request);
-
-            if (subscription == null)
-            {
-                // subscription will be null when there's no tradeable dates for the security between the requested times, so
-                // don't even try to load the data
-                return false;
-            }
-
-            Log.Debug("FileSystemDataFeed.AddSubscription(): Added " + request.Configuration + " Start: " + request.StartTimeUtc + " End: " + request.EndTimeUtc);
-            _subscriptions.TryAdd(subscription);
-            return true;
+                : CreateDataSubscription(request);
         }
 
         /// <summary>
         /// Removes the subscription from the data feed, if it exists
         /// </summary>
-        /// <param name="configuration">The configuration of the subscription to remove</param>
-        /// <returns>True if the subscription was successfully removed, false otherwise</returns>
-        public bool RemoveSubscription(SubscriptionDataConfig configuration)
+        /// <param name="subscription">The subscription to remove</param>
+        public void RemoveSubscription(Subscription subscription)
         {
-            // remove the subscription from our collection, if it exists
-            Subscription subscription;
-
-            if (_subscriptions.TryGetValue(configuration, out subscription))
-            {
-                // don't remove universe subscriptions immediately, instead mark them as disposed
-                // so we can turn the crank one more time to ensure we emit security changes properly
-                if (subscription.IsUniverseSelectionSubscription && subscription.Universe.DisposeRequested)
-                {
-                    // subscription syncer will dispose the universe AFTER we've run selection a final time
-                    // and then will invoke SubscriptionFinished which will remove the universe subscription
-                    return false;
-                }
-
-                if (!_subscriptions.TryRemove(configuration, out subscription))
-                {
-                    Log.Error("FileSystemDataFeed.RemoveSubscription(): Unable to remove: " + configuration);
-                    return false;
-                }
-
-                // if the security is no longer a member of the universe, then mark the subscription properly
-                // universe may be null for internal currency conversion feeds
-                // TODO : Put currency feeds in their own internal universe
-                if (subscription.Universe != null && !subscription.Universe.Members.ContainsKey(configuration.Symbol))
-                {
-                    subscription.MarkAsRemovedFromUniverse();
-                }
-                subscription.Dispose();
-                Log.Debug("FileSystemDataFeed.RemoveSubscription(): Removed " + configuration);
-            }
-
-            return true;
-        }
-
-        private DateTime GetInitialFrontierTime()
-        {
-            var frontier = DateTime.MaxValue;
-            foreach (var subscription in Subscriptions)
-            {
-                var current = subscription.Current;
-                if (current == null)
-                {
-                    continue;
-                }
-
-                // we need to initialize both the frontier time and the offset provider, in order to do
-                // this we'll first convert the current.EndTime to UTC time, this will allow us to correctly
-                // determine the offset in ticks using the OffsetProvider, we can then use this to recompute
-                // the UTC time. This seems odd, but is necessary given Noda time's lenient mapping, the
-                // OffsetProvider exists to give forward marching mapping
-
-                // compute the initial frontier time
-                if (current.EmitTimeUtc < frontier)
-                {
-                    frontier = current.EmitTimeUtc;
-                }
-            }
-
-            if (frontier == DateTime.MaxValue)
-            {
-                frontier = _algorithm.StartDate.ConvertToUtc(_algorithm.TimeZone);
-            }
-            return frontier;
         }
 
         /// <summary>
@@ -390,7 +259,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 }
             }
 
-            return _subscriptionfactory;
+            return _subscriptionFactory;
         }
 
         /// <summary>
@@ -405,94 +274,9 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 _cancellationTokenSource.Cancel();
                 Log.Trace("FileSystemDataFeed.Exit(): Ending Thread...");
                 _controller?.DisposeSafely();
-
-                if (_subscriptions != null)
-                {
-                    // remove each subscription from our collection
-                    foreach (var subscription in Subscriptions)
-                    {
-                        try
-                        {
-                            RemoveSubscription(subscription.Configuration);
-                        }
-                        catch (Exception err)
-                        {
-                            Log.Error(err, "Error removing: " + subscription.Configuration);
-                        }
-                    }
-                }
-
-                _subscriptionfactory?.DisposeSafely();
+                _subscriptionFactory?.DisposeSafely();
                 Log.Trace("FileSystemDataFeed.Exit(): Exit Finished.");
             }
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the collection.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
-        /// </returns>
-        /// <filterpriority>1</filterpriority>
-        public IEnumerator<TimeSlice> GetEnumerator()
-        {
-            // compute initial frontier time
-            var frontierUtc = GetInitialFrontierTime();
-            Log.Trace(string.Format("FileSystemDataFeed.GetEnumerator(): Begin: {0} UTC", frontierUtc));
-
-            var subscriptionFrontierTimeProvider = new SubscriptionFrontierTimeProvider(frontierUtc, _subscriptionManager);
-            var syncer = new SubscriptionSynchronizer(_universeSelection, _algorithm.TimeZone, _algorithm.Portfolio.CashBook, subscriptionFrontierTimeProvider);
-            syncer.SubscriptionFinished += (sender, subscription) =>
-            {
-                RemoveSubscription(subscription.Configuration);
-                Log.Debug($"FileSystemDataFeed.SubscriptionFinished(): Finished subscription: {subscription.Configuration} at {_algorithm.UtcTime} UTC");
-            };
-
-            var previousDateTime = DateTime.MaxValue;
-            while (!_cancellationTokenSource.IsCancellationRequested)
-            {
-                TimeSlice timeSlice;
-
-                try
-                {
-                    timeSlice = syncer.Sync(Subscriptions);
-                }
-                catch (Exception err)
-                {
-                    Log.Error(err);
-
-                    // notify the algorithm about the error, so it can be reported to the user
-                    _algorithm.RunTimeError = err;
-                    _algorithm.Status = AlgorithmStatus.RuntimeError;
-
-                    break;
-                }
-
-                // SubscriptionFrontierTimeProvider will return twice the same time if there are no more subscriptions or if Subscription.Current is null
-                if (timeSlice.Time != previousDateTime)
-                {
-                    previousDateTime = timeSlice.Time;
-                    yield return timeSlice;
-                }
-                else if (timeSlice.SecurityChanges == SecurityChanges.None)
-                {
-                    // there's no more data to pull off, we're done (frontier is max value and no security changes)
-                    break;
-                }
-            }
-            Log.Trace(string.Format("FileSystemDataFeed.GetEnumerator(): Data Feed Completed at {0} UTC", _algorithm.UtcTime));
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through a collection.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
-        /// </returns>
-        /// <filterpriority>2</filterpriority>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
 
         /// <summary>

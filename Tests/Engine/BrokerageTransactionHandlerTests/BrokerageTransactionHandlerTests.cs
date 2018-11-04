@@ -30,7 +30,6 @@ using QuantConnect.Orders;
 using QuantConnect.Securities;
 using QuantConnect.Data.Market;
 using QuantConnect.Interfaces;
-using QuantConnect.Packets;
 using QuantConnect.Tests.Engine.DataFeeds;
 using QuantConnect.Util;
 using HistoryRequest = QuantConnect.Data.HistoryRequest;
@@ -843,18 +842,57 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             broker.Verify(m => m.GetCashBalance(), Times.Exactly(0));
         }
 
-        internal class EmptyHistoryProvider : IHistoryProvider
+        [Test]
+        public void DoesNotLoopEndlesslyIfGetCashBalanceAlwaysThrows()
         {
-            public int DataPointCount
+            // simulate connect failure
+            var ib = new Mock<IBrokerage>();
+            ib.Setup(m => m.GetCashBalance()).Callback(() => { throw new Exception("Connection error in CashBalance"); });
+            ib.Setup(m => m.IsConnected).Returns(false);
+
+            var brokerage = ib.Object;
+            Assert.IsFalse(brokerage.IsConnected);
+
+            var algorithm = new QCAlgorithm();
+            var marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
+            var symbolPropertiesDataBase = SymbolPropertiesDatabase.FromDataFolder();
+            var securityService = new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm);
+            algorithm.Securities.SetSecurityService(securityService);
+            algorithm.SetLiveMode(true);
+
+            var transactionHandler = new TestBrokerageTransactionHandler();
+            transactionHandler.Initialize(algorithm, brokerage, new TestResultHandler());
+
+            // Advance current time UTC so cash sync is performed
+            transactionHandler.TestCurrentTimeUtc = transactionHandler.TestCurrentTimeUtc.AddDays(2);
+
+            try
             {
-                get { return 0; }
+                while (true)
+                {
+                    transactionHandler.ProcessSynchronousEvents();
+
+                    Assert.IsFalse(brokerage.IsConnected);
+
+                    Thread.Sleep(1000);
+                }
+            }
+            catch (Exception exception)
+            {
+                // expect exception from ProcessSynchronousEvents when max attempts reached
+                Assert.That(exception.Message.Contains("maximum number of attempts"));
+            }
+        }
+
+        internal class EmptyHistoryProvider : HistoryProviderBase
+        {
+            public override int DataPointCount => 0;
+
+            public override void Initialize(HistoryProviderInitializeParameters parameters)
+            {
             }
 
-            public void Initialize(AlgorithmNodePacket job, IDataProvider dataProvider, IDataCacheProvider dataCacheProvider, IMapFileProvider mapFileProvider, IFactorFileProvider factorFileProvider, Action<int> statusUpdate)
-            {
-            }
-
-            public IEnumerable<Slice> GetHistory(IEnumerable<HistoryRequest> requests, DateTimeZone sliceTimeZone)
+            public override IEnumerable<Slice> GetHistory(IEnumerable<HistoryRequest> requests, DateTimeZone sliceTimeZone)
             {
                 return Enumerable.Empty<Slice>();
             }

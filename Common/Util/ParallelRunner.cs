@@ -83,8 +83,8 @@ namespace QuantConnect.Util
                 if (_workers[0] != null) return;
                 for (int i = 0; i < _threadCount; i++)
                 {
-                    var worker = new ParallelRunnerWorker(this, _processQueue);
-                    worker.Start(token);
+                    var worker = new ParallelRunnerWorker(token, _processQueue);
+                    worker.Start();
                     _workers[i] = worker;
                 }
 
@@ -93,22 +93,20 @@ namespace QuantConnect.Util
 
             Task.Run(() =>
             {
-                try
-                {
-                    WaitHandle.WaitAll(waitHandles);
-                    _waitHandle.Set();
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"{ex.GetType()}: {ex.Message}");
-                }
-
+                WaitHandle.WaitAll(waitHandles);
+                _waitHandle.Set();
                 lock (_sync)
                 {
-                    for (int i = 0; i < _threadCount; i++)
+                    // if the handle is already closed means we already were disposed
+                    // and so were the workers
+                    if (_waitHandle != null && !_waitHandle.SafeWaitHandle.IsClosed)
                     {
-                        _workers[i].DisposeSafely();
-                        _workers[i] = null;
+                        for (int i = 0; i < _threadCount; i++)
+                        {
+                            _workers[i].DisposeSafely();
+                            _workers[i] = null;
+                        }
+                        _waitHandle.Set();
                     }
                 }
             }, CancellationToken.None);
@@ -176,7 +174,7 @@ namespace QuantConnect.Util
 
                 foreach (var worker in _workers)
                 {
-                    worker.DisposeSafely();
+                    worker?.DisposeSafely();
                 }
 
                 _holdQueue?.DisposeSafely();

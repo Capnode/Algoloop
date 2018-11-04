@@ -24,8 +24,24 @@ namespace QuantConnect.Interfaces
     /// This interface exposes methods for creating a list of <see cref="SubscriptionDataConfig" /> for a given
     /// configuration
     /// </summary>
-    public interface ISubscriptionDataConfigService
+    public interface ISubscriptionDataConfigService : ISubscriptionDataConfigProvider
     {
+        /// <summary>
+        /// Creates and adds a list of <see cref="SubscriptionDataConfig" /> for a given symbol and configuration.
+        /// Can optionally pass in desired subscription data type to use.
+        /// If the config already existed will return existing instance instead
+        /// </summary>
+        SubscriptionDataConfig Add(
+            Type dataType,
+            Symbol symbol,
+            Resolution resolution,
+            bool fillForward = true,
+            bool extendedMarketHours = false,
+            bool isFilteredSubscription = true,
+            bool isInternalFeed = false,
+            bool isCustomData = false
+            );
+
         /// <summary>
         /// Creates and adds a list of <see cref="SubscriptionDataConfig" /> for a given symbol and configuration.
         /// Can optionally pass in desired subscription data types to use.
@@ -59,10 +75,5 @@ namespace QuantConnect.Interfaces
         /// Gets the available data types
         /// </summary>
         Dictionary<SecurityType, List<TickType>> AvailableDataTypes { get; }
-
-        /// <summary>
-        /// Gets a list of all registered <see cref="SubscriptionDataConfig"/> for a given <see cref="Symbol"/>
-        /// </summary>
-        List<SubscriptionDataConfig> GetSubscriptionDataConfigs(Symbol symbol);
     }
 }

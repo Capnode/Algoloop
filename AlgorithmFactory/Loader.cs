@@ -317,7 +317,7 @@ namespace QuantConnect.AlgorithmFactory
             var complete = isolator.ExecuteWithTimeLimit(_loaderTimeLimit, () =>
             {
                 success = TryCreateAlgorithmInstance(assemblyPath, out instance, out error);
-            }, ramLimit);
+            }, ramLimit, sleepIntervalMillis:50);
 
             algorithmInstance = instance;
             errorMessage = error;

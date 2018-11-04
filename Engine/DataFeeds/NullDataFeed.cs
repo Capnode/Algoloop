@@ -15,9 +15,6 @@
 */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using QuantConnect.Data;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
 using QuantConnect.Lean.Engine.Results;
@@ -31,15 +28,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
     public class NullDataFeed : IDataFeed
     {
         /// <inheritdoc />
-        public IEnumerable<Subscription> Subscriptions
-        {
-            get
-            {
-                throw new NotImplementedException("Unexpected usage of null data feed implementation.");
-            }
-        }
-
-        /// <inheritdoc />
         public bool IsActive
         {
             get
@@ -49,38 +37,28 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         }
 
         /// <inheritdoc />
-        public void Initialize(IAlgorithm algorithm, AlgorithmNodePacket job, IResultHandler resultHandler,
-            IMapFileProvider mapFileProvider, IFactorFileProvider factorFileProvider, IDataProvider dataProvider,
-            IDataFeedSubscriptionManager subscriptionManager)
+        public void Initialize(
+            IAlgorithm algorithm,
+            AlgorithmNodePacket job,
+            IResultHandler resultHandler,
+            IMapFileProvider mapFileProvider,
+            IFactorFileProvider factorFileProvider,
+            IDataProvider dataProvider,
+            IDataFeedSubscriptionManager subscriptionManager,
+            IDataFeedTimeProvider dataFeedTimeProvider
+            )
         {
             throw new NotImplementedException("Unexpected usage of null data feed implementation.");
         }
 
         /// <inheritdoc />
-        public IEnumerator<TimeSlice> GetEnumerator()
-        {
-            throw new NotImplementedException("Unexpected usage of null data feed implementation.");
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        /// <inheritdoc />
-        public bool AddSubscription(SubscriptionRequest request)
+        public Subscription CreateSubscription(SubscriptionRequest request)
         {
             throw new NotImplementedException("Unexpected usage of null data feed implementation.");
         }
 
         /// <inheritdoc />
-        public bool RemoveSubscription(SubscriptionDataConfig configuration)
-        {
-            throw new NotImplementedException("Unexpected usage of null data feed implementation.");
-        }
-
-        /// <inheritdoc />
-        public void Run()
+        public void RemoveSubscription(Subscription subscription)
         {
             throw new NotImplementedException("Unexpected usage of null data feed implementation.");
         }
