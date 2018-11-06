@@ -268,10 +268,10 @@
                                 <DataGrid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
-                                    AutoGenerateColumns="False"
+                                    AutoGenerateColumns="True"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding Jobs}">
+                                    ItemsSource="{Binding DataView, Mode=TwoWay}">
                                     <DataGrid.Resources>
                                         <Style x:Key="cellRight" TargetType="TextBlock">
                                             <Setter Property="TextAlignment" Value="Right"></Setter>
@@ -289,17 +289,6 @@
                                             CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
-                                    <DataGrid.Columns>
-                                        <DataGridCheckBoxColumn IsReadOnly="False" Header="Active" Binding="{Binding Active, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                        <DataGridTextColumn IsReadOnly="True" Header="Algorithm" Binding="{Binding Model.AlgorithmName}" />
-                                        <DataGridTextColumn IsReadOnly="True" Header="Parameters" Binding="{Binding Model.Name}" />
-                                        <DataGridTextColumn IsReadOnly="True" Header="Ratio" Binding="{Binding Ratio}" ElementStyle="{StaticResource cellRight}"/>
-                                        <DataGridTextColumn IsReadOnly="True" Header="Sharpe Ratio" Binding="{Binding SharpeRatio}" ElementStyle="{StaticResource cellRight}"/>
-                                        <DataGridTextColumn IsReadOnly="True" Header="Net Profit%" Binding="{Binding NetProfit}" ElementStyle="{StaticResource cellRight}"/>
-                                        <DataGridTextColumn IsReadOnly="True" Header="Drawdown%" Binding="{Binding Drawdown}" ElementStyle="{StaticResource cellRight}"/>
-                                        <DataGridTextColumn IsReadOnly="True" Header="Trades" Binding="{Binding Trades}" ElementStyle="{StaticResource cellRight}"/>
-                                        <DataGridTextColumn IsReadOnly="True" Header="Extra" Binding="{Binding Extra}" ElementStyle="{StaticResource cellRight}"/>
-                                    </DataGrid.Columns>
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem

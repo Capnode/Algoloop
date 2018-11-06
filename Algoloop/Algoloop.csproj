@@ -263,9 +263,6 @@
     <Compile Include="ViewModel\PositionViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
-    <Compile Include="ViewSupport\CustomPropertyInfoHelper.cs" />
-    <Compile Include="ViewSupport\CustomType.cs" />
-    <Compile Include="ViewSupport\CustomTypeHelper.cs" />
     <Compile Include="ViewSupport\FolderEditor.cs" />
     <Compile Include="ViewSupport\ResolutionConverter.cs" />
     <Compile Include="Chart\ResultMapper.cs" />
