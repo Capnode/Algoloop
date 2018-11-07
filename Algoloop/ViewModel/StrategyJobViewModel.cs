@@ -16,7 +16,6 @@ using Algoloop.Charts;
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
@@ -27,7 +26,6 @@ using QuantConnect.Packets;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -36,7 +34,7 @@ using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyJobViewModel: ViewModelBase
+    public class StrategyJobViewModel: TypeProviderBase
     {
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
@@ -46,7 +44,6 @@ namespace Algoloop.ViewModel
         private ChartViewModel _selectedChart;
         private bool _isSelected;
         private bool _isExpanded;
-        private string _extra;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -133,68 +130,68 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public decimal Trades
-        {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
-                if (value == null)
-                    return 0;
+        //public decimal Trades
+        //{
+        //    get
+        //    {
+        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
+        //        if (value == null)
+        //            return 0;
 
-                return decimal.Parse(value);
-            }
-        }
+        //        return decimal.Parse(value);
+        //    }
+        //}
 
-        public decimal Drawdown
-        {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Drawdown"))?.Value;
-                if (value == null)
-                    return 0;
+        //public decimal Drawdown
+        //{
+        //    get
+        //    {
+        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Drawdown"))?.Value;
+        //        if (value == null)
+        //            return 0;
 
-                value = value.Replace("%", "");
-                return decimal.Parse(value, CultureInfo.InvariantCulture);
-            }
-        }
+        //        value = value.Replace("%", "");
+        //        return decimal.Parse(value, CultureInfo.InvariantCulture);
+        //    }
+        //}
 
-        public decimal NetProfit
-        {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Net Profit"))?.Value;
-                if (value == null)
-                    return 0;
+        //public decimal NetProfit
+        //{
+        //    get
+        //    {
+        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Net Profit"))?.Value;
+        //        if (value == null)
+        //            return 0;
 
-                value = value.Replace("%", "");
-                return decimal.Parse(value, CultureInfo.InvariantCulture);
-            }
-        }
+        //        value = value.Replace("%", "");
+        //        return decimal.Parse(value, CultureInfo.InvariantCulture);
+        //    }
+        //}
 
-        public decimal SharpeRatio
-        {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Sharpe Ratio"))?.Value;
-                if (value == null)
-                    return 0;
+        //public decimal SharpeRatio
+        //{
+        //    get
+        //    {
+        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Sharpe Ratio"))?.Value;
+        //        if (value == null)
+        //            return 0;
 
-                return decimal.Parse(value, CultureInfo.InvariantCulture);
-            }
-        }
+        //        return decimal.Parse(value, CultureInfo.InvariantCulture);
+        //    }
+        //}
 
-        public decimal Ratio
-        {
-            get
-            {
-                decimal drawdown = Drawdown;
-                if (drawdown == 0)
-                    return 0;
+        //public decimal Ratio
+        //{
+        //    get
+        //    {
+        //        decimal drawdown = Drawdown;
+        //        if (drawdown == 0)
+        //            return 0;
 
-                decimal ratio = NetProfit / drawdown;
-                return decimal.Round(ratio, 2);
-            }
-        }
+        //        decimal ratio = NetProfit / drawdown;
+        //        return decimal.Round(ratio, 2);
+        //    }
+        //}
 
         public void DeleteJob()
         {
@@ -309,8 +306,7 @@ namespace Algoloop.ViewModel
                             var itemProperty = new ItemProperty(typeof(string), item.Key, true);
                             _parent.JobProperties.Add(itemProperty);
                         }
-                        _extra = item.Value;
-                        Set(item.Key, ref _extra);
+                        SetPropertyValue(item.Key, item.Value);
 
                         Statistics.Add(statisticViewModel);
                     }
@@ -337,11 +333,11 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            RaisePropertyChanged(() => Trades);
-            RaisePropertyChanged(() => Drawdown);
-            RaisePropertyChanged(() => SharpeRatio);
-            RaisePropertyChanged(() => NetProfit);
-            RaisePropertyChanged(() => Ratio);
+            //RaisePropertyChanged(() => Trades);
+            //RaisePropertyChanged(() => Drawdown);
+            //RaisePropertyChanged(() => SharpeRatio);
+            //RaisePropertyChanged(() => NetProfit);
+            //RaisePropertyChanged(() => Ratio);
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
         }
