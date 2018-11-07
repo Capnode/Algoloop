@@ -46,7 +46,7 @@ namespace Algoloop.ViewModel
         private ChartViewModel _selectedChart;
         private bool _isSelected;
         private bool _isExpanded;
-        private decimal _extra;
+        private string _extra;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -196,12 +196,6 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public decimal Extra
-        {
-            get => _extra;
-            private set => Set(ref _extra, value);
-        }
-
         public void DeleteJob()
         {
             SelectedChart = null;
@@ -310,6 +304,14 @@ namespace Algoloop.ViewModel
                     foreach (var item in result.Statistics)
                     {
                         var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
+                        if (!_parent.JobProperties.Any(m => m.Name.Equals(item.Key)))
+                        {
+                            var itemProperty = new ItemProperty(typeof(string), item.Key, true);
+                            _parent.JobProperties.Add(itemProperty);
+                        }
+                        _extra = item.Value;
+                        Set(item.Key, ref _extra);
+
                         Statistics.Add(statisticViewModel);
                     }
 
@@ -334,8 +336,6 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
-
-            Extra = ExtractExtraFromString(Model.Logs);
 
             RaisePropertyChanged(() => Trades);
             RaisePropertyChanged(() => Drawdown);

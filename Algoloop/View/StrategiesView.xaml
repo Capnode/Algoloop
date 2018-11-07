@@ -268,10 +268,11 @@
                                 <DataGrid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
-                                    AutoGenerateColumns="True"
+                                    AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding DataView, Mode=TwoWay}">
+                                    viewsupport:DataGridExtension.ItemProperties="{Binding JobProperties}" 
+                                    ItemsSource="{Binding Jobs}">
                                     <DataGrid.Resources>
                                         <Style x:Key="cellRight" TargetType="TextBlock">
                                             <Setter Property="TextAlignment" Value="Right"></Setter>
