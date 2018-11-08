@@ -16,7 +16,6 @@ limitations under the License.
 Major Changes:
 04/2018    1.0     Initial release (Joel Champagne)
 ***********************************************************************/
-using Algoloop.ViewModel;
 using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
@@ -166,17 +165,23 @@ namespace Algoloop.ViewSupport
 
             public override MethodInfo GetGetMethod(bool nonPublic)
             {
-                return null;
+                Action<object> getMethod = (object obj) =>
+                    _type.GetMethod("GetPropertyValue")
+                    .Invoke(obj, new[] { _name });
+                return getMethod.Method;
             }
 
             public override ParameterInfo[] GetIndexParameters()
             {
-                return null;
+                return new ParameterInfo[] { };
             }
 
             public override MethodInfo GetSetMethod(bool nonPublic)
             {
-                return null;
+                Action<object, object> setMethod = (object obj, object value) =>
+                    _type.GetMethod("SetPropertyValue")
+                    .Invoke(obj, new[] { _name, value });
+                return setMethod.Method;
             }
 
             public override object GetValue(object obj, BindingFlags invokeAttr, Binder binder, object[] index, System.Globalization.CultureInfo culture)

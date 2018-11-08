@@ -16,6 +16,7 @@ using Algoloop.Charts;
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
