@@ -35,7 +35,7 @@ using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyJobViewModel: TypeProviderBase
+    public class StrategyJobViewModel: ViewModelBase
     {
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
@@ -51,6 +51,8 @@ namespace Algoloop.ViewModel
             _parent = parent;
             Model = model;
             _settingsModel = settingsModel;
+
+            Statistics = new StrategyJobStatisticsViewModel(this);
 
             StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Active);
             StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Active);
@@ -70,7 +72,7 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
 
-        public SyncObservableCollection<StatisticViewModel> Statistics { get; } = new SyncObservableCollection<StatisticViewModel>();
+        public StrategyJobStatisticsViewModel Statistics { get; }
 
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
@@ -301,21 +303,12 @@ namespace Algoloop.ViewModel
                 {
                     foreach (var item in result.Statistics)
                     {
-                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
-                        if (!_parent.JobProperties.Any(m => m.Name.Equals(item.Key)))
-                        {
-                            var itemProperty = new ItemProperty(typeof(string), item.Key, true);
-                            _parent.JobProperties.Add(itemProperty);
-                        }
-                        SetPropertyValue(item.Key, item.Value);
-
-                        Statistics.Add(statisticViewModel);
+                        Statistics.Add(item.Key, item.Value);
                     }
 
                     foreach (var item in result.RuntimeStatistics)
                     {
-                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
-                        Statistics.Add(statisticViewModel);
+                        Statistics.Add(item.Key, item.Value);
                     }
 
                     foreach (var order in result.Orders.OrderBy(o => o.Key))

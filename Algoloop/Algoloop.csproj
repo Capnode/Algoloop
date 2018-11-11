@@ -262,6 +262,7 @@
     <Compile Include="ViewModel\MarketViewModel.cs" />
     <Compile Include="ViewModel\PositionViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
+    <Compile Include="ViewModel\StrategyJobStatisticsViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
     <Compile Include="ViewSupport\DataGridExtensions.cs" />
     <Compile Include="ViewSupport\FolderEditor.cs" />
