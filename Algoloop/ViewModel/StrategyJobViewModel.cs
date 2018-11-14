@@ -27,6 +27,7 @@ using QuantConnect.Packets;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -45,14 +46,13 @@ namespace Algoloop.ViewModel
         private ChartViewModel _selectedChart;
         private bool _isSelected;
         private bool _isExpanded;
+        private decimal _extra;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
             _parent = parent;
             Model = model;
             _settingsModel = settingsModel;
-
-            Statistics = new StrategyJobStatisticsViewModel(this);
 
             StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Active);
             StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Active);
@@ -72,7 +72,7 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
 
-        public StrategyJobStatisticsViewModel Statistics { get; }
+        public SyncObservableCollection<StatisticViewModel> Statistics { get; } = new SyncObservableCollection<StatisticViewModel>();
 
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
@@ -133,68 +133,74 @@ namespace Algoloop.ViewModel
             }
         }
 
-        //public decimal Trades
-        //{
-        //    get
-        //    {
-        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
-        //        if (value == null)
-        //            return 0;
+        public decimal Trades
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
+                if (value == null)
+                    return 0;
 
-        //        return decimal.Parse(value);
-        //    }
-        //}
+                return decimal.Parse(value);
+            }
+        }
 
-        //public decimal Drawdown
-        //{
-        //    get
-        //    {
-        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Drawdown"))?.Value;
-        //        if (value == null)
-        //            return 0;
+        public decimal Drawdown
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Drawdown"))?.Value;
+                if (value == null)
+                    return 0;
 
-        //        value = value.Replace("%", "");
-        //        return decimal.Parse(value, CultureInfo.InvariantCulture);
-        //    }
-        //}
+                value = value.Replace("%", "");
+                return decimal.Parse(value, CultureInfo.InvariantCulture);
+            }
+        }
 
-        //public decimal NetProfit
-        //{
-        //    get
-        //    {
-        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Net Profit"))?.Value;
-        //        if (value == null)
-        //            return 0;
+        public decimal NetProfit
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Net Profit"))?.Value;
+                if (value == null)
+                    return 0;
 
-        //        value = value.Replace("%", "");
-        //        return decimal.Parse(value, CultureInfo.InvariantCulture);
-        //    }
-        //}
+                value = value.Replace("%", "");
+                return decimal.Parse(value, CultureInfo.InvariantCulture);
+            }
+        }
 
-        //public decimal SharpeRatio
-        //{
-        //    get
-        //    {
-        //        string value = Statistics.FirstOrDefault(m => m.Name.Equals("Sharpe Ratio"))?.Value;
-        //        if (value == null)
-        //            return 0;
+        public decimal SharpeRatio
+        {
+            get
+            {
+                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Sharpe Ratio"))?.Value;
+                if (value == null)
+                    return 0;
 
-        //        return decimal.Parse(value, CultureInfo.InvariantCulture);
-        //    }
-        //}
+                return decimal.Parse(value, CultureInfo.InvariantCulture);
+            }
+        }
 
-        //public decimal Ratio
-        //{
-        //    get
-        //    {
-        //        decimal drawdown = Drawdown;
-        //        if (drawdown == 0)
-        //            return 0;
+        public decimal Ratio
+        {
+            get
+            {
+                decimal drawdown = Drawdown;
+                if (drawdown == 0)
+                    return 0;
 
-        //        decimal ratio = NetProfit / drawdown;
-        //        return decimal.Round(ratio, 2);
-        //    }
-        //}
+                decimal ratio = NetProfit / drawdown;
+                return decimal.Round(ratio, 2);
+            }
+        }
+
+        public decimal Extra
+        {
+            get => _extra;
+            private set => Set(ref _extra, value);
+        }
 
         public void DeleteJob()
         {
@@ -303,12 +309,14 @@ namespace Algoloop.ViewModel
                 {
                     foreach (var item in result.Statistics)
                     {
-                        Statistics.Add(item.Key, item.Value);
+                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
+                        Statistics.Add(statisticViewModel);
                     }
 
                     foreach (var item in result.RuntimeStatistics)
                     {
-                        Statistics.Add(item.Key, item.Value);
+                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
+                        Statistics.Add(statisticViewModel);
                     }
 
                     foreach (var order in result.Orders.OrderBy(o => o.Key))
@@ -327,11 +335,13 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            //RaisePropertyChanged(() => Trades);
-            //RaisePropertyChanged(() => Drawdown);
-            //RaisePropertyChanged(() => SharpeRatio);
-            //RaisePropertyChanged(() => NetProfit);
-            //RaisePropertyChanged(() => Ratio);
+            Extra = ExtractExtraFromString(Model.Logs);
+
+            RaisePropertyChanged(() => Trades);
+            RaisePropertyChanged(() => Drawdown);
+            RaisePropertyChanged(() => SharpeRatio);
+            RaisePropertyChanged(() => NetProfit);
+            RaisePropertyChanged(() => Ratio);
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
         }

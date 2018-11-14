@@ -38,6 +38,8 @@ namespace Algoloop.ViewModel
         private IList _taskSelection;
         private bool _isSelected;
         private bool _isExpanded;
+        private DataView _dataView;
+        private DataTable _dataTable = new DataTable();
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -56,6 +58,7 @@ namespace Algoloop.ViewModel
             UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
+            DataView = _dataTable.DefaultView;
 
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
 
@@ -66,7 +69,6 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
-        public SyncObservableCollection<ItemProperty> JobProperties { get; } = new SyncObservableCollection<ItemProperty>();
 
         public RelayCommand<IList> TaskSelectionChangedCommand { get; }
         public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
@@ -90,6 +92,12 @@ namespace Algoloop.ViewModel
         {
             get => _isExpanded;
             set => Set(ref _isExpanded, value);
+        }
+
+        public DataView DataView
+        {
+            get => _dataView;
+            set => Set(ref _dataView, value);
         }
 
         internal bool DeleteSymbol(SymbolViewModel symbol)
@@ -258,6 +266,11 @@ namespace Algoloop.ViewModel
             {
                 var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _settingsModel);
                 Jobs.Add(strategyJobViewModel);
+                if (!_dataTable.Columns.Contains("Trades"))
+                {
+                    _dataTable.Columns.Add("Trades");
+                }
+                _dataTable.Rows.Add(new object[] { strategyJobViewModel.Trades });
             }
         }
 

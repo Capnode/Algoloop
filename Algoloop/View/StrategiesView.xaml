@@ -271,7 +271,7 @@
                                     AutoGenerateColumns="True"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding Source=Jobs, Path=Statistics}">
+                                    ItemsSource="{Binding DataView, Mode=TwoWay}">
                                     <DataGrid.Resources>
                                         <Style x:Key="cellRight" TargetType="TextBlock">
                                             <Setter Property="TextAlignment" Value="Right"></Setter>
