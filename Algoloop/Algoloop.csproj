@@ -253,6 +253,7 @@
     <Compile Include="Service\Isolated.cs" />
     <Compile Include="Service\HostDomainLogger.cs" />
     <Compile Include="Service\StreamLogger.cs" />
+    <Compile Include="Service\Summary.cs" />
     <Compile Include="Service\Toolbox.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />

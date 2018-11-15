@@ -39,7 +39,6 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private DataView _dataView;
-        private DataTable _dataTable = new DataTable();
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -58,7 +57,7 @@ namespace Algoloop.ViewModel
             UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
-            DataView = _dataTable.DefaultView;
+            DataView = Summary.DefaultView;
 
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
 
@@ -69,6 +68,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
+        public DataTable Summary { get; } = new DataTable();
 
         public RelayCommand<IList> TaskSelectionChangedCommand { get; }
         public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
@@ -266,11 +266,6 @@ namespace Algoloop.ViewModel
             {
                 var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _settingsModel);
                 Jobs.Add(strategyJobViewModel);
-                if (!_dataTable.Columns.Contains("Trades"))
-                {
-                    _dataTable.Columns.Add("Trades");
-                }
-                _dataTable.Rows.Add(new object[] { strategyJobViewModel.Trades });
             }
         }
 

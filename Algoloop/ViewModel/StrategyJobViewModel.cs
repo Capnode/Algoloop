@@ -26,6 +26,7 @@ using QuantConnect.Orders;
 using QuantConnect.Packets;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -281,6 +282,7 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
+            DataRow row = _parent.Summary.NewRow();
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -293,6 +295,10 @@ namespace Algoloop.ViewModel
             {
                 var parameterViewModel = new ParameterViewModel(null, parameterModel);
                 Parameters.Add(parameterViewModel);
+                if (parameterModel.UseValue)
+                {
+                    _parent.Summary.Add(row, parameterModel.Name, parameterModel.Value);
+                }
             }
 
             Statistics.Clear();
@@ -311,12 +317,14 @@ namespace Algoloop.ViewModel
                     {
                         var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
                         Statistics.Add(statisticViewModel);
+                        _parent.Summary.Add(row, item.Key, item.Value);
                     }
 
                     foreach (var item in result.RuntimeStatistics)
                     {
                         var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
                         Statistics.Add(statisticViewModel);
+                        _parent.Summary.Add(row, item.Key, item.Value);
                     }
 
                     foreach (var order in result.Orders.OrderBy(o => o.Key))
@@ -335,7 +343,7 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            Extra = ExtractExtraFromString(Model.Logs);
+            _parent.Summary.Rows.Add(row);
 
             RaisePropertyChanged(() => Trades);
             RaisePropertyChanged(() => Drawdown);
@@ -434,17 +442,6 @@ namespace Algoloop.ViewModel
             {
                 Log.Error($"{e.GetType()}: {e.Message}");
             }
-        }
-
-        public static Decimal ExtractExtraFromString(string str)
-        {
-            if (string.IsNullOrEmpty(str))
-                return 0m;
-
-            Regex digits = new Regex(@"^Extra:((-?(\d+(\.\d+)?))|(-?\.\d+)).*");
-            Match mx = digits.Match(str);
-
-            return mx.Success ? Convert.ToDecimal(mx.Groups[1].Value) : 0;
         }
     }
 }
