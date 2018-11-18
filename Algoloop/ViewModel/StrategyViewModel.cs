@@ -48,7 +48,7 @@ namespace Algoloop.ViewModel
             _settingsModel = settingsModel;
 
             TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
-            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => OnSelectItem(m));
+            TaskDoubleClickCommand = new RelayCommand<DataRowView>(m => OnSelectItem(m));
             RunCommand = new RelayCommand(() => RunStrategy(), true);
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
@@ -71,7 +71,7 @@ namespace Algoloop.ViewModel
         public DataTable Summary { get; } = new DataTable();
 
         public RelayCommand<IList> TaskSelectionChangedCommand { get; }
-        public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
+        public RelayCommand<DataRowView> TaskDoubleClickCommand { get; }
         public RelayCommand RunCommand { get; }
         public RelayCommand CloneCommand { get; }
         public RelayCommand ExportCommand { get; }
@@ -111,6 +111,17 @@ namespace Algoloop.ViewModel
         {
             bool ok = Jobs.Remove(job);
             Debug.Assert(ok);
+            DataRow rowToDelete = null;
+            foreach (DataRow row in Summary.Rows)
+            {
+                if (job.Equals(row[0]))
+                {
+                    rowToDelete = row;
+                    break;
+                }
+            }
+
+            rowToDelete?.Delete();
             return ok;
         }
 
@@ -119,10 +130,16 @@ namespace Algoloop.ViewModel
             if (selected == null)
                 return;
 
-            List<StrategyJobViewModel> list = selected.Cast<StrategyJobViewModel>().ToList();
-            foreach (StrategyJobViewModel job in list)
+            List<DataRowView> list = selected.Cast<DataRowView>().ToList();
+            foreach (DataRowView row in list)
             {
-                job.DeleteJob();
+                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
+                if (job != null)
+                {
+                    job.DeleteJob();
+                }
+
+                row.Delete();
             }
         }
 
@@ -164,8 +181,12 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void OnSelectItem(StrategyJobViewModel job)
+        private void OnSelectItem(DataRowView row)
         {
+            StrategyJobViewModel job = row[0] as StrategyJobViewModel;
+            if (job == null)
+                return;
+
             job.IsSelected = true;
             _parent.SelectedItem = job;
             IsExpanded = true;
@@ -182,8 +203,9 @@ namespace Algoloop.ViewModel
             if (selected == null)
                 return;
 
-            List<StrategyJobViewModel> list = selected.Cast<StrategyJobViewModel>().ToList();
-            UseParameters(list.FirstOrDefault());
+            List<DataRowView> list = selected.Cast<DataRowView>().ToList();
+            DataRowView row = list.FirstOrDefault();
+            UseParameters(row[0] as StrategyJobViewModel);
         }
 
         private async void RunStrategy()

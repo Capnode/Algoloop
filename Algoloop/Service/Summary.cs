@@ -14,19 +14,107 @@
 
 using Algoloop.ViewModel;
 using System.Data;
+using System.Globalization;
 
 namespace Algoloop.Service
 {
     public static class Summary
     {
-        public static void Add(this DataTable table, DataRow row, string name, string value)
+        public static DataRow CreateRow(this DataTable table, StrategyJobViewModel task)
         {
-            if (!table.Columns.Contains(name))
+            DataRow row = table.NewRow();
+            if (!table.Columns.Contains("Task-name"))
             {
-                table.Columns.Add(name);
+                var column = new DataColumn();
+                column.ColumnName = "Task-name";
+                column.DataType = typeof(StrategyJobViewModel);
+                column.ReadOnly = true;
+                column.Unique = false;
+                table.Columns.Add(column);
             }
 
-            row[name] = value;
+            row[0] = task;
+            return row;
+        }
+
+        public static void Add(this DataTable table, DataRow row, string name, string value)
+        {
+            if (value.Contains("$"))
+            {
+                value = value.Replace("$", "");
+                decimal val = decimal.Parse(value, CultureInfo.InvariantCulture);
+                string header = name + "$";
+                if (!table.Columns.Contains(header))
+                {
+                    var column = new DataColumn();
+                    column.ColumnName = header;
+                    column.DataType = typeof(decimal);
+                    column.ReadOnly = true;
+                    column.Unique = false;
+                    table.Columns.Add(column);
+                }
+
+                row[header] = val;
+            }
+            else if (value.Contains("%"))
+            {
+                value = value.Replace("%", "");
+                decimal val = decimal.Parse(value, CultureInfo.InvariantCulture);
+                string header = name + "%";
+                if (!table.Columns.Contains(header))
+                {
+                    var column = new DataColumn();
+                    column.ColumnName = header;
+                    column.DataType = typeof(decimal);
+                    column.ReadOnly = true;
+                    column.Unique = false;
+                    table.Columns.Add(column);
+                }
+
+                row[header] = val;
+            }
+            else if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal decVal))
+            {
+                if (!table.Columns.Contains(name))
+                {
+                    var column = new DataColumn();
+                    column.ColumnName = name;
+                    column.DataType = typeof(decimal);
+                    column.ReadOnly = true;
+                    column.Unique = false;
+                    table.Columns.Add(column);
+                }
+
+                row[name] = decVal;
+            }
+            else if (bool.TryParse(value, out bool boolVal))
+            {
+                if (!table.Columns.Contains(name))
+                {
+                    var column = new DataColumn();
+                    column.ColumnName = name;
+                    column.DataType = typeof(bool);
+                    column.ReadOnly = true;
+                    column.Unique = false;
+                    table.Columns.Add(column);
+                }
+
+                row[name] = boolVal;
+            }
+            else
+            {
+                if (!table.Columns.Contains(name))
+                {
+                    var column = new DataColumn();
+                    column.ColumnName = name;
+                    column.DataType = typeof(string);
+                    column.ReadOnly = true;
+                    column.Unique = false;
+                    table.Columns.Add(column);
+                }
+
+                row[name] = value;
+            }
         }
     }
 }

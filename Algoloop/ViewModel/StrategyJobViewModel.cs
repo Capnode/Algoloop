@@ -28,10 +28,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,7 +45,6 @@ namespace Algoloop.ViewModel
         private ChartViewModel _selectedChart;
         private bool _isSelected;
         private bool _isExpanded;
-        private decimal _extra;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -134,73 +131,9 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public decimal Trades
+        public override string ToString()
         {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Total Trades"))?.Value;
-                if (value == null)
-                    return 0;
-
-                return decimal.Parse(value);
-            }
-        }
-
-        public decimal Drawdown
-        {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Drawdown"))?.Value;
-                if (value == null)
-                    return 0;
-
-                value = value.Replace("%", "");
-                return decimal.Parse(value, CultureInfo.InvariantCulture);
-            }
-        }
-
-        public decimal NetProfit
-        {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Net Profit"))?.Value;
-                if (value == null)
-                    return 0;
-
-                value = value.Replace("%", "");
-                return decimal.Parse(value, CultureInfo.InvariantCulture);
-            }
-        }
-
-        public decimal SharpeRatio
-        {
-            get
-            {
-                string value = Statistics.FirstOrDefault(m => m.Name.Equals("Sharpe Ratio"))?.Value;
-                if (value == null)
-                    return 0;
-
-                return decimal.Parse(value, CultureInfo.InvariantCulture);
-            }
-        }
-
-        public decimal Ratio
-        {
-            get
-            {
-                decimal drawdown = Drawdown;
-                if (drawdown == 0)
-                    return 0;
-
-                decimal ratio = NetProfit / drawdown;
-                return decimal.Round(ratio, 2);
-            }
-        }
-
-        public decimal Extra
-        {
-            get => _extra;
-            private set => Set(ref _extra, value);
+            return _model.Name;
         }
 
         public void DeleteJob()
@@ -282,7 +215,7 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
-            DataRow row = _parent.Summary.NewRow();
+            DataRow row = _parent.Summary.CreateRow(this);
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -345,11 +278,6 @@ namespace Algoloop.ViewModel
 
             _parent.Summary.Rows.Add(row);
 
-            RaisePropertyChanged(() => Trades);
-            RaisePropertyChanged(() => Drawdown);
-            RaisePropertyChanged(() => SharpeRatio);
-            RaisePropertyChanged(() => NetProfit);
-            RaisePropertyChanged(() => Ratio);
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
         }

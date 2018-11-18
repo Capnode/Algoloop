@@ -269,12 +269,12 @@
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="True"
-                                    IsReadOnly="False"
+                                    IsReadOnly="True"
                                     GridLinesVisibility="None"
                                     ItemsSource="{Binding DataView, Mode=TwoWay}">
                                     <DataGrid.Resources>
-                                        <Style x:Key="cellRight" TargetType="TextBlock">
-                                            <Setter Property="TextAlignment" Value="Right"></Setter>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Setter Property="TextBlock.TextAlignment" Value="Right" />
                                         </Style>
                                     </DataGrid.Resources>
                                     <i:Interaction.Triggers>
