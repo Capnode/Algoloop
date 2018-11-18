@@ -161,6 +161,7 @@
     <Compile Include="DataFeeds\LiveFutureChainProvider.cs" />
     <Compile Include="DataFeeds\LiveOptionChainProvider.cs" />
     <Compile Include="DataFeeds\NullDataFeed.cs" />
+    <Compile Include="DataFeeds\PendingRemovalsManager.cs" />
     <Compile Include="DataFeeds\SubscriptionDataReaderEvents.cs" />
     <Compile Include="DataFeeds\SubscriptionFrontierTimeProvider.cs" />
     <Compile Include="DataFeeds\SingleEntryDataCacheProvider.cs" />
@@ -168,8 +169,8 @@
     <Compile Include="DataFeeds\Enumerators\EnqueueableEnumerator.cs" />
     <Compile Include="DataFeeds\Enumerators\Factories\BaseDataCollectionSubscriptionEnumeratorFactory.cs" />
     <Compile Include="DataFeeds\Enumerators\Factories\BaseDataSubscriptionEnumeratorFactory.cs" />
-    <Compile Include="DataFeeds\Enumerators\Factories\DataQueueFuturesChainUniverseDataCollectionEnumerator.cs" />
-    <Compile Include="DataFeeds\Enumerators\Factories\DataQueueOptionChainUniverseDataCollectionEnumerator.cs" />
+    <Compile Include="DataFeeds\Enumerators\DataQueueFuturesChainUniverseDataCollectionEnumerator.cs" />
+    <Compile Include="DataFeeds\Enumerators\DataQueueOptionChainUniverseDataCollectionEnumerator.cs" />
     <Compile Include="DataFeeds\Enumerators\Factories\FineFundamentalSubscriptionEnumeratorFactory.cs" />
     <Compile Include="DataFeeds\Enumerators\Factories\FuturesChainUniverseSubscriptionEnumeratorFactory.cs" />
     <Compile Include="DataFeeds\Enumerators\Factories\OptionChainUniverseSubscriptionEnumeratorFactory.cs" />

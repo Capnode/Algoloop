@@ -23,7 +23,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using QuantConnect.Data.Market;
 using QuantConnect.Interfaces;
-using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Lean.Engine.Setup;
 using QuantConnect.Lean.Engine.TransactionHandlers;
 using QuantConnect.Logging;
@@ -278,7 +277,6 @@ namespace QuantConnect.Lean.Engine.Results
                     if (utcNow > _nextChartsUpdate)
                     {
                         Log.Debug("LiveTradingResultHandler.Update(): Pre-store result");
-                        _nextChartsUpdate = DateTime.UtcNow.AddMinutes(1);
                         var chartComplete = new Dictionary<string, Chart>();
                         lock (_chartLock)
                         {
@@ -292,6 +290,7 @@ namespace QuantConnect.Lean.Engine.Results
                         var orders = new Dictionary<int, Order>(_transactionHandler.Orders);
                         var complete = new LiveResultPacket(_job, new LiveResult(_algorithm.IsFrameworkAlgorithm, chartComplete, orders, _algorithm.Transactions.TransactionRecord, holdings, _algorithm.Portfolio.CashBook, deltaStatistics, runtimeStatistics, serverStatistics));
                         StoreResult(complete);
+                        _nextChartsUpdate = DateTime.UtcNow.AddMinutes(1);
                         Log.Debug("LiveTradingResultHandler.Update(): End-store result");
                     }
 
@@ -308,6 +307,8 @@ namespace QuantConnect.Lean.Engine.Results
                                     select log).ToList();
                             //Override the log master to delete the old entries and prevent memory creep.
                             _logStore = logs;
+                            // we need a new container instance so we can store the logs outside the lock
+                            logs = new List<LogEntry>(logs);
                         }
                         StoreLog(logs);
                         _nextLogStoreUpdate = DateTime.UtcNow.AddMinutes(2);

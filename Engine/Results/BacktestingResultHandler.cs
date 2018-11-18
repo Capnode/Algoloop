@@ -29,7 +29,6 @@ using QuantConnect.Packets;
 using QuantConnect.Statistics;
 using QuantConnect.Util;
 using System.IO;
-using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Securities;
 
 namespace QuantConnect.Lean.Engine.Results
@@ -274,10 +273,15 @@ namespace QuantConnect.Lean.Engine.Results
                 //1. Cloud Upload -> Upload the whole packet to S3  Immediately:
                 if (DateTime.UtcNow > _nextS3Update)
                 {
+                    // For intermediate backtesting results, we truncate the order list to include only the last 100 orders
+                    // The final packet will contain the full list of orders.
+                    const int maxOrders = 100;
+                    var orderCount = _transactionHandler.Orders.Count;
+
                     var completeResult = new BacktestResult(
                         Algorithm.IsFrameworkAlgorithm,
                         Charts,
-                        _transactionHandler.Orders,
+                        orderCount > maxOrders ? _transactionHandler.Orders.Skip(orderCount - maxOrders).ToDictionary() : _transactionHandler.Orders.ToDictionary(),
                         Algorithm.Transactions.TransactionRecord,
                         new Dictionary<string, string>(),
                         runtimeStatistics,

@@ -90,11 +90,13 @@
     <Compile Include="AddRemoveSecurityRegressionAlgorithm.cs" />
     <Compile Include="Alphas\ForexCalendarAlpha.cs" />
     <Compile Include="Alphas\RebalancingLeveragedETFAlpha.cs" />
+    <Compile Include="MaximumPortfolioDrawdownFrameworkAlgorithm.cs" />
     <Compile Include="CompositeRiskManagementModelFrameworkAlgorithm.cs" />
     <Compile Include="TrailingStopRiskFrameworkAlgorithm.cs" />
     <Compile Include="BasicTemplateFuturesFrameworkAlgorithm.cs" />
     <Compile Include="BasicTemplateOptionsFrameworkAlgorithm.cs" />
     <Compile Include="BlackLittermanPortfolioOptimizationFrameworkAlgorithm.cs" />
+    <Compile Include="DailyResolutionSplitRegressionAlgorithm.cs" />
     <Compile Include="MeanVarianceOptimizationFrameworkAlgorithm.cs" />
     <Compile Include="TiingoDailyDataAlgorithm.cs" />
     <Compile Include="OptionExpiryDateOnHolidayCase.cs" />
@@ -184,6 +186,7 @@
     <Compile Include="StandardDeviationExecutionModelRegressionAlgorithm.cs" />
     <Compile Include="TimeInForceAlgorithm.cs" />
     <Compile Include="UniverseSelectionDefinitionsAlgorithm.cs" />
+    <Compile Include="UniverseSharingSubscriptionRequestRegressionAlgorithm.cs" />
     <Compile Include="UserDefinedUniverseAlgorithm.cs" />
     <Compile Include="VolumeWeightedAveragePriceExecutionModelRegressionAlgorithm.cs" />
     <Compile Include="WarmupAlgorithm.cs" />

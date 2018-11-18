@@ -170,8 +170,12 @@
     <Compile Include="Common\Util\SeriesJsonConverterTests.cs" />
     <Compile Include="Common\Util\StreamReaderEnumerableTests.cs" />
     <Compile Include="Engine\DataFeeds\DataManagerStub.cs" />
+    <Compile Include="Engine\DataFeeds\Enumerators\Factories\OptionChainUniverseSubscriptionEnumeratorFactoryTests.cs" />
+    <Compile Include="Engine\DataFeeds\Enumerators\Factories\FuturesChainUniverseSubscriptionEnumeratorFactoryTests.cs" />
     <Compile Include="Engine\DataFeeds\MockDataFeed.cs" />
+    <Compile Include="Engine\DataFeeds\PendingRemovalsManagerTests.cs" />
     <Compile Include="Engine\DataFeeds\UniverseSelectionTests.cs" />
+    <Compile Include="Engine\DataFeeds\SubscriptionTests.cs" />
     <Compile Include="PythonSetup.cs" />
     <Compile Include="Algorithm\Framework\QCAlgorithmFrameworkTests.cs" />
     <Compile Include="Algorithm\Framework\Risk\MaximumDrawdownPercentPerSecurityTests.cs" />
@@ -260,10 +264,8 @@
     <Compile Include="Common\Securities\CashBookTests.cs" />
     <Compile Include="Common\Securities\CashTests.cs" />
     <Compile Include="Common\Securities\Cfd\CfdTests.cs" />
-    <Compile Include="Common\Securities\Equity\EquityTransactionModelTests.cs" />
     <Compile Include="Common\Securities\PriceVariationModelsTests.cs" />
     <Compile Include="Common\Securities\Forex\ForexTests.cs" />
-    <Compile Include="Common\Securities\Forex\ForexTransactionModelTests.cs" />
     <Compile Include="Common\Securities\DelayedSettlementModelTests.cs" />
     <Compile Include="Common\Securities\ImmediateSettlementModelTests.cs" />
     <Compile Include="Common\Securities\LocalMarketHoursTests.cs" />
@@ -280,7 +282,6 @@
     <Compile Include="Common\Securities\MarginCallModelTests.cs" />
     <Compile Include="Common\Securities\SecurityPortfolioModelTests.cs" />
     <Compile Include="Common\Securities\SecurityTests.cs" />
-    <Compile Include="Common\Securities\SecurityTransactionModelTests.cs" />
     <Compile Include="Common\Securities\SubscriptionDataConfigTests.cs" />
     <Compile Include="Common\Securities\OptionFilterTests.cs" />
     <Compile Include="Common\Securities\SymbolPropertiesDatabaseTests.cs" />
@@ -680,9 +681,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\spy_ad.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="TestData\spy_adxr.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\spy_ad_osc.txt">

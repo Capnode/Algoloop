@@ -108,6 +108,7 @@
     <Compile Include="QCAlgorithmFrameworkBridge.cs" />
     <Compile Include="Risk\CompositeRiskManagementModel.cs" />
     <Compile Include="Risk\IRiskManagementModel.cs" />
+    <Compile Include="Risk\MaximumDrawdownPercentPortfolio.cs" />
     <Compile Include="Risk\MaximumDrawdownPercentPerSecurity.cs" />
     <Compile Include="Risk\MaximumSectorExposureRiskManagementModel.cs" />
     <Compile Include="Risk\MaximumUnrealizedProfitPercentPerSecurity.cs" />
@@ -194,6 +195,18 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Portfolio\EqualWeightingPortfolioConstructionModel.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Risk\CompositeRiskManagementModel.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Risk\TrailingStopRiskManagementModel.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Risk\MaximumDrawdownPercentPortfolio.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Risk\MaximumUnrealizedProfitPercentPerSecurity.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Risk\MaximumDrawdownPercentPerSecurity.py">

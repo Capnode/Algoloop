@@ -35,7 +35,8 @@ class MaximumDrawdownPercentPerSecurity(RiskManagementModel):
     def ManageRisk(self, algorithm, targets):
         '''Manages the algorithm's risk at each time step
         Args:
-            algorithm: The algorithm instance'''
+            algorithm: The algorithm instance
+            targets: The current portfolio targets to be assessed for risk'''
         targets = []
         for kvp in algorithm.Securities:
             security = kvp.Value

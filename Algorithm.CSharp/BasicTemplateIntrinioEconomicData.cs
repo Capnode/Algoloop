@@ -20,6 +20,7 @@ using QuantConnect.Data.Custom.Intrinio;
 using QuantConnect.Indicators;
 using QuantConnect.Parameters;
 using QuantConnect.Interfaces;
+using QuantConnect.Util;
 
 namespace QuantConnect.Algorithm.CSharp
 {
@@ -60,6 +61,11 @@ namespace QuantConnect.Algorithm.CSharp
 
             // Set your Intrinino user and password.
             IntrinioConfig.SetUserAndPassword(_user, _password);
+
+            // Set Intrinio config to make 1 call each minute, default is 1 call each 5 seconds.
+            // (1 call each minute is the free account limit for historical_data endpoint)
+            IntrinioConfig.SetTimeIntervalBetweenCalls(TimeSpan.FromMinutes(1));
+
 
             // Find more symbols here: http://quantconnect.com/data
             // Forex, CFD, Equities Resolutions: Tick, Second, Minute, Hour, Daily.
@@ -128,20 +134,20 @@ namespace QuantConnect.Algorithm.CSharp
             {"Average Win", "0.09%"},
             {"Average Loss", "-0.01%"},
             {"Compounding Annual Return", "5.732%"},
-            {"Drawdown", "21.500%"},
+            {"Drawdown", "4.800%"},
             {"Expectancy", "1.846"},
             {"Net Profit", "24.996%"},
-            {"Sharpe Ratio", "0.416"},
+            {"Sharpe Ratio", "1.142"},
             {"Loss Rate", "68%"},
             {"Win Rate", "32%"},
             {"Profit-Loss Ratio", "7.97"},
-            {"Alpha", "0.097"},
-            {"Beta", "-1.612"},
-            {"Annual Standard Deviation", "0.16"},
-            {"Annual Variance", "0.025"},
-            {"Information Ratio", "0.295"},
-            {"Tracking Error", "0.16"},
-            {"Treynor Ratio", "-0.041"},
+            {"Alpha", "0.076"},
+            {"Beta", "-1.101"},
+            {"Annual Standard Deviation", "0.048"},
+            {"Annual Variance", "0.002"},
+            {"Information Ratio", "0.741"},
+            {"Tracking Error", "0.048"},
+            {"Treynor Ratio", "-0.05"},
             {"Total Fees", "$102.64"}
         };
     }
