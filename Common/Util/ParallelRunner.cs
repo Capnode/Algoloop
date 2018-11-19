@@ -94,7 +94,6 @@ namespace QuantConnect.Util
             Task.Run(() =>
             {
                 WaitHandle.WaitAll(waitHandles);
-                _waitHandle.Set();
                 lock (_sync)
                 {
                     // if the handle is already closed means we already were disposed
