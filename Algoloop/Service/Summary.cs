@@ -31,7 +31,7 @@ namespace Algoloop.Service
                 if (task.Equals(item[0]))
                 {
                     row = item;
-//                    row.Clear();
+                    row.Clear();
                     break;
                 }
             }
@@ -152,48 +152,8 @@ namespace Algoloop.Service
             // for each column in the schema
             for (int i = 0; i < row.Table.Columns.Count; i++)
             {
-                // get the column
                 DataColumn column = row.Table.Columns[i];
-                // if the column doesn't have a default value
-                if (column.DefaultValue != null)
-                {
-                    // Based on the data type of the column, set an appropriate 
-                    // default value. Since we're only dealing with intrinsic 
-                    // types, we can derive a kind of shortcut for the type name,
-                    // thus making our switch statemenbt a bit shorter.
-                    switch (column.DataType.Name.ToLower().Substring(0, 3))
-                    {
-                        case "str":
-                        case "cha":
-                            row[i] = "";
-                            break;
-                        case "int":
-                        case "uin":
-                        case "sho":
-                        case "byt":
-                        case "sby":
-                        case "dec":
-                        case "dou":
-                        case "sin":
-                            row[i] = 0;
-                            break;
-                        case "boo":
-                            row[i] = false;
-                            break;
-                        case "dat":
-                            row[i] = new DateTime(0);
-                            break;
-                        case "obj":
-                        default:
-                            row[i] = DBNull.Value;
-                            break;
-                    }
-                }
-                // otherwise, set the column to its default value
-                else
-                {
-                    row[i] = column.DefaultValue;
-                }
+                row[i] = column.DefaultValue;
             }
         }
     }

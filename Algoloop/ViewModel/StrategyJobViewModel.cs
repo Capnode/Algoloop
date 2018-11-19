@@ -35,7 +35,7 @@ using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyJobViewModel: ViewModelBase
+    public class StrategyJobViewModel: ViewModelBase, IComparable
     {
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
@@ -369,6 +369,12 @@ namespace Algoloop.ViewModel
             {
                 Log.Error($"{e.GetType()}: {e.Message}");
             }
+        }
+
+        public int CompareTo(object obj)
+        {
+            var a = obj as StrategyJobViewModel;
+            return string.Compare(Model.Name, a?.Model.Name);
         }
     }
 }

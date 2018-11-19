@@ -183,6 +183,9 @@ namespace Algoloop.ViewModel
 
         private void OnSelectItem(DataRowView row)
         {
+            if (row == null)
+                return;
+
             StrategyJobViewModel job = row[0] as StrategyJobViewModel;
             if (job == null)
                 return;
