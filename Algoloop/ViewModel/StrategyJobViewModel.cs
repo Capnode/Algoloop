@@ -148,6 +148,7 @@ namespace Algoloop.ViewModel
         {
             ClearRunData();
             DataToModel();
+            DataRow row = _parent.Summary.CreateRow(this);
 
             // Get account
             AccountModel account = null;
@@ -190,10 +191,10 @@ namespace Algoloop.ViewModel
             Model = null;
             Model = model;
 
+            Active = false;
             DataFromModel();
             _cancel = null;
             _leanEngine = null;
-            Active = false;
         }
 
         internal void DataToModel()
@@ -275,8 +276,6 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
-
-            _parent.Summary.Rows.Add(row);
 
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
