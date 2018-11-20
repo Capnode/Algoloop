@@ -112,7 +112,14 @@
                                         </MenuItem>
                                         <MenuItem
                                             Header="Delete Strategy"
-                                            Command="{Binding DeleteCommand}">
+                                            Command="{Binding DeleteStrategyCommand}">
+                                            <MenuItem.Icon>
+                                                <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem
+                                            Header="Delete Tasks"
+                                            Command="{Binding DeleteAllJobsCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>

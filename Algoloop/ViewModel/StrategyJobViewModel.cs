@@ -148,7 +148,8 @@ namespace Algoloop.ViewModel
         {
             ClearRunData();
             DataToModel();
-            DataRow row = _parent.Summary.CreateRow(this);
+            DataRow row = _parent.CreateSummaryRow(this);
+            _parent.RefreshSummary();
 
             // Get account
             AccountModel account = null;
@@ -216,7 +217,7 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
-            DataRow row = _parent.Summary.CreateRow(this);
+            DataRow row = _parent.CreateSummaryRow(this);
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -277,6 +278,7 @@ namespace Algoloop.ViewModel
                 }
             }
 
+            _parent.RefreshSummary();
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
         }

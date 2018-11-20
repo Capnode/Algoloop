@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -53,6 +54,7 @@ namespace Algoloop.ViewModel
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
             DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
+            DeleteAllJobsCommand = new RelayCommand(() => DeleteTasks(Summary.Rows), true);
             DeleteSelectedJobsCommand = new RelayCommand(() => DeleteTasks(_taskSelection), true);
             UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
@@ -76,6 +78,7 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneCommand { get; }
         public RelayCommand ExportCommand { get; }
         public RelayCommand DeleteStrategyCommand { get; }
+        public RelayCommand DeleteAllJobsCommand { get; }
         public RelayCommand DeleteSelectedJobsCommand { get; }
         public RelayCommand UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
@@ -122,15 +125,34 @@ namespace Algoloop.ViewModel
             }
 
             rowToDelete?.Delete();
+            RemoveUnusedSummaryColumns();
             return ok;
         }
 
-        internal void DeleteTasks(IList selected)
+        private void DeleteTasks(DataRowCollection rows)
         {
-            if (selected == null)
+            var list = new DataRow[rows.Count];
+            rows.CopyTo(list, 0);
+            foreach (DataRow row in list)
+            {
+                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
+                if (job != null)
+                {
+                    job.DeleteJob();
+                }
+
+                row.Delete();
+            }
+
+            RemoveUnusedSummaryColumns();
+        }
+
+        private void DeleteTasks(IList rows)
+        {
+            List<DataRowView> list = rows?.Cast<DataRowView>()?.ToList();
+            if (list == null)
                 return;
 
-            List<DataRowView> list = selected.Cast<DataRowView>().ToList();
             foreach (DataRowView row in list)
             {
                 StrategyJobViewModel job = row[0] as StrategyJobViewModel;
@@ -141,6 +163,8 @@ namespace Algoloop.ViewModel
 
                 row.Delete();
             }
+
+            RemoveUnusedSummaryColumns();
         }
 
         internal void Refresh(SymbolViewModel symbolViewModel)
@@ -157,6 +181,8 @@ namespace Algoloop.ViewModel
             {
                 Parameters.Add(parameter);
             }
+
+            RemoveUnusedSummaryColumns();
         }
 
         internal void DataToModel()
@@ -179,6 +205,23 @@ namespace Algoloop.ViewModel
                 Model.Jobs.Add(job.Model);
                 job.DataToModel();
             }
+        }
+
+        internal DataRow CreateSummaryRow(StrategyJobViewModel task)
+        {
+            return Summary.CreateRow(task);
+        }
+
+        internal void RemoveUnusedSummaryColumns()
+        {
+            Summary.RemoveUnusedColumns();
+            RefreshSummary();
+        }
+
+        internal void RefreshSummary()
+        {
+            DataView = null;
+            DataView = Summary.DefaultView;
         }
 
         private void OnSelectItem(DataRowView row)

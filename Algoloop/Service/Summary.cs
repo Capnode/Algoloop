@@ -156,5 +156,30 @@ namespace Algoloop.Service
                 row[i] = column.DefaultValue;
             }
         }
+
+        public static void RemoveUnusedColumns(this DataTable table)
+        {
+            // for each column in the schema
+            for (int c = table.Columns.Count - 1; c >= 0; c--)
+            {
+                DataColumn column = table.Columns[c];
+                bool clean = true;
+
+                for (int r = 0; r < table.Rows.Count; r++)
+                {
+                    object cell = table.Rows[r][c];
+                    if (!cell.Equals(column.DefaultValue))
+                    {
+                        clean = false;
+                        break;
+                    }
+                }
+
+                if (clean)
+                {
+                    table.Columns.Remove(column);
+                }
+            }
+        }
     }
 }
