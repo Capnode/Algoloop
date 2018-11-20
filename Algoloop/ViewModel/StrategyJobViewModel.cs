@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -248,6 +249,8 @@ namespace Algoloop.ViewModel
                 var result = JsonConvert.DeserializeObject<BacktestResult>(Model.Result, new[] { new OrderJsonConverter() });
                 if (result != null)
                 {
+                    AddCustomStatistics(result, row);
+
                     foreach (var item in result.Statistics)
                     {
                         var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
@@ -281,6 +284,24 @@ namespace Algoloop.ViewModel
             _parent.RefreshSummary();
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
+        }
+
+        private void AddCustomStatistics(BacktestResult result, DataRow row)
+        {
+            string profit = result.Statistics["Net Profit"];
+            string dd = result.Statistics["Drawdown"];
+            bool isNetProfit = decimal.TryParse(profit.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal netProfit)
+                && profit.Contains("%");
+            bool isDrawdown = decimal.TryParse(dd.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal drawdown)
+                && dd.Contains("%");
+
+            if (isNetProfit && isDrawdown && drawdown != 0)
+            {
+                string ratio = (netProfit / drawdown).RoundToSignificantDigits(4).ToString(CultureInfo.InvariantCulture);
+                var statisticViewModel = new StatisticViewModel { Name = "Profit-DD", Value = ratio};
+                Statistics.Add(statisticViewModel);
+                _parent.Summary.Add(row, "Profit-DD", ratio);
+            }
         }
 
         private void UseParameters()

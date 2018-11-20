@@ -63,6 +63,16 @@ namespace Algoloop.Service
                 table.Columns.Add(column);
             }
 
+            if (!table.Columns.Contains("Profit-DD"))
+            {
+                var column = new DataColumn();
+                column.ColumnName = "Profit-DD";
+                column.DataType = typeof(decimal);
+                column.ReadOnly = false;
+                column.Unique = false;
+                table.Columns.Add(column);
+            }
+
             row[0] = task;
             row[1] = task.Active;
             return row;
@@ -73,7 +83,7 @@ namespace Algoloop.Service
             decimal value;
             if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
-                string header = name + "%";
+                string header = name + "$";
                 if (!table.Columns.Contains(header))
                 {
                     var column = new DataColumn();
