@@ -129,6 +129,16 @@ namespace Algoloop.ViewModel
             return ok;
         }
 
+        internal static void AddPath(string path)
+        {
+            string pathValue = Environment.GetEnvironmentVariable("PATH");
+            if (pathValue.Contains(path))
+                return;
+
+            pathValue += ";" + path;
+            Environment.SetEnvironmentVariable("PATH", pathValue);
+        }
+
         private void DeleteTasks(DataRowCollection rows)
         {
             var list = new DataRow[rows.Count];

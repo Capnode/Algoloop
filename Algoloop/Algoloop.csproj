@@ -263,7 +263,6 @@
     <Compile Include="ViewModel\MarketViewModel.cs" />
     <Compile Include="ViewModel\PositionViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
-    <Compile Include="ViewModel\StrategyJobStatisticsViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
     <Compile Include="ViewSupport\FolderEditor.cs" />
     <Compile Include="ViewSupport\ResolutionConverter.cs" />
@@ -297,7 +296,6 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\StrategiesViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
-    <Compile Include="ViewSupport\TypeProviderBase.cs" />
     <Compile Include="ViewSupport\WpDataGrid.cs" />
     <Compile Include="View\AccountsView.xaml.cs">
       <DependentUpon>AccountsView.xaml</DependentUpon>

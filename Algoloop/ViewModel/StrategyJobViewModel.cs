@@ -167,7 +167,7 @@ namespace Algoloop.ViewModel
             string folder = Path.GetDirectoryName(Model.AlgorithmLocation);
             if (!AppDomain.CurrentDomain.BaseDirectory.Equals(folder))
             {
-                AddPath(folder);
+                StrategyViewModel.AddPath(folder);
             }
 
             StrategyJobModel model = Model;
@@ -307,16 +307,6 @@ namespace Algoloop.ViewModel
         private void UseParameters()
         {
             _parent?.UseParameters(this);
-        }
-
-        private static void AddPath(string path)
-        {
-            string pathValue = Environment.GetEnvironmentVariable("PATH");
-            if (pathValue.Contains(path))
-                return;
-
-            pathValue += ";" + path;
-            Environment.SetEnvironmentVariable("PATH", pathValue);
         }
 
         private async void OnStartJobCommand()
