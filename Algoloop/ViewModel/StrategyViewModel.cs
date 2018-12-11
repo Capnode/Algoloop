@@ -272,7 +272,7 @@ namespace Algoloop.ViewModel
             var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
             var tasks = new List<Task>();
-            using (var throttler = new SemaphoreSlim(Environment.ProcessorCount))
+            using (var throttler = new SemaphoreSlim(_settingsModel.MaxBacktests))
             {
                 foreach (StrategyModel model in models)
                 {

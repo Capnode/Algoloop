@@ -29,9 +29,15 @@ namespace Algoloop.Model
         [Editor(typeof(FolderEditor), typeof(FolderEditor))]
         public string DataFolder { get; set; } = @"..\..\..\Data";
 
+        [DataMember]
+        [DisplayName("Max backtests")]
+        [Description("Largest number of simultaneous ongoing backtest execution.")]
+        public int MaxBacktests { get; set; } = Environment.ProcessorCount;
+
         internal void Copy(SettingsModel oldSettings)
         {
             DataFolder = oldSettings.DataFolder;
+            MaxBacktests = oldSettings.MaxBacktests;
         }
     }
 }
