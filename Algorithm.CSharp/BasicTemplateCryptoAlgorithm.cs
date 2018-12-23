@@ -50,16 +50,13 @@ namespace QuantConnect.Algorithm.CSharp
 
             // Set Strategy Cash (EUR)
             // EUR/USD conversion rate will be updated dynamically
-            SetCash("EUR", 10000, 1.23m);
+            SetCash("EUR", 10000);
 
             // Add some coins as initial holdings
             // When connected to a real brokerage, the amount specified in SetCash
             // will be replaced with the amount in your actual account.
-            SetCash("BTC", 1m, 7300m);
-            SetCash("ETH", 5m, 400m);
-
-            // Note: the conversion rates above are required in backtesting (for now) because of this issue:
-            // https://github.com/QuantConnect/Lean/issues/1859
+            SetCash("BTC", 1m);
+            SetCash("ETH", 5m);
 
             SetBrokerageModel(BrokerageName.GDAX, AccountType.Cash);
 
@@ -85,6 +82,18 @@ namespace QuantConnect.Algorithm.CSharp
         /// <param name="data">Slice object keyed by symbol containing the stock data</param>
         public override void OnData(Slice data)
         {
+            if (Portfolio.CashBook["EUR"].ConversionRate == 0
+                || Portfolio.CashBook["BTC"].ConversionRate == 0
+                || Portfolio.CashBook["ETH"].ConversionRate == 0
+                || Portfolio.CashBook["LTC"].ConversionRate == 0)
+            {
+                Log($"EUR conversion rate: {Portfolio.CashBook["EUR"].ConversionRate}");
+                Log($"BTC conversion rate: {Portfolio.CashBook["BTC"].ConversionRate}");
+                Log($"LTC conversion rate: {Portfolio.CashBook["LTC"].ConversionRate}");
+                Log($"ETH conversion rate: {Portfolio.CashBook["ETH"].ConversionRate}");
+
+                throw new Exception("Conversion rate is 0");
+            }
             if (Time.Hour == 1 && Time.Minute == 0)
             {
                 // Sell all ETH holdings with a limit order at 1% above the current price
@@ -197,20 +206,20 @@ namespace QuantConnect.Algorithm.CSharp
             {"Total Trades", "10"},
             {"Average Win", "0%"},
             {"Average Loss", "-0.18%"},
-            {"Compounding Annual Return", "-99.992%"},
+            {"Compounding Annual Return", "-99.991%"},
             {"Drawdown", "3.800%"},
             {"Expectancy", "-1"},
-            {"Net Profit", "-2.545%"},
-            {"Sharpe Ratio", "-16.028"},
+            {"Net Profit", "-2.510%"},
+            {"Sharpe Ratio", "-16.126"},
             {"Loss Rate", "100%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "-5.47"},
-            {"Beta", "326.539"},
-            {"Annual Standard Deviation", "0.201"},
-            {"Annual Variance", "0.04"},
-            {"Information Ratio", "-16.112"},
-            {"Tracking Error", "0.2"},
+            {"Alpha", "-5.381"},
+            {"Beta", "320.052"},
+            {"Annual Standard Deviation", "0.197"},
+            {"Annual Variance", "0.039"},
+            {"Information Ratio", "-16.211"},
+            {"Tracking Error", "0.196"},
             {"Treynor Ratio", "-0.01"},
             {"Total Fees", "$85.27"}
         };

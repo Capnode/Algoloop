@@ -14,14 +14,13 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
-using QuantConnect.Interfaces;
 using QuantConnect.Securities;
+using QuantConnect.Tests.Common.Data;
 
 namespace QuantConnect.Tests.Common.Securities
 {
@@ -39,8 +38,8 @@ namespace QuantConnect.Tests.Common.Securities
             var security = new Security(
                 SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork),
                 config,
-                new Cash("USD", 0, 0),
-                SymbolProperties.GetDefault("USD"),
+                new Cash(Currencies.USD, 0, 0),
+                SymbolProperties.GetDefault(Currencies.USD),
                 ErrorCurrencyConverter.Instance
             );
             security.SetLocalTimeKeeper(timeKeeper.GetLocalTimeKeeper(TimeZones.NewYork));
@@ -78,8 +77,8 @@ namespace QuantConnect.Tests.Common.Securities
             var security = new Security(
                 SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork),
                 config,
-                new Cash("USD", 0, 0),
-                SymbolProperties.GetDefault("USD"),
+                new Cash(Currencies.USD, 0, 0),
+                SymbolProperties.GetDefault(Currencies.USD),
                 ErrorCurrencyConverter.Instance
             );
             security.SetLocalTimeKeeper(timeKeeper.GetLocalTimeKeeper(TimeZones.NewYork));
@@ -122,8 +121,8 @@ namespace QuantConnect.Tests.Common.Securities
             var security = new Security(
                 SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork),
                 config,
-                new Cash("USD", 0, 0),
-                SymbolProperties.GetDefault("USD"),
+                new Cash(Currencies.USD, 0, 0),
+                SymbolProperties.GetDefault(Currencies.USD),
                 ErrorCurrencyConverter.Instance
             );
             security.SetLocalTimeKeeper(timeKeeper.GetLocalTimeKeeper(TimeZones.NewYork));
@@ -153,8 +152,8 @@ namespace QuantConnect.Tests.Common.Securities
             var security = new Security(
                 SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork),
                 config,
-                new Cash("USD", 0, 0),
-                SymbolProperties.GetDefault("USD"),
+                new Cash(Currencies.USD, 0, 0),
+                SymbolProperties.GetDefault(Currencies.USD),
                 ErrorCurrencyConverter.Instance
             );
             security.SetLocalTimeKeeper(timeKeeper.GetLocalTimeKeeper(TimeZones.NewYork));
@@ -183,22 +182,6 @@ namespace QuantConnect.Tests.Common.Securities
             Assert.AreEqual(true, result.IncludeExtendedMarketHours);
             // the StandardDeviationOfReturnsVolatilityModel always uses daily
             Assert.AreEqual(Resolution.Daily, result.Resolution);
-        }
-
-        private class MockSubscriptionDataConfigProvider : ISubscriptionDataConfigProvider
-        {
-            public List<SubscriptionDataConfig> SubscriptionDataConfigs
-                = new List<SubscriptionDataConfig>();
-
-            public MockSubscriptionDataConfigProvider(SubscriptionDataConfig config)
-            {
-                SubscriptionDataConfigs.Add(config);
-            }
-
-            public List<SubscriptionDataConfig> GetSubscriptionDataConfigs(Symbol symbol)
-            {
-                return SubscriptionDataConfigs;
-            }
         }
     }
 }

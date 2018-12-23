@@ -86,8 +86,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                                 security = new Security(
                                     _marketHoursDatabase.GetExchangeHours(config),
                                     config,
-                                    algorithm.Portfolio.CashBook[CashBook.AccountCurrency],
-                                    SymbolProperties.GetDefault(CashBook.AccountCurrency),
+                                    algorithm.Portfolio.CashBook[algorithm.AccountCurrency],
+                                    SymbolProperties.GetDefault(algorithm.AccountCurrency),
                                     algorithm.Portfolio.CashBook
                                  );
                             }
@@ -104,7 +104,12 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     case NotifyCollectionChangedAction.Remove:
                         foreach (var universe in args.OldItems.OfType<Universe>())
                         {
-                            RemoveSubscription(universe.Configuration, universe);
+                            // removing the subscription will be handled by the SubscriptionSynchronizer
+                            // in the next loop as well as executing a UniverseSelection one last time.
+                            if (!universe.DisposeRequested)
+                            {
+                                universe.Dispose();
+                            }
                         }
                         break;
 
@@ -184,16 +189,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
             if (DataFeedSubscriptions.TryGetValue(configuration, out subscription))
             {
-                // don't remove universe subscriptions immediately, instead mark them as disposed
-                // so we can turn the crank one more time to ensure we emit security changes properly
-                if (subscription.IsUniverseSelectionSubscription
-                    && subscription.Universes.Single().DisposeRequested)
-                {
-                    // subscription syncer will dispose the universe AFTER we've run selection a final time
-                    // and then will invoke SubscriptionFinished which will remove the universe subscription
-                    return false;
-                }
-
                 // we remove the subscription when there are no other requests left
                 if (subscription.RemoveSubscriptionRequest(universe))
                 {
@@ -207,7 +202,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
                     subscription.Dispose();
 
-                    RemoveSubscriptionDataConfig(configuration);
+                    RemoveSubscriptionDataConfig(subscription);
 
                     LiveDifferentiatedLog($"DataManager.RemoveSubscription(): Removed {configuration}");
                     return true;
@@ -274,10 +269,12 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// Will try to remove a <see cref="SubscriptionDataConfig"/> and update the corresponding
         /// consumers accordingly
         /// </summary>
-        /// <param name="config">The configuration to remove</param>
-        private void RemoveSubscriptionDataConfig(SubscriptionDataConfig config)
+        /// <param name="subscription">The <see cref="Subscription"/> owning the configuration to remove</param>
+        private void RemoveSubscriptionDataConfig(Subscription subscription)
         {
-            if (_subscriptionManagerSubscriptions.TryRemove(config, out config))
+            SubscriptionDataConfig config;
+            if (subscription.RemovedFromUniverse.Value
+                && _subscriptionManagerSubscriptions.TryRemove(subscription.Configuration, out config))
             {
                 if (HasCustomData && config.IsCustomData)
                 {

@@ -13,35 +13,41 @@
  * limitations under the License.
 */
 
+using QuantConnect.Orders;
+
 namespace QuantConnect.Securities
 {
     /// <summary>
-    /// Defines the parameters for <see cref="IBuyingPowerModel.GetReservedBuyingPowerForPosition"/>
+    /// Defines the parameters for <see cref="IBuyingPowerModel.HasSufficientBuyingPowerForOrder"/>
     /// </summary>
-    public class ReservedBuyingPowerForPositionContext
+    public class HasSufficientBuyingPowerForOrderParameters
     {
+        /// <summary>
+        /// Gets the algorithm's portfolio
+        /// </summary>
+        public SecurityPortfolioManager Portfolio { get; }
+
         /// <summary>
         /// Gets the security
         /// </summary>
         public Security Security { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReservedBuyingPowerForPositionContext"/> class
+        /// Gets the order
         /// </summary>
-        /// <param name="security">The security</param>
-        public ReservedBuyingPowerForPositionContext(Security security)
-        {
-            Security = security;
-        }
+        public Order Order { get; }
 
         /// <summary>
-        /// Creates the result using the specified reserved buying power in units of the account currency
+        /// Initializes a new instance of the <see cref="HasSufficientBuyingPowerForOrderParameters"/> class
         /// </summary>
-        /// <param name="reservedBuyingPower">The reserved buying power in units of the account currency</param>
-        /// <returns>The reserved buying power</returns>
-        public ReservedBuyingPowerForPosition ResultInAccountCurrency(decimal reservedBuyingPower)
+        /// <param name="portfolio">The algorithm's portfolio</param>
+        /// <param name="security">The security</param>
+        /// <param name="order">The order</param>
+        public HasSufficientBuyingPowerForOrderParameters(SecurityPortfolioManager portfolio, Security security, Order order)
         {
-            return new ReservedBuyingPowerForPosition(reservedBuyingPower);
+            Portfolio = portfolio;
+            Security = security;
+            Order = order;
         }
     }
 }

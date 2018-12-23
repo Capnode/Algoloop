@@ -15,6 +15,7 @@
 
 using System;
 using QuantConnect.Orders;
+using QuantConnect.Orders.Fees;
 
 namespace QuantConnect.Securities.Option
 {
@@ -66,18 +67,25 @@ namespace QuantConnect.Securities.Option
         /// <summary>
         /// Gets the total margin required to execute the specified order in units of the account currency including fees
         /// </summary>
-        /// <param name="security">The security to compute initial margin for</param>
-        /// <param name="order">The order to be executed</param>
+        /// <param name="parameters">An object containing the portfolio, the security and the order</param>
         /// <returns>The total margin in terms of the currency quoted in the order</returns>
-        protected override decimal GetInitialMarginRequiredForOrder(Security security, Order order)
+        protected override decimal GetInitialMarginRequiredForOrder(
+            InitialMarginRequiredForOrderParameters parameters)
         {
             //Get the order value from the non-abstract order classes (MarketOrder, LimitOrder, StopMarketOrder)
             //Market order is approximated from the current security price and set in the MarketOrder Method in QCAlgorithm.
-            var orderFees = security.FeeModel.GetOrderFee(security, order);
-            var value = order.GetValue(security);
-            var orderValue = value * GetInitialMarginRequirement(security, value);
 
-            return orderValue + Math.Sign(orderValue) * orderFees;
+            var fees = parameters.Security.FeeModel.GetOrderFee(
+                new OrderFeeParameters(parameters.Security,
+                    parameters.Order,
+                    parameters.CurrencyConverter.AccountCurrency)).Value;
+            var feesInAccountCurrency = parameters.CurrencyConverter.
+                ConvertToAccountCurrency(fees).Amount;
+
+            var value = parameters.Order.GetValue(parameters.Security);
+            var orderValue = value * GetInitialMarginRequirement(parameters.Security, value);
+
+            return orderValue + Math.Sign(orderValue) * feesInAccountCurrency;
         }
 
         /// <summary>

@@ -16,6 +16,7 @@
 using System;
 using QuantConnect.Algorithm.Framework.Portfolio;
 using QuantConnect.Orders;
+using QuantConnect.Orders.Fees;
 
 namespace QuantConnect.Securities
 {
@@ -33,17 +34,20 @@ namespace QuantConnect.Securities
         private decimal _lastTradeProfit;
         private decimal _totalFees;
         private readonly Security _security;
+        private readonly ICurrencyConverter _currencyConverter;
 
         /// <summary>
         /// Create a new holding class instance setting the initial properties to $0.
         /// </summary>
         /// <param name="security">The security being held</param>
-        public SecurityHolding(Security security)
+        /// <param name="currencyConverter">A currency converter instance</param>
+        public SecurityHolding(Security security, ICurrencyConverter currencyConverter)
         {
             _security = security;
             //Total Sales Volume for the day
             _totalSaleVolume = 0;
             _lastTradeProfit = 0;
+            _currencyConverter = currencyConverter;
         }
 
         /// <summary>
@@ -60,6 +64,7 @@ namespace QuantConnect.Securities
             _profit = holding._profit;
             _lastTradeProfit = holding._lastTradeProfit;
             _totalFees = holding._totalFees;
+            _currencyConverter = holding._currencyConverter;
         }
 
 
@@ -427,10 +432,16 @@ namespace QuantConnect.Securities
 
             // this is in the account currency
             var marketOrder = new MarketOrder(_security.Symbol, -Quantity, _security.LocalTime.ConvertToUtc(_security.Exchange.TimeZone));
-            var orderFee = _security.FeeModel.GetOrderFee(_security, marketOrder);
+
+            var orderFee = _security.FeeModel.GetOrderFee(
+                new OrderFeeParameters(_security, marketOrder, _currencyConverter.AccountCurrency)).Value;
+            var feesInAccountCurrency = _currencyConverter.
+                ConvertToAccountCurrency(orderFee).Amount;
+
             var price = marketOrder.Direction == OrderDirection.Sell ? _security.BidPrice : _security.AskPrice;
 
-            return (price - AveragePrice)*Quantity*_security.QuoteCurrency.ConversionRate*_security.SymbolProperties.ContractMultiplier - orderFee;
+            return (price - AveragePrice) * Quantity * _security.QuoteCurrency.ConversionRate
+                * _security.SymbolProperties.ContractMultiplier - feesInAccountCurrency;
         }
     }
 }

@@ -13,12 +13,14 @@
  * limitations under the License.
 */
 
+using QuantConnect.Securities;
+
 namespace QuantConnect.Orders.Fees
 {
     /// <summary>
-    /// Provides an implementation of <see cref="IFeeModel"/> that models Bitfinex order fees
+    /// Provides an implementation of <see cref="FeeModel"/> that models Bitfinex order fees
     /// </summary>
-    public class BitfinexFeeModel : IFeeModel
+    public class BitfinexFeeModel : FeeModel
     {
         /// <summary>
         /// Tier 1 maker fees
@@ -35,25 +37,27 @@ namespace QuantConnect.Orders.Fees
         public const decimal TakerFee = 0.002m;
 
         /// <summary>
-        /// Get the fee for this order in units of the account currency
+        /// Get the fee for this order in quote currency
         /// </summary>
-        /// <param name="security">The security matching the order</param>
-        /// <param name="order">The order to compute fees for</param>
-        /// <returns>The cost of the order in units of the account currency</returns>
-        public decimal GetOrderFee(Securities.Security security, Order order)
+        /// <param name="parameters">A <see cref="OrderFeeParameters"/> object
+        /// containing the security and order</param>
+        /// <returns>The cost of the order in quote currency</returns>
+        public override OrderFee GetOrderFee(OrderFeeParameters parameters)
         {
+            var order = parameters.Order;
+            var security = parameters.Security;
             decimal fee = TakerFee;
             var props = order.Properties as BitfinexOrderProperties;
-            
+
             if (order.Type == OrderType.Limit &&
-                props?.Hidden != true && 
+                props?.Hidden != true &&
                 (props?.PostOnly == true || !order.IsMarketable))
             {
                 // limit order posted to the order book
                 fee = MakerFee;
             }
 
-            // get order value in account currency
+            // get order value in quote currency
             var unitPrice = order.Direction == OrderDirection.Buy ? security.AskPrice : security.BidPrice;
             if (order.Type == OrderType.Limit)
             {
@@ -61,10 +65,12 @@ namespace QuantConnect.Orders.Fees
                 unitPrice = ((LimitOrder)order).LimitPrice;
             }
 
-            unitPrice *= security.QuoteCurrency.ConversionRate * security.SymbolProperties.ContractMultiplier;
+            unitPrice *= security.SymbolProperties.ContractMultiplier;
 
             // apply fee factor, currently we do not model 30-day volume, so we use the first tier
-            return unitPrice * order.AbsoluteQuantity * fee;
+            return new OrderFee(new CashAmount(
+                unitPrice * order.AbsoluteQuantity * fee,
+                security.QuoteCurrency.Symbol));
         }
     }
 }

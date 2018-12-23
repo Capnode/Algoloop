@@ -89,6 +89,8 @@ namespace QuantConnect.Algorithm
         private Resolution? _warmupResolution;
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
+        private HistoryRequestFactory _historyRequestFactory;
+
         /// <summary>
         /// QCAlgorithm Base Class Constructor - Initialize the underlying QCAlgorithm components.
         /// QCAlgorithm manages the transactions, portfolio, charting and security subscriptions for the users algorithms.
@@ -155,6 +157,7 @@ namespace QuantConnect.Algorithm
 
             OptionChainProvider = new EmptyOptionChainProvider();
             FutureChainProvider = new EmptyFutureChainProvider();
+            _historyRequestFactory = new HistoryRequestFactory(this);
         }
 
         /// <summary>
@@ -187,6 +190,11 @@ namespace QuantConnect.Algorithm
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets the account currency
+        /// </summary>
+        public string AccountCurrency => Portfolio.CashBook.AccountCurrency;
 
         /// <summary>
         /// Gets the time keeper instance
@@ -1142,7 +1150,7 @@ namespace QuantConnect.Algorithm
         /// <param name="symbol">The cash symbol to set</param>
         /// <param name="startingCash">Decimal cash value of portfolio</param>
         /// <param name="conversionRate">The current conversion rate for the</param>
-        public void SetCash(string symbol, decimal startingCash, decimal conversionRate)
+        public void SetCash(string symbol, decimal startingCash, decimal conversionRate = 0)
         {
             if (!_locked)
             {
@@ -1578,18 +1586,30 @@ namespace QuantConnect.Algorithm
             // add underlying if not present
             var underlying = option.Symbol.Underlying;
             Security equity;
+            List<SubscriptionDataConfig> underlyingConfigs;
             if (!Securities.TryGetValue(underlying, out equity))
             {
-                equity = AddEquity(underlying.Value, option.Resolution, underlying.ID.Market, false);
+                equity = AddEquity(underlying.Value, resolution, underlying.ID.Market, false);
+                underlyingConfigs = SubscriptionManager.SubscriptionDataConfigService
+                    .GetSubscriptionDataConfigs(underlying);
             }
-            else if (equity.DataNormalizationMode != DataNormalizationMode.Raw && _locked)
+            else
             {
-                // We check the "locked" flag here because during initialization we need to load existing open orders and holdings from brokerages.
-                // There is no data streaming yet, so it is safe to change the data normalization mode to Raw.
-                throw new ArgumentException($"The underlying equity asset ({underlying.Value}) is set to {equity.DataNormalizationMode}, " +
-                                            "please change this to DataNormalizationMode.Raw with the SetDataNormalization() method");
+                underlyingConfigs = SubscriptionManager.SubscriptionDataConfigService
+                    .GetSubscriptionDataConfigs(underlying);
+
+                var dataNormalizationMode = underlyingConfigs.DataNormalizationMode();
+                if (dataNormalizationMode != DataNormalizationMode.Raw && _locked)
+                {
+                    // We check the "locked" flag here because during initialization we need to load existing open orders and holdings from brokerages.
+                    // There is no data streaming yet, so it is safe to change the data normalization mode to Raw.
+                    throw new ArgumentException($"The underlying equity asset ({underlying.Value}) is set to {dataNormalizationMode}, " +
+                                                "please change this to DataNormalizationMode.Raw with the SetDataNormalization() method");
+                }
             }
-            equity.SetDataNormalizationMode(DataNormalizationMode.Raw);
+            underlyingConfigs.SetDataNormalizationMode(DataNormalizationMode.Raw);
+            // For backward compatibility we need to refresh the security DataNormalizationMode Property
+            equity.RefreshDataNormalizationModeProperty();
 
             option.Underlying = equity;
 

@@ -149,10 +149,19 @@
     <Compile Include="DataFeeds\BacktestingOptionChainProvider.cs" />
     <Compile Include="DataFeeds\CachingFutureChainProvider.cs" />
     <Compile Include="DataFeeds\CachingOptionChainProvider.cs" />
+    <Compile Include="DataFeeds\CurrencySubscriptionDataConfigManager.cs" />
     <Compile Include="DataFeeds\DataManager.cs" />
+    <Compile Include="DataFeeds\Enumerators\DelistingEventProvider.cs" />
+    <Compile Include="DataFeeds\Enumerators\DividendEventProvider.cs" />
+    <Compile Include="DataFeeds\Enumerators\Factories\CorporateEventEnumeratorFactory.cs" />
+    <Compile Include="DataFeeds\Enumerators\ITradableDateEventProvider.cs" />
+    <Compile Include="DataFeeds\Enumerators\ITradableDatesNotifier.cs" />
+    <Compile Include="DataFeeds\Enumerators\MappingEventProvider.cs" />
+    <Compile Include="DataFeeds\Enumerators\SplitEventProvider.cs" />
     <Compile Include="DataFeeds\Enumerators\Factories\LiveCustomDataSubscriptionEnumeratorFactory.cs" />
     <Compile Include="DataFeeds\Enumerators\LiveBaseDataSynchronizingEnumerator.cs" />
     <Compile Include="DataFeeds\Enumerators\QuoteBarFillForwardEnumerator.cs" />
+    <Compile Include="DataFeeds\Enumerators\AuxiliaryDataEnumerator.cs" />
     <Compile Include="DataFeeds\IDataFeedSubscriptionManager.cs" />
     <Compile Include="DataFeeds\IDataFeedTimeProvider.cs" />
     <Compile Include="DataFeeds\IDataManager.cs" />
@@ -238,6 +247,7 @@
     <Compile Include="Results\DesktopResultHandler.cs" />
     <Compile Include="Results\IResultHandler.cs" />
     <Compile Include="Setup\AlgorithmSetupException.cs" />
+    <Compile Include="Setup\BaseSetupHandler.cs" />
     <Compile Include="Setup\BrokerageSetupHandler.cs" />
     <Compile Include="Setup\ConsoleSetupHandler.cs" />
     <Compile Include="Setup\BacktestingSetupHandler.cs" />
@@ -250,6 +260,7 @@
     <Compile Include="DataFeeds\FileSystemDataFeed.cs" />
     <Compile Include="Alphas\DefaultAlphaHandler.cs" />
     <Compile Include="Alphas\IAlphaHandler.cs" />
+    <Compile Include="Setup\SetupHandlerParameters.cs" />
     <Compile Include="TransactionHandlers\BacktestingTransactionHandler.cs" />
     <Compile Include="TransactionHandlers\BrokerageTransactionHandler.cs" />
     <Compile Include="TransactionHandlers\CancelPendingOrders.cs" />

@@ -1,11 +1,11 @@
 ﻿/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +16,13 @@
 using System;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
-using QuantConnect.Securities.Forex;
+using QuantConnect.Orders.Fees;
 
 namespace QuantConnect.Securities
 {
     /// <summary>
     /// Provides a default implementation of <see cref="ISecurityPortfolioModel"/> that simply
-    /// applies the fills to the algorithm's portfolio. This implementation is intended to 
+    /// applies the fills to the algorithm's portfolio. This implementation is intended to
     /// handle all security types.
     /// </summary>
     public class SecurityPortfolioModel : ISecurityPortfolioModel
@@ -63,10 +63,15 @@ namespace QuantConnect.Securities
                     security.Holdings.AddNewSale(saleValue);
                 }
 
-                // subtract transaction fees from the portfolio (assumes in account currency)
-                var feeThisOrder = Math.Abs(fill.OrderFee);
-                security.Holdings.AddNewFee(feeThisOrder);
-                portfolio.CashBook[CashBook.AccountCurrency].AddAmount(-feeThisOrder);
+                // subtract transaction fees from the portfolio
+                var feeInAccountCurrency = 0m;
+                if (fill.OrderFee != OrderFee.Zero)
+                {
+                    var feeThisOrder = fill.OrderFee.Value;
+                    feeInAccountCurrency = portfolio.CashBook.ConvertToAccountCurrency(feeThisOrder).Amount;
+                    security.Holdings.AddNewFee(feeInAccountCurrency);
+                    portfolio.CashBook[feeThisOrder.Currency].AddAmount(-feeThisOrder.Amount);
+                }
 
                 // apply the funds using the current settlement model
                 // we dont adjust funds for futures: it is zero upfront payment derivative (margin applies though)
@@ -80,7 +85,7 @@ namespace QuantConnect.Securities
                     var forex = (IBaseCurrencySymbol) security;
                     security.SettlementModel.ApplyFunds(portfolio, security, fill.UtcTime, forex.BaseCurrencySymbol, fill.FillQuantity);
                 }
-                
+
                 // did we close or open a position further?
                 closedPosition = isLong && fill.Direction == OrderDirection.Sell
                              || isShort && fill.Direction == OrderDirection.Buy;
@@ -94,19 +99,22 @@ namespace QuantConnect.Securities
                     var absoluteQuantityClosed = Math.Min(fill.AbsoluteFillQuantity, absoluteHoldingsQuantity);
                     var closedSaleValueInQuoteCurrency = Math.Sign(-fill.FillQuantity)*fill.FillPrice*absoluteQuantityClosed;
                     var closedCost = Math.Sign(-fill.FillQuantity)*absoluteQuantityClosed*averageHoldingsPrice;
-                    var conversionFactor = security.QuoteCurrency.ConversionRate*security.SymbolProperties.ContractMultiplier;
-                    var lastTradeProfit = (closedSaleValueInQuoteCurrency - closedCost)*conversionFactor;
+                    var lastTradeProfit = (closedSaleValueInQuoteCurrency - closedCost)
+                        * security.SymbolProperties.ContractMultiplier;
+                    var lastTradeProfitInAccountCurrency = lastTradeProfit * security.QuoteCurrency.ConversionRate;
 
-                    // Reflect account cash adjustment for futures position 
+                    // Reflect account cash adjustment for futures position
                     if (security.Type == SecurityType.Future)
                     {
                         security.SettlementModel.ApplyFunds(portfolio, security, fill.UtcTime, quoteCash.Symbol, lastTradeProfit);
                     }
 
                     //Update Vehicle Profit Tracking:
-                    security.Holdings.AddNewProfit(lastTradeProfit);
-                    security.Holdings.SetLastTradeProfit(lastTradeProfit);
-                    portfolio.AddTransactionRecord(security.LocalTime.ConvertToUtc(security.Exchange.TimeZone), lastTradeProfit - 2*feeThisOrder);
+                    security.Holdings.AddNewProfit(lastTradeProfitInAccountCurrency);
+                    security.Holdings.SetLastTradeProfit(lastTradeProfitInAccountCurrency);
+                    portfolio.AddTransactionRecord(security.LocalTime.ConvertToUtc(
+                        security.Exchange.TimeZone),
+                        lastTradeProfitInAccountCurrency - 2 * feeInAccountCurrency);
                 }
 
                 //UPDATE HOLDINGS QUANTITY, AVG PRICE:

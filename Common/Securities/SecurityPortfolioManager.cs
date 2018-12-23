@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Python.Runtime;
+using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Interfaces;
 using QuantConnect.Logging;
@@ -429,7 +430,7 @@ namespace QuantConnect.Securities
                 foreach (var kvp in Securities)
                 {
                     var security = kvp.Value;
-                    var context = new ReservedBuyingPowerForPositionContext(security);
+                    var context = new ReservedBuyingPowerForPositionParameters(security);
                     var reservedBuyingPower = security.BuyingPowerModel.GetReservedBuyingPowerForPosition(context);
                     sum += reservedBuyingPower.Value;
                 }
@@ -511,7 +512,7 @@ namespace QuantConnect.Securities
         public decimal GetMarginRemaining(Symbol symbol, OrderDirection direction = OrderDirection.Buy)
         {
             var security = Securities[symbol];
-            var context = new BuyingPowerContext(this, security, direction);
+            var context = new BuyingPowerParameters(this, security, direction);
             return security.BuyingPowerModel.GetBuyingPower(context).Value;
         }
 
@@ -546,7 +547,8 @@ namespace QuantConnect.Securities
         /// </summary>
         /// <param name="dividend">The dividend to be applied</param>
         /// <param name="liveMode">True if live mode, false for backtest</param>
-        public void ApplyDividend(Dividend dividend, bool liveMode)
+        /// <param name="mode">The <see cref="DataNormalizationMode"/> for this security</param>
+        public void ApplyDividend(Dividend dividend, bool liveMode, DataNormalizationMode mode)
         {
             // we currently don't properly model dividend payable dates, so in
             // live mode it's more accurate to rely on the brokerage cash sync
@@ -558,7 +560,6 @@ namespace QuantConnect.Securities
             var security = Securities[dividend.Symbol];
 
             // only apply dividends when we're in raw mode or split adjusted mode
-            var mode = security.DataNormalizationMode;
             if (mode == DataNormalizationMode.Raw || mode == DataNormalizationMode.SplitAdjusted)
             {
                 // longs get benefits, shorts get clubbed on dividends
@@ -574,7 +575,8 @@ namespace QuantConnect.Securities
         /// </summary>
         /// <param name="split">The split to be applied</param>
         /// <param name="liveMode">True if live mode, false for backtest</param>
-        public void ApplySplit(Split split, bool liveMode)
+        /// <param name="mode">The <see cref="DataNormalizationMode"/> for this security</param>
+        public void ApplySplit(Split split, bool liveMode, DataNormalizationMode mode)
         {
             var security = Securities[split.Symbol];
 
@@ -585,7 +587,6 @@ namespace QuantConnect.Securities
             }
 
             // only apply splits in live or raw data mode
-            var mode = security.DataNormalizationMode;
             if (!liveMode && mode != DataNormalizationMode.Raw)
             {
                 return;
@@ -637,20 +638,11 @@ namespace QuantConnect.Securities
         /// <summary>
         /// Record the transaction value and time in a list to later be processed for statistics creation.
         /// </summary>
-        /// <remarks>
-        /// Bit of a hack -- but using datetime as dictionary key is dangerous as you can process multiple orders within a second.
-        /// For the accounting / statistics generating purposes its not really critical to know the precise time, so just add a millisecond while there's an identical key.
-        /// </remarks>
         /// <param name="time">Time of order processed </param>
         /// <param name="transactionProfitLoss">Profit Loss.</param>
         public void AddTransactionRecord(DateTime time, decimal transactionProfitLoss)
         {
-            var clone = time;
-            while (Transactions.TransactionRecord.ContainsKey(clone))
-            {
-                clone = clone.AddMilliseconds(1);
-            }
-            Transactions.TransactionRecord.Add(clone, transactionProfitLoss);
+            Transactions.AddTransactionRecord(time, transactionProfitLoss);
         }
 
         /// <summary>
@@ -723,11 +715,11 @@ namespace QuantConnect.Securities
                 var security = Securities[orderSubmitRequest.Symbol];
 
                 var marginUsed = security.BuyingPowerModel.GetReservedBuyingPowerForPosition(
-                    new ReservedBuyingPowerForPositionContext(security)
+                    new ReservedBuyingPowerForPositionParameters(security)
                 );
 
                 var marginRemaining = security.BuyingPowerModel.GetBuyingPower(
-                    new BuyingPowerContext(this, security, direction)
+                    new BuyingPowerParameters(this, security, direction)
                 );
 
                 Log.Trace("Order request margin information: " +

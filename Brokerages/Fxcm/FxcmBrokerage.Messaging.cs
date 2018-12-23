@@ -29,6 +29,8 @@ using NodaTime;
 using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
+using QuantConnect.Orders.Fees;
+using QuantConnect.Securities;
 
 namespace QuantConnect.Brokerages.Fxcm
 {
@@ -58,7 +60,7 @@ namespace QuantConnect.Brokerages.Fxcm
         private readonly Dictionary<string, AutoResetEvent> _mapRequestsToAutoResetEvents = new Dictionary<string, AutoResetEvent>();
         private readonly HashSet<string> _pendingHistoryRequests = new HashSet<string>();
 
-        private string _fxcmAccountCurrency = "USD";
+        private string _fxcmAccountCurrency = Currencies.USD;
 
         private void LoadInstruments()
         {
@@ -177,7 +179,7 @@ namespace QuantConnect.Brokerages.Fxcm
         /// <remarks>Synchronous, blocking</remarks>
         private decimal GetUsdConversion(string currency)
         {
-            if (currency == "USD")
+            if (currency == Currencies.USD)
                 return 1m;
 
             // determine the correct symbol to choose
@@ -406,7 +408,9 @@ namespace QuantConnect.Brokerages.Fxcm
                     {
                         order.PriceCurrency = message.getCurrency();
 
-                        var orderEvent = new OrderEvent(order, DateTime.UtcNow, 0)
+                        var orderEvent = new OrderEvent(order,
+                            DateTime.UtcNow,
+                            OrderFee.Zero)
                         {
                             Status = ConvertOrderStatus(orderStatus),
                             FillPrice = Convert.ToDecimal(message.getPrice()),
@@ -417,7 +421,8 @@ namespace QuantConnect.Brokerages.Fxcm
                         if ((int)message.getCumQty() == (int)message.getLastQty() && message.getLastQty() > 0)
                         {
                             var security = _securityProvider.GetSecurity(order.Symbol);
-                            orderEvent.OrderFee = security.FeeModel.GetOrderFee(security, order);
+                            orderEvent.OrderFee = security.FeeModel.GetOrderFee(
+                                new OrderFeeParameters(security, order, _fxcmAccountCurrency));
                         }
 
                         _orderEventQueue.Enqueue(orderEvent);
@@ -430,7 +435,9 @@ namespace QuantConnect.Brokerages.Fxcm
                     order.PriceCurrency = message.getCurrency();
 
                     // new order
-                    var orderEvent = new OrderEvent(order, DateTime.UtcNow, 0)
+                    var orderEvent = new OrderEvent(order,
+                        DateTime.UtcNow,
+                        OrderFee.Zero)
                     {
                         Status = ConvertOrderStatus(orderStatus)
                     };
