@@ -156,13 +156,8 @@
                                     GridLinesVisibility="None"
                                     ItemsSource="{Binding Balances}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
                                         <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
-                                        <DataGridTextColumn Header="ConversionRate" Binding="{Binding ConversionRate}" />
-                                        <DataGridTextColumn Header="ValueInAccountCurrency" Binding="{Binding ValueInAccountCurrency}" />
-                                        <DataGridTextColumn Header="CurrencySymbol" Binding="{Binding CurrencySymbol}" />
-                                        <DataGridTextColumn Header="SecuritySymbol" Binding="{Binding SecuritySymbol}" />
-                                        <DataGridTextColumn Header="ConversionRateSecurity" Binding="{Binding ConversionRateSecurity}" />
+                                        <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>

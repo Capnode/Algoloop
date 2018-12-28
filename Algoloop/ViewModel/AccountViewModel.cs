@@ -137,7 +137,7 @@ namespace Algoloop.ViewModel
                     }
 
                     // Set Balance
-                    List<QuantConnect.Securities.Cash> balances = brokerage.GetCashBalance();
+                    List<QuantConnect.Securities.CashAmount> balances = brokerage.GetCashBalance();
                     if (Balances.Count != balances.Count)
                     {
                         Balances.Clear();
