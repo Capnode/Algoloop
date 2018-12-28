@@ -66,6 +66,7 @@
     <Compile Include="BasicTemplateDailyAlgorithm.cs" />
     <Compile Include="ForexSchedule.cs" />
     <Compile Include="CustomChartingAlgorithm.cs" />
+    <Compile Include="LogQuotes.cs" />
     <Compile Include="MACDTrendAlgorithm.cs" />
     <Compile Include="MovingAverageCrossAlgorithm.cs" />
     <Compile Include="OpeningBreakoutAlgorithm.cs" />
