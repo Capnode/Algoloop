@@ -144,7 +144,9 @@ namespace Algoloop.ViewModel
                 product = ((AssemblyProductAttribute)productAttributes[0]).Product;
             }
 
-            return Path.Combine(appData, company, product);
+            string path = Path.Combine(appData, company, product);
+            Directory.CreateDirectory(path);
+            return path;
         }
 
         private void ReadConfig(string appData)
