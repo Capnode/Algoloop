@@ -58,6 +58,7 @@ namespace QuantConnect.Brokerages.Fxcm
         private readonly Dictionary<string, Order> _mapFxcmOrderIdsToOrders = new Dictionary<string, Order>();
         private readonly Dictionary<string, AutoResetEvent> _mapRequestsToAutoResetEvents = new Dictionary<string, AutoResetEvent>();
         private readonly HashSet<string> _pendingHistoryRequests = new HashSet<string>();
+        private List<string> _printedMessage = new List<string>();
 
         private string _fxcmAccountCurrency = Currencies.USD;
 
@@ -180,42 +181,53 @@ namespace QuantConnect.Brokerages.Fxcm
         /// <param name="message">Generic message received</param>
         public void messageArrived(ITransportable message)
         {
-            // Dispatch message to specific handler
-
-            lock (_locker)
+            try
             {
-                if (message is TradingSessionStatus)
-                    OnTradingSessionStatus((TradingSessionStatus)message);
-
-                else if (message is CollateralReport)
-                    OnCollateralReport((CollateralReport)message);
-
-                else if (message is MarketDataSnapshot)
-                    OnMarketDataSnapshot((MarketDataSnapshot)message);
-
-                else if (message is ExecutionReport)
-                    OnExecutionReport((ExecutionReport)message);
-
-                else if (message is RequestForPositionsAck)
-                    OnRequestForPositionsAck((RequestForPositionsAck)message);
-
-                else if (message is PositionReport)
-                    OnPositionReport((PositionReport)message);
-
-                else if (message is OrderCancelReject)
-                    OnOrderCancelReject((OrderCancelReject)message);
-
-                else if (message is UserResponse || message is CollateralInquiryAck || message is Logout ||
-                    message is MarketDataRequestReject || message is BusinessMessageReject || message is SecurityStatus)
+                // Dispatch message to specific handler
+                lock (_locker)
                 {
-                    // Unused messages, no handler needed
+                    if (message is TradingSessionStatus)
+                        OnTradingSessionStatus((TradingSessionStatus)message);
+
+                    else if (message is CollateralReport)
+                        OnCollateralReport((CollateralReport)message);
+
+                    else if (message is MarketDataSnapshot)
+                        OnMarketDataSnapshot((MarketDataSnapshot)message);
+
+                    else if (message is ExecutionReport)
+                        OnExecutionReport((ExecutionReport)message);
+
+                    else if (message is RequestForPositionsAck)
+                        OnRequestForPositionsAck((RequestForPositionsAck)message);
+
+                    else if (message is PositionReport)
+                        OnPositionReport((PositionReport)message);
+
+                    else if (message is OrderCancelReject)
+                        OnOrderCancelReject((OrderCancelReject)message);
+
+                    else if (message is UserResponse || message is CollateralInquiryAck || message is Logout ||
+                        message is MarketDataRequestReject || message is BusinessMessageReject || message is SecurityStatus)
+                    {
+                        // Unused messages, no handler needed
+                    }
+
+                    else
+                    {
+                        // Should never get here, if it does log and ignore message
+                        // New messages added in future api updates should be added to the unused list above
+                        Log.Trace("FxcmBrokerage.messageArrived(): Unknown message: {0}", message);
+                    }
                 }
-
-                else
+            }
+            catch (Exception ex)
+            {
+                // Log message once
+                if (!_printedMessage.Contains(ex.Message))
                 {
-                    // Should never get here, if it does log and ignore message
-                    // New messages added in future api updates should be added to the unused list above
-                    Log.Trace("FxcmBrokerage.messageArrived(): Unknown message: {0}", message);
+                    Log.Trace($"{ex.GetType()}: {ex.Message}");
+                    _printedMessage.Add(ex.Message);
                 }
             }
         }
