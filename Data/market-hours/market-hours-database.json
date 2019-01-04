@@ -3388,11 +3388,11 @@
       ]
     },
     "Forex-fxcm-[*]": {
-      "dataTimeZone": "UTC-05",
-      "exchangeTimeZone": "UTC-05",
+      "dataTimeZone": "UTC",
+      "exchangeTimeZone": "UTC",
       "sunday": [
         {
-          "start": "17:00:00",
+          "start": "22:00:00",
           "end": "1.00:00:00",
           "state": "market"
         }
@@ -3428,7 +3428,7 @@
       "friday": [
         {
           "start": "00:00:00",
-          "end": "17:00:00",
+          "end": "22:00:00",
           "state": "market"
         }
       ],
@@ -3487,7 +3487,7 @@
         "12/31/2017"
       ],
       "earlyCloses": {
-        "12/24/2018": "14:00:00"
+        "12/24/2018": "22:00:00"
       }
     },
     "Forex-dukascopy-[*]": {
