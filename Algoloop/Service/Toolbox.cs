@@ -51,25 +51,21 @@ namespace Algoloop.Service
             return model;
         }
 
-        private void PrepareDataFolder(string dataFolder)
+        public static void PrepareDataFolder(string dataFolder)
         {
             string marketHoursFolder = Path.Combine(dataFolder, "market-hours");
             const string marketHoursFile = "market-hours-database.json";
             string marketHoursPath = Path.Combine(marketHoursFolder, marketHoursFile);
-            if (!File.Exists(marketHoursPath))
-            {
-                Directory.CreateDirectory(marketHoursFolder);
-                File.Copy(Path.Combine("Data", marketHoursFile), marketHoursPath);
-            }
+            Directory.CreateDirectory(marketHoursFolder);
+            string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", marketHoursFile);
+            File.Copy(file, marketHoursPath, true);
 
             string symbolPropertiesFolder = Path.Combine(dataFolder, "symbol-properties");
             const string symbolPropertiesFile = "symbol-properties-database.csv";
             string symbolPropertiesPath = Path.Combine(symbolPropertiesFolder, symbolPropertiesFile);
-            if (!File.Exists(symbolPropertiesPath))
-            {
-                Directory.CreateDirectory(symbolPropertiesFolder);
-                File.Copy(Path.Combine("Data", symbolPropertiesFile), symbolPropertiesPath);
-            }
+            Directory.CreateDirectory(symbolPropertiesFolder);
+            file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", symbolPropertiesFile);
+            File.Copy(file, symbolPropertiesPath, true);
         }
 
         private void MarketDownloader(MarketModel model)

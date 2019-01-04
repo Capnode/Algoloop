@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using System;
@@ -89,6 +90,7 @@ namespace Algoloop.ViewModel
 
         private void DataFromModel()
         {
+            Toolbox.PrepareDataFolder(Model.DataFolder);
         }
     }
 }
