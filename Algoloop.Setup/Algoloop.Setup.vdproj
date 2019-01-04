@@ -6989,7 +6989,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -7237,7 +7237,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -7929,7 +7929,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Algoloop"
         "ProductCode" = "8:{F15D31F4-1208-49B0-AF99-26437B6D1C23}"
-        "PackageCode" = "8:{F2080F36-4FA7-45E8-8DEF-5C40FD4E31AD}"
+        "PackageCode" = "8:{70199499-0A0A-4D62-8D56-6A6DA9CCD610}"
         "UpgradeCode" = "8:{CCE7A8C1-FA08-446C-8A0E-CD5F0C055C7A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
