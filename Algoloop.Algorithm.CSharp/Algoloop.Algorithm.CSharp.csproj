@@ -69,6 +69,7 @@
     <Compile Include="LogQuotes.cs" />
     <Compile Include="MACDTrendAlgorithm.cs" />
     <Compile Include="MovingAverageCrossAlgorithm.cs" />
+    <Compile Include="NullAlgorithm.cs" />
     <Compile Include="OpeningBreakoutAlgorithm.cs" />
     <Compile Include="ParameterizedAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
