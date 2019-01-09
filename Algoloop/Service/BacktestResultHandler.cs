@@ -32,7 +32,7 @@ namespace Algoloop.Service
         /// <returns>The path to the logs</returns>
         public override string SaveLogs(string id, IEnumerable<string> logs)
         {
-            Logs = string.Join("\n", logs);
+            Logs = string.Join("\r\n", logs);
             return string.Empty;
         }
 
