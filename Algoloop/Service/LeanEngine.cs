@@ -35,7 +35,7 @@ namespace Algoloop.Service
             SetConfig(model, account);
 
             var liveMode = Config.GetBool("live-mode");
-            Log.Trace("LeanEngine: Memory " + OS.ApplicationMemoryUsed + "Mb-App  " + +OS.TotalPhysicalMemoryUsed + "Mb-Used  " + OS.TotalPhysicalMemory + "Mb-Total");
+            Log.Trace("LeanEngine: Memory " + OS.ApplicationMemoryUsed + "Mb-App " + OS.TotalPhysicalMemoryUsed + "Mb-Used");
 
             try
             {
