@@ -1,9 +1,0 @@
-﻿<Window x:Class="StockCharts.TestApplication.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:stockCharts="clr-namespace:StockChartControl;assembly=StockChartControl"
-        Title="StockChartsControl Test Application" Height="350" Width="525">
-    <Grid>
-        <stockCharts:StockChartControl Name="stockChart" MouseEnter="StockChart_OnMouseEnter"/>
-    </Grid>
-</Window>

@@ -48,7 +48,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Algorithm.Pyth
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.ToolBox", "ToolBox\QuantConnect.ToolBox.csproj", "{AC9A142C-B485-44D7-91FF-015C22C43D05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.VisualStudio17Plugin", "VisualStudioPlugin\QuantConnect.VisualStudio17Plugin.csproj", "{5326A9FB-0270-4647-8C43-20C5607DB529}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.VisualStudioPlugin", "VisualStudioPlugin\QuantConnect.VisualStudio17Plugin.csproj", "{5326A9FB-0270-4647-8C43-20C5607DB529}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Jupyter", "Jupyter\QuantConnect.Jupyter.csproj", "{9561D14A-467E-40AD-928E-EE9F758D7D98}"
 EndProject
@@ -63,10 +63,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Algorithm.CSharp", "Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj", "{37F5493C-79FF-4532-B7C5-FEDE03196E67}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Algoloop.Setup", "Algoloop.Setup\Algoloop.Setup.vdproj", "{FC2A591C-E19A-410C-8A82-100DC17EE0F1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockChartControl", "StockChartControl\StockChartControl.csproj", "{61E44E6B-C3E5-4963-8932-0E725A8E7B13}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockCharts.TestApplication", "StockCharts.TestApplication\StockCharts.TestApplication.csproj", "{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -250,22 +246,6 @@ Global
 		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Release|Any CPU.ActiveCfg = Release
 		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Release|x64.ActiveCfg = Release
 		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Release|x64.Build.0 = Release
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Debug|x64.Build.0 = Debug|Any CPU
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Release|x64.ActiveCfg = Release|Any CPU
-		{61E44E6B-C3E5-4963-8932-0E725A8E7B13}.Release|x64.Build.0 = Release|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Debug|x64.Build.0 = Debug|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Release|x64.ActiveCfg = Release|Any CPU
-		{F781F2D4-6F22-46F3-9ECB-2C7948D786F7}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
