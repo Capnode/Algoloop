@@ -58,6 +58,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Algorithm.Fram
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "QuantConnect.PythonToolbox", "PythonToolbox\QuantConnect.PythonToolbox.pyproj", "{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop", "Algoloop\Algoloop.csproj", "{F65DA573-DB1B-4524-A254-2034954CAE66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Algorithm.CSharp", "Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj", "{37F5493C-79FF-4532-B7C5-FEDE03196E67}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Algoloop.Setup", "Algoloop.Setup\Algoloop.Setup.vdproj", "{FC2A591C-E19A-410C-8A82-100DC17EE0F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -218,8 +224,33 @@ Global
 		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|x64.ActiveCfg = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Debug|x64.Build.0 = Debug|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|x64.ActiveCfg = Release|Any CPU
+		{F65DA573-DB1B-4524-A254-2034954CAE66}.Release|x64.Build.0 = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Debug|x64.Build.0 = Debug|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|x64.ActiveCfg = Release|Any CPU
+		{37F5493C-79FF-4532-B7C5-FEDE03196E67}.Release|x64.Build.0 = Release|Any CPU
+		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Debug|Any CPU.ActiveCfg = Debug
+		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Debug|x64.ActiveCfg = Debug
+		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Debug|x64.Build.0 = Debug
+		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Release|Any CPU.ActiveCfg = Release
+		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Release|x64.ActiveCfg = Release
+		{FC2A591C-E19A-410C-8A82-100DC17EE0F1}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1656B18C-CDAD-4248-8CD3-4F617A00CAE5}
 	EndGlobalSection
 EndGlobal
