@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Charts;
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
@@ -272,7 +271,7 @@ namespace Algoloop.ViewModel
 
                     try
                     {
-                        ParseCharts(result.Charts.MapToChartDefinitionDictionary());
+                        ParseCharts(result.Charts);
                     }
                     catch (Exception ex)
                     {
@@ -351,27 +350,15 @@ namespace Algoloop.ViewModel
             RaisePropertyChanged(() => Loglines);
         }
 
-        private void ParseCharts(Dictionary<string, ChartDefinition> charts)
+        private void ParseCharts(IDictionary<string, Chart> charts)
         {
-            var chartParser = new SeriesChartComponent();
-
             try
             {
                 foreach (var chart in charts)
                 {
-                    foreach (var series in chart.Value.Series)
+                    foreach (var serie in chart.Value.Series)
                     {
-                        InstantChartPoint first = series.Value.Values.FirstOrDefault();
-                        InstantChartPoint last = series.Value.Values.LastOrDefault();
-
-                        LiveCharts.Wpf.Series chartSeries = chartParser.BuildSeries(series.Value);
-                        chartParser.UpdateSeries(chartSeries, series.Value);
-
-                        LiveCharts.Wpf.Series scrollSeries = chartParser.BuildSeries(series.Value);
-                        chartParser.UpdateSeries(scrollSeries, series.Value);
-
-                        Resolution resolution = SeriesChartComponent.DetectResolution(series.Value);
-                        var viewModel = new ChartViewModel(chartSeries.Title, chartSeries, scrollSeries, first.X, last.X, resolution);
+                        var viewModel = new ChartViewModel(serie.Value);
                         Charts.Add(viewModel);
                     }
                 }

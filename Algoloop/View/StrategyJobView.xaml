@@ -6,7 +6,7 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
-    xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+    xmlns:amc="clr-namespace:Algoloop"
     xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"
     mc:Ignorable="d" 
@@ -116,39 +116,7 @@
                             DisplayMemberPath="Title"
                             ItemsSource="{Binding Charts}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
                     </StackPanel>
-                    <lvc:CartesianChart
-                        Grid.Row="1"
-                        Zoom="X"
-                        Series="{Binding SelectedChart.Chart}" >
-                        <lvc:CartesianChart.AxisX>
-                            <lvc:Axis
-                                Unit="{Binding SelectedChart.Unit}"
-                                MinValue="{Binding SelectedChart.TimeFrom, Mode=TwoWay}"
-                                MaxValue="{Binding SelectedChart.TimeTo, Mode=TwoWay}"
-                                LabelFormatter="{Binding SelectedChart.Formatter}"
-                                Separator="{x:Static lvc:DefaultAxes.CleanSeparator}" />
-                        </lvc:CartesianChart.AxisX>
-                    </lvc:CartesianChart>
-
-                    <!-- Scroll chart -->
-                    <lvc:CartesianChart
-                        Grid.Row="2"
-                        ScrollMode="X"
-                        ScrollHorizontalFrom="{Binding SelectedChart.TimeFrom, Mode=TwoWay}"
-                        ScrollHorizontalTo="{Binding SelectedChart.TimeTo, Mode=TwoWay}"
-                        DisableAnimations="True" 
-                        Series="{Binding SelectedChart.Scroll}"
-                        DataTooltip="{x:Null}">
-                        <lvc:CartesianChart.AxisX>
-                            <lvc:Axis
-                                Unit="{Binding SelectedChart.Unit}"
-                                LabelFormatter="{Binding SelectedChart.Formatter}"
-                                Separator="{x:Static lvc:DefaultAxes.CleanSeparator}" />
-                        </lvc:CartesianChart.AxisX>
-                        <lvc:CartesianChart.AxisY>
-                            <lvc:Axis ShowLabels="False" />
-                        </lvc:CartesianChart.AxisY>
-                    </lvc:CartesianChart>
+                    <amc:IrregularChart Grid.Row="1" DataContext="{Binding SelectedChart}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">

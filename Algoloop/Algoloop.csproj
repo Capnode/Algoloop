@@ -78,6 +78,15 @@
     <Reference Include="Accord.Statistics, Version=3.6.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
       <HintPath>..\packages\Accord.Statistics.3.6.0\lib\net45\Accord.Statistics.dll</HintPath>
     </Reference>
+    <Reference Include="AmCharts.Windows">
+      <HintPath>.\AmCharts.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="AmCharts.Windows.QuickCharts">
+      <HintPath>.\AmCharts.Windows.QuickCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="AmCharts.Windows.Stock">
+      <HintPath>.\AmCharts.Windows.Stock.dll</HintPath>
+    </Reference>
     <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
       <HintPath>..\packages\AsyncIO.0.1.26.0\lib\net40\AsyncIO.dll</HintPath>
     </Reference>
@@ -177,12 +186,6 @@
     <Reference Include="IKVM.Runtime.JNI, Version=7.3.4830.0, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
       <HintPath>..\packages\IKVM.7.3.4830.0\lib\IKVM.Runtime.JNI.dll</HintPath>
     </Reference>
-    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
-    </Reference>
-    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
-    </Reference>
     <Reference Include="MathNet.Numerics, Version=3.19.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.3.19.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -246,17 +249,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Chart\ChartDefinition.cs" />
-    <Compile Include="Chart\Geometries.cs" />
-    <Compile Include="Chart\GridPoint.cs" />
-    <Compile Include="Chart\GridSerie.cs" />
-    <Compile Include="Chart\IChartParser.cs" />
-    <Compile Include="Chart\IChartView.cs" />
-    <Compile Include="Chart\IInstantChartPoint.cs" />
-    <Compile Include="Chart\InstantChartPoint.cs" />
-    <Compile Include="Chart\InstantChartPointMapper.cs" />
-    <Compile Include="Chart\OhlcInstantChartPoint.cs" />
-    <Compile Include="Chart\OhlcInstantChartPointMapper.cs" />
+    <Compile Include="AmCharts\IrregularChart.xaml.cs">
+      <DependentUpon>IrregularChart.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\AccountModel.cs" />
     <Compile Include="Model\AccountsModel.cs" />
     <Compile Include="Model\MarketModel.cs" />
@@ -277,10 +272,6 @@
     <Compile Include="ViewModel\SettingsViewModel.cs" />
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
     <Compile Include="ViewSupport\FolderEditor.cs" />
-    <Compile Include="ViewSupport\ResolutionConverter.cs" />
-    <Compile Include="Chart\ResultMapper.cs" />
-    <Compile Include="Chart\SeriesChartComponent.cs" />
-    <Compile Include="Chart\SeriesDefinition.cs" />
     <Compile Include="Model\ParameterModel.cs" />
     <Compile Include="Service\BacktestResultHandler.cs" />
     <Compile Include="Service\LeanEngine.cs" />
@@ -325,6 +316,10 @@
     <Compile Include="View\StrategyJobView.xaml.cs">
       <DependentUpon>StrategyJobView.xaml</DependentUpon>
     </Compile>
+    <Page Include="AmCharts\IrregularChart.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\AboutView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
