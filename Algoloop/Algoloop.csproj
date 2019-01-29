@@ -78,12 +78,6 @@
     <Reference Include="Accord.Statistics, Version=3.6.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
       <HintPath>..\packages\Accord.Statistics.3.6.0\lib\net45\Accord.Statistics.dll</HintPath>
     </Reference>
-    <Reference Include="AmCharts.Windows">
-      <HintPath>.\AmCharts.Windows.dll</HintPath>
-    </Reference>
-    <Reference Include="AmCharts.Windows.QuickCharts">
-      <HintPath>.\AmCharts.Windows.QuickCharts.dll</HintPath>
-    </Reference>
     <Reference Include="AmCharts.Windows.Stock">
       <HintPath>.\AmCharts.Windows.Stock.dll</HintPath>
     </Reference>
