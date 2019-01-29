@@ -13,9 +13,9 @@ namespace Algoloop.View
 {
     public partial class AmChart : UserControl
     {
-        public static readonly DependencyProperty
-            ItemsSourceProperty = DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
-              typeof(AmChart), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
+        public static readonly DependencyProperty ItemsSourceProperty = 
+            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
+            typeof(AmChart), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
 
         public AmChart()
         {
@@ -30,7 +30,6 @@ namespace Algoloop.View
 
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Debug.WriteLine("OnItemsSourceChanged");
             AmChart amChart = d as AmChart;
             var charts = e.NewValue as IReadOnlyList<ChartViewModel>;
             if (amChart != null && charts != null)
@@ -46,6 +45,7 @@ namespace Algoloop.View
             Debug.Assert(stockChart.Charts.Count == 1);
             stockChart.Charts[0].Graphs.Clear();
 
+            Visibility visibility = Visibility.Visible;
             foreach (ChartViewModel chart in charts)
             {
                 int ix = 0;
@@ -83,8 +83,8 @@ namespace Algoloop.View
                     GraphType = ToGraphType(chart.Series.SeriesType),
                     Brush = ToMediaBrush(chart.Series.Color),
                     BulletType = GraphBulletType.RoundOutline,
-                    CursorBrush= ToMediaBrush(chart.Series.Color),
-                    CursorSize= 6,
+                    CursorBrush = ToMediaBrush(chart.Series.Color),
+                    CursorSize = 6,
                     DataField = DataItemField.Value,
                     ShowLegendKey = true,
                     ShowLegendTitle = true,
@@ -93,10 +93,12 @@ namespace Algoloop.View
                     LegendPeriodItemType = AmCharts.Windows.Stock.Primitives.LegendItemType.Value,
                     LegendValueFormatString = "0.0000",
                     PeriodValue = PeriodValue.Last,
-                    DataSet = dataset
+                    DataSet = dataset,
+                    Visibility = visibility
                 };
 
                 stockChart.Charts[0].Graphs.Add(graph);
+                visibility = Visibility.Hidden;
             }
         }
 

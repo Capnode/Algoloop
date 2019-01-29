@@ -44,6 +44,7 @@ namespace Algoloop.ViewModel
         private StrategyJobModel _model;
         private bool _isSelected;
         private bool _isExpanded;
+        private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -73,7 +74,11 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
-        public SyncObservableCollection<ChartViewModel> Charts { get; } = new SyncObservableCollection<ChartViewModel>();
+        public SyncObservableCollection<ChartViewModel> Charts
+        {
+            get => _charts;
+            set => Set(ref _charts, value);
+        }
 
         public RelayCommand StartJobCommand { get; }
 
@@ -128,8 +133,10 @@ namespace Algoloop.ViewModel
 
         public void DeleteJob()
         {
-            Charts.Clear();
-            RaisePropertyChanged(() => Charts);
+            var charts = Charts;
+            charts.Clear();
+            Charts = null;
+            Charts = charts;
 
             _cancel?.Cancel();
             _parent?.DeleteJob(this);
@@ -229,9 +236,10 @@ namespace Algoloop.ViewModel
 
             Statistics.Clear();
             Orders.Clear();
-
-            Charts.Clear();
-            RaisePropertyChanged(() => Charts);
+            var charts = Charts;
+            charts.Clear();
+            Charts = null;
+            Charts = charts;
 
             if (Model.Result != null)
             {
@@ -331,8 +339,10 @@ namespace Algoloop.ViewModel
             Model.Logs = null;
             Model.Result = null;
 
-            Charts.Clear();
-            RaisePropertyChanged(() =>Charts);
+            var charts = Charts;
+            charts.Clear();
+            Charts = null;
+            Charts = charts;
 
             Statistics.Clear();
             Orders.Clear();
@@ -343,6 +353,8 @@ namespace Algoloop.ViewModel
 
         private void ParseCharts(IDictionary<string, Chart> charts)
         {
+            var workCharts = Charts;
+            Debug.Assert(workCharts.Count == 0);
             try
             {
                 foreach (var chart in charts)
@@ -350,7 +362,7 @@ namespace Algoloop.ViewModel
                     foreach (var serie in chart.Value.Series)
                     {
                         var viewModel = new ChartViewModel(serie.Value);
-                        Charts.Add(viewModel);
+                        workCharts.Add(viewModel);
                     }
                 }
             }
@@ -358,6 +370,9 @@ namespace Algoloop.ViewModel
             {
                 Log.Error($"{e.GetType()}: {e.Message}");
             }
+
+            Charts = null;
+            Charts = workCharts;
         }
 
         public int CompareTo(object obj)
