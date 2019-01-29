@@ -103,20 +103,7 @@
                 </DataGrid>
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <StackPanel Margin="4" Orientation="Horizontal">
-                        <ComboBox
-                            MinWidth="100"
-                            DisplayMemberPath="Title"
-                            ItemsSource="{Binding Charts}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
-                    </StackPanel>
-                    <view:AmChart Grid.Row="1" DataContext="{Binding SelectedChart}"/>
-                </Grid>
+                <view:AmChart ItemsSource="{Binding Charts}"/>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox

@@ -42,7 +42,6 @@ namespace Algoloop.ViewModel
         private CancellationTokenSource _cancel;
         private Isolated<LeanEngine> _leanEngine;
         private StrategyJobModel _model;
-        private ChartViewModel _selectedChart;
         private bool _isSelected;
         private bool _isExpanded;
 
@@ -122,15 +121,6 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public ChartViewModel SelectedChart
-        {
-            get => _selectedChart;
-            set
-            {
-                Set(ref _selectedChart, value);
-            }
-        }
-
         public override string ToString()
         {
             return _model.Name;
@@ -138,8 +128,9 @@ namespace Algoloop.ViewModel
 
         public void DeleteJob()
         {
-            SelectedChart = null;
             Charts.Clear();
+            RaisePropertyChanged(() => Charts);
+
             _cancel?.Cancel();
             _parent?.DeleteJob(this);
         }
@@ -239,8 +230,8 @@ namespace Algoloop.ViewModel
             Statistics.Clear();
             Orders.Clear();
 
-            SelectedChart = null;
             Charts.Clear();
+            RaisePropertyChanged(() => Charts);
 
             if (Model.Result != null)
             {
@@ -340,8 +331,8 @@ namespace Algoloop.ViewModel
             Model.Logs = null;
             Model.Result = null;
 
-            SelectedChart = null;
             Charts.Clear();
+            RaisePropertyChanged(() =>Charts);
 
             Statistics.Clear();
             Orders.Clear();
@@ -362,8 +353,6 @@ namespace Algoloop.ViewModel
                         Charts.Add(viewModel);
                     }
                 }
-
-                SelectedChart = Charts.FirstOrDefault();
             }
             catch (Exception e)
             {

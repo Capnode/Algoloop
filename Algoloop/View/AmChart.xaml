@@ -5,7 +5,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ams="http://schemas.amcharts.com/stock/wpf/2009/xaml"
     mc:Ignorable="d"
-    DataContextChanged="UserControl_DataContextChanged"
     d:DesignHeight="126" d:DesignWidth="225">
     <DockPanel>
         <ams:StockChart
@@ -39,7 +38,7 @@
                             ValuesFormatString="0"
                             Stroke="Transparent"
                             StrokeThickness="0"
-                            TickLength="0" />
+                            TickLength="0"/>
                     </ams:Chart.LeftValueAxis>
 
                     <ams:Chart.Legend>
@@ -49,25 +48,9 @@
                             NegativeValueForeground="Green"
                             Margin="0,0,0,5"/>
                     </ams:Chart.Legend>
-
-                    <ams:Chart.Graphs>
-                        <ams:Graph
-                            GraphType="Line"
-                            Brush="Red"
-                            BulletType="RoundOutline"
-                            CursorBrush="Blue"
-                            CursorSize="6"
-                            DataField="Value"
-                            ShowLegendKey="True"
-                            ShowLegendTitle="True"
-                            LegendItemType="Value"
-                            LegendValueLabelText=""
-                            LegendPeriodItemType="Value"
-                            LegendValueFormatString="0.00"
-                            PeriodValue="Last"/>
-                    </ams:Chart.Graphs>
                 </ams:Chart>
             </ams:StockChart.Charts>
+            
             <ams:StockChart.PeriodSelector>
                 <ams:PeriodSelector
                     CustomPeriodLabelText="Custom period"
