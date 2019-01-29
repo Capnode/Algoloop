@@ -6,7 +6,6 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
-    xmlns:amc="clr-namespace:Algoloop"
     xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"
     mc:Ignorable="d" 
@@ -116,7 +115,7 @@
                             DisplayMemberPath="Title"
                             ItemsSource="{Binding Charts}" SelectedItem="{Binding SelectedChart, Mode=TwoWay}"/>
                     </StackPanel>
-                    <amc:IrregularChart Grid.Row="1" DataContext="{Binding SelectedChart}"/>
+                    <view:AmChart Grid.Row="1" DataContext="{Binding SelectedChart}"/>
                 </Grid>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">

@@ -6,14 +6,11 @@ using System.Windows.Controls;
 using AmCharts.Windows.Stock.Data;
 using QuantConnect;
 
-namespace Algoloop
+namespace Algoloop.View
 {
-    public partial class IrregularChart : UserControl
+    public partial class AmChart : UserControl
     {
-        public DateTime SelectedStartDate { get { return this.stockChart1.Scroller.SelectedStartDate; } }
-        public DateTime SelectedEndDate { get { return this.stockChart1.Scroller.SelectedEndDate; } }
-
-        public IrregularChart()
+        public AmChart()
         {
             InitializeComponent();
         }
@@ -24,7 +21,7 @@ namespace Algoloop
             if (chart == null)
                 return;
 
-            stockChart1.DataSets.Clear();
+            stockChart.DataSets.Clear();
 
             int size = chart.Series.Values.Count;
             KeyValuePair<DateTime, double>[] timeseries = null;
@@ -43,7 +40,7 @@ namespace Algoloop
             {
                 ID = "id",
                 Title = chart.Title,
-                ShortTitle = "ShortTitle",
+                ShortTitle = chart.Title,
                 DateMemberPath = "Key",
                 ValueMemberPath = "Value",
                 IsSelectedForComparison = false,
@@ -54,10 +51,10 @@ namespace Algoloop
                 EndDate = timeseries.Last().Key
             };
 
-            stockChart1.DataSets.Add(dataset);
-            stockChart1.PeriodSelector.ZoomToEnd = true;
-            stockChart1.StartDate = timeseries.First().Key;
-            stockChart1.EndDate = timeseries.Last().Key;
+            stockChart.DataSets.Add(dataset);
+            stockChart.PeriodSelector.ZoomToEnd = true;
+            stockChart.StartDate = timeseries.First().Key;
+            stockChart.EndDate = timeseries.Last().Key;
         }
     }
 }

@@ -1,17 +1,22 @@
-﻿<UserControl x:Class="Algoloop.IrregularChart"
+﻿<UserControl x:Class="Algoloop.View.AmChart"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:ams="http://schemas.amcharts.com/stock/wpf/2009/xaml"
-    xmlns:local="clr-namespace:Algoloop.View"
-    mc:Ignorable="d"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ams="http://schemas.amcharts.com/stock/wpf/2009/xaml"
+    mc:Ignorable="d"
     DataContextChanged="UserControl_DataContextChanged"
     d:DesignHeight="126" d:DesignWidth="225">
     <DockPanel>
-        <ams:StockChart Name="stockChart1" Height="Auto" DockPanel.Dock="Top" IsEquallySpaced="False" Margin="5">
+        <ams:StockChart
+            Name="stockChart"
+            Height="Auto"
+            DockPanel.Dock="Top"
+            IsEquallySpaced="False"
+            Margin="5">
             <ams:StockChart.Charts>
-                <ams:Chart GridHeight="2*" 
+                <ams:Chart
+                    GridHeight="2*" 
                     PlotAreaBorderBrush="#CCCCCC" 
                     PlotAreaBorderThickness="1">
                     <ams:Chart.PlotAreaBackground>
@@ -22,32 +27,53 @@
                     </ams:Chart.PlotAreaBackground>
 
                     <ams:Chart.DateTimeAxis>
-                        <ams:DateTimeAxis ValuesEnabled="True" Stroke="Transparent" StrokeThickness="0" />
+                        <ams:DateTimeAxis
+                            ValuesEnabled="True"
+                            Stroke="Transparent"
+                            StrokeThickness="0"
+                            TickLength="0"/>
                     </ams:Chart.DateTimeAxis>
 
                     <ams:Chart.LeftValueAxis>
-                        <ams:ValueAxis ValuesFormatString="0" Stroke="Transparent" TickLength="0" />
+                        <ams:ValueAxis
+                            ValuesFormatString="0"
+                            Stroke="Transparent"
+                            StrokeThickness="0"
+                            TickLength="0" />
                     </ams:Chart.LeftValueAxis>
 
                     <ams:Chart.Legend>
-                        <ams:Legend IsDateVisible="True" Margin="0,0,0,5"  />
+                        <ams:Legend
+                            IsDateVisible="True"
+                            PositiveValueForeground="Red"
+                            NegativeValueForeground="Green"
+                            Margin="0,0,0,5"/>
                     </ams:Chart.Legend>
 
                     <ams:Chart.Graphs>
-                        <ams:Graph GraphType="Line" 
-                           BulletType="RoundOutline" 
-                           ShowLegendKey="False" 
-                           ShowLegendTitle="False" 
-                           LegendItemType="Value" 
-                           LegendValueLabelText=""
-                           LegendPeriodItemType="Ohlc"
-                           LegendValueFormatString="0.00"
-                       />
+                        <ams:Graph
+                            GraphType="Line"
+                            Brush="Red"
+                            BulletType="RoundOutline"
+                            CursorBrush="Blue"
+                            CursorSize="6"
+                            DataField="Value"
+                            ShowLegendKey="True"
+                            ShowLegendTitle="True"
+                            LegendItemType="Value"
+                            LegendValueLabelText=""
+                            LegendPeriodItemType="Value"
+                            LegendValueFormatString="0.00"
+                            PeriodValue="Last"/>
                     </ams:Chart.Graphs>
                 </ams:Chart>
             </ams:StockChart.Charts>
             <ams:StockChart.PeriodSelector>
-                <ams:PeriodSelector CustomPeriodLabelText="Custom period:" PresetPeriodLabelText="Zoom:" Margin="0,5,0,0">
+                <ams:PeriodSelector
+                    CustomPeriodLabelText="Custom period"
+                    CustomPeriodVisibility="Visible" 
+                    Margin="5"
+                    PresetPeriodLabelText="Scale:">
                     <ams:PeriodSelector.PresetPeriods>
                         <ams:PresetPeriodButton Interval="Day" Quantity="10" ToolTip="10 days">10D</ams:PresetPeriodButton>
                         <ams:PresetPeriodButton Interval="Month" Quantity="1" ToolTip="1 month">1M</ams:PresetPeriodButton>

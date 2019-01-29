@@ -249,8 +249,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AmCharts\IrregularChart.xaml.cs">
-      <DependentUpon>IrregularChart.xaml</DependentUpon>
+    <Compile Include="View\AmChart.xaml.cs">
+      <DependentUpon>AmChart.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\AccountModel.cs" />
     <Compile Include="Model\AccountsModel.cs" />
@@ -316,7 +316,7 @@
     <Compile Include="View\StrategyJobView.xaml.cs">
       <DependentUpon>StrategyJobView.xaml</DependentUpon>
     </Compile>
-    <Page Include="AmCharts\IrregularChart.xaml">
+    <Page Include="View\AmChart.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
