@@ -78,8 +78,9 @@
     <Reference Include="Accord.Statistics, Version=3.6.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
       <HintPath>..\packages\Accord.Statistics.3.6.0\lib\net45\Accord.Statistics.dll</HintPath>
     </Reference>
-    <Reference Include="AmCharts.Windows.Stock">
-      <HintPath>.\AmCharts.Windows.Stock.dll</HintPath>
+    <Reference Include="AmCharts.Windows.Stock, Version=1.1.0.0, Culture=neutral, PublicKeyToken=6a0af00bd7de39d1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Extern\AmCharts.Windows.Stock.dll</HintPath>
     </Reference>
     <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
       <HintPath>..\packages\AsyncIO.0.1.26.0\lib\net40\AsyncIO.dll</HintPath>
@@ -376,6 +377,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="Extern\AmCharts.Windows.Stock.dll" />
     <Resource Include="Resources\Info.png" />
     <Resource Include="Resources\New.png" />
     <Resource Include="Resources\MoveUp.png" />
