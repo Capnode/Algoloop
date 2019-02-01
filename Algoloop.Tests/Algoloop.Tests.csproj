@@ -69,12 +69,6 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Brokerages\Fxcm\FxcmBrokerageDataQueueHandlerTests.cs" />
-    <Compile Include="Brokerages\Fxcm\FxcmBrokerageHistoryProviderTests.cs" />
-    <Compile Include="Brokerages\Fxcm\FxcmBrokerageTests.cs" />
-    <Compile Include="Brokerages\Fxcm\FxcmLimitOrderTestParameters.cs" />
-    <Compile Include="Brokerages\Fxcm\FxcmStopMarketOrderTestParameters.cs" />
-    <Compile Include="Brokerages\Fxcm\FxcmSymbolMapperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
