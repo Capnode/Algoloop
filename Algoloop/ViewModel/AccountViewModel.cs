@@ -117,6 +117,8 @@ namespace Algoloop.ViewModel
 
                 List<QuantConnect.Orders.Order> orders = brokerage.GetOpenOrders();
 
+                brokerage.Get
+
                 bool stop = false;
                 while (!stop)
                 {
