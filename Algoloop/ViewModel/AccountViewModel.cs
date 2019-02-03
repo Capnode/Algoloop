@@ -45,6 +45,8 @@ namespace Algoloop.ViewModel
             StartCommand = new RelayCommand(async () => await ConnectAsync(), () => !Active);
             StopCommand = new RelayCommand(async () => await DisconnectAsync(), () => Active);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Active);
+
+            DataFromModel();
         }
 
         public AccountModel Model { get; }
@@ -229,6 +231,25 @@ namespace Algoloop.ViewModel
             if (!update)
             {
                 Balances.Add(new BalanceViewModel(message));
+            }
+        }
+
+        internal void DataToModel()
+        {
+            Model.Orders.Clear();
+            foreach (OrderViewModel vm in Orders)
+            {
+                Model.Orders.Add(vm.Model);
+            }
+        }
+
+        internal void DataFromModel()
+        {
+            Orders.Clear();
+            foreach (OrderModel order in Model.Orders)
+            {
+                var vm = new OrderViewModel(order);
+                Orders.Add(vm);
             }
         }
     }

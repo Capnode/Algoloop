@@ -141,6 +141,7 @@ namespace Algoloop.ViewModel
             foreach (AccountViewModel account in Accounts)
             {
                 Model.Accounts.Add(account.Model);
+                account.DataToModel();
             }
         }
 

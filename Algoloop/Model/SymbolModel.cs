@@ -23,8 +23,8 @@ namespace Algoloop.Model
     {
         public SymbolModel()
         {
-
         }
+
         public SymbolModel(SymbolModel model)
         {
             Name = model.Name;

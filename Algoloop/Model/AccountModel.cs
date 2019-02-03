@@ -13,8 +13,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using QuantConnect.Orders;
 
 namespace Algoloop.Model
 {
@@ -68,5 +70,9 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public string DataFolder { get; set; }
+
+        [Browsable(false)]
+        [DataMember]
+        public List<OrderModel> Orders { get; } = new List<OrderModel>();
     }
 }

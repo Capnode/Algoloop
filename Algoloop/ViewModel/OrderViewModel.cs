@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using GalaSoft.MvvmLight;
-using QuantConnect.Interfaces;
 using QuantConnect.Orders;
 using System;
 using System.Collections.Generic;
@@ -22,35 +22,12 @@ namespace Algoloop.ViewModel
 {
     public class OrderViewModel : ViewModelBase
     {
-        private IReadOnlyList<string> _brokerId;
-        private string _securityType;
-        private string _symbolCurrency;
-        private decimal _averagePrice;
-        private decimal _quantity;
-        private decimal _marketPrice;
-        private decimal _conversionRate;
-        private decimal _marketValue;
-        private decimal _unrealizedPnL;
-        private int _id;
-        private int _contingentId;
-        private decimal _price;
-        private string _symbol;
-        private string _priceCurrency;
-        private DateTime _time;
-        private DateTime? _lastFillTime;
-        private DateTime? _lastUpdateTime;
-        private DateTime? _canceledTime;
-        private OrderType _orderType;
-        private OrderStatus _status;
-        private TimeInForce _timeInForce;
-        private string _tag;
-        private IOrderProperties _properties;
-        private string _direction;
-        private decimal _value;
-        private OrderSubmissionData _orderSubmissionData;
-        private bool _isMarketable;
-
         public OrderViewModel(Order order)
+        {
+            Update(order);
+        }
+
+        public OrderViewModel(OrderModel order)
         {
             Update(order);
         }
@@ -60,10 +37,16 @@ namespace Algoloop.ViewModel
             Update(message);
         }
 
+        public OrderModel Model { get; set; }
+
         public int Id
         {
-            get => _id;
-            set => Set(ref _id, value);
+            get => Model.Id;
+            set
+            {
+                Model.Id = value;
+                RaisePropertyChanged(() => Id);
+            }
         }
 
         /// <summary>
@@ -71,17 +54,25 @@ namespace Algoloop.ViewModel
         /// </summary>
         public int ContingentId
         {
-            get => _contingentId;
-            set => Set(ref _contingentId, value);
+            get => Model.ContingentId;
+            set
+            {
+                Model.ContingentId = value;
+                RaisePropertyChanged(() => ContingentId);
+            }
         }
 
         /// <summary>
         /// Brokerage Id for this order for when the brokerage splits orders into multiple pieces
         /// </summary>
-        public IReadOnlyList<string> BrokerId
+        public List<string> BrokerId
         {
-            get => _brokerId;
-            set => Set(ref _brokerId, value);
+            get => Model.BrokerId;
+            set
+            {
+                Model.BrokerId = value;
+                RaisePropertyChanged(() => BrokerId);
+            }
         }
 
         /// <summary>
@@ -89,8 +80,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public string Symbol
         {
-            get => _symbol;
-            set => Set(ref _symbol, value);
+            get => Model.Symbol;
+            set
+            {
+                Model.Symbol = value;
+                RaisePropertyChanged(() => Symbol);
+            }
         }
 
         /// <summary>
@@ -98,8 +93,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public decimal Price
         {
-            get => _price;
-            set => Set(ref _price, value);
+            get => Model.Price;
+            set
+            {
+                Model.Price = value;
+                RaisePropertyChanged(() => Price);
+            }
         }
 
         /// <summary>
@@ -107,8 +106,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public string PriceCurrency
         {
-            get => _priceCurrency;
-            set => Set(ref _priceCurrency, value);
+            get => Model.PriceCurrency;
+            set
+            {
+                Model.PriceCurrency = value;
+                RaisePropertyChanged(() => PriceCurrency);
+            }
         }
 
         /// <summary>
@@ -116,8 +119,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public DateTime Time
         {
-            get => _time;
-            set => Set(ref _time, value);
+            get => Model.Time;
+            set
+            {
+                Model.Time = value;
+                RaisePropertyChanged(() => Time);
+            }
         }
 
         /// <summary>
@@ -125,8 +132,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public DateTime? LastFillTime
         {
-            get => _lastFillTime;
-            set => Set(ref _lastFillTime, value);
+            get => Model.LastFillTime;
+            set
+            {
+                Model.LastFillTime = value;
+                RaisePropertyChanged(() => LastFillTime);
+            }
         }
 
         /// <summary>
@@ -134,8 +145,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public DateTime? LastUpdateTime
         {
-            get => _lastUpdateTime;
-            set => Set(ref _lastUpdateTime, value);
+            get => Model.LastUpdateTime;
+            set
+            {
+                Model.LastUpdateTime = value;
+                RaisePropertyChanged(() => LastUpdateTime);
+            }
         }
 
         /// <summary>
@@ -143,8 +158,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public DateTime? CanceledTime
         {
-            get => _canceledTime;
-            set => Set(ref _canceledTime, value);
+            get => Model.CanceledTime;
+            set
+            {
+                Model.CanceledTime = value;
+                RaisePropertyChanged(() => CanceledTime);
+            }
         }
 
         /// <summary>
@@ -152,8 +171,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public decimal Quantity
         {
-            get => _quantity;
-            set => Set(ref _quantity, value);
+            get => Model.Quantity;
+            set
+            {
+                Model.Quantity = value;
+                RaisePropertyChanged(() => Quantity);
+            }
         }
 
         /// <summary>
@@ -161,8 +184,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public OrderType Type
         {
-            get => _orderType;
-            set => Set(ref _orderType, value);
+            get => Model.Type;
+            set
+            {
+                Model.Type = value;
+                RaisePropertyChanged(() => Type);
+            }
         }
 
         /// <summary>
@@ -170,8 +197,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public OrderStatus Status
         {
-            get => _status;
-            set => Set(ref _status, value);
+            get => Model.Status;
+            set
+            {
+                Model.Status = value;
+                RaisePropertyChanged(() => Status);
+            }
         }
 
         /// <summary>
@@ -179,8 +210,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public TimeInForce TimeInForce
         {
-            get => _timeInForce;
-            set => Set(ref _timeInForce, value);
+            get => Model.TimeInForce;
+            set
+            {
+                Model.TimeInForce = value;
+                RaisePropertyChanged(() => TimeInForce);
+            }
         }
 
         /// <summary>
@@ -188,17 +223,25 @@ namespace Algoloop.ViewModel
         /// </summary>
         public string Tag
         {
-            get => _tag;
-            set => Set(ref _tag, value);
+            get => Model.Tag;
+            set
+            {
+                Model.Tag = value;
+                RaisePropertyChanged(() => Tag);
+            }
         }
 
         /// <summary>
         /// Additional properties of the order
         /// </summary>
-        public IOrderProperties Properties
+        public OrderProperties Properties
         {
-            get => _properties;
-            set => Set(ref _properties, value);
+            get => Model.Properties;
+            set
+            {
+                Model.Properties = value;
+                RaisePropertyChanged(() => Properties);
+            }
         }
 
         /// <summary>
@@ -206,8 +249,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public string SecurityType
         {
-            get => _securityType;
-            set => Set(ref _securityType, value);
+            get => Model.SecurityType;
+            set
+            {
+                Model.SecurityType = value;
+                RaisePropertyChanged(() => SecurityType);
+            }
         }
 
         /// <summary>
@@ -215,8 +262,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public string Direction
         {
-            get => _direction;
-            set => Set(ref _direction, value);
+            get => Model.Direction;
+            set
+            {
+                Model.Direction = value;
+                RaisePropertyChanged(() => Direction);
+            }
         }
 
         /// <summary>
@@ -225,8 +276,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public decimal Value
         {
-            get => _value;
-            set => Set(ref _value, value);
+            get => Model.Value;
+            set
+            {
+                Model.Value = value;
+                RaisePropertyChanged(() => Value);
+            }
         }
 
         /// <summary>
@@ -234,8 +289,12 @@ namespace Algoloop.ViewModel
         /// </summary>
         public OrderSubmissionData OrderSubmissionData
         {
-            get => _orderSubmissionData;
-            set => Set(ref _orderSubmissionData, value);
+            get => Model.OrderSubmissionData;
+            set
+            {
+                Model.OrderSubmissionData = value;
+                RaisePropertyChanged(() => OrderSubmissionData);
+            }
         }
 
         /// <summary>
@@ -243,16 +302,45 @@ namespace Algoloop.ViewModel
         /// </summary>
         public bool IsMarketable
         {
-            get => _isMarketable;
-            set => Set(ref _isMarketable, value);
+            get => Model.IsMarketable;
+            set
+            {
+                Model.IsMarketable = value;
+                RaisePropertyChanged(() => IsMarketable);
+            }
         }
 
-        public void Update(Order order)
+        internal void Update(Order order)
         {
-            Symbol = order.Symbol.ID.Symbol;
-
             Id = order.Id;
             ContingentId = order.ContingentId;
+            Symbol = order.Symbol;
+            BrokerId = order.BrokerId;
+            Symbol = order.Symbol;
+            Price = order.Price;
+            PriceCurrency = order.PriceCurrency;
+            Time = order.Time;
+            LastFillTime = order.LastFillTime;
+            LastUpdateTime = order.LastUpdateTime;
+            CanceledTime = order.CanceledTime;
+            Quantity = order.Quantity;
+            Type = order.Type;
+            Status = order.Status;
+            TimeInForce = order.TimeInForce;
+            Tag = order.Tag;
+            Properties = (OrderProperties)order.Properties;
+            SecurityType = order.SecurityType.ToString();
+            Direction = order.Direction.ToString();
+            Value = order.Value;
+            OrderSubmissionData = order.OrderSubmissionData;
+            IsMarketable = order.IsMarketable;
+        }
+
+        internal void Update(OrderModel order)
+        {
+            Id = order.Id;
+            ContingentId = order.ContingentId;
+            Symbol = order.Symbol;
             BrokerId = order.BrokerId;
             Symbol = order.Symbol;
             Price = order.Price;
