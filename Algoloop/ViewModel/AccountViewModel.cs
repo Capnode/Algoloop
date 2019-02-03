@@ -32,9 +32,8 @@ namespace Algoloop.ViewModel
     public class AccountViewModel : ViewModelBase
     {
         private AccountsViewModel _parent;
-        private CancellationTokenSource _connectCancel;
+        private CancellationTokenSource _cancel;
         private FxcmBrokerage _brokerage;
-        private CancellationTokenSource _disconnectCancel;
         private const string FxcmServer = "http://www.fxcorporate.com/Hosts.jsp";
 
         public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel)
@@ -62,28 +61,25 @@ namespace Algoloop.ViewModel
             get => Model.Active;
             set
             {
-                if (Model.Active != value)
-                {
-                    Model.Active = value;
-                    RaisePropertyChanged(() => Active);
-                    StartCommand.RaiseCanExecuteChanged();
-                    StopCommand.RaiseCanExecuteChanged();
-                    DeleteCommand.RaiseCanExecuteChanged();
-                }
+                Model.Active = value;
+                RaisePropertyChanged(() => Active);
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
             }
         }
 
         internal async Task ConnectAsync()
         {
-            if (_connectCancel != null || _disconnectCancel != null)
+            Active = true;
+            if (_cancel != null)
             {
                 Log.Error($"{_brokerage.Name}: Busy");
                 return;
             }
 
-            Active = true;
             Log.Trace($"Connect Account {Model.Name}");
-            _connectCancel = new CancellationTokenSource();
+            _cancel = new CancellationTokenSource();
             try
             {
                 _brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
@@ -92,7 +88,7 @@ namespace Algoloop.ViewModel
                 _brokerage.OrderStatusChanged += OnOrderStatusChanged;
                 _brokerage.Message += OnMessage;
 
-                await Task.Run(() => _brokerage.Connect(), _connectCancel.Token);
+                await Task.Run(() => _brokerage.Connect(), _cancel.Token);
 
                 // Update Orders
                 List<Order> openOrders = _brokerage.GetOpenOrders();
@@ -132,7 +128,7 @@ namespace Algoloop.ViewModel
                 }
 
                 Active = true;
-                _connectCancel = null;
+                _cancel = null;
             }
             catch (Exception ex)
             {
@@ -143,8 +139,10 @@ namespace Algoloop.ViewModel
 
         internal async Task DisconnectAsync()
         {
-            if (_connectCancel != null || _disconnectCancel != null)
+            if (_cancel != null)
             {
+                Active = true;
+                _cancel.Cancel();
                 Log.Error($"{_brokerage.Name}: Busy");
                 return;
             }
@@ -155,14 +153,13 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            _connectCancel?.Cancel();
-
-            _disconnectCancel = new CancellationTokenSource();
-            await Task.Run(() => _brokerage.Disconnect(), _disconnectCancel.Token);
+            _cancel = new CancellationTokenSource();
+            await Task.Run(() => _brokerage.Disconnect(), _cancel.Token);
             Positions.Clear();
             Balances.Clear();
             _brokerage = null;
-            _disconnectCancel = null;
+            _cancel = null;
+            Active = false;
         }
 
         private async void OnActiveCommand(bool value)
