@@ -27,8 +27,13 @@ namespace Algoloop.ViewModel
             Update(cash);
         }
 
-        //     Gets the symbol of the security required to provide conversion rates. If this
-        //     cash represents the account currency, then QuantConnect.Symbol.Empty is returned
+        public BalanceViewModel(AccountEvent message)
+        {
+            Update(message);
+        }
+
+        // Gets the symbol of the security required to provide conversion rates. If this
+        // cash represents the account currency, then QuantConnect.Symbol.Empty is returned
         public string Currency
         {
             get => _currency;
@@ -46,6 +51,12 @@ namespace Algoloop.ViewModel
         {
             Currency = cash.Currency;
             Amount = cash.Amount;
+        }
+
+        public void Update(AccountEvent message)
+        {
+            Currency = message.CurrencySymbol;
+            Amount = message.CashBalance;
         }
     }
 }

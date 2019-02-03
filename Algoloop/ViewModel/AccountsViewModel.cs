@@ -160,7 +160,7 @@ namespace Algoloop.ViewModel
             {
                 if (account.Active)
                 {
-                    Task task = account.StartTask();
+                    Task task = account.ConnectAsync();
                 }
             }
         }

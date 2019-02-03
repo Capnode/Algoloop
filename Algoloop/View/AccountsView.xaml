@@ -108,6 +108,47 @@
                             </Button>
                         </ToolBar>
                         <TabControl>
+                            <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
+                                <DataGrid
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    ItemsSource="{Binding Orders}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
+                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
+                                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" />
+                                        <DataGridTextColumn Header="PriceCurrency" Binding="{Binding PriceCurrency}" />
+                                        <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
+                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" />
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
+                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
+                                        <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
+                                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction}" />
+                                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
+                                    </DataGrid.Columns>
+                                    <DataGrid.Resources>
+                                        <ContextMenu
+                                            x:Key="RowMenu"
+                                            DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem
+                                                Header="Close order"
+                                                Command="{Binding CloseOrderCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </DataGrid.Resources>
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow" >
+                                            <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                </DataGrid>
+                            </TabItem>
                             <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}">
                                 <DataGrid
                                     HorizontalAlignment="Stretch"

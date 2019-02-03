@@ -24,13 +24,17 @@ using QuantConnect;
 using QuantConnect.Brokerages;
 using QuantConnect.Brokerages.Fxcm;
 using QuantConnect.Logging;
+using QuantConnect.Orders;
+using QuantConnect.Securities;
 
 namespace Algoloop.ViewModel
 {
     public class AccountViewModel : ViewModelBase
     {
         private AccountsViewModel _parent;
-        private CancellationTokenSource _cancel;
+        private CancellationTokenSource _connectCancel;
+        private FxcmBrokerage _brokerage;
+        private CancellationTokenSource _disconnectCancel;
         private const string FxcmServer = "http://www.fxcorporate.com/Hosts.jsp";
 
         public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel)
@@ -39,158 +43,196 @@ namespace Algoloop.ViewModel
             Model = accountModel;
 
             ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
-            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Active);
-            StopCommand = new RelayCommand(() => StopTask(), () => Active);
+            StartCommand = new RelayCommand(async () => await ConnectAsync(), () => !Active);
+            StopCommand = new RelayCommand(async () => await DisconnectAsync(), () => Active);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Active);
         }
 
         public AccountModel Model { get; }
-
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
         public RelayCommand DeleteCommand { get; }
+        public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
+        public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
+        public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
 
         public bool Active
         {
             get => Model.Active;
             set
             {
-                Model.Active = value;
-                RaisePropertyChanged(() => Active);
-                StartCommand.RaiseCanExecuteChanged();
-                StopCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
+                if (Model.Active != value)
+                {
+                    Model.Active = value;
+                    RaisePropertyChanged(() => Active);
+                    StartCommand.RaiseCanExecuteChanged();
+                    StopCommand.RaiseCanExecuteChanged();
+                    DeleteCommand.RaiseCanExecuteChanged();
+                }
             }
         }
 
-        public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
-        public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
-
-        internal async Task StartTask()
+        internal async Task ConnectAsync()
         {
-            Log.Trace($"Connect Account {Model.Name}");
-            _cancel = new CancellationTokenSource();
-            await Task.Run(() => StartFxcm(_cancel.Token), _cancel.Token);
-            _cancel = null;
-            Log.Trace($"Disconnect Account {Model.Name}");
-            Active = false;
-        }
-
-        internal void StopTask()
-        {
-            if (_cancel != null)
+            if (_connectCancel != null || _disconnectCancel != null)
             {
-                _cancel.Cancel();
+                Log.Error($"{_brokerage.Name}: Busy");
+                return;
             }
+
+            Active = true;
+            Log.Trace($"Connect Account {Model.Name}");
+            _connectCancel = new CancellationTokenSource();
+            try
+            {
+                _brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
+                _brokerage.AccountChanged += OnAccountChanged;
+                _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
+                _brokerage.OrderStatusChanged += OnOrderStatusChanged;
+                _brokerage.Message += OnMessage;
+
+                await Task.Run(() => _brokerage.Connect(), _connectCancel.Token);
+
+                // Update Orders
+                List<Order> openOrders = _brokerage.GetOpenOrders();
+                foreach (Order openOrder in openOrders)
+                {
+                    bool update = false;
+                    foreach (OrderViewModel order in Orders)
+                    {
+                        if (openOrder.Id == order.Id)
+                        {
+                            order.Update(openOrder);
+                            update = true;
+                            break;
+                        }
+                    }
+
+                    if (!update)
+                    {
+                        Orders.Add(new OrderViewModel(openOrder));
+                    }
+                }
+
+                // Set Positions
+                Positions.Clear();
+                List<Holding> holdings = _brokerage.GetAccountHoldings();
+                foreach (var holding in holdings)
+                {
+                    Positions.Add(new PositionViewModel(holding));
+                }
+
+                // Set Balance
+                Balances.Clear();
+                List<CashAmount> balances = _brokerage.GetCashBalance();
+                foreach (var balance in balances)
+                {
+                    Balances.Add(new BalanceViewModel(balance));
+                }
+
+                Active = true;
+                _connectCancel = null;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
+                await DisconnectAsync();
+            }
+        }
+
+        internal async Task DisconnectAsync()
+        {
+            if (_connectCancel != null || _disconnectCancel != null)
+            {
+                Log.Error($"{_brokerage.Name}: Busy");
+                return;
+            }
+
+            Active = false;
+            if (_brokerage == null)
+            {
+                return;
+            }
+
+            _connectCancel?.Cancel();
+
+            _disconnectCancel = new CancellationTokenSource();
+            await Task.Run(() => _brokerage.Disconnect(), _disconnectCancel.Token);
+            Positions.Clear();
+            Balances.Clear();
+            _brokerage = null;
+            _disconnectCancel = null;
         }
 
         private async void OnActiveCommand(bool value)
         {
             if (value)
             {
-                await StartTask();
+                await ConnectAsync();
             }
             else
             {
-                StopTask();
+                await DisconnectAsync();
             }
         }
 
-        private async void OnStartCommand()
+        private void OnMessage(object sender, BrokerageMessageEvent message)
         {
-            Active = true;
-            await StartTask();
+            var brokerage = sender as Brokerage;
+            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
         }
 
-        private void StartFxcm(CancellationToken cancel)
+        private void OnOrderStatusChanged(object sender, OrderEvent message)
         {
-            Brokerage brokerage = null;
-            try
+            var brokerage = sender as Brokerage;
+            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
+
+            // Update Orders
+            bool update = false;
+            foreach (OrderViewModel order in Orders)
             {
-                brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
-                brokerage.AccountChanged += OnAccountChanged;
-                brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
-                brokerage.OrderStatusChanged += OnOrderStatusChanged;
-                brokerage.Message += OnMessage;
-                brokerage.Connect();
-
-                List<QuantConnect.Orders.Order> orders = brokerage.GetOpenOrders();
-
-                brokerage.Get
-
-                bool stop = false;
-                while (!stop)
+                if (message.OrderId == order.Id)
                 {
-                    // Set Positions
-                    List<Holding> holdings = brokerage.GetAccountHoldings();
-                    if (Positions.Count != holdings.Count)
-                    {
-                        Positions.Clear();
-                        holdings.ForEach(m => Positions.Add(new PositionViewModel(m)));
-                    }
-                    else
-                    {
-                        int i = 0;
-                        foreach (var holding in holdings)
-                        {
-                            Positions[i++].Update(holding);
-                        }
-                    }
-
-                    // Set Balance
-                    List<QuantConnect.Securities.CashAmount> balances = brokerage.GetCashBalance();
-                    if (Balances.Count != balances.Count)
-                    {
-                        Balances.Clear();
-                        balances.ForEach(m => Balances.Add(new BalanceViewModel(m)));
-                    }
-                    else
-                    {
-                        int i = 0;
-                        foreach (var balance in balances)
-                        {
-                            Balances[i++].Update(balance);
-                        }
-                    }
-
-                    // Tick data
-
-                    stop = cancel.WaitHandle.WaitOne(1000);
-                }
-
-                brokerage.Disconnect();
-                Positions.Clear();
-                Balances.Clear();
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"{ex.GetType()}: {ex.Message}");
-                if (brokerage != null)
-                {
-                    brokerage.Disconnect();
+                    order.Update(message);
+                    update = true;
+                    break;
                 }
             }
+
+            if (!update)
+            {
+                Orders.Add(new OrderViewModel(message));
+            }
         }
 
-        private void OnMessage(object sender, QuantConnect.Brokerages.BrokerageMessageEvent e)
+        private void OnOptionPositionAssigned(object sender, OrderEvent message)
         {
-            Log.Trace($"{e.GetType()}: {e.Code} {e.Message}");
+            var brokerage = sender as Brokerage;
+            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
         }
 
-        private void OnOrderStatusChanged(object sender, QuantConnect.Orders.OrderEvent e)
+        private void OnAccountChanged(object sender, AccountEvent message)
         {
-            Log.Trace($"{e.GetType()}: {e.Message}");
-        }
+            var brokerage = sender as Brokerage;
+            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
 
-        private void OnOptionPositionAssigned(object sender, QuantConnect.Orders.OrderEvent e)
-        {
-            Log.Trace($"{e.GetType()}: {e.Message}");
-        }
+            // Update balance
+            bool update = false;
+            foreach (BalanceViewModel balance in Balances)
+            {
+                if (message.CurrencySymbol == balance.Currency)
+                {
+                    balance.Update(message);
+                    update = true;
+                    break;
+                }
+            }
 
-        private void OnAccountChanged(object sender, QuantConnect.Securities.AccountEvent e)
-        {
-            Log.Trace($"{e.GetType()}: {e.CurrencySymbol} {e.CashBalance}");
+            if (!update)
+            {
+                Balances.Add(new BalanceViewModel(message));
+            }
         }
     }
 }
