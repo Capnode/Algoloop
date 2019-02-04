@@ -34,6 +34,7 @@ namespace Algoloop.ViewModel
         private AccountsViewModel _parent;
         private CancellationTokenSource _cancel;
         private FxcmBrokerage _brokerage;
+        private Task _task;
         private const string FxcmServer = "http://www.fxcorporate.com/Hosts.jsp";
 
         public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel)
@@ -73,25 +74,57 @@ namespace Algoloop.ViewModel
 
         internal async Task ConnectAsync()
         {
-            Active = true;
-            if (_cancel != null)
+            if (_cancel != null || _task != null)
             {
-                Log.Error($"{_brokerage.Name}: Busy");
                 return;
             }
 
+            Active = true;
             Log.Trace($"Connect Account {Model.Name}");
-            _cancel = new CancellationTokenSource();
             try
             {
                 _brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
-                _brokerage.AccountChanged += OnAccountChanged;
-                _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
-                _brokerage.OrderStatusChanged += OnOrderStatusChanged;
                 _brokerage.Message += OnMessage;
+                _cancel = new CancellationTokenSource();
+                _task = Task.Run(() => MainLoop(), _cancel.Token);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
+            }
 
-                await Task.Run(() => _brokerage.Connect(), _cancel.Token);
+            if (!Active)
+            {
+                await DisconnectAsync();
+            }
+        }
 
+        internal async Task DisconnectAsync()
+        {
+            if (_cancel == null || _task == null)
+            {
+                return;
+            }
+
+            Active = false;
+            _cancel.Cancel();
+            await _task;
+            _cancel = null;
+            _task = null;
+
+            if (Active)
+            {
+                await ConnectAsync();
+            }
+        }
+
+        private void MainLoop()
+        {
+            _brokerage.Connect();
+
+            bool loop = true;
+            while (loop)
+            {
                 // Update Orders
                 List<Order> openOrders = _brokerage.GetOpenOrders();
                 foreach (Order openOrder in openOrders)
@@ -129,39 +162,12 @@ namespace Algoloop.ViewModel
                     Balances.Add(new BalanceViewModel(balance));
                 }
 
-                Active = true;
-                _cancel = null;
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
-                await DisconnectAsync();
-            }
-        }
-
-        internal async Task DisconnectAsync()
-        {
-            if (_cancel != null)
-            {
-                Active = true;
-                _cancel.Cancel();
-                Log.Error($"{_brokerage.Name}: Busy");
-                return;
+                loop = !_cancel.Token.WaitHandle.WaitOne(1000);
             }
 
-            Active = false;
-            if (_brokerage == null)
-            {
-                return;
-            }
-
-            _cancel = new CancellationTokenSource();
-            await Task.Run(() => _brokerage.Disconnect(), _cancel.Token);
+            _brokerage.Disconnect();
             Positions.Clear();
             Balances.Clear();
-            _brokerage = null;
-            _cancel = null;
-            Active = false;
         }
 
         private async void OnActiveCommand(bool value)
@@ -180,58 +186,6 @@ namespace Algoloop.ViewModel
         {
             var brokerage = sender as Brokerage;
             Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
-        }
-
-        private void OnOrderStatusChanged(object sender, OrderEvent message)
-        {
-            var brokerage = sender as Brokerage;
-            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
-
-            // Update Orders
-            bool update = false;
-            foreach (OrderViewModel order in Orders)
-            {
-                if (message.OrderId == order.Id)
-                {
-                    order.Update(message);
-                    update = true;
-                    break;
-                }
-            }
-
-            if (!update)
-            {
-                Orders.Add(new OrderViewModel(message));
-            }
-        }
-
-        private void OnOptionPositionAssigned(object sender, OrderEvent message)
-        {
-            var brokerage = sender as Brokerage;
-            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
-        }
-
-        private void OnAccountChanged(object sender, AccountEvent message)
-        {
-            var brokerage = sender as Brokerage;
-            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
-
-            // Update balance
-            bool update = false;
-            foreach (BalanceViewModel balance in Balances)
-            {
-                if (message.CurrencySymbol == balance.Currency)
-                {
-                    balance.Update(message);
-                    update = true;
-                    break;
-                }
-            }
-
-            if (!update)
-            {
-                Balances.Add(new BalanceViewModel(message));
-            }
         }
 
         internal void DataToModel()
