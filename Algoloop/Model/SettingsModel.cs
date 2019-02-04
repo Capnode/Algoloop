@@ -24,6 +24,21 @@ namespace Algoloop.Model
     public class SettingsModel
     {
         [DataMember]
+        [DisplayName("API access token")]
+        [Description("Your unique access token to the API.")]
+        public string ApiToken { get; set; }
+
+        [DataMember]
+        [DisplayName("API user id")]
+        [Description("Your user id for the API.")]
+        public string ApiUser { get; set; }
+
+        [DataMember]
+        [DisplayName("API data download")]
+        [Description("Download missing data from QuantConnect.")]
+        public bool ApiDownload { get; set; }
+
+        [DataMember]
         [DisplayName("Data folder")]
         [Description("Folder for market data.")]
         [Editor(typeof(FolderEditor), typeof(FolderEditor))]
@@ -36,6 +51,9 @@ namespace Algoloop.Model
 
         internal void Copy(SettingsModel oldSettings)
         {
+            ApiToken = oldSettings.ApiToken;
+            ApiUser = oldSettings.ApiUser;
+            ApiDownload = oldSettings.ApiDownload;
             DataFolder = oldSettings.DataFolder;
             MaxBacktests = oldSettings.MaxBacktests;
         }

@@ -199,6 +199,9 @@ namespace Algoloop.ViewModel
         internal void DataToModel()
         {
             Model.DataFolder = _settingsModel.DataFolder;
+            Model.ApiToken = _settingsModel.ApiToken;
+            Model.ApiUser = _settingsModel.ApiUser;
+            Model.ApiDownload = _settingsModel.ApiDownload;
 
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)

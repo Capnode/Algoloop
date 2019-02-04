@@ -71,8 +71,12 @@ namespace Algoloop.Service
             Config.Set("api-handler", "QuantConnect.Api.Api");
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
-            Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
             Config.Set("alpha-handler", "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler");
+
+            if (model.ApiDownload)
+                Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.ApiDataProvider");
+            else
+                Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
 
             if (account == null)
             {
@@ -130,8 +134,8 @@ namespace Algoloop.Service
                 Config.Set("fxcm-account-id", account.Id);
             }
 
-            Config.Set("api-access-token", "");
-            Config.Set("job-user-id", "0");
+            Config.Set("api-access-token", model.ApiToken);
+            Config.Set("job-user-id", model.ApiUser);
             Config.Set("job-project-id", "0");
             Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
             Config.Set("regression-update-statistics", "false");
