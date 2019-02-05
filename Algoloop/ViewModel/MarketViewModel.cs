@@ -45,6 +45,7 @@ namespace Algoloop.ViewModel
             ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
             StartCommand = new RelayCommand(() => OnStartCommand(), () => !Active);
             StopCommand = new RelayCommand(() => OnStopCommand(), () => Active);
+            SelectedChangedCommand = new RelayCommand(() => Model.Refresh(), true);
 
             DataFromModel();
 
@@ -65,14 +66,12 @@ namespace Algoloop.ViewModel
         public CollectionViewSource ActiveSymbols { get; } = new CollectionViewSource();
 
         public RelayCommand AddSymbolCommand { get; }
-
         public RelayCommand ImportSymbolsCommand { get; }
-
         public RelayCommand DeleteCommand { get; }
-
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
+        public RelayCommand SelectedChangedCommand { get; }
 
         public bool Active
         {
