@@ -97,7 +97,7 @@ namespace Algoloop.ViewModel
             AveragePrice = holding.AveragePrice;
             Quantity = holding.Quantity;
             MarketPrice = holding.MarketPrice;
-            ConversionRate = (decimal)holding.ConversionRate;
+            ConversionRate = holding.ConversionRate ?? 0;
             MarketValue = holding.MarketValue;
             UnrealizedPnL = holding.UnrealizedPnL;
         }
