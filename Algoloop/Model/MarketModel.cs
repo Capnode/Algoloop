@@ -17,38 +17,60 @@ using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
+    [RefreshProperties(RefreshProperties.All)]
     public class MarketModel
     {
+        private MarketType _provider;
+        private Resolution _resolution;
+
         public enum MarketType { None, CryptoIQ, Dukascopy, Fxcm, FxcmVolume, Gdax, Google, IB, IEX, Kraken, Oanda, QuandBitfinex, Yahoo };
         public enum AccessType { No_login, Demo, Real };
 
         [Category("Data provider")]
         [DisplayName("Market name")]
         [Description("Name of the market.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public string Name { get; set; } = "Market";
 
         [Category("Data provider")]
         [DisplayName("Provider")]
         [Description("Name of the data provider.")]
+        [RefreshProperties(RefreshProperties.All)]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
-        public MarketType Provider { get; set; }
+        public MarketType Provider
+        {
+            get => _provider;
+            set
+            {
+                _provider = value;
+                Refresh();
+            }
+        }
 
         [Category("Account")]
         [DisplayName("Access type")]
         [Description("Type of login account at data provider.")]
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public AccessType Access { get; set; }
 
         [Category("Account")]
         [DisplayName("Login")]
         [Description("User login.")]
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public string Login { get; set; } = string.Empty;
 
@@ -56,30 +78,86 @@ namespace Algoloop.Model
         [DisplayName("Password")]
         [Description("User login password.")]
         [PasswordPropertyText(true)]
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public string Password { get; set; } = string.Empty;
 
         [Category("Time")]
         [DisplayName("From date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public DateTime FromDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("Resolution")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
-        public Resolution Resolution { get; set; }
+        public Resolution Resolution
+        {
+            get => _resolution;
+            set => SetResolution(ref _resolution, value);
+        }
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public bool Active { get; set; }
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public string DataFolder { get; set; }
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
+
+        public void Refresh()
+        {
+            switch (Provider)
+            {
+                case MarketType.Fxcm:
+                    SetBrowsable("Access", true);
+                    SetBrowsable("Login", true);
+                    SetBrowsable("Password", true);
+                    break;
+                default:
+                    SetBrowsable("Access", false);
+                    SetBrowsable("Login", false);
+                    SetBrowsable("Password", false);
+                    break;
+            }
+        }
+
+        private void SetResolution(ref Resolution resolution, Resolution value)
+        {
+            switch (Provider)
+            {
+                default:
+                    resolution = value;
+                    break;
+            }
+        }
+
+        private void SetBrowsable(string property, bool value)
+        {
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
+            BrowsableAttribute attribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
+            FieldInfo fieldToChange = attribute.GetType().GetField("browsable", BindingFlags.NonPublic | BindingFlags.Instance);
+            fieldToChange.SetValue(attribute, value);
+        }
+
+        private void SetReadonly(string property, bool value)
+        {
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
+            ReadOnlyAttribute attribute = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
+            FieldInfo fieldToChange = attribute.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
+            fieldToChange.SetValue(attribute, value);
+        }
     }
 }
