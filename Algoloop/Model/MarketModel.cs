@@ -17,21 +17,19 @@ using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    [RefreshProperties(RefreshProperties.All)]
-    public class MarketModel
+    public class MarketModel : ModelBase
     {
         private MarketType _provider;
         private Resolution _resolution;
 
         public enum MarketType { None, CryptoIQ, Dukascopy, Fxcm, FxcmVolume, Gdax, Google, IB, IEX, Kraken, Oanda, QuandBitfinex, Yahoo };
-        public enum AccessType { No_login, Demo, Real };
+        public enum AccessType { Demo, Real };
 
         [Category("Data provider")]
         [DisplayName("Market name")]
@@ -142,22 +140,6 @@ namespace Algoloop.Model
                     resolution = value;
                     break;
             }
-        }
-
-        private void SetBrowsable(string property, bool value)
-        {
-            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
-            BrowsableAttribute attribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-            FieldInfo fieldToChange = attribute.GetType().GetField("browsable", BindingFlags.NonPublic | BindingFlags.Instance);
-            fieldToChange.SetValue(attribute, value);
-        }
-
-        private void SetReadonly(string property, bool value)
-        {
-            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
-            ReadOnlyAttribute attribute = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
-            FieldInfo fieldToChange = attribute.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
-            fieldToChange.SetValue(attribute, value);
         }
     }
 }

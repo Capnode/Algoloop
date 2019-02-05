@@ -63,6 +63,7 @@ namespace Algoloop.ViewModel
 
         private void OnSelectedChanged(AccountViewModel account)
         {
+            account.Model.Refresh();
             SelectedItem = account;
         }
 

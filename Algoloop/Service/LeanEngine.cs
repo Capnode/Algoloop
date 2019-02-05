@@ -92,7 +92,7 @@ namespace Algoloop.Service
                 Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             }
-            else if (account.Account.Equals(AccountModel.AccountType.Paper))
+            else if (account.Provider.Equals(AccountModel.AccountType.Paper))
             {
                 Config.Set("live-mode", "true");
                 Config.Set("live-mode-brokerage", "PaperBrokerage");
@@ -103,7 +103,7 @@ namespace Algoloop.Service
                 Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             }
-            else if (account.Account.Equals(AccountModel.AccountType.Fxcm))
+            else if (account.Provider.Equals(AccountModel.AccountType.Fxcm))
             {
                 Config.Set("environment", "live");
                 Config.Set("live-mode", "true");

@@ -16,41 +16,60 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
-using QuantConnect.Orders;
 
 namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class AccountModel
+    public class AccountModel : ModelBase
     {
+        private AccountType _provider;
+
         public enum AccountType { Paper, Fxcm };
-        public enum AccessType { No_login, Demo, Real };
+        public enum AccessType { Demo, Real };
 
         [DisplayName("Account name")]
         [Description("Name of the account.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public string Name { get; set; } = "Account";
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public bool Active { get; set; }
 
         [Category("Account")]
         [DisplayName("Account provider")]
         [Description("Name of the broker.")]
+        [RefreshProperties(RefreshProperties.All)]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
-        public AccountType Account { get; set; }
+        public AccountType Provider
+        {
+            get => _provider;
+            set
+            {
+                _provider = value;
+                Refresh();
+            }
+        }
 
         [Category("Account")]
         [DisplayName("Access type")]
         [Description("Type of login account at the broker.")]
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public AccessType Access { get; set; }
 
         [Category("Account")]
         [DisplayName("Login")]
         [Description("User login.")]
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public string Login { get; set; } = string.Empty;
 
@@ -58,21 +77,46 @@ namespace Algoloop.Model
         [DisplayName("Password")]
         [Description("User login password.")]
         [PasswordPropertyText(true)]
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public string Password { get; set; } = string.Empty;
 
         [Category("Account")]
         [DisplayName("Account number")]
         [Description("Account number.")]
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public string Id { get; set; } = string.Empty;
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public string DataFolder { get; set; }
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public List<OrderModel> Orders { get; } = new List<OrderModel>();
+
+        public void Refresh()
+        {
+            switch (Provider)
+            {
+                case AccountType.Fxcm:
+                    SetBrowsable("Access", true);
+                    SetBrowsable("Login", true);
+                    SetBrowsable("Password", true);
+                    SetBrowsable("Id", true);
+                    break;
+                default:
+                    SetBrowsable("Access", false);
+                    SetBrowsable("Login", false);
+                    SetBrowsable("Password", false);
+                    SetBrowsable("Id", false);
+                    break;
+            }
+        }
     }
 }

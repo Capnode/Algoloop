@@ -21,32 +21,42 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class SettingsModel
+    public class SettingsModel : ModelBase
     {
-        [DataMember]
         [DisplayName("API access token")]
         [Description("Your unique access token to the API.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
         public string ApiToken { get; set; }
 
-        [DataMember]
         [DisplayName("API user id")]
         [Description("Your user id for the API.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
         public string ApiUser { get; set; }
 
-        [DataMember]
         [DisplayName("API data download")]
         [Description("Download missing data from QuantConnect.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
         public bool ApiDownload { get; set; }
 
-        [DataMember]
         [DisplayName("Data folder")]
         [Description("Folder for market data.")]
         [Editor(typeof(FolderEditor), typeof(FolderEditor))]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
         public string DataFolder { get; set; } = @"..\..\..\Data";
 
-        [DataMember]
         [DisplayName("Max backtests")]
         [Description("Largest number of simultaneous ongoing backtest execution.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
         public int MaxBacktests { get; set; } = Environment.ProcessorCount;
 
         internal void Copy(SettingsModel oldSettings)

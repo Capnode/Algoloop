@@ -24,11 +24,12 @@ using static Algoloop.Model.MarketModel;
 namespace Algoloop.Model
 {
     [DataContract]
-    public class StrategyModel
+    public class StrategyModel : ModelBase
     {
         public event Action<string> AlgorithmNameChanged;
 
         private string _algorithmName;
+        private string _account;
 
         public StrategyModel()
         {
@@ -54,12 +55,16 @@ namespace Algoloop.Model
         [Category("Information")]
         [DisplayName("Name")]
         [Description("Name of the strategy.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public string Name { get; set; } = "Strategy";
 
         [Category("Broker")]
         [DisplayName("Data provider")]
         [Description("Market data provider")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public MarketType Provider { get; set; }
 
@@ -68,38 +73,60 @@ namespace Algoloop.Model
         [Description("Trading account for live or paper trading.")]
         [RefreshProperties(RefreshProperties.Repaint)]
         [TypeConverter(typeof(AccountNameConverter))]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
-        public string Account { get; set; }
+        public string Account
+        {
+            get => _account;
+            set
+            {
+                _account = value;
+                Refresh();
+            }
+        }
 
         [Category("Time")]
         [DisplayName("Bars back")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public int BarsBack { get; set; }
 
         [Category("Time")]
         [DisplayName("From date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public DateTime StartDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("To date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("Resolution")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public Resolution Resolution { get; set; }
 
         [Category("Capital")]
         [DisplayName("Initial capial")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public long InitialCapital { get; set; }
 
         [Category("Capital")]
         [DisplayName("Percent capital per position")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public double PcntCapitalPerPosition { get; set; }
 
@@ -107,12 +134,16 @@ namespace Algoloop.Model
         [DisplayName("File location")]
         [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
         [RefreshProperties(RefreshProperties.All)]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public string AlgorithmLocation { get; set; }
 
         [Category("Algorithm")]
         [DisplayName("Algorithm name")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public string AlgorithmName
         {
@@ -125,15 +156,22 @@ namespace Algoloop.Model
         }
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public List<ParameterModel> Parameters { get; } = new List<ParameterModel>();
 
         [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public List<StrategyJobModel> Jobs { get; } = new List<StrategyJobModel>();
+
+        public void Refresh()
+        {
+        }
     }
 }

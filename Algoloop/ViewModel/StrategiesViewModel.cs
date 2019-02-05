@@ -132,7 +132,16 @@ namespace Algoloop.ViewModel
 
         private void OnSelectedChanged(ViewModelBase vm)
         {
-            SelectedItem = vm;
+            if (vm is StrategyViewModel strategy)
+            {
+                strategy.Model.Refresh();
+                SelectedItem = strategy;
+            }
+            else if (vm is StrategyJobViewModel job)
+            {
+                job.Model.Refresh();
+                SelectedItem = job;
+            }
         }
 
         private void ImportStrategy()

@@ -25,36 +25,43 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class StrategyJobModel
+    public class StrategyJobModel : ModelBase
     {
         [Category("Information")]
         [DisplayName("Name")]
         [Description("Name of the job.")]
-        [ReadOnly(true)]
+        [ReadOnly(false)]
+        [Browsable(true)]
         [DataMember]
         public string Name { get; set; } = "Job";
 
         [Category("Broker")]
         [DisplayName("Data provider")]
         [Description("Market data provider")]
+        [ReadOnly(false)]
+        [Browsable(true)]
         [DataMember]
         public MarketType Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
         [Description("Trading account for live or paper trading.")]
+        [ReadOnly(false)]
+        [Browsable(true)]
         [DataMember]
         public string Account { get; set; }
 
         [Category("Time")]
         [DisplayName("Bars back")]
         [ReadOnly(true)]
+        [Browsable(true)]
         [DataMember]
         public int BarsBack { get; set; }
 
         [Category("Time")]
         [DisplayName("From date")]
         [ReadOnly(true)]
+        [Browsable(true)]
         [DataMember]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         public DateTime StartDate { get; set; } = DateTime.Today;
@@ -62,6 +69,7 @@ namespace Algoloop.Model
         [Category("Time")]
         [DisplayName("To date")]
         [ReadOnly(true)]
+        [Browsable(true)]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [DataMember]
         public DateTime EndDate { get; set; } = DateTime.Today;
@@ -69,70 +77,85 @@ namespace Algoloop.Model
         [Category("Time")]
         [DisplayName("Resolution")]
         [ReadOnly(true)]
+        [Browsable(true)]
         [DataMember]
         public Resolution Resolution { get; set; }
 
         [Category("Capital")]
         [DisplayName("Initial capial")]
         [ReadOnly(true)]
+        [Browsable(true)]
         [DataMember]
         public long InitialCapital { get; set; }
 
         [Category("Capital")]
         [DisplayName("Percent capital per position")]
         [ReadOnly(true)]
+        [Browsable(true)]
         [DataMember]
         public double PcntCapitalPerPosition { get; set; }
 
         [Category("Algorithm")]
         [DisplayName("File location")]
-        [ReadOnly(true)]
         [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
+        [ReadOnly(true)]
+        [Browsable(true)]
         [DataMember]
         public string AlgorithmLocation { get; set; }
 
         [Category("Algorithm")]
         [DisplayName("Algorithm name")]
         [ReadOnly(true)]
+        [Browsable(true)]
         [DataMember]
         public string AlgorithmName { get; set; }
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public bool Active { get; set; } = true;
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public List<ParameterModel> Parameters { get; } = new List<ParameterModel>();
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public string DataFolder { get; set; }
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public string ApiUser { get; set; }
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public string ApiToken { get; set; }
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public bool ApiDownload { get; set; }
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public bool Completed { get; set; }
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public string Result { get; set; }
 
+        [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
         public string Logs { get; set; }
@@ -167,6 +190,10 @@ namespace Algoloop.Model
             {
                 Name = parameters;
             }
+        }
+
+        public void Refresh()
+        {
         }
     }
 }
