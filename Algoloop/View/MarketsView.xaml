@@ -117,12 +117,6 @@
                                     ShowAdvancedOptions="False"
                                     ShowSortOptions="False"
                                     SelectedObject="{Binding Model}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="SelectedObjectChanged">
-                                            <i:InvokeCommandAction
-                                                Command="{Binding SelectedChangedCommand}"/>
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
                                 </xctk:PropertyGrid>
                             </TabItem>
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">

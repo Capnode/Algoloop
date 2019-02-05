@@ -66,6 +66,7 @@ namespace Algoloop.ViewModel
 
         private void OnSelectedChanged(MarketViewModel market)
         {
+            market.Model.Refresh();
             SelectedItem = market;
         }
 
