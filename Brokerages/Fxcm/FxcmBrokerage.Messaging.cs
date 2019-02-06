@@ -161,16 +161,18 @@ namespace QuantConnect.Brokerages.Fxcm
             }
 
             AutoResetEvent autoResetEvent;
+            List<MarketDataSnapshot> quotes;
             lock (_locker)
             {
                 _currentRequest = _gateway.sendMessage(request);
                 autoResetEvent = new AutoResetEvent(false);
                 _mapRequestsToAutoResetEvents[_currentRequest] = autoResetEvent;
+                quotes = _rates.Where(x => fxcmSymbols.Contains(x.Key)).Select(x => x.Value).ToList();
             }
             if (!autoResetEvent.WaitOne(ResponseTimeout))
                 throw new TimeoutException(string.Format("FxcmBrokerage.GetQuotes(): Operation took longer than {0} seconds.", (decimal)ResponseTimeout / 1000));
 
-            return _rates.Where(x => fxcmSymbols.Contains(x.Key)).Select(x => x.Value).ToList();
+            return quotes;
         }
 
         #region IGenericMessageListener implementation
@@ -330,7 +332,10 @@ namespace QuantConnect.Brokerages.Fxcm
             else
             {
                 // update the current prices for the instrument
-                _rates[instrument.getSymbol()] = message;
+                lock (_locker)
+                {
+                    _rates[instrument.getSymbol()] = message;
+                }
 
                 // if instrument is subscribed, add ticks to list
                 if (_subscribedSymbols.Contains(symbol))
