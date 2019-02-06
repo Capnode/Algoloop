@@ -30,7 +30,7 @@ namespace Algoloop.Model
         [Category("Information")]
         [DisplayName("Name")]
         [Description("Name of the job.")]
-        [ReadOnly(false)]
+        [ReadOnly(true)]
         [Browsable(true)]
         [DataMember]
         public string Name { get; set; } = "Job";
@@ -38,7 +38,7 @@ namespace Algoloop.Model
         [Category("Broker")]
         [DisplayName("Data provider")]
         [Description("Market data provider")]
-        [ReadOnly(false)]
+        [ReadOnly(true)]
         [Browsable(true)]
         [DataMember]
         public MarketType Provider { get; set; }
@@ -46,7 +46,7 @@ namespace Algoloop.Model
         [Category("Broker")]
         [DisplayName("Account")]
         [Description("Trading account for live or paper trading.")]
-        [ReadOnly(false)]
+        [ReadOnly(true)]
         [Browsable(true)]
         [DataMember]
         public string Account { get; set; }

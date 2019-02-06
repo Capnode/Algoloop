@@ -117,7 +117,7 @@ namespace Algoloop.ViewModel
                 DeleteJobCommand.RaiseCanExecuteChanged();
                 if (value)
                 {
-                    StartTaskAsync();
+                    Task task = StartTaskAsync();
                 }
                 else
                 {
@@ -150,15 +150,10 @@ namespace Algoloop.ViewModel
             _parent.RefreshSummary();
 
             // Get account
-            AccountModel account = null;
-            if (!string.IsNullOrEmpty(Model.Account))
-            {
-                IReadOnlyList<AccountModel> accounts = null;
-                var message = new NotificationMessageAction<List<AccountModel>>(Model.Account, m => accounts = m);
-                Messenger.Default.Send(message);
-                Debug.Assert(accounts != null);
-                account = accounts.FirstOrDefault();
-            }
+            IReadOnlyList<AccountModel> accounts = null;
+            var message = new NotificationMessageAction<List<AccountModel>>(Model.Account, m => accounts = m);
+            Messenger.Default.Send(message);
+            AccountModel account = accounts?.FirstOrDefault();
 
             // Set search path if not base directory
             string folder = Path.GetDirectoryName(Model.AlgorithmLocation);

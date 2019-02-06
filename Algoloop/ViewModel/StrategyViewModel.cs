@@ -113,7 +113,11 @@ namespace Algoloop.ViewModel
         internal bool DeleteJob(StrategyJobViewModel job)
         {
             bool ok = Jobs.Remove(job);
-            Debug.Assert(ok);
+            if (!ok)
+            {
+                return false;
+            }
+
             DataRow rowToDelete = null;
             foreach (DataRow row in Summary.Rows)
             {

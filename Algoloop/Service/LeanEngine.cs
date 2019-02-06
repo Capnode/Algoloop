@@ -32,7 +32,10 @@ namespace Algoloop.Service
         public StrategyJobModel Run(StrategyJobModel model, AccountModel account, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
-            SetConfig(model, account);
+            if (!SetConfig(model, account))
+            {
+                return model;
+            }
 
             var liveMode = Config.GetBool("live-mode");
             Log.Trace("LeanEngine: Memory " + OS.ApplicationMemoryUsed + "Mb-App " + OS.TotalPhysicalMemoryUsed + "Mb-Used");
@@ -64,8 +67,10 @@ namespace Algoloop.Service
             return model;
         }
 
-        private void SetConfig(StrategyJobModel model, AccountModel account)
+        private bool SetConfig(StrategyJobModel model, AccountModel account)
         {
+            var parameters = new Dictionary<string, string>();
+
             Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
             Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
             Config.Set("api-handler", "QuantConnect.Api.Api");
@@ -78,11 +83,10 @@ namespace Algoloop.Service
             else
                 Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
 
-            if (account == null)
+            if (model.Account.Equals(AccountModel.AccountType.Backtest.ToString()))
             {
                 Config.Set("environment", "backtesting");
                 Config.Set("live-mode", "false");
-
                 Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler");
 //                Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
                 Config.Set("result-handler", "Algoloop.Service.BacktestResultHandler");
@@ -91,8 +95,9 @@ namespace Algoloop.Service
                 Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
                 Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
+                parameters.Add("market", model.Provider.ToString());
             }
-            else if (account.Provider.Equals(AccountModel.AccountType.Paper))
+            else if (model.Account.Equals(AccountModel.AccountType.Paper.ToString()))
             {
                 Config.Set("live-mode", "true");
                 Config.Set("live-mode-brokerage", "PaperBrokerage");
@@ -102,8 +107,9 @@ namespace Algoloop.Service
                 Config.Set("data-queue-handler", "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue");
                 Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
+                parameters.Add("market", model.Provider.ToString());
             }
-            else if (account.Provider.Equals(AccountModel.AccountType.Fxcm))
+            else if (account.Brokerage.Equals(AccountModel.BrokerageType.Fxcm))
             {
                 Config.Set("environment", "live");
                 Config.Set("live-mode", "true");
@@ -116,8 +122,12 @@ namespace Algoloop.Service
                 Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler");
                 Config.Set("live-mode-brokerage", "FxcmBrokerage");
                 Config.Set("data-queue-handler", "FxcmBrokerage");
-
                 Config.Set("force-exchange-always-open", "false");
+                Config.Set("fxcm-user-name", account.Login);
+                Config.Set("fxcm-password", account.Password);
+                Config.Set("fxcm-account-id", account.Id);
+                parameters.Add("market", Market.FXCM.ToString());
+
                 switch (account.Access)
                 {
                     case AccountModel.AccessType.Demo:
@@ -128,10 +138,11 @@ namespace Algoloop.Service
                         Config.Set("fxcm-terminal", "Real");
                         break;
                 }
-
-                Config.Set("fxcm-user-name", account.Login);
-                Config.Set("fxcm-password", account.Password);
-                Config.Set("fxcm-account-id", account.Id);
+            }
+            else
+            {
+                Log.Error("No broker selected");
+                return false;
             }
 
             Config.Set("api-access-token", model.ApiToken);
@@ -163,12 +174,10 @@ namespace Algoloop.Service
             Config.Set("algorithm-type-name", model.AlgorithmName);
 
             // Set parameters
-            var parameters = new Dictionary<string, string>();
             parameters.Add("startdate", model.StartDate.ToString());
             parameters.Add("enddate", model.EndDate.ToString());
             parameters.Add("cash", model.InitialCapital.ToString());
             parameters.Add("resolution", model.Resolution.ToString());
-            parameters.Add("market", model.Provider.ToString());
             parameters.Add(
                 "symbols",
                 string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Name)));
@@ -187,6 +196,7 @@ namespace Algoloop.Service
 
             string parametersConfigString = JsonConvert.SerializeObject(parameters);
             Config.Set("parameters", parametersConfigString);
+            return true;
         }
     }
 }

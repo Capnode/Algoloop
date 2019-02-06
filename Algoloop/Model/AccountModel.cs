@@ -23,9 +23,9 @@ namespace Algoloop.Model
     [DataContract]
     public class AccountModel : ModelBase
     {
-        private AccountType _provider;
-
-        public enum AccountType { Paper, Fxcm };
+        private BrokerageType _brokerage;
+        public enum AccountType { Backtest, Paper, Live };
+        public enum BrokerageType { Fxcm };
         public enum AccessType { Demo, Real };
 
         [DisplayName("Account name")]
@@ -41,25 +41,25 @@ namespace Algoloop.Model
         public bool Active { get; set; }
 
         [Category("Account")]
-        [DisplayName("Account provider")]
+        [DisplayName("Brokerage")]
         [Description("Name of the broker.")]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public AccountType Provider
+        public BrokerageType Brokerage
         {
-            get => _provider;
+            get => _brokerage;
             set
             {
-                _provider = value;
+                _brokerage = value;
                 Refresh();
             }
         }
 
         [Category("Account")]
-        [DisplayName("Access type")]
-        [Description("Type of login account at the broker.")]
+        [DisplayName("Type")]
+        [Description("Type of account at the broker.")]
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
@@ -102,9 +102,9 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
-            switch (Provider)
+            switch (Brokerage)
             {
-                case AccountType.Fxcm:
+                case BrokerageType.Fxcm:
                     SetBrowsable("Access", true);
                     SetBrowsable("Login", true);
                     SetBrowsable("Password", true);

@@ -314,9 +314,9 @@ namespace Algoloop.ViewModel
         {
             Id = order.Id;
             ContingentId = order.ContingentId;
-            Symbol = order.Symbol;
+            Symbol = order.Symbol.Value;
             BrokerId = order.BrokerId;
-            Symbol = order.Symbol;
+            Symbol = order.Symbol.Value;
             Price = order.Price;
             PriceCurrency = order.PriceCurrency;
             Time = order.Time;
@@ -364,7 +364,7 @@ namespace Algoloop.ViewModel
 
         internal void Update(OrderEvent message)
         {
-            Symbol = message.Symbol;
+            Symbol = message.Symbol.Value;
             Id = message.OrderId;
             Price = message.FillPrice;
             PriceCurrency = message.FillPriceCurrency;

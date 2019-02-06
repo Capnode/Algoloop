@@ -85,6 +85,9 @@ namespace Algoloop.ViewModel
             {
                 _brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
                 _brokerage.Message += OnMessage;
+                _brokerage.AccountChanged += OnAccountChanged;
+                _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
+                _brokerage.OrderStatusChanged += OnOrderStatusChanged;
                 _cancel = new CancellationTokenSource();
                 _task = Task.Run(() => MainLoop(), _cancel.Token);
             }
@@ -121,53 +124,109 @@ namespace Algoloop.ViewModel
         private void MainLoop()
         {
             _brokerage.Connect();
-
             bool loop = true;
             while (loop)
             {
-                // Update Orders
-                List<Order> openOrders = _brokerage.GetOpenOrders();
-                foreach (Order openOrder in openOrders)
-                {
-                    bool update = false;
-                    foreach (OrderViewModel order in Orders)
-                    {
-                        if (openOrder.Id == order.Id)
-                        {
-                            order.Update(openOrder);
-                            update = true;
-                            break;
-                        }
-                    }
-
-                    if (!update)
-                    {
-                        Orders.Add(new OrderViewModel(openOrder));
-                    }
-                }
-
-                // Set Positions
-                Positions.Clear();
-                List<Holding> holdings = _brokerage.GetAccountHoldings();
-                foreach (var holding in holdings)
-                {
-                    Positions.Add(new PositionViewModel(holding));
-                }
-
-                // Set Balance
-                Balances.Clear();
-                List<CashAmount> balances = _brokerage.GetCashBalance();
-                foreach (var balance in balances)
-                {
-                    Balances.Add(new BalanceViewModel(balance));
-                }
-
+                UpdateOrder();
+                UpdatePosition();
+                UpdateBalance();
                 loop = !_cancel.Token.WaitHandle.WaitOne(1000);
             }
 
             _brokerage.Disconnect();
             Positions.Clear();
             Balances.Clear();
+        }
+
+        private void UpdateOrder()
+        {
+            List<Order> orders = _brokerage.GetOpenOrders();
+            foreach (Order order in orders)
+            {
+                bool update = false;
+                foreach (OrderViewModel vm in Orders)
+                {
+                    if (order.Id == vm.Id)
+                    {
+                        vm.Update(order);
+                        update = true;
+                        break;
+                    }
+                }
+
+                if (!update)
+                {
+                    Orders.Add(new OrderViewModel(order));
+                }
+            }
+        }
+
+        private void UpdatePosition()
+        {
+            List<Holding> holdings = _brokerage.GetAccountHoldings();
+            foreach (Holding holding in holdings)
+            {
+                bool update = false;
+                foreach (PositionViewModel vm in Positions)
+                {
+                    if (holding.Symbol.Value == vm.Symbol)
+                    {
+                        vm.Update(holding);
+                        update = true;
+                        break;
+                    }
+                }
+
+                if (!update)
+                {
+                    Positions.Add(new PositionViewModel(holding));
+                }
+            }
+
+            PositionViewModel[] vms = new PositionViewModel[Positions.Count];
+            Positions.CopyTo(vms, 0);
+            foreach (PositionViewModel vm in vms)
+            {
+                Holding holding = holdings.Find(m => m.Symbol.Value == vm.Symbol);
+                if (holding == null)
+                {
+                    Positions.Remove(vm);
+                }
+            }
+        }
+
+        private void UpdateBalance()
+        {
+            List<CashAmount> balances = _brokerage.GetCashBalance();
+            foreach (CashAmount balance in balances)
+            {
+                bool update = false;
+                foreach (BalanceViewModel vm in Balances)
+                {
+                    if (vm.Currency == balance.Currency)
+                    {
+                        vm.Update(balance);
+                        update = true;
+                        break;
+                    }
+                }
+
+                if (!update)
+                {
+                    Balances.Add(new BalanceViewModel(balance));
+                }
+            }
+
+            BalanceViewModel[] vms = new BalanceViewModel[Balances.Count];
+            Balances.CopyTo(vms, 0);
+            foreach (BalanceViewModel vm in vms)
+            {
+                CashAmount balance = balances.Find(m => m.Currency == vm.Currency);
+                if (balance == null)
+                {
+                    Balances.Remove(vm);
+                }
+            }
         }
 
         private async void OnActiveCommand(bool value)
@@ -186,6 +245,24 @@ namespace Algoloop.ViewModel
         {
             var brokerage = sender as Brokerage;
             Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
+        }
+
+        private void OnAccountChanged(object sender, AccountEvent e)
+        {
+            var brokerage = sender as Brokerage;
+            Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
+        }
+
+        private void OnOrderStatusChanged(object sender, OrderEvent e)
+        {
+            var brokerage = sender as Brokerage;
+            Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
+        }
+
+        private void OnOptionPositionAssigned(object sender, OrderEvent e)
+        {
+            var brokerage = sender as Brokerage;
+            Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
         }
 
         internal void DataToModel()

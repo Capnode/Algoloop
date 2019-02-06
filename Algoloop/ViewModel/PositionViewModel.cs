@@ -47,7 +47,7 @@ namespace Algoloop.ViewModel
             set => Set(ref _securityType, value);
         }
 
-        public string SymbolCurrency
+        public string CurrencySymbol
         {
             get => _symbolCurrency;
             set => Set(ref _symbolCurrency, value);
@@ -93,7 +93,7 @@ namespace Algoloop.ViewModel
         {
             Symbol = holding.Symbol.ID.Symbol;
             SecurityType = Enum.GetName(typeof(SecurityType), holding.Type);
-            SymbolCurrency = holding.CurrencySymbol;
+            CurrencySymbol = holding.CurrencySymbol;
             AveragePrice = holding.AveragePrice;
             Quantity = holding.Quantity;
             MarketPrice = holding.MarketPrice;

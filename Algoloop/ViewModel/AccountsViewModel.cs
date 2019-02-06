@@ -30,6 +30,12 @@ namespace Algoloop.ViewModel
 {
     public class AccountsViewModel : ViewModelBase
     {
+        private static readonly AccountModel[] _standardAccounts = new []
+        {
+            new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
+            new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
+        };
+
         private AccountViewModel _selectedItem;
 
         public AccountsViewModel(AccountsModel model)
@@ -69,13 +75,14 @@ namespace Algoloop.ViewModel
 
         private void OnNotificationMessage(NotificationMessageAction<List<AccountModel>> message)
         {
+            IEnumerable<AccountModel> accounts = Accounts.Select(m => m.Model).Concat(_standardAccounts);
             if (string.IsNullOrEmpty(message.Notification))
             {
-                message.Execute(Accounts.Select(m => m.Model).ToList());
+                message.Execute(accounts.ToList());
             }
             else
             {
-                message.Execute(Accounts.Where(s => s.Model.Name.Equals(message.Notification)).Select(m => m.Model).ToList());
+                message.Execute(accounts.Where(s => s.Name.Equals(message.Notification)).ToList());
             }
         }
 

@@ -62,7 +62,7 @@ namespace Algoloop.Model
 
         [Category("Broker")]
         [DisplayName("Data provider")]
-        [Description("Market data provider")]
+        [Description("Market data provider for backtest")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
@@ -70,7 +70,7 @@ namespace Algoloop.Model
 
         [Category("Broker")]
         [DisplayName("Account")]
-        [Description("Trading account for live or paper trading.")]
+        [Description("Name of trading account.")]
         [RefreshProperties(RefreshProperties.Repaint)]
         [TypeConverter(typeof(AccountNameConverter))]
         [Browsable(true)]
@@ -172,6 +172,15 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
+            if (Account.Equals(AccountModel.AccountType.Backtest.ToString())
+             || Account.Equals(AccountModel.AccountType.Paper.ToString()))
+            {
+                SetBrowsable("Provider", true);
+            }
+            else
+            {
+                SetBrowsable("Provider", false);
+            }
         }
     }
 }

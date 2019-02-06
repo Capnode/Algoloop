@@ -25,13 +25,13 @@ namespace Algoloop.ViewSupport
     {
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            //true means show a combobox
+            // true means show a combobox
             return true;
         }
 
         public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
         {
-            //true will limit to list. false will show the list, but allow free-form entry
+            // true will limit to list. false will show the list, but allow free-form entry
             return true;
         }
 
@@ -46,8 +46,6 @@ namespace Algoloop.ViewSupport
                 .Select(m => m.Name)
                 .ToList();
 
-            // Add empty account
-            list.Add(string.Empty);
             list.Sort();
 
             return new StandardValuesCollection(list);

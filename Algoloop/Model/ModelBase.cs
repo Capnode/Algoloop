@@ -11,13 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
+using System;
 using System.ComponentModel;
 using System.Reflection;
 
 namespace Algoloop.Model
 {
-   abstract public class ModelBase
+    [Serializable]
+    abstract public class ModelBase
     {
         protected void SetBrowsable(string property, bool value)
         {
