@@ -40,7 +40,7 @@ namespace Algoloop.ViewModel
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
-        private Isolated<LeanEngine> _leanEngine;
+        private Isolated<LeanLauncher> _leanEngine;
         private StrategyJobModel _model;
         private bool _isSelected;
         private bool _isExpanded;
@@ -165,7 +165,7 @@ namespace Algoloop.ViewModel
             StrategyJobModel model = Model;
             try
             {
-                _leanEngine = new Isolated<LeanEngine>();
+                _leanEngine = new Isolated<LeanLauncher>();
                 _cancel = new CancellationTokenSource();
                 await Task.Run(() => model = _leanEngine.Value.Run(Model, account, new HostDomainLogger()), _cancel.Token);
                 _leanEngine.Dispose();

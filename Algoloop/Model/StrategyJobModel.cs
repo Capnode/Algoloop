@@ -27,86 +27,104 @@ namespace Algoloop.Model
     [DataContract]
     public class StrategyJobModel : ModelBase
     {
+        private string _account;
+
         [Category("Information")]
         [DisplayName("Name")]
         [Description("Name of the job.")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public string Name { get; set; } = "Job";
+
+        [Category("Information")]
+        [DisplayName("Desktop")]
+        [Description("Desktop execution.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public bool Desktop { get; set; }
 
         [Category("Broker")]
         [DisplayName("Data provider")]
         [Description("Market data provider")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public MarketType Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
         [Description("Trading account for live or paper trading.")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
-        public string Account { get; set; }
+        public string Account
+        {
+            get => _account;
+            set
+            {
+                _account = value;
+                Refresh();
+            }
+        }
 
         [Category("Time")]
         [DisplayName("Bars back")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public int BarsBack { get; set; }
 
         [Category("Time")]
         [DisplayName("From date")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         public DateTime StartDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("To date")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [DataMember]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("Resolution")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public Resolution Resolution { get; set; }
 
         [Category("Capital")]
         [DisplayName("Initial capial")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public long InitialCapital { get; set; }
 
         [Category("Capital")]
         [DisplayName("Percent capital per position")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public double PcntCapitalPerPosition { get; set; }
 
         [Category("Algorithm")]
         [DisplayName("File location")]
         [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public string AlgorithmLocation { get; set; }
 
         [Category("Algorithm")]
         [DisplayName("Algorithm name")]
-        [ReadOnly(true)]
         [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
         public string AlgorithmName { get; set; }
 
@@ -167,6 +185,7 @@ namespace Algoloop.Model
         public StrategyJobModel(string name, StrategyModel strategy)
         {
             Name = name;
+            Desktop = strategy.Desktop;
             Account = strategy.Account;
             Provider = strategy.Provider;
             BarsBack = strategy.BarsBack;
@@ -194,6 +213,16 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
+            if (Account == null
+             || Account.Equals(AccountModel.AccountType.Backtest.ToString())
+             || Account.Equals(AccountModel.AccountType.Paper.ToString()))
+            {
+                SetBrowsable("Provider", true);
+            }
+            else
+            {
+                SetBrowsable("Provider", false);
+            }
         }
     }
 }

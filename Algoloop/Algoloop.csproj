@@ -272,7 +272,7 @@
     <Compile Include="ViewSupport\FolderEditor.cs" />
     <Compile Include="Model\ParameterModel.cs" />
     <Compile Include="Service\BacktestResultHandler.cs" />
-    <Compile Include="Service\LeanEngine.cs" />
+    <Compile Include="Service\LeanLauncher.cs" />
     <Compile Include="ViewModel\ParameterViewModel.cs" />
     <Compile Include="ViewModel\StatisticViewModel.cs" />
     <Compile Include="ViewSupport\AlgorithmNameConverter.cs" />

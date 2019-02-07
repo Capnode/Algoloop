@@ -38,6 +38,7 @@ namespace Algoloop.Model
         public StrategyModel(StrategyModel model)
         {
             Name = model.Name;
+            Desktop = model.Desktop;
             Provider = model.Provider;
             Account = model.Account;
             BarsBack = model.BarsBack;
@@ -59,6 +60,14 @@ namespace Algoloop.Model
         [ReadOnly(false)]
         [DataMember]
         public string Name { get; set; } = "Strategy";
+
+        [Category("Information")]
+        [DisplayName("Desktop")]
+        [Description("Desktop execution.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public bool Desktop { get; set; }
 
         [Category("Broker")]
         [DisplayName("Data provider")]
