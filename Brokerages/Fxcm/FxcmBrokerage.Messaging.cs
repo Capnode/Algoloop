@@ -167,10 +167,14 @@ namespace QuantConnect.Brokerages.Fxcm
                 _currentRequest = _gateway.sendMessage(request);
                 autoResetEvent = new AutoResetEvent(false);
                 _mapRequestsToAutoResetEvents[_currentRequest] = autoResetEvent;
-                quotes = _rates.Where(x => fxcmSymbols.Contains(x.Key)).Select(x => x.Value).ToList();
             }
             if (!autoResetEvent.WaitOne(ResponseTimeout))
                 throw new TimeoutException(string.Format("FxcmBrokerage.GetQuotes(): Operation took longer than {0} seconds.", (decimal)ResponseTimeout / 1000));
+
+            lock (_locker)
+            {
+                quotes = _rates.Where(x => fxcmSymbols.Contains(x.Key)).Select(x => x.Value).ToList();
+            }
 
             return quotes;
         }

@@ -188,7 +188,7 @@ namespace Algoloop.ViewModel
             foreach (PositionViewModel vm in vms)
             {
                 Holding holding = holdings.Find(m => m.Symbol.Value == vm.Symbol);
-                if (holding == null)
+                if (holding == null || holding.Symbol == null)
                 {
                     Positions.Remove(vm);
                 }
@@ -222,7 +222,7 @@ namespace Algoloop.ViewModel
             foreach (BalanceViewModel vm in vms)
             {
                 CashAmount balance = balances.Find(m => m.Currency == vm.Currency);
-                if (balance == null)
+                if (balance == null || balance.Currency == null)
                 {
                     Balances.Remove(vm);
                 }
