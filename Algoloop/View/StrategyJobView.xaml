@@ -105,6 +105,9 @@
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
                 <view:AmChart ItemsSource="{Binding Charts}"/>
             </TabItem>
+            <TabItem Header="Desktop">
+                <viewsupport:HtmlBox HtmlText="{Binding HtmlText}"/>
+            </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox
                     Text="{Binding Logs, Mode=OneWay}"

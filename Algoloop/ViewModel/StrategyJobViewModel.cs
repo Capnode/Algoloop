@@ -30,6 +30,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,6 +46,7 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
+        private string _htmlText;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -124,6 +126,12 @@ namespace Algoloop.ViewModel
                     StopTask();
                 }
             }
+        }
+
+        public string HtmlText
+        {
+            get => _htmlText;
+            set => Set(ref _htmlText, value);
         }
 
         public override string ToString()
@@ -288,6 +296,10 @@ namespace Algoloop.ViewModel
             _parent.RefreshSummary();
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
+
+            string url = @"https://www.quantconnect.com";
+            WebClient client = new WebClient();
+            HtmlText = client.DownloadString(url);
         }
 
         private void AddCustomStatistics(BacktestResult result, DataRow row)

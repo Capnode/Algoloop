@@ -247,6 +247,9 @@
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\OrderModel.cs" />
     <Compile Include="ViewModel\OrderViewModel.cs" />
+    <Compile Include="ViewSupport\HtmlBox.xaml.cs">
+      <DependentUpon>HtmlBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\AmChart.xaml.cs">
       <DependentUpon>AmChart.xaml</DependentUpon>
     </Compile>
@@ -314,6 +317,10 @@
     <Compile Include="View\StrategyJobView.xaml.cs">
       <DependentUpon>StrategyJobView.xaml</DependentUpon>
     </Compile>
+    <Page Include="ViewSupport\HtmlBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\AmChart.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
