@@ -149,6 +149,14 @@ namespace Algoloop.ViewModel
             DataRow row = _parent.CreateSummaryRow(this);
             _parent.RefreshSummary();
 
+            // Account must not be null
+            if (Model.Account == null)
+            {
+                Active = false;
+                Log.Error($"Strategy {Model.Name}: Account is not defined!");
+                return;
+            }
+
             // Get account
             IReadOnlyList<AccountModel> accounts = null;
             var message = new NotificationMessageAction<List<AccountModel>>(Model.Account, m => accounts = m);

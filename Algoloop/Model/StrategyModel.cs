@@ -181,7 +181,8 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
-            if (Account.Equals(AccountModel.AccountType.Backtest.ToString())
+            if (Account == null
+             || Account.Equals(AccountModel.AccountType.Backtest.ToString())
              || Account.Equals(AccountModel.AccountType.Paper.ToString()))
             {
                 SetBrowsable("Provider", true);
