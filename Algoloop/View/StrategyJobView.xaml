@@ -106,7 +106,7 @@
                 <view:AmChart ItemsSource="{Binding Charts}"/>
             </TabItem>
             <TabItem Header="Desktop">
-                <viewsupport:HtmlBox HtmlText="{Binding HtmlText}"/>
+                <view:HtmlView HtmlText="{Binding HtmlText}"/>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox
