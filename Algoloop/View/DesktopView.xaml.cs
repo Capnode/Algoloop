@@ -22,6 +22,7 @@ using QuantConnect.Orders;
 using QuantConnect.Packets;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,7 +45,7 @@ namespace Algoloop.View
         public DesktopView()
         {
             InitializeComponent();
-            browser.ScriptErrorsSuppressed = true;
+            browser.Loaded += OnLoaded;
             Unloaded += OnUnloaded;
             _logging = new QueueLogHandler();
 
@@ -55,6 +56,24 @@ namespace Algoloop.View
         {
             get => (string)GetValue(PortProperty);
             set => SetValue(PortProperty, value);
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var wb = sender as WebBrowser;
+            if (wb != null)
+            {
+                // Silent
+                FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField(
+                    "_axIWebBrowser2",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                if (fiComWebBrowser == null) return;
+                object objComWebBrowser = fiComWebBrowser.GetValue(wb);
+                if (objComWebBrowser == null) return;
+                objComWebBrowser.GetType().InvokeMember(
+                    "Silent", BindingFlags.SetProperty, null, objComWebBrowser,
+                    new object[] { true });
+            }
         }
 
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -85,9 +104,12 @@ namespace Algoloop.View
 
         private void OnUnloaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            Debug.Assert(_thread != null);
-            _stopServer = true;
-            _thread.Join();
+            if (_thread != null)
+            {
+                _stopServer = true;
+                _thread.Join();
+                _thread = null;
+            }
         }
 
         /// <summary>
@@ -173,7 +195,7 @@ namespace Algoloop.View
             _liveMode = job is LiveNodePacket;
             var url = GetUrl(job, _liveMode);
 
-//            browser.Navigate(url);
+            Dispatcher.BeginInvoke((Action)(() => browser.Navigate(url)));
         }
 
         /// <summary>
@@ -202,13 +224,14 @@ namespace Algoloop.View
             final.oResultData = resultData;
             var json = JsonConvert.SerializeObject(final);
 
-            browser.DocumentCompleted += (sender, args) =>
+            browser.LoadCompleted += (sender, args) =>
             {
-                if (browser.Document == null) return;
-                browser.Document.InvokeScript("eval", new object[] { "window.jnBacktest = JSON.parse('" + json + "');" });
-                browser.Document.InvokeScript("eval", new object[] { "$.holdReady(false)" });
+                if (browser.Document == null)
+                    return;
+                browser.InvokeScript("eval", new object[] { "window.jnBacktest = JSON.parse('" + json + "');" });
+                browser.InvokeScript("eval", new object[] { "$.holdReady(false)" });
             };
-            browser.Navigate(url);
+            Dispatcher.BeginInvoke((Action)(() => browser.Navigate(url)));
 
             foreach (var pair in packet.Results.Statistics)
             {

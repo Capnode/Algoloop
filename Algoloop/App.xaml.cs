@@ -13,6 +13,7 @@
  */
 
 using Algoloop.ViewModel;
+using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -28,6 +29,7 @@ namespace Algoloop
         {
             base.OnStartup(e);
             Algoloop.Properties.Settings.Default.Reload();
+            EnsureBrowserEmulationEnabled("Algoloop.exe");
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -47,6 +49,30 @@ namespace Algoloop
                 Debug.WriteLine("Exception inner {0} - {1}", iex.GetType(), iex.Message);
 
             ex.Handled = true; // Continue processing
+        }
+
+        /// <summary>
+        /// WebBrowser Internet Explorer 11 emulation
+        /// </summary>
+        public static void EnsureBrowserEmulationEnabled(string exename, bool uninstall = false)
+        {
+            try
+            {
+                using (var rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true))
+                {
+                    if (!uninstall)
+                    {
+                        dynamic value = rk.GetValue(exename);
+                        if (value == null)
+                            rk.SetValue(exename, (uint)11001, RegistryValueKind.DWord);
+                    }
+                    else
+                        rk.DeleteValue(exename);
+                }
+            }
+            catch
+            {
+            }
         }
     }
 }
