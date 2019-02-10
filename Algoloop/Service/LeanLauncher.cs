@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using NetMQ;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Configuration;
@@ -22,7 +23,6 @@ using QuantConnect.Packets;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -47,17 +47,6 @@ namespace Algoloop.Service
                 {
                     string assemblyPath;
                     systemHandlers.Initialize();
-                    if (model.Desktop)
-                    {
-                        var info = new ProcessStartInfo
-                        {
-                            UseShellExecute = false,
-                            FileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Config.Get("desktop-exe")),
-                            Arguments = Config.Get("desktop-http-port")
-                        };
-                        Process.Start(info);
-                    }
-
                     var engine = new Engine(systemHandlers, algorithmHandlers, liveMode);
                     var algorithmManager = new AlgorithmManager(liveMode);
                     AlgorithmNodePacket job = systemHandlers.JobQueue.NextJob(out assemblyPath);
@@ -74,6 +63,7 @@ namespace Algoloop.Service
                 Log.Error("{0}: {1}", ex.GetType(), ex.Message);
             }
 
+            NetMQConfig.Cleanup(false);
             Log.LogHandler.Dispose();
             return model;
         }

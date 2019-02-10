@@ -30,7 +30,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -46,7 +45,7 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
-        private string _htmlText;
+        private string _port;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
         {
@@ -128,10 +127,10 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public string HtmlText
+        public string Port
         {
-            get => _htmlText;
-            set => Set(ref _htmlText, value);
+            get => _port;
+            set => Set(ref _port, value);
         }
 
         public override string ToString()
@@ -148,6 +147,12 @@ namespace Algoloop.ViewModel
 
             _cancel?.Cancel();
             _parent?.DeleteJob(this);
+        }
+
+        public int CompareTo(object obj)
+        {
+            var a = obj as StrategyJobViewModel;
+            return string.Compare(Model.Name, a?.Model.Name);
         }
 
         internal async Task StartTaskAsync()
@@ -181,11 +186,13 @@ namespace Algoloop.ViewModel
             StrategyJobModel model = Model;
             try
             {
+                Port = "1234";
                 _leanEngine = new Isolated<LeanLauncher>();
                 _cancel = new CancellationTokenSource();
                 await Task.Run(() => model = _leanEngine.Value.Run(Model, account, new HostDomainLogger()), _cancel.Token);
+                Port = null;
                 _leanEngine.Dispose();
-                Model.Completed = true;
+                model.Completed = true;
             }
             catch (AppDomainUnloadedException)
             {
@@ -296,10 +303,6 @@ namespace Algoloop.ViewModel
             _parent.RefreshSummary();
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
-
-            string url = @"https://www.quantconnect.com";
-            WebClient client = new WebClient();
-            HtmlText = client.DownloadString(url);
         }
 
         private void AddCustomStatistics(BacktestResult result, DataRow row)
@@ -391,12 +394,6 @@ namespace Algoloop.ViewModel
 
             Charts = null;
             Charts = workCharts;
-        }
-
-        public int CompareTo(object obj)
-        {
-            var a = obj as StrategyJobViewModel;
-            return string.Compare(Model.Name, a?.Model.Name);
         }
     }
 }
