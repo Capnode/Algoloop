@@ -118,6 +118,7 @@ namespace Algoloop.Service
             Config.Set("alpha-handler", "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler");
             if (model.ApiToken != null) Config.Set("api-access-token", model.ApiToken);
             if (model.ApiUser != null) Config.Set("job-user-id", model.ApiUser);
+            if (model.DesktopPort != 0) Config.Set("desktop-http-port", model.DesktopPort.ToString());
             Config.Set("job-project-id", "0");
             Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
             Config.Set("regression-update-statistics", "false");
@@ -195,15 +196,13 @@ namespace Algoloop.Service
             Config.Set("live-mode", "false");
             Config.Set("send-via-api", "true");
             Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
-            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.BacktestingResultHandler");
+//            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.BacktestingResultHandler");
+            Config.Set("result-handler", "Algoloop.Service.BacktestResultHandler");
             Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed");
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
-            Config.Set("log-handler", "QuantConnect.Logging.QueueLogHandler");
-            Config.Set("desktop-http-port", "1234");
-            Config.Set("desktop-exe", @"../../../UserInterface/bin/Release/QuantConnect.Views.exe");
             parameters.Add("market", model.Provider.ToString());
         }
 
@@ -268,7 +267,6 @@ namespace Algoloop.Service
             Config.Set("fxcm-password", account.Password);
             Config.Set("fxcm-account-id", account.Id);
             Config.Set("log-handler", "QuantConnect.Logging.QueueLogHandler");
-            Config.Set("desktop-http-port", "1234");
             Config.Set("desktop-exe", @"../../../UserInterface/bin/Release/QuantConnect.Views.exe");
             parameters.Add("market", Market.FXCM.ToString());
             switch (account.Access)

@@ -23,6 +23,7 @@ namespace Algoloop.Model
     [DataContract]
     public class SettingsModel : ModelBase
     {
+        [Category("API")]
         [DisplayName("API access token")]
         [Description("Your unique access token to the API.")]
         [Browsable(true)]
@@ -30,6 +31,7 @@ namespace Algoloop.Model
         [DataMember]
         public string ApiToken { get; set; }
 
+        [Category("API")]
         [DisplayName("API user id")]
         [Description("Your user id for the API.")]
         [Browsable(true)]
@@ -37,12 +39,21 @@ namespace Algoloop.Model
         [DataMember]
         public string ApiUser { get; set; }
 
+        [Category("API")]
         [DisplayName("API data download")]
         [Description("Download missing data from QuantConnect.")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
         public bool ApiDownload { get; set; }
+
+        [Category("API")]
+        [DisplayName("Desktop port")]
+        [Description("Desktop API port number.")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public int DesktopPort { get; set; }
 
         [DisplayName("Data folder")]
         [Description("Folder for market data.")]
@@ -64,6 +75,7 @@ namespace Algoloop.Model
             ApiToken = oldSettings.ApiToken;
             ApiUser = oldSettings.ApiUser;
             ApiDownload = oldSettings.ApiDownload;
+            DesktopPort = oldSettings.DesktopPort;
             DataFolder = oldSettings.DataFolder;
             MaxBacktests = oldSettings.MaxBacktests;
         }

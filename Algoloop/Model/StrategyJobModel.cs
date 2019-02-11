@@ -166,6 +166,11 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
+        public int DesktopPort { get; set; }
+
+        [ReadOnly(true)]
+        [Browsable(false)]
+        [DataMember]
         public bool Completed { get; set; }
 
         [ReadOnly(true)]

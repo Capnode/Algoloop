@@ -186,7 +186,7 @@ namespace Algoloop.ViewModel
             StrategyJobModel model = Model;
             try
             {
-                Port = "1234";
+                Port = model.DesktopPort > 0 ? model.DesktopPort.ToString() : null;
                 _leanEngine = new Isolated<LeanLauncher>();
                 _cancel = new CancellationTokenSource();
                 await Task.Run(() => model = _leanEngine.Value.Run(Model, account, new HostDomainLogger()), _cancel.Token);
@@ -220,6 +220,7 @@ namespace Algoloop.ViewModel
             Model.ApiToken = _settingsModel.ApiToken;
             Model.ApiUser = _settingsModel.ApiUser;
             Model.ApiDownload = _settingsModel.ApiDownload;
+            Model.DesktopPort = _settingsModel.DesktopPort;
 
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
