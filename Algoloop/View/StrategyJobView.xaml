@@ -105,7 +105,9 @@
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
                 <view:AmChart ItemsSource="{Binding Charts}"/>
             </TabItem>
-            <TabItem Header="Desktop">
+            <TabItem
+                Header="Desktop"
+                Visibility="{Binding Desktop, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <view:DesktopView Port="{Binding Port}"/>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">

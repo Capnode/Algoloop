@@ -133,6 +133,16 @@ namespace Algoloop.ViewModel
             set => Set(ref _port, value);
         }
 
+        public bool Desktop
+        {
+            get => Model.Desktop;
+            set
+            {
+                Model.Desktop = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public override string ToString()
         {
             return _model.Name;
@@ -186,11 +196,21 @@ namespace Algoloop.ViewModel
             StrategyJobModel model = Model;
             try
             {
-                Port = model.DesktopPort > 0 ? model.DesktopPort.ToString() : null;
-                _leanEngine = new Isolated<LeanLauncher>();
-                _cancel = new CancellationTokenSource();
-                await Task.Run(() => model = _leanEngine.Value.Run(Model, account, new HostDomainLogger()), _cancel.Token);
-                Port = null;
+                if (Desktop)
+                {
+                    Port = _settingsModel.DesktopPort > 0 ? _settingsModel.DesktopPort.ToString() : null;
+                    _leanEngine = new Isolated<LeanLauncher>();
+                    _cancel = new CancellationTokenSource();
+                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settingsModel, new HostDomainLogger()), _cancel.Token);
+                    Port = null;
+                }
+                else
+                {
+                    _leanEngine = new Isolated<LeanLauncher>();
+                    _cancel = new CancellationTokenSource();
+                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settingsModel, new HostDomainLogger()), _cancel.Token);
+                }
+
                 _leanEngine.Dispose();
                 model.Completed = true;
             }
@@ -216,12 +236,6 @@ namespace Algoloop.ViewModel
 
         internal void DataToModel()
         {
-            Model.DataFolder = _settingsModel.DataFolder;
-            Model.ApiToken = _settingsModel.ApiToken;
-            Model.ApiUser = _settingsModel.ApiUser;
-            Model.ApiDownload = _settingsModel.ApiDownload;
-            Model.DesktopPort = _settingsModel.DesktopPort;
-
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {

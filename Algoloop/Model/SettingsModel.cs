@@ -53,7 +53,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public int DesktopPort { get; set; }
+        public int DesktopPort { get; set; } = 1234;
 
         [DisplayName("Data folder")]
         [Description("Folder for market data.")]

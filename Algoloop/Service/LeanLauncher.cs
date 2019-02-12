@@ -30,10 +30,10 @@ namespace Algoloop.Service
 {
     public class LeanLauncher : MarshalByRefObject
     {
-        public StrategyJobModel Run(StrategyJobModel model, AccountModel account, HostDomainLogger logger)
+        public StrategyJobModel Run(StrategyJobModel model, AccountModel account, SettingsModel settings, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
-            if (!SetConfig(model, account))
+            if (!SetConfig(model, account, settings))
             {
                 return model;
             }
@@ -68,10 +68,10 @@ namespace Algoloop.Service
             return model;
         }
 
-        private static bool SetConfig(StrategyJobModel model, AccountModel account)
+        private static bool SetConfig(StrategyJobModel model, AccountModel account, SettingsModel settings)
         {
             var parameters = new Dictionary<string, string>();
-            SetModel(model);
+            SetModel(model, settings);
             if (model.Account.Equals(AccountModel.AccountType.Backtest.ToString()))
             {
                 if (model.Desktop)
@@ -108,7 +108,7 @@ namespace Algoloop.Service
             return true;
         }
 
-        private static void SetModel(StrategyJobModel model)
+        private static void SetModel(StrategyJobModel model, SettingsModel settings)
         {
             Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
             Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
@@ -116,9 +116,9 @@ namespace Algoloop.Service
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
             Config.Set("alpha-handler", "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler");
-            if (model.ApiToken != null) Config.Set("api-access-token", model.ApiToken);
-            if (model.ApiUser != null) Config.Set("job-user-id", model.ApiUser);
-            if (model.DesktopPort != 0) Config.Set("desktop-http-port", model.DesktopPort.ToString());
+            if (settings.ApiToken != null) Config.Set("api-access-token", settings.ApiToken);
+            if (settings.ApiUser != null) Config.Set("job-user-id", settings.ApiUser);
+            if (settings.DesktopPort != 0) Config.Set("desktop-http-port", settings.DesktopPort.ToString());
             Config.Set("job-project-id", "0");
             Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
             Config.Set("regression-update-statistics", "false");
@@ -135,9 +135,9 @@ namespace Algoloop.Service
             Config.Set("lean-manager-type", "LocalLeanManager");
             Config.Set("transaction-log", "");
             Config.Set("algorithm-language", "CSharp");
-            Config.Set("data-folder", model.DataFolder);
-            Config.Set("data-directory", model.DataFolder);
-            Config.Set("cache-location", model.DataFolder);
+            Config.Set("data-folder", settings.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
+            Config.Set("cache-location", settings.DataFolder);
             string fullPath = Path.GetFullPath(model.AlgorithmLocation);
             Config.Set("algorithm-location", fullPath);
             string fullFolder = Path.GetDirectoryName(fullPath);
@@ -146,7 +146,7 @@ namespace Algoloop.Service
             Config.Set("algorithm-type-name", model.AlgorithmName);
             Config.Set("live-data-url", "ws://www.quantconnect.com/api/v2/live/data/");
             Config.Set("live-data-port", "8020");
-            if (model.ApiDownload)
+            if (settings.ApiDownload)
                 Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.ApiDataProvider");
             else
                 Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");

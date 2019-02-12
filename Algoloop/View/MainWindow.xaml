@@ -16,12 +16,11 @@
     <Window.Resources>
         <ResourceDictionary>
             <ObjectDataProvider x:Key="settings" ObjectInstance="{x:Static properties:Settings.Default}"/>
-            <viewsupport:BusyMouseConverter x:Key="BusyConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
     <Window.Cursor>
-        <Binding Path="IsBusy" Converter="{StaticResource BusyConverter}"/>
+        <Binding Path="IsBusy" Converter="{viewsupport:BusyMouseConverter}"/>
     </Window.Cursor>
 
     <DockPanel>

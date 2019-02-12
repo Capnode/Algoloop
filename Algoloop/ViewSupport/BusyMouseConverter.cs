@@ -22,7 +22,7 @@ namespace Algoloop.ViewSupport
     /// Sets the cursor state of the mouse.
     /// </summary>
     [ValueConversion(typeof(bool), typeof(Cursors))]
-    public class BusyMouseConverter : IValueConverter
+    public class BusyMouseConverter : BaseConverter, IValueConverter
     {
         /// <summary>
         /// BusyMouseConverter constructor
