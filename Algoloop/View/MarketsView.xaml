@@ -63,7 +63,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding ActiveMarketItems.View}" >
+                    <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding Folders}" >
                         <StackPanel Orientation="Horizontal">
                             <CheckBox
                                 IsChecked="{Binding Active}"
@@ -90,26 +90,16 @@
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:FolderViewModel}" ItemsSource="{Binding ActiveMarketItems.View}" >
+                    <HierarchicalDataTemplate DataType="{x:Type vm:FolderViewModel}" ItemsSource="{Binding Symbols}" >
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox
-                                IsChecked="{Binding Active}"
-                                Command="{Binding ActiveCommand}" />
                             <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem
-                                            Header="Delete Market"
+                                            Header="Delete list"
                                             Command="{Binding DeleteCommand}" >
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem
-                                            Header="New list"
-                                            Command="{Binding NewListCommand}" >
-                                            <MenuItem.Icon>
-                                                <Image Source="/Resources/Add.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Capnode AB
+ * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -12,15 +12,21 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using GalaSoft.MvvmLight;
 
 namespace Algoloop.ViewModel
 {
-    public class FolderViewModel : MarketItemViewModel
+    public class FolderViewModel : ViewModelBase
     {
-        public FolderViewModel()
-        {
+        private MarketViewModel _parent;
 
+        public FolderViewModel(MarketViewModel market, FolderModel model)
+        {
+            _parent = market;
+            Model = model;
         }
+
+        public FolderModel Model { get; }
     }
 }

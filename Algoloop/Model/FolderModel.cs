@@ -12,11 +12,23 @@
  * limitations under the License.
  */
 
-using GalaSoft.MvvmLight;
+using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Model
 {
-    public class MarketItemViewModel : ViewModelBase
+    [Serializable]
+    public class FolderModel
     {
+        public FolderModel()
+        {
+        }
+
+        [DataMember]
+        public string Name { get; set; } = "New list";
+
+        [DataMember]
+        public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
     }
 }

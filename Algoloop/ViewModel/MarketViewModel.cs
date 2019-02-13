@@ -42,29 +42,16 @@ namespace Algoloop.ViewModel
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !Active);
-            NewListCommand = new RelayCommand(() => MarketItems.Add(new FolderViewModel()), () => !Active);
+            NewListCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !Active);
             ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
             StartCommand = new RelayCommand(() => OnStartCommand(), () => !Active);
             StopCommand = new RelayCommand(() => OnStopCommand(), () => Active);
 
             DataFromModel();
-
-            ActiveMarketItems.Filter += (object sender, FilterEventArgs e) =>
-            {
-                if (e.Item is SymbolViewModel symbol)
-                {
-                    e.Accepted = symbol.Model.Active;
-                }
-                else
-                {
-                    e.Accepted = true;
-                }
-            };
-
-            ActiveMarketItems.Source = MarketItems;
         }
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
 
-        public SyncObservableCollection<MarketItemViewModel> MarketItems { get; } = new SyncObservableCollection<MarketItemViewModel>();
+        public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
         public CollectionViewSource ActiveMarketItems { get; } = new CollectionViewSource();
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
@@ -103,26 +90,45 @@ namespace Algoloop.ViewModel
             Model.DataFolder = _settingsModel.DataFolder;
 
             Model.Symbols.Clear();
-            foreach (SymbolViewModel symbol in MarketItems)
+            foreach (SymbolViewModel symbol in Symbols)
             {
                 Model.Symbols.Add(symbol.Model);
+            }
+
+            Model.Folders.Clear();
+            foreach (FolderViewModel folder in Folders)
+            {
+                Model.Folders.Add(folder.Model);
             }
         }
 
         internal void DataFromModel()
         {
             Active = Model.Active;
-            MarketItems.Clear();
+            Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
-                MarketItems.Add(symbolViewModel);
+                Symbols.Add(symbolViewModel);
+            }
+
+            Folders.Clear();
+            foreach (FolderModel folderModel in Model.Folders)
+            {
+                var folderViewModel = new FolderViewModel(this, folderModel);
+                Folders.Add(folderViewModel);
             }
         }
 
+        internal bool DeleteFolder(FolderViewModel symbol)
+        {
+            return Folders.Remove(symbol);
+        }
+
+
         internal bool DeleteSymbol(SymbolViewModel symbol)
         {
-            return MarketItems.Remove(symbol);
+            return Symbols.Remove(symbol);
         }
 
         internal async Task StartTaskAsync()
@@ -205,7 +211,7 @@ namespace Algoloop.ViewModel
         private void AddSymbol()
         {
             var symbol = new SymbolViewModel(this, new SymbolModel());
-            MarketItems.Add(symbol);
+            Symbols.Add(symbol);
         }
 
         private void ImportSymbols()

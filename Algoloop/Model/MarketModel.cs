@@ -115,6 +115,11 @@ namespace Algoloop.Model
         [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
 
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public List<FolderModel> Folders { get; } = new List<FolderModel>();
+
         public void Refresh()
         {
             switch (Provider)
