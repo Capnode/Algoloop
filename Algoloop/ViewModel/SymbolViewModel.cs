@@ -19,7 +19,7 @@ using System.ComponentModel;
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolViewModel : ViewModelBase
+    public class SymbolViewModel : MarketItemViewModel
     {
         private ViewModelBase _parent;
 

@@ -42,31 +42,34 @@ namespace Algoloop.ViewModel
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !Active);
+            NewListCommand = new RelayCommand(() => MarketItems.Add(new FolderViewModel()), () => !Active);
             ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
             StartCommand = new RelayCommand(() => OnStartCommand(), () => !Active);
             StopCommand = new RelayCommand(() => OnStopCommand(), () => Active);
 
             DataFromModel();
 
-            ActiveSymbols.Filter += (object sender, FilterEventArgs e) =>
+            ActiveMarketItems.Filter += (object sender, FilterEventArgs e) =>
             {
-                SymbolViewModel symbol = e.Item as SymbolViewModel;
-                if (symbol != null)
+                if (e.Item is SymbolViewModel symbol)
                 {
                     e.Accepted = symbol.Model.Active;
                 }
+                else
+                {
+                    e.Accepted = true;
+                }
             };
 
-            ActiveSymbols.Source = Symbols;
+            ActiveMarketItems.Source = MarketItems;
         }
 
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-
-        public CollectionViewSource ActiveSymbols { get; } = new CollectionViewSource();
-
+        public SyncObservableCollection<MarketItemViewModel> MarketItems { get; } = new SyncObservableCollection<MarketItemViewModel>();
+        public CollectionViewSource ActiveMarketItems { get; } = new CollectionViewSource();
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand DeleteCommand { get; }
+        public RelayCommand NewListCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
@@ -92,7 +95,7 @@ namespace Algoloop.ViewModel
 
         internal void Refresh(SymbolViewModel symbolViewModel)
         {
-            ActiveSymbols.View.Refresh();
+            ActiveMarketItems.View.Refresh();
         }
 
         internal void DataToModel()
@@ -100,7 +103,7 @@ namespace Algoloop.ViewModel
             Model.DataFolder = _settingsModel.DataFolder;
 
             Model.Symbols.Clear();
-            foreach (SymbolViewModel symbol in Symbols)
+            foreach (SymbolViewModel symbol in MarketItems)
             {
                 Model.Symbols.Add(symbol.Model);
             }
@@ -109,17 +112,17 @@ namespace Algoloop.ViewModel
         internal void DataFromModel()
         {
             Active = Model.Active;
-            Symbols.Clear();
+            MarketItems.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
-                Symbols.Add(symbolViewModel);
+                MarketItems.Add(symbolViewModel);
             }
         }
 
         internal bool DeleteSymbol(SymbolViewModel symbol)
         {
-            return Symbols.Remove(symbol);
+            return MarketItems.Remove(symbol);
         }
 
         internal async Task StartTaskAsync()
@@ -202,7 +205,7 @@ namespace Algoloop.ViewModel
         private void AddSymbol()
         {
             var symbol = new SymbolViewModel(this, new SymbolModel());
-            Symbols.Add(symbol);
+            MarketItems.Add(symbol);
         }
 
         private void ImportSymbols()
