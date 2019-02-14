@@ -102,6 +102,10 @@
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
+                                        <MenuItem
+                                            Header="Rename"
+                                            Command="{Binding RenameCommand}">
+                                        </MenuItem>
                                     </ContextMenu>
                                 </TextBlock.ContextMenu>
                             </TextBlock>

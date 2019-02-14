@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 
 namespace Algoloop.ViewModel
 {
@@ -25,8 +26,13 @@ namespace Algoloop.ViewModel
         {
             _parent = market;
             Model = model;
+
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteFolder(this), () => !_parent.Active);
+            RenameCommand = new RelayCommand(() => _parent?.DeleteFolder(this), () => !_parent.Active);
         }
 
         public FolderModel Model { get; }
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand RenameCommand { get; }
     }
 }
