@@ -14,21 +14,33 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
 {
     [Serializable]
-    public class FolderModel
+    [DataContract]
+    public class FolderModel : ModelBase
     {
         public FolderModel()
         {
         }
 
+        [DisplayName("List name")]
+        [Description("Name of the list")]
+        [Browsable(true)]
+        [ReadOnly(false)]
         [DataMember]
         public string Name { get; set; } = "New list";
 
+        [Browsable(false)]
+        [ReadOnly(false)]
         [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
+
+        internal void Refresh()
+        {
+        }
     }
 }

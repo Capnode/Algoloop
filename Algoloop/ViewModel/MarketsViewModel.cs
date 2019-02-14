@@ -32,7 +32,7 @@ namespace Algoloop.ViewModel
     public class MarketsViewModel : ViewModelBase
     {
         private readonly SettingsModel _settingsModel;
-        private MarketViewModel _selectedItem;
+        private ViewModelBase _selectedItem;
 
         public MarketsViewModel(MarketsModel model, SettingsModel settingsModel)
         {
@@ -41,7 +41,7 @@ namespace Algoloop.ViewModel
 
             AddCommand = new RelayCommand(() => AddMarket(), true);
             DeleteCommand = new RelayCommand<MarketViewModel>((market) => DeleteMarket(market), (market) => market != null);
-            SelectedChangedCommand = new RelayCommand<MarketViewModel>((market) => OnSelectedChanged(market), (market) => market != null);
+            SelectedChangedCommand = new RelayCommand<ViewModelBase>((vm) => OnSelectedChanged(vm), (vm) => vm != null);
             Messenger.Default.Register<NotificationMessageAction<List<MarketModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
         }
@@ -52,9 +52,9 @@ namespace Algoloop.ViewModel
 
         public RelayCommand AddCommand { get; }
         public RelayCommand<MarketViewModel> DeleteCommand { get; }
-        public RelayCommand<MarketViewModel> SelectedChangedCommand { get; }
+        public RelayCommand<ViewModelBase> SelectedChangedCommand { get; }
 
-        public MarketViewModel SelectedItem
+        public ViewModelBase SelectedItem
         {
             get => _selectedItem;
             set
@@ -64,10 +64,22 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void OnSelectedChanged(MarketViewModel market)
+        private void OnSelectedChanged(ViewModelBase vm)
         {
-            market.Model.Refresh();
-            SelectedItem = market;
+            if (vm is MarketViewModel market)
+            {
+                market.Model.Refresh();
+            }
+            else if (vm is FolderViewModel folder)
+            {
+                folder.Model.Refresh();
+            }
+            else if (vm is SymbolViewModel symbol)
+            {
+                symbol.Model.Refresh();
+            }
+
+            SelectedItem = vm;
         }
 
         private void OnNotificationMessage(NotificationMessageAction<List<MarketModel>> message)

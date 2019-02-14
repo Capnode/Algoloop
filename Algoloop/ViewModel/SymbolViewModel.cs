@@ -45,6 +45,7 @@ namespace Algoloop.ViewModel
                 RaisePropertyChanged(() => Active);
                 (_parent as StrategyViewModel)?.Refresh(this);
                 (_parent as MarketViewModel)?.Refresh(this);
+                (_parent as FolderViewModel)?.Refresh(this);
             }
         }
 

@@ -19,6 +19,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using QuantConnect.Logging;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -49,10 +50,9 @@ namespace Algoloop.ViewModel
 
             DataFromModel();
         }
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
 
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
-        public CollectionViewSource ActiveMarketItems { get; } = new CollectionViewSource();
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand DeleteCommand { get; }
@@ -82,7 +82,10 @@ namespace Algoloop.ViewModel
 
         internal void Refresh(SymbolViewModel symbolViewModel)
         {
-            ActiveMarketItems.View.Refresh();
+            foreach (FolderViewModel folder in Folders)
+            {
+                folder.Refresh(symbolViewModel);
+            }
         }
 
         internal void DataToModel()
@@ -99,6 +102,7 @@ namespace Algoloop.ViewModel
             foreach (FolderViewModel folder in Folders)
             {
                 Model.Folders.Add(folder.Model);
+                folder.DataToModel();
             }
         }
 

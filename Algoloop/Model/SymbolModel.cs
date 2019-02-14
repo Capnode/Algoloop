@@ -36,5 +36,9 @@ namespace Algoloop.Model
 
         [DataMember]
         public bool Active { get; set; } = true;
+
+        internal void Refresh()
+        {
+        }
     }
 }

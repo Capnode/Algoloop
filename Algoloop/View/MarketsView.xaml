@@ -90,7 +90,7 @@
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:FolderViewModel}" ItemsSource="{Binding Symbols}" >
+                    <HierarchicalDataTemplate DataType="{x:Type vm:FolderViewModel}" ItemsSource="{Binding ActiveSymbols.View}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
                                 <TextBlock.ContextMenu>
@@ -101,10 +101,6 @@
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem
-                                            Header="Rename"
-                                            Command="{Binding RenameCommand}">
                                         </MenuItem>
                                     </ContextMenu>
                                 </TextBlock.ContextMenu>
@@ -189,6 +185,56 @@
                                 </ListBox>
                             </TabItem>
                         </TabControl>
+                    </DockPanel>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:FolderViewModel}">
+                    <DockPanel>
+                        <TabControl>
+                            <TabItem Header="Settings">
+                                <xctk:PropertyGrid
+                                    ShowTitle="False"
+                                    ShowSearchBox="False"
+                                    ShowSummary="True"
+                                    ShowAdvancedOptions="False"
+                                    ShowSortOptions="False"
+                                    SelectedObject="{Binding Model}">
+                                </xctk:PropertyGrid>
+                            </TabItem>
+                            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                                <ListBox
+                                    SelectionMode="Extended"
+                                    DockPanel.Dock="Bottom"
+                                    ItemsSource="{Binding Symbols}">
+                                    <ListBox.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem
+                                                Header="Add Symbol"
+                                                Command="{Binding AddSymbolCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem
+                                                Header="Import Symbol list..."
+                                                Command="{Binding ImportSymbolsCommand}" />
+                                        </ContextMenu>
+                                    </ListBox.ContextMenu>
+                                    <ListBox.Resources>
+                                        <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <CheckBox IsChecked="{Binding Active}" />
+                                                <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ListBox.Resources>
+                                </ListBox>
+                            </TabItem>
+                        </TabControl>
+                    </DockPanel>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                    <DockPanel>
+                        <TextBox Text="{Binding Model.Name}" BorderThickness="0"/>
                     </DockPanel>
                 </DataTemplate>
             </ContentControl.Resources>
