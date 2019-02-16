@@ -37,7 +37,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
+        public List<string> Symbols { get; } = new List<string>();
 
         internal void Refresh()
         {

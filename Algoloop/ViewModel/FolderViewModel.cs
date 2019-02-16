@@ -16,6 +16,11 @@ using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Algoloop.ViewModel
@@ -23,6 +28,8 @@ namespace Algoloop.ViewModel
     public class FolderViewModel : ViewModelBase
     {
         private MarketViewModel _market;
+        private SymbolViewModel _selectedSymbol;
+        private SymbolViewModel _marketSymbol;
 
         public FolderViewModel(MarketViewModel market, FolderModel model)
         {
@@ -30,29 +37,55 @@ namespace Algoloop.ViewModel
             Model = model;
 
             DeleteCommand = new RelayCommand(() => _market?.DeleteFolder(this), () => !_market.Active);
+            RefreshCommand = new RelayCommand(() => Refresh(null), () => !_market.Active);
+
+            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => AddSymbol(m), m => !_market.Active);
+            RemoveSymbolsCommand = new RelayCommand<IList>(m => RemoveSymbols(m), m => !_market.Active);
+            MoveUpSymbolsCommand = new RelayCommand<IList>(m => MoveUpSymbols(m), m => !_market.Active);
+            MoveDownSymbolsCommand = new RelayCommand<IList>(m => MoveDownSymbols(m), m => !_market.Active);
+
             DataFromModel();
 
-            ActiveSymbols.Filter += (object sender, FilterEventArgs e) =>
+            MarketSymbols.Filter += (object sender, FilterEventArgs e) =>
             {
                 SymbolViewModel symbol = e.Item as SymbolViewModel;
                 if (symbol != null)
                 {
-                    e.Accepted = symbol.Model.Active;
+                    e.Accepted = !Symbols.Any(m => m.Model.Name.Equals(symbol.Model.Name));
                 }
             };
 
-            ActiveSymbols.Source = Symbols;
+            MarketSymbols.Source = _market.Symbols;
         }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public CollectionViewSource ActiveSymbols { get; } = new CollectionViewSource();
+        public CollectionViewSource MarketSymbols { get; } = new CollectionViewSource();
+
         public FolderModel Model { get; }
+
         public RelayCommand DeleteCommand { get; }
+        public RelayCommand RefreshCommand { get; }
+        public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
+        public RelayCommand<IList> RemoveSymbolsCommand { get; }
+        public RelayCommand<IList> MoveUpSymbolsCommand { get; }
+        public RelayCommand<IList> MoveDownSymbolsCommand { get; }
+
+        public SymbolViewModel MarketSymbol
+        {
+            get => _marketSymbol;
+            set => Set(ref _marketSymbol, value);
+        }
+
+        public SymbolViewModel SelectedSymbol
+        {
+            get => _selectedSymbol;
+            set => Set(ref _selectedSymbol, value);
+        }
+
 
         internal void Refresh(SymbolViewModel symbol)
         {
-            DataFromModel();
-            ActiveSymbols.View.Refresh();
+            MarketSymbols.View.Refresh();
         }
 
         internal void DataToModel()
@@ -60,7 +93,7 @@ namespace Algoloop.ViewModel
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
-                Model.Symbols.Add(symbol.Model);
+                Model.Symbols.Add(symbol.Model.Name);
             }
         }
 
@@ -71,13 +104,79 @@ namespace Algoloop.ViewModel
             {
                 if (marketSymbol.Active)
                 {
-                    SymbolModel symbol = Model.Symbols.Find(m => m.Name.Equals(marketSymbol.Model.Name));
-                    if (symbol == null)
+                    string symbol = Model.Symbols.Find(m => m.Equals(marketSymbol.Model.Name));
+                    if (symbol != null)
                     {
-                        symbol = new SymbolModel(marketSymbol.Model) { Active = false };
+                        Symbols.Add(marketSymbol);
                     }
-                    var folderSymbol = new SymbolViewModel(this, symbol);
-                    Symbols.Add(folderSymbol);
+                }
+            }
+        }
+
+        private void AddSymbol(SymbolViewModel symbol)
+        {
+            if (symbol == null)
+                return;
+
+            Symbols.Add(symbol);
+            MarketSymbols.View.Refresh();
+        }
+
+        private void RemoveSymbols(IList symbols)
+        {
+            if (Symbols.Count == 0 || symbols.Count == 0)
+                return;
+
+            // Create a copy of the list before remove
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            int pos = Symbols.IndexOf(list.First());
+            foreach (SymbolViewModel symbol in list)
+            {
+                Symbols.Remove(symbol);
+            }
+
+            if (Symbols.Count > 0)
+            {
+                SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+            }
+
+            MarketSymbols.View.Refresh();
+        }
+
+        private void MoveUpSymbols(IList symbols)
+        {
+            if (Symbols.Count <= 1)
+                return;
+
+            // Create a copy of the list before move
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            for (int i = 1; i < Symbols.Count; i++)
+            {
+                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i - 1]))
+                {
+                    Symbols.Move(i, i - 1);
+                }
+            }
+        }
+
+        private void MoveDownSymbols(IList symbols)
+        {
+            if (Symbols.Count <= 1)
+                return;
+
+            // Create a copy of the list before move
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            for (int i = Symbols.Count - 2; i >= 0; i--)
+            {
+                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i + 1]))
+                {
+                    Symbols.Move(i, i + 1);
                 }
             }
         }

@@ -68,7 +68,13 @@
                             <CheckBox
                                 IsChecked="{Binding Active}"
                                 Command="{Binding ActiveCommand}" />
-                            <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{} {0} ({1})">
+                                        <Binding Path="Model.Name"/>
+                                        <Binding Path="Folders.Count"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem
@@ -90,9 +96,15 @@
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:FolderViewModel}" ItemsSource="{Binding ActiveSymbols.View}">
+                    <HierarchicalDataTemplate DataType="{x:Type vm:FolderViewModel}" ItemsSource="{Binding Symbols}">
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{} {0} ({1})">
+                                        <Binding Path="Model.Name"/>
+                                        <Binding Path="Symbols.Count"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem
@@ -201,40 +213,59 @@
                                 </xctk:PropertyGrid>
                             </TabItem>
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
-                                <ListBox
-                                    SelectionMode="Extended"
-                                    DockPanel.Dock="Bottom"
-                                    ItemsSource="{Binding Symbols}">
-                                    <ListBox.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem
-                                                Header="Add Symbol"
-                                                Command="{Binding AddSymbolCommand}">
-                                                <MenuItem.Icon>
-                                                    <Image Source="/Resources/Add.png" Width="16" Height="16"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem
-                                                Header="Import Symbol list..."
-                                                Command="{Binding ImportSymbolsCommand}" />
-                                        </ContextMenu>
-                                    </ListBox.ContextMenu>
-                                    <ListBox.Resources>
-                                        <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <CheckBox IsChecked="{Binding Active}" />
-                                                <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.Resources>
-                                </ListBox>
+                                <DockPanel>
+                                    <ToolBar DockPanel.Dock="Top">
+                                        <ComboBox Name="combobox"
+                                            SelectedValue="{Binding MarketSymbol, Mode=TwoWay}"
+                                            ItemsSource="{Binding MarketSymbols.View}"
+                                            MinWidth="120"/>
+                                        <Button ToolTip="Add symbol" 
+                                            Command="{Binding AddSymbolCommand}"
+                                            CommandParameter="{Binding ElementName=combobox, Path=SelectedValue}">
+                                            <Image Source="/Resources\Add.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button ToolTip="Remove symbols"
+                                            Command="{Binding RemoveSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
+                                            <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button ToolTip="Move symbols up"
+                                            Command="{Binding MoveUpSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
+                                            <Image Source="/Resources\MoveUp.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button ToolTip="Move symbols down"
+                                            Command="{Binding MoveDownSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
+                                            <Image Source="/Resources\MoveDown.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button ToolTip="Refresh"
+                                            Command="{Binding RefreshCommand}">
+                                            <Image Source="/Resources\Refresh.png" Width="16" Height="16"/>
+                                        </Button>
+                                    </ToolBar>
+                                    <ListBox
+                                        Name="listbox"
+                                        SelectionMode="Extended"
+                                        DockPanel.Dock="Bottom"
+                                        SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                        ItemsSource="{Binding Symbols}">
+                                        <ListBox.Resources>
+                                            <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Model.Name}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.Resources>
+                                    </ListBox>
+                                </DockPanel>
                             </TabItem>
                         </TabControl>
                     </DockPanel>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                     <DockPanel>
-                        <TextBox Text="{Binding Model.Name}" BorderThickness="0"/>
+                        <TextBlock Text="{Binding Model.Name}"/>
                     </DockPanel>
                 </DataTemplate>
             </ContentControl.Resources>

@@ -216,11 +216,11 @@ namespace Algoloop.ViewModel
         {
             var symbol = new SymbolViewModel(this, new SymbolModel());
             Symbols.Add(symbol);
+            Folders.ToList().ForEach(m => m.Refresh(symbol));
         }
 
         private void ImportSymbols()
         {
-            throw new NotImplementedException();
         }
     }
 }
