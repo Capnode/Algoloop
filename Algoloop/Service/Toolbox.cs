@@ -36,15 +36,15 @@ namespace Algoloop.Service
 {
     public class Toolbox : MarshalByRefObject
     {
-        public MarketModel Run(MarketModel model, HostDomainLogger logger)
+        public MarketModel Run(MarketModel model, SettingsModel settings, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
-            PrepareDataFolder(model.DataFolder);
+            PrepareDataFolder(settings.DataFolder);
 
             using (var writer = new StreamLogger(logger))
             {
                 Console.SetOut(writer);
-                MarketDownloader(model);
+                MarketDownloader(model, settings);
             }
 
             Log.LogHandler.Dispose();
@@ -68,7 +68,7 @@ namespace Algoloop.Service
             File.Copy(file, symbolPropertiesPath, true);
         }
 
-        private void MarketDownloader(MarketModel model)
+        private void MarketDownloader(MarketModel model, SettingsModel settings)
         {
             try
             {
@@ -81,37 +81,37 @@ namespace Algoloop.Service
                             CryptoIQDownloader(model, list);
                             break;
                         case MarketModel.MarketType.Dukascopy:
-                            DukascopyDownloader(model, list);
+                            DukascopyDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.Fxcm:
-                            FxcmDownloader(model, list);
+                            FxcmDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.FxcmVolume:
-                            FxcmVolumeDownload(model, list);
+                            FxcmVolumeDownload(model, settings, list);
                             break;
                         case MarketModel.MarketType.Gdax:
-                            GdaxDownloader(model, list);
+                            GdaxDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.Google:
-                            GoogleDownloader(model, list);
+                            GoogleDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.IB:
-                            IBDownloader(model, list);
+                            IBDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.IEX:
-                            IEXDownloader(model, list);
+                            IEXDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.Kraken:
-                            KrakenDownloader(model, list);
+                            KrakenDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.Oanda:
-                            OandaDownloader(model, list);
+                            OandaDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.QuandBitfinex:
-                            QuandBitfinexDownloader(model, list);
+                            QuandBitfinexDownloader(model, settings, list);
                             break;
                         case MarketModel.MarketType.Yahoo:
-                            YahooDownloader(model, list);
+                            YahooDownloader(model, settings, list);
                             break;
                         default:
                             Log.Error($"Market Provider not supported: {model.Provider}");
@@ -137,10 +137,10 @@ namespace Algoloop.Service
             throw new NotImplementedException();
         }
 
-        private static void DukascopyDownloader(MarketModel model, IList<string> symbols)
+        private static void DukascopyDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             DateTime fromDate = model.FromDate.Date;
@@ -153,10 +153,10 @@ namespace Algoloop.Service
             model.Active = model.FromDate < DateTime.Today;
         }
 
-        private static void FxcmDownloader(MarketModel model, IList<string> symbols)
+        private static void FxcmDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
             switch (model.Access)
             {
                 case MarketModel.AccessType.Demo:
@@ -182,9 +182,9 @@ namespace Algoloop.Service
             model.Active = model.FromDate < DateTime.Today;
         }
 
-        private static void FxcmVolumeDownload(MarketModel model, IList<string> symbols)
+        private static void FxcmVolumeDownload(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
             switch (model.Access)
             {
                 case MarketModel.AccessType.Demo:
@@ -203,69 +203,69 @@ namespace Algoloop.Service
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.FromDate, model.FromDate);
         }
 
-        private void GdaxDownloader(MarketModel model, IList<string> list)
+        private void GdaxDownloader(MarketModel model, SettingsModel settings, IList<string> list)
         {
             throw new NotImplementedException();
         }
 
-        private static void GoogleDownloader(MarketModel model, IList<string> symbols)
+        private static void GoogleDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             GoogleDownloaderProgram.GoogleDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
 
-        private void IBDownloader(MarketModel model, IList<string> symbols)
+        private void IBDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             IBDownloaderProgram.IBDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
 
-        private void IEXDownloader(MarketModel model, IList<string> symbols)
+        private void IEXDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
 
-        private void KrakenDownloader(MarketModel model, IList<string> symbols)
+        private void KrakenDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
 
-        private void OandaDownloader(MarketModel model, IList<string> symbols)
+        private void OandaDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             OandaDownloaderProgram.OandaDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
 
-        private void QuandBitfinexDownloader(MarketModel model, IList<string> symbols)
+        private void QuandBitfinexDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string apiKey = ""; // TODO:
             QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.FromDate, apiKey);
         }
 
-        private static void YahooDownloader(MarketModel model, IList<string> symbols)
+        private static void YahooDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", model.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
 
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             YahooDownloaderProgram.YahooDownloader(symbols, resolution, model.FromDate, model.FromDate);

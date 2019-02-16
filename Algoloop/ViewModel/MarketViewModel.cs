@@ -90,8 +90,6 @@ namespace Algoloop.ViewModel
 
         internal void DataToModel()
         {
-            Model.DataFolder = _settingsModel.DataFolder;
-
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
@@ -147,7 +145,7 @@ namespace Algoloop.ViewModel
                 {
                     _toolbox = new Isolated<Toolbox>();
                     _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _toolbox.Value.Run(Model, new HostDomainLogger()), _cancel.Token);
+                    await Task.Run(() => model = _toolbox.Value.Run(Model, _settingsModel, new HostDomainLogger()), _cancel.Token);
                     _toolbox.Dispose();
                     _toolbox = null;
                 }

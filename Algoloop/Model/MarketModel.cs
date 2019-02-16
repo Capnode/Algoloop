@@ -108,11 +108,6 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public string DataFolder { get; set; }
-
-        [Browsable(false)]
-        [ReadOnly(false)]
-        [DataMember]
         public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
 
         [Browsable(false)]
