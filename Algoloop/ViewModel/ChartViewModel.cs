@@ -17,7 +17,6 @@ using QuantConnect;
 
 public class ChartViewModel : ViewModelBase
 {
-
     public ChartViewModel(Series series)
     {
         Title = series.Name;

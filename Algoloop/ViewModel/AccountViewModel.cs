@@ -29,7 +29,7 @@ using QuantConnect.Securities;
 
 namespace Algoloop.ViewModel
 {
-    public class AccountViewModel : ViewModelBase
+    public class AccountViewModel : ViewModelBase, ITreeViewModel
     {
         private AccountsViewModel _parent;
         private CancellationTokenSource _cancel;
@@ -50,11 +50,12 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
-        public AccountModel Model { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
         public RelayCommand DeleteCommand { get; }
+
+        public AccountModel Model { get; }
         public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
@@ -70,6 +71,11 @@ namespace Algoloop.ViewModel
                 StopCommand.RaiseCanExecuteChanged();
                 DeleteCommand.RaiseCanExecuteChanged();
             }
+        }
+
+        public void Refresh()
+        {
+            Model.Refresh();
         }
 
         internal async Task ConnectAsync()
@@ -118,6 +124,25 @@ namespace Algoloop.ViewModel
             if (Active)
             {
                 await ConnectAsync();
+            }
+        }
+
+        internal void DataToModel()
+        {
+            Model.Orders.Clear();
+            foreach (OrderViewModel vm in Orders)
+            {
+                Model.Orders.Add(vm.Model);
+            }
+        }
+
+        internal void DataFromModel()
+        {
+            Orders.Clear();
+            foreach (OrderModel order in Model.Orders)
+            {
+                var vm = new OrderViewModel(order);
+                Orders.Add(vm);
             }
         }
 
@@ -263,25 +288,6 @@ namespace Algoloop.ViewModel
         {
             var brokerage = sender as Brokerage;
             Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
-        }
-
-        internal void DataToModel()
-        {
-            Model.Orders.Clear();
-            foreach (OrderViewModel vm in Orders)
-            {
-                Model.Orders.Add(vm.Model);
-            }
-        }
-
-        internal void DataFromModel()
-        {
-            Orders.Clear();
-            foreach (OrderModel order in Model.Orders)
-            {
-                var vm = new OrderViewModel(order);
-                Orders.Add(vm);
-            }
         }
     }
 }

@@ -35,7 +35,7 @@ using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyJobViewModel: ViewModelBase, IComparable
+    public class StrategyJobViewModel: ViewModelBase, ITreeViewModel, IComparable
     {
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
@@ -53,13 +53,24 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            StartJobCommand = new RelayCommand(() => OnStartJobCommand(), () => !Active);
-            StopJobCommand = new RelayCommand(() => OnStopJobCommand(false), () => Active);
-            DeleteJobCommand = new RelayCommand(() => DeleteJob(), () => !Active);
+            StartCommand = new RelayCommand(() => OnStartJobCommand(), () => !Active);
+            StopCommand = new RelayCommand(() => OnStopJobCommand(false), () => Active);
+            DeleteCommand = new RelayCommand(() => DeleteJob(), () => !Active);
             UseParametersCommand = new RelayCommand(() => UseParameters(), () => !Active);
 
             DataFromModel();
         }
+
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand UseParametersCommand { get; }
+        public RelayCommand ActiveCommand { get; }
+
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
+        public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
+        public SyncObservableCollection<StatisticViewModel> Statistics { get; } = new SyncObservableCollection<StatisticViewModel>();
+        public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
         public StrategyJobModel Model
         {
@@ -67,28 +78,11 @@ namespace Algoloop.ViewModel
             set => Set(ref _model, value);
         }
 
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-
-        public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-
-        public SyncObservableCollection<StatisticViewModel> Statistics { get; } = new SyncObservableCollection<StatisticViewModel>();
-
-        public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
-
         public SyncObservableCollection<ChartViewModel> Charts
         {
             get => _charts;
             set => Set(ref _charts, value);
         }
-
-        public RelayCommand StartJobCommand { get; }
-
-        public RelayCommand StopJobCommand { get; }
-
-        public RelayCommand DeleteJobCommand { get; }
-        public RelayCommand UseParametersCommand { get; }
-
-        public RelayCommand ActiveCommand { get; }
 
         public bool IsSelected
         {
@@ -113,9 +107,9 @@ namespace Algoloop.ViewModel
             {
                 Model.Active = value;
                 RaisePropertyChanged(() => Active);
-                StartJobCommand.RaiseCanExecuteChanged();
-                StopJobCommand.RaiseCanExecuteChanged();
-                DeleteJobCommand.RaiseCanExecuteChanged();
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
                 if (value)
                 {
                     Task task = StartTaskAsync();
@@ -163,6 +157,11 @@ namespace Algoloop.ViewModel
         {
             var a = obj as StrategyJobViewModel;
             return string.Compare(Model.Name, a?.Model.Name);
+        }
+
+        public void Refresh()
+        {
+            Model.Refresh();
         }
 
         internal async Task StartTaskAsync()

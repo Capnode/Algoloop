@@ -23,8 +23,6 @@ namespace Algoloop.ViewModel
 {
     public class LogViewModel : ViewModelBase
     {
-        public SyncObservableCollection<LogItem> Logs { get; } = new SyncObservableCollection<LogItem>();
-
         public LogViewModel(ILogHandler logHandler)
         {
             Log.LogHandler = logHandler;
@@ -38,5 +36,7 @@ namespace Algoloop.ViewModel
                 logService.Connect((item) => Logs.Add(item));
             }
         }
+
+        public SyncObservableCollection<LogItem> Logs { get; } = new SyncObservableCollection<LogItem>();
     }
 }

@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight.Command;
 
 namespace Algoloop.ViewModel
 {
@@ -21,12 +20,12 @@ namespace Algoloop.ViewModel
     {
         private StrategyViewModel _parent;
 
-        public ParameterModel Model { get; }
-
         public ParameterViewModel(StrategyViewModel parent, ParameterModel model)
         {
             _parent = parent;
             Model = model;
         }
+
+        public ParameterModel Model { get; }
     }
 }

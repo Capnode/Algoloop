@@ -30,15 +30,9 @@ namespace Algoloop.ViewModel
             OkCommand = new RelayCommand<Window>(window => OnOk(window));
         }
 
-        public SettingsModel Model { get; }
-
         public RelayCommand<Window> OkCommand { get; private set; }
 
-        void OnOk(Window window)
-        {
-            window.DialogResult = true;
-            window.Close();
-        }
+        public SettingsModel Model { get; }
 
         internal bool Read(string fileName)
         {
@@ -82,6 +76,12 @@ namespace Algoloop.ViewModel
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
+        }
+
+        private void OnOk(Window window)
+        {
+            window.DialogResult = true;
+            window.Close();
         }
 
         private void DataToModel()

@@ -29,7 +29,7 @@ namespace Algoloop.ViewModel
     public class StrategiesViewModel : ViewModelBase
     {
         private readonly SettingsModel _settingsModel;
-        private ViewModelBase _selectedItem;
+        private ITreeViewModel _selectedItem;
 
         public StrategiesViewModel(StrategiesModel model, SettingsModel settingsModel)
         {
@@ -37,36 +37,26 @@ namespace Algoloop.ViewModel
             _settingsModel = settingsModel;
 
             AddCommand = new RelayCommand(() => AddStrategy(), true);
-            DeleteCommand = new RelayCommand<StrategyViewModel>((strategy) => DeleteStrategy(strategy), (strategy) => strategy != null);
             ImportCommand = new RelayCommand(() => ImportStrategy(), true);
-            SelectedChangedCommand = new RelayCommand<ViewModelBase>((vm) => OnSelectedChanged(vm), (vm) => vm != null);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => OnSelectedChanged(vm), (vm) => vm != null);
 
             DataFromModel();
         }
 
-        public StrategiesModel Model { get; }
-
-        public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
-
+        public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
-        public RelayCommand<StrategyViewModel> DeleteCommand { get; }
-        public RelayCommand<ViewModelBase> SelectedChangedCommand { get; }
         public RelayCommand ImportCommand { get; }
 
-        public ViewModelBase SelectedItem
+        public StrategiesModel Model { get; }
+        public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
+
+        public ITreeViewModel SelectedItem
         {
             get => _selectedItem;
             set
             {
                 Set(ref _selectedItem, value);
-                DeleteCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        private void AddStrategy()
-        {
-            var strategy = new StrategyViewModel(this, new StrategyModel(), _settingsModel);
-            Strategies.Add(strategy);
         }
 
         internal bool DeleteStrategy(StrategyViewModel strategy)
@@ -130,18 +120,41 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void OnSelectedChanged(ViewModelBase vm)
+        internal void ExportStrategy(StrategyViewModel strategyViewModel)
         {
-            if (vm is StrategyViewModel strategy)
+            strategyViewModel.DataToModel();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.FileName = strategyViewModel.Model.Name;
+            //            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == true)
             {
-                strategy.Model.Refresh();
-                SelectedItem = strategy;
+                try
+                {
+                    string fileName = saveFileDialog.FileName;
+                    using (StreamWriter file = File.CreateText(fileName))
+                    {
+                        JsonSerializer serializer = new JsonSerializer();
+                        serializer.Serialize(file, strategyViewModel.Model);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                }
             }
-            else if (vm is StrategyJobViewModel job)
-            {
-                job.Model.Refresh();
-                SelectedItem = job;
-            }
+        }
+
+        private void AddStrategy()
+        {
+            var strategy = new StrategyViewModel(this, new StrategyModel(), _settingsModel);
+            Strategies.Add(strategy);
+        }
+
+        private void OnSelectedChanged(ITreeViewModel vm)
+        {
+            vm.Refresh();
+            SelectedItem = vm;
         }
 
         private void ImportStrategy()
@@ -170,31 +183,6 @@ namespace Algoloop.ViewModel
                     }
 
                     DataFromModel();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, ex.GetType().ToString());
-                }
-            }
-        }
-
-        internal void ExportStrategy(StrategyViewModel strategyViewModel)
-        {
-            strategyViewModel.DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.FileName = strategyViewModel.Model.Name;
-//            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    string fileName = saveFileDialog.FileName;
-                    using (StreamWriter file = File.CreateText(fileName))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Serialize(file, strategyViewModel.Model);
-                    }
                 }
                 catch (Exception ex)
                 {

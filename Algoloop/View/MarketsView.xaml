@@ -37,8 +37,14 @@
                 <Button ToolTip="Add market" Command="{Binding AddCommand}">
                     <Image Source="/Resources/Add.png" Width="16" Height="16"/>
                 </Button>
-                <Button ToolTip="Delete market" Command="{Binding DeleteCommand}" CommandParameter="{Binding SelectedItem}">
+                <Button ToolTip="Delete market" Command="{Binding SelectedItem.DeleteCommand}">
                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                </Button>
+                <Button ToolTip="Start market" Command="{Binding SelectedItem.StartCommand}">
+                    <Image Source="/Resources/Run.png" Width="16" Height="16"/>
+                </Button>
+                <Button ToolTip="Stop market" Command="{Binding SelectedItem.StopCommand}">
+                    <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
             <TreeView
@@ -134,16 +140,6 @@
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:MarketViewModel}">
                     <DockPanel>
-                        <ToolBar
-                            DockPanel.Dock="Top"
-                            ToolBarTray.IsLocked="True">
-                            <Button ToolTip="Start market" Command="{Binding StartCommand}">
-                                <Image Source="/Resources/Run.png" Width="16" Height="16"/>
-                            </Button>
-                            <Button ToolTip="Stop market" Command="{Binding StopCommand}">
-                                <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
-                            </Button>
-                        </ToolBar>
                         <TabControl>
                             <TabItem Header="Settings">
                                 <xctk:PropertyGrid

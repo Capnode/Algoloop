@@ -39,10 +39,20 @@
                     Command="{Binding AddCommand}">
                     <Image Source="/Resources/Add.png" Width="16" Height="16"/>
                 </Button>
-                <Button ToolTip="Delete account"
-                    Command="{Binding DeleteCommand}"
-                    CommandParameter="{Binding SelectedItem}">
+                <Button
+                    ToolTip="Delete account"
+                    Command="{Binding SelectedItem.DeleteCommand}">
                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                </Button>
+                <Button
+                    ToolTip="Start account"
+                    Command="{Binding SelectedItem.StartCommand}">
+                    <Image Source="/Resources/Run.png" Width="16" Height="16"/>
+                </Button>
+                <Button
+                    ToolTip="Stop account"
+                    Command="{Binding SelectedItem.StopCommand}">
+                    <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
             <TreeView
@@ -97,16 +107,6 @@
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:AccountViewModel}">
                     <DockPanel>
-                        <ToolBar
-                            DockPanel.Dock="Top"
-                            ToolBarTray.IsLocked="True">
-                            <Button ToolTip="Start account" Command="{Binding StartCommand}">
-                                <Image Source="/Resources/Run.png" Width="16" Height="16"/>
-                            </Button>
-                            <Button ToolTip="Stop account" Command="{Binding StopCommand}">
-                                <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
-                            </Button>
-                        </ToolBar>
                         <TabControl>
                             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
                                 <DataGrid

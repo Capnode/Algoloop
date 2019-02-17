@@ -25,7 +25,7 @@ using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
-    public class FolderViewModel : ViewModelBase
+    public class FolderViewModel : ViewModelBase, ITreeViewModel
     {
         private MarketViewModel _market;
         private SymbolViewModel _selectedSymbol;
@@ -37,8 +37,9 @@ namespace Algoloop.ViewModel
             Model = model;
 
             DeleteCommand = new RelayCommand(() => _market?.DeleteFolder(this), () => !_market.Active);
-            RefreshCommand = new RelayCommand(() => Refresh(null), () => !_market.Active);
-
+            RefreshCommand = new RelayCommand(() => Refresh(), () => !_market.Active);
+            StartCommand = new RelayCommand(() => { }, () => false);
+            StopCommand = new RelayCommand(() => { }, () => false);
             AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => AddSymbol(m), m => !_market.Active);
             RemoveSymbolsCommand = new RelayCommand<IList>(m => RemoveSymbols(m), m => !_market.Active);
             MoveUpSymbolsCommand = new RelayCommand<IList>(m => MoveUpSymbols(m), m => !_market.Active);
@@ -58,17 +59,19 @@ namespace Algoloop.ViewModel
             MarketSymbols.Source = _market.Symbols;
         }
 
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public CollectionViewSource MarketSymbols { get; } = new CollectionViewSource();
-
-        public FolderModel Model { get; }
-
         public RelayCommand DeleteCommand { get; }
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
         public RelayCommand RefreshCommand { get; }
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand<IList> MoveUpSymbolsCommand { get; }
         public RelayCommand<IList> MoveDownSymbolsCommand { get; }
+
+        public FolderModel Model { get; }
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
+        public CollectionViewSource MarketSymbols { get; } = new CollectionViewSource();
+
 
         public SymbolViewModel MarketSymbol
         {
@@ -83,8 +86,9 @@ namespace Algoloop.ViewModel
         }
 
 
-        internal void Refresh(SymbolViewModel symbol)
+        public void Refresh()
         {
+            Model.Refresh();
             MarketSymbols.View.Refresh();
         }
 

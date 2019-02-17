@@ -22,11 +22,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
-    public class MarketViewModel : ViewModelBase
+    public class MarketViewModel : ViewModelBase, ITreeViewModel
     {
         private readonly MarketsViewModel _parent;
         private readonly SettingsModel _settingsModel;
@@ -51,8 +50,6 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand DeleteCommand { get; }
@@ -60,6 +57,9 @@ namespace Algoloop.ViewModel
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
+
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
+        public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
 
         public bool Active
         {
@@ -80,11 +80,12 @@ namespace Algoloop.ViewModel
             set => Set(ref _model, value);
         }
 
-        internal void Refresh(SymbolViewModel symbolViewModel)
+        public void Refresh()
         {
+            Model.Refresh();
             foreach (FolderViewModel folder in Folders)
             {
-                folder.Refresh(symbolViewModel);
+                folder.Refresh();
             }
         }
 
@@ -214,7 +215,7 @@ namespace Algoloop.ViewModel
         {
             var symbol = new SymbolViewModel(this, new SymbolModel());
             Symbols.Add(symbol);
-            Folders.ToList().ForEach(m => m.Refresh(symbol));
+            Folders.ToList().ForEach(m => m.Refresh());
         }
 
         private void ImportSymbols()

@@ -30,66 +30,35 @@ namespace Algoloop.ViewModel
 {
     public class AccountsViewModel : ViewModelBase
     {
+        private ITreeViewModel _selectedItem;
         private static readonly AccountModel[] _standardAccounts = new []
         {
             new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
             new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
         };
 
-        private AccountViewModel _selectedItem;
-
         public AccountsViewModel(AccountsModel model)
         {
             Model = model;
             AddCommand = new RelayCommand(() => AddAccount(), true);
-            DeleteCommand = new RelayCommand<AccountViewModel>((account) => DeleteAccount(account), (account) => account != null);
-            SelectedChangedCommand = new RelayCommand<AccountViewModel>((market) => OnSelectedChanged(market), (market) => market != null);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => OnSelectedChanged(market), (market) => market != null);
             Messenger.Default.Register<NotificationMessageAction<List<AccountModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
         }
 
-        public AccountsModel Model { get; }
-
-        public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
-
+        public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
 
-        public RelayCommand<AccountViewModel> DeleteCommand { get; }
-        public RelayCommand<AccountViewModel> SelectedChangedCommand { get; }
+        public AccountsModel Model { get; }
+        public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
 
-        public AccountViewModel SelectedItem
+        public ITreeViewModel SelectedItem
         {
             get => _selectedItem;
             set
             {
                 Set(ref _selectedItem, value);
-                DeleteCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        private void OnSelectedChanged(AccountViewModel account)
-        {
-            account.Model.Refresh();
-            SelectedItem = account;
-        }
-
-        private void OnNotificationMessage(NotificationMessageAction<List<AccountModel>> message)
-        {
-            IEnumerable<AccountModel> accounts = Accounts.Select(m => m.Model).Concat(_standardAccounts);
-            if (string.IsNullOrEmpty(message.Notification))
-            {
-                message.Execute(accounts.ToList());
-            }
-            else
-            {
-                message.Execute(accounts.Where(s => s.Name.Equals(message.Notification)).ToList());
-            }
-        }
-
-        private void AddAccount()
-        {
-            var loginViewModel = new AccountViewModel(this, new AccountModel());
-            Accounts.Add(loginViewModel);
         }
 
         internal bool DeleteAccount(AccountViewModel account)
@@ -141,6 +110,31 @@ namespace Algoloop.ViewModel
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
+        }
+
+        private void OnSelectedChanged(ITreeViewModel vm)
+        {
+            vm.Refresh();
+            SelectedItem = vm;
+        }
+
+        private void OnNotificationMessage(NotificationMessageAction<List<AccountModel>> message)
+        {
+            IEnumerable<AccountModel> accounts = Accounts.Select(m => m.Model).Concat(_standardAccounts);
+            if (string.IsNullOrEmpty(message.Notification))
+            {
+                message.Execute(accounts.ToList());
+            }
+            else
+            {
+                message.Execute(accounts.Where(s => s.Name.Equals(message.Notification)).ToList());
+            }
+        }
+
+        private void AddAccount()
+        {
+            var loginViewModel = new AccountViewModel(this, new AccountModel());
+            Accounts.Add(loginViewModel);
         }
 
         private void DataToModel()

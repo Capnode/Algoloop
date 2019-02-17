@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Capnode AB
+ * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -12,18 +12,15 @@
  * limitations under the License.
  */
 
-using System.Windows.Controls;
+using GalaSoft.MvvmLight.Command;
 
-namespace Algoloop.View
+namespace Algoloop.ViewModel
 {
-    /// <summary>
-    /// Interaction logic for StrategyJobView.xaml
-    /// </summary>
-    public partial class StrategyJobView : UserControl
+    public interface ITreeViewModel
     {
-        public StrategyJobView()
-        {
-            InitializeComponent();
-        }
+        RelayCommand DeleteCommand { get; }
+        RelayCommand StartCommand { get; }
+        RelayCommand StopCommand { get; }
+        void Refresh();
     }
 }

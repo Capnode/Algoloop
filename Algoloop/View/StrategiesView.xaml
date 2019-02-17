@@ -41,10 +41,20 @@
                     Command="{Binding AddCommand}">
                     <Image Source="/Resources/Add.png" Width="16" Height="16"/>
                 </Button>
-                <Button ToolTip="Delete strategy"
-                    Command="{Binding DeleteCommand}"
-                    CommandParameter="{Binding SelectedItem}">
+                <Button
+                    ToolTip="Delete"
+                    Command="{Binding SelectedItem.DeleteCommand}">
                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                </Button>
+                <Button
+                    ToolTip="Start"
+                    Command="{Binding SelectedItem.StartCommand}">
+                    <Image Source="/Resources/Run.png" Width="16" Height="16"/>
+                </Button>
+                <Button
+                    ToolTip="Stop"
+                    Command="{Binding SelectedItem.StopCommand}">
+                    <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
             <TreeView
@@ -97,14 +107,14 @@
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem
-                                            Header="Run Strategy"
-                                            Command="{Binding RunCommand}">
+                                            Header="Start strategy"
+                                            Command="{Binding StartCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Run.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                            Header="Clone Strategy"
+                                            Header="Clone strategy"
                                             Command="{Binding CloneCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
@@ -166,13 +176,6 @@
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:StrategyViewModel}">
                     <DockPanel>
-                        <ToolBar
-                            DockPanel.Dock="Top"
-                            ToolBarTray.IsLocked="True">
-                            <Button ToolTip="Run strategy" Command="{Binding RunCommand}">
-                                <Image Source="/Resources/Run.png" Width="16" Height="16"/>
-                            </Button>
-                        </ToolBar>
                         <TabControl>
                             <TabItem Header="Configuration">
                                 <xctk:PropertyGrid

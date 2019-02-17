@@ -31,10 +31,9 @@ using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyViewModel : ViewModelBase
+    public class StrategyViewModel : ViewModelBase, ITreeViewModel
     {
         private readonly string[] exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
-
         private StrategiesViewModel _parent;
         private IList _taskSelection;
         private bool _isSelected;
@@ -50,10 +49,11 @@ namespace Algoloop.ViewModel
 
             TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
             TaskDoubleClickCommand = new RelayCommand<DataRowView>(m => OnSelectItem(m));
-            RunCommand = new RelayCommand(() => RunStrategy(), true);
+            StartCommand = new RelayCommand(() => RunStrategy(), true);
+            StopCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
-            DeleteStrategyCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
             DeleteAllJobsCommand = new RelayCommand(() => DeleteTasks(Summary.Rows), true);
             DeleteSelectedJobsCommand = new RelayCommand(() => DeleteTasks(_taskSelection), true);
             UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
@@ -66,24 +66,25 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
-        public StrategyModel Model { get; }
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-        public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
-        public DataTable Summary { get; } = new DataTable();
-
         public RelayCommand<IList> TaskSelectionChangedCommand { get; }
         public RelayCommand<DataRowView> TaskDoubleClickCommand { get; }
-        public RelayCommand RunCommand { get; }
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
         public RelayCommand CloneCommand { get; }
         public RelayCommand ExportCommand { get; }
-        public RelayCommand DeleteStrategyCommand { get; }
+        public RelayCommand DeleteCommand { get; }
         public RelayCommand DeleteAllJobsCommand { get; }
         public RelayCommand DeleteSelectedJobsCommand { get; }
         public RelayCommand UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
+
+        public StrategyModel Model { get; }
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
+        public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
+        public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
+        public DataTable Summary { get; } = new DataTable();
 
         public bool IsSelected
         {
@@ -101,6 +102,11 @@ namespace Algoloop.ViewModel
         {
             get => _dataView;
             set => Set(ref _dataView, value);
+        }
+
+        public void Refresh()
+        {
+            Model.Refresh();
         }
 
         internal bool DeleteSymbol(SymbolViewModel symbol)
@@ -141,48 +147,6 @@ namespace Algoloop.ViewModel
 
             pathValue += ";" + path;
             Environment.SetEnvironmentVariable("PATH", pathValue);
-        }
-
-        private void DeleteTasks(DataRowCollection rows)
-        {
-            var list = new DataRow[rows.Count];
-            rows.CopyTo(list, 0);
-            foreach (DataRow row in list)
-            {
-                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
-                if (job != null)
-                {
-                    job.DeleteJob();
-                }
-
-                row.Delete();
-            }
-
-            RemoveUnusedSummaryColumns();
-        }
-
-        private void DeleteTasks(IList rows)
-        {
-            List<DataRowView> list = rows?.Cast<DataRowView>()?.ToList();
-            if (list == null)
-                return;
-
-            foreach (DataRowView row in list)
-            {
-                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
-                if (job != null)
-                {
-                    job.DeleteJob();
-                }
-
-                row.Delete();
-            }
-
-            RemoveUnusedSummaryColumns();
-        }
-
-        internal void Refresh(SymbolViewModel symbolViewModel)
-        {
         }
 
         internal void UseParameters(StrategyJobViewModel job)
@@ -236,6 +200,44 @@ namespace Algoloop.ViewModel
         {
             DataView = null;
             DataView = Summary.DefaultView;
+        }
+
+        private void DeleteTasks(DataRowCollection rows)
+        {
+            var list = new DataRow[rows.Count];
+            rows.CopyTo(list, 0);
+            foreach (DataRow row in list)
+            {
+                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
+                if (job != null)
+                {
+                    job.DeleteJob();
+                }
+
+                row.Delete();
+            }
+
+            RemoveUnusedSummaryColumns();
+        }
+
+        private void DeleteTasks(IList rows)
+        {
+            List<DataRowView> list = rows?.Cast<DataRowView>()?.ToList();
+            if (list == null)
+                return;
+
+            foreach (DataRowView row in list)
+            {
+                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
+                if (job != null)
+                {
+                    job.DeleteJob();
+                }
+
+                row.Delete();
+            }
+
+            RemoveUnusedSummaryColumns();
         }
 
         private void OnSelectItem(DataRowView row)

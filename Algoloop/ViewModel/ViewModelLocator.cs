@@ -27,7 +27,6 @@
 */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using GalaSoft.MvvmLight.Ioc;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -41,14 +40,6 @@ namespace Algoloop.ViewModel
     /// </summary>
     public class ViewModelLocator
     {
-        public MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
-        public MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
-        public AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
-        public StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
-        public LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
-        public SettingsViewModel SettingsViewModel => SimpleIoc.Default.GetInstance<SettingsViewModel>();
-        public AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
-
         /// <summary>
         /// Initializes a new instance of the ViewModelLocator class.
         /// </summary>
@@ -71,6 +62,14 @@ namespace Algoloop.ViewModel
             SimpleIoc.Default.Register(
                 () => Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Service.LogItemHandler")));
         }
+
+        public MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
+        public MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
+        public AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
+        public StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
+        public LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
+        public SettingsViewModel SettingsViewModel => SimpleIoc.Default.GetInstance<SettingsViewModel>();
+        public AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
 
         public static void Cleanup()
         {

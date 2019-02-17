@@ -14,27 +14,31 @@
 
 using Algoloop.Model;
 using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.CommandWpf;
-using System.ComponentModel;
+using GalaSoft.MvvmLight.Command;
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolViewModel : ViewModelBase
+    public class SymbolViewModel : ViewModelBase, ITreeViewModel
     {
-        private ViewModelBase _parent;
+        private ITreeViewModel _parent;
 
-        public SymbolViewModel(ViewModelBase parent, SymbolModel model)
+        public SymbolViewModel(ITreeViewModel parent, SymbolModel model)
         {
             _parent = parent;
             Model = model;
 
+            DeleteCommand = new RelayCommand(() => { }, () => false);
+            StartCommand = new RelayCommand(() => { }, () => false);
+            StopCommand = new RelayCommand(() => { }, () => false);
             DeleteSymbolCommand = new RelayCommand(() => DeleteSymbol(this), true);
         }
 
-        public SymbolModel Model { get; }
-
-        [Browsable(false)]
+        public RelayCommand DeleteCommand { get; }
         public RelayCommand DeleteSymbolCommand { get; }
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
+
+        public SymbolModel Model { get; }
 
         public bool Active
         {
@@ -43,10 +47,15 @@ namespace Algoloop.ViewModel
             {
                 Model.Active = value;
                 RaisePropertyChanged(() => Active);
-                (_parent as StrategyViewModel)?.Refresh(this);
-                (_parent as MarketViewModel)?.Refresh(this);
-                (_parent as FolderViewModel)?.Refresh(this);
+                (_parent as StrategyViewModel)?.Refresh();
+                (_parent as MarketViewModel)?.Refresh();
+                (_parent as FolderViewModel)?.Refresh();
             }
+        }
+
+        public void Refresh()
+        {
+            Model.Refresh();
         }
 
         private void DeleteSymbol(SymbolViewModel symbol)
