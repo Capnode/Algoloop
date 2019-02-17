@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Capnode AB
+ * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -16,45 +16,56 @@ using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Data.Market;
 using QuantConnect.Parameters;
+using QuantConnect.Securities;
 using System;
 using System.Globalization;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Capnode.Algorithm.CSharp
 {
     public class Tide : QCAlgorithm
     {
-        private enum MarketSide { Buy, Sell };
-
         [Parameter("symbols")]
-        private string _symbols = "EURUSD";
+        protected string _symbols = "EURUSD";
         private string _symbol;
 
         [Parameter("resolution")]
-        private string _resolution = "Minute";
+        protected string _resolution = "Hour";
 
         [Parameter("market")]
-        private string _market = Market.FXCM;
+        protected string _market = Market.FXCM;
 
         [Parameter("startdate")]
-        private string _startdate = "2018-01-01 00:00:00";
+        protected string _startdate = "2018-01-01 00:00:00";
 
         [Parameter("enddate")]
-        private string _enddate = "2018-09-01 00:00:00";
+        protected string _enddate = "2018-10-30 00:00:00";
 
         [Parameter("cash")]
-        private string _cash = "100000";
+        protected string _cash = "100000";
 
-        [Parameter("opentime")]
-        private string _opentime = "01:00:00";
-        private DateTime __opentime;
+        [Parameter("OpenHourLong")]
+        private string _openHourLong = "1";
+        private TimeSpan _openTimeLong;
 
-        [Parameter("closetime")]
-        private string _closetime = "03:00:00";
-        private DateTime __closetime;
+        [Parameter("CloseHourLong")]
+        private string _closeHourLong = "3";
+        private TimeSpan _closeTimeLong;
 
-        [Parameter("side")]
-        private string _side = "Buy";
-        private MarketSide __side = MarketSide.Buy;
+        [Parameter("OpenHourShort")]
+        private string _openHourShort = "1";
+        private TimeSpan _openTimeShort;
+
+        [Parameter("CloseHourShort")]
+        private string _closeHourShort = "3";
+        private TimeSpan _closeTimeShort;
+
+        [Parameter("SymbolIndex")]
+        private string _symbolIndex = "0";
+        private int __symbolIndex = 0;
+
+        [Parameter("Size")]
+        private string _size = "1";
+        private double __size = 0;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash
@@ -62,6 +73,9 @@ namespace Algoloop.Algorithm.CSharp
         /// </summary>
         public override void Initialize()
         {
+            SetTimeZone(NodaTime.DateTimeZone.Utc);
+            Log($"Timezone {TimeZone}");
+
             // Standard parameters
             SetStartDate(DateTime.Parse(_startdate, CultureInfo.InvariantCulture));
             SetEndDate(DateTime.Parse(_enddate, CultureInfo.InvariantCulture));
@@ -69,16 +83,18 @@ namespace Algoloop.Algorithm.CSharp
 
             Resolution resolution = Resolution.Hour;
             Enum.TryParse(_resolution, out resolution);
-            _symbol = _symbols.Split(';')[0];
+            int.TryParse(_symbolIndex, out __symbolIndex);
+            _symbol = _symbols.Split(';')[__symbolIndex];
             AddForex(_symbol, resolution, _market);
 
             // Algorithm parameters
-            __opentime = DateTime.Parse(_opentime, CultureInfo.InvariantCulture);
-            __closetime = DateTime.Parse(_closetime, CultureInfo.InvariantCulture);
-            Enum.TryParse(_side, out __side);
+            _openTimeLong = TimeSpan.FromHours(double.Parse(_openHourLong));
+            _closeTimeLong = TimeSpan.FromHours(double.Parse(_closeHourLong));
+            _openTimeShort = TimeSpan.FromHours(double.Parse(_openHourShort));
+            _closeTimeShort = TimeSpan.FromHours(double.Parse(_closeHourShort));
+            __size = double.Parse(_size, CultureInfo.InvariantCulture);
 
-            SetTimeZone(NodaTime.DateTimeZone.Utc);
-            Log($"Timezone {TimeZone}");
+            Log($"Tide {_openTimeLong.Hours} {_closeTimeLong.Hours} {_openTimeShort.Hours} {_closeTimeShort.Hours} {__symbolIndex} {__size}");
         }
 
         /// <summary>
@@ -88,29 +104,61 @@ namespace Algoloop.Algorithm.CSharp
         /// <param name="data">TradeBars IDictionary object with your stock data</param>
         public void OnData(TradeBars data)
         {
-            if (Portfolio.Invested)
+            if (!IsMarketOpen(_symbol))
+                return;
+
+            SecurityHolding holding = Portfolio[_symbol];
+            TimeSpan now = Time.TimeOfDay;
+            bool longInHours = InHours(_openTimeLong, now, _closeTimeLong);
+            bool shortInHours = InHours(_openTimeShort, now, _closeTimeShort);
+
+            if (holding.IsLong)
             {
-                if (Time.TimeOfDay >= __closetime.TimeOfDay || Time.TimeOfDay < __opentime.TimeOfDay)
+                if (!longInHours)
                 {
-                    Log($"Close {_symbol}");
                     Liquidate(_symbol);
                 }
-            }
-            else if (__side.Equals(MarketSide.Buy))
-            {
-                if (Time.TimeOfDay >= __opentime.TimeOfDay && Time.TimeOfDay < __closetime.TimeOfDay)
+                else
                 {
-                    Log($"Buy {_symbol}");
-                    SetHoldings(_symbol, 0.5);
+                    return;
                 }
             }
-            else if (__side.Equals(MarketSide.Sell))
+            else if (holding.IsShort)
             {
-                if (Time.TimeOfDay >= __opentime.TimeOfDay && Time.TimeOfDay < __closetime.TimeOfDay)
+                if (!shortInHours)
                 {
-                    Log($"Sell {_symbol}");
-                    SetHoldings(_symbol, -0.5);
+                    Liquidate(_symbol);
                 }
+                else
+                {
+                    return;
+                }
+            }
+
+            if (longInHours)
+            {
+                SetHoldings(_symbol, __size);
+            }
+            else if (shortInHours)
+            {
+                SetHoldings(_symbol, -__size);
+            }
+        }
+
+        private bool InHours(TimeSpan open, TimeSpan now, TimeSpan close)
+        {
+            if (open == close)
+            {
+                return false;
+            }
+
+            if (open < close)
+            {
+                return open <= now && now < close;
+            }
+            else
+            {
+                return now < close || open <= now;
             }
         }
     }
