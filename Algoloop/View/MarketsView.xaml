@@ -7,6 +7,7 @@
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
+    xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"
     DataContext="{Binding Source={StaticResource Locator}, Path=MarketsViewModel}" 
     mc:Ignorable="d" 
@@ -213,26 +214,31 @@
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top">
-                                        <ComboBox Name="combobox"
+                                        <ComboBox
+                                            Name="combobox"
                                             SelectedValue="{Binding MarketSymbol, Mode=TwoWay}"
                                             ItemsSource="{Binding MarketSymbols.View}"
                                             MinWidth="120"/>
-                                        <Button ToolTip="Add symbol" 
+                                        <Button
+                                            ToolTip="Add symbol" 
                                             Command="{Binding AddSymbolCommand}"
                                             CommandParameter="{Binding ElementName=combobox, Path=SelectedValue}">
                                             <Image Source="/Resources\Add.png" Width="16" Height="16"/>
                                         </Button>
-                                        <Button ToolTip="Remove symbols"
+                                        <Button
+                                            ToolTip="Remove symbols"
                                             Command="{Binding RemoveSymbolsCommand}"
                                             CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
                                             <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                         </Button>
-                                        <Button ToolTip="Move symbols up"
+                                        <Button
+                                            ToolTip="Move symbols up"
                                             Command="{Binding MoveUpSymbolsCommand}"
                                             CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
                                             <Image Source="/Resources\MoveUp.png" Width="16" Height="16"/>
                                         </Button>
-                                        <Button ToolTip="Move symbols down"
+                                        <Button
+                                            ToolTip="Move symbols down"
                                             Command="{Binding MoveDownSymbolsCommand}"
                                             CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
                                             <Image Source="/Resources\MoveDown.png" Width="16" Height="16"/>
@@ -259,7 +265,24 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                     <DockPanel>
-                        <TextBlock Text="{Binding Model.Name}"/>
+                        <ToolBar DockPanel.Dock="Top">
+                            <Label
+                                Content="{Binding Model.Name}"
+                                FontSize="20"
+                                Margin="10 0 10 0"
+                                MinWidth="60"/>
+                            <ComboBox
+                                SelectedValue="{Binding SelectedResolution, Mode=TwoWay}"
+                                ItemsSource="{Binding ResolutionList}"
+                                MinWidth="120">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SelectionChanged">
+                                        <i:InvokeCommandAction Command="{Binding ResolutionChangedCommand}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </ComboBox>
+                        </ToolBar>
+                        <view:AmChart ItemsSource="{Binding Charts}"/>
                     </DockPanel>
                 </DataTemplate>
             </ContentControl.Resources>

@@ -72,6 +72,7 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
+        public string DataFolder => _settingsModel.DataFolder;
 
         public bool Active
         {
