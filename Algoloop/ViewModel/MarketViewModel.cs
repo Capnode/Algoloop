@@ -17,11 +17,17 @@ using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.Win32;
 using QuantConnect.Logging;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Algoloop.ViewModel
 {
@@ -32,6 +38,7 @@ namespace Algoloop.ViewModel
         private CancellationTokenSource _cancel;
         private MarketModel _model;
         private Isolated<Toolbox> _toolbox;
+        private SymbolViewModel _selectedSymbol;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel)
         {
@@ -40,7 +47,9 @@ namespace Algoloop.ViewModel
             _settingsModel = settingsModel;
 
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
+            DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !Active && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), m => !Active && SelectedSymbol != null);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !Active);
             NewListCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !Active);
             ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
@@ -50,8 +59,11 @@ namespace Algoloop.ViewModel
             DataFromModel();
         }
 
+        public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
+        public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
+        public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand NewListCommand { get; }
         public RelayCommand ActiveCommand { get; }
@@ -71,6 +83,8 @@ namespace Algoloop.ViewModel
                 StartCommand.RaiseCanExecuteChanged();
                 StopCommand.RaiseCanExecuteChanged();
                 DeleteCommand.RaiseCanExecuteChanged();
+                DeleteSymbolsCommand.RaiseCanExecuteChanged();
+                ExportSymbolsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -78,6 +92,17 @@ namespace Algoloop.ViewModel
         {
             get => _model;
             set => Set(ref _model, value);
+        }
+
+        public SymbolViewModel SelectedSymbol
+        {
+            get => _selectedSymbol;
+            set
+            {
+                Set(ref _selectedSymbol, value);
+                DeleteSymbolsCommand.RaiseCanExecuteChanged();
+                ExportSymbolsCommand.RaiseCanExecuteChanged();
+            }
         }
 
         public void Refresh()
@@ -218,8 +243,91 @@ namespace Algoloop.ViewModel
             Folders.ToList().ForEach(m => m.Refresh());
         }
 
+        private void DeleteSymbols(IList symbols)
+        {
+            Debug.Assert(symbols != null);
+            if (Symbols.Count == 0 || symbols.Count == 0)
+                return;
+
+            // Create a copy of the list before remove
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            int pos = Symbols.IndexOf(list.First());
+            foreach (SymbolViewModel symbol in list)
+            {
+                Symbols.Remove(symbol);
+            }
+
+            DataToModel();
+            if (Symbols.Count > 0)
+            {
+                SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+            }
+        }
+
         private void ImportSymbols()
         {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = false;
+            openFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                foreach (string fileName in openFileDialog.FileNames)
+                {
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        while (!r.EndOfStream)
+                        {
+                            string name = r.ReadLine();
+                            if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
+                            {
+                                var symbol = new SymbolModel() { Name = name };
+                                Model.Symbols.Add(symbol);
+                            }
+                        }
+                    }
+                }
+
+                Folders.ToList().ForEach(m => m.Refresh());
+                DataFromModel();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        private void ExportSymbols(IList symbols)
+        {
+            Debug.Assert(symbols != null);
+            if (symbols.Count == 0)
+                return;
+
+            DataToModel();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                string fileName = saveFileDialog.FileName;
+                using (StreamWriter file = File.CreateText(fileName))
+                {
+                    foreach (SymbolViewModel symbol in symbols)
+                    {
+                        file.WriteLine(symbol.Model.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
         }
     }
 }

@@ -37,7 +37,7 @@
                 <Button ToolTip="Add market" Command="{Binding AddCommand}">
                     <Image Source="/Resources/Add.png" Width="16" Height="16"/>
                 </Button>
-                <Button ToolTip="Delete market" Command="{Binding SelectedItem.DeleteCommand}">
+                <Button ToolTip="Delete" Command="{Binding SelectedItem.DeleteCommand}">
                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Start market" Command="{Binding SelectedItem.StartCommand}">
@@ -152,45 +152,47 @@
                                 </xctk:PropertyGrid>
                             </TabItem>
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
-                                <ListBox
-                                    SelectionMode="Extended"
-                                    DockPanel.Dock="Bottom"
-                                    ItemsSource="{Binding Symbols}">
-                                    <ListBox.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem
-                                                Header="Add Symbol"
-                                                Command="{Binding AddSymbolCommand}">
-                                                <MenuItem.Icon>
-                                                    <Image Source="/Resources/Add.png" Width="16" Height="16"/>
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem
-                                                Header="Import Symbol list..."
-                                                Command="{Binding ImportSymbolsCommand}" />
-                                        </ContextMenu>
-                                    </ListBox.ContextMenu>
-                                    <ListBox.Resources>
-                                        <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <CheckBox IsChecked="{Binding Active}" />
-                                                <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0">
-                                                    <TextBox.ContextMenu>
-                                                        <ContextMenu>
-                                                            <MenuItem
-                                                                Header="Delete Symbol"
-                                                                Command="{Binding DeleteSymbolCommand}">
-                                                                <MenuItem.Icon>
-                                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
-                                                                </MenuItem.Icon>
-                                                            </MenuItem>
-                                                        </ContextMenu>
-                                                    </TextBox.ContextMenu>
-                                                </TextBox>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.Resources>
-                                </ListBox>
+                                <DockPanel>
+                                    <ToolBar DockPanel.Dock="Top">
+                                        <Button
+                                            ToolTip="Add symbol" 
+                                            Command="{Binding AddSymbolCommand}">
+                                            <Image Source="/Resources\Add.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button
+                                            ToolTip="Delete symbols"
+                                            Command="{Binding DeleteSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=marketSymbolListbox, Path=SelectedItems}">
+                                            <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button
+                                            ToolTip="Import symbol list..."
+                                            Command="{Binding ImportSymbolsCommand}">
+                                            <Image Source="/Resources\Import.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button
+                                            ToolTip="Export symbol list..."
+                                            Command="{Binding ExportSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=marketSymbolListbox, Path=SelectedItems}">
+                                            <Image Source="/Resources\Export.png" Width="16" Height="16"/>
+                                        </Button>
+                                    </ToolBar>
+                                    <ListBox
+                                        DockPanel.Dock="Bottom"
+                                        Name="marketSymbolListbox"
+                                        SelectionMode="Extended"
+                                        SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                        ItemsSource="{Binding Symbols}">
+                                        <ListBox.Resources>
+                                            <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox IsChecked="{Binding Active}" />
+                                                    <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.Resources>
+                                    </ListBox>
+                                </DockPanel>
                             </TabItem>
                         </TabControl>
                     </DockPanel>
@@ -235,15 +237,11 @@
                                             CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
                                             <Image Source="/Resources\MoveDown.png" Width="16" Height="16"/>
                                         </Button>
-                                        <Button ToolTip="Refresh"
-                                            Command="{Binding RefreshCommand}">
-                                            <Image Source="/Resources\Refresh.png" Width="16" Height="16"/>
-                                        </Button>
                                     </ToolBar>
                                     <ListBox
+                                        DockPanel.Dock="Bottom"
                                         Name="listbox"
                                         SelectionMode="Extended"
-                                        DockPanel.Dock="Bottom"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                         ItemsSource="{Binding Symbols}">
                                         <ListBox.Resources>

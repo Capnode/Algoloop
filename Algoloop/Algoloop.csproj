@@ -402,6 +402,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Content Include="Extern\AmCharts.Windows.Stock.dll" />
+    <Resource Include="Resources\Export.png" />
+    <Resource Include="Resources\Import.png" />
     <Resource Include="Resources\Info.png" />
     <Resource Include="Resources\New.png" />
     <Resource Include="Resources\MoveUp.png" />

@@ -17,6 +17,7 @@ using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.Win32;
 using QuantConnect.Logging;
 using QuantConnect.Parameters;
 using System;
@@ -24,10 +25,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Algoloop.ViewModel
 {
@@ -39,6 +42,7 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private DataView _dataView;
+        private SymbolViewModel _selectedSymbol;
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -47,8 +51,6 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
-            TaskDoubleClickCommand = new RelayCommand<DataRowView>(m => OnSelectItem(m));
             StartCommand = new RelayCommand(() => RunStrategy(), true);
             StopCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
@@ -58,16 +60,17 @@ namespace Algoloop.ViewModel
             DeleteSelectedJobsCommand = new RelayCommand(() => DeleteTasks(_taskSelection), true);
             UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
+            DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), trm => SelectedSymbol != null);
+            TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
+            TaskDoubleClickCommand = new RelayCommand<DataRowView>(m => OnSelectItem(m));
+
             DataView = Summary.DefaultView;
-
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
-
             DataFromModel();
         }
 
-        public RelayCommand<IList> TaskSelectionChangedCommand { get; }
-        public RelayCommand<DataRowView> TaskDoubleClickCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
         public RelayCommand CloneCommand { get; }
@@ -77,8 +80,12 @@ namespace Algoloop.ViewModel
         public RelayCommand DeleteSelectedJobsCommand { get; }
         public RelayCommand UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
+        public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
+        public RelayCommand<IList> ExportSymbolsCommand { get; }
+        public RelayCommand<IList> TaskSelectionChangedCommand { get; }
+        public RelayCommand<DataRowView> TaskDoubleClickCommand { get; }
 
         public StrategyModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -104,16 +111,20 @@ namespace Algoloop.ViewModel
             set => Set(ref _dataView, value);
         }
 
+        public SymbolViewModel SelectedSymbol
+        {
+            get => _selectedSymbol;
+            set
+            {
+                Set(ref _selectedSymbol, value);
+                DeleteSymbolsCommand.RaiseCanExecuteChanged();
+                ExportSymbolsCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         public void Refresh()
         {
             Model.Refresh();
-        }
-
-        internal bool DeleteSymbol(SymbolViewModel symbol)
-        {
-            bool ok = Symbols.Remove(symbol);
-            Debug.Assert(ok);
-            return ok;
         }
 
         internal bool DeleteJob(StrategyJobViewModel job)
@@ -353,11 +364,6 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void ImportSymbols()
-        {
-            throw new NotImplementedException();
-        }
-
         private void UpdateParametersFromModel(string algorithmName)
         {
             if (string.IsNullOrEmpty(Model.AlgorithmLocation) || string.IsNullOrEmpty(algorithmName))
@@ -391,6 +397,92 @@ namespace Algoloop.ViewModel
             }
 
             RaisePropertyChanged(() => Parameters);
+        }
+
+        private void DeleteSymbols(IList symbols)
+        {
+            Debug.Assert(symbols != null);
+            if (Symbols.Count == 0 || symbols.Count == 0)
+                return;
+
+            // Create a copy of the list before remove
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            int pos = Symbols.IndexOf(list.First());
+            foreach (SymbolViewModel symbol in list)
+            {
+                Symbols.Remove(symbol);
+            }
+
+            DataToModel();
+            if (Symbols.Count > 0)
+            {
+                SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+            }
+        }
+
+        private void ImportSymbols()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = false;
+            openFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                foreach (string fileName in openFileDialog.FileNames)
+                {
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        while (!r.EndOfStream)
+                        {
+                            string name = r.ReadLine();
+                            if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
+                            {
+                                var symbol = new SymbolModel() { Name = name };
+                                Model.Symbols.Add(symbol);
+                            }
+                        }
+                    }
+                }
+
+                DataFromModel();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        private void ExportSymbols(IList symbols)
+        {
+            Debug.Assert(symbols != null);
+            if (Symbols.Count == 0 || symbols.Count == 0)
+                return;
+
+            DataToModel();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                string fileName = saveFileDialog.FileName;
+                using (StreamWriter file = File.CreateText(fileName))
+                {
+                    foreach (SymbolViewModel symbol in symbols)
+                    {
+                        file.WriteLine(symbol.Model.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
         }
     }
 }

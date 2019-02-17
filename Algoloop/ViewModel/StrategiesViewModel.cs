@@ -38,7 +38,9 @@ namespace Algoloop.ViewModel
 
             AddCommand = new RelayCommand(() => AddStrategy(), true);
             ImportCommand = new RelayCommand(() => ImportStrategy(), true);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => OnSelectedChanged(vm), (vm) => vm != null);
+            ExportCommand = new RelayCommand(() => ExportStrategy(SelectedItem), () => SelectedItem is StrategyViewModel);
+            CloneCommand = new RelayCommand(() => CloneStrategy(SelectedItem), () => SelectedItem is StrategyViewModel);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => OnSelectedChanged(vm), true);
 
             DataFromModel();
         }
@@ -46,6 +48,8 @@ namespace Algoloop.ViewModel
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
         public RelayCommand ImportCommand { get; }
+        public RelayCommand ExportCommand { get; }
+        public RelayCommand CloneCommand { get; }
 
         public StrategiesModel Model { get; }
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
@@ -56,6 +60,8 @@ namespace Algoloop.ViewModel
             set
             {
                 Set(ref _selectedItem, value);
+                ExportCommand.RaiseCanExecuteChanged();
+                CloneCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -68,12 +74,15 @@ namespace Algoloop.ViewModel
             return ok;
         }
 
-        internal void CloneStrategy(StrategyViewModel strategyViewModel)
+        internal void CloneStrategy(ITreeViewModel vm)
         {
-            strategyViewModel.DataToModel();
-            var strategyModel = new StrategyModel(strategyViewModel.Model);
-            var strategy = new StrategyViewModel(this, strategyModel, _settingsModel);
-            Strategies.Add(strategy);
+            if (vm is StrategyViewModel strategyViewModel)
+            {
+                strategyViewModel.DataToModel();
+                var strategyModel = new StrategyModel(strategyViewModel.Model);
+                var strategy = new StrategyViewModel(this, strategyModel, _settingsModel);
+                Strategies.Add(strategy);
+            }
         }
 
         internal bool Read(string fileName)
@@ -120,31 +129,6 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal void ExportStrategy(StrategyViewModel strategyViewModel)
-        {
-            strategyViewModel.DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.FileName = strategyViewModel.Model.Name;
-            //            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                try
-                {
-                    string fileName = saveFileDialog.FileName;
-                    using (StreamWriter file = File.CreateText(fileName))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Serialize(file, strategyViewModel.Model);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, ex.GetType().ToString());
-                }
-            }
-        }
-
         private void AddStrategy()
         {
             var strategy = new StrategyViewModel(this, new StrategyModel(), _settingsModel);
@@ -163,26 +147,54 @@ namespace Algoloop.ViewModel
             //            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             openFileDialog.Multiselect = true;
             openFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
-            if (openFileDialog.ShowDialog() == true)
+            if (openFileDialog.ShowDialog() != true)
+                return;
+
+            try
             {
+                foreach (string fileName in openFileDialog.FileNames)
+                {
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        string json = r.ReadToEnd();
+                        StrategyModel strategy = JsonConvert.DeserializeObject<StrategyModel>(json);
+                        foreach (StrategyJobModel job in strategy.Jobs)
+                        {
+                            job.Active = false;
+                        }
+
+                        Model.Strategies.Add(strategy);
+                    }
+                }
+
+                DataFromModel();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        internal void ExportStrategy(ITreeViewModel item)
+        {
+            if (item is StrategyViewModel strategyViewModel)
+            {
+                strategyViewModel.DataToModel();
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.FileName = strategyViewModel.Model.Name;
+                //            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+                saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+                if (saveFileDialog.ShowDialog() == false)
+                    return;
+
                 try
                 {
-                    foreach (string fileName in openFileDialog.FileNames)
+                    string fileName = saveFileDialog.FileName;
+                    using (StreamWriter file = File.CreateText(fileName))
                     {
-                        using (StreamReader r = new StreamReader(fileName))
-                        {
-                            string json = r.ReadToEnd();
-                            StrategyModel strategy = JsonConvert.DeserializeObject<StrategyModel>(json);
-                            foreach (StrategyJobModel job in strategy.Jobs)
-                            {
-                                job.Active = false;
-                            }
-
-                            Model.Strategies.Add(strategy);
-                        }
+                        JsonSerializer serializer = new JsonSerializer();
+                        serializer.Serialize(file, strategyViewModel.Model);
                     }
-
-                    DataFromModel();
                 }
                 catch (Exception ex)
                 {

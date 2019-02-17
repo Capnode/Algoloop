@@ -30,11 +30,9 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            DeleteSymbolCommand = new RelayCommand(() => DeleteSymbol(this), true);
         }
 
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand DeleteSymbolCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
 
@@ -56,12 +54,6 @@ namespace Algoloop.ViewModel
         public void Refresh()
         {
             Model.Refresh();
-        }
-
-        private void DeleteSymbol(SymbolViewModel symbol)
-        {
-            (_parent as StrategyViewModel)?.DeleteSymbol(this);
-            (_parent as MarketViewModel)?.DeleteSymbol(this);
         }
     }
 }

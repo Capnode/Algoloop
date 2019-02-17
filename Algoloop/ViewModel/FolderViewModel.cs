@@ -37,22 +37,21 @@ namespace Algoloop.ViewModel
             Model = model;
 
             DeleteCommand = new RelayCommand(() => _market?.DeleteFolder(this), () => !_market.Active);
-            RefreshCommand = new RelayCommand(() => Refresh(), () => !_market.Active);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => AddSymbol(m), m => !_market.Active);
-            RemoveSymbolsCommand = new RelayCommand<IList>(m => RemoveSymbols(m), m => !_market.Active);
-            MoveUpSymbolsCommand = new RelayCommand<IList>(m => MoveUpSymbols(m), m => !_market.Active);
-            MoveDownSymbolsCommand = new RelayCommand<IList>(m => MoveDownSymbols(m), m => !_market.Active);
+            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => AddSymbol(m), m => !_market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
+            RemoveSymbolsCommand = new RelayCommand<IList>(m => RemoveSymbols(m), m => !_market.Active && SelectedSymbol != null);
+            MoveUpSymbolsCommand = new RelayCommand<IList>(m => MoveUpSymbols(m), m => !_market.Active && SelectedSymbol != null);
+            MoveDownSymbolsCommand = new RelayCommand<IList>(m => MoveDownSymbols(m), m => !_market.Active && SelectedSymbol != null);
 
             DataFromModel();
 
             MarketSymbols.Filter += (object sender, FilterEventArgs e) =>
             {
-                SymbolViewModel symbol = e.Item as SymbolViewModel;
-                if (symbol != null)
+                SymbolViewModel marketSymbol = e.Item as SymbolViewModel;
+                if (marketSymbol != null)
                 {
-                    e.Accepted = !Symbols.Any(m => m.Model.Name.Equals(symbol.Model.Name));
+                    e.Accepted = marketSymbol.Active && !Symbols.Any(m => m.Model.Name.Equals(marketSymbol.Model.Name));
                 }
             };
 
@@ -62,7 +61,6 @@ namespace Algoloop.ViewModel
         public RelayCommand DeleteCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
-        public RelayCommand RefreshCommand { get; }
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand<IList> MoveUpSymbolsCommand { get; }
@@ -82,14 +80,21 @@ namespace Algoloop.ViewModel
         public SymbolViewModel SelectedSymbol
         {
             get => _selectedSymbol;
-            set => Set(ref _selectedSymbol, value);
+            set
+            {
+                Set(ref _selectedSymbol, value);
+                RemoveSymbolsCommand.RaiseCanExecuteChanged();
+                MoveUpSymbolsCommand.RaiseCanExecuteChanged();
+                MoveDownSymbolsCommand.RaiseCanExecuteChanged();
+            }
         }
-
 
         public void Refresh()
         {
             Model.Refresh();
+            DataFromModel();
             MarketSymbols.View.Refresh();
+            AddSymbolCommand.RaiseCanExecuteChanged();
         }
 
         internal void DataToModel()
@@ -123,7 +128,9 @@ namespace Algoloop.ViewModel
                 return;
 
             Symbols.Add(symbol);
+            DataToModel();
             MarketSymbols.View.Refresh();
+            AddSymbolCommand.RaiseCanExecuteChanged();
         }
 
         private void RemoveSymbols(IList symbols)
@@ -147,6 +154,7 @@ namespace Algoloop.ViewModel
             }
 
             MarketSymbols.View.Refresh();
+            AddSymbolCommand.RaiseCanExecuteChanged();
         }
 
         private void MoveUpSymbols(IList symbols)

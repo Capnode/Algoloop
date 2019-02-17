@@ -67,11 +67,10 @@ namespace Algoloop.ViewSupport
             dlg.Description = "Select data folder";
             dlg.SelectedPath = item.Value?.ToString();
             dlg.ShowNewFolderButton = true;
-            System.Windows.Forms.DialogResult result = dlg.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                item.Value = dlg.SelectedPath;
-            }
+            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+
+            item.Value = dlg.SelectedPath;
         }
     }
 }
