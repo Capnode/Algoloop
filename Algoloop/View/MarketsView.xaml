@@ -217,6 +217,7 @@
                                         <ComboBox
                                             Name="combobox"
                                             SelectedValue="{Binding MarketSymbol, Mode=TwoWay}"
+                                            DisplayMemberPath="Model.Name"
                                             ItemsSource="{Binding MarketSymbols.View}"
                                             MinWidth="120"/>
                                         <Button

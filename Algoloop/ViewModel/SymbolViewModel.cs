@@ -26,7 +26,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
@@ -43,7 +42,7 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            ResolutionChangedCommand = new RelayCommand(async () => await LoadChart(_parent as MarketViewModel), () => _parent is MarketViewModel);
+            ResolutionChangedCommand = new RelayCommand(() => LoadChart(_parent as MarketViewModel), () => _parent is MarketViewModel);
         }
 
         public RelayCommand DeleteCommand { get; }
@@ -85,14 +84,15 @@ namespace Algoloop.ViewModel
 
             if (_parent is MarketViewModel market)
             {
-                Task.Run(() => LoadChart(market));
+                LoadChart(market);
             }
         }
 
-        private async Task LoadChart(MarketViewModel market)
+        private void LoadChart(MarketViewModel market)
         {
             Debug.Assert(market != null);
-
+            Charts.Clear();
+            var charts = Charts;
             var dataType = LeanData.GetDataType(SelectedResolution, TickType.Quote);
             var symbol = new Symbol(SecurityIdentifier.GenerateForex(Model.Name, Market.Dukascopy), Model.Name);
             var config = new SubscriptionDataConfig(dataType, symbol, SelectedResolution, TimeZones.NewYork, TimeZones.NewYork, false, false, false, false, TickType.Quote);
@@ -111,8 +111,9 @@ namespace Algoloop.ViewModel
                 return;
 
             var viewModel = new ChartViewModel(series);
-            Charts.Clear();
-            Charts.Add(viewModel);
+            charts.Add(viewModel);
+            Charts = null;
+            Charts = charts;
         }
 
         public static string GenerateFilepathForTesting(string dataDirectory, string securityType, string market, string resolution, string ticker, string fileName)

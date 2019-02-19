@@ -148,6 +148,7 @@ namespace Algoloop.ViewModel
                 Symbols.Remove(symbol);
             }
 
+            DataToModel();
             if (Symbols.Count > 0)
             {
                 SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
