@@ -22,6 +22,7 @@ using System.Windows.Controls;
 using AmCharts.Windows.Stock;
 using AmCharts.Windows.Stock.Data;
 using QuantConnect;
+using QuantConnect.Data;
 
 namespace Algoloop.View
 {
@@ -62,34 +63,7 @@ namespace Algoloop.View
             Visibility visibility = Visibility.Visible;
             foreach (ChartViewModel chart in charts)
             {
-                int ix = 0;
-                int size = chart.Series.Values.Count;
-                KeyValuePair<DateTime, double>[] timeseries = new KeyValuePair<DateTime, double>[size];
-                foreach (ChartPoint point in chart.Series.Values)
-                {
-                    DateTime time = Time.UnixTimeStampToDateTime(point.x);
-                    timeseries[ix++] = new KeyValuePair<DateTime, double>(time, (double)point.y);
-                }
-
-                var dataset = new DataSet()
-                {
-                    ID = "id",
-                    Title = chart.Title,
-                    ShortTitle = chart.Title,
-                    DateMemberPath = "Key",
-                    OpenMemberPath = "Value",
-                    HighMemberPath = "Value",
-                    LowMemberPath = "Value",
-                    CloseMemberPath = "Value",
-                    ValueMemberPath = "Value",
-                    IsSelectedForComparison = false,
-                    ItemsSource = timeseries,
-                    IsVisibleInCompareDataSetSelector = false,
-                    IsVisibleInMainDataSetSelector = false,
-                    StartDate = timeseries.First().Key,
-                    EndDate = timeseries.Last().Key
-                };
-
+                DataSet dataset = chart.Data != null ? ChartData(chart) : ChartSeries(chart);
                 stockChart.DataSets.Add(dataset);
 
                 var graph = new Graph
@@ -114,6 +88,61 @@ namespace Algoloop.View
                 stockChart.Charts[0].Graphs.Add(graph);
                 visibility = Visibility.Hidden;
             }
+        }
+
+        private static DataSet ChartData(ChartViewModel chart)
+        {
+            return new DataSet()
+            {
+                ID = "id",
+                Title = chart.Title,
+                ShortTitle = chart.Title,
+                DateMemberPath = "Time",
+                OpenMemberPath = "Value",
+                HighMemberPath = "Value",
+                LowMemberPath = "Value",
+                CloseMemberPath = "Value",
+                ValueMemberPath = "Value",
+                IsSelectedForComparison = false,
+                ItemsSource = chart.Data,
+                IsVisibleInCompareDataSetSelector = false,
+                IsVisibleInMainDataSetSelector = false,
+                StartDate = chart.Data.First().Time,
+                EndDate = chart.Data.Last().Time,
+            };
+        }
+
+        private static DataSet ChartSeries(ChartViewModel chart)
+        {
+            DataSet dataset;
+            int ix = 0;
+            int size = chart.Series.Values.Count;
+            KeyValuePair<DateTime, double>[] timeseries = new KeyValuePair<DateTime, double>[size];
+            foreach (ChartPoint point in chart.Series.Values)
+            {
+                DateTime time = Time.UnixTimeStampToDateTime(point.x);
+                timeseries[ix++] = new KeyValuePair<DateTime, double>(time, (double)point.y);
+            }
+
+            dataset = new DataSet()
+            {
+                ID = "id",
+                Title = chart.Title,
+                ShortTitle = chart.Title,
+                DateMemberPath = "Key",
+                OpenMemberPath = "Value",
+                HighMemberPath = "Value",
+                LowMemberPath = "Value",
+                CloseMemberPath = "Value",
+                ValueMemberPath = "Value",
+                IsSelectedForComparison = false,
+                ItemsSource = timeseries,
+                IsVisibleInCompareDataSetSelector = false,
+                IsVisibleInMainDataSetSelector = false,
+                StartDate = timeseries.First().Key,
+                EndDate = timeseries.Last().Key
+            };
+            return dataset;
         }
 
         private static GraphType ToGraphType(SeriesType seriesType)

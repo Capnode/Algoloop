@@ -14,6 +14,8 @@
 
 using GalaSoft.MvvmLight;
 using QuantConnect;
+using QuantConnect.Data;
+using System.Collections.Generic;
 
 public class ChartViewModel : ViewModelBase
 {
@@ -21,8 +23,17 @@ public class ChartViewModel : ViewModelBase
     {
         Title = series.Name;
         Series = series;
+        Data = null;
+    }
+
+    public ChartViewModel(Series series, IReadOnlyList<BaseData> data)
+    {
+        Title = series.Name;
+        Series = series;
+        Data = data;
     }
 
     public string Title { get; }
     public Series Series { get; }
+    public IReadOnlyList<BaseData> Data { get; }
 }

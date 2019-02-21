@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Algoloop.ViewModel
@@ -42,17 +43,18 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            ResolutionChangedCommand = new RelayCommand(() => LoadChart(_parent as MarketViewModel), () => _parent is MarketViewModel);
+            UpdateCommand = new RelayCommand(() => LoadChart(_parent as MarketViewModel), () => _parent is MarketViewModel);
         }
 
         public RelayCommand DeleteCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
-        public RelayCommand ResolutionChangedCommand { get; }
+        public RelayCommand UpdateCommand { get; }
 
         public SymbolModel Model { get; }
         public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
+        private DateTime _date = DateTime.Today;
 
         public bool Active
         {
@@ -70,6 +72,12 @@ namespace Algoloop.ViewModel
         {
             get => _selectedResolution;
             set => Set(ref _selectedResolution, value);
+        }
+
+        public DateTime Date
+        {
+            get => _date;
+            set => Set(ref _date, value);
         }
 
         public SyncObservableCollection<ChartViewModel> Charts
@@ -96,38 +104,18 @@ namespace Algoloop.ViewModel
             var dataType = LeanData.GetDataType(SelectedResolution, TickType.Quote);
             var symbol = new Symbol(SecurityIdentifier.GenerateForex(Model.Name, Market.Dukascopy), Model.Name);
             var config = new SubscriptionDataConfig(dataType, symbol, SelectedResolution, TimeZones.NewYork, TimeZones.NewYork, false, false, false, false, TickType.Quote);
-            var date = DateTime.Now;
             var sb = new StringBuilder();
-            var leanDataReader = new LeanDataReader(config, symbol, SelectedResolution, date, market.DataFolder);
+            var leanDataReader = new LeanDataReader(config, symbol, SelectedResolution, _date, market.DataFolder);
 
             var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
-            IEnumerable<BaseData> data = leanDataReader.Parse();
-            foreach (BaseData bar in data)
-            {
-                series.AddPoint(bar.Time, bar.Value);
-            }
-
-            if (series.Values.Count == 0)
+            List<BaseData> data = leanDataReader.Parse().ToList();
+            if (!data.Any())
                 return;
 
-            var viewModel = new ChartViewModel(series);
+            var viewModel = new ChartViewModel(series, data);
             charts.Add(viewModel);
             Charts = null;
             Charts = charts;
-        }
-
-        public static string GenerateFilepathForTesting(string dataDirectory, string securityType, string market, string resolution, string ticker, string fileName)
-        {
-            string filepath;
-            if (resolution == "daily" || resolution == "hour")
-            {
-                filepath = Path.Combine(dataDirectory, securityType, market, resolution, fileName);
-            }
-            else
-            {
-                filepath = Path.Combine(dataDirectory, securityType, market, resolution, ticker, fileName);
-            }
-            return filepath;
         }
     }
 }

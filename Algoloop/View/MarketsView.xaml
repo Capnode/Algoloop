@@ -278,10 +278,22 @@
                                 MinWidth="120">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding ResolutionChangedCommand}"/>
+                                        <i:InvokeCommandAction Command="{Binding UpdateCommand}"/>
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </ComboBox>
+                            <xctk:DateTimePicker
+                                AutoCloseCalendar="True"
+                                Value="{Binding Date}"
+                                Format="ShortDate"
+                                ShowButtonSpinner="False"
+                                TimePickerVisibility="Collapsed">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="ValueChanged">
+                                        <i:InvokeCommandAction Command="{Binding UpdateCommand}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </xctk:DateTimePicker>
                         </ToolBar>
                         <view:AmChart ItemsSource="{Binding Charts}"/>
                     </DockPanel>
