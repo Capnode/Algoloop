@@ -272,7 +272,7 @@
     <Compile Include="Service\HostDomainLogger.cs" />
     <Compile Include="Service\StreamLogger.cs" />
     <Compile Include="Service\Summary.cs" />
-    <Compile Include="Service\Toolbox.cs" />
+    <Compile Include="Provider\Toolbox.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />
     <Compile Include="ViewModel\BalanceViewModel.cs" />
@@ -402,6 +402,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Content Include="Extern\AmCharts.Windows.Stock.dll" />
+    <Content Include="Provider\Dukascopy.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Export.png" />
     <Resource Include="Resources\Import.png" />
     <Resource Include="Resources\Info.png" />
@@ -464,6 +467,10 @@
     <ProjectReference Include="..\Api\QuantConnect.Api.csproj">
       <Project>{c5d44209-49a0-4505-a870-043c5ef5fddf}</Project>
       <Name>QuantConnect.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Borsdata.Api.Dal\Borsdata.Api.Dal.csproj">
+      <Project>{2a790af0-b68b-47d4-89ed-5011e1549b7d}</Project>
+      <Name>Borsdata.Api.Dal</Name>
     </ProjectReference>
     <ProjectReference Include="..\Brokerages\QuantConnect.Brokerages.csproj">
       <Project>{2d3e13cf-2d14-4180-a42d-f0a13af0ade2}</Project>

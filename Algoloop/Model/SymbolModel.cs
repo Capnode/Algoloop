@@ -19,7 +19,7 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class SymbolModel
+    public class SymbolModel : ModelBase, IComparable
     {
         public SymbolModel()
         {
@@ -35,10 +35,16 @@ namespace Algoloop.Model
         public string Name { get; set; } = "symbol";
 
         [DataMember]
-        public bool Active { get; set; } = true;
+        public bool Active { get; set; } = false;
 
         internal void Refresh()
         {
+        }
+
+        public int CompareTo(object obj)
+        {
+            var a = obj as SymbolModel;
+            return string.Compare(Name, a?.Name);
         }
     }
 }

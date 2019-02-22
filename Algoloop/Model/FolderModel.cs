@@ -21,7 +21,7 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class FolderModel : ModelBase
+    public class FolderModel : ModelBase, IComparable
     {
         public FolderModel()
         {
@@ -38,6 +38,12 @@ namespace Algoloop.Model
         [ReadOnly(false)]
         [DataMember]
         public List<string> Symbols { get; } = new List<string>();
+
+        public int CompareTo(object obj)
+        {
+            var a = obj as FolderModel;
+            return string.Compare(Name, a?.Name);
+        }
 
         internal void Refresh()
         {

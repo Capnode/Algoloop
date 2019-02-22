@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
+using Algoloop.Provider;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using System;

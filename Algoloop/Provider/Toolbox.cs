@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -32,7 +33,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.Service
+namespace Algoloop.Provider
 {
     public class Toolbox : MarshalByRefObject
     {

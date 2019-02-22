@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2A790AF0-B68B-47D4-89ED-5011E1549B7D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Borsdata.Api.Dal</RootNamespace>
+    <AssemblyName>Borsdata.Api.Dal</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApiClient.cs" />
+    <Compile Include="Infrastructure\CalcType.cs" />
+    <Compile Include="Infrastructure\Instrument.cs" />
+    <Compile Include="Infrastructure\PriceType.cs" />
+    <Compile Include="Infrastructure\ReportType.cs" />
+    <Compile Include="Infrastructure\TimeType.cs" />
+    <Compile Include="Model\BranchesRespV1.cs" />
+    <Compile Include="Model\BranchV1.cs" />
+    <Compile Include="Model\StockSplitV1.cs" />
+    <Compile Include="Model\StockSplitRespV1.cs" />
+    <Compile Include="Model\InstrumentsRespV1.cs" />
+    <Compile Include="Model\KpisCalcUpdatedRespV1.cs" />
+    <Compile Include="Model\InstrumentsUpdatedRespV1.cs" />
+    <Compile Include="Model\InstrumentUpdatedV1.cs" />
+    <Compile Include="Model\InstrumentV1.cs" />
+    <Compile Include="Model\CountriesRespV1.cs" />
+    <Compile Include="Model\CountryV1.cs" />
+    <Compile Include="Model\KpiHistoryV1.cs" />
+    <Compile Include="Model\KpisAllCompRespV1.cs" />
+    <Compile Include="Model\KpisHistoryRespV1.cs" />
+    <Compile Include="Model\KpisRespV1.cs" />
+    <Compile Include="Model\KpiV1.cs" />
+    <Compile Include="Model\MarketsRespV1.cs" />
+    <Compile Include="Model\MarketV1.cs" />
+    <Compile Include="Model\ReportQuarterV1.cs" />
+    <Compile Include="Model\ReportR12V1.cs" />
+    <Compile Include="Model\ReportsQuarterRespV1.cs" />
+    <Compile Include="Model\ReportsR12RespV1.cs" />
+    <Compile Include="Model\ReportsYearRespV1.cs" />
+    <Compile Include="Model\ReportYearV1.cs" />
+    <Compile Include="Model\SectorsRespV1.cs" />
+    <Compile Include="Model\SectorV1.cs" />
+    <Compile Include="Model\StockPricesRespV1.cs" />
+    <Compile Include="Model\StockPriceV1.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

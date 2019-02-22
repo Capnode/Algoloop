@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Provider;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
@@ -136,6 +137,7 @@ namespace Algoloop.ViewModel
         {
             Active = Model.Active;
             Symbols.Clear();
+            Model.Symbols.Sort();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
@@ -143,6 +145,7 @@ namespace Algoloop.ViewModel
             }
 
             Folders.Clear();
+            Model.Folders.Sort();
             foreach (FolderModel folderModel in Model.Folders)
             {
                 var folderViewModel = new FolderViewModel(this, folderModel);
@@ -281,7 +284,7 @@ namespace Algoloop.ViewModel
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = false;
-            openFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == false)
                 return;
 
@@ -305,6 +308,7 @@ namespace Algoloop.ViewModel
 
                 Folders.ToList().ForEach(m => m.Refresh());
                 DataFromModel();
+
             }
             catch (Exception ex)
             {
@@ -320,7 +324,7 @@ namespace Algoloop.ViewModel
 
             DataToModel();
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == false)
                 return;
 
