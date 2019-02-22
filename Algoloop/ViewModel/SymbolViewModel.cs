@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -99,23 +98,22 @@ namespace Algoloop.ViewModel
         private void LoadChart(MarketViewModel market)
         {
             Debug.Assert(market != null);
-            Charts.Clear();
-            var charts = Charts;
             var dataType = LeanData.GetDataType(SelectedResolution, TickType.Quote);
             var symbol = new Symbol(SecurityIdentifier.GenerateForex(Model.Name, Market.Dukascopy), Model.Name);
             var config = new SubscriptionDataConfig(dataType, symbol, SelectedResolution, TimeZones.NewYork, TimeZones.NewYork, false, false, false, false, TickType.Quote);
             var sb = new StringBuilder();
             var leanDataReader = new LeanDataReader(config, symbol, SelectedResolution, _date, market.DataFolder);
-
-            var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
-            List<BaseData> data = leanDataReader.Parse().ToList();
-            if (!data.Any())
-                return;
-
-            var viewModel = new ChartViewModel(series, data);
-            charts.Add(viewModel);
-            Charts = null;
-            Charts = charts;
+            IEnumerable<BaseData> data = leanDataReader.Parse();
+            Charts.Clear();
+            if (data.Any())
+            {
+                var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
+                var viewModel = new ChartViewModel(series, data);
+                var charts = Charts;
+                charts.Add(viewModel);
+                Charts = null;
+                Charts = charts;
+            }
         }
     }
 }

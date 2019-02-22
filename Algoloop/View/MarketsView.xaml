@@ -284,9 +284,10 @@
                             </ComboBox>
                             <xctk:DateTimePicker
                                 AutoCloseCalendar="True"
+                                BorderThickness="0"
                                 Value="{Binding Date}"
                                 Format="ShortDate"
-                                ShowButtonSpinner="False"
+                                Margin="6"
                                 TimePickerVisibility="Collapsed">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="ValueChanged">

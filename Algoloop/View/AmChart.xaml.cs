@@ -22,7 +22,6 @@ using System.Windows.Controls;
 using AmCharts.Windows.Stock;
 using AmCharts.Windows.Stock.Data;
 using QuantConnect;
-using QuantConnect.Data;
 
 namespace Algoloop.View
 {
@@ -98,10 +97,10 @@ namespace Algoloop.View
                 Title = chart.Title,
                 ShortTitle = chart.Title,
                 DateMemberPath = "Time",
-                OpenMemberPath = "Value",
-                HighMemberPath = "Value",
-                LowMemberPath = "Value",
-                CloseMemberPath = "Value",
+                OpenMemberPath = "Open",
+                HighMemberPath = "High",
+                LowMemberPath = "Low",
+                CloseMemberPath = "Close",
                 ValueMemberPath = "Value",
                 IsSelectedForComparison = false,
                 ItemsSource = chart.Data,
