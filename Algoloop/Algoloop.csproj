@@ -268,10 +268,10 @@
     <Compile Include="Model\MarketModel.cs" />
     <Compile Include="Model\MarketsModel.cs" />
     <Compile Include="Model\SettingsModel.cs" />
-    <Compile Include="Service\Isolated.cs" />
+    <Compile Include="Common\Isolated.cs" />
     <Compile Include="Lean\HostDomainLogger.cs" />
     <Compile Include="Lean\StreamLogger.cs" />
-    <Compile Include="Service\Summary.cs" />
+    <Compile Include="Common\Summary.cs" />
     <Compile Include="Provider\Toolbox.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />

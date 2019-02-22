@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Algoloop.Service
+namespace Algoloop.Common
 {
     public sealed class Isolated<T> : IDisposable where T : MarshalByRefObject
     {

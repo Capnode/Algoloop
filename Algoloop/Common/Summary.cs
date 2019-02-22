@@ -16,7 +16,7 @@ using Algoloop.ViewModel;
 using System.Data;
 using System.Globalization;
 
-namespace Algoloop.Service
+namespace Algoloop.Common
 {
     public static class Summary
     {

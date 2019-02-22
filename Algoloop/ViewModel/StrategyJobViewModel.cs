@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
+using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
-using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
