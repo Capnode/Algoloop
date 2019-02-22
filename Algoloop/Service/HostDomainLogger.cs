@@ -19,6 +19,10 @@ namespace Algoloop.Service
 {
     public class HostDomainLogger : MarshalByRefObject, ILogHandler
     {
+        private int _errCount = 0;
+
+        public bool IsError => _errCount > 0;
+
         public void Debug(string text)
         {
             Log.Debug(text);
@@ -30,6 +34,7 @@ namespace Algoloop.Service
 
         public void Error(string text)
         {
+            _errCount++;
             Log.Error(text);
         }
 

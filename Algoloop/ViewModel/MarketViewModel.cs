@@ -57,6 +57,7 @@ namespace Algoloop.ViewModel
             StopCommand = new RelayCommand(() => OnStopCommand(), () => Active);
 
             DataFromModel();
+            OnActiveCommand(Active);
         }
 
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
@@ -165,29 +166,35 @@ namespace Algoloop.ViewModel
             DataToModel();
             MarketModel model = Model;
             _cancel = new CancellationTokenSource();
-            while (!_cancel.Token.IsCancellationRequested && Model.Active)
+            while (!_cancel.Token.IsCancellationRequested && model.Active)
             {
-                Log.Trace($"{Model.Provider} download {Model.Resolution} {Model.FromDate:d}");
+                Log.Trace($"{model.Provider} download {model.Resolution} {model.FromDate:d}");
+                var logger = new HostDomainLogger();
                 try
                 {
                     _toolbox = new Isolated<Toolbox>();
                     _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _toolbox.Value.Run(Model, _settingsModel, new HostDomainLogger()), _cancel.Token);
+                    await Task.Run(() => model = _toolbox.Value.Run(model, _settingsModel, logger), _cancel.Token);
                     _toolbox.Dispose();
                     _toolbox = null;
                 }
                 catch (AppDomainUnloadedException)
                 {
-                    Log.Trace($"Market {Model.Name} canceled by user");
+                    Log.Trace($"Market {model.Name} canceled by user");
                     _toolbox = null;
-                    Active = false;
+                    model.Active = false;
                 }
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
                     _toolbox.Dispose();
                     _toolbox = null;
-                    Active = false;
+                    model.Active = false;
+                }
+
+                if (logger.IsError)
+                {
+                    Log.Trace($"{Model.Provider} download failed");
                 }
 
                 // Update view
@@ -196,8 +203,11 @@ namespace Algoloop.ViewModel
                 DataFromModel();
             }
 
-            Log.Trace($"{Model.Provider} download complete");
             _cancel = null;
+            if (model.Active)
+            {
+                Log.Trace($"{Model.Provider} download complete");
+            }
         }
 
         private void StopTask()

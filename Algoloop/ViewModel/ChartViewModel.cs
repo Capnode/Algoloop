@@ -26,7 +26,7 @@ public class ChartViewModel : ViewModelBase
         Data = null;
     }
 
-    public ChartViewModel(Series series, IReadOnlyList<BaseData> data)
+    public ChartViewModel(Series series, IEnumerable<BaseData> data)
     {
         Title = series.Name;
         Series = series;
@@ -35,5 +35,5 @@ public class ChartViewModel : ViewModelBase
 
     public string Title { get; }
     public Series Series { get; }
-    public IReadOnlyList<BaseData> Data { get; }
+    public IEnumerable<BaseData> Data { get; }
 }
