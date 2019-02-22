@@ -16,7 +16,7 @@ using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.Service
+namespace Algoloop.Lean
 {
     /// <summary>
     /// Provides an implementation of <see cref="ILogHandler"/> that writes all log messages to a file on disk.

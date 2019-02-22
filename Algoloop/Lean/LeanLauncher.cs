@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.Service
+namespace Algoloop.Lean
 {
     public class LeanLauncher : MarshalByRefObject
     {

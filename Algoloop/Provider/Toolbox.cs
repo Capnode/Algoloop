@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
+using Algoloop.Lean;
 using Algoloop.Model;
-using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;

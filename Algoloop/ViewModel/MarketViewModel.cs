@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Provider;
 using Algoloop.Service;

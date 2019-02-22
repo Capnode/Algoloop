@@ -269,8 +269,8 @@
     <Compile Include="Model\MarketsModel.cs" />
     <Compile Include="Model\SettingsModel.cs" />
     <Compile Include="Service\Isolated.cs" />
-    <Compile Include="Service\HostDomainLogger.cs" />
-    <Compile Include="Service\StreamLogger.cs" />
+    <Compile Include="Lean\HostDomainLogger.cs" />
+    <Compile Include="Lean\StreamLogger.cs" />
     <Compile Include="Service\Summary.cs" />
     <Compile Include="Provider\Toolbox.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
@@ -284,8 +284,8 @@
     <Compile Include="ViewSupport\AccountNameConverter.cs" />
     <Compile Include="ViewSupport\FolderEditor.cs" />
     <Compile Include="Model\ParameterModel.cs" />
-    <Compile Include="Service\BacktestResultHandler.cs" />
-    <Compile Include="Service\LeanLauncher.cs" />
+    <Compile Include="Lean\BacktestResultHandler.cs" />
+    <Compile Include="Lean\LeanLauncher.cs" />
     <Compile Include="ViewModel\ParameterViewModel.cs" />
     <Compile Include="ViewModel\StatisticViewModel.cs" />
     <Compile Include="ViewSupport\AlgorithmNameConverter.cs" />
@@ -304,8 +304,8 @@
     <Compile Include="ViewModel\StrategyViewModel.cs" />
     <Compile Include="ViewSupport\SyncObservableCollection.cs" />
     <Compile Include="Model\LogItem.cs" />
-    <Compile Include="Service\ILogItemHandler.cs" />
-    <Compile Include="Service\LogItemHandler.cs" />
+    <Compile Include="Lean\ILogItemHandler.cs" />
+    <Compile Include="Lean\LogItemHandler.cs" />
     <Compile Include="ViewModel\AboutViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\StrategiesViewModel.cs" />

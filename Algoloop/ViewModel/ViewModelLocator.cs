@@ -60,7 +60,7 @@ namespace Algoloop.ViewModel
 
             // Register QuantConnect types
             SimpleIoc.Default.Register(
-                () => Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Service.LogItemHandler")));
+                () => Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Lean.LogItemHandler")));
         }
 
         public MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();

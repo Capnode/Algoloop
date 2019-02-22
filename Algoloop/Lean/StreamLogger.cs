@@ -15,7 +15,7 @@
 using System.IO;
 using System.Text;
 
-namespace Algoloop.Service
+namespace Algoloop.Lean
 {
     public class StreamLogger : TextWriter
     {

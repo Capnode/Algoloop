@@ -13,7 +13,6 @@
  */
 
 using Algoloop.ViewModel;
-using System;
 using System.Data;
 using System.Globalization;
 

@@ -17,7 +17,7 @@ using QuantConnect;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Algoloop.Service
+namespace Algoloop.Lean
 {
     public class BacktestResultHandler : BacktestingResultHandler
     {

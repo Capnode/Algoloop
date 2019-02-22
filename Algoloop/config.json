@@ -1,5 +1,5 @@
 ﻿{
-    "log-handler": "Algoloop.Service.LogItemHandler",
+    "log-handler": "Algoloop.Lean.LogItemHandler",
     "debug-mode": true,
     "debug-level": 0,
     "composer-dll-directory": ".",
