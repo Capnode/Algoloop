@@ -270,7 +270,7 @@
     <Compile Include="Model\SettingsModel.cs" />
     <Compile Include="Common\Isolated.cs" />
     <Compile Include="Lean\HostDomainLogger.cs" />
-    <Compile Include="Lean\StreamLogger.cs" />
+    <Compile Include="Common\StreamLogger.cs" />
     <Compile Include="Common\Summary.cs" />
     <Compile Include="Provider\Toolbox.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />

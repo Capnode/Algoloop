@@ -12,10 +12,11 @@
  * limitations under the License.
  */
 
+using Algoloop.Lean;
 using System.IO;
 using System.Text;
 
-namespace Algoloop.Lean
+namespace Algoloop.Common
 {
     public class StreamLogger : TextWriter
     {
