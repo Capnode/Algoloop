@@ -123,14 +123,6 @@ namespace Algoloop.Model
         {
             switch (Provider)
             {
-                case "Börsdata":
-                    SetBrowsable("Access", false);
-                    SetBrowsable("Login", false);
-                    SetBrowsable("Password", false);
-                    SetBrowsable("ApiKey", true);
-                    SetReadonly("Resolution", true);
-                    Resolution = Resolution.Daily;
-                    break;
                 case "Fxcm":
                     SetBrowsable("Access", true);
                     SetBrowsable("Login", true);

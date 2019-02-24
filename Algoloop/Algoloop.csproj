@@ -482,10 +482,6 @@
       <Project>{c5d44209-49a0-4505-a870-043c5ef5fddf}</Project>
       <Name>QuantConnect.Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Borsdata.Api.Dal\Borsdata.Api.Dal.csproj">
-      <Project>{2a790af0-b68b-47d4-89ed-5011e1549b7d}</Project>
-      <Name>Borsdata.Api.Dal</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Brokerages\QuantConnect.Brokerages.csproj">
       <Project>{2d3e13cf-2d14-4180-a42d-f0a13af0ade2}</Project>
       <Name>QuantConnect.Brokerages</Name>
