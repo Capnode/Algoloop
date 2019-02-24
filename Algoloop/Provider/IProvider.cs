@@ -19,7 +19,7 @@ namespace Algoloop.Provider
 {
     public interface IProvider
     {
-        void Download(MarketModel model, SettingsModel settings, IList<string> symbols);
-        IEnumerable<SymbolModel> GetAllSymbols();
+        void Download(MarketModel market, SettingsModel settings, IList<string> symbols);
+        IEnumerable<SymbolModel> GetAllSymbols(MarketModel market);
     }
 }

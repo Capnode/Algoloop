@@ -262,7 +262,7 @@ namespace Algoloop.ViewModel
 
         private void AddAllSymbols()
         {
-            IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model.Provider);
+            IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
             foreach (SymbolModel symbol in symbols)
             {
                 if (!Model.Symbols.Exists(m => m.Name.Equals(symbol.Name)))

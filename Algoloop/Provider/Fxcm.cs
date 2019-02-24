@@ -52,7 +52,7 @@ namespace Algoloop.Provider
             model.Active = model.FromDate < DateTime.Today;
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols()
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
             throw new NotImplementedException();
         }

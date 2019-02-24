@@ -41,13 +41,13 @@ namespace Algoloop.Provider
             return model;
         }
 
-        internal static IEnumerable<SymbolModel> GetAllSymbols(string name)
+        internal static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
-            IProvider provider = CreateProvider(name);
+            IProvider provider = CreateProvider(market.Provider);
             if (provider == null)
                 return null;
 
-            return provider.GetAllSymbols();
+            return provider.GetAllSymbols(market);
         }
 
         public static void PrepareDataFolder(string dataFolder)
@@ -67,30 +67,30 @@ namespace Algoloop.Provider
             File.Copy(file, symbolPropertiesPath, true);
         }
 
-        private static void MarketDownloader(MarketModel model, SettingsModel settings)
+        private static void MarketDownloader(MarketModel market, SettingsModel settings)
         {
-            IList<string> list = model.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
+            IList<string> list = market.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
             if (!list.Any())
             {
                 Log.Trace($"No symbols selected");
-                model.Active = false;
+                market.Active = false;
                 return;
             }
 
-            IProvider provider = CreateProvider(model.Provider);
+            IProvider provider = CreateProvider(market.Provider);
             if (provider == null)
             {
-                model.Active = false;
+                market.Active = false;
             }
 
             try
             {
-                provider.Download(model, settings, list);
+                provider.Download(market, settings, list);
             }
             catch (Exception ex)
             {
                 Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
-                model.Active = false;
+                market.Active = false;
             }
         }
 

@@ -43,7 +43,7 @@ namespace Algoloop.Provider
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.FromDate, model.FromDate);
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols()
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
             throw new System.NotImplementedException();
         }

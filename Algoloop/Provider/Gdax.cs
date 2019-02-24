@@ -23,7 +23,7 @@ namespace Algoloop.Provider
         {
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols()
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
             throw new System.NotImplementedException();
         }

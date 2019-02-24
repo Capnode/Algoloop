@@ -50,7 +50,7 @@ namespace Algoloop.Provider
             model.Active = model.FromDate < DateTime.Today;
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols()
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
             return _symbols.Select(m => new SymbolModel() { Name = m });
         }
