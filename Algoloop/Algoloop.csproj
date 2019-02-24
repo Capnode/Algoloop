@@ -250,10 +250,24 @@
     <Compile Include="Model\FolderModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\OrderModel.cs" />
+    <Compile Include="Provider\CryptoIq.cs" />
+    <Compile Include="Provider\Dukascopy.cs" />
+    <Compile Include="Provider\Fxcm.cs" />
+    <Compile Include="Provider\FxcmVolume.cs" />
+    <Compile Include="Provider\Gdax.cs" />
+    <Compile Include="Provider\Google.cs" />
+    <Compile Include="Provider\Ib.cs" />
+    <Compile Include="Provider\Iex.cs" />
+    <Compile Include="Provider\IProvider.cs" />
+    <Compile Include="Provider\Kraken.cs" />
+    <Compile Include="Provider\Oanda.cs" />
+    <Compile Include="Provider\QuandBitfinex.cs" />
+    <Compile Include="Provider\Yahoo.cs" />
     <Compile Include="ViewModel\FolderViewModel.cs" />
     <Compile Include="ViewModel\ITreeViewModel.cs" />
     <Compile Include="ViewModel\OrderViewModel.cs" />
     <Compile Include="ViewSupport\BooleanToVisibilityConverter.cs" />
+    <Compile Include="ViewSupport\ProviderNameConverter.cs" />
     <Compile Include="View\DesktopView.xaml.cs">
       <DependentUpon>DesktopView.xaml</DependentUpon>
     </Compile>

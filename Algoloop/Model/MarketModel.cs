@@ -25,10 +25,8 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketModel : ModelBase
     {
-        private MarketType _provider;
-        private Resolution _resolution;
+        private string _provider;
 
-        public enum MarketType { None, CryptoIQ, Dukascopy, Fxcm, FxcmVolume, Gdax, Google, IB, IEX, Kraken, Oanda, QuandBitfinex, Yahoo };
         public enum AccessType { Demo, Real };
 
         [Category("Data provider")]
@@ -42,11 +40,12 @@ namespace Algoloop.Model
         [Category("Data provider")]
         [DisplayName("Provider")]
         [Description("Name of the data provider.")]
+        [TypeConverter(typeof(ProviderNameConverter))]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public MarketType Provider
+        public string Provider
         {
             get => _provider;
             set
@@ -81,6 +80,15 @@ namespace Algoloop.Model
         [DataMember]
         public string Password { get; set; } = string.Empty;
 
+        [Category("Account")]
+        [DisplayName("API key")]
+        [Description("User API key.")]
+        [PasswordPropertyText(true)]
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string ApiKey { get; set; } = string.Empty;
+
         [Category("Time")]
         [DisplayName("From date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
@@ -94,11 +102,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public Resolution Resolution
-        {
-            get => _resolution;
-            set => SetResolution(ref _resolution, value);
-        }
+        public Resolution Resolution { get; set; }
 
         [Browsable(false)]
         [ReadOnly(false)]
@@ -119,25 +123,27 @@ namespace Algoloop.Model
         {
             switch (Provider)
             {
-                case MarketType.Fxcm:
+                case "Börsdata":
+                    SetBrowsable("Access", false);
+                    SetBrowsable("Login", false);
+                    SetBrowsable("Password", false);
+                    SetBrowsable("ApiKey", true);
+                    SetReadonly("Resolution", true);
+                    Resolution = Resolution.Daily;
+                    break;
+                case "Fxcm":
                     SetBrowsable("Access", true);
                     SetBrowsable("Login", true);
                     SetBrowsable("Password", true);
+                    SetBrowsable("ApiKey", false);
+                    SetReadonly("Resolution", false);
                     break;
                 default:
                     SetBrowsable("Access", false);
                     SetBrowsable("Login", false);
                     SetBrowsable("Password", false);
-                    break;
-            }
-        }
-
-        private void SetResolution(ref Resolution resolution, Resolution value)
-        {
-            switch (Provider)
-            {
-                default:
-                    resolution = value;
+                    SetBrowsable("ApiKey", false);
+                    SetReadonly("Resolution", false);
                     break;
             }
         }

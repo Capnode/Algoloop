@@ -72,10 +72,11 @@ namespace Algoloop.Model
         [Category("Broker")]
         [DisplayName("Data provider")]
         [Description("Market data provider for backtest")]
+        [TypeConverter(typeof(ProviderNameConverter))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public MarketType Provider { get; set; }
+        public string Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]

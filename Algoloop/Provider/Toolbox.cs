@@ -15,19 +15,8 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
-using QuantConnect;
-using QuantConnect.Configuration;
+using GalaSoft.MvvmLight.Ioc;
 using QuantConnect.Logging;
-using QuantConnect.ToolBox.DukascopyDownloader;
-using QuantConnect.ToolBox.FxcmDownloader;
-using QuantConnect.ToolBox.FxcmVolumeDownload;
-using QuantConnect.ToolBox.GoogleDownloader;
-using QuantConnect.ToolBox.IBDownloader;
-using QuantConnect.ToolBox.IEX;
-using QuantConnect.ToolBox.KrakenDownloader;
-using QuantConnect.ToolBox.OandaDownloader;
-using QuantConnect.ToolBox.QuandlBitfinexDownloader;
-using QuantConnect.ToolBox.YahooDownloader;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
@@ -72,205 +61,43 @@ namespace Algoloop.Provider
 
         private void MarketDownloader(MarketModel model, SettingsModel settings)
         {
+            IList<string> list = model.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
+            if (!list.Any())
+            {
+                Log.Trace($"No symbols selected");
+                model.Active = false;
+                return;
+            }
+
+            // Request list of providers
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
+                .FirstOrDefault(m => m.Name.Equals(model.Provider));
+            if (type == null )
+            {
+                Log.Trace($"Provider {model.Provider} not found");
+                model.Active = false;
+                return;
+            }
+
+            IProvider provider = (IProvider)Activator.CreateInstance(type);
+            if (provider == null)
+            {
+                Log.Trace($"Can not create provider {model.Provider}");
+                model.Active = false;
+                return;
+            }
+
             try
             {
-                IList<string> list = model.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
-                if (list.Any())
-                {
-                    switch (model.Provider)
-                    {
-                        case MarketModel.MarketType.CryptoIQ:
-                            CryptoIQDownloader(model, list);
-                            break;
-                        case MarketModel.MarketType.Dukascopy:
-                            DukascopyDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.Fxcm:
-                            FxcmDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.FxcmVolume:
-                            FxcmVolumeDownload(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.Gdax:
-                            GdaxDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.Google:
-                            GoogleDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.IB:
-                            IBDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.IEX:
-                            IEXDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.Kraken:
-                            KrakenDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.Oanda:
-                            OandaDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.QuandBitfinex:
-                            QuandBitfinexDownloader(model, settings, list);
-                            break;
-                        case MarketModel.MarketType.Yahoo:
-                            YahooDownloader(model, settings, list);
-                            break;
-                        default:
-                            Log.Error($"Market Provider not supported: {model.Provider}");
-                            model.Active = false;
-                            break;
-                    }
-                }
-                else
-                {
-                    Log.Trace($"No symbols selected");
-                    model.Active = false;
-                }
+                provider.Download(model, settings, list);
             }
             catch (Exception ex)
             {
                 Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
                 model.Active = false;
             }
-        }
-
-        private void CryptoIQDownloader(MarketModel model, IList<string> list)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void DukascopyDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DateTime fromDate = model.FromDate.Date;
-            if (fromDate < DateTime.Today)
-            {
-                DateTime nextDate = fromDate.AddDays(1);
-                DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, nextDate.AddMilliseconds(-1));
-                model.FromDate = nextDate;
-            }
-            model.Active = model.FromDate < DateTime.Today;
-        }
-
-        private static void FxcmDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            Config.Set("data-directory", settings.DataFolder);
-            switch (model.Access)
-            {
-                case MarketModel.AccessType.Demo:
-                    Config.Set("fxcm-terminal", "Demo");
-                    break;
-
-                case MarketModel.AccessType.Real:
-                    Config.Set("fxcm-terminal", "Real");
-                    break;
-            }
-
-            Config.Set("fxcm-user-name", model.Login);
-            Config.Set("fxcm-password", model.Password);
-
-            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DateTime fromDate = model.FromDate.Date;
-            if (fromDate < DateTime.Today)
-            {
-                FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, fromDate, fromDate);
-                model.FromDate = fromDate.AddDays(1);
-            }
-
-            model.Active = model.FromDate < DateTime.Today;
-        }
-
-        private static void FxcmVolumeDownload(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("data-directory", settings.DataFolder);
-            switch (model.Access)
-            {
-                case MarketModel.AccessType.Demo:
-                    Config.Set("fxcm-terminal", "Demo");
-                    break;
-
-                case MarketModel.AccessType.Real:
-                    Config.Set("fxcm-terminal", "Real");
-                    break;
-            }
-
-            Config.Set("fxcm-user-name", model.Login);
-            Config.Set("fxcm-password", model.Password);
-
-            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.FromDate, model.FromDate);
-        }
-
-        private void GdaxDownloader(MarketModel model, SettingsModel settings, IList<string> list)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void GoogleDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            GoogleDownloaderProgram.GoogleDownloader(symbols, resolution, model.FromDate, model.FromDate);
-        }
-
-        private void IBDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            IBDownloaderProgram.IBDownloader(symbols, resolution, model.FromDate, model.FromDate);
-        }
-
-        private void IEXDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.FromDate, model.FromDate);
-        }
-
-        private void KrakenDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, model.FromDate, model.FromDate);
-        }
-
-        private void OandaDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            OandaDownloaderProgram.OandaDownloader(symbols, resolution, model.FromDate, model.FromDate);
-        }
-
-        private void QuandBitfinexDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string apiKey = ""; // TODO:
-            QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.FromDate, apiKey);
-        }
-
-        private static void YahooDownloader(MarketModel model, SettingsModel settings, IList<string> symbols)
-        {
-            Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
-
-            string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            YahooDownloaderProgram.YahooDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
-        public MarketType Provider { get; set; }
+        public string Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
