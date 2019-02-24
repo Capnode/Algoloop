@@ -48,16 +48,16 @@ namespace Algoloop.ViewModel
             Model = marketModel;
             _settingsModel = settingsModel;
 
-            AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
-            AddAllSymbolsCommand = new RelayCommand(() => AddAllSymbols(), true);
-            DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !Active && SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), m => !Active && SelectedSymbol != null);
-            DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !Active);
-            NewListCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !Active);
-            ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
-            StartCommand = new RelayCommand(() => OnStartCommand(), () => !Active);
-            StopCommand = new RelayCommand(() => OnStopCommand(), () => Active);
+            AddSymbolCommand = new RelayCommand(() => AddSymbol(), () => !_parent.IsBusy);
+            AddAllSymbolsCommand = new RelayCommand(() => AddAllSymbols(), !_parent.IsBusy);
+            DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
+            ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), !_parent.IsBusy);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
+            DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !_parent.IsBusy && !Active);
+            NewListCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !_parent.IsBusy && !Active);
+            ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), !_parent.IsBusy);
+            StartCommand = new RelayCommand(() => OnStartCommand(), () => !_parent.IsBusy && !Active);
+            StopCommand = new RelayCommand(() => OnStopCommand(), () => !_parent.IsBusy && Active);
 
             DataFromModel();
             OnActiveCommand(Active);
@@ -262,6 +262,7 @@ namespace Algoloop.ViewModel
 
         private void AddAllSymbols()
         {
+            _parent.IsBusy = true;
             IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
             foreach (SymbolModel symbol in symbols)
             {
@@ -273,6 +274,7 @@ namespace Algoloop.ViewModel
 
             Folders.ToList().ForEach(m => m.Refresh());
             DataFromModel();
+            _parent.IsBusy = false;
         }
 
         private void DeleteSymbols(IList symbols)

@@ -32,13 +32,14 @@ namespace Algoloop.ViewModel
     {
         private readonly SettingsModel _settingsModel;
         private ITreeViewModel _selectedItem;
+        private bool _isBusy;
 
         public MarketsViewModel(MarketsModel model, SettingsModel settingsModel)
         {
             Model = model;
             _settingsModel = settingsModel;
 
-            AddCommand = new RelayCommand(() => AddMarket(), true);
+            AddCommand = new RelayCommand(() => AddMarket(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => OnSelectedChanged(vm), (vm) => vm != null);
             Messenger.Default.Register<NotificationMessageAction<List<MarketModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
@@ -49,6 +50,19 @@ namespace Algoloop.ViewModel
 
         public MarketsModel Model { get; }
         public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
+
+        /// <summary>
+        /// Mark ongoing operation
+        /// </summary>
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                RaisePropertyChanged("IsBusy");
+            }
+        }
 
         public ITreeViewModel SelectedItem
         {

@@ -31,6 +31,7 @@ namespace Algoloop.ViewModel
     public class AccountsViewModel : ViewModelBase
     {
         private ITreeViewModel _selectedItem;
+        private bool _isBusy;
         private static readonly AccountModel[] _standardAccounts = new []
         {
             new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
@@ -40,7 +41,7 @@ namespace Algoloop.ViewModel
         public AccountsViewModel(AccountsModel model)
         {
             Model = model;
-            AddCommand = new RelayCommand(() => AddAccount(), true);
+            AddCommand = new RelayCommand(() => AddAccount(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => OnSelectedChanged(market), (market) => market != null);
             Messenger.Default.Register<NotificationMessageAction<List<AccountModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
@@ -51,6 +52,19 @@ namespace Algoloop.ViewModel
 
         public AccountsModel Model { get; }
         public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
+
+        /// <summary>
+        /// Mark ongoing operation
+        /// </summary>
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                RaisePropertyChanged("IsBusy");
+            }
+        }
 
         public ITreeViewModel SelectedItem
         {

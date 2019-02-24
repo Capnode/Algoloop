@@ -30,16 +30,17 @@ namespace Algoloop.ViewModel
     {
         private readonly SettingsModel _settingsModel;
         private ITreeViewModel _selectedItem;
+        private bool _isBusy;
 
         public StrategiesViewModel(StrategiesModel model, SettingsModel settingsModel)
         {
             Model = model;
             _settingsModel = settingsModel;
 
-            AddCommand = new RelayCommand(() => AddStrategy(), true);
-            ImportCommand = new RelayCommand(() => ImportStrategy(), true);
-            ExportCommand = new RelayCommand(() => ExportStrategy(SelectedItem), () => SelectedItem is StrategyViewModel);
-            CloneCommand = new RelayCommand(() => CloneStrategy(SelectedItem), () => SelectedItem is StrategyViewModel);
+            AddCommand = new RelayCommand(() => AddStrategy(), () => !IsBusy);
+            ImportCommand = new RelayCommand(() => ImportStrategy(), () => !IsBusy);
+            ExportCommand = new RelayCommand(() => ExportStrategy(SelectedItem), () => !IsBusy && SelectedItem is StrategyViewModel);
+            CloneCommand = new RelayCommand(() => CloneStrategy(SelectedItem), () => !IsBusy && SelectedItem is StrategyViewModel);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => OnSelectedChanged(vm), true);
 
             DataFromModel();
@@ -53,6 +54,19 @@ namespace Algoloop.ViewModel
 
         public StrategiesModel Model { get; }
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
+
+        /// <summary>
+        /// Mark ongoing operation
+        /// </summary>
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                _isBusy = value;
+                RaisePropertyChanged("IsBusy");
+            }
+        }
 
         public ITreeViewModel SelectedItem
         {

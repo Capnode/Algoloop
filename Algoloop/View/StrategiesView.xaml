@@ -20,6 +20,10 @@
             ObjectInstance="{x:Static properties:Settings.Default}"/>
     </UserControl.Resources>
 
+    <UserControl.Cursor>
+        <Binding Path="IsBusy" Converter="{viewsupport:BusyMouseConverter}"/>
+    </UserControl.Cursor>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="{Binding Source={StaticResource settings}, Path=StrategyViewSplitter, Mode=TwoWay, Converter={viewsupport:Int32FromGridLengthConverter}}"/>
