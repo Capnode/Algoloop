@@ -30,5 +30,10 @@ namespace Algoloop.Provider
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             OandaDownloaderProgram.OandaDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
+
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

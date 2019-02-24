@@ -15,7 +15,6 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
-using GalaSoft.MvvmLight.Ioc;
 using QuantConnect.Logging;
 using QuantConnect.Util;
 using System;
@@ -25,7 +24,7 @@ using System.Linq;
 
 namespace Algoloop.Provider
 {
-    public class Toolbox : MarshalByRefObject
+    public class ProviderFactory : MarshalByRefObject
     {
         public MarketModel Run(MarketModel model, SettingsModel settings, HostDomainLogger logger)
         {
@@ -40,6 +39,15 @@ namespace Algoloop.Provider
 
             Log.LogHandler.Dispose();
             return model;
+        }
+
+        internal static IEnumerable<SymbolModel> GetAllSymbols(string name)
+        {
+            IProvider provider = CreateProvider(name);
+            if (provider == null)
+                return null;
+
+            return provider.GetAllSymbols();
         }
 
         public static void PrepareDataFolder(string dataFolder)
@@ -59,7 +67,7 @@ namespace Algoloop.Provider
             File.Copy(file, symbolPropertiesPath, true);
         }
 
-        private void MarketDownloader(MarketModel model, SettingsModel settings)
+        private static void MarketDownloader(MarketModel model, SettingsModel settings)
         {
             IList<string> list = model.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
             if (!list.Any())
@@ -69,24 +77,10 @@ namespace Algoloop.Provider
                 return;
             }
 
-            // Request list of providers
-            Type type = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
-                .FirstOrDefault(m => m.Name.Equals(model.Provider));
-            if (type == null )
-            {
-                Log.Trace($"Provider {model.Provider} not found");
-                model.Active = false;
-                return;
-            }
-
-            IProvider provider = (IProvider)Activator.CreateInstance(type);
+            IProvider provider = CreateProvider(model.Provider);
             if (provider == null)
             {
-                Log.Trace($"Can not create provider {model.Provider}");
                 model.Active = false;
-                return;
             }
 
             try
@@ -98,6 +92,29 @@ namespace Algoloop.Provider
                 Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
                 model.Active = false;
             }
+        }
+
+        private static IProvider CreateProvider(string name)
+        {
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
+                .FirstOrDefault(m => m.Name.Equals(name));
+
+            if (type == null)
+            {
+                Log.Trace($"Provider {name} not found");
+                return null;
+            }
+
+            IProvider provider = (IProvider)Activator.CreateInstance(type);
+            if (provider == null)
+            {
+                Log.Trace($"Can not create provider {name}");
+                return null;
+            }
+
+            return provider;
         }
     }
 }

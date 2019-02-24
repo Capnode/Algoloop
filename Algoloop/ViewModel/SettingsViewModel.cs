@@ -90,7 +90,7 @@ namespace Algoloop.ViewModel
 
         private void DataFromModel()
         {
-            Toolbox.PrepareDataFolder(Model.DataFolder);
+            ProviderFactory.PrepareDataFolder(Model.DataFolder);
         }
     }
 }

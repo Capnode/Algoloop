@@ -22,5 +22,10 @@ namespace Algoloop.Provider
         public void Download(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
         }
+
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

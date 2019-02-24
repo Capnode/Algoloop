@@ -30,5 +30,10 @@ namespace Algoloop.Provider
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             GoogleDownloaderProgram.GoogleDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
+
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

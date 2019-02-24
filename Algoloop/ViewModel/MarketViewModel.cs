@@ -39,7 +39,7 @@ namespace Algoloop.ViewModel
         private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
-        private Isolated<Toolbox> _toolbox;
+        private Isolated<ProviderFactory> _factory;
         private SymbolViewModel _selectedSymbol;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel)
@@ -49,6 +49,7 @@ namespace Algoloop.ViewModel
             _settingsModel = settingsModel;
 
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
+            AddAllSymbolsCommand = new RelayCommand(() => AddAllSymbols(), true);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !Active && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), m => !Active && SelectedSymbol != null);
@@ -64,6 +65,7 @@ namespace Algoloop.ViewModel
 
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
+        public RelayCommand AddAllSymbolsCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
@@ -176,23 +178,23 @@ namespace Algoloop.ViewModel
                 var logger = new HostDomainLogger();
                 try
                 {
-                    _toolbox = new Isolated<Toolbox>();
+                    _factory = new Isolated<ProviderFactory>();
                     _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _toolbox.Value.Run(model, _settingsModel, logger), _cancel.Token);
-                    _toolbox.Dispose();
-                    _toolbox = null;
+                    await Task.Run(() => model = _factory.Value.Run(model, _settingsModel, logger), _cancel.Token);
+                    _factory.Dispose();
+                    _factory = null;
                 }
                 catch (AppDomainUnloadedException)
                 {
                     Log.Trace($"Market {model.Name} canceled by user");
-                    _toolbox = null;
+                    _factory = null;
                     model.Active = false;
                 }
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
-                    _toolbox.Dispose();
-                    _toolbox = null;
+                    _factory.Dispose();
+                    _factory = null;
                     model.Active = false;
                 }
 
@@ -221,9 +223,9 @@ namespace Algoloop.ViewModel
                 _cancel.Cancel();
             }
 
-            if (_toolbox != null)
+            if (_factory != null)
             {
-                _toolbox.Dispose();
+                _factory.Dispose();
             }
         }
 
@@ -256,6 +258,21 @@ namespace Algoloop.ViewModel
             var symbol = new SymbolViewModel(this, new SymbolModel());
             Symbols.Add(symbol);
             Folders.ToList().ForEach(m => m.Refresh());
+        }
+
+        private void AddAllSymbols()
+        {
+            IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model.Provider);
+            foreach (SymbolModel symbol in symbols)
+            {
+                if (!Model.Symbols.Exists(m => m.Name.Equals(symbol.Name)))
+                {
+                    Model.Symbols.Add(symbol);
+                }
+            }
+
+            Folders.ToList().ForEach(m => m.Refresh());
+            DataFromModel();
         }
 
         private void DeleteSymbols(IList symbols)
@@ -309,7 +326,6 @@ namespace Algoloop.ViewModel
 
                 Folders.ToList().ForEach(m => m.Refresh());
                 DataFromModel();
-
             }
             catch (Exception ex)
             {

@@ -71,12 +71,32 @@ namespace Algoloop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap AddText {
+            get {
+                object obj = ResourceManager.GetObject("AddText", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon Algoloop {
             get {
                 object obj = ResourceManager.GetObject("Algoloop", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Checklist {
+            get {
+                object obj = ResourceManager.GetObject("Checklist", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

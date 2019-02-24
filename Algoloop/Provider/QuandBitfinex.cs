@@ -29,5 +29,10 @@ namespace Algoloop.Provider
             string apiKey = ""; // TODO:
             QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.FromDate, apiKey);
         }
+
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

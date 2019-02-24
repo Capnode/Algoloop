@@ -30,5 +30,10 @@ namespace Algoloop.Provider
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             IBDownloaderProgram.IBDownloader(symbols, resolution, model.FromDate, model.FromDate);
         }
+
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

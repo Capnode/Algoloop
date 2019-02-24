@@ -177,6 +177,11 @@
                                             CommandParameter="{Binding ElementName=marketSymbolListbox, Path=SelectedItems}">
                                             <Image Source="/Resources\Export.png" Width="16" Height="16"/>
                                         </Button>
+                                        <Button
+                                            ToolTip="Add all symbols"
+                                            Command="{Binding AddAllSymbolsCommand}">
+                                            <Image Source="/Resources\AddText.png" Width="16" Height="16"/>
+                                        </Button>
                                     </ToolBar>
                                     <ListBox
                                         DockPanel.Dock="Bottom"

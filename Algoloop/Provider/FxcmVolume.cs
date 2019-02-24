@@ -42,5 +42,10 @@ namespace Algoloop.Provider
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.FromDate, model.FromDate);
         }
+
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

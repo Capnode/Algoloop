@@ -51,5 +51,10 @@ namespace Algoloop.Provider
 
             model.Active = model.FromDate < DateTime.Today;
         }
+
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

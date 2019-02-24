@@ -18,11 +18,22 @@ using QuantConnect.Configuration;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Algoloop.Provider
 {
     class Dukascopy : IProvider
     {
+        private readonly IEnumerable<string> _symbols = new []
+        {
+            "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDSGD", "AUDUSD", "AU200AUD", "BRIDXBRL", "BCOUSD", "CADCHF", "CADHKD", "CADJPY", "CH20CHF", "CHFJPY", "CHFPLN", "CHFSGD",
+            "XCUUSD", "DE30EUR", "ES35EUR", "EURAUD", "EURCAD", "EURCHF", "EURDKK", "EURGBP", "EURHKD", "EURHUF", "EURJPY", "EURMXN", "EURNOK", "EURNZD", "EURPLN", "EURRUB",
+            "EURSEK", "EURSGD", "EURTRY", "EURUSD", "EURZAR", "EU50EUR", "FR40EUR", "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "UK100GBP", "HKDJPY", "HK33HKD",
+            "IT40EUR", "JP225JPY", "WTICOUSD", "MXNJPY", "NATGASUSD", "NL25EUR", "NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD", "NZDUSD", "XPDUSD", "XPTUSD", "SGDJPY", "US30USD",
+            "SPX500USD", "NAS100USD", "USDBRL", "USDCAD", "USDCHF", "USDCNY", "USDDKK", "USDHKD", "USDHUF", "USDJPY", "USDMXN", "USDNOK", "USDPLN", "USDRUB", "USDSEK", "USDSGD",
+            "USDTRY", "USDZAR", "XAGUSD", "XAUUSD", "ZARJPY"
+        };
+
         public void Download(MarketModel model, SettingsModel settings, IList<string> symbols)
         {
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
@@ -39,5 +50,9 @@ namespace Algoloop.Provider
             model.Active = model.FromDate < DateTime.Today;
         }
 
+        public IEnumerable<SymbolModel> GetAllSymbols()
+        {
+            return _symbols.Select(m => new SymbolModel() { Name = m });
+        }
     }
 }
