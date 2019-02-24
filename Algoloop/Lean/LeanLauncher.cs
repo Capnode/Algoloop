@@ -181,7 +181,7 @@ namespace Algoloop.Lean
             Config.Set("live-mode", "false");
             Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler");
 //                Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
-            Config.Set("result-handler", "Algoloop.Service.BacktestResultHandler");
+            Config.Set("result-handler", "Algoloop.Lean.BacktestResultHandler");
 //            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.BacktestingResultHandler");
             Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed");
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
@@ -197,7 +197,7 @@ namespace Algoloop.Lean
             Config.Set("send-via-api", "true");
             Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
 //            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.BacktestingResultHandler");
-            Config.Set("result-handler", "Algoloop.Service.BacktestResultHandler");
+            Config.Set("result-handler", "Algoloop.Lean.BacktestResultHandler");
             Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed");
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
