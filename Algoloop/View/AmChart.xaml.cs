@@ -73,6 +73,10 @@ namespace Algoloop.View
                 {
                     dataset = QuoteBarData(chart);
                 }
+                else if (item.GetType() == typeof(TradeBar))
+                {
+                    dataset = QuoteBarData(chart);
+                }
                 else if (item.GetType() == typeof(Tick))
                 {
                     dataset = TickData(chart);

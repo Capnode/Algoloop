@@ -91,7 +91,6 @@ namespace Algoloop.ViewModel
 
         private void DataFromModel()
         {
-            Config.Set("data-directory", Model.DataFolder);
             ProviderFactory.PrepareDataFolder(Model.DataFolder);
         }
     }

@@ -18,6 +18,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using Algoloop.Model;
+using Algoloop.Provider;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -60,6 +61,8 @@ namespace Algoloop.ViewModel
 
             // Read configuration
             ReadConfig(appData);
+
+            ProviderFactory.RegisterProviders();
         }
 
         public RelayCommand SettingsCommand { get; }
