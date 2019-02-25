@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.Provider;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
+using QuantConnect.Configuration;
 using System;
 using System.IO;
 using System.Windows;
@@ -90,6 +91,7 @@ namespace Algoloop.ViewModel
 
         private void DataFromModel()
         {
+            Config.Set("data-directory", Model.DataFolder);
             ProviderFactory.PrepareDataFolder(Model.DataFolder);
         }
     }

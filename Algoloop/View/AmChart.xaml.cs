@@ -22,6 +22,7 @@ using System.Windows.Controls;
 using AmCharts.Windows.Stock;
 using AmCharts.Windows.Stock.Data;
 using QuantConnect;
+using QuantConnect.Data.Market;
 
 namespace Algoloop.View
 {
@@ -62,7 +63,21 @@ namespace Algoloop.View
             Visibility visibility = Visibility.Visible;
             foreach (ChartViewModel chart in charts)
             {
-                DataSet dataset = chart.Data != null ? ChartData(chart) : ChartSeries(chart);
+                DataSet dataset = null;
+                QuantConnect.Data.BaseData item = chart.Data?.FirstOrDefault();
+                if (item == null)
+                {
+                    dataset = ChartSeries(chart);
+                }
+                else if (item.GetType() == typeof(QuoteBar))
+                {
+                    dataset = QuoteBarData(chart);
+                }
+                else if (item.GetType() == typeof(Tick))
+                {
+                    dataset = TickData(chart);
+                }
+
                 stockChart.DataSets.Add(dataset);
 
                 var graph = new Graph
@@ -87,28 +102,6 @@ namespace Algoloop.View
                 stockChart.Charts[0].Graphs.Add(graph);
                 visibility = Visibility.Hidden;
             }
-        }
-
-        private static DataSet ChartData(ChartViewModel chart)
-        {
-            return new DataSet()
-            {
-                ID = "id",
-                Title = chart.Title,
-                ShortTitle = chart.Title,
-                DateMemberPath = "Time",
-                OpenMemberPath = "Open",
-                HighMemberPath = "High",
-                LowMemberPath = "Low",
-                CloseMemberPath = "Close",
-                ValueMemberPath = "Value",
-                IsSelectedForComparison = false,
-                ItemsSource = chart.Data,
-                IsVisibleInCompareDataSetSelector = false,
-                IsVisibleInMainDataSetSelector = false,
-                StartDate = chart.Data.First().Time,
-                EndDate = chart.Data.Last().Time,
-            };
         }
 
         private static DataSet ChartSeries(ChartViewModel chart)
@@ -142,6 +135,50 @@ namespace Algoloop.View
                 EndDate = timeseries.Last().Key
             };
             return dataset;
+        }
+
+        private static DataSet QuoteBarData(ChartViewModel chart)
+        {
+            return new DataSet()
+            {
+                ID = "id",
+                Title = chart.Title,
+                ShortTitle = chart.Title,
+                DateMemberPath = "Time",
+                OpenMemberPath = "Open",
+                HighMemberPath = "High",
+                LowMemberPath = "Low",
+                CloseMemberPath = "Close",
+                ValueMemberPath = "Value",
+                IsSelectedForComparison = false,
+                ItemsSource = chart.Data,
+                IsVisibleInCompareDataSetSelector = false,
+                IsVisibleInMainDataSetSelector = false,
+                StartDate = chart.Data.First().Time,
+                EndDate = chart.Data.Last().Time,
+            };
+        }
+
+        private DataSet TickData(ChartViewModel chart)
+        {
+            return new DataSet()
+            {
+                ID = "id",
+                Title = chart.Title,
+                ShortTitle = chart.Title,
+                DateMemberPath = "Time",
+                OpenMemberPath = "Value",
+                HighMemberPath = "Value",
+                LowMemberPath = "Value",
+                CloseMemberPath = "Value",
+                ValueMemberPath = "Value",
+                IsSelectedForComparison = false,
+                ItemsSource = chart.Data,
+                IsVisibleInCompareDataSetSelector = false,
+                IsVisibleInMainDataSetSelector = false,
+                StartDate = chart.Data.First().Time,
+                EndDate = chart.Data.Last().Time,
+            };
         }
 
         private static GraphType ToGraphType(SeriesType seriesType)

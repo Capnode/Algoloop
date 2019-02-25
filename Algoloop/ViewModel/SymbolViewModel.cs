@@ -24,8 +24,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Algoloop.ViewModel
 {
@@ -98,22 +98,64 @@ namespace Algoloop.ViewModel
         private void LoadChart(MarketViewModel market)
         {
             Debug.Assert(market != null);
-            var dataType = LeanData.GetDataType(SelectedResolution, TickType.Quote);
-            var symbol = new Symbol(SecurityIdentifier.GenerateForex(Model.Name, Market.Dukascopy), Model.Name);
-            var config = new SubscriptionDataConfig(dataType, symbol, SelectedResolution, TimeZones.NewYork, TimeZones.NewYork, false, false, false, false, TickType.Quote);
-            var sb = new StringBuilder();
-            var leanDataReader = new LeanDataReader(config, symbol, SelectedResolution, _date, market.DataFolder);
-            IEnumerable<BaseData> data = leanDataReader.Parse();
             Charts.Clear();
-            if (data.Any())
+            SyncObservableCollection<ChartViewModel> charts = Charts;
+            string filename = LeanFilepath(market, Model.Name, SelectedResolution, Date);
+            if (filename != null)
             {
-                var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
-                var viewModel = new ChartViewModel(series, data);
-                var charts = Charts;
-                charts.Add(viewModel);
-                Charts = null;
-                Charts = charts;
+                var leanDataReader = new LeanDataReader(filename);
+                IEnumerable<BaseData> data = leanDataReader.Parse();
+                if (data.Any())
+                {
+                    var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
+                    var viewModel = new ChartViewModel(series, data);
+                    charts.Add(viewModel);
+                }
             }
+
+            Charts = null;
+            Charts = charts;
+        }
+
+        private string LeanFilepath(MarketViewModel market, string symbol, Resolution resolution, DateTime date)
+        {
+            DirectoryInfo basedir = new DirectoryInfo(market.DataFolder);
+            DirectoryInfo[] subdirs = basedir.GetDirectories("*");
+            if (resolution.Equals(Resolution.Daily) || resolution.Equals(Resolution.Hour))
+            {
+                foreach (DirectoryInfo folder in subdirs)
+                {
+                    var path = Path.Combine(folder.FullName, market.Model.Provider, resolution.ToString());
+                    if (!Directory.Exists(path))
+                        continue;
+
+                    var dir = new DirectoryInfo(path);
+                    var files = dir.GetFiles(symbol + "*.zip").Select(x => x.FullName);
+                    if (files.Count() == 1)
+                    {
+                        return files.Single();
+                    }
+                }
+            }
+            else
+            {
+                foreach (DirectoryInfo folder in subdirs)
+                {
+                    var path = Path.Combine(folder.FullName, market.Model.Provider, resolution.ToString(), symbol);
+                    if (!Directory.Exists(path))
+                        continue;
+
+                    var dir = new DirectoryInfo(path);
+                    string date1 = date.ToString("yyyyMMdd");
+                    var files = dir.GetFiles(date1 + "*.zip").Select(x => x.FullName);
+                    if (files.Count() == 1)
+                    {
+                        return files.Single();
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }
