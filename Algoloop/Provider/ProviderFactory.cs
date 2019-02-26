@@ -15,6 +15,8 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
+using QuantConnect;
+using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using QuantConnect.Util;
 using System;
@@ -26,7 +28,7 @@ namespace Algoloop.Provider
 {
     public class ProviderFactory : MarshalByRefObject
     {
-        public MarketModel Run(MarketModel model, SettingsModel settings, HostDomainLogger logger)
+        public MarketModel Run(MarketModel market, SettingsModel settings, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
             PrepareDataFolder(settings.DataFolder);
@@ -34,14 +36,36 @@ namespace Algoloop.Provider
             using (var writer = new StreamLogger(logger))
             {
                 Console.SetOut(writer);
-                MarketDownloader(model, settings);
+                IList<string> list = market.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
+                if (!list.Any())
+                {
+                    Log.Trace($"No symbols selected");
+                    market.Active = false;
+                    return market;
+                }
+
+                IProvider provider = CreateProvider(market.Provider);
+                if (provider == null)
+                {
+                    market.Active = false;
+                }
+
+                try
+                {
+                    provider.Download(market, settings, list);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
+                    market.Active = false;
+                }
             }
 
             Log.LogHandler.Dispose();
-            return model;
+            return market;
         }
 
-        internal static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
+        public static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
             IProvider provider = CreateProvider(market.Provider);
             if (provider == null)
@@ -50,8 +74,22 @@ namespace Algoloop.Provider
             return provider.GetAllSymbols(market);
         }
 
+        public static void RegisterProviders()
+        {
+            IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface);
+            foreach (Type provider in providers)
+            {
+                RegisterProvider(provider);
+            }
+        }
+
         public static void PrepareDataFolder(string dataFolder)
         {
+            Config.Set("data-directory", dataFolder);
+            Config.Set("cache-location", dataFolder);
+
             string marketHoursFolder = Path.Combine(dataFolder, "market-hours");
             const string marketHoursFile = "market-hours-database.json";
             string marketHoursPath = Path.Combine(marketHoursFolder, marketHoursFile);
@@ -65,33 +103,6 @@ namespace Algoloop.Provider
             Directory.CreateDirectory(symbolPropertiesFolder);
             file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", symbolPropertiesFile);
             File.Copy(file, symbolPropertiesPath, true);
-        }
-
-        private static void MarketDownloader(MarketModel market, SettingsModel settings)
-        {
-            IList<string> list = market.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
-            if (!list.Any())
-            {
-                Log.Trace($"No symbols selected");
-                market.Active = false;
-                return;
-            }
-
-            IProvider provider = CreateProvider(market.Provider);
-            if (provider == null)
-            {
-                market.Active = false;
-            }
-
-            try
-            {
-                provider.Download(market, settings, list);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
-                market.Active = false;
-            }
         }
 
         private static IProvider CreateProvider(string name)
@@ -114,7 +125,25 @@ namespace Algoloop.Provider
                 return null;
             }
 
+            RegisterProvider(type);
+
             return provider;
+        }
+
+        private static void RegisterProvider(Type provider)
+        {
+            string name = provider.Name.ToLower();
+            if (Market.Encode(name) == null)
+            {
+                // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
+                int code = 0;
+                while (Market.Decode(code) != null)
+                {
+                    code++;
+                }
+
+                Market.Add(name, code);
+            }
         }
     }
 }
