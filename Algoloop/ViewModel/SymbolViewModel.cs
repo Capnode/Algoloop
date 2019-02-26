@@ -26,6 +26,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Algoloop.ViewModel
 {
@@ -99,7 +100,6 @@ namespace Algoloop.ViewModel
         {
             Debug.Assert(market != null);
             Charts.Clear();
-            SyncObservableCollection<ChartViewModel> charts = Charts;
             string filename = LeanFilepath(market, Model.Name, SelectedResolution, Date);
             if (filename != null)
             {
@@ -109,12 +109,9 @@ namespace Algoloop.ViewModel
                 {
                     var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
                     var viewModel = new ChartViewModel(series, data);
-                    charts.Add(viewModel);
+                    Charts.Add(viewModel);
                 }
             }
-
-            Charts = null;
-            Charts = charts;
         }
 
         private string LeanFilepath(MarketViewModel market, string symbol, Resolution resolution, DateTime date)

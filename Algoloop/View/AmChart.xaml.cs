@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -46,11 +47,30 @@ namespace Algoloop.View
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             AmChart amChart = d as AmChart;
-            var charts = e.NewValue as IReadOnlyList<ChartViewModel>;
-            if (amChart != null && charts != null)
+            Debug.Assert(amChart != null);
+
+            if (e.OldValue != null)
             {
-                amChart.OnItemsSourceChanged(charts);
+                // Unsubscribe from CollectionChanged on the old collection
+                var coll = e.OldValue as INotifyCollectionChanged;
+                coll.CollectionChanged -= amChart.OnCollectionChanged;
             }
+
+            if (e.NewValue != null)
+            {
+                // Subscribe to CollectionChanged on the new collection
+                var coll = e.NewValue as ObservableCollection<ChartViewModel>;
+                coll.CollectionChanged += amChart.OnCollectionChanged;
+            }
+
+            var charts = e.NewValue as IReadOnlyList<ChartViewModel>;
+            amChart.OnItemsSourceChanged(charts);
+        }
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            List<ChartViewModel> charts = e.NewItems?.Cast<ChartViewModel>().ToList();
+            OnItemsSourceChanged(charts);
         }
 
         private void OnItemsSourceChanged(IReadOnlyList<ChartViewModel> charts)
@@ -59,6 +79,8 @@ namespace Algoloop.View
             stockChart.DataSets.Clear();
             Debug.Assert(stockChart.Charts.Count == 1);
             stockChart.Charts[0].Graphs.Clear();
+            if (charts == null)
+                return;
 
             Visibility visibility = Visibility.Visible;
             foreach (ChartViewModel chart in charts)
