@@ -88,6 +88,7 @@ namespace Algoloop.Provider
         public static void PrepareDataFolder(string dataFolder)
         {
             Config.Set("data-directory", dataFolder);
+            Config.Set("data-folder", dataFolder);
             Config.Set("cache-location", dataFolder);
 
             string marketHoursFolder = Path.Combine(dataFolder, "market-hours");

@@ -123,7 +123,7 @@ namespace Algoloop.Model
         {
             switch (Provider)
             {
-                case "Fxcm":
+                case nameof(Algoloop.Provider.Fxcm):
                     SetBrowsable("Access", true);
                     SetBrowsable("Login", true);
                     SetBrowsable("Password", true);
