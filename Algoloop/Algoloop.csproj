@@ -267,6 +267,7 @@
     <Compile Include="ViewModel\ITreeViewModel.cs" />
     <Compile Include="ViewModel\OrderViewModel.cs" />
     <Compile Include="ViewSupport\BooleanToVisibilityConverter.cs" />
+    <Compile Include="ViewSupport\ExDataGrid.cs" />
     <Compile Include="ViewSupport\ProviderNameConverter.cs" />
     <Compile Include="View\DesktopView.xaml.cs">
       <DependentUpon>DesktopView.xaml</DependentUpon>

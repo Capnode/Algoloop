@@ -24,12 +24,15 @@ using QuantConnect.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
@@ -41,6 +44,7 @@ namespace Algoloop.ViewModel
         private MarketModel _model;
         private Isolated<ProviderFactory> _factory;
         private SymbolViewModel _selectedSymbol;
+        private ObservableCollection<DataGridBoundColumn> _symbolColumns = new ObservableCollection<DataGridBoundColumn>();
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel)
         {
@@ -111,6 +115,12 @@ namespace Algoloop.ViewModel
             }
         }
 
+        public ObservableCollection<DataGridBoundColumn> SymbolColumns
+        {
+            get => _symbolColumns;
+            set => Set(ref _symbolColumns, value);
+        }
+
         public void Refresh()
         {
             Model.Refresh();
@@ -154,6 +164,9 @@ namespace Algoloop.ViewModel
                 var folderViewModel = new FolderViewModel(this, folderModel);
                 Folders.Add(folderViewModel);
             }
+
+            SymbolColumns.Add(new DataGridCheckBoxColumn() { Header = "Download", Binding = new Binding("Active") { Mode = BindingMode.TwoWay } });
+            SymbolColumns.Add(new DataGridTextColumn() { Header = "Name", Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay } });
         }
 
         internal bool DeleteFolder(FolderViewModel symbol)
