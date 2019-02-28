@@ -47,6 +47,7 @@ namespace Algoloop.ViewModel
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private Style _rightCellStyle = new Style(typeof(TextBlock));
         private Style _leftCellStyle = new Style(typeof(TextBlock));
+        private bool _checkAll;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel)
         {
@@ -54,6 +55,7 @@ namespace Algoloop.ViewModel
             Model = marketModel;
             _settingsModel = settingsModel;
 
+            CheckAllCommand = new RelayCommand<IList>(m => OnCheckAll(m), m => !_parent.IsBusy);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), () => !_parent.IsBusy);
             AddAllSymbolsCommand = new RelayCommand(() => AddAllSymbols(), !_parent.IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
@@ -73,6 +75,7 @@ namespace Algoloop.ViewModel
         }
 
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
+        public RelayCommand<IList> CheckAllCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand AddAllSymbolsCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
@@ -120,6 +123,12 @@ namespace Algoloop.ViewModel
             }
         }
 
+        public bool CheckAll
+        {
+            get => _checkAll;
+            set => Set(ref _checkAll, value);
+        }
+
         public ObservableCollection<DataGridColumn> SymbolColumns
         {
             get => _symbolColumns;
@@ -161,7 +170,7 @@ namespace Algoloop.ViewModel
             });
             SymbolColumns.Add(new DataGridTextColumn()
             {
-                Header = "Name",
+                Header = "Symbol",
                 Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
@@ -317,6 +326,7 @@ namespace Algoloop.ViewModel
             IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
             foreach (SymbolModel symbol in symbols)
             {
+                symbol.Name = symbol.Name.Trim();
                 SymbolModel sym = Model.Symbols.Find(m => m.Name.Equals(symbol.Name));
                 if (sym != null)
                 {
@@ -331,6 +341,25 @@ namespace Algoloop.ViewModel
             Folders.ToList().ForEach(m => m.Refresh());
             DataFromModel();
             _parent.IsBusy = false;
+        }
+
+
+        private void OnCheckAll(IList symbols)
+        {
+            Debug.Assert(symbols != null);
+            if (Symbols.Count == 0 || symbols.Count == 0)
+                return;
+
+            // Create a copy of the list before remove
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            foreach (SymbolViewModel symbol in list)
+            {
+                symbol.Active = CheckAll;
+            }
+
+            DataToModel();
         }
 
         private void DeleteSymbols(IList symbols)

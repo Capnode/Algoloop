@@ -159,6 +159,15 @@
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top">
+                                        <Grid>
+                                            <CheckBox
+                                                ToolTip="Check all selected"
+                                                VerticalAlignment="Center"
+                                                IsChecked="{Binding CheckAll}"
+                                                Command="{Binding CheckAllCommand}"
+                                                CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
+                                            </CheckBox>
+                                        </Grid>
                                         <Button
                                             ToolTip="Add symbol" 
                                             Command="{Binding AddSymbolCommand}">
