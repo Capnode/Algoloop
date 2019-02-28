@@ -197,11 +197,6 @@
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                         ItemsSource="{Binding Symbols}"
                                         ExColumns="{Binding SymbolColumns}">
-                                        <viewsupport:ExDataGrid.Resources>
-                                            <Style TargetType="{x:Type DataGridCell}">
-                                                <Setter Property="TextBlock.TextAlignment" Value="Right" />
-                                            </Style>
-                                        </viewsupport:ExDataGrid.Resources>
                                     </viewsupport:ExDataGrid>
                                 </DockPanel>
                             </TabItem>

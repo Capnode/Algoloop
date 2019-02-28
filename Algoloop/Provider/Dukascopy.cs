@@ -24,14 +24,20 @@ namespace Algoloop.Provider
 {
     class Dukascopy : IProvider
     {
-        private readonly IEnumerable<string> _symbols = new []
+        private readonly IEnumerable<string> _majors = new[] { "AUDUSD", "EURUSD", "GBPUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY" };
+        private readonly IEnumerable<string> _crosses = new[]
         {
-            "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDSGD", "AUDUSD", "AU200AUD", "BRIDXBRL", "BCOUSD", "CADCHF", "CADHKD", "CADJPY", "CH20CHF", "CHFJPY", "CHFPLN", "CHFSGD",
-            "XCUUSD", "DE30EUR", "ES35EUR", "EURAUD", "EURCAD", "EURCHF", "EURDKK", "EURGBP", "EURHKD", "EURHUF", "EURJPY", "EURMXN", "EURNOK", "EURNZD", "EURPLN", "EURRUB",
-            "EURSEK", "EURSGD", "EURTRY", "EURUSD", "EURZAR", "EU50EUR", "FR40EUR", "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD", "GBPUSD", "UK100GBP", "HKDJPY", "HK33HKD",
-            "IT40EUR", "JP225JPY", "WTICOUSD", "MXNJPY", "NATGASUSD", "NL25EUR", "NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD", "NZDUSD", "XPDUSD", "XPTUSD", "SGDJPY", "US30USD",
-            "SPX500USD", "NAS100USD", "USDBRL", "USDCAD", "USDCHF", "USDCNY", "USDDKK", "USDHKD", "USDHUF", "USDJPY", "USDMXN", "USDNOK", "USDPLN", "USDRUB", "USDSEK", "USDSGD",
-            "USDTRY", "USDZAR", "XAGUSD", "XAUUSD", "ZARJPY"
+            "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDSGD", "CADCHF", "CADHKD", "CADJPY", "CHFJPY", "CHFPLN", "CHFSGD",
+            "EURAUD", "EURCAD", "EURCHF", "EURDKK", "EURGBP", "EURHKD", "EURHUF", "EURJPY", "EURMXN", "EURNOK", "EURNZD",
+            "EURPLN", "EURRUB", "EURSEK", "EURSGD", "EURTRY", "EURZAR", "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD",
+            "HKDJPY", "MXNJPY", "NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD", "XPDUSD", "XPTUSD", "SGDJPY", "USDBRL", "USDCNY",
+            "USDDKK", "USDHKD", "USDHUF", "USDMXN", "USDNOK", "USDPLN", "USDRUB", "USDSEK", "USDSGD", "USDTRY", "USDZAR", "ZARJPY"
+        };
+        private readonly IEnumerable<string> _metals = new[] { "XAGUSD", "XAUUSD", "WTICOUSD", "NATGASUSD" };
+        private readonly IEnumerable<string> _indices = new[]
+        {
+            "AU200AUD", "CH20CHF", "DE30EUR", "ES35EUR", "EU50EUR", "FR40EUR", "UK100GBP", "HK33HKD", "IT40EUR", "JP225JPY",
+            "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
 
         public void Download(MarketModel model, SettingsModel settings, IList<string> symbols)
@@ -52,7 +58,12 @@ namespace Algoloop.Provider
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
-            return _symbols.Select(m => new SymbolModel() { Name = m });
+            var list = new List<SymbolModel>();
+            list.AddRange(_majors.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Majors" } } }));
+            list.AddRange(_crosses.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Crosses" } } }));
+            list.AddRange(_metals.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Metals" } } }));
+            list.AddRange(_indices.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Indices" } } }));
+            return list;
         }
     }
 }

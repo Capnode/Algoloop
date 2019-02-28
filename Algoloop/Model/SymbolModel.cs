@@ -13,6 +13,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -32,10 +33,13 @@ namespace Algoloop.Model
         }
 
         [DataMember]
+        public bool Active { get; set; } = false;
+
+        [DataMember]
         public string Name { get; set; } = "symbol";
 
         [DataMember]
-        public bool Active { get; set; } = false;
+        public IDictionary<string, string> Properties { get; set; }
 
         internal void Refresh()
         {

@@ -22,7 +22,7 @@ namespace Algoloop.ViewSupport
     public class ExDataGrid : DataGrid
     {
         public static readonly DependencyProperty ExColumnsProperty = DependencyProperty.Register("ExColumns",
-            typeof(ObservableCollection<DataGridBoundColumn>), typeof(ExDataGrid),
+            typeof(ObservableCollection<DataGridColumn>), typeof(ExDataGrid),
                 new PropertyMetadata(OnDataGridColumnsPropertyChanged));
 
         public ObservableCollection<DataGridColumn> ExColumns
@@ -35,7 +35,7 @@ namespace Algoloop.ViewSupport
         {
             var context = source as ExDataGrid;
 
-            var oldItems = e.OldValue as ObservableCollection<DataGridBoundColumn>;
+            var oldItems = e.OldValue as ObservableCollection<DataGridColumn>;
 
             if (oldItems != null)
             {
@@ -45,7 +45,7 @@ namespace Algoloop.ViewSupport
                 oldItems.CollectionChanged -= context.collectionChanged;
             }
 
-            var newItems = e.NewValue as ObservableCollection<DataGridBoundColumn>;
+            var newItems = e.NewValue as ObservableCollection<DataGridColumn>;
 
             if (newItems != null)
             {
@@ -62,13 +62,13 @@ namespace Algoloop.ViewSupport
             {
                 case NotifyCollectionChangedAction.Add:
                     if (e.NewItems != null)
-                        foreach (DataGridBoundColumn one in e.NewItems)
+                        foreach (DataGridColumn one in e.NewItems)
                             Columns.Add(one);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems != null)
-                        foreach (DataGridBoundColumn one in e.OldItems)
+                        foreach (DataGridColumn one in e.OldItems)
                             Columns.Remove(one);
                     break;
 
@@ -79,7 +79,7 @@ namespace Algoloop.ViewSupport
                 case NotifyCollectionChangedAction.Reset:
                     Columns.Clear();
                     if (e.NewItems != null)
-                        foreach (DataGridBoundColumn one in e.NewItems)
+                        foreach (DataGridColumn one in e.NewItems)
                             Columns.Add(one);
                     break;
             }
