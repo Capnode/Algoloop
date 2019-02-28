@@ -167,7 +167,7 @@
                                         <Button
                                             ToolTip="Delete symbols"
                                             Command="{Binding DeleteSymbolsCommand}"
-                                            CommandParameter="{Binding ElementName=marketSymbolListbox, Path=SelectedItems}">
+                                            CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
                                             <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                         </Button>
                                         <Button
@@ -178,7 +178,7 @@
                                         <Button
                                             ToolTip="Export symbol list..."
                                             Command="{Binding ExportSymbolsCommand}"
-                                            CommandParameter="{Binding ElementName=marketSymbolListbox, Path=SelectedItems}">
+                                            CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
                                             <Image Source="/Resources\Export.png" Width="16" Height="16"/>
                                         </Button>
                                         <Button
@@ -187,21 +187,25 @@
                                             <Image Source="/Resources\AddText.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <ListBox
+                                    <DataGrid
                                         DockPanel.Dock="Bottom"
-                                        Name="marketSymbolListbox"
-                                        SelectionMode="Extended"
+                                        Name="marketSymbolList"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        AutoGenerateColumns="False"
+                                        GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                         ItemsSource="{Binding Symbols}">
-                                        <ListBox.Resources>
-                                            <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsChecked="{Binding Active}" />
-                                                    <TextBox Text="{Binding Model.Name, Mode=TwoWay}" BorderThickness="0"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ListBox.Resources>
-                                    </ListBox>
+                                        <DataGrid.Columns>
+                                            <DataGridCheckBoxColumn Header="Download" Binding="{Binding Active, Mode=TwoWay}"/>
+                                            <DataGridTextColumn Header="Symbol" Binding="{Binding Model.Name, Mode=TwoWay}"/>
+                                        </DataGrid.Columns>
+                                        <DataGrid.Resources>
+                                            <Style TargetType="{x:Type DataGridCell}">
+                                                <Setter Property="TextBlock.TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGrid.Resources>
+                                    </DataGrid>
                                 </DockPanel>
                             </TabItem>
                         </TabControl>
