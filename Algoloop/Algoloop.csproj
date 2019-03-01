@@ -250,6 +250,11 @@
     <Compile Include="Model\FolderModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\OrderModel.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Provider\CryptoIq.cs" />
     <Compile Include="Provider\Dukascopy.cs" />
     <Compile Include="Provider\Fxcm.cs" />
@@ -406,17 +411,16 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Content Include="Extern\AmCharts.Windows.Stock.dll" />
+    <Resource Include="Resources\AddList.png" />
+    <Resource Include="Resources\Download3.png" />
+    <Resource Include="Resources\Download2.png" />
+    <Resource Include="Resources\Download1.png" />
     <Resource Include="Resources\AddText.png" />
     <Resource Include="Resources\Checklist.png" />
     <Resource Include="Resources\Export.png" />
@@ -431,6 +435,7 @@
     <Resource Include="Resources\Add.png" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Content Include="..\Data\market-hours\market-hours-database.json">

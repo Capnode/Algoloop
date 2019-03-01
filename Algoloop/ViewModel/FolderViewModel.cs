@@ -97,6 +97,17 @@ namespace Algoloop.ViewModel
             AddSymbolCommand.RaiseCanExecuteChanged();
         }
 
+        public void AddSymbol(SymbolViewModel symbol)
+        {
+            if (symbol == null)
+                return;
+
+            Symbols.Add(symbol);
+            DataToModel();
+            MarketSymbols.View.Refresh();
+            AddSymbolCommand.RaiseCanExecuteChanged();
+        }
+
         internal void DataToModel()
         {
             Model.Symbols.Clear();
@@ -120,17 +131,6 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
-        }
-
-        private void AddSymbol(SymbolViewModel symbol)
-        {
-            if (symbol == null)
-                return;
-
-            Symbols.Add(symbol);
-            DataToModel();
-            MarketSymbols.View.Refresh();
-            AddSymbolCommand.RaiseCanExecuteChanged();
         }
 
         private void RemoveSymbols(IList symbols)

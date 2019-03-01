@@ -57,10 +57,11 @@ namespace Algoloop.ViewModel
 
             CheckAllCommand = new RelayCommand<IList>(m => OnCheckAll(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), () => !_parent.IsBusy);
-            AddAllSymbolsCommand = new RelayCommand(() => AddAllSymbols(), !_parent.IsBusy);
+            DownloadSymbolListCommand = new RelayCommand(() => DownloadSymbolList(), !_parent.IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), !_parent.IsBusy);
             ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
+            AddToSymbolListCommand = new RelayCommand<IList>(m => AddToSymbolList(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !_parent.IsBusy && !Active);
             NewListCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !_parent.IsBusy && !Active);
             ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), !_parent.IsBusy);
@@ -77,10 +78,11 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
         public RelayCommand<IList> CheckAllCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
-        public RelayCommand AddAllSymbolsCommand { get; }
+        public RelayCommand DownloadSymbolListCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
+        public RelayCommand<IList> AddToSymbolListCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand NewListCommand { get; }
         public RelayCommand ActiveCommand { get; }
@@ -104,6 +106,7 @@ namespace Algoloop.ViewModel
                 DeleteCommand.RaiseCanExecuteChanged();
                 DeleteSymbolsCommand.RaiseCanExecuteChanged();
                 ExportSymbolsCommand.RaiseCanExecuteChanged();
+                AddToSymbolListCommand.RaiseCanExecuteChanged();
                 CheckAllCommand.RaiseCanExecuteChanged();
             }
         }
@@ -122,6 +125,7 @@ namespace Algoloop.ViewModel
                 Set(ref _selectedSymbol, value);
                 DeleteSymbolsCommand.RaiseCanExecuteChanged();
                 ExportSymbolsCommand.RaiseCanExecuteChanged();
+                AddToSymbolListCommand.RaiseCanExecuteChanged();
                 CheckAllCommand.RaiseCanExecuteChanged();
             }
         }
@@ -284,7 +288,7 @@ namespace Algoloop.ViewModel
             Folders.ToList().ForEach(m => m.Refresh());
         }
 
-        private void AddAllSymbols()
+        private void DownloadSymbolList()
         {
             _parent.IsBusy = true;
             IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
@@ -411,6 +415,23 @@ namespace Algoloop.ViewModel
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+        }
+
+        private void AddToSymbolList(IList symbols)
+        {
+            Debug.Assert(symbols != null);
+            if (symbols.Count == 0)
+                return;
+
+            DataToModel();
+            var folder = new FolderViewModel(this, new FolderModel());
+            foreach (SymbolViewModel symbol in symbols)
+            {
+                symbol.Active = true;
+                folder.AddSymbol(symbol);
+            }
+
+            Folders.Add(folder);
         }
 
         private void UpdateSymbolsAndColumns()

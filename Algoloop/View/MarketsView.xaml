@@ -180,6 +180,11 @@
                                             <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                         </Button>
                                         <Button
+                                            ToolTip="Download symbol list"
+                                            Command="{Binding DownloadSymbolListCommand}">
+                                            <Image Source="/Resources\Download1.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button
                                             ToolTip="Import symbol list..."
                                             Command="{Binding ImportSymbolsCommand}">
                                             <Image Source="/Resources\Import.png" Width="16" Height="16"/>
@@ -191,9 +196,10 @@
                                             <Image Source="/Resources\Export.png" Width="16" Height="16"/>
                                         </Button>
                                         <Button
-                                            ToolTip="Add all symbols"
-                                            Command="{Binding AddAllSymbolsCommand}">
-                                            <Image Source="/Resources\AddText.png" Width="16" Height="16"/>
+                                            ToolTip="Add to new symbol list"
+                                            Command="{Binding AddToSymbolListCommand}"
+                                            CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
+                                            <Image Source="/Resources\AddList.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
                                     <viewsupport:ExDataGrid
