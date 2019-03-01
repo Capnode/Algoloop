@@ -55,7 +55,7 @@ namespace Algoloop.ViewModel
             Model = marketModel;
             _settingsModel = settingsModel;
 
-            CheckAllCommand = new RelayCommand<IList>(m => OnCheckAll(m), m => !_parent.IsBusy);
+            CheckAllCommand = new RelayCommand<IList>(m => OnCheckAll(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), () => !_parent.IsBusy);
             AddAllSymbolsCommand = new RelayCommand(() => AddAllSymbols(), !_parent.IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
@@ -98,11 +98,13 @@ namespace Algoloop.ViewModel
             {
                 Model.Active = value;
                 RaisePropertyChanged(() => Active);
+
                 StartCommand.RaiseCanExecuteChanged();
                 StopCommand.RaiseCanExecuteChanged();
                 DeleteCommand.RaiseCanExecuteChanged();
                 DeleteSymbolsCommand.RaiseCanExecuteChanged();
                 ExportSymbolsCommand.RaiseCanExecuteChanged();
+                CheckAllCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -120,6 +122,7 @@ namespace Algoloop.ViewModel
                 Set(ref _selectedSymbol, value);
                 DeleteSymbolsCommand.RaiseCanExecuteChanged();
                 ExportSymbolsCommand.RaiseCanExecuteChanged();
+                CheckAllCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -162,50 +165,12 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
-            SymbolColumns.Clear();
-            SymbolColumns.Add(new DataGridCheckBoxColumn()
-            {
-                Header = "Download",
-                Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
-            });
-            SymbolColumns.Add(new DataGridTextColumn()
-            {
-                Header = "Symbol",
-                Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
-            });
-
             Active = Model.Active;
             Symbols.Clear();
             Model.Symbols.Sort();
-            foreach (SymbolModel symbolModel in Model.Symbols)
-            {
-                var symbolViewModel = new SymbolViewModel(this, symbolModel);
-                Symbols.Add(symbolViewModel);
+            UpdateSymbolsAndColumns();
 
-                if (symbolModel.Properties == null)
-                    continue;
-
-                foreach (var property in symbolModel.Properties)
-                {
-                    if (!SymbolColumns.Any(m => m.Header.Equals(property.Key)))
-                    {
-                        bool isDecimal = decimal.TryParse(property.Value, out _);
-                        SymbolColumns.Add(new DataGridTextColumn()
-                        {
-                            Header = property.Key,
-                            IsReadOnly = true,
-                            Binding = new Binding($"Model.Properties[{property.Key}]")
-                            {
-                                Mode = BindingMode.OneWay,
-                                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                                FallbackValue = string.Empty
-                            },
-                            ElementStyle = isDecimal ? _rightCellStyle : _leftCellStyle
-                        });
-                    }
-                }
-            }
-
+            // Update Folders
             Folders.Clear();
             Model.Folders.Sort();
             foreach (FolderModel folderModel in Model.Folders)
@@ -213,7 +178,6 @@ namespace Algoloop.ViewModel
                 var folderViewModel = new FolderViewModel(this, folderModel);
                 Folders.Add(folderViewModel);
             }
-
         }
 
         internal bool DeleteFolder(FolderViewModel symbol)
@@ -446,6 +410,66 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        private void UpdateSymbolsAndColumns()
+        {
+            SymbolColumns.Clear();
+            SymbolColumns.Add(new DataGridCheckBoxColumn()
+            {
+                Header = "Download",
+                Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
+            });
+            SymbolColumns.Add(new DataGridTextColumn()
+            {
+                Header = "Symbol",
+                Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
+            });
+
+            Active = Model.Active;
+            Symbols.Clear();
+            Model.Symbols.Sort();
+            foreach (SymbolModel symbolModel in Model.Symbols)
+            {
+                var symbolViewModel = new SymbolViewModel(this, symbolModel);
+                Symbols.Add(symbolViewModel);
+
+                if (symbolModel.Properties == null)
+                    continue;
+
+                foreach (var property in symbolModel.Properties)
+                {
+                    bool isDecimal = decimal.TryParse(property.Value, out _);
+                    DataGridColumn column = SymbolColumns.FirstOrDefault(m => m.Header.Equals(property.Key));
+                    if (column != null)
+                    {
+                        // Set leftCellStyle if not a number
+                        if (column is DataGridTextColumn textColumn)
+                        {
+                            if (!isDecimal && textColumn.ElementStyle.Equals(_rightCellStyle))
+                            {
+                                textColumn.ElementStyle = _leftCellStyle;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Create new DataGridColumn
+                        SymbolColumns.Add(new DataGridTextColumn()
+                        {
+                            Header = property.Key,
+                            IsReadOnly = true,
+                            Binding = new Binding($"Model.Properties[{property.Key}]")
+                            {
+                                Mode = BindingMode.OneWay,
+                                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                                FallbackValue = string.Empty
+                            },
+                            ElementStyle = isDecimal ? _rightCellStyle : _leftCellStyle
+                        });
+                    }
+                }
             }
         }
     }
