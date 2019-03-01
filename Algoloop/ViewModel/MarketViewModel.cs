@@ -431,6 +431,9 @@ namespace Algoloop.ViewModel
 
         private void UpdateSymbolsAndColumns()
         {
+            Active = Model.Active;
+            Symbols.Clear();
+
             SymbolColumns.Clear();
             SymbolColumns.Add(new DataGridCheckBoxColumn()
             {
@@ -443,8 +446,6 @@ namespace Algoloop.ViewModel
                 Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
-            Active = Model.Active;
-            Symbols.Clear();
             Model.Symbols.Sort();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {

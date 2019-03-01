@@ -23,6 +23,7 @@ using QuantConnect.Parameters;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
@@ -31,6 +32,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
@@ -41,8 +44,9 @@ namespace Algoloop.ViewModel
         private IList _taskSelection;
         private bool _isSelected;
         private bool _isExpanded;
-        private DataView _dataView;
         private SymbolViewModel _selectedSymbol;
+        private ObservableCollection<DataGridColumn> _jobColumns = new ObservableCollection<DataGridColumn>();
+        private StrategyJobViewModel _selectedJob;
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -56,7 +60,7 @@ namespace Algoloop.ViewModel
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
-            DeleteAllJobsCommand = new RelayCommand(() => DeleteTasks(Summary.Rows), true);
+//            DeleteAllJobsCommand = new RelayCommand(() => DeleteTasks(Summary.Rows), true);
             DeleteSelectedJobsCommand = new RelayCommand(() => DeleteTasks(_taskSelection), true);
             UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
@@ -66,7 +70,6 @@ namespace Algoloop.ViewModel
             TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
             TaskDoubleClickCommand = new RelayCommand<DataRowView>(m => OnSelectItem(m));
 
-            DataView = Summary.DefaultView;
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
             DataFromModel();
         }
@@ -91,7 +94,6 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
-        public DataTable Summary { get; } = new DataTable();
 
         public bool IsSelected
         {
@@ -105,10 +107,10 @@ namespace Algoloop.ViewModel
             set => Set(ref _isExpanded, value);
         }
 
-        public DataView DataView
+        public ObservableCollection<DataGridColumn> JobColumns
         {
-            get => _dataView;
-            set => Set(ref _dataView, value);
+            get => _jobColumns;
+            set => Set(ref _jobColumns, value);
         }
 
         public SymbolViewModel SelectedSymbol
@@ -122,6 +124,15 @@ namespace Algoloop.ViewModel
             }
         }
 
+        public StrategyJobViewModel SelectedJob
+        {
+            get => _selectedJob;
+            set
+            {
+                Set(ref _selectedJob, value);
+            }
+        }
+
         public void Refresh()
         {
             Model.Refresh();
@@ -130,23 +141,6 @@ namespace Algoloop.ViewModel
         internal bool DeleteJob(StrategyJobViewModel job)
         {
             bool ok = Jobs.Remove(job);
-            if (!ok)
-            {
-                return false;
-            }
-
-            DataRow rowToDelete = null;
-            foreach (DataRow row in Summary.Rows)
-            {
-                if (job.Equals(row[0]))
-                {
-                    rowToDelete = row;
-                    break;
-                }
-            }
-
-            rowToDelete?.Delete();
-            RemoveUnusedSummaryColumns();
             return ok;
         }
 
@@ -198,19 +192,20 @@ namespace Algoloop.ViewModel
 
         internal DataRow CreateSummaryRow(StrategyJobViewModel task)
         {
-            return Summary.CreateRow(task);
+            //            return Summary.CreateRow(task);
+            return null;
         }
 
         internal void RemoveUnusedSummaryColumns()
         {
-            Summary.RemoveUnusedColumns();
+//            Summary.RemoveUnusedColumns();
             RefreshSummary();
         }
 
         internal void RefreshSummary()
         {
-            DataView = null;
-            DataView = Summary.DefaultView;
+//            DataView = null;
+//            DataView = Summary.DefaultView;
         }
 
         private void DeleteTasks(DataRowCollection rows)
@@ -356,11 +351,30 @@ namespace Algoloop.ViewModel
 
             UpdateParametersFromModel(Model.AlgorithmName);
 
+            UpdateJobsAndColumns();
+        }
+
+        private void UpdateJobsAndColumns()
+        {
             Jobs.Clear();
+
+            JobColumns.Clear();
+            JobColumns.Add(new DataGridCheckBoxColumn()
+            {
+                Header = "Active",
+                Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
+            });
+            JobColumns.Add(new DataGridTextColumn()
+            {
+                Header = "Name",
+                Binding = new Binding("Model.Name") { Mode = BindingMode.OneWay}
+            });
+
             foreach (StrategyJobModel strategyJobModel in Model.Jobs)
             {
                 var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _settingsModel);
                 Jobs.Add(strategyJobViewModel);
+                ExDataGridColumns.AddPropertyColumns(JobColumns, strategyJobViewModel.Statistics);
             }
         }
 

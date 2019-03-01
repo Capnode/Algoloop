@@ -308,7 +308,6 @@
     <Compile Include="Lean\BacktestResultHandler.cs" />
     <Compile Include="Lean\LeanLauncher.cs" />
     <Compile Include="ViewModel\ParameterViewModel.cs" />
-    <Compile Include="ViewModel\StatisticViewModel.cs" />
     <Compile Include="ViewSupport\AlgorithmNameConverter.cs" />
     <Compile Include="ViewSupport\BusyMouseConverter.cs" />
     <Compile Include="ViewSupport\BaseConverter.cs" />

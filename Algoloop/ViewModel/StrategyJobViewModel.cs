@@ -70,7 +70,7 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-        public SyncObservableCollection<StatisticViewModel> Statistics { get; } = new SyncObservableCollection<StatisticViewModel>();
+        public IDictionary<string, string> Statistics { get; } = new Dictionary<string, string>();
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
         public StrategyJobModel Model
@@ -266,7 +266,7 @@ namespace Algoloop.ViewModel
                 Parameters.Add(parameterViewModel);
                 if (parameterModel.UseValue)
                 {
-                    _parent.Summary.Add(row, parameterModel.Name, parameterModel.Value);
+//                    _parent.Summary.Add(row, parameterModel.Name, parameterModel.Value);
                 }
             }
 
@@ -285,18 +285,14 @@ namespace Algoloop.ViewModel
                 {
                     AddCustomStatistics(result, row);
 
-                    foreach (var item in result.Statistics)
+                    foreach (KeyValuePair<string, string> item in result.Statistics)
                     {
-                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
-                        Statistics.Add(statisticViewModel);
-                        _parent.Summary.Add(row, item.Key, item.Value);
+                        AddStatisticItem(item.Key, item.Value);
                     }
 
-                    foreach (var item in result.RuntimeStatistics)
+                    foreach (KeyValuePair<string, string> item in result.RuntimeStatistics)
                     {
-                        var statisticViewModel = new StatisticViewModel { Name = item.Key, Value = item.Value };
-                        Statistics.Add(statisticViewModel);
-                        _parent.Summary.Add(row, item.Key, item.Value);
+                        AddStatisticItem(item.Key, item.Value);
                     }
 
                     foreach (var order in result.Orders.OrderBy(o => o.Key))
@@ -320,6 +316,33 @@ namespace Algoloop.ViewModel
             RaisePropertyChanged(() => Loglines);
         }
 
+        private void AddStatisticItem(string name, string text)
+        {
+            decimal value;
+            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            {
+                string header = name + "$";
+                Statistics.Add(header, value.ToString());
+            }
+            else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            {
+                string header = name + "%";
+                Statistics.Add(header, value.ToString());
+            }
+            else if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            {
+                Statistics.Add(name, value.ToString());
+            }
+            else if (bool.TryParse(text, out bool boolVal))
+            {
+                Statistics.Add(name, boolVal.ToString());
+            }
+            else
+            {
+                Statistics.Add(name, text);
+            }
+        }
+
         private void AddCustomStatistics(BacktestResult result, DataRow row)
         {
             string profit = result.Statistics["Net Profit"];
@@ -332,9 +355,7 @@ namespace Algoloop.ViewModel
             if (isNetProfit && isDrawdown && drawdown != 0)
             {
                 string ratio = (netProfit / drawdown).RoundToSignificantDigits(4).ToString(CultureInfo.InvariantCulture);
-                var statisticViewModel = new StatisticViewModel { Name = "Profit-DD", Value = ratio};
-                Statistics.Add(statisticViewModel);
-                _parent.Summary.Add(row, "Profit-DD", ratio);
+                AddStatisticItem("Profit-DD", ratio);
             }
         }
 

@@ -300,13 +300,13 @@
                                 </DataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Jobs.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
-                                <DataGrid
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    AutoGenerateColumns="True"
+                                <viewsupport:ExDataGrid
+                                    AutoGenerateColumns="False"
                                     IsReadOnly="True"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding DataView, Mode=TwoWay}">
+                                    SelectedValue="{Binding SelectedJob, Mode=TwoWay}"
+                                    ItemsSource="{Binding Jobs}"
+                                    ExColumns="{Binding JobColumns}">
                                     <DataGrid.Resources>
                                         <Style TargetType="{x:Type DataGridCell}">
                                             <Setter Property="TextBlock.TextAlignment" Value="Right" />
@@ -342,7 +342,7 @@
                                             </MenuItem>
                                         </ContextMenu>
                                     </DataGrid.ContextMenu>
-                                </DataGrid>
+                                </viewsupport:ExDataGrid>
                             </TabItem>
                         </TabControl>
                     </DockPanel>
