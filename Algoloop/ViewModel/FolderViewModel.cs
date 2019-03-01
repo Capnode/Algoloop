@@ -19,8 +19,10 @@ using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace Algoloop.ViewModel
@@ -30,6 +32,7 @@ namespace Algoloop.ViewModel
         private MarketViewModel _market;
         private SymbolViewModel _selectedSymbol;
         private SymbolViewModel _marketSymbol;
+        private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
 
         public FolderViewModel(MarketViewModel market, FolderModel model)
         {
@@ -89,6 +92,13 @@ namespace Algoloop.ViewModel
             }
         }
 
+        public ObservableCollection<DataGridColumn> SymbolColumns
+        {
+            get => _symbolColumns;
+            set => Set(ref _symbolColumns, value);
+        }
+
+
         public void Refresh()
         {
             Model.Refresh();
@@ -119,6 +129,13 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
+            SymbolColumns.Clear();
+            SymbolColumns.Add(new DataGridTextColumn()
+            {
+                Header = "Symbol",
+                Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
+            });
+
             Symbols.Clear();
             foreach (SymbolViewModel marketSymbol in _market.Symbols)
             {
@@ -129,6 +146,8 @@ namespace Algoloop.ViewModel
                     {
                         Symbols.Add(marketSymbol);
                     }
+
+                    ExDataGridColumns.AddPropertyColumns(SymbolColumns, marketSymbol.Model.Properties);
                 }
             }
         }

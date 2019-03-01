@@ -45,8 +45,6 @@ namespace Algoloop.ViewModel
         private Isolated<ProviderFactory> _factory;
         private SymbolViewModel _selectedSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
-        private Style _rightCellStyle = new Style(typeof(TextBlock));
-        private Style _leftCellStyle = new Style(typeof(TextBlock));
         private bool _checkAll;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel)
@@ -67,9 +65,6 @@ namespace Algoloop.ViewModel
             ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), !_parent.IsBusy);
             StartCommand = new RelayCommand(() => OnStartCommand(), () => !_parent.IsBusy && !Active);
             StopCommand = new RelayCommand(() => OnStopCommand(), () => !_parent.IsBusy && Active);
-
-            _rightCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Right));
-            _leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));
 
             DataFromModel();
             OnActiveCommand(Active);
@@ -455,42 +450,7 @@ namespace Algoloop.ViewModel
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
-
-                if (symbolModel.Properties == null)
-                    continue;
-
-                foreach (var property in symbolModel.Properties)
-                {
-                    bool isDecimal = decimal.TryParse(property.Value, out _);
-                    DataGridColumn column = SymbolColumns.FirstOrDefault(m => m.Header.Equals(property.Key));
-                    if (column != null)
-                    {
-                        // Set leftCellStyle if not a number
-                        if (column is DataGridTextColumn textColumn)
-                        {
-                            if (!isDecimal && textColumn.ElementStyle.Equals(_rightCellStyle))
-                            {
-                                textColumn.ElementStyle = _leftCellStyle;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // Create new DataGridColumn
-                        SymbolColumns.Add(new DataGridTextColumn()
-                        {
-                            Header = property.Key,
-                            IsReadOnly = true,
-                            Binding = new Binding($"Model.Properties[{property.Key}]")
-                            {
-                                Mode = BindingMode.OneWay,
-                                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                                FallbackValue = string.Empty
-                            },
-                            ElementStyle = isDecimal ? _rightCellStyle : _leftCellStyle
-                        });
-                    }
-                }
+                ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties);
             }
         }
     }

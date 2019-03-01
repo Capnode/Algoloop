@@ -203,10 +203,7 @@
                                         </Button>
                                     </ToolBar>
                                     <viewsupport:ExDataGrid
-                                        DockPanel.Dock="Bottom"
-                                        Name="marketSymbolList"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Stretch"
+                                        x:Name="marketSymbolList"
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
@@ -265,20 +262,14 @@
                                             <Image Source="/Resources\MoveDown.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <ListBox
-                                        DockPanel.Dock="Bottom"
-                                        Name="listbox"
-                                        SelectionMode="Extended"
+                                    <viewsupport:ExDataGrid
+                                        x:Name="listbox"
+                                        AutoGenerateColumns="False"
+                                        GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                        ItemsSource="{Binding Symbols}">
-                                        <ListBox.Resources>
-                                            <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Model.Name}"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ListBox.Resources>
-                                    </ListBox>
+                                        ItemsSource="{Binding Symbols}"
+                                        ExColumns="{Binding SymbolColumns}">
+                                    </viewsupport:ExDataGrid>
                                 </DockPanel>
                             </TabItem>
                         </TabControl>

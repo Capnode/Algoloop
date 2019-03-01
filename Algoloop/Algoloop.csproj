@@ -247,6 +247,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewSupport\ExDataGridColumns.cs" />
     <Compile Include="Model\FolderModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\OrderModel.cs" />
