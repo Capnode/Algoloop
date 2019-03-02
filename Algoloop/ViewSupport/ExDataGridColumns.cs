@@ -21,49 +21,58 @@ using System.Windows.Data;
 
 namespace Algoloop.ViewSupport
 {
-    public class ExDataGridColumns
+    public static class ExDataGridColumns
     {
-        public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, string> properties)
+        static Style rightCellStyle = new Style(typeof(TextBlock));
+        static Style leftCellStyle = new Style(typeof(TextBlock));
+
+        static ExDataGridColumns()
+        {
+            rightCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Right));
+            leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));
+        }
+
+        public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, string> properties, string binding)
         {
             if (properties == null)
                 return;
 
-            Style rightCellStyle = new Style(typeof(TextBlock));
-            rightCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Right));
-            Style leftCellStyle = new Style(typeof(TextBlock));
-            leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));
-
             foreach (var property in properties)
             {
-                bool isDecimal = decimal.TryParse(property.Value, out _);
-                DataGridColumn column = columns.FirstOrDefault(m => m.Header.Equals(property.Key));
-                if (column != null)
+                bool isNumber = decimal.TryParse(property.Value, out _);
+                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", isNumber);
+            }
+        }
+
+        public static void AddTextColumn(ObservableCollection<DataGridColumn> columns, string header, string binding, bool isRightAligned)
+        {
+            DataGridColumn column = columns.FirstOrDefault(m => m.Header.Equals(header));
+            if (column != null)
+            {
+                // Set leftCellStyle if not a number
+                if (column is DataGridTextColumn textColumn)
                 {
-                    // Set leftCellStyle if not a number
-                    if (column is DataGridTextColumn textColumn)
+                    if (!isRightAligned && textColumn.ElementStyle.Equals(rightCellStyle))
                     {
-                        if (!isDecimal && textColumn.ElementStyle.Equals(rightCellStyle))
-                        {
-                            textColumn.ElementStyle = leftCellStyle;
-                        }
+                        textColumn.ElementStyle = leftCellStyle;
                     }
                 }
-                else
+            }
+            else
+            {
+                // Create new DataGridColumn
+                columns.Add(new DataGridTextColumn()
                 {
-                    // Create new DataGridColumn
-                    columns.Add(new DataGridTextColumn()
+                    Header = header,
+                    IsReadOnly = true,
+                    Binding = new Binding(binding)
                     {
-                        Header = property.Key,
-                        IsReadOnly = true,
-                        Binding = new Binding($"Model.Properties[{property.Key}]")
-                        {
-                            Mode = BindingMode.OneWay,
-                            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                            FallbackValue = string.Empty
-                        },
-                        ElementStyle = isDecimal ? rightCellStyle : leftCellStyle
-                    });
-                }
+                        Mode = BindingMode.OneWay,
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                        FallbackValue = ""
+                    },
+                    ElementStyle = isRightAligned ? rightCellStyle : leftCellStyle
+                });
             }
         }
     }

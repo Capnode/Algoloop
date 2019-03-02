@@ -173,7 +173,7 @@
                                 <ContextMenu>
                                     <MenuItem
                                         Header="Delete Job"
-                                        Command="{Binding DeleteJobCommand}">
+                                        Command="{Binding DeleteCommand}">
                                         <MenuItem.Icon>
                                             <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                         </MenuItem.Icon>
@@ -302,7 +302,6 @@
                             <TabItem Header="{Binding Jobs.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
                                 <viewsupport:ExDataGrid
                                     AutoGenerateColumns="False"
-                                    IsReadOnly="True"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedJob, Mode=TwoWay}"
                                     ItemsSource="{Binding Jobs}"
@@ -313,29 +312,32 @@
                                         </Style>
                                     </DataGrid.Resources>
                                     <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="SelectionChanged">
-                                            <i:InvokeCommandAction
-                                                Command="{Binding TaskSelectionChangedCommand}"
-                                                CommandParameter="{Binding Path=SelectedItems, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
-                                        </i:EventTrigger>
                                         <i:EventTrigger EventName="MouseDoubleClick">
                                             <i:InvokeCommandAction
-                                            Command="{Binding TaskDoubleClickCommand}"
-                                            CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                                Command="{Binding TaskDoubleClickCommand}"
+                                                CommandParameter="{Binding
+                                                    Path=SelectedItem,
+                                                    RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem
                                                 Header="Delete Jobs"
-                                                Command="{Binding DeleteSelectedJobsCommand}">
+                                                Command="{Binding DeleteSelectedJobsCommand}"
+                                                CommandParameter="{Binding
+                                                    Path=PlacementTarget.SelectedItems,
+                                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
                                                 <MenuItem.Icon>
                                                     <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                             <MenuItem
                                                 Header="Use Parameters"
-                                                Command="{Binding UseParametersCommand}">
+                                                Command="{Binding UseParametersCommand}"
+                                                CommandParameter="{Binding
+                                                    Path=PlacementTarget.SelectedItems,
+                                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
                                                 <MenuItem.Icon>
                                                     <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
                                                 </MenuItem.Icon>

@@ -292,7 +292,6 @@
     <Compile Include="Common\Isolated.cs" />
     <Compile Include="Lean\HostDomainLogger.cs" />
     <Compile Include="Common\StreamLogger.cs" />
-    <Compile Include="Common\Summary.cs" />
     <Compile Include="Provider\ProviderFactory.cs" />
     <Compile Include="ViewModel\AccountsViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />

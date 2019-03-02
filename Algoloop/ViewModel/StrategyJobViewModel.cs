@@ -46,6 +46,7 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
+        public IDictionary<string, string> _statistics = new Dictionary<string, string>();
         private string _port;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
@@ -70,8 +71,13 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-        public IDictionary<string, string> Statistics { get; } = new Dictionary<string, string>();
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
+
+        public IDictionary<string, string> Statistics
+        {
+            get => _statistics;
+            set => Set(ref _statistics, value);
+        }
 
         public StrategyJobModel Model
         {
@@ -169,8 +175,6 @@ namespace Algoloop.ViewModel
         {
             ClearRunData();
             DataToModel();
-            DataRow row = _parent.CreateSummaryRow(this);
-            _parent.RefreshSummary();
 
             // Account must not be null
             if (Model.Account == null)
@@ -251,7 +255,6 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
-            DataRow row = _parent.CreateSummaryRow(this);
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -270,12 +273,12 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            Statistics.Clear();
             Orders.Clear();
             var charts = Charts;
             charts.Clear();
             Charts = null;
             Charts = charts;
+            IDictionary<string, string> statistics = new Dictionary<string, string>();
 
             if (Model.Result != null)
             {
@@ -283,17 +286,19 @@ namespace Algoloop.ViewModel
                 var result = JsonConvert.DeserializeObject<BacktestResult>(Model.Result, new[] { new OrderJsonConverter() });
                 if (result != null)
                 {
-                    AddCustomStatistics(result, row);
+                    AddCustomStatistics(statistics, result);
 
                     foreach (KeyValuePair<string, string> item in result.Statistics)
                     {
-                        AddStatisticItem(item.Key, item.Value);
+                        AddStatisticItem(statistics, item.Key, item.Value);
                     }
 
                     foreach (KeyValuePair<string, string> item in result.RuntimeStatistics)
                     {
-                        AddStatisticItem(item.Key, item.Value);
+                        AddStatisticItem(statistics, item.Key, item.Value);
                     }
+
+                    Statistics = statistics;
 
                     foreach (var order in result.Orders.OrderBy(o => o.Key))
                     {
@@ -311,39 +316,38 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            _parent.RefreshSummary();
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
         }
 
-        private void AddStatisticItem(string name, string text)
+        private void AddStatisticItem(IDictionary<string, string> statistics, string name, string text)
         {
             decimal value;
             if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "$";
-                Statistics.Add(header, value.ToString());
+                statistics.Add(header, value.ToString());
             }
             else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "%";
-                Statistics.Add(header, value.ToString());
+                statistics.Add(header, value.ToString());
             }
             else if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
-                Statistics.Add(name, value.ToString());
+                statistics.Add(name, value.ToString());
             }
             else if (bool.TryParse(text, out bool boolVal))
             {
-                Statistics.Add(name, boolVal.ToString());
+                statistics.Add(name, boolVal.ToString());
             }
             else
             {
-                Statistics.Add(name, text);
+                statistics.Add(name, text);
             }
         }
 
-        private void AddCustomStatistics(BacktestResult result, DataRow row)
+        private void AddCustomStatistics(IDictionary<string, string> statistics, BacktestResult result)
         {
             string profit = result.Statistics["Net Profit"];
             string dd = result.Statistics["Drawdown"];
@@ -355,7 +359,7 @@ namespace Algoloop.ViewModel
             if (isNetProfit && isDrawdown && drawdown != 0)
             {
                 string ratio = (netProfit / drawdown).RoundToSignificantDigits(4).ToString(CultureInfo.InvariantCulture);
-                AddStatisticItem("Profit-DD", ratio);
+                AddStatisticItem(statistics, "Profit-DD", ratio);
             }
         }
 
@@ -402,6 +406,7 @@ namespace Algoloop.ViewModel
             Charts = charts;
 
             Statistics.Clear();
+            Statistics = null;
             Orders.Clear();
 
             RaisePropertyChanged(() => Logs);

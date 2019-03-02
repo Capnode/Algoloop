@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Common;
 using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
@@ -24,7 +23,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -41,7 +39,6 @@ namespace Algoloop.ViewModel
     {
         private readonly string[] exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
         private StrategiesViewModel _parent;
-        private IList _taskSelection;
         private bool _isSelected;
         private bool _isExpanded;
         private SymbolViewModel _selectedSymbol;
@@ -60,15 +57,14 @@ namespace Algoloop.ViewModel
             CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
             ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
             DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
-//            DeleteAllJobsCommand = new RelayCommand(() => DeleteTasks(Summary.Rows), true);
-            DeleteSelectedJobsCommand = new RelayCommand(() => DeleteTasks(_taskSelection), true);
-            UseParametersCommand = new RelayCommand(() => UseParameters(_taskSelection), true);
+            DeleteAllJobsCommand = new RelayCommand(() => DeleteAllJobs(), true);
+            DeleteSelectedJobsCommand = new RelayCommand<IList>(m => DeleteJobs(m), true);
+            UseParametersCommand = new RelayCommand<IList>(m => UseParameters(m), true);
             AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
             ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), trm => SelectedSymbol != null);
-            TaskSelectionChangedCommand = new RelayCommand<IList>(m => _taskSelection = m);
-            TaskDoubleClickCommand = new RelayCommand<DataRowView>(m => OnSelectItem(m));
+            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => OnSelectItem(m));
 
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
             DataFromModel();
@@ -80,15 +76,14 @@ namespace Algoloop.ViewModel
         public RelayCommand ExportCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand DeleteAllJobsCommand { get; }
-        public RelayCommand DeleteSelectedJobsCommand { get; }
-        public RelayCommand UseParametersCommand { get; }
+        public RelayCommand<IList> DeleteSelectedJobsCommand { get; }
+        public RelayCommand<IList> UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
-        public RelayCommand<IList> TaskSelectionChangedCommand { get; }
-        public RelayCommand<DataRowView> TaskDoubleClickCommand { get; }
+        public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
 
         public StrategyModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -138,12 +133,6 @@ namespace Algoloop.ViewModel
             Model.Refresh();
         }
 
-        internal bool DeleteJob(StrategyJobViewModel job)
-        {
-            bool ok = Jobs.Remove(job);
-            return ok;
-        }
-
         internal static void AddPath(string path)
         {
             string pathValue = Environment.GetEnvironmentVariable("PATH");
@@ -164,8 +153,6 @@ namespace Algoloop.ViewModel
             {
                 Parameters.Add(parameter);
             }
-
-            RemoveUnusedSummaryColumns();
         }
 
         internal void DataToModel()
@@ -190,68 +177,37 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal DataRow CreateSummaryRow(StrategyJobViewModel task)
+        internal bool DeleteJob(StrategyJobViewModel job)
         {
-            //            return Summary.CreateRow(task);
-            return null;
+            bool ok = Jobs.Remove(job);
+            return ok;
         }
 
-        internal void RemoveUnusedSummaryColumns()
+        private void DeleteAllJobs()
         {
-//            Summary.RemoveUnusedColumns();
-            RefreshSummary();
+            JobColumns.Clear();
+            Jobs.Clear();
+            DataToModel();
         }
 
-        internal void RefreshSummary()
+        private void DeleteJobs(IList jobs)
         {
-//            DataView = null;
-//            DataView = Summary.DefaultView;
-        }
+            Debug.Assert(jobs != null);
+            if (Jobs.Count == 0 || jobs.Count == 0)
+                return;
 
-        private void DeleteTasks(DataRowCollection rows)
-        {
-            var list = new DataRow[rows.Count];
-            rows.CopyTo(list, 0);
-            foreach (DataRow row in list)
+            List<StrategyJobViewModel> list = jobs.Cast<StrategyJobViewModel>()?.ToList();
+            foreach (StrategyJobViewModel job in list)
             {
-                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
                 if (job != null)
                 {
                     job.DeleteJob();
                 }
-
-                row.Delete();
             }
-
-            RemoveUnusedSummaryColumns();
         }
 
-        private void DeleteTasks(IList rows)
+        private void OnSelectItem(StrategyJobViewModel job)
         {
-            List<DataRowView> list = rows?.Cast<DataRowView>()?.ToList();
-            if (list == null)
-                return;
-
-            foreach (DataRowView row in list)
-            {
-                StrategyJobViewModel job = row[0] as StrategyJobViewModel;
-                if (job != null)
-                {
-                    job.DeleteJob();
-                }
-
-                row.Delete();
-            }
-
-            RemoveUnusedSummaryColumns();
-        }
-
-        private void OnSelectItem(DataRowView row)
-        {
-            if (row == null)
-                return;
-
-            StrategyJobViewModel job = row[0] as StrategyJobViewModel;
             if (job == null)
                 return;
 
@@ -271,9 +227,11 @@ namespace Algoloop.ViewModel
             if (selected == null)
                 return;
 
-            List<DataRowView> list = selected.Cast<DataRowView>().ToList();
-            DataRowView row = list.FirstOrDefault();
-            UseParameters(row[0] as StrategyJobViewModel);
+            foreach (StrategyJobViewModel job in selected)
+            {
+                UseParameters(job);
+                break; // skip rest
+            }
         }
 
         private async void RunStrategy()
@@ -356,25 +314,21 @@ namespace Algoloop.ViewModel
 
         private void UpdateJobsAndColumns()
         {
+            JobColumns.Clear();
             Jobs.Clear();
 
-            JobColumns.Clear();
             JobColumns.Add(new DataGridCheckBoxColumn()
             {
                 Header = "Active",
                 Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
-            JobColumns.Add(new DataGridTextColumn()
-            {
-                Header = "Name",
-                Binding = new Binding("Model.Name") { Mode = BindingMode.OneWay}
-            });
 
+            ExDataGridColumns.AddTextColumn(JobColumns, "Name", "Model.Name", false);
             foreach (StrategyJobModel strategyJobModel in Model.Jobs)
             {
                 var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _settingsModel);
                 Jobs.Add(strategyJobViewModel);
-                ExDataGridColumns.AddPropertyColumns(JobColumns, strategyJobViewModel.Statistics);
+                ExDataGridColumns.AddPropertyColumns(JobColumns, strategyJobViewModel.Statistics, "Statistics");
             }
         }
 
