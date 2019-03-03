@@ -23,13 +23,13 @@ namespace Algoloop.ViewSupport
 {
     public static class ExDataGridColumns
     {
-        static Style rightCellStyle = new Style(typeof(TextBlock));
-        static Style leftCellStyle = new Style(typeof(TextBlock));
+        static readonly Style _rightCellStyle = new Style(typeof(TextBlock));
+        static readonly Style _leftCellStyle = new Style(typeof(TextBlock));
 
         static ExDataGridColumns()
         {
-            rightCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Right));
-            leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));
+            _rightCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Right));
+            _leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));
         }
 
         public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, string> properties, string binding)
@@ -44,7 +44,7 @@ namespace Algoloop.ViewSupport
             }
         }
 
-        public static void AddTextColumn(ObservableCollection<DataGridColumn> columns, string header, string binding, bool isRightAligned)
+        public static void AddTextColumn(ObservableCollection<DataGridColumn> columns, string header, string binding, bool rightAligned)
         {
             DataGridColumn column = columns.FirstOrDefault(m => m.Header.Equals(header));
             if (column != null)
@@ -52,9 +52,9 @@ namespace Algoloop.ViewSupport
                 // Set leftCellStyle if not a number
                 if (column is DataGridTextColumn textColumn)
                 {
-                    if (!isRightAligned && textColumn.ElementStyle.Equals(rightCellStyle))
+                    if (!rightAligned && textColumn.ElementStyle.Equals(_rightCellStyle))
                     {
-                        textColumn.ElementStyle = leftCellStyle;
+                        textColumn.ElementStyle = _leftCellStyle;
                     }
                 }
             }
@@ -71,7 +71,7 @@ namespace Algoloop.ViewSupport
                         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
                         FallbackValue = ""
                     },
-                    ElementStyle = isRightAligned ? rightCellStyle : leftCellStyle
+                    ElementStyle = rightAligned ? _rightCellStyle : _leftCellStyle
                 });
             }
         }

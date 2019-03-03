@@ -286,6 +286,8 @@ namespace Algoloop.ViewModel
         private void DownloadSymbolList()
         {
             _parent.IsBusy = true;
+            List<SymbolModel> oldSymbols = Model.Symbols.ToList();
+
             IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
             foreach (SymbolModel symbol in symbols)
             {
@@ -294,11 +296,18 @@ namespace Algoloop.ViewModel
                 if (sym != null)
                 {
                     sym.Properties = symbol.Properties;
+                    oldSymbols.Remove(sym);
                 }
                 else
                 {
                     Model.Symbols.Add(symbol);
                 }
+            }
+
+            // Remove symbols not updated
+            foreach (SymbolModel symbol in oldSymbols)
+            {
+                Model.Symbols.Remove(symbol);
             }
 
             Folders.ToList().ForEach(m => m.Refresh());
