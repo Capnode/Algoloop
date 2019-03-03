@@ -64,7 +64,7 @@
                     IsReadOnly="True"
                     ItemsSource="{Binding Statistics}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
                     </DataGrid.Columns>
                 </DataGrid>

@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Provider;
 using NetMQ;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -38,10 +39,13 @@ namespace Algoloop.Lean
                 return model;
             }
 
-            var liveMode = Config.GetBool("live-mode");
+            // Register all data providers
+            ProviderFactory.RegisterProviders();
+
             Log.Trace("LeanLanucher: Memory " + OS.ApplicationMemoryUsed + "Mb-App " + OS.TotalPhysicalMemoryUsed + "Mb-Used");
             try
             {
+                var liveMode = Config.GetBool("live-mode");
                 using (var algorithmHandlers = LeanEngineAlgorithmHandlers.FromConfiguration(Composer.Instance))
                 using (var systemHandlers = LeanEngineSystemHandlers.FromConfiguration(Composer.Instance))
                 {

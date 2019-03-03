@@ -419,10 +419,12 @@ namespace Algoloop.ViewModel
             Debug.Assert(workCharts.Count == 0);
             try
             {
-                foreach (var chart in charts)
+                foreach (KeyValuePair<string, Chart> chart in charts)
                 {
-                    foreach (var serie in chart.Value.Series)
+                    foreach (KeyValuePair<string, Series> serie in chart.Value.Series)
                     {
+                        if (serie.Value.Values.Count < 2)
+                            continue;
                         var viewModel = new ChartViewModel(serie.Value);
                         workCharts.Add(viewModel);
                     }
