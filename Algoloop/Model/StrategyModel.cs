@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using static Algoloop.Model.MarketModel;
 
 namespace Algoloop.Model
 {
@@ -28,6 +27,7 @@ namespace Algoloop.Model
     {
         public event Action<string> AlgorithmNameChanged;
 
+        private const string _defaultName = "Strategy";
         private string _algorithmName;
         private string _account;
 
@@ -59,7 +59,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Name { get; set; } = "Strategy";
+        public string Name { get; set; } = _defaultName;
 
         [Category("Information")]
         [DisplayName("Desktop")]
@@ -76,7 +76,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Provider { get; set; }
+        public string Provider { get; set; } = string.Empty;
 
         [Category("Broker")]
         [DisplayName("Account")]

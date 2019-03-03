@@ -59,6 +59,8 @@ namespace Algoloop.ViewModel
             StopCommand = new RelayCommand(() => DoStopJobCommand(false), () => Active);
             DeleteCommand = new RelayCommand(() => DoDeleteJob(), () => !Active);
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
+            ExportCommand = new RelayCommand(() => { }, () => false);
+            CloneCommand = new RelayCommand(() => { }, () => false);
 
             DataFromModel();
         }
@@ -68,6 +70,8 @@ namespace Algoloop.ViewModel
         public RelayCommand DeleteCommand { get; }
         public RelayCommand UseParametersCommand { get; }
         public RelayCommand ActiveCommand { get; }
+        public RelayCommand ExportCommand { get; }
+        public RelayCommand CloneCommand { get; }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();

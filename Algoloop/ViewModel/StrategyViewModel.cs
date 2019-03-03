@@ -17,6 +17,7 @@ using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using QuantConnect.Logging;
 using QuantConnect.Parameters;
 using System;
@@ -37,7 +38,7 @@ namespace Algoloop.ViewModel
 {
     public class StrategyViewModel : ViewModelBase, ITreeViewModel
     {
-        private readonly string[] exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
+        private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
         private StrategiesViewModel _parent;
         private bool _isSelected;
         private bool _isExpanded;
@@ -52,21 +53,21 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            StartCommand = new RelayCommand(() => DoRunStrategy(), true);
+            StartCommand = new RelayCommand(() => DoRunStrategy(), () => true);
             StopCommand = new RelayCommand(() => { }, () => false);
-            CloneCommand = new RelayCommand(() => _parent?.DoCloneStrategy(this), true);
-            ExportCommand = new RelayCommand(() => _parent?.DoExportStrategy(this), true);
-            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), true);
-            DeleteAllJobsCommand = new RelayCommand(() => DoDeleteAllJobs(), true);
-            DeleteSelectedJobsCommand = new RelayCommand<IList>(m => DoDeleteJobs(m), true);
-            UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), true);
-            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), true);
+            CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => true);
+            ExportCommand = new RelayCommand(() => DoExportStrategy(), () => true);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => true);
+            DeleteAllJobsCommand = new RelayCommand(() => DoDeleteAllJobs(), () => true);
+            DeleteSelectedJobsCommand = new RelayCommand<IList>(m => DoDeleteJobs(m), m => true);
+            UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => true);
+            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => true);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), true);
+            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => true);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
             TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => DoSelectItem(m));
 
-            Model.AlgorithmNameChanged += UpdateParametersFromModel;
+            Model.AlgorithmNameChanged += ImportParametersFromAlgorithm;
             DataFromModel();
         }
 
@@ -307,7 +308,7 @@ namespace Algoloop.ViewModel
                 Symbols.Add(symbolViewModel);
             }
 
-            UpdateParametersFromModel(Model.AlgorithmName);
+            ImportParametersFromAlgorithm(Model.AlgorithmName);
 
             UpdateJobsAndColumns();
         }
@@ -332,7 +333,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void UpdateParametersFromModel(string algorithmName)
+        private void ImportParametersFromAlgorithm(string algorithmName)
         {
             if (string.IsNullOrEmpty(Model.AlgorithmLocation) || string.IsNullOrEmpty(algorithmName))
                 return;
@@ -351,7 +352,7 @@ namespace Algoloop.ViewModel
                 string parameterName = parameter.Key;
                 string parameterType = parameter.Value;
 
-                if (exclude.Contains(parameterName))
+                if (_exclude.Contains(parameterName))
                     continue;
 
                 ParameterModel parameterModel = Model.Parameters.FirstOrDefault(m => m.Name.Equals(parameterName));
@@ -421,6 +422,51 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        private void DoCloneStrategy()
+        {
+            try
+            {
+                _parent.IsBusy = true;
+                DataToModel();
+                var strategyModel = new StrategyModel(Model);
+                var strategy = new StrategyViewModel(_parent, strategyModel, _settingsModel);
+                _parent.Strategies.Add(strategy);
+            }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
+        }
+
+        private void DoExportStrategy()
+        {
+            DataToModel();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.FileName = Model.Name;
+            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                _parent.IsBusy = true;
+                string fileName = saveFileDialog.FileName;
+                using (StreamWriter file = File.CreateText(fileName))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(file, Model);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+            finally
+            {
+                _parent.IsBusy = false;
             }
         }
 

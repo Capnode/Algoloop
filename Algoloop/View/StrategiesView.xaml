@@ -67,12 +67,12 @@
                 </Button>
                 <Button
                     ToolTip="Export strategy"
-                    Command="{Binding ExportCommand}">
+                    Command="{Binding SelectedItem.ExportCommand}">
                     <Image Source="/Resources/Export.png" Width="16" Height="16"/>
                 </Button>
                 <Button
                     ToolTip="Clone strategy"
-                    Command="{Binding CloneCommand}">
+                    Command="{Binding SelectedItem.CloneCommand}">
                     <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
                 </Button>
             </ToolBar>

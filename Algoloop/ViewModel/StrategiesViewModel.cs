@@ -39,8 +39,6 @@ namespace Algoloop.ViewModel
 
             AddCommand = new RelayCommand(() => DoAddStrategy(), () => !IsBusy);
             ImportCommand = new RelayCommand(() => DoImportStrategy(), () => !IsBusy);
-            ExportCommand = new RelayCommand(() => DoExportStrategy(SelectedItem), () => !IsBusy && SelectedItem is StrategyViewModel);
-            CloneCommand = new RelayCommand(() => DoCloneStrategy(SelectedItem), () => !IsBusy && SelectedItem is StrategyViewModel);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), true);
 
             DataFromModel();
@@ -49,8 +47,6 @@ namespace Algoloop.ViewModel
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
         public RelayCommand ImportCommand { get; }
-        public RelayCommand ExportCommand { get; }
-        public RelayCommand CloneCommand { get; }
 
         public StrategiesModel Model { get; }
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
@@ -74,8 +70,6 @@ namespace Algoloop.ViewModel
             set
             {
                 Set(ref _selectedItem, value);
-                ExportCommand.RaiseCanExecuteChanged();
-                CloneCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -89,25 +83,6 @@ namespace Algoloop.ViewModel
                 DataToModel();
                 SelectedItem = null;
                 return ok;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        internal void DoCloneStrategy(ITreeViewModel vm)
-        {
-            try
-            {
-                IsBusy = true;
-                if (vm is StrategyViewModel strategyViewModel)
-                {
-                    strategyViewModel.DataToModel();
-                    var strategyModel = new StrategyModel(strategyViewModel.Model);
-                    var strategy = new StrategyViewModel(this, strategyModel, _settingsModel);
-                    Strategies.Add(strategy);
-                }
             }
             finally
             {
@@ -178,7 +153,9 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                vm.Refresh();
+                if (vm != null)
+                    vm.Refresh();
+
                 SelectedItem = vm;
             }
             finally
@@ -223,39 +200,6 @@ namespace Algoloop.ViewModel
             finally
             {
                 IsBusy = false;
-            }
-        }
-
-        internal void DoExportStrategy(ITreeViewModel item)
-        {
-            if (item is StrategyViewModel strategyViewModel)
-            {
-                strategyViewModel.DataToModel();
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.FileName = strategyViewModel.Model.Name;
-                //            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-                saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
-                if (saveFileDialog.ShowDialog() == false)
-                    return;
-
-                try
-                {
-                    IsBusy = true;
-                    string fileName = saveFileDialog.FileName;
-                    using (StreamWriter file = File.CreateText(fileName))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Serialize(file, strategyViewModel.Model);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, ex.GetType().ToString());
-                }
-                finally
-                {
-                    IsBusy = false;
-                }
             }
         }
 
