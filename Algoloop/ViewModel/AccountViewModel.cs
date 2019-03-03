@@ -42,10 +42,10 @@ namespace Algoloop.ViewModel
             _parent = accountsViewModel;
             Model = accountModel;
 
-            ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), true);
-            StartCommand = new RelayCommand(async () => await ConnectAsync(), () => !Active);
-            StopCommand = new RelayCommand(async () => await DisconnectAsync(), () => Active);
-            DeleteCommand = new RelayCommand(() => _parent?.DeleteAccount(this), () => !Active);
+            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), true);
+            StartCommand = new RelayCommand(async () => await DoConnectAsync(), () => !Active);
+            StopCommand = new RelayCommand(async () => await DoDisconnectAsync(), () => Active);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteAccount(this), () => !Active);
 
             DataFromModel();
         }
@@ -78,7 +78,7 @@ namespace Algoloop.ViewModel
             Model.Refresh();
         }
 
-        internal async Task ConnectAsync()
+        internal async Task DoConnectAsync()
         {
             if (_cancel != null || _task != null)
             {
@@ -104,11 +104,11 @@ namespace Algoloop.ViewModel
 
             if (!Active)
             {
-                await DisconnectAsync();
+                await DoDisconnectAsync();
             }
         }
 
-        internal async Task DisconnectAsync()
+        internal async Task DoDisconnectAsync()
         {
             if (_cancel == null || _task == null)
             {
@@ -123,7 +123,7 @@ namespace Algoloop.ViewModel
 
             if (Active)
             {
-                await ConnectAsync();
+                await DoConnectAsync();
             }
         }
 
@@ -254,15 +254,15 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async void OnActiveCommand(bool value)
+        private async void DoActiveCommand(bool value)
         {
             if (value)
             {
-                await ConnectAsync();
+                await DoConnectAsync();
             }
             else
             {
-                await DisconnectAsync();
+                await DoDisconnectAsync();
             }
         }
 

@@ -39,9 +39,10 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            AddCommand = new RelayCommand(() => AddMarket(), () => !IsBusy);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => OnSelectedChanged(vm), (vm) => vm != null);
+            AddCommand = new RelayCommand(() => DoAddMarket(), () => !IsBusy);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => vm != null);
             Messenger.Default.Register<NotificationMessageAction<List<MarketModel>>>(this, (message) => OnNotificationMessage(message));
+
             DataFromModel();
         }
 
@@ -73,7 +74,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DeleteMarket(MarketViewModel market)
+        internal bool DoDeleteMarket(MarketViewModel market)
         {
             Debug.Assert(market != null);
             SelectedItem = null;
@@ -123,7 +124,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void OnSelectedChanged(ITreeViewModel vm)
+        private void DoSelectedChanged(ITreeViewModel vm)
         {
             vm.Refresh();
             SelectedItem = vm;
@@ -141,7 +142,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void AddMarket()
+        private void DoAddMarket()
         {
             var loginViewModel = new MarketViewModel(this, new MarketModel(), _settingsModel);
             Markets.Add(loginViewModel);

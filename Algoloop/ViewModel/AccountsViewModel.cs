@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel
         {
             Model = model;
             AddCommand = new RelayCommand(() => AddAccount(), () => !IsBusy);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => OnSelectedChanged(market), (market) => market != null);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => DoSelectedChanged(market), (market) => market != null);
             Messenger.Default.Register<NotificationMessageAction<List<AccountModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
         }
@@ -75,11 +75,19 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DeleteAccount(AccountViewModel account)
+        public bool DoDeleteAccount(AccountViewModel account)
         {
-            Debug.Assert(account != null);
-            SelectedItem = null;
-            return Accounts.Remove(account);
+            try
+            {
+                IsBusy = true;
+                Debug.Assert(account != null);
+                SelectedItem = null;
+                return Accounts.Remove(account);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         internal bool Read(string fileName)
@@ -126,10 +134,17 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void OnSelectedChanged(ITreeViewModel vm)
+        private void DoSelectedChanged(ITreeViewModel vm)
         {
-            vm.Refresh();
-            SelectedItem = vm;
+            try
+            {
+                vm.Refresh();
+                SelectedItem = vm;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void OnNotificationMessage(NotificationMessageAction<List<AccountModel>> message)
@@ -177,7 +192,7 @@ namespace Algoloop.ViewModel
             {
                 if (account.Active)
                 {
-                    Task task = account.ConnectAsync();
+                    Task task = account.DoConnectAsync();
                 }
             }
         }

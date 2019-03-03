@@ -55,10 +55,10 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            StartCommand = new RelayCommand(() => OnStartJobCommand(), () => !Active);
-            StopCommand = new RelayCommand(() => OnStopJobCommand(false), () => Active);
-            DeleteCommand = new RelayCommand(() => DeleteJob(), () => !Active);
-            UseParametersCommand = new RelayCommand(() => UseParameters(), () => !Active);
+            StartCommand = new RelayCommand(() => DoStartJobCommand(), () => !Active);
+            StopCommand = new RelayCommand(() => DoStopJobCommand(false), () => Active);
+            DeleteCommand = new RelayCommand(() => DoDeleteJob(), () => !Active);
+            UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
 
             DataFromModel();
         }
@@ -149,7 +149,7 @@ namespace Algoloop.ViewModel
             return _model.Name;
         }
 
-        public void DeleteJob()
+        public void DoDeleteJob()
         {
             var charts = Charts;
             charts.Clear();
@@ -363,18 +363,18 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void UseParameters()
+        private void DoUseParameters()
         {
             _parent?.UseParameters(this);
         }
 
-        private async void OnStartJobCommand()
+        private async void DoStartJobCommand()
         {
             Active = true;
             await StartTaskAsync();
         }
 
-        private void OnStopJobCommand(bool v)
+        private void DoStopJobCommand(bool v)
         {
             StopTask();
             Active = false;

@@ -28,7 +28,7 @@ namespace Algoloop.ViewModel
         public SettingsViewModel(SettingsModel model)
         {
             Model = model;
-            OkCommand = new RelayCommand<Window>(window => OnOk(window));
+            OkCommand = new RelayCommand<Window>(window => DoOk(window));
         }
 
         public RelayCommand<Window> OkCommand { get; private set; }
@@ -79,7 +79,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void OnOk(Window window)
+        private void DoOk(Window window)
         {
             window.DialogResult = true;
             window.Close();

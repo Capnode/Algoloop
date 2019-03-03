@@ -52,19 +52,19 @@ namespace Algoloop.ViewModel
             Model = model;
             _settingsModel = settingsModel;
 
-            StartCommand = new RelayCommand(() => RunStrategy(), true);
+            StartCommand = new RelayCommand(() => DoRunStrategy(), true);
             StopCommand = new RelayCommand(() => { }, () => false);
-            CloneCommand = new RelayCommand(() => _parent?.CloneStrategy(this), true);
-            ExportCommand = new RelayCommand(() => _parent?.ExportStrategy(this), true);
-            DeleteCommand = new RelayCommand(() => _parent?.DeleteStrategy(this), true);
-            DeleteAllJobsCommand = new RelayCommand(() => DeleteAllJobs(), true);
-            DeleteSelectedJobsCommand = new RelayCommand<IList>(m => DeleteJobs(m), true);
-            UseParametersCommand = new RelayCommand<IList>(m => UseParameters(m), true);
-            AddSymbolCommand = new RelayCommand(() => AddSymbol(), true);
-            DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), true);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), trm => SelectedSymbol != null);
-            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => OnSelectItem(m));
+            CloneCommand = new RelayCommand(() => _parent?.DoCloneStrategy(this), true);
+            ExportCommand = new RelayCommand(() => _parent?.DoExportStrategy(this), true);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), true);
+            DeleteAllJobsCommand = new RelayCommand(() => DoDeleteAllJobs(), true);
+            DeleteSelectedJobsCommand = new RelayCommand<IList>(m => DoDeleteJobs(m), true);
+            UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), true);
+            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), true);
+            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => SelectedSymbol != null);
+            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), true);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
+            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => DoSelectItem(m));
 
             Model.AlgorithmNameChanged += UpdateParametersFromModel;
             DataFromModel();
@@ -183,14 +183,14 @@ namespace Algoloop.ViewModel
             return ok;
         }
 
-        private void DeleteAllJobs()
+        private void DoDeleteAllJobs()
         {
             JobColumns.Clear();
             Jobs.Clear();
             DataToModel();
         }
 
-        private void DeleteJobs(IList jobs)
+        private void DoDeleteJobs(IList jobs)
         {
             Debug.Assert(jobs != null);
             if (Jobs.Count == 0 || jobs.Count == 0)
@@ -201,12 +201,12 @@ namespace Algoloop.ViewModel
             {
                 if (job != null)
                 {
-                    job.DeleteJob();
+                    job.DoDeleteJob();
                 }
             }
         }
 
-        private void OnSelectItem(StrategyJobViewModel job)
+        private void DoSelectItem(StrategyJobViewModel job)
         {
             if (job == null)
                 return;
@@ -216,13 +216,13 @@ namespace Algoloop.ViewModel
             IsExpanded = true;
         }
 
-        private void AddSymbol()
+        private void DoAddSymbol()
         {
             var symbol = new SymbolViewModel(this, new SymbolModel());
             Symbols.Add(symbol);
         }
 
-        private void UseParameters(IList selected)
+        private void DoUseParameters(IList selected)
         {
             if (selected == null)
                 return;
@@ -234,7 +234,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async void RunStrategy()
+        private async void DoRunStrategy()
         {
             DataToModel();
 
@@ -367,7 +367,7 @@ namespace Algoloop.ViewModel
             RaisePropertyChanged(() => Parameters);
         }
 
-        private void DeleteSymbols(IList symbols)
+        private void DoDeleteSymbols(IList symbols)
         {
             Debug.Assert(symbols != null);
             if (Symbols.Count == 0 || symbols.Count == 0)
@@ -390,7 +390,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void ImportSymbols()
+        private void DoImportSymbols()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = false;
@@ -424,7 +424,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void ExportSymbols(IList symbols)
+        private void DoExportSymbols(IList symbols)
         {
             Debug.Assert(symbols != null);
             if (Symbols.Count == 0 || symbols.Count == 0)

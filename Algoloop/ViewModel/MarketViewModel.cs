@@ -53,21 +53,21 @@ namespace Algoloop.ViewModel
             Model = marketModel;
             _settingsModel = settingsModel;
 
-            CheckAllCommand = new RelayCommand<IList>(m => OnCheckAll(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            AddSymbolCommand = new RelayCommand(() => AddSymbol(), () => !_parent.IsBusy);
-            DownloadSymbolListCommand = new RelayCommand(() => DownloadSymbolList(), !_parent.IsBusy);
-            DeleteSymbolsCommand = new RelayCommand<IList>(m => DeleteSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => ImportSymbols(), !_parent.IsBusy);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => ExportSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            AddToSymbolListCommand = new RelayCommand<IList>(m => AddToSymbolList(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            DeleteCommand = new RelayCommand(() => _parent?.DeleteMarket(this), () => !_parent.IsBusy && !Active);
+            CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
+            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !_parent.IsBusy);
+            DownloadSymbolListCommand = new RelayCommand(() => DoDownloadSymbolList(), !_parent.IsBusy);
+            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
+            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), !_parent.IsBusy);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
+            AddToSymbolListCommand = new RelayCommand<IList>(m => DoAddToSymbolList(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteMarket(this), () => !_parent.IsBusy && !Active);
             NewListCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !_parent.IsBusy && !Active);
-            ActiveCommand = new RelayCommand(() => OnActiveCommand(Model.Active), !_parent.IsBusy);
-            StartCommand = new RelayCommand(() => OnStartCommand(), () => !_parent.IsBusy && !Active);
-            StopCommand = new RelayCommand(() => OnStopCommand(), () => !_parent.IsBusy && Active);
+            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !_parent.IsBusy);
+            StartCommand = new RelayCommand(() => DoStartCommand(), () => !_parent.IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopCommand(), () => !_parent.IsBusy && Active);
 
             DataFromModel();
-            OnActiveCommand(Active);
+            DoActiveCommand(Active);
         }
 
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
@@ -252,7 +252,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async void OnActiveCommand(bool value)
+        private async void DoActiveCommand(bool value)
         {
             if (value)
             {
@@ -264,100 +264,144 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async void OnStartCommand()
+        private async void DoStartCommand()
         {
-            Active = true;
-            await StartTaskAsync();
-        }
-
-        private void OnStopCommand()
-        {
-            StopTask();
-            Active = false;
-        }
-
-        private void AddSymbol()
-        {
-            var symbol = new SymbolViewModel(this, new SymbolModel());
-            Symbols.Add(symbol);
-            Folders.ToList().ForEach(m => m.Refresh());
-        }
-
-        private void DownloadSymbolList()
-        {
-            _parent.IsBusy = true;
-            List<SymbolModel> oldSymbols = Model.Symbols.ToList();
-
-            IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
-            foreach (SymbolModel symbol in symbols)
+            try
             {
-                symbol.Name = symbol.Name.Trim();
-                SymbolModel sym = Model.Symbols.Find(m => m.Name.Equals(symbol.Name));
-                if (sym != null)
+                _parent.IsBusy = true;
+                Active = true;
+                await StartTaskAsync();
+            }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
+        }
+
+        private void DoStopCommand()
+        {
+            try
+            {
+                _parent.IsBusy = true;
+                StopTask();
+                Active = false;
+            }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
+        }
+
+        private void DoAddSymbol()
+        {
+            try
+            {
+                _parent.IsBusy = true;
+                var symbol = new SymbolViewModel(this, new SymbolModel());
+                Symbols.Add(symbol);
+                Folders.ToList().ForEach(m => m.Refresh());
+            }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
+        }
+
+        private void DoDownloadSymbolList()
+        {
+            try
+            {
+                _parent.IsBusy = true;
+                List<SymbolModel> oldSymbols = Model.Symbols.ToList();
+
+                IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
+                foreach (SymbolModel symbol in symbols)
                 {
-                    sym.Properties = symbol.Properties;
-                    oldSymbols.Remove(sym);
+                    symbol.Name = symbol.Name.Trim();
+                    SymbolModel sym = Model.Symbols.Find(m => m.Name.Equals(symbol.Name));
+                    if (sym != null)
+                    {
+                        sym.Properties = symbol.Properties;
+                        oldSymbols.Remove(sym);
+                    }
+                    else
+                    {
+                        Model.Symbols.Add(symbol);
+                    }
                 }
-                else
+
+                // Remove symbols not updated
+                foreach (SymbolModel symbol in oldSymbols)
                 {
-                    Model.Symbols.Add(symbol);
+                    Model.Symbols.Remove(symbol);
+                }
+
+                Folders.ToList().ForEach(m => m.Refresh());
+                DataFromModel();
+            }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
+        }
+
+
+        private void DoCheckAll(IList symbols)
+        {
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+            if (list.Count == 0)
+                return;
+
+            try
+            {
+                _parent.IsBusy = true;
+                list.ForEach(m => m.Active = CheckAll);
+
+                // Update folders
+                foreach (var folder in Folders)
+                {
+                    folder.Refresh();
                 }
             }
-
-            // Remove symbols not updated
-            foreach (SymbolModel symbol in oldSymbols)
+            finally
             {
-                Model.Symbols.Remove(symbol);
+                _parent.IsBusy = false;
             }
-
-            Folders.ToList().ForEach(m => m.Refresh());
-            DataFromModel();
-            _parent.IsBusy = false;
         }
 
-
-        private void OnCheckAll(IList symbols)
+        private void DoDeleteSymbols(IList symbols)
         {
             Debug.Assert(symbols != null);
             if (Symbols.Count == 0 || symbols.Count == 0)
                 return;
 
-            // Create a copy of the list before remove
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            foreach (SymbolViewModel symbol in list)
+            try
             {
-                symbol.Active = CheckAll;
+                _parent.IsBusy = true;
+                // Create a copy of the list before remove
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+                Debug.Assert(list != null);
+
+                int pos = Symbols.IndexOf(list.First());
+                foreach (SymbolViewModel symbol in list)
+                {
+                    Symbols.Remove(symbol);
+                }
+
+                DataToModel();
+                if (Symbols.Count > 0)
+                {
+                    SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+                }
             }
-
-            DataToModel();
-        }
-
-        private void DeleteSymbols(IList symbols)
-        {
-            Debug.Assert(symbols != null);
-            if (Symbols.Count == 0 || symbols.Count == 0)
-                return;
-
-            // Create a copy of the list before remove
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            int pos = Symbols.IndexOf(list.First());
-            foreach (SymbolViewModel symbol in list)
+            finally
             {
-                Symbols.Remove(symbol);
-            }
-
-            DataToModel();
-            if (Symbols.Count > 0)
-            {
-                SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+                _parent.IsBusy = false;
             }
         }
 
-        private void ImportSymbols()
+        private void DoImportSymbols()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = false;
@@ -367,6 +411,7 @@ namespace Algoloop.ViewModel
 
             try
             {
+                _parent.IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
                     using (StreamReader r = new StreamReader(fileName))
@@ -390,9 +435,13 @@ namespace Algoloop.ViewModel
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
         }
 
-        private void ExportSymbols(IList symbols)
+        private void DoExportSymbols(IList symbols)
         {
             Debug.Assert(symbols != null);
             if (symbols.Count == 0)
@@ -406,6 +455,7 @@ namespace Algoloop.ViewModel
 
             try
             {
+                _parent.IsBusy = true;
                 string fileName = saveFileDialog.FileName;
                 using (StreamWriter file = File.CreateText(fileName))
                 {
@@ -419,23 +469,32 @@ namespace Algoloop.ViewModel
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
         }
 
-        private void AddToSymbolList(IList symbols)
+        private void DoAddToSymbolList(IList symbols)
         {
-            Debug.Assert(symbols != null);
-            if (symbols.Count == 0)
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+            if (list.Count == 0)
                 return;
 
-            DataToModel();
-            var folder = new FolderViewModel(this, new FolderModel());
-            foreach (SymbolViewModel symbol in symbols)
+            try
             {
-                symbol.Active = true;
-                folder.AddSymbol(symbol);
+                _parent.IsBusy = true;
+//                DataToModel();
+                list.ForEach(m => m.Active = true);
+                var folder = new FolderViewModel(this, new FolderModel());
+                folder.AddSymbols(list);
+                Folders.Add(folder);
             }
-
-            Folders.Add(folder);
+            finally
+            {
+                _parent.IsBusy = false;
+            }
         }
 
         private void UpdateSymbolsAndColumns()

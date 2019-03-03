@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            UpdateCommand = new RelayCommand(() => LoadChart(_parent as MarketViewModel), () => _parent is MarketViewModel);
+            UpdateCommand = new RelayCommand(() => DoLoadChart(_parent as MarketViewModel), () => _parent is MarketViewModel);
         }
 
         public RelayCommand DeleteCommand { get; }
@@ -60,10 +60,13 @@ namespace Algoloop.ViewModel
             get => Model.Active;
             set
             {
-                Model.Active = value;
-                RaisePropertyChanged(() => Active);
-                (_parent as StrategyViewModel)?.Refresh();
-                (_parent as MarketViewModel)?.Refresh();
+                if (Model.Active != value)
+                {
+                    Model.Active = value;
+                    RaisePropertyChanged(() => Active);
+//                (_parent as StrategyViewModel)?.Refresh();
+//                (_parent as MarketViewModel)?.Refresh();
+                }
             }
         }
 
@@ -91,11 +94,11 @@ namespace Algoloop.ViewModel
 
             if (_parent is MarketViewModel market)
             {
-                LoadChart(market);
+                DoLoadChart(market);
             }
         }
 
-        private void LoadChart(MarketViewModel market)
+        private void DoLoadChart(MarketViewModel market)
         {
             Debug.Assert(market != null);
             Charts.Clear();

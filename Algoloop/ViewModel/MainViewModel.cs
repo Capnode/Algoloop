@@ -102,10 +102,15 @@ namespace Algoloop.ViewModel
         private void DoExit(Window window)
         {
             Debug.Assert(window != null);
-
-            IsBusy = true;
-            window.Close();
-            IsBusy = false;
+            try
+            {
+                IsBusy = true;
+                window.Close();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoSettings()
