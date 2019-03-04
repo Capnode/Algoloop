@@ -18,6 +18,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using QuantConnect.AlgorithmFactory;
 using QuantConnect.Logging;
 using QuantConnect.Parameters;
 using System;
@@ -59,6 +60,7 @@ namespace Algoloop.ViewModel
             StartCommand = new RelayCommand(() => DoRunStrategy(), () => true);
             StopCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => true);
+            CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !string.IsNullOrEmpty(Model.AlgorithmName));
             ExportCommand = new RelayCommand(() => DoExportStrategy(), () => true);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => true);
             DeleteAllJobsCommand = new RelayCommand(() => DoDeleteAllJobs(), () => true);
@@ -78,6 +80,7 @@ namespace Algoloop.ViewModel
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
         public RelayCommand CloneCommand { get; }
+        public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand ExportCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand DeleteAllJobsCommand { get; }
@@ -104,7 +107,11 @@ namespace Algoloop.ViewModel
         public bool IsSelected
         {
             get => _isSelected;
-            set => Set(ref _isSelected, value);
+            set
+            {
+                Set(ref _isSelected, value);
+                CloneAlgorithmCommand.RaiseCanExecuteChanged();
+            }
         }
 
         public bool IsExpanded
@@ -464,6 +471,44 @@ namespace Algoloop.ViewModel
                 var strategyModel = new StrategyModel(Model);
                 var strategy = new StrategyViewModel(_parent, strategyModel, _settingsModel);
                 _parent.Strategies.Add(strategy);
+            }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
+        }
+
+        private void DoCloneAlgorithm()
+        {
+            try
+            {
+                _parent.IsBusy = true;
+                DataToModel();
+
+                // Load assemblies of algorithms
+                string assemblyPath = Model.AlgorithmLocation;
+                Debug.Assert(!string.IsNullOrEmpty(assemblyPath));
+                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+
+                //Get the list of extention classes in the library: 
+                List<string> extended = Loader.GetExtendedTypeNames(assembly);
+                List<string> list = assembly.ExportedTypes
+                    .Where(m => extended.Contains(m.FullName))
+                    .Select(m => m.Name)
+                    .ToList();
+                list.Sort();
+
+                // Iterate and clone strategies
+                foreach (string algorithm in list)
+                {
+                    if (algorithm.Equals(Model.AlgorithmName))
+                        continue; // Skip this algorithm
+
+                    var strategyModel = new StrategyModel(Model);
+                    strategyModel.AlgorithmName = algorithm;
+                    var strategy = new StrategyViewModel(_parent, strategyModel, _settingsModel);
+                    _parent.Strategies.Add(strategy);
+                }
             }
             finally
             {

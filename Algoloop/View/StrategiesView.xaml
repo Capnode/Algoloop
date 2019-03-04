@@ -75,6 +75,11 @@
                     Command="{Binding SelectedItem.CloneCommand}">
                     <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
                 </Button>
+                <Button
+                    ToolTip="Clone strategy by algorithm"
+                    Command="{Binding SelectedItem.CloneAlgorithmCommand}">
+                    <Image Source="/Resources/AddList.png" Width="16" Height="16"/>
+                </Button>
             </ToolBar>
             <TreeView
                 Grid.Column="0"

@@ -29,7 +29,7 @@ namespace Algoloop.Model
         public event Action<string> AlgorithmNameChanged;
 
         private string _algorithmName;
-        private string _account;
+        private string _account = AccountModel.AccountType.Backtest.ToString();
         private string _name;
 
         public StrategyModel()
