@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using static Algoloop.Model.MarketModel;
 
 namespace Algoloop.Model
 {
@@ -28,6 +27,39 @@ namespace Algoloop.Model
     public class StrategyJobModel : ModelBase
     {
         private string _account;
+
+        public StrategyJobModel()
+        {
+        }
+
+        public StrategyJobModel(string name, StrategyModel strategy)
+        {
+            Name = name;
+            Desktop = strategy.Desktop;
+            Account = strategy.Account;
+            Provider = strategy.Provider;
+            BarsBack = strategy.BarsBack;
+            StartDate = strategy.StartDate;
+            EndDate = strategy.EndDate;
+            InitialCapital = strategy.InitialCapital;
+            PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
+            AlgorithmLocation = strategy.AlgorithmLocation;
+            AlgorithmName = strategy.AlgorithmName;
+            Resolution = strategy.Resolution;
+
+            // Clone symbols
+            Symbols.AddRange(strategy.Symbols.Select(m => new SymbolModel(m)));
+
+            // Clone parameters
+            Parameters.AddRange(strategy.Parameters.Select(m => new ParameterModel(m)));
+
+            // Use paramerter list as job name
+            string parameters = string.Join(" ", Parameters.Where(m => m.UseValue).Select(m => m.Value));
+            if (!string.IsNullOrWhiteSpace(parameters))
+            {
+                Name = parameters;
+            }
+        }
 
         [Category("Information")]
         [DisplayName("Name")]
@@ -115,7 +147,6 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [DisplayName("File location")]
-        [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
@@ -157,35 +188,6 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public string Logs { get; set; }
-
-        public StrategyJobModel(string name, StrategyModel strategy)
-        {
-            Name = name;
-            Desktop = strategy.Desktop;
-            Account = strategy.Account;
-            Provider = strategy.Provider;
-            BarsBack = strategy.BarsBack;
-            StartDate = strategy.StartDate;
-            EndDate = strategy.EndDate;
-            InitialCapital = strategy.InitialCapital;
-            PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
-            AlgorithmLocation = strategy.AlgorithmLocation;
-            AlgorithmName = strategy.AlgorithmName;
-            Resolution = strategy.Resolution;
-
-            // Clone symbols
-            Symbols.AddRange(strategy.Symbols.Select(m => new SymbolModel(m)));
-
-            // Clone parameters
-            Parameters.AddRange(strategy.Parameters.Select(m => new ParameterModel(m)));
-
-            // Use paramerter list as job name
-            string parameters = string.Join(" ", Parameters.Where(m => m.UseValue).Select(m => m.Value));
-            if (!string.IsNullOrWhiteSpace(parameters))
-            {
-                Name = parameters;
-            }
-        }
 
         public void Refresh()
         {

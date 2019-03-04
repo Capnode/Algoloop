@@ -423,6 +423,7 @@ namespace Algoloop.ViewModel
         private void DoImportSymbols()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             openFileDialog.Multiselect = false;
             openFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == false)
@@ -474,6 +475,7 @@ namespace Algoloop.ViewModel
         {
             DataToModel();
             SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             saveFileDialog.FileName = Model.Name;
             saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == false)
@@ -486,7 +488,9 @@ namespace Algoloop.ViewModel
                 using (StreamWriter file = File.CreateText(fileName))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(file, Model);
+                    var strategies = new StrategiesModel();
+                    strategies.Strategies.Add(Model);
+                    serializer.Serialize(file, strategies);
                 }
             }
             catch (Exception ex)
@@ -507,6 +511,7 @@ namespace Algoloop.ViewModel
 
             DataToModel();
             SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             saveFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == false)
                 return;

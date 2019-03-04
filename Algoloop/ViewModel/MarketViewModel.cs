@@ -404,6 +404,7 @@ namespace Algoloop.ViewModel
         private void DoImportSymbols()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             openFileDialog.Multiselect = false;
             openFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == false)
@@ -449,6 +450,7 @@ namespace Algoloop.ViewModel
 
             DataToModel();
             SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             saveFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == false)
                 return;

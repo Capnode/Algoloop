@@ -38,7 +38,8 @@ namespace Algoloop.ViewModel
             _settingsModel = settingsModel;
 
             AddCommand = new RelayCommand(() => DoAddStrategy(), () => !IsBusy);
-            ImportCommand = new RelayCommand(() => DoImportStrategy(), () => !IsBusy);
+            ImportCommand = new RelayCommand(() => DoImportStrategies(), () => !IsBusy);
+            ExportCommand = new RelayCommand(() => DoExportStrategies(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), true);
 
             DataFromModel();
@@ -47,6 +48,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
         public RelayCommand ImportCommand { get; }
+        public RelayCommand ExportCommand { get; }
 
         public StrategiesModel Model { get; }
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
@@ -170,10 +172,10 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoImportStrategy()
+        private void DoImportStrategies()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            //            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             openFileDialog.Multiselect = true;
             openFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() != true)
@@ -187,13 +189,16 @@ namespace Algoloop.ViewModel
                     using (StreamReader r = new StreamReader(fileName))
                     {
                         string json = r.ReadToEnd();
-                        StrategyModel strategy = JsonConvert.DeserializeObject<StrategyModel>(json);
-                        foreach (StrategyJobModel job in strategy.Jobs)
+                        StrategiesModel strategies = JsonConvert.DeserializeObject<StrategiesModel>(json);
+                        foreach (StrategyModel strategy in strategies.Strategies)
                         {
-                            job.Active = false;
-                        }
+                            foreach (StrategyJobModel job in strategy.Jobs)
+                            {
+                                job.Active = false;
+                            }
 
-                        Model.Strategies.Add(strategy);
+                            Model.Strategies.Add(strategy);
+                        }
                     }
                 }
 
@@ -202,6 +207,26 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private void DoExportStrategies()
+        {
+            DataToModel();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                IsBusy = true;
+                Save(saveFileDialog.FileName);
             }
             finally
             {

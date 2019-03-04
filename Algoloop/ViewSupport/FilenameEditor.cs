@@ -66,12 +66,12 @@ namespace Algoloop.ViewSupport
                 return;
             }
 
-            var dlg = new Microsoft.Win32.OpenFileDialog();
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
             string path = item.Value?.ToString();
             string folder;
             if (path == null)
             {
-                folder = Directory.GetCurrentDirectory();
+                folder = AppDomain.CurrentDomain.BaseDirectory;
             }
             else
             {
@@ -79,10 +79,10 @@ namespace Algoloop.ViewSupport
                 folder = Path.GetDirectoryName(fullPath);
             }
 
-            dlg.InitialDirectory = folder;
-            if ((bool)dlg.ShowDialog())
+            openFileDialog.InitialDirectory = folder;
+            if ((bool)openFileDialog.ShowDialog())
             {
-                item.Value = dlg.FileName;
+                item.Value = openFileDialog.FileName;
             }
         }
     }

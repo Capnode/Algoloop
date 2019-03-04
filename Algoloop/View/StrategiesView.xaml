@@ -103,7 +103,18 @@
                         </MenuItem>
                         <MenuItem
                             Header="Import Strategies..."
-                            Command="{Binding ImportCommand}" />
+                            Command="{Binding ImportCommand}">
+                            <MenuItem.Icon>
+                                <Image Source="/Resources/Import.png" Width="16" Height="16"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem
+                            Header="Export Strategies..."
+                            Command="{Binding ExportCommand}">
+                            <MenuItem.Icon>
+                                <Image Source="/Resources/Export.png" Width="16" Height="16"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </ContextMenu>
                 </TreeView.ContextMenu>
                 <i:Interaction.Triggers>
