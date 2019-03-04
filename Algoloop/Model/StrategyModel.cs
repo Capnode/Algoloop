@@ -25,11 +25,12 @@ namespace Algoloop.Model
     [DataContract]
     public class StrategyModel : ModelBase
     {
+        public event Action NameChanged;
         public event Action<string> AlgorithmNameChanged;
 
-        private const string _defaultName = "Strategy";
         private string _algorithmName;
         private string _account;
+        private string _name;
 
         public StrategyModel()
         {
@@ -59,7 +60,15 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Name { get; set; } = _defaultName;
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                _name = value;
+                NameChanged?.Invoke();
+            }
+        }
 
         [Category("Information")]
         [DisplayName("Desktop")]
@@ -76,7 +85,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Provider { get; set; } = string.Empty;
+        public string Provider { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]
@@ -124,7 +133,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public Resolution Resolution { get; set; }
+        public Resolution Resolution { get; set; } = Resolution.Daily;
 
         [Category("Capital")]
         [DisplayName("Initial capial")]

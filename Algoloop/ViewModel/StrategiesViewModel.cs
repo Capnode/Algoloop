@@ -73,16 +73,22 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DoDeleteStrategy(StrategyViewModel strategy)
+        internal void DoDeleteStrategy(StrategyViewModel strategy)
         {
             Debug.Assert(strategy != null);
             try
             {
                 IsBusy = true;
-                bool ok = Strategies.Remove(strategy);
+                int pos = Strategies.IndexOf(strategy);
+                Strategies.RemoveAt(pos);
                 DataToModel();
-                SelectedItem = null;
-                return ok;
+                if (Strategies.Count == 0)
+                {
+                    SelectedItem = null;
+                    return;
+                }
+
+                SelectedItem = Strategies[Math.Max(0, pos - 1)];
             }
             finally
             {

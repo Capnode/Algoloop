@@ -119,7 +119,7 @@
                             <TextBlock>
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{} {0} ({1})">
-                                        <Binding Path="Model.Name"/>
+                                        <Binding Path="DisplayName"/>
                                         <Binding Path="Jobs.Count"/>
                                     </MultiBinding>
                                 </TextBlock.Text>

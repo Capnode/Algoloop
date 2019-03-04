@@ -158,10 +158,6 @@ namespace Algoloop.Model
         [DataMember]
         public string Logs { get; set; }
 
-        public StrategyJobModel()
-        {
-        }
-
         public StrategyJobModel(string name, StrategyModel strategy)
         {
             Name = name;

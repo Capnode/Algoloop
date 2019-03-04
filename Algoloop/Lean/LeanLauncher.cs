@@ -191,7 +191,10 @@ namespace Algoloop.Lean
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
-            parameters.Add("market", model.Provider.ToString());
+            if (model.Provider != null)
+            {
+                parameters.Add("market", model.Provider.ToString());
+            }
         }
 
         private static void SetBacktestDesktop(StrategyJobModel model, Dictionary<string, string> parameters)
@@ -207,7 +210,10 @@ namespace Algoloop.Lean
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
-            parameters.Add("market", model.Provider.ToString());
+            if (model.Provider != null)
+            {
+                parameters.Add("market", model.Provider.ToString());
+            }
         }
 
         private static void SetPaper(StrategyJobModel model, Dictionary<string, string> parameters)
@@ -221,7 +227,10 @@ namespace Algoloop.Lean
             Config.Set("data-queue-handler", "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue");
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
-            parameters.Add("market", model.Provider.ToString());
+            if (model.Provider != null)
+            {
+                parameters.Add("market", model.Provider.ToString());
+            }
         }
 
         private static void SetFxcm(AccountModel account, Dictionary<string, string> parameters)

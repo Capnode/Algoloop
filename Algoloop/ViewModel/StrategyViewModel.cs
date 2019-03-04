@@ -38,6 +38,8 @@ namespace Algoloop.ViewModel
 {
     public class StrategyViewModel : ViewModelBase, ITreeViewModel
     {
+        public const string DefaultName = "Strategy";
+
         private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
         private StrategiesViewModel _parent;
         private bool _isSelected;
@@ -45,6 +47,7 @@ namespace Algoloop.ViewModel
         private SymbolViewModel _selectedSymbol;
         private ObservableCollection<DataGridColumn> _jobColumns = new ObservableCollection<DataGridColumn>();
         private StrategyJobViewModel _selectedJob;
+        private string _displayName;
         private readonly SettingsModel _settingsModel;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
@@ -67,6 +70,7 @@ namespace Algoloop.ViewModel
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
             TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => DoSelectItem(m));
 
+            Model.NameChanged += SetDisplayName;
             Model.AlgorithmNameChanged += ImportParametersFromAlgorithm;
             DataFromModel();
         }
@@ -90,6 +94,12 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
+
+        public string DisplayName
+        {
+            get => _displayName;
+            set => Set(ref _displayName, value);
+        }
 
         public bool IsSelected
         {
@@ -333,8 +343,27 @@ namespace Algoloop.ViewModel
             }
         }
 
+
+        private void SetDisplayName()
+        {
+            if (!string.IsNullOrWhiteSpace(Model.Name))
+            {
+                DisplayName = Model.Name;
+            }
+            else if (!string.IsNullOrWhiteSpace(Model.AlgorithmName))
+            {
+                DisplayName = Model.AlgorithmName;
+            }
+            else
+            {
+                DisplayName = DefaultName;
+            }
+        }
+
         private void ImportParametersFromAlgorithm(string algorithmName)
         {
+            SetDisplayName();
+
             if (string.IsNullOrEmpty(Model.AlgorithmLocation) || string.IsNullOrEmpty(algorithmName))
                 return;
 
