@@ -411,8 +411,11 @@ namespace Algoloop.ViewModel
             Charts = null;
             Charts = charts;
 
-            Statistics.Clear();
+            var statistics = Statistics;
+            statistics.Clear();
             Statistics = null;
+            Statistics = statistics;
+
             Orders.Clear();
 
             RaisePropertyChanged(() => Logs);

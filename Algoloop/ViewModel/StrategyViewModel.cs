@@ -72,8 +72,8 @@ namespace Algoloop.ViewModel
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
             TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => DoSelectItem(m));
 
-            Model.NameChanged += SetDisplayName;
-            Model.AlgorithmNameChanged += ImportParametersFromAlgorithm;
+            Model.NameChanged += StrategyNameChanged;
+            Model.AlgorithmNameChanged += AlgorithmNameChanged;
             DataFromModel();
         }
 
@@ -110,7 +110,6 @@ namespace Algoloop.ViewModel
             set
             {
                 Set(ref _isSelected, value);
-                CloneAlgorithmCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -325,7 +324,7 @@ namespace Algoloop.ViewModel
                 Symbols.Add(symbolViewModel);
             }
 
-            ImportParametersFromAlgorithm(Model.AlgorithmName);
+            AlgorithmNameChanged(Model.AlgorithmName);
 
             UpdateJobsAndColumns();
         }
@@ -351,7 +350,7 @@ namespace Algoloop.ViewModel
         }
 
 
-        private void SetDisplayName()
+        private void StrategyNameChanged()
         {
             if (!string.IsNullOrWhiteSpace(Model.Name))
             {
@@ -367,9 +366,11 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void ImportParametersFromAlgorithm(string algorithmName)
+        private void AlgorithmNameChanged(string algorithmName)
         {
-            SetDisplayName();
+            CloneAlgorithmCommand.RaiseCanExecuteChanged();
+
+            StrategyNameChanged();
 
             if (string.IsNullOrEmpty(Model.AlgorithmLocation) || string.IsNullOrEmpty(algorithmName))
                 return;
@@ -506,6 +507,7 @@ namespace Algoloop.ViewModel
 
                     var strategyModel = new StrategyModel(Model);
                     strategyModel.AlgorithmName = algorithm;
+                    strategyModel.Name = null;
                     var strategy = new StrategyViewModel(_parent, strategyModel, _settingsModel);
                     _parent.Strategies.Add(strategy);
                 }

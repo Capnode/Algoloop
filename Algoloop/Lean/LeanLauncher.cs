@@ -162,7 +162,11 @@ namespace Algoloop.Lean
             parameters.Add("enddate", model.EndDate.ToString());
             parameters.Add("cash", model.InitialCapital.ToString());
             parameters.Add("resolution", model.Resolution.ToString());
-            parameters.Add("symbols", string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Name)));
+            if (!model.Symbols.IsNullOrEmpty())
+            {
+                parameters.Add("symbols", string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Name)));
+            }
+
             foreach (ParameterModel parameter in model.Parameters)
             {
                 string value;
@@ -191,7 +195,7 @@ namespace Algoloop.Lean
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
-            if (model.Provider != null)
+            if (!model.Provider.IsNullOrEmpty())
             {
                 parameters.Add("market", model.Provider.ToString());
             }
@@ -210,7 +214,7 @@ namespace Algoloop.Lean
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
-            if (model.Provider != null)
+            if (!model.Provider.IsNullOrEmpty())
             {
                 parameters.Add("market", model.Provider.ToString());
             }
@@ -227,7 +231,7 @@ namespace Algoloop.Lean
             Config.Set("data-queue-handler", "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue");
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
-            if (model.Provider != null)
+            if (!model.Provider.IsNullOrEmpty())
             {
                 parameters.Add("market", model.Provider.ToString());
             }
