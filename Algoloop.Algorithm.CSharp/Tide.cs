@@ -13,16 +13,25 @@
  */
 
 using QuantConnect;
-using QuantConnect.Algorithm;
-using QuantConnect.Data.Market;
+using QuantConnect.Algorithm.Framework;
+using QuantConnect.Algorithm.Framework.Alphas;
+using QuantConnect.Algorithm.Framework.Execution;
+using QuantConnect.Algorithm.Framework.Portfolio;
+using QuantConnect.Algorithm.Framework.Risk;
+using QuantConnect.Algorithm.Framework.Selection;
+using QuantConnect.Data;
+using QuantConnect.Data.UniverseSelection;
+using QuantConnect.Orders.Fees;
 using QuantConnect.Parameters;
 using QuantConnect.Securities;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Capnode.Algorithm.CSharp
 {
-    public class Tide : QCAlgorithm
+    public class Tide : QCAlgorithmFramework
     {
         [Parameter("symbols")]
         protected string _symbols = "EURUSD";
@@ -45,27 +54,15 @@ namespace Capnode.Algorithm.CSharp
 
         [Parameter("OpenHourLong")]
         private string _openHourLong = "1";
-        private TimeSpan _openTimeLong;
 
         [Parameter("CloseHourLong")]
         private string _closeHourLong = "3";
-        private TimeSpan _closeTimeLong;
 
         [Parameter("OpenHourShort")]
         private string _openHourShort = "1";
-        private TimeSpan _openTimeShort;
 
         [Parameter("CloseHourShort")]
         private string _closeHourShort = "3";
-        private TimeSpan _closeTimeShort;
-
-        [Parameter("SymbolIndex")]
-        private string _symbolIndex = "0";
-        private int __symbolIndex = 0;
-
-        [Parameter("Size")]
-        private string _size = "1";
-        private double __size = 0;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash
@@ -83,67 +80,109 @@ namespace Capnode.Algorithm.CSharp
 
             Resolution resolution = Resolution.Hour;
             Enum.TryParse(_resolution, out resolution);
-            int.TryParse(_symbolIndex, out __symbolIndex);
-            _symbol = _symbols.Split(';')[__symbolIndex];
-            AddForex(_symbol, resolution, _market);
 
             // Algorithm parameters
-            _openTimeLong = TimeSpan.FromHours(double.Parse(_openHourLong));
-            _closeTimeLong = TimeSpan.FromHours(double.Parse(_closeHourLong));
-            _openTimeShort = TimeSpan.FromHours(double.Parse(_openHourShort));
-            _closeTimeShort = TimeSpan.FromHours(double.Parse(_closeHourShort));
-            __size = double.Parse(_size, CultureInfo.InvariantCulture);
+            var openTimeLong = TimeSpan.FromHours(double.Parse(_openHourLong));
+            var closeTimeLong = TimeSpan.FromHours(double.Parse(_closeHourLong));
+            var openTimeShort = TimeSpan.FromHours(double.Parse(_openHourShort));
+            var closeTimeShort = TimeSpan.FromHours(double.Parse(_closeHourShort));
 
-            Log($"Tide {_openTimeLong.Hours} {_closeTimeLong.Hours} {_openTimeShort.Hours} {_closeTimeShort.Hours} {__symbolIndex} {__size}");
+            Log($"Tide {openTimeLong.Hours} {closeTimeLong.Hours} {openTimeShort.Hours} {closeTimeShort.Hours}");
+
+            // Set zero transaction fees
+            SetSecurityInitializer(s => s.SetFeeModel(new ConstantFeeModel(0m)));
+
+            // Universe Selection
+            var symbols = _symbols
+                .Split(';')
+                .Select(x => QuantConnect.Symbol.Create(x, SecurityType.Forex, _market));
+
+            UniverseSettings.Resolution = Resolution.Hour;
+            SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
+
+            // Alpha Model
+            SetAlpha(new TideAlphaModel(openTimeLong, closeTimeLong, openTimeShort, closeTimeShort));
+
+            // Portfolio Construction
+            SetPortfolioConstruction(new EqualWeightingPortfolioConstructionModel());
+
+            // Execution
+            SetExecution(new ImmediateExecutionModel());
+
+            // Risk Management
+            SetRiskManagement(new MaximumDrawdownPercentPerSecurity(0.03m));
         }
+    }
 
-        /// <summary>
-        /// OnData event is the primary entry point for your algorithm.
-        /// Each new data point will be pumped in here.
-        /// </summary>
-        /// <param name="data">TradeBars IDictionary object with your stock data</param>
-        public void OnData(TradeBars data)
+    public class TideAlphaModel : AlphaModel
+    {
+        private TimeSpan _openTimeLong;
+        private TimeSpan _closeTimeLong;
+        private TimeSpan _openTimeShort;
+        private TimeSpan _closeTimeShort;
+
+        public TideAlphaModel(
+            TimeSpan openTimeLong,
+            TimeSpan closeTimeLong,
+            TimeSpan openTimeShort,
+            TimeSpan closeTimeShort)
         {
-            if (!IsMarketOpen(_symbol))
-                return;
-
-            SecurityHolding holding = Portfolio[_symbol];
-            TimeSpan now = Time.TimeOfDay;
-            bool longInHours = InHours(_openTimeLong, now, _closeTimeLong);
-            bool shortInHours = InHours(_openTimeShort, now, _closeTimeShort);
-
-            if (holding.IsLong)
-            {
-                if (!longInHours)
-                {
-                    Liquidate(_symbol);
-                }
-                else
-                {
-                    return;
-                }
-            }
-            else if (holding.IsShort)
-            {
-                if (!shortInHours)
-                {
-                    Liquidate(_symbol);
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            if (longInHours)
-            {
-                SetHoldings(_symbol, __size);
-            }
-            else if (shortInHours)
-            {
-                SetHoldings(_symbol, -__size);
-            }
+            _openTimeLong = openTimeLong;
+            _closeTimeLong = closeTimeLong;
+            _openTimeShort = openTimeShort;
+            _closeTimeShort = closeTimeShort;
         }
+
+        public override IEnumerable<Insight> Update(
+            QCAlgorithmFramework algorithm,
+            Slice data)
+        {
+            var insights = new List<Insight>();
+            foreach (var kvp in algorithm.ActiveSecurities)
+            {
+                Symbol symbol = kvp.Key;
+
+                if (!algorithm.IsMarketOpen(symbol))
+                    continue;
+
+                SecurityHolding holding = algorithm.Portfolio[symbol];
+                TimeSpan now = algorithm.Time.TimeOfDay;
+                bool longInHours = InHours(_openTimeLong, now, _closeTimeLong);
+                bool shortInHours = InHours(_openTimeShort, now, _closeTimeShort);
+
+                if (longInHours)
+                {
+                    TimeSpan duration = _openTimeLong - _closeTimeLong;
+                    if (duration < TimeSpan.Zero)
+                    {
+                        duration = duration.Add(TimeSpan.FromDays(1));
+                    }
+
+                    DateTime timeToClose = algorithm.Time.Date
+                        .Add(_openTimeLong)
+                        .Add(duration);
+
+                    insights.Add(Insight.Price(symbol, timeToClose, InsightDirection.Up));
+                }
+                else if (shortInHours)
+                {
+                    TimeSpan duration = _openTimeShort - _closeTimeShort;
+                    if (duration < TimeSpan.Zero)
+                    {
+                        duration = duration.Add(TimeSpan.FromDays(1));
+                    }
+
+                    DateTime timeToClose = algorithm.Time.Date
+                        .Add(_openTimeLong)
+                        .Add(duration);
+
+                    insights.Add(Insight.Price(symbol, timeToClose, InsightDirection.Down));
+                }
+            }
+
+            return insights;
+        }
+
 
         private bool InHours(TimeSpan open, TimeSpan now, TimeSpan close)
         {
