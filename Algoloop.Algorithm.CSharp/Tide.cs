@@ -35,7 +35,6 @@ namespace Capnode.Algorithm.CSharp
     {
         [Parameter("symbols")]
         protected string _symbols = "EURUSD";
-        private string _symbol;
 
         [Parameter("resolution")]
         protected string _resolution = "Hour";
@@ -59,10 +58,10 @@ namespace Capnode.Algorithm.CSharp
         private string _closeHourLong = "3";
 
         [Parameter("OpenHourShort")]
-        private string _openHourShort = "1";
+        private string _openHourShort = "7";
 
         [Parameter("CloseHourShort")]
-        private string _closeHourShort = "3";
+        private string _closeHourShort = "9";
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash
@@ -110,7 +109,7 @@ namespace Capnode.Algorithm.CSharp
             SetExecution(new ImmediateExecutionModel());
 
             // Risk Management
-            SetRiskManagement(new MaximumDrawdownPercentPerSecurity(0.03m));
+            SetRiskManagement(new NullRiskManagementModel());
         }
     }
 
@@ -146,37 +145,32 @@ namespace Capnode.Algorithm.CSharp
                     continue;
 
                 SecurityHolding holding = algorithm.Portfolio[symbol];
+                if (holding.Invested)
+                    return insights;
+
                 TimeSpan now = algorithm.Time.TimeOfDay;
                 bool longInHours = InHours(_openTimeLong, now, _closeTimeLong);
                 bool shortInHours = InHours(_openTimeShort, now, _closeTimeShort);
 
                 if (longInHours)
                 {
-                    TimeSpan duration = _openTimeLong - _closeTimeLong;
+                    TimeSpan duration = _closeTimeLong - algorithm.Time.TimeOfDay;
                     if (duration < TimeSpan.Zero)
                     {
                         duration = duration.Add(TimeSpan.FromDays(1));
                     }
 
-                    DateTime timeToClose = algorithm.Time.Date
-                        .Add(_openTimeLong)
-                        .Add(duration);
-
-                    insights.Add(Insight.Price(symbol, timeToClose, InsightDirection.Up));
+                    insights.Add(Insight.Price(symbol, duration, InsightDirection.Up));
                 }
                 else if (shortInHours)
                 {
-                    TimeSpan duration = _openTimeShort - _closeTimeShort;
+                    TimeSpan duration = _closeTimeShort - algorithm.Time.TimeOfDay;
                     if (duration < TimeSpan.Zero)
                     {
                         duration = duration.Add(TimeSpan.FromDays(1));
                     }
 
-                    DateTime timeToClose = algorithm.Time.Date
-                        .Add(_openTimeLong)
-                        .Add(duration);
-
-                    insights.Add(Insight.Price(symbol, timeToClose, InsightDirection.Down));
+                    insights.Add(Insight.Price(symbol, duration, InsightDirection.Down));
                 }
             }
 
