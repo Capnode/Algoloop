@@ -322,11 +322,6 @@
                                     SelectedValue="{Binding SelectedJob, Mode=TwoWay}"
                                     ItemsSource="{Binding Jobs}"
                                     ExColumns="{Binding JobColumns}">
-                                    <DataGrid.Resources>
-                                        <Style TargetType="{x:Type DataGridCell}">
-                                            <Setter Property="TextBlock.TextAlignment" Value="Right" />
-                                        </Style>
-                                    </DataGrid.Resources>
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDoubleClick">
                                             <i:InvokeCommandAction

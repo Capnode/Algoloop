@@ -46,7 +46,7 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
-        public IDictionary<string, string> _statistics = new Dictionary<string, string>();
+        public IDictionary<string, string> _statistics;
         private string _port;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
@@ -284,7 +284,7 @@ namespace Algoloop.ViewModel
             charts.Clear();
             Charts = null;
             Charts = charts;
-            IDictionary<string, string> statistics = new Dictionary<string, string>();
+            IDictionary<string, string> statistics = new SafeDictionary<string, string>();
 
             if (Model.Result != null)
             {
@@ -411,11 +411,7 @@ namespace Algoloop.ViewModel
             Charts = null;
             Charts = charts;
 
-            var statistics = Statistics;
-            statistics.Clear();
             Statistics = null;
-            Statistics = statistics;
-
             Orders.Clear();
 
             RaisePropertyChanged(() => Logs);

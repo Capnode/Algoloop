@@ -69,6 +69,7 @@
     <Compile Include="NullAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tide.cs" />
+    <Compile Include="TideV0.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -202,7 +202,6 @@ namespace Algoloop.ViewModel
 
         private void DoDeleteAllJobs()
         {
-            JobColumns.Clear();
             Jobs.Clear();
             DataToModel();
         }
@@ -269,7 +268,14 @@ namespace Algoloop.ViewModel
                     Log.Trace($"Strategy {jobModel.AlgorithmName} {jobModel.Name} {count}({total})");
                     var job = new StrategyJobViewModel(this, jobModel, _settingsModel);
                     Jobs.Add(job);
-                    Task task =  job.StartTaskAsync().ContinueWith(m => { throttler.Release(); });
+                    Task task = job
+                        .StartTaskAsync()
+                        .ContinueWith(m =>
+                        {
+                            ExDataGridColumns.AddPropertyColumns(JobColumns, job.Statistics, "Statistics");
+                            throttler.Release();
+                        },
+                        TaskScheduler.FromCurrentSynchronizationContext());
                     tasks.Add(task);
                 }
 
@@ -348,7 +354,6 @@ namespace Algoloop.ViewModel
                 ExDataGridColumns.AddPropertyColumns(JobColumns, strategyJobViewModel.Statistics, "Statistics");
             }
         }
-
 
         private void StrategyNameChanged()
         {

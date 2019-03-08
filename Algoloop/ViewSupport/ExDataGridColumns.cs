@@ -68,8 +68,7 @@ namespace Algoloop.ViewSupport
                     Binding = new Binding(binding)
                     {
                         Mode = BindingMode.OneWay,
-                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                        FallbackValue = ""
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                     },
                     ElementStyle = rightAligned ? _rightCellStyle : _leftCellStyle
                 });
