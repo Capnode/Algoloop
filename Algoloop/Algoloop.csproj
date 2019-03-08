@@ -248,6 +248,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\SafeDictionary.cs" />
+    <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="ViewSupport\ExDataGridColumns.cs" />
     <Compile Include="Model\FolderModel.cs" />
     <Compile Include="Model\ModelBase.cs" />

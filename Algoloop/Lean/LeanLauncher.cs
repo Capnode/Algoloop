@@ -119,7 +119,7 @@ namespace Algoloop.Lean
             Config.Set("api-handler", "QuantConnect.Api.Api");
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
-            Config.Set("alpha-handler", "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler");
+            Config.Set("alpha-handler", "Algoloop.Lean.AlphaHandler");
             if (settings.ApiToken != null) Config.Set("api-access-token", settings.ApiToken);
             if (settings.ApiUser != null) Config.Set("job-user-id", settings.ApiUser);
             if (settings.DesktopPort != 0) Config.Set("desktop-http-port", settings.DesktopPort.ToString());

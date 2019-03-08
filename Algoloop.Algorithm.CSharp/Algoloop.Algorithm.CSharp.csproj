@@ -62,7 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicTemplateAlgorithm.cs" />
     <Compile Include="ForexSchedule.cs" />
     <Compile Include="LogQuotes.cs" />
     <Compile Include="MACDTrendAlgorithm.cs" />
