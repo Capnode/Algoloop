@@ -28,7 +28,7 @@ namespace Algoloop.Provider
             Config.Set("data-directory", settings.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            GoogleDownloaderProgram.GoogleDownloader(symbols, resolution, model.FromDate, model.FromDate);
+            GoogleDownloaderProgram.GoogleDownloader(symbols, resolution, model.LastDate, model.LastDate);
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)

@@ -46,14 +46,14 @@ namespace Algoloop.Provider
             Config.Set("data-directory", settings.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DateTime fromDate = model.FromDate.Date;
+            DateTime fromDate = model.LastDate.Date;
             if (fromDate < DateTime.Today)
             {
                 DateTime nextDate = fromDate.AddDays(1);
                 DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, nextDate.AddMilliseconds(-1));
-                model.FromDate = nextDate;
+                model.LastDate = nextDate;
             }
-            model.Active = model.FromDate < DateTime.Today;
+            model.Active = model.LastDate < DateTime.Today;
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)

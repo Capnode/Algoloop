@@ -90,12 +90,13 @@ namespace Algoloop.Model
         public string ApiKey { get; set; } = string.Empty;
 
         [Category("Time")]
-        [DisplayName("From date")]
+        [DisplayName("Last date")]
+        [Description("Symbols are updated up to this date.")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public DateTime FromDate { get; set; } = DateTime.Today;
+        public DateTime LastDate { get; set; } = DateTime.Today;
 
         [Category("Time")]
         [DisplayName("Resolution")]

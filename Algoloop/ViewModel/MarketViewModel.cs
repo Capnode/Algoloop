@@ -197,7 +197,7 @@ namespace Algoloop.ViewModel
             _cancel = new CancellationTokenSource();
             while (!_cancel.Token.IsCancellationRequested && model.Active)
             {
-                Log.Trace($"{model.Provider} download {model.Resolution} {model.FromDate:d}");
+                Log.Trace($"{model.Provider} download {model.Resolution} {model.LastDate:d}");
                 var logger = new HostDomainLogger();
                 try
                 {

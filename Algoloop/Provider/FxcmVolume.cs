@@ -40,7 +40,7 @@ namespace Algoloop.Provider
             Config.Set("fxcm-password", model.Password);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.FromDate, model.FromDate);
+            FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.LastDate, model.LastDate);
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)

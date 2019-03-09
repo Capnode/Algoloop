@@ -42,14 +42,14 @@ namespace Algoloop.Provider
             Config.Set("fxcm-password", model.Password);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DateTime fromDate = model.FromDate.Date;
+            DateTime fromDate = model.LastDate.Date;
             if (fromDate < DateTime.Today)
             {
                 FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, fromDate, fromDate);
-                model.FromDate = fromDate.AddDays(1);
+                model.LastDate = fromDate.AddDays(1);
             }
 
-            model.Active = model.FromDate < DateTime.Today;
+            model.Active = model.LastDate < DateTime.Today;
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)

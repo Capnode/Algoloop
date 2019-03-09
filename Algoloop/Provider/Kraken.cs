@@ -28,7 +28,7 @@ namespace Algoloop.Provider
             Config.Set("data-directory", settings.DataFolder);
 
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, model.FromDate, model.FromDate);
+            KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, model.LastDate, model.LastDate);
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)

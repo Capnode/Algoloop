@@ -27,7 +27,7 @@ namespace Algoloop.Provider
             Config.Set("data-directory", settings.DataFolder);
 
             string apiKey = ""; // TODO:
-            QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.FromDate, apiKey);
+            QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.LastDate, apiKey);
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
