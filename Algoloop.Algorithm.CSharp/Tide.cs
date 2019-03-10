@@ -96,11 +96,11 @@ namespace Capnode.Algorithm.CSharp
                 .Split(';')
                 .Select(x => QuantConnect.Symbol.Create(x, SecurityType.Forex, _market));
 
-            UniverseSettings.Resolution = Resolution.Hour;
+            UniverseSettings.Resolution = resolution;
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
 
             // Alpha Model
-            SetAlpha(new TideAlphaModel(openTimeLong, closeTimeLong, openTimeShort, closeTimeShort));
+            SetAlpha(new TideAlphaModel(resolution, openTimeLong, closeTimeLong, openTimeShort, closeTimeShort));
 
             // Portfolio Construction
             SetPortfolioConstruction(new EqualWeightingPortfolioConstructionModel());
@@ -115,17 +115,20 @@ namespace Capnode.Algorithm.CSharp
 
     public class TideAlphaModel : AlphaModel
     {
+        private Resolution _resolution;
         private TimeSpan _openTimeLong;
         private TimeSpan _closeTimeLong;
         private TimeSpan _openTimeShort;
         private TimeSpan _closeTimeShort;
 
         public TideAlphaModel(
+            Resolution resolution,
             TimeSpan openTimeLong,
             TimeSpan closeTimeLong,
             TimeSpan openTimeShort,
             TimeSpan closeTimeShort)
         {
+            _resolution = resolution;
             _openTimeLong = openTimeLong;
             _closeTimeLong = closeTimeLong;
             _openTimeShort = openTimeShort;
@@ -144,30 +147,32 @@ namespace Capnode.Algorithm.CSharp
                 if (!algorithm.IsMarketOpen(symbol))
                     continue;
 
-                SecurityHolding holding = algorithm.Portfolio[symbol];
-                if (holding.Invested)
-                    return insights;
+                TimeSpan now = data.Time.TimeOfDay; // Time at end of bar
+                if (now >= TimeSpan.FromHours(24))
+                {
+                    now = now.Subtract(TimeSpan.FromHours(24));
+                }
 
-                TimeSpan now = algorithm.Time.TimeOfDay;
                 bool longInHours = InHours(_openTimeLong, now, _closeTimeLong);
                 bool shortInHours = InHours(_openTimeShort, now, _closeTimeShort);
 
-                if (longInHours)
+                SecurityHolding holding = algorithm.Portfolio[symbol];
+                if (!holding.IsLong && longInHours)
                 {
-                    TimeSpan duration = _closeTimeLong - algorithm.Time.TimeOfDay;
+                    TimeSpan duration = (_closeTimeLong - now).Subtract(TimeSpan.FromSeconds(1));
                     if (duration < TimeSpan.Zero)
                     {
-                        duration = duration.Add(TimeSpan.FromDays(1));
+                        duration = duration.Add(TimeSpan.FromHours(24));
                     }
 
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Up));
                 }
-                else if (shortInHours)
+                else if (!holding.IsShort && shortInHours)
                 {
-                    TimeSpan duration = _closeTimeShort - algorithm.Time.TimeOfDay;
+                    TimeSpan duration = (_closeTimeShort - now).Subtract(TimeSpan.FromSeconds(1));
                     if (duration < TimeSpan.Zero)
                     {
-                        duration = duration.Add(TimeSpan.FromDays(1));
+                        duration = duration.Add(TimeSpan.FromHours(24));
                     }
 
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Down));
