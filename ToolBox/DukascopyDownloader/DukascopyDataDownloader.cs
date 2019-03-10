@@ -164,6 +164,11 @@ namespace QuantConnect.ToolBox.DukascopyDownloader
                     {
                         bytes = client.DownloadData(url);
                     }
+                    catch (WebException exception)
+                    {
+                        Log.Trace($"{exception.Message}: {dukascopySymbol} {date:d}");
+                        yield break;
+                    }
                     catch (Exception exception)
                     {
                         Log.Error(exception);

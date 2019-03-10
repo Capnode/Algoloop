@@ -24,16 +24,18 @@ namespace Algoloop.Provider
 {
     class Dukascopy : IProvider
     {
+        private readonly DateTime FirstDate = new DateTime(2003, 05, 05);
+
         private readonly IEnumerable<string> _majors = new[] { "AUDUSD", "EURUSD", "GBPUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY" };
         private readonly IEnumerable<string> _crosses = new[]
         {
             "AUDCAD", "AUDCHF", "AUDJPY", "AUDNZD", "AUDSGD", "CADCHF", "CADHKD", "CADJPY", "CHFJPY", "CHFPLN", "CHFSGD",
             "EURAUD", "EURCAD", "EURCHF", "EURDKK", "EURGBP", "EURHKD", "EURHUF", "EURJPY", "EURMXN", "EURNOK", "EURNZD",
             "EURPLN", "EURRUB", "EURSEK", "EURSGD", "EURTRY", "EURZAR", "GBPAUD", "GBPCAD", "GBPCHF", "GBPJPY", "GBPNZD",
-            "HKDJPY", "MXNJPY", "NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD", "XPDUSD", "XPTUSD", "SGDJPY", "USDBRL", "USDCNY",
-            "USDDKK", "USDHKD", "USDHUF", "USDMXN", "USDNOK", "USDPLN", "USDRUB", "USDSEK", "USDSGD", "USDTRY", "USDZAR", "ZARJPY"
+            "HKDJPY", "MXNJPY", "NZDCAD", "NZDCHF", "NZDJPY", "NZDSGD", "SGDJPY", "USDBRL", "USDCNY", "USDDKK", "USDHKD",
+            "USDHUF", "USDMXN", "USDNOK", "USDPLN", "USDRUB", "USDSEK", "USDSGD", "USDTRY", "USDZAR", "ZARJPY"
         };
-        private readonly IEnumerable<string> _metals = new[] { "XAGUSD", "XAUUSD", "WTICOUSD", "NATGASUSD" };
+        private readonly IEnumerable<string> _metals = new[] { "XAGUSD", "XAUUSD", "WTICOUSD" };
         private readonly IEnumerable<string> _indices = new[]
         {
             "AU200AUD", "CH20CHF", "DE30EUR", "ES35EUR", "EU50EUR", "FR40EUR", "UK100GBP", "HK33HKD", "IT40EUR", "JP225JPY",
@@ -46,14 +48,19 @@ namespace Algoloop.Provider
             Config.Set("data-directory", settings.DataFolder);
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DateTime fromDate = model.LastDate.Date;
+            DateTime fromDate = model.LastDate.Date.AddDays(1);
+            if (fromDate < FirstDate )
+            {
+                fromDate = FirstDate;
+            }
+
             if (fromDate < DateTime.Today)
             {
-                DateTime nextDate = fromDate.AddDays(1);
-                DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, nextDate.AddMilliseconds(-1));
-                model.LastDate = nextDate;
+                DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, fromDate.AddDays(1).AddMilliseconds(-1));
+                model.LastDate = fromDate;
             }
-            model.Active = model.LastDate < DateTime.Today;
+
+            model.Active = model.LastDate.AddDays(1) < DateTime.Today;
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
@@ -63,7 +70,9 @@ namespace Algoloop.Provider
             list.AddRange(_crosses.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Crosses" } } }));
             list.AddRange(_metals.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Metals" } } }));
             list.AddRange(_indices.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Indices" } } }));
-            return list;
+
+            var downloader = new DukascopyDataDownloader();
+            return list.Where(m => downloader.HasSymbol(m.Name));
         }
     }
 }
