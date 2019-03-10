@@ -201,6 +201,15 @@ namespace Algoloop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading configuration, please wait....
+        /// </summary>
+        internal static string LoadingConfiguration {
+            get {
+                return ResourceManager.GetString("LoadingConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap MoveDown {
@@ -247,6 +256,15 @@ namespace Algoloop.Properties {
             get {
                 object obj = ResourceManager.GetObject("Run", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving configuration, please wait....
+        /// </summary>
+        internal static string SavingConfiguration {
+            get {
+                return ResourceManager.GetString("SavingConfiguration", resourceCulture);
             }
         }
         

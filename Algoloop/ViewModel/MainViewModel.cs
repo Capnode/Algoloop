@@ -16,8 +16,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
+using Algoloop.Properties;
 using Algoloop.Provider;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
@@ -32,6 +34,8 @@ namespace Algoloop.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private bool _isBusy;
+        private Task _task;
+        private string _statusMessage;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -59,10 +63,10 @@ namespace Algoloop.ViewModel
             string appData = GetAppDataFolder();
             Directory.SetCurrentDirectory(appData);
 
-            // Read configuration
-            ReadConfig(appData);
-
             ProviderFactory.RegisterProviders();
+
+            // Read configuration
+            _task = ReadConfigAsync(appData);
         }
 
         public RelayCommand SettingsCommand { get; }
@@ -91,6 +95,12 @@ namespace Algoloop.ViewModel
                 _isBusy = value;
                 RaisePropertyChanged("IsBusy");
             }
+        }
+
+        public string StatusMessage
+        {
+            get => _statusMessage;
+            set => Set(ref _statusMessage, value);
         }
 
         public void SaveAll()
@@ -157,25 +167,46 @@ namespace Algoloop.ViewModel
             return path;
         }
 
-        private void ReadConfig(string appData)
+        private async Task ReadConfigAsync(string appData)
         {
-            SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
-            MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
-            AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
-            StrategiesViewModel.Read(Path.Combine(appData, "Strategies.json"));
+            try
+            {
+                IsBusy = true;
+                StatusMessage = Resources.LoadingConfiguration;
+                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
+                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
+                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
+                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json"));
+            }
+            finally
+            {
+                StatusMessage = string.Empty;
+                IsBusy = false;
+            }
         }
 
         private void SaveConfig(string appData)
         {
-            if (!Directory.Exists(appData))
+            try
             {
-                Directory.CreateDirectory(appData);
-            }
+                IsBusy = true;
+                StatusMessage = Resources.SavingConfiguration;
 
-            SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
-            MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
-            AccountsViewModel.Save(Path.Combine(appData, "Accounts.json"));
-            StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));
+                if (!Directory.Exists(appData))
+                {
+                    Directory.CreateDirectory(appData);
+                }
+
+                SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
+                MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
+                AccountsViewModel.Save(Path.Combine(appData, "Accounts.json"));
+                StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));
+            }
+            finally
+            {
+                StatusMessage = string.Empty;
+                IsBusy = false;
+            }
         }
     }
 }

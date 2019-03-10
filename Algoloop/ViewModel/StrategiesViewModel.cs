@@ -98,18 +98,21 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool Read(string fileName)
+        internal async Task<bool> ReadAsync(string fileName)
         {
             if (!File.Exists(fileName))
                 return false;
 
             try
             {
-                using (StreamReader r = new StreamReader(fileName))
-                {
-                    string json = r.ReadToEnd();
-                    Model.Copy(JsonConvert.DeserializeObject<StrategiesModel>(json));
-                }
+                await Task.Run(() =>
+               {
+                   using (StreamReader r = new StreamReader(fileName))
+                   {
+                       string json = r.ReadToEnd();
+                       Model.Copy(JsonConvert.DeserializeObject<StrategiesModel>(json));
+                   }
+               });
 
                 DataFromModel();
                 StartTasks();

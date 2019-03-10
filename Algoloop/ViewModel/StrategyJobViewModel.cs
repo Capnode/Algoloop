@@ -355,6 +355,9 @@ namespace Algoloop.ViewModel
 
         private void AddCustomStatistics(IDictionary<string, string> statistics, BacktestResult result)
         {
+            if (result.Statistics.Count == 0)
+                return;
+
             string profit = result.Statistics["Net Profit"];
             string dd = result.Statistics["Drawdown"];
             bool isNetProfit = decimal.TryParse(profit.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal netProfit)
