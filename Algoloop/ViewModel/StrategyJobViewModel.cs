@@ -46,7 +46,7 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
-        public IDictionary<string, string> _statistics;
+        public IDictionary<string, object> _statistics;
         private string _port;
 
         public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
@@ -79,7 +79,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
 
-        public IDictionary<string, string> Statistics
+        public IDictionary<string, object> Statistics
         {
             get => _statistics;
             set => Set(ref _statistics, value);
@@ -284,7 +284,7 @@ namespace Algoloop.ViewModel
             charts.Clear();
             Charts = null;
             Charts = charts;
-            IDictionary<string, string> statistics = new SafeDictionary<string, string>();
+            IDictionary<string, object> statistics = new SafeDictionary<string, object>();
 
             if (Model.Result != null)
             {
@@ -326,26 +326,26 @@ namespace Algoloop.ViewModel
             RaisePropertyChanged(() => Loglines);
         }
 
-        private void AddStatisticItem(IDictionary<string, string> statistics, string name, string text)
+        private void AddStatisticItem(IDictionary<string, object> statistics, string name, string text)
         {
             decimal value;
             if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "$";
-                statistics.Add(header, value.ToString());
+                statistics.Add(header, value);
             }
             else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "%";
-                statistics.Add(header, value.ToString());
+                statistics.Add(header, value);
             }
             else if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
-                statistics.Add(name, value.ToString());
+                statistics.Add(name, value);
             }
             else if (bool.TryParse(text, out bool boolVal))
             {
-                statistics.Add(name, boolVal.ToString());
+                statistics.Add(name, boolVal);
             }
             else
             {
@@ -353,7 +353,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void AddCustomStatistics(IDictionary<string, string> statistics, BacktestResult result)
+        private void AddCustomStatistics(IDictionary<string, object> statistics, BacktestResult result)
         {
             if (result.Statistics.Count == 0)
                 return;
@@ -367,8 +367,8 @@ namespace Algoloop.ViewModel
 
             if (isNetProfit && isDrawdown && drawdown != 0)
             {
-                string ratio = (netProfit / drawdown).RoundToSignificantDigits(4).ToString(CultureInfo.InvariantCulture);
-                AddStatisticItem(statistics, "Profit-DD", ratio);
+                decimal ratio = (netProfit / drawdown).RoundToSignificantDigits(4);
+                statistics.Add("Profit-DD", ratio);
             }
         }
 

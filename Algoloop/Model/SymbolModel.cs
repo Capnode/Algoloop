@@ -39,7 +39,7 @@ namespace Algoloop.Model
         public string Name { get; set; } = "symbol";
 
         [DataMember]
-        public IDictionary<string, string> Properties { get; set; }
+        public IDictionary<string, object> Properties { get; set; }
 
         internal void Refresh()
         {

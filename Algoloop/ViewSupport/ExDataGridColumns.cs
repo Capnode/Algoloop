@@ -32,14 +32,18 @@ namespace Algoloop.ViewSupport
             _leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));
         }
 
-        public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, string> properties, string binding)
+        public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, object> properties, string binding)
         {
             if (properties == null)
                 return;
 
             foreach (var property in properties)
             {
-                bool isNumber = decimal.TryParse(property.Value, out _);
+                bool isNumber = property.Value is int
+                    || property.Value is long
+                    || property.Value is float
+                    || property.Value is double
+                    || property.Value is decimal;
                 AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", isNumber);
             }
         }

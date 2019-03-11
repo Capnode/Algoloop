@@ -66,10 +66,10 @@ namespace Algoloop.Provider
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
             var list = new List<SymbolModel>();
-            list.AddRange(_majors.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Majors" } } }));
-            list.AddRange(_crosses.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Crosses" } } }));
-            list.AddRange(_metals.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Metals" } } }));
-            list.AddRange(_indices.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, string> { { "Category", "Indices" } } }));
+            list.AddRange(_majors.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
+            list.AddRange(_crosses.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, object> { { "Category", "Crosses" } } }));
+            list.AddRange(_metals.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, object> { { "Category", "Metals" } } }));
+            list.AddRange(_indices.Select(m => new SymbolModel() { Name = m, Properties = new Dictionary<string, object> { { "Category", "Indices" } } }));
 
             var downloader = new DukascopyDataDownloader();
             return list.Where(m => downloader.HasSymbol(m.Name));
