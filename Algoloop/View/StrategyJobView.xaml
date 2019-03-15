@@ -69,6 +69,21 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
+            <TabItem Header="{Binding Holdings.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Holdings ({0}), FallbackValue=Holdings}">
+                <DataGrid
+                    IsReadOnly="True"
+                    GridLinesVisibility="None"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding Holdings}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
+                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
                 <DataGrid
                     IsReadOnly="True"

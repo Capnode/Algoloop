@@ -78,6 +78,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
+        public SyncObservableCollection<HoldingViewModel> Holdings { get; } = new SyncObservableCollection<HoldingViewModel>();
 
         public IDictionary<string, object> Statistics
         {
@@ -280,6 +281,7 @@ namespace Algoloop.ViewModel
             }
 
             Orders.Clear();
+            Holdings.Clear();
             var charts = Charts;
             charts.Clear();
             Charts = null;
@@ -306,9 +308,35 @@ namespace Algoloop.ViewModel
 
                     Statistics = statistics;
 
-                    foreach (var order in result.Orders.OrderBy(o => o.Key))
+                    // Process orders
+                    foreach (var pair in result.Orders.OrderBy(o => o.Key))
                     {
-                        Orders.Add(order.Value);
+                        Order order = pair.Value;
+                        Orders.Add(order);
+
+                        HoldingViewModel holding = Holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
+                        if (holding == null)
+                        {
+                            holding = new HoldingViewModel(order.Symbol)
+                            {
+                                Price = order.Price,
+                                Quantity = order.Quantity,
+                                Profit = order.Value
+                            };
+
+                            Holdings.Add(holding);
+                        }
+                        else
+                        {
+                            decimal quantity = holding.Quantity + order.Quantity;
+                            holding.Price = quantity == 0 ? 0 : (holding.Price * holding.Quantity + order.Price * order.Quantity) / quantity;
+                            holding.Quantity += order.Quantity;
+                            holding.Profit += order.Value;
+                            if (holding.Quantity == 0)
+                            {
+                                Holdings.Remove(holding);
+                            }
+                        }
                     }
 
                     try
@@ -416,6 +444,7 @@ namespace Algoloop.ViewModel
 
             Statistics = null;
             Orders.Clear();
+            Holdings.Clear();
 
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
