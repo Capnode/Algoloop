@@ -206,10 +206,6 @@ namespace QuantConnect.Algorithm
             {
                 var mooTicket = MarketOnOpenOrder(security.Symbol, quantity, tag);
                 var anyNonDailySubscriptions = security.Subscriptions.Any(x => x.Resolution != Resolution.Daily);
-                if (mooTicket.SubmitRequest.Response.IsSuccess && !anyNonDailySubscriptions)
-                {
-                    Debug("Converted OrderID: " + mooTicket.OrderId + " into a MarketOnOpen order.");
-                }
                 return mooTicket;
             }
 
