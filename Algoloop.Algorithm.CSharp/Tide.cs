@@ -43,10 +43,10 @@ namespace Capnode.Algorithm.CSharp
         protected string _market = Market.FXCM;
 
         [Parameter("startdate")]
-        protected string _startdate = "2018-01-01 00:00:00";
+        protected string _startdate = "01/01/2018 00:00:00";
 
         [Parameter("enddate")]
-        protected string _enddate = "2018-10-30 00:00:00";
+        protected string _enddate = "01/01/2019 00:00:00";
 
         [Parameter("cash")]
         protected string _cash = "100000";
@@ -55,13 +55,13 @@ namespace Capnode.Algorithm.CSharp
         private string _openHourLong = "1";
 
         [Parameter("CloseHourLong")]
-        private string _closeHourLong = "3";
+        private string _closeHourLong = "4";
 
         [Parameter("OpenHourShort")]
-        private string _openHourShort = "7";
+        private string _openHourShort = "4";
 
         [Parameter("CloseHourShort")]
-        private string _closeHourShort = "9";
+        private string _closeHourShort = "7";
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash
@@ -86,8 +86,6 @@ namespace Capnode.Algorithm.CSharp
             var openTimeShort = TimeSpan.FromHours(double.Parse(_openHourShort));
             var closeTimeShort = TimeSpan.FromHours(double.Parse(_closeHourShort));
 
-            Log($"Tide {openTimeLong.Hours} {closeTimeLong.Hours} {openTimeShort.Hours} {closeTimeShort.Hours}");
-
             // Set zero transaction fees
             SetSecurityInitializer(s => s.SetFeeModel(new ConstantFeeModel(0m)));
 
@@ -110,6 +108,8 @@ namespace Capnode.Algorithm.CSharp
 
             // Risk Management
             SetRiskManagement(new NullRiskManagementModel());
+
+            Log($"Tide {openTimeLong.Hours} {closeTimeLong.Hours} {openTimeShort.Hours} {closeTimeShort.Hours} {string.Join(";", symbols.Select(m => m))}");
         }
     }
 
@@ -139,6 +139,8 @@ namespace Capnode.Algorithm.CSharp
             QCAlgorithmFramework algorithm,
             Slice data)
         {
+            algorithm.Log($"Update");
+
             var insights = new List<Insight>();
             foreach (var kvp in algorithm.ActiveSecurities)
             {
@@ -147,12 +149,7 @@ namespace Capnode.Algorithm.CSharp
                 if (!algorithm.IsMarketOpen(symbol))
                     continue;
 
-                TimeSpan now = data.Time.TimeOfDay; // Time at end of bar
-                if (now >= TimeSpan.FromHours(24))
-                {
-                    now = now.Subtract(TimeSpan.FromHours(24));
-                }
-
+                TimeSpan now = data.Time.TimeOfDay;
                 bool longInHours = InHours(_openTimeLong, now, _closeTimeLong);
                 bool shortInHours = InHours(_openTimeShort, now, _closeTimeShort);
 
@@ -166,6 +163,7 @@ namespace Capnode.Algorithm.CSharp
                     }
 
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Up));
+                    algorithm.Log($"Insight Up");
                 }
                 else if (!holding.IsShort && shortInHours)
                 {
@@ -176,6 +174,7 @@ namespace Capnode.Algorithm.CSharp
                     }
 
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Down));
+                    algorithm.Log($"Insight Down");
                 }
             }
 
