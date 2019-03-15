@@ -56,19 +56,6 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
-                <DataGrid HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch"
-                    AutoGenerateColumns="False"
-                    GridLinesVisibility="None"
-                    IsReadOnly="True"
-                    ItemsSource="{Binding Statistics}">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
-                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
-                    </DataGrid.Columns>
-                </DataGrid>
-            </TabItem>
             <TabItem Header="{Binding Holdings.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Holdings ({0}), FallbackValue=Holdings}">
                 <DataGrid
                     IsReadOnly="True"
@@ -101,6 +88,19 @@
                         <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
                         <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                         <DataGridTextColumn Header="Tag" Binding="{Binding Tag}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
+                <DataGrid HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    AutoGenerateColumns="False"
+                    GridLinesVisibility="None"
+                    IsReadOnly="True"
+                    ItemsSource="{Binding Statistics}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
+                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>

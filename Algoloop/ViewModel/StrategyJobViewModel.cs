@@ -313,6 +313,8 @@ namespace Algoloop.ViewModel
                     {
                         Order order = pair.Value;
                         Orders.Add(order);
+                        if (order.Status.Equals(OrderStatus.Submitted))
+                            continue;
 
                         HoldingViewModel holding = Holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
                         if (holding == null)
