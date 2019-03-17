@@ -14,6 +14,7 @@
 
 using GalaSoft.MvvmLight;
 using QuantConnect;
+using System;
 
 namespace Algoloop.ViewModel
 {
@@ -22,6 +23,7 @@ namespace Algoloop.ViewModel
         private decimal _price;
         private decimal _quantity;
         private decimal _profit;
+        private TimeSpan _duration;
 
         public HoldingViewModel(Symbol symbol)
         {
@@ -46,6 +48,12 @@ namespace Algoloop.ViewModel
         {
             get => _profit;
             set => Set(ref _profit, value);
+        }
+
+        public TimeSpan Duration
+        {
+            get => _duration;
+            set => Set(ref _duration, value);
         }
     }
 }

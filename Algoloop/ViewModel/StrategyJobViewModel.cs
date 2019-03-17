@@ -333,8 +333,9 @@ namespace Algoloop.ViewModel
                     {
                         Price = order.Price,
                         Quantity = order.Quantity,
-                        Profit = order.Value
-                    };
+                        Profit = order.Value,
+                        Duration = (order.LastUpdateTime ?? DateTime.Now) - order.CreatedTime
+                };
 
                     Holdings.Add(holding);
                 }
@@ -453,6 +454,7 @@ namespace Algoloop.ViewModel
             Statistics = null;
             Orders.Clear();
             Holdings.Clear();
+            Trades.Clear();
 
             RaisePropertyChanged(() => Logs);
             RaisePropertyChanged(() => Loglines);
