@@ -24,10 +24,12 @@ using QuantConnect;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
+using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -77,6 +79,7 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
+        public SyncObservableCollection<Trade> Trades { get; } = new SyncObservableCollection<Trade>();
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
         public SyncObservableCollection<HoldingViewModel> Holdings { get; } = new SyncObservableCollection<HoldingViewModel>();
 
@@ -262,6 +265,18 @@ namespace Algoloop.ViewModel
 
         internal void DataFromModel()
         {
+            // Cleanup
+            Trades.Clear();
+            Orders.Clear();
+            Holdings.Clear();
+            var charts = Charts;
+            charts.Clear();
+            Charts = null;
+            Charts = charts;
+            RaisePropertyChanged(() => Logs);
+            RaisePropertyChanged(() => Loglines);
+
+            // Get symbols from model
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -269,91 +284,82 @@ namespace Algoloop.ViewModel
                 Symbols.Add(symbolViewModel);
             }
 
+            // Get parameters from model
             Parameters.Clear();
             foreach (ParameterModel parameterModel in Model.Parameters)
             {
                 var parameterViewModel = new ParameterViewModel(null, parameterModel);
                 Parameters.Add(parameterViewModel);
-                if (parameterModel.UseValue)
-                {
-//                    _parent.Summary.Add(row, parameterModel.Name, parameterModel.Value);
-                }
             }
 
-            Orders.Clear();
-            Holdings.Clear();
-            var charts = Charts;
-            charts.Clear();
-            Charts = null;
-            Charts = charts;
+            if (Model.Result == null)
+                return;
+
+            // Process results
+            var result = JsonConvert.DeserializeObject<BacktestResult>(Model.Result, new[] { new OrderJsonConverter() });
+            if (result == null)
+                return;
+
+            // Closed trades result
+            result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
+
+            // Statistics results
             IDictionary<string, object> statistics = new SafeDictionary<string, object>();
-
-            if (Model.Result != null)
+            AddCustomStatistics(statistics, result);
+            foreach (KeyValuePair<string, string> item in result.Statistics)
             {
-                // Allow proper decoding of orders.
-                var result = JsonConvert.DeserializeObject<BacktestResult>(Model.Result, new[] { new OrderJsonConverter() });
-                if (result != null)
+                AddStatisticItem(statistics, item.Key, item.Value);
+            }
+
+            foreach (KeyValuePair<string, string> item in result.RuntimeStatistics)
+            {
+                AddStatisticItem(statistics, item.Key, item.Value);
+            }
+
+            Statistics = statistics;
+
+            // Orders result
+            foreach (var pair in result.Orders.OrderBy(o => o.Key))
+            {
+                Order order = pair.Value;
+                Orders.Add(order);
+                if (order.Status.Equals(OrderStatus.Submitted))
+                    continue;
+
+                HoldingViewModel holding = Holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
+                if (holding == null)
                 {
-                    AddCustomStatistics(statistics, result);
-
-                    foreach (KeyValuePair<string, string> item in result.Statistics)
+                    holding = new HoldingViewModel(order.Symbol)
                     {
-                        AddStatisticItem(statistics, item.Key, item.Value);
-                    }
+                        Price = order.Price,
+                        Quantity = order.Quantity,
+                        Profit = order.Value
+                    };
 
-                    foreach (KeyValuePair<string, string> item in result.RuntimeStatistics)
+                    Holdings.Add(holding);
+                }
+                else
+                {
+                    decimal quantity = holding.Quantity + order.Quantity;
+                    holding.Price = quantity == 0 ? 0 : (holding.Price * holding.Quantity + order.Price * order.Quantity) / quantity;
+                    holding.Quantity += order.Quantity;
+                    holding.Profit += order.Value;
+                    if (holding.Quantity == 0)
                     {
-                        AddStatisticItem(statistics, item.Key, item.Value);
-                    }
-
-                    Statistics = statistics;
-
-                    // Process orders
-                    foreach (var pair in result.Orders.OrderBy(o => o.Key))
-                    {
-                        Order order = pair.Value;
-                        Orders.Add(order);
-                        if (order.Status.Equals(OrderStatus.Submitted))
-                            continue;
-
-                        HoldingViewModel holding = Holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
-                        if (holding == null)
-                        {
-                            holding = new HoldingViewModel(order.Symbol)
-                            {
-                                Price = order.Price,
-                                Quantity = order.Quantity,
-                                Profit = order.Value
-                            };
-
-                            Holdings.Add(holding);
-                        }
-                        else
-                        {
-                            decimal quantity = holding.Quantity + order.Quantity;
-                            holding.Price = quantity == 0 ? 0 : (holding.Price * holding.Quantity + order.Price * order.Quantity) / quantity;
-                            holding.Quantity += order.Quantity;
-                            holding.Profit += order.Value;
-                            if (holding.Quantity == 0)
-                            {
-                                Holdings.Remove(holding);
-                            }
-                        }
-                    }
-
-                    try
-                    {
-                        ParseCharts(result.Charts);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Trace($"Strategy {Model.Name} {ex.GetType()}: {ex.Message}");
+                        Holdings.Remove(holding);
                     }
                 }
             }
 
-            RaisePropertyChanged(() => Logs);
-            RaisePropertyChanged(() => Loglines);
+            // Charts results
+            try
+            {
+                ParseCharts(result);
+            }
+            catch (Exception ex)
+            {
+                Log.Trace($"Strategy {Model.Name} {ex.GetType()}: {ex.Message}");
+            }
         }
 
         private void AddStatisticItem(IDictionary<string, object> statistics, string name, string text)
@@ -452,26 +458,31 @@ namespace Algoloop.ViewModel
             RaisePropertyChanged(() => Loglines);
         }
 
-        private void ParseCharts(IDictionary<string, Chart> charts)
+        private void ParseCharts(Result result)
         {
-            var workCharts = Charts;
+            SyncObservableCollection<ChartViewModel> workCharts = Charts;
             Debug.Assert(workCharts.Count == 0);
-            try
+
+            var series = new Series("Net profit", SeriesType.Line, "$", Color.Green, ScatterMarkerSymbol.Diamond);
+            decimal profit = Model.InitialCapital;
+            series.AddPoint(Model.StartDate, profit);
+            foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
-                foreach (KeyValuePair<string, Chart> chart in charts)
-                {
-                    foreach (KeyValuePair<string, Series> serie in chart.Value.Series)
-                    {
-                        if (serie.Value.Values.Count < 2)
-                            continue;
-                        var viewModel = new ChartViewModel(serie.Value);
-                        workCharts.Add(viewModel);
-                    }
-                }
+                profit += trade.Value;
+                series.AddPoint(trade.Key, profit);
             }
-            catch (Exception e)
+
+            workCharts.Add(new ChartViewModel(series));
+
+            foreach (KeyValuePair<string, Chart> chart in result.Charts)
             {
-                Log.Error($"{e.GetType()}: {e.Message}");
+                foreach (KeyValuePair<string, Series> serie in chart.Value.Series)
+                {
+                    if (serie.Value.Values.Count < 2)
+                        continue;
+
+                    workCharts.Add(new ChartViewModel(serie.Value));
+                }
             }
 
             Charts = null;

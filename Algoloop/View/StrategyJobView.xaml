@@ -10,6 +10,12 @@
     xmlns:properties="clr-namespace:Algoloop.Properties"
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}" x:Key="RightCell">
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+    </UserControl.Resources>
+    
     <DockPanel>
         <TabControl>
             <TabItem Header="Configuration">
@@ -64,14 +70,38 @@
                     ItemsSource="{Binding Holdings}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
-                        <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
-                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
-                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit}" ElementStyle="{StaticResource RightCell}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
+            <TabItem Header="{Binding Trades.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
+                <DataGrid
+                    IsReadOnly="True"
+                    GridLinesVisibility="None"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding Trades}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
+                        <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>
+                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction}"/>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                        <DataGridTextColumn Header="Entry price" Binding="{Binding EntryPrice}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Exit price" Binding="{Binding ExitPrice}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Profit" Binding="{Binding ProfitLoss}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Fees" Binding="{Binding TotalFees}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Duration" Binding="{Binding Duration}"/>
+                        <DataGridTextColumn Header="Drawdown" Binding="{Binding EndTradeDrawdown}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="MAE" Binding="{Binding MAE}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="MFE" Binding="{Binding MFE}" ElementStyle="{StaticResource RightCell}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
                 <DataGrid
                     IsReadOnly="True"
                     GridLinesVisibility="None"
@@ -79,12 +109,13 @@
                     ItemsSource="{Binding Orders}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
-                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
-                        <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
-                        <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}"/>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
-                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}"/>
-                        <DataGridTextColumn Header="Value" Binding="{Binding Value}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
                         <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                         <DataGridTextColumn Header="Tag" Binding="{Binding Tag}"/>
@@ -100,7 +131,7 @@
                     ItemsSource="{Binding Statistics}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
-                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
+                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
