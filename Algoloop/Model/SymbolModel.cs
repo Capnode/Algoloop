@@ -33,7 +33,7 @@ namespace Algoloop.Model
         }
 
         [DataMember]
-        public bool Active { get; set; } = false;
+        public bool Active { get; set; } = true;
 
         [DataMember]
         public string Name { get; set; } = "symbol";

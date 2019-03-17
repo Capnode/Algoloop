@@ -438,7 +438,7 @@ namespace Algoloop.ViewModel
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
             openFileDialog.Multiselect = false;
-            openFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            openFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == false)
                 return;
 
@@ -564,7 +564,7 @@ namespace Algoloop.ViewModel
             DataToModel();
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.Filter = "symbol file (*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
             if (saveFileDialog.ShowDialog() == false)
                 return;
 
