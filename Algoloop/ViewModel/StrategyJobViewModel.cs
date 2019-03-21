@@ -323,7 +323,12 @@ namespace Algoloop.ViewModel
             {
                 Order order = pair.Value;
                 Orders.Add(order);
-                if (order.Status.Equals(OrderStatus.Submitted))
+                if (order.Status.Equals(OrderStatus.Submitted)
+                    || order.Status.Equals(OrderStatus.Canceled)
+                    || order.Status.Equals(OrderStatus.CancelPending)
+                    || order.Status.Equals(OrderStatus.None)
+                    || order.Status.Equals(OrderStatus.New)
+                    || order.Status.Equals(OrderStatus.Invalid))
                     continue;
 
                 HoldingViewModel holding = Holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
@@ -334,7 +339,7 @@ namespace Algoloop.ViewModel
                         Price = order.Price,
                         Quantity = order.Quantity,
                         Profit = order.Value,
-                        Duration = (order.LastUpdateTime ?? DateTime.Now) - order.CreatedTime
+                        Duration = (order.LastUpdateTime ?? Model.EndDate) - order.CreatedTime
                 };
 
                     Holdings.Add(holding);

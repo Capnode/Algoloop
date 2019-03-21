@@ -112,12 +112,13 @@
                         <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
-                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" ElementStyle="{StaticResource RightCell}"/>
-                        <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
                         <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Limit" Binding="{Binding LimitPrice}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
-                        <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
                         <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                         <DataGridTextColumn Header="Tag" Binding="{Binding Tag}"/>
                     </DataGrid.Columns>
