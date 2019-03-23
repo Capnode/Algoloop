@@ -324,7 +324,7 @@ namespace Algoloop.ViewModel
         private void DataFromModel()
         {
             Symbols.Clear();
-            foreach (SymbolModel symbolModel in Model.Symbols)
+            foreach (SymbolModel symbolModel in Model.Symbols.OrderBy(m => m.Name))
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
