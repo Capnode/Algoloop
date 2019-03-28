@@ -90,9 +90,12 @@ namespace Capnode.Algorithm.CSharp
             SetSecurityInitializer(s => s.SetFeeModel(new ConstantFeeModel(0m)));
 
             // Universe Selection
-            var symbols = _symbols
+            IEnumerable<Symbol> symbols = _symbols
                 .Split(';')
                 .Select(x => QuantConnect.Symbol.Create(x, SecurityType.Forex, _market));
+
+            // Add symbols again to get updates. (Should not be needed)
+            symbols.ToList().ForEach(m => AddForex(m.Value, resolution, _market));
 
             UniverseSettings.Resolution = resolution;
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
