@@ -59,7 +59,7 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void OnData(Slice slice)
         {
-            QuoteBar quote = slice.QuoteBars[_symbol];
+            QuoteBar quote = slice.QuoteBars[_symbol.Value];
         }
     }
 }

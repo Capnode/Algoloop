@@ -17,6 +17,7 @@ using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Parameters;
+using QuantConnect.Securities.Forex;
 using System;
 
 namespace Algoloop.Algorithm.CSharp
@@ -36,7 +37,7 @@ namespace Algoloop.Algorithm.CSharp
         private string _symbol;
 
         [Parameter("resolution")]
-        private string __resolution;
+        private string __resolution = null;
         private Resolution _resolution = Resolution.Minute;
 
         [Parameter("market")]
@@ -57,14 +58,7 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("period")]
         private string __period = "10";
         private int _period;
-
-        [Parameter("period2")]
-        private string __period2 = "10";
-        private int _period2;
-
-        [Parameter("period3")]
-        private string __period3 = "10";
-        private int _period3;
+        private Forex _forex;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
@@ -77,14 +71,12 @@ namespace Algoloop.Algorithm.CSharp
             Enum.TryParse(__resolution, out _resolution);
             _cash = int.Parse(__cash);
             _period = int.Parse(__period);
-            _period2 = int.Parse(__period2);
-            _period3 = int.Parse(__period3);
-            Log($"Period: {_period} {_period2} {_period3} ");
+            Log($"Period: {_period}");
 
             SetStartDate(_startdate);
             SetEndDate(_enddate);
             SetCash(_cash);
-            AddForex(_symbol, _resolution, __market);
+            _forex = AddForex(_symbol, _resolution, __market);
         }
 
         /// <summary>
@@ -98,7 +90,7 @@ namespace Algoloop.Algorithm.CSharp
                 if (Time.Minute / _period % 2 == 1)
                 {
                     //                    Log($"Close {string.Join(", ", data.Values)}");
-                    Liquidate("EURUSD");
+                    Liquidate(_forex.Symbol);
                 }
             }
             else
@@ -106,7 +98,7 @@ namespace Algoloop.Algorithm.CSharp
                 if (Time.Minute / _period % 2 == 0)
                 {
                     //                    Log($"Open {string.Join(", ", data.Values)}");
-                    SetHoldings("EURUSD", .5);
+                    SetHoldings(_forex.Symbol, .5);
                 }
             }
         }

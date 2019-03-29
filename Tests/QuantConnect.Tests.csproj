@@ -709,10 +709,6 @@
       <Project>{9561d14a-467e-40ad-928e-ee9f758d7d98}</Project>
       <Name>QuantConnect.Jupyter</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj">
-      <Project>{09e7b916-e58b-4021-bd8b-c10b4446e226}</Project>
-      <Name>QuantConnect.Lean.Launcher</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj">
       <Project>{01911409-86BE-4E7D-9947-DF714138610D}</Project>
       <Name>QuantConnect.Logging</Name>

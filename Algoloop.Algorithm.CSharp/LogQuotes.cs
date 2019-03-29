@@ -59,7 +59,7 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void OnData(Slice slice)
         {
-            QuoteBar quote = slice.QuoteBars[_symbol];
+            QuoteBar quote = slice.QuoteBars[_symbol.Value];
             Log(string.Format(
                 CultureInfo.InvariantCulture,
                 "{0:u}: {1} {2} {3} {4} {5}",

@@ -21,6 +21,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
 using QuantConnect.Interfaces;
 using QuantConnect.Parameters;
+using QuantConnect.Securities.Forex;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -51,14 +52,15 @@ namespace Algoloop.Algorithm.CSharp
         private string _market = "fxcm";
 
         [Parameter("startdate")]
-        private string _startdate;
+        private string __startdate = "20180101 00:00:00";
 
         [Parameter("enddate")]
-        private string _enddate;
+        private string __enddate = "20180901 00:00:00";
 
         private DateTime _previous;
         private MovingAverageConvergenceDivergence _macd;
         private string _symbol;
+        private Forex _forex;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
@@ -66,13 +68,13 @@ namespace Algoloop.Algorithm.CSharp
         public override void Initialize()
         {
             DateTime startdate;
-            if (DateTime.TryParse(_startdate, out startdate))
+            if (DateTime.TryParse(__startdate, out startdate))
             {
                 SetStartDate(startdate);
             }
 
             DateTime enddate;
-            if (DateTime.TryParse(_enddate, out enddate))
+            if (DateTime.TryParse(__enddate, out enddate))
             {
                 SetEndDate(enddate);
             }
@@ -82,11 +84,11 @@ namespace Algoloop.Algorithm.CSharp
             Resolution res;
             if (Enum.TryParse(_resolution, out res))
             {
-                AddForex(_symbol, res, _market);
+                _forex = AddForex(_symbol, res, _market);
             }
 
             // define our daily macd(12,26) with a 9 day signal
-            _macd = MACD(_symbol, _fastPeriod, _slowPeriod, _signalPeriod, MovingAverageType.Exponential, Resolution.Daily);
+            _macd = MACD(_forex.Symbol, _fastPeriod, _slowPeriod, _signalPeriod, MovingAverageType.Exponential, Resolution.Daily);
         }
 
         /// <summary>
@@ -110,12 +112,12 @@ namespace Algoloop.Algorithm.CSharp
             if (holding.Quantity <= 0 && signalDeltaPercent > tolerance) // 0.01%
             {
                 // longterm says buy as well
-                SetHoldings(_symbol, 1.0);
+                SetHoldings(_forex.Symbol, 1.0);
             }
             // of our macd is less than our signal, then let's go short
             else if (holding.Quantity >= 0 && signalDeltaPercent < -tolerance)
             {
-                SetHoldings(_symbol, -1.0);
+                SetHoldings(_forex.Symbol, -1.0);
             }
 
             // plot both lines

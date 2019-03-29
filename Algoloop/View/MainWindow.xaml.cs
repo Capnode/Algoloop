@@ -14,6 +14,7 @@
 
 using Algoloop.Properties;
 using Algoloop.ViewSupport;
+using QuantConnect.Configuration;
 using System;
 using System.Windows;
 
@@ -26,6 +27,10 @@ namespace Algoloop.View
     {
         public MainWindow()
         {
+            // Avoid warning logs
+            Config.Set("plugin-directory", ".");
+            Config.Set("composer-dll-directory", ".");
+
             InitializeComponent();
         }
 

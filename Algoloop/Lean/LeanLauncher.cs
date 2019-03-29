@@ -120,9 +120,9 @@ namespace Algoloop.Lean
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
             Config.Set("alpha-handler", "Algoloop.Lean.AlphaHandler");
-            if (settings.ApiToken != null) Config.Set("api-access-token", settings.ApiToken);
-            if (settings.ApiUser != null) Config.Set("job-user-id", settings.ApiUser);
-            if (settings.DesktopPort != 0) Config.Set("desktop-http-port", settings.DesktopPort.ToString());
+            Config.Set("api-access-token", settings.ApiToken ?? string.Empty);
+            Config.Set("job-user-id", settings.ApiUser ?? "0");
+            Config.Set("desktop-http-port", settings.DesktopPort.ToString());
             Config.Set("job-project-id", "0");
             Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
             Config.Set("regression-update-statistics", "false");
