@@ -63,9 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ForexSchedule.cs" />
-    <Compile Include="LogQuotes.cs" />
     <Compile Include="MACDTrendAlgorithm.cs" />
-    <Compile Include="NullAlgorithm.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tide.cs" />
   </ItemGroup>
