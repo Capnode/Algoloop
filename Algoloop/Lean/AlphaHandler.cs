@@ -263,7 +263,7 @@ namespace Algoloop.Lean
         /// </summary>
         protected class AlphaResultPacketSender : IInsightManagerExtension, IDisposable
         {
-            private readonly Timer _timer;
+            private Timer _timer;
             private readonly TimeSpan _interval;
             private readonly int _maximumQueueLength;
             private readonly AlgorithmNodePacket _job;
@@ -312,7 +312,7 @@ namespace Algoloop.Lean
                     Log.Error(err);
                 }
 
-                _timer.Change(_interval, _interval);
+                _timer?.Change(_interval, _interval);
             }
 
             /// <summary>
@@ -351,6 +351,7 @@ namespace Algoloop.Lean
             public void Dispose()
             {
                 _timer?.DisposeSafely();
+                _timer = null;
             }
         }
     }
