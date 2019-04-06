@@ -16,6 +16,7 @@ using Algoloop.ViewModel;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace Algoloop
@@ -25,15 +26,28 @@ namespace Algoloop
     /// </summary>
     public partial class App : Application
     {
+        public const uint ES_CONTINUOUS = 0x80000000;
+        public const uint ES_SYSTEM_REQUIRED = 0x00000001;
+        public const uint ES_DISPLAY_REQUIRED = 0x00000002;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern uint SetThreadExecutionState([In] uint esFlags);
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             Algoloop.Properties.Settings.Default.Reload();
             EnsureBrowserEmulationEnabled("Algoloop.exe");
+
+            // Prevent going to sleep mode
+            SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
+            // Enable sleep mode
+            SetThreadExecutionState(ES_CONTINUOUS);
+
             ViewModelLocator locator = Resources["Locator"] as ViewModelLocator;
             Debug.Assert(locator != null);
             locator.MainViewModel.SaveAll();
