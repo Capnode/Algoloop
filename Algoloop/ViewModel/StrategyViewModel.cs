@@ -75,6 +75,8 @@ namespace Algoloop.ViewModel
             Model.NameChanged += StrategyNameChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
             DataFromModel();
+
+            Model.EndDate = DateTime.Now;
         }
 
         public RelayCommand StartCommand { get; }
