@@ -47,7 +47,7 @@ namespace QuantConnect.Algorithm.Framework.Alphas
         /// <summary>
         /// Gets an identifier for the source model that generated this insight.
         /// </summary>
-        public string SourceModel { get; internal set; }
+        public string SourceModel { get; set; }
 
         /// <summary>
         /// Gets the utc time this insight was generated
@@ -57,14 +57,14 @@ namespace QuantConnect.Algorithm.Framework.Alphas
         /// If providing custom <see cref="Insight"/> implementation, be sure
         /// to set this value to algorithm.UtcTime when the insight is generated.
         /// </remarks>
-        public DateTime GeneratedTimeUtc { get; internal set; }
+        public DateTime GeneratedTimeUtc { get; set; }
 
         /// <summary>
         /// Gets the insight's prediction end time. This is the time when this
         /// insight prediction is expected to be fulfilled. This time takes into
         /// account market hours, weekends, as well as the symbol's data resolution
         /// </summary>
-        public DateTime CloseTimeUtc { get; internal set; }
+        public DateTime CloseTimeUtc { get; set; }
 
         /// <summary>
         /// Gets the symbol this insight is for
@@ -79,7 +79,7 @@ namespace QuantConnect.Algorithm.Framework.Alphas
         /// <summary>
         /// Gets the reference value this insight is predicting against. The value is dependent on the specified <see cref="InsightType"/>
         /// </summary>
-        public decimal ReferenceValue { get; internal set; }
+        public decimal ReferenceValue { get; set; }
 
         /// <summary>
         /// Gets the predicted direction, down, flat or up
@@ -169,6 +169,33 @@ namespace QuantConnect.Algorithm.Framework.Alphas
             Confidence = confidence;
 
             _periodSpecification = new TimeSpanPeriodSpecification(period);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Insight"/> class
+        /// </summary>
+        /// <param name="symbol">The symbol this insight is for</param>
+        /// <param name="expiryFunc">Func that defines the expiry time</param>
+        /// <param name="type">The type of insight, price/volatility</param>
+        /// <param name="direction">The predicted direction</param>
+        public Insight(Symbol symbol, Func<DateTime, DateTime> expiryFunc, InsightType type, InsightDirection direction)
+            : this(symbol, expiryFunc, type, direction, null, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Insight"/> class
+        /// </summary>
+        /// <param name="symbol">The symbol this insight is for</param>
+        /// <param name="expiryFunc">Func that defines the expiry time</param>
+        /// <param name="type">The type of insight, price/volatility</param>
+        /// <param name="direction">The predicted direction</param>
+        /// <param name="magnitude">The predicted magnitude as a percentage change</param>
+        /// <param name="confidence">The confidence in this insight</param>
+        /// <param name="sourceModel">An identifier defining the model that generated this insight</param>
+        public Insight(Symbol symbol, Func<DateTime, DateTime> expiryFunc, InsightType type, InsightDirection direction, double? magnitude, double? confidence, string sourceModel = null)
+            : this(symbol, new FuncPeriodSpecification(expiryFunc), type, direction, magnitude, confidence)
+        {
         }
 
         /// <summary>
@@ -318,6 +345,21 @@ namespace QuantConnect.Algorithm.Framework.Alphas
             var spec = period == Time.EndOfTimeTimeSpan ? (IPeriodSpecification)
                 new EndOfTimeCloseTimePeriodSpecification() : new TimeSpanPeriodSpecification(period);
             return new Insight(symbol, spec, InsightType.Price, direction, magnitude, confidence, sourceModel);
+        }
+
+        /// <summary>
+        /// Creates a new insight for predicting the percent change in price over the specified period
+        /// </summary>
+        /// <param name="symbol">The symbol this insight is for</param>
+        /// <param name="expiryFunc">Func that defines the expiry time</param>
+        /// <param name="direction">The predicted direction</param>
+        /// <param name="magnitude">The predicted magnitude as a percent change</param>
+        /// <param name="confidence">The confidence in this insight</param>
+        /// <param name="sourceModel">The model generating this insight</param>
+        /// <returns>A new insight object for the specified parameters</returns>
+        public static Insight Price(Symbol symbol, Func<DateTime, DateTime> expiryFunc, InsightDirection direction, double? magnitude = null, double? confidence = null, string sourceModel = null)
+        {
+            return new Insight(symbol, expiryFunc, InsightType.Price, direction, magnitude, confidence, sourceModel);
         }
 
         /// <summary>
@@ -639,6 +681,35 @@ namespace QuantConnect.Algorithm.Framework.Alphas
                 }
 
                 insight.Period = ComputePeriod(exchangeHours, insight.GeneratedTimeUtc, insight.CloseTimeUtc);
+            }
+        }
+
+        /// <summary>
+        /// Special case for insights which close time is defined by a function
+        /// and want insights to expiry with calendar rules 
+        /// </summary>
+        private class FuncPeriodSpecification : IPeriodSpecification
+        {
+            public readonly Func<DateTime, DateTime> _expiryFunc;
+
+            public FuncPeriodSpecification(Func<DateTime, DateTime> expiryFunc)
+            {
+                _expiryFunc = expiryFunc;
+            }
+
+            public void SetPeriodAndCloseTime(Insight insight, SecurityExchangeHours exchangeHours)
+            {
+                var closeTimeLocal = insight.GeneratedTimeUtc.ConvertFromUtc(exchangeHours.TimeZone);
+                closeTimeLocal = _expiryFunc(closeTimeLocal);
+
+                // Prevent close time to be defined to a date/time in closed market
+                if (!exchangeHours.IsOpen(closeTimeLocal, false))
+                {
+                    closeTimeLocal = exchangeHours.GetNextMarketOpen(closeTimeLocal, false);
+                }
+
+                insight.CloseTimeUtc = closeTimeLocal.ConvertToUtc(exchangeHours.TimeZone);
+                insight.Period = insight.CloseTimeUtc - insight.GeneratedTimeUtc;
             }
         }
 

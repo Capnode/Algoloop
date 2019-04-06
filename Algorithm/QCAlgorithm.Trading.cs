@@ -27,6 +27,7 @@ namespace QuantConnect.Algorithm
     public partial class QCAlgorithm
     {
         private int _maxOrders = 10000;
+        private bool _isMarketOnOpenOrderWarningSent = false;
 
         /// <summary>
         /// Transaction Manager - Process transaction fills and order management.
@@ -205,7 +206,15 @@ namespace QuantConnect.Algorithm
             if (!security.Exchange.ExchangeOpen)
             {
                 var mooTicket = MarketOnOpenOrder(security.Symbol, quantity, tag);
-                var anyNonDailySubscriptions = security.Subscriptions.Any(x => x.Resolution != Resolution.Daily);
+                if (!_isMarketOnOpenOrderWarningSent)
+                {
+                    var anyNonDailySubscriptions = security.Subscriptions.Any(x => x.Resolution != Resolution.Daily);
+                    if (mooTicket.SubmitRequest.Response.IsSuccess && !anyNonDailySubscriptions)
+                    {
+                        Debug("Warning: all market orders sent using daily data, or market orders sent after hours are automatically converted into MarketOnOpen orders.");
+                        _isMarketOnOpenOrderWarningSent = true;
+                    }
+                }
                 return mooTicket;
             }
 
