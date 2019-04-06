@@ -13,6 +13,7 @@
  */
 
 using QuantConnect;
+using QuantConnect.Algorithm;
 using QuantConnect.Algorithm.Framework;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Execution;
@@ -31,7 +32,7 @@ using System.Linq;
 
 namespace Capnode.Algorithm.CSharp
 {
-    public class Tide : QCAlgorithmFramework
+    public class Tide : QCAlgorithm
     {
         [Parameter("symbols")]
         protected string _symbols = "EURUSD";
@@ -139,7 +140,7 @@ namespace Capnode.Algorithm.CSharp
         }
 
         public override IEnumerable<Insight> Update(
-            QCAlgorithmFramework algorithm,
+            QCAlgorithm algorithm,
             Slice data)
         {
             algorithm.Log($"Update");
