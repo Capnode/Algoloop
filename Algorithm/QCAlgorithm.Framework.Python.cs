@@ -95,18 +95,29 @@ namespace QuantConnect.Algorithm
         /// <summary>
         /// Sets the universe selection model
         /// </summary>
-        /// <param name="portfolioSelection">Model defining universes for the algorithm</param>
-        public void SetUniverseSelection(PyObject portfolioSelection)
+        /// <param name="universeSelection">Model defining universes for the algorithm</param>
+        public void SetUniverseSelection(PyObject universeSelection)
         {
             IUniverseSelectionModel model;
-            if (portfolioSelection.TryConvert(out model))
+            if (!universeSelection.TryConvert(out model))
             {
-                SetUniverseSelection(model);
+                model = new UniverseSelectionModelPythonWrapper(universeSelection);
             }
-            else
+            SetUniverseSelection(model);
+        }
+
+        /// <summary>
+        /// Adds a new universe selection model
+        /// </summary>
+        /// <param name="universeSelection">Model defining universes for the algorithm to add</param>
+        public void AddUniverseSelection(PyObject universeSelection)
+        {
+            IUniverseSelectionModel model;
+            if (!universeSelection.TryConvert(out model))
             {
-                UniverseSelection = new UniverseSelectionModelPythonWrapper(portfolioSelection);
+                model = new UniverseSelectionModelPythonWrapper(universeSelection);
             }
+            AddUniverseSelection(model);
         }
 
         /// <summary>
@@ -124,6 +135,20 @@ namespace QuantConnect.Algorithm
             {
                 RiskManagement = new RiskManagementModelPythonWrapper(riskManagement);
             }
+        }
+
+        /// <summary>
+        /// Adds a new risk management model
+        /// </summary>
+        /// <param name="riskManagement">Model defining how risk is managed to add</param>
+        public void AddRiskManagement(PyObject riskManagement)
+        {
+            IRiskManagementModel model;
+            if (!riskManagement.TryConvert(out model))
+            {
+                model = new RiskManagementModelPythonWrapper(riskManagement);
+            }
+            AddRiskManagement(model);
         }
     }
 }

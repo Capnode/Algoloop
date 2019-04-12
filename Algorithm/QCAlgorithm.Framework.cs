@@ -137,7 +137,10 @@ namespace QuantConnect.Algorithm
             }
 
             // insight timestamping handled via InsightsGenerated event handler
-            var insights = Alpha.Update(this, slice).ToArray();
+            var insightsEnumerable = Alpha.Update(this, slice);
+            // for performance only call 'ToArray' if not empty enumerable (which is static)
+            var insights = insightsEnumerable == Enumerable.Empty<Insight>()
+                ? new Insight[] { } : insightsEnumerable.ToArray();
 
             // only fire insights generated event if we actually have insights
             if (insights.Length != 0)
@@ -158,7 +161,10 @@ namespace QuantConnect.Algorithm
         private void ProcessInsights(Insight[] insights)
         {
             // construct portfolio targets from insights
-            var targets = PortfolioConstruction.CreateTargets(this, insights).ToArray();
+            var targetsEnumerable = PortfolioConstruction.CreateTargets(this, insights);
+            // for performance only call 'ToArray' if not empty enumerable (which is static)
+            var targets = targetsEnumerable == Enumerable.Empty<IPortfolioTarget>()
+                ? new IPortfolioTarget[] {} : targetsEnumerable.ToArray();
 
             // set security targets w/ those generated via portfolio construction module
             foreach (var target in targets)
@@ -176,7 +182,10 @@ namespace QuantConnect.Algorithm
                 }
             }
 
-            var riskTargetOverrides = RiskManagement.ManageRisk(this, targets).ToArray();
+            var riskTargetOverridesEnumerable = RiskManagement.ManageRisk(this, targets);
+            // for performance only call 'ToArray' if not empty enumerable (which is static)
+            var riskTargetOverrides = riskTargetOverridesEnumerable == Enumerable.Empty<IPortfolioTarget>()
+                ? new IPortfolioTarget[] { } : riskTargetOverridesEnumerable.ToArray();
 
             // override security targets w/ those generated via risk management module
             foreach (var target in riskTargetOverrides)
@@ -194,8 +203,18 @@ namespace QuantConnect.Algorithm
                 }
             }
 
-            // execute on the targets, overriding targets for symbols w/ risk targets
-            var riskAdjustedTargets = riskTargetOverrides.Concat(targets).DistinctBy(pt => pt.Symbol).ToArray();
+            IPortfolioTarget[] riskAdjustedTargets;
+            // for performance we check the length before
+            if (riskTargetOverrides.Length != 0
+                || targets.Length != 0)
+            {
+                // execute on the targets, overriding targets for symbols w/ risk targets
+                riskAdjustedTargets = riskTargetOverrides.Concat(targets).DistinctBy(pt => pt.Symbol).ToArray();
+            }
+            else
+            {
+                riskAdjustedTargets = new IPortfolioTarget[] { };
+            }
 
             if (DebugMode)
             {
@@ -242,6 +261,30 @@ namespace QuantConnect.Algorithm
         public void SetUniverseSelection(IUniverseSelectionModel universeSelection)
         {
             UniverseSelection = universeSelection;
+        }
+
+        /// <summary>
+        /// Adds a new universe selection model
+        /// </summary>
+        /// <param name="universeSelection">Model defining universes for the algorithm to add</param>
+        public void AddUniverseSelection(IUniverseSelectionModel universeSelection)
+        {
+            if (UniverseSelection.GetType() != typeof(NullUniverseSelectionModel))
+            {
+                var compositeUniverseSelection = UniverseSelection as CompositeUniverseSelectionModel;
+                if (compositeUniverseSelection != null)
+                {
+                    compositeUniverseSelection.AddUniverseSelection(universeSelection);
+                }
+                else
+                {
+                    UniverseSelection = new CompositeUniverseSelectionModel(UniverseSelection, universeSelection);
+                }
+            }
+            else
+            {
+                UniverseSelection = universeSelection;
+            }
         }
 
         /// <summary>
@@ -298,10 +341,34 @@ namespace QuantConnect.Algorithm
         /// <summary>
         /// Sets the risk management model
         /// </summary>
-        /// <param name="riskManagement">Model defining </param>
+        /// <param name="riskManagement">Model defining how risk is managed</param>
         public void SetRiskManagement(IRiskManagementModel riskManagement)
         {
             RiskManagement = riskManagement;
+        }
+
+        /// <summary>
+        /// Adds a new risk management model
+        /// </summary>
+        /// <param name="riskManagement">Model defining how risk is managed to add</param>
+        public void AddRiskManagement(IRiskManagementModel riskManagement)
+        {
+            if (RiskManagement.GetType() != typeof(NullRiskManagementModel))
+            {
+                var compositeRiskModel = RiskManagement as CompositeRiskManagementModel;
+                if (compositeRiskModel != null)
+                {
+                    compositeRiskModel.AddRiskManagement(riskManagement);
+                }
+                else
+                {
+                    RiskManagement = new CompositeRiskManagementModel(RiskManagement, riskManagement);
+                }
+            }
+            else
+            {
+                RiskManagement = riskManagement;
+            }
         }
 
         /// <summary>

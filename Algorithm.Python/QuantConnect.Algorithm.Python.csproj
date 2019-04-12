@@ -37,6 +37,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="AddAlphaModelAlgorithm.py" />
+    <Content Include="AddRiskManagementAlgorithm.py" />
+    <Content Include="AddUniverseSelectionModelAlgorithm.py" />
     <Content Include="Alphas\ContingentClaimsAnalysisDefaultPredictionAlpha.py" />
     <Content Include="Alphas\ForexCalendarAlpha.py" />
     <Content Include="Alphas\GasAndCrudeOilEnergyCorrelationAlpha.py" />
@@ -52,6 +54,8 @@
     <Content Include="Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py" />
     <Content Include="Alphas\VIXDualThrustAlpha.py" />
     <Content Include="BasicSetAccountCurrencyAlgorithm.py" />
+    <None Include="CapmAlphaRankingFrameworkAlgorithm.py" />
+    <Content Include="G10CurrencySelectionModelFrameworkAlgorithm.py" />
     <Content Include="ExpiryHelperAlphaModelFrameworkAlgorithm.py" />
     <Content Include="BasicTemplateFuturesFrameworkAlgorithm.py" />
     <Content Include="BasicTemplateOptionsFrameworkAlgorithm.py" />

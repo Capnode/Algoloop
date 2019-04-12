@@ -145,6 +145,7 @@
     <Compile Include="Portfolio\PortfolioConstructionModel.cs" />
     <Compile Include="Portfolio\PortfolioConstructionModelPythonWrapper.cs" />
     <Compile Include="QCAlgorithm.Framework.Python.cs" />
+    <Compile Include="Risk\CompositeRiskManagementModel.cs" />
     <Compile Include="Risk\IRiskManagementModel.cs" />
     <Compile Include="Risk\NullRiskManagementModel.cs" />
     <Compile Include="Risk\RiskManagementModel.cs" />
@@ -158,9 +159,11 @@
     <Compile Include="QCAlgorithm.Plotting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QCAlgorithm.Universe.cs" />
+    <Compile Include="Selection\CompositeUniverseSelectionModel.cs" />
     <Compile Include="Selection\IUniverseSelectionModel.cs" />
     <Compile Include="Selection\ManualUniverse.cs" />
     <Compile Include="Selection\ManualUniverseSelectionModel.cs" />
+    <Compile Include="Selection\NullUniverseSelectionModel.cs" />
     <Compile Include="Selection\UniverseSelectionModel.cs" />
     <Compile Include="Selection\UniverseSelectionModelPythonWrapper.cs" />
     <Compile Include="UniverseDefinitions.cs" />
@@ -201,7 +204,13 @@
     <Content Include="Portfolio\NullPortfolioConstructionModel.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Risk\CompositeRiskManagementModel.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Risk\NullRiskManagementModel.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Selection\ManualUniverseSelectionModel.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Selection\UniverseSelectionModel.py">
