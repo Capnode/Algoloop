@@ -16,12 +16,15 @@ using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Microsoft.Win32;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -46,6 +49,7 @@ namespace Algoloop.ViewModel
             RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !_market.Active && SelectedSymbol != null);
             MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => !_market.Active && SelectedSymbol != null);
             MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => !_market.Active && SelectedSymbol != null);
+            ExportFolderCommand = new RelayCommand(() => DoExportFolder(), () => !_market.Active);
 
             DataFromModel();
 
@@ -68,6 +72,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand<IList> MoveUpSymbolsCommand { get; }
         public RelayCommand<IList> MoveDownSymbolsCommand { get; }
+        public RelayCommand ExportFolderCommand { get; }
 
         public FolderModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -219,6 +224,32 @@ namespace Algoloop.ViewModel
                 {
                     Symbols.Move(i, i + 1);
                 }
+            }
+        }
+
+        private void DoExportFolder()
+        {
+            DataToModel();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+            saveFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                string fileName = saveFileDialog.FileName;
+                using (StreamWriter file = File.CreateText(fileName))
+                {
+                    foreach (SymbolViewModel symbol in Symbols)
+                    {
+                        file.WriteLine(symbol.Model.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
         }
     }

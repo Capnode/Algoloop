@@ -125,6 +125,13 @@
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
+                                        <MenuItem
+                                            Header="Export list..."
+                                            Command="{Binding ExportFolderCommand}" >
+                                            <MenuItem.Icon>
+                                                <Image Source="/Resources/Export.png" Width="16" Height="16"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
                                     </ContextMenu>
                                 </TextBlock.ContextMenu>
                             </TextBlock>
