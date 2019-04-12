@@ -50,7 +50,7 @@ namespace Algoloop.ViewModel
         public RelayCommand ImportCommand { get; }
         public RelayCommand ExportCommand { get; }
 
-        public StrategiesModel Model { get; }
+        public StrategiesModel Model { get; set; }
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
 
         /// <summary>
@@ -106,13 +106,16 @@ namespace Algoloop.ViewModel
             try
             {
                 await Task.Run(() =>
-               {
-                   using (StreamReader r = new StreamReader(fileName))
-                   {
-                       string json = r.ReadToEnd();
-                       Model.Copy(JsonConvert.DeserializeObject<StrategiesModel>(json));
-                   }
-               });
+                {
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        using (JsonReader reader = new JsonTextReader(r))
+                        {
+                            JsonSerializer serializer = new JsonSerializer();
+                            Model = serializer.Deserialize<StrategiesModel>(reader);
+                        }
+                    }
+                });
 
                 DataFromModel();
                 StartTasks();
