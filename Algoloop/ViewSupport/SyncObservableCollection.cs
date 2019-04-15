@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Data;
 
 namespace Algoloop.ViewSupport
@@ -34,6 +36,16 @@ namespace Algoloop.ViewSupport
             : base(list)
         {
             BindingOperations.EnableCollectionSynchronization(this, _lock);
+        }
+
+        public void Sort()
+        {
+            if (this.Count <= 1)
+                return;
+
+            List<T> sorted = this.OrderBy(x => x).ToList();
+            for (int i = 0; i < sorted.Count(); i++)
+                this.Move(this.IndexOf(sorted[i]), i);
         }
     }
 }

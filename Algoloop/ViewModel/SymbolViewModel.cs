@@ -29,7 +29,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolViewModel : ViewModelBase, ITreeViewModel
+    public class SymbolViewModel : ViewModelBase, ITreeViewModel, IComparable
     {
         private ITreeViewModel _parent;
         private Resolution _selectedResolution = Resolution.Daily;
@@ -155,6 +155,16 @@ namespace Algoloop.ViewModel
             }
 
             return null;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is SymbolViewModel other)
+            {
+                return string.Compare(Model.Name, other.Model.Name);
+            }
+
+            return 0;
         }
     }
 }

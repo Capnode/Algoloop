@@ -166,7 +166,6 @@ namespace Algoloop.ViewModel
         {
             Active = Model.Active;
             Symbols.Clear();
-            Model.Symbols.Sort();
             UpdateSymbolsAndColumns();
 
             // Update Folders
@@ -516,7 +515,6 @@ namespace Algoloop.ViewModel
                 Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
-            Model.Symbols.Sort();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);

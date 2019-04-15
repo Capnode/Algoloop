@@ -47,8 +47,6 @@ namespace Algoloop.ViewModel
             StopCommand = new RelayCommand(() => { }, () => false);
             AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => DoAddSymbol(m), m => !_market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
             RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !_market.Active && SelectedSymbol != null);
-            MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => !_market.Active && SelectedSymbol != null);
-            MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => !_market.Active && SelectedSymbol != null);
             ExportFolderCommand = new RelayCommand(() => DoExportFolder(), () => !_market.Active);
 
             DataFromModel();
@@ -70,9 +68,8 @@ namespace Algoloop.ViewModel
         public RelayCommand StopCommand { get; }
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
-        public RelayCommand<IList> MoveUpSymbolsCommand { get; }
-        public RelayCommand<IList> MoveDownSymbolsCommand { get; }
         public RelayCommand ExportFolderCommand { get; }
+
 
         public FolderModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -92,8 +89,6 @@ namespace Algoloop.ViewModel
             {
                 Set(ref _selectedSymbol, value);
                 RemoveSymbolsCommand.RaiseCanExecuteChanged();
-                MoveUpSymbolsCommand.RaiseCanExecuteChanged();
-                MoveDownSymbolsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -189,42 +184,6 @@ namespace Algoloop.ViewModel
 
             MarketSymbols.View.Refresh();
             AddSymbolCommand.RaiseCanExecuteChanged();
-        }
-
-        private void OnMoveUpSymbols(IList symbols)
-        {
-            if (Symbols.Count <= 1)
-                return;
-
-            // Create a copy of the list before move
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            for (int i = 1; i < Symbols.Count; i++)
-            {
-                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i - 1]))
-                {
-                    Symbols.Move(i, i - 1);
-                }
-            }
-        }
-
-        private void OnMoveDownSymbols(IList symbols)
-        {
-            if (Symbols.Count <= 1)
-                return;
-
-            // Create a copy of the list before move
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            for (int i = Symbols.Count - 2; i >= 0; i--)
-            {
-                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i + 1]))
-                {
-                    Symbols.Move(i, i + 1);
-                }
-            }
         }
 
         private void DoExportFolder()

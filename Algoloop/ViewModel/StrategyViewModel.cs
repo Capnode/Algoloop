@@ -71,6 +71,9 @@ namespace Algoloop.ViewModel
             ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => true);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
             TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => DoSelectItem(m));
+            MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => SelectedSymbol != null);
+            MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => SelectedSymbol != null);
+            SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => true);
 
             Model.NameChanged += StrategyNameChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
@@ -94,6 +97,9 @@ namespace Algoloop.ViewModel
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
+        public RelayCommand<IList> MoveUpSymbolsCommand { get; }
+        public RelayCommand<IList> MoveDownSymbolsCommand { get; }
+        public RelayCommand SortSymbolsCommand { get; }
 
         public StrategyModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -135,6 +141,8 @@ namespace Algoloop.ViewModel
                 Set(ref _selectedSymbol, value);
                 DeleteSymbolsCommand.RaiseCanExecuteChanged();
                 ExportSymbolsCommand.RaiseCanExecuteChanged();
+                MoveUpSymbolsCommand.RaiseCanExecuteChanged();
+                MoveDownSymbolsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -326,7 +334,7 @@ namespace Algoloop.ViewModel
         private void DataFromModel()
         {
             Symbols.Clear();
-            foreach (SymbolModel symbolModel in Model.Symbols.OrderBy(m => m.Name))
+            foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
@@ -584,6 +592,42 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        private void OnMoveUpSymbols(IList symbols)
+        {
+            if (Symbols.Count <= 1)
+                return;
+
+            // Create a copy of the list before move
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            for (int i = 1; i < Symbols.Count; i++)
+            {
+                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i - 1]))
+                {
+                    Symbols.Move(i, i - 1);
+                }
+            }
+        }
+
+        private void OnMoveDownSymbols(IList symbols)
+        {
+            if (Symbols.Count <= 1)
+                return;
+
+            // Create a copy of the list before move
+            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(list != null);
+
+            for (int i = Symbols.Count - 2; i >= 0; i--)
+            {
+                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i + 1]))
+                {
+                    Symbols.Move(i, i + 1);
+                }
             }
         }
     }

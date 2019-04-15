@@ -256,18 +256,6 @@
                                             CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
                                             <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                         </Button>
-                                        <Button
-                                            ToolTip="Move symbols up"
-                                            Command="{Binding MoveUpSymbolsCommand}"
-                                            CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
-                                            <Image Source="/Resources\MoveUp.png" Width="16" Height="16"/>
-                                        </Button>
-                                        <Button
-                                            ToolTip="Move symbols down"
-                                            Command="{Binding MoveDownSymbolsCommand}"
-                                            CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
-                                            <Image Source="/Resources\MoveDown.png" Width="16" Height="16"/>
-                                        </Button>
                                     </ToolBar>
                                     <viewsupport:ExDataGrid
                                         x:Name="listbox"

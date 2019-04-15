@@ -251,6 +251,23 @@
                                             CommandParameter="{Binding ElementName=symbolListbox, Path=SelectedItems}">
                                             <Image Source="/Resources\Export.png" Width="16" Height="16"/>
                                         </Button>
+                                        <Button
+                                            ToolTip="Move symbols up"
+                                            Command="{Binding MoveUpSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=symbolListbox, Path=SelectedItems}">
+                                            <Image Source="/Resources\MoveUp.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button
+                                            ToolTip="Move symbols down"
+                                            Command="{Binding MoveDownSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=symbolListbox, Path=SelectedItems}">
+                                            <Image Source="/Resources\MoveDown.png" Width="16" Height="16"/>
+                                        </Button>
+                                        <Button
+                                            ToolTip="Sort symbols by name"
+                                            Command="{Binding SortSymbolsCommand}">
+                                            <Image Source="/Resources\SortTextDown.png" Width="16" Height="16"/>
+                                        </Button>
                                     </ToolBar>
                                     <ListBox
                                         DockPanel.Dock="Bottom"
