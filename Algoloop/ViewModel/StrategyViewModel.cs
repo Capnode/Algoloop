@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel
         public const string DefaultName = "Strategy";
 
         private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
-        private StrategiesViewModel _parent;
+        private readonly StrategiesViewModel _parent;
         private bool _isSelected;
         private bool _isExpanded;
         private SymbolViewModel _selectedSymbol;
@@ -445,10 +445,12 @@ namespace Algoloop.ViewModel
 
         private void DoImportSymbols()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            openFileDialog.Multiselect = false;
-            openFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Multiselect = false,
+                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
             if (openFileDialog.ShowDialog() == false)
                 return;
 
@@ -460,11 +462,14 @@ namespace Algoloop.ViewModel
                     {
                         while (!r.EndOfStream)
                         {
-                            string name = r.ReadLine();
-                            if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
+                            string line = r.ReadLine();
+                            foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                             {
-                                var symbol = new SymbolModel() { Name = name };
-                                Model.Symbols.Add(symbol);
+                                if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
+                                {
+                                    var symbol = new SymbolModel() { Name = name };
+                                    Model.Symbols.Add(symbol);
+                                }
                             }
                         }
                     }
@@ -520,9 +525,11 @@ namespace Algoloop.ViewModel
                     if (algorithm.Equals(Model.AlgorithmName))
                         continue; // Skip this algorithm
 
-                    var strategyModel = new StrategyModel(Model);
-                    strategyModel.AlgorithmName = algorithm;
-                    strategyModel.Name = null;
+                    var strategyModel = new StrategyModel(Model)
+                    {
+                        AlgorithmName = algorithm,
+                        Name = null
+                    };
                     var strategy = new StrategyViewModel(_parent, strategyModel, _settingsModel);
                     _parent.Strategies.Add(strategy);
                 }
@@ -536,10 +543,12 @@ namespace Algoloop.ViewModel
         private void DoExportStrategy()
         {
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.FileName = Model.Name;
-            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                FileName = Model.Name,
+                Filter = "json file (*.json)|*.json|All files (*.*)|*.*"
+            };
             if (saveFileDialog.ShowDialog() == false)
                 return;
 
@@ -572,9 +581,11 @@ namespace Algoloop.ViewModel
                 return;
 
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
             if (saveFileDialog.ShowDialog() == false)
                 return;
 

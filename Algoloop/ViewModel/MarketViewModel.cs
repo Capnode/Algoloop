@@ -402,10 +402,12 @@ namespace Algoloop.ViewModel
 
         private void DoImportSymbols()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            openFileDialog.Multiselect = false;
-            openFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Multiselect = false,
+                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
             if (openFileDialog.ShowDialog() == false)
                 return;
 
@@ -418,11 +420,14 @@ namespace Algoloop.ViewModel
                     {
                         while (!r.EndOfStream)
                         {
-                            string name = r.ReadLine();
-                            if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
+                            string line = r.ReadLine();
+                            foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                             {
-                                var symbol = new SymbolModel() { Name = name };
-                                Model.Symbols.Add(symbol);
+                                if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
+                                {
+                                    var symbol = new SymbolModel() { Name = name };
+                                    Model.Symbols.Add(symbol);
+                                }
                             }
                         }
                     }
@@ -448,9 +453,11 @@ namespace Algoloop.ViewModel
                 return;
 
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
             if (saveFileDialog.ShowDialog() == false)
                 return;
 
