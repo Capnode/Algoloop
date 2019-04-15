@@ -53,6 +53,7 @@ namespace Algoloop.ViewModel
             StrategiesViewModel = strategiesViewModel;
             LogViewModel = logViewModel;
 
+            SaveCommand = new RelayCommand(() => SaveAll(), () => !IsBusy);
             SettingsCommand = new RelayCommand(() => DoSettings(), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             AboutCommand = new RelayCommand(() => DoAbout(), () => !IsBusy);
@@ -69,6 +70,7 @@ namespace Algoloop.ViewModel
             _task = ReadConfigAsync(appData);
         }
 
+        public RelayCommand SaveCommand { get; }
         public RelayCommand SettingsCommand { get; }
         public RelayCommand<Window> ExitCommand { get; }
         public RelayCommand AboutCommand { get; }

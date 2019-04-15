@@ -415,6 +415,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Content Include="Extern\AmCharts.Windows.Stock.dll" />
+    <Resource Include="Resources\Exit.png" />
+    <Resource Include="Resources\Tools.png" />
+    <Resource Include="Resources\Save.png" />
     <Resource Include="Resources\SortTextDown.png" />
     <Resource Include="Resources\AddList.png" />
     <Resource Include="Resources\Download3.png" />

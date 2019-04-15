@@ -27,15 +27,34 @@
         <Menu Width="Auto" DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem
+                    Header="Save"
+                    Command="{Binding SaveCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Save.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem
                     Header="Settings..."
-                    Command="{Binding SettingsCommand}" />
+                    Command="{Binding SettingsCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Tools.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem
                     Header="E_xit"
                     Command="{Binding ExitCommand}"
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}" />
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Exit.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
                 </MenuItem>
+            </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Header="_About" Command="{Binding AboutCommand}" />
+                <MenuItem Header="_About" Command="{Binding AboutCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Info.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
