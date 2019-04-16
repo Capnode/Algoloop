@@ -33,7 +33,7 @@ namespace Algoloop.ViewModel
         /// <summary>
         /// The symbol of the traded instrument
         /// </summary>
-        public string Name => _symbol.Value;
+        public string Symbol => _symbol.Value;
 
         /// <summary>
         /// The type of the traded instrument
@@ -62,13 +62,15 @@ namespace Algoloop.ViewModel
 
         public void Calculate()
         {
-            ProfitLoss = _trades.Sum(m =>m.ProfitLoss);
-            decimal stddev = StdDev(_trades.Select(m => m.ProfitLoss));
+            decimal profitLoss = _trades.Sum(m => m.ProfitLoss);
+            ProfitLoss = Math.Round(profitLoss, 2);
+
+            decimal stddev = StandardDeviation(_trades.Select(m => m.ProfitLoss));
             decimal sharpe = stddev == 0 ? 0 : ProfitLoss / stddev;
-            Sharpe = sharpe.SmartRounding();
+            Sharpe = Math.Round(sharpe, 2);
         }
 
-        private static decimal StdDev(IEnumerable<decimal> values)
+        private static decimal StandardDeviation(IEnumerable<decimal> values)
         {
             int count = values.Count();
             if (count == 1)
