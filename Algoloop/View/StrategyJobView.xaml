@@ -145,6 +145,22 @@
                 Visibility="{Binding Desktop, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <view:DesktopView Port="{Binding Port}"/>
             </TabItem>
+            <TabItem Header="{Binding SymbolsSummary.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols summary ({0}), FallbackValue=Symbols summary}">
+                <!--https://www.codeproject.com/Articles/657657/WPF-DataGrid-With-Excel-Style-Column-Filter-->
+                <DataGrid
+                    IsReadOnly="True"
+                    GridLinesVisibility="None"
+                    AutoGenerateColumns="False"
+                    ItemsSource="{Binding SymbolsSummary}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                        <DataGridTextColumn Header="Trades" Binding="{Binding Trades}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Profit" Binding="{Binding ProfitLoss}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Sharpe" Binding="{Binding Sharpe}" ElementStyle="{StaticResource RightCell}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox
                     Text="{Binding Logs, Mode=OneWay}"

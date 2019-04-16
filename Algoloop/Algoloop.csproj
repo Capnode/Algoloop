@@ -246,6 +246,7 @@
     <Compile Include="Common\SafeDictionary.cs" />
     <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />
+    <Compile Include="ViewModel\SymbolSummaryViewModel.cs" />
     <Compile Include="ViewSupport\ExDataGridColumns.cs" />
     <Compile Include="Model\FolderModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
@@ -512,6 +513,10 @@
     <ProjectReference Include="..\Indicators\QuantConnect.Indicators.csproj">
       <Project>{73fb2522-c3ed-4e47-8e3d-afad48a6b888}</Project>
       <Name>QuantConnect.Indicators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Jib.WPF.Controls\Jib.WPF.Controls.csproj">
+      <Project>{769d993c-2867-4212-be80-b70e4862ebc5}</Project>
+      <Name>Jib.WPF.Controls</Name>
     </ProjectReference>
     <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj">
       <Project>{01911409-86be-4e7d-9947-df714138610d}</Project>
