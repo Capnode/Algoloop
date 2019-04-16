@@ -80,7 +80,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<Trade> Trades { get; } = new SyncObservableCollection<Trade>();
-        public SyncObservableCollection<SymbolSummaryViewModel> SymbolsSummary { get; } = new SyncObservableCollection<SymbolSummaryViewModel>();
+        public SyncObservableCollection<SymbolSummaryViewModel> SummarySymbols { get; } = new SyncObservableCollection<SymbolSummaryViewModel>();
         public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
         public SyncObservableCollection<HoldingViewModel> Holdings { get; } = new SyncObservableCollection<HoldingViewModel>();
 
@@ -303,21 +303,21 @@ namespace Algoloop.ViewModel
 
             // Closed trades result
             result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
-            List<SymbolSummaryViewModel> symbolsSymmary = new List<SymbolSummaryViewModel>();
+            List<SymbolSummaryViewModel> summarySymbols = new List<SymbolSummaryViewModel>();
             foreach (Trade trade in Trades)
             {
-                SymbolSummaryViewModel summary = symbolsSymmary.FirstOrDefault(m => m.Name.Equals(trade.Symbol.Value));
+                SymbolSummaryViewModel summary = summarySymbols.FirstOrDefault(m => m.Name.Equals(trade.Symbol.Value));
                 if (summary == null)
                 {
                     summary = new SymbolSummaryViewModel(trade.Symbol);
-                    symbolsSymmary.Add(summary);
+                    summarySymbols.Add(summary);
                 }
 
                 summary.AddTrade(trade);
             }
 
-            symbolsSymmary.ForEach(m => m.Calculate());
-            SymbolsSummary.ReplaceRange(symbolsSymmary);
+            summarySymbols.ForEach(m => m.Calculate());
+            SummarySymbols.ReplaceRange(summarySymbols);
 
             // Statistics results
             IDictionary<string, object> statistics = new SafeDictionary<string, object>();

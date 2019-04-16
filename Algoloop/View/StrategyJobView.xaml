@@ -146,14 +146,14 @@
                 Visibility="{Binding Desktop, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <view:DesktopView Port="{Binding Port}"/>
             </TabItem>
-            <TabItem Header="{Binding SymbolsSummary.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols summary ({0}), FallbackValue=Symbols summary}">
+            <TabItem Header="{Binding SummarySymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Summary symbols ({0}), FallbackValue=Summary symbols}">
                 <wpfControls:FilterGrid
                     AutoGenerateColumns="True"
                     CanUserFreeze="True"
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
-                    FilteredItemsSource="{Binding SymbolsSummary}"/>
+                    FilteredItemsSource="{Binding SummarySymbols}"/>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox
