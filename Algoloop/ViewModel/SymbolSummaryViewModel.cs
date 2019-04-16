@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2018 Capnode AB
+ * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using GalaSoft.MvvmLight;
 using QuantConnect;
 using QuantConnect.Statistics;
 using System;
@@ -21,19 +20,25 @@ using System.Linq;
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolSummaryViewModel : ViewModelBase
+    public class SymbolSummaryViewModel
     {
         List<Trade> _trades = new List<Trade>();
+        private readonly Symbol _symbol;
 
         public SymbolSummaryViewModel(Symbol symbol)
         {
-            Symbol = symbol;
+            _symbol = symbol;
         }
 
         /// <summary>
         /// The symbol of the traded instrument
         /// </summary>
-        public Symbol Symbol { get; }
+        public string Name => _symbol.Value;
+
+        /// <summary>
+        /// The type of the traded instrument
+        /// </summary>
+        public string Type => _symbol.SecurityType.ToString();
 
         /// <summary>
         /// The number of trades

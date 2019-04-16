@@ -306,7 +306,7 @@ namespace Algoloop.ViewModel
             List<SymbolSummaryViewModel> symbolsSymmary = new List<SymbolSummaryViewModel>();
             foreach (Trade trade in Trades)
             {
-                SymbolSummaryViewModel summary = symbolsSymmary.FirstOrDefault(m => m.Symbol.Equals(trade.Symbol));
+                SymbolSummaryViewModel summary = symbolsSymmary.FirstOrDefault(m => m.Name.Equals(trade.Symbol.Value));
                 if (summary == null)
                 {
                     summary = new SymbolSummaryViewModel(trade.Symbol);

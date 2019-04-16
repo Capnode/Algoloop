@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 15.0.0.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Lean.Engine", "Engine\QuantConnect.Lean.Engine.csproj", "{12156F46-D07E-4E3D-AD2B-7409E82AB62F}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Tests", "Algoloop.
 		{37F5493C-79FF-4532-B7C5-FEDE03196E67} = {37F5493C-79FF-4532-B7C5-FEDE03196E67}
 		{F65DA573-DB1B-4524-A254-2034954CAE66} = {F65DA573-DB1B-4524-A254-2034954CAE66}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.WPF", "Algoloop.WPF\Algoloop.WPF.csproj", "{769D993C-2867-4212-BE80-B70E4862EBC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -234,6 +236,14 @@ Global
 		{1A681009-799A-4BA8-8B92-314018515060}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1A681009-799A-4BA8-8B92-314018515060}.Release|x64.ActiveCfg = Release|Any CPU
 		{1A681009-799A-4BA8-8B92-314018515060}.Release|x64.Build.0 = Release|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Debug|x64.Build.0 = Debug|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Release|x64.ActiveCfg = Release|Any CPU
+		{769D993C-2867-4212-BE80-B70E4862EBC5}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
