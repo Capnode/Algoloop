@@ -178,7 +178,7 @@
                                 </Microsoft_Windows_Themes:SystemDropShadowChrome>
                             </Popup>
                             <ToggleButton BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxReadonlyToggleButton}"/>
-                            <TextBox BorderThickness="1" BorderBrush="Gray" KeyUp="txtFilter_KeyUp"  Text="{Binding FilterText,Mode=TwoWay, UpdateSourceTrigger=Explicit}" Background="{Binding FilterBackGround,Mode=OneWay}" IsReadOnly="{Binding FilterReadOnly}" VerticalAlignment="Stretch" Margin="0,0,0,0"  FontSize="9" />
+                            <TextBox BorderThickness="1" BorderBrush="Gray" KeyUp="txtFilter_KeyUp"  Text="{Binding FilterText,Mode=TwoWay, UpdateSourceTrigger=Explicit}" Background="{Binding FilterBackGround,Mode=OneWay}" IsReadOnly="{Binding FilterReadOnly}" VerticalAlignment="Stretch" Margin="0,0,0,0"  FontSize="12" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="HasDropShadow" SourceName="PART_Popup" Value="true">
@@ -249,6 +249,6 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBox x:Name="txtFilter" Visibility="Collapsed" BorderThickness="1" BorderBrush="Gray" KeyUp="txtFilter_KeyUp"  Text="{Binding FilterText,Mode=TwoWay, UpdateSourceTrigger=Explicit}" IsReadOnly="{Binding FilterReadOnly}" Grid.Column="1" VerticalAlignment="Stretch" Margin="0,0,0,0"  FontSize="9" />
+        <TextBox x:Name="txtFilter" Visibility="Collapsed" BorderThickness="1" BorderBrush="Gray" KeyUp="txtFilter_KeyUp"  Text="{Binding FilterText,Mode=TwoWay, UpdateSourceTrigger=Explicit}" IsReadOnly="{Binding FilterReadOnly}" Grid.Column="1" VerticalAlignment="Stretch" Margin="0,0,0,0"  FontSize="12" />
     </Grid>
 </UserControl>

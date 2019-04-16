@@ -4,8 +4,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:Microsoft_Windows_Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" 
-    mc:Ignorable="d" 
-    >
+    mc:Ignorable="d">
     <UserControl.Resources>
         <Style x:Key="ComboBoxFocusVisual">
             <Setter Property="Control.Template">
@@ -23,8 +22,6 @@
             <GradientStop Color="#CDCDCD" Offset="1"/>
         </LinearGradientBrush>
         <SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/>
-
-
 
         <Style x:Key="ComboBoxReadonlyToggleButton" TargetType="{x:Type ToggleButton}">
             <Setter Property="OverridesDefaultStyle" Value="true"/>

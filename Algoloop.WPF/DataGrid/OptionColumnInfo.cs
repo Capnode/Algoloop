@@ -13,6 +13,8 @@
  */
 
 using System;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -20,6 +22,8 @@ namespace Algoloop.WPF.DataGrid
 {
     public class OptionColumnInfo
     {
+        private static readonly Style _rightCellStyle = CellStyle(TextAlignment.Right);
+
         public DataGridColumn Column { get; set; }
         public bool IsValid { get; set; }
         public string PropertyPath { get; set; }
@@ -34,11 +38,10 @@ namespace Algoloop.WPF.DataGrid
                 return;
 
             Column = column;
-            var boundColumn = column as DataGridBoundColumn;
-            if (boundColumn != null)
+            if (column is DataGridBoundColumn boundColumn)
             {
-                System.Windows.Data.Binding binding = boundColumn.Binding as System.Windows.Data.Binding;
-                if (binding != null && !string.IsNullOrWhiteSpace(binding.Path.Path))
+                if (boundColumn.Binding is Binding binding
+                    && !string.IsNullOrWhiteSpace(binding.Path.Path))
                 {
                     System.Reflection.PropertyInfo propInfo = null;
                     if (boundObjectType != null)
@@ -52,11 +55,17 @@ namespace Algoloop.WPF.DataGrid
                         Converter = binding.Converter;
                         ConverterCultureInfo = binding.ConverterCulture;
                         ConverterParameter = binding.ConverterParameter;
+                        if (TypeHelper.IsNumbericType(PropertyType))
+                        {
+                            boundColumn.ElementStyle = _rightCellStyle;
+                        }
                     }
                     else
                     {
-                        if (System.Diagnostics.Debugger.IsAttached && System.Diagnostics.Debugger.IsLogging())
-                            System.Diagnostics.Debug.WriteLine("Algoloop.WPF.DataGrid.FilterGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType.ToString());
+                        if (Debugger.IsAttached && Debugger.IsLogging())
+                        {
+                            Debug.WriteLine("Algoloop.WPF.DataGrid.FilterGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType.ToString());
+                        }
                     }
                 }
             }
@@ -65,6 +74,13 @@ namespace Algoloop.WPF.DataGrid
                 PropertyPath = column.SortMemberPath;
                 PropertyType = boundObjectType.GetProperty(column.SortMemberPath).PropertyType;
             }
+        }
+
+        private static Style CellStyle(TextAlignment alignment)
+        {
+            var style = new Style(typeof(TextBlock));
+            style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, alignment));
+            return style;
         }
 
         public override string ToString()

@@ -18,109 +18,96 @@ namespace Algoloop.WPF.DataGrid
 {
     public class TypeHelper
     {
-        public static object ValueConvertor(Type type, string value)
+        public static object ValueConverter(Type type, string value)
         {
 
             if (type == typeof(byte) || type == typeof(byte?))
             {
-                byte x;
-                if (byte.TryParse(value, out x))
+                if (byte.TryParse(value, out byte x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(sbyte) || type == typeof(sbyte?))
             {
-                sbyte x;
-                if (sbyte.TryParse(value, out x))
+                if (sbyte.TryParse(value, out sbyte x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(short) || type == typeof(short?))
             {
-                short x;
-                if (short.TryParse(value, out x))
+                if (short.TryParse(value, out short x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(ushort) || type == typeof(ushort?))
             {
-                ushort x;
-                if (ushort.TryParse(value, out x))
+                if (ushort.TryParse(value, out ushort x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(int) || type == typeof(int?))
             {
-                int x;
-                if (int.TryParse(value, out x))
+                if (int.TryParse(value, out int x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(uint) || type == typeof(uint?))
             {
-                uint x;
-                if (uint.TryParse(value, out x))
+                if (uint.TryParse(value, out uint x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(long) || type == typeof(long?))
             {
-                long x;
-                if (long.TryParse(value, out x))
+                if (long.TryParse(value, out long x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(ulong) || type == typeof(ulong?))
             {
-                ulong x;
-                if (ulong.TryParse(value, out x))
+                if (ulong.TryParse(value, out ulong x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(float) || type == typeof(float?))
             {
-                float x;
-                if (float.TryParse(value, out x))
+                if (float.TryParse(value, out float x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(double) || type == typeof(double?))
             {
-                double x;
-                if (double.TryParse(value, out x))
+                if (double.TryParse(value, out double x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(decimal) || type == typeof(decimal?))
             {
-                decimal x;
-                if (decimal.TryParse(value, out x))
+                if (decimal.TryParse(value, out decimal x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(char) || type == typeof(char?))
             {
-                char x;
-                if (char.TryParse(value, out x))
+                if (char.TryParse(value, out char x))
                     return x;
                 else
                     return null;
             }
             else if (type == typeof(bool) || type == typeof(bool?))
             {
-                bool x;
-                if (bool.TryParse(value, out x))
+                if (bool.TryParse(value, out bool x))
                     return x;
                 else
                     return null;

@@ -21,17 +21,17 @@ namespace Algoloop.WPF.DataGrid
     {
         public static MethodCallExpression ToString(System.Linq.Expressions.Expression prop)
         {
-            return System.Linq.Expressions.Expression.Call(prop, typeof(object).GetMethod("ToString", System.Type.EmptyTypes));
+            return Expression.Call(prop, typeof(object).GetMethod("ToString", System.Type.EmptyTypes));
         }
 
         public static MethodCallExpression ToLower(MethodCallExpression stringProp)
         {
-            return System.Linq.Expressions.Expression.Call(stringProp, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
+            return Expression.Call(stringProp, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
         }
 
         public static BinaryExpression NotNull(System.Linq.Expressions.Expression prop)
         {
-            return System.Linq.Expressions.Expression.NotEqual(prop, System.Linq.Expressions.Expression.Constant(null));
+            return Expression.NotEqual(prop, System.Linq.Expressions.Expression.Constant(null));
         }
 
         public static Predicate<object> GenerateGeneric(MemberExpression prop, ConstantExpression val, Type type, ParameterExpression objParam, string methodName)
@@ -56,7 +56,7 @@ namespace Algoloop.WPF.DataGrid
             BinaryExpression equalExpresion = null;
             if (TypeHelper.IsValueType(type))
             {
-                object equalTypedInput = TypeHelper.ValueConvertor(type, value);
+                object equalTypedInput = TypeHelper.ValueConverter(type, value);
                 if (equalTypedInput != null)
                 {
                     var equalValue = System.Linq.Expressions.Expression.Constant(equalTypedInput, type);
@@ -75,7 +75,7 @@ namespace Algoloop.WPF.DataGrid
             }
             if (equalExpresion != null)
             {
-                Expression<Func<object, bool>> equalfunction = System.Linq.Expressions.Expression.Lambda<Func<object, bool>>(equalExpresion, objParam);
+                Expression<Func<object, bool>> equalfunction = Expression.Lambda<Func<object, bool>>(equalExpresion, objParam);
                 return new Predicate<object>(equalfunction.Compile());
             }
             else
@@ -87,22 +87,22 @@ namespace Algoloop.WPF.DataGrid
             BinaryExpression notEqualExpresion = null;
             if (TypeHelper.IsValueType(type))
             {
-                object equalTypedInput = TypeHelper.ValueConvertor(type, value);
+                object equalTypedInput = TypeHelper.ValueConverter(type, value);
                 if (equalTypedInput != null)
                 {
-                    var equalValue = System.Linq.Expressions.Expression.Constant(equalTypedInput, type);
-                    notEqualExpresion = System.Linq.Expressions.Expression.NotEqual(prop, equalValue);
+                    var equalValue = Expression.Constant(equalTypedInput, type);
+                    notEqualExpresion = Expression.NotEqual(prop, equalValue);
                 }
             }
             else
             {
-                var toStringExp = System.Linq.Expressions.Expression.NotEqual(ToLower(ToString(prop)), ExpressionHelper.ToLower(ExpressionHelper.ToString(System.Linq.Expressions.Expression.Constant(value))));
-                notEqualExpresion = System.Linq.Expressions.Expression.AndAlso(ExpressionHelper.NotNull(prop), toStringExp);
+                var toStringExp = Expression.NotEqual(ToLower(ToString(prop)), ExpressionHelper.ToLower(ExpressionHelper.ToString(System.Linq.Expressions.Expression.Constant(value))));
+                notEqualExpresion = Expression.AndAlso(ExpressionHelper.NotNull(prop), toStringExp);
 
             }
             if (notEqualExpresion != null)
             {
-                Expression<Func<object, bool>> equalfunction = System.Linq.Expressions.Expression.Lambda<Func<object, bool>>(notEqualExpresion, objParam);
+                Expression<Func<object, bool>> equalfunction = Expression.Lambda<Func<object, bool>>(notEqualExpresion, objParam);
                 return new Predicate<object>(equalfunction.Compile());
             }
             else
@@ -111,7 +111,7 @@ namespace Algoloop.WPF.DataGrid
 
         public static Predicate<object> GenerateGreaterThanEqual(MemberExpression prop, string value, Type type, ParameterExpression objParam)
         {
-            object typedInput = TypeHelper.ValueConvertor(type, value);
+            object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
             {
                 var greaterThanEqualValue = System.Linq.Expressions.Expression.Constant(typedInput, type);
@@ -127,7 +127,7 @@ namespace Algoloop.WPF.DataGrid
 
         public static Predicate<object> GenerateLessThanEqual(MemberExpression prop, string value, Type type, ParameterExpression objParam)
         {
-            object typedInput = TypeHelper.ValueConvertor(type, value);
+            object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
             {
                 var lessThanEqualValue = System.Linq.Expressions.Expression.Constant(typedInput, type);
@@ -142,7 +142,7 @@ namespace Algoloop.WPF.DataGrid
         }
         public static Predicate<object> GenerateLessThan(MemberExpression prop, string value, Type type, ParameterExpression objParam)
         {
-            object typedInput = TypeHelper.ValueConvertor(type, value);
+            object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
             {
                 var lessThan = System.Linq.Expressions.Expression.Constant(typedInput, type);
@@ -157,7 +157,7 @@ namespace Algoloop.WPF.DataGrid
         }
         public static Predicate<object> GenerateGreaterThan(MemberExpression prop, string value, Type type, ParameterExpression objParam)
         {
-            object typedInput = TypeHelper.ValueConvertor(type, value);
+            object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
             {
                 var greaterThanValue = System.Linq.Expressions.Expression.Constant(typedInput, type);
