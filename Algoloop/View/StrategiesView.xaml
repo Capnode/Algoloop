@@ -130,13 +130,13 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Jobs}">
+                    <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Tasks}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{} {0} ({1})">
                                         <Binding Path="DisplayName"/>
-                                        <Binding Path="Jobs.Count"/>
+                                        <Binding Path="Tasks.Count"/>
                                     </MultiBinding>
                                 </TextBlock.Text>
                                 <TextBlock.ContextMenu>
@@ -164,7 +164,7 @@
                                         </MenuItem>
                                         <MenuItem
                                             Header="Delete Tasks"
-                                            Command="{Binding DeleteAllJobsCommand}">
+                                            Command="{Binding DeleteAllTasksCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
@@ -181,14 +181,14 @@
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type vm:StrategyJobViewModel}">
+                    <DataTemplate DataType="{x:Type vm:StrategyTaskViewModel}">
                         <StackPanel Orientation="Horizontal">
                             <CheckBox IsChecked="{Binding Active}" />
                             <TextBlock Text="{Binding Model.Name}" />
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem
-                                        Header="Delete Job"
+                                        Header="Delete Task"
                                         Command="{Binding DeleteCommand}">
                                         <MenuItem.Icon>
                                             <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
@@ -332,13 +332,13 @@
                                     </DataGrid.RowStyle>
                                 </DataGrid>
                             </TabItem>
-                            <TabItem Header="{Binding Jobs.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
+                            <TabItem Header="{Binding Tasks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
                                 <viewsupport:ExDataGrid
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
-                                    SelectedValue="{Binding SelectedJob, Mode=TwoWay}"
-                                    ItemsSource="{Binding Jobs}"
-                                    ExColumns="{Binding JobColumns}">
+                                    SelectedValue="{Binding SelectedTask, Mode=TwoWay}"
+                                    ItemsSource="{Binding Tasks}"
+                                    ExColumns="{Binding TaskColumns}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDoubleClick">
                                             <i:InvokeCommandAction
@@ -351,8 +351,8 @@
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem
-                                                Header="Delete Jobs"
-                                                Command="{Binding DeleteSelectedJobsCommand}"
+                                                Header="Delete Tasks"
+                                                Command="{Binding DeleteSelectedTasksCommand}"
                                                 CommandParameter="{Binding
                                                     Path=PlacementTarget.SelectedItems,
                                                     RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
@@ -377,8 +377,8 @@
                         </TabControl>
                     </DockPanel>
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:StrategyJobViewModel}">
-                    <view:StrategyJobView />
+                <DataTemplate DataType="{x:Type vm:StrategyTaskViewModel}">
+                    <view:StrategyTaskView />
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

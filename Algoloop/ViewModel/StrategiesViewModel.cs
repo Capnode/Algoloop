@@ -198,9 +198,9 @@ namespace Algoloop.ViewModel
                         StrategiesModel strategies = JsonConvert.DeserializeObject<StrategiesModel>(json);
                         foreach (StrategyModel strategy in strategies.Strategies)
                         {
-                            foreach (StrategyJobModel job in strategy.Jobs)
+                            foreach (StrategyTaskModel task in strategy.Tasks)
                             {
-                                job.Active = false;
+                                task.Active = false;
                             }
 
                             Model.Strategies.Add(strategy);
@@ -264,11 +264,11 @@ namespace Algoloop.ViewModel
         {
             foreach (StrategyViewModel strategy in Strategies)
             {
-                foreach (StrategyJobViewModel job in strategy.Jobs)
+                foreach (StrategyTaskViewModel task in strategy.Tasks)
                 {
-                    if (job.Active)
+                    if (task.Active)
                     {
-                        Task task = job.StartTaskAsync();
+                        Task job = task.StartTaskAsync();
                     }
                 }
             }

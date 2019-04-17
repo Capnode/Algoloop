@@ -19,6 +19,7 @@ using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -26,6 +27,7 @@ using QuantConnect.Orders;
 using QuantConnect.Packets;
 using QuantConnect.Statistics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -35,32 +37,34 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyJobViewModel: ViewModelBase, ITreeViewModel, IComparable
+    public class StrategyTaskViewModel: ViewModelBase, ITreeViewModel, IComparable
     {
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
         private Isolated<LeanLauncher> _leanEngine;
-        private StrategyJobModel _model;
+        private StrategyTaskModel _model;
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
         public IDictionary<string, object> _statistics;
         private string _port;
 
-        public StrategyJobViewModel(StrategyViewModel parent, StrategyJobModel model, SettingsModel settingsModel)
+        public StrategyTaskViewModel(StrategyViewModel parent, StrategyTaskModel model, SettingsModel settingsModel)
         {
             _parent = parent;
             Model = model;
             _settingsModel = settingsModel;
 
-            StartCommand = new RelayCommand(() => DoStartJobCommand(), () => !Active);
-            StopCommand = new RelayCommand(() => DoStopJobCommand(false), () => Active);
-            DeleteCommand = new RelayCommand(() => DoDeleteJob(), () => !Active);
+            StartCommand = new RelayCommand(() => DoStartTaskCommand(), () => !Active);
+            StopCommand = new RelayCommand(() => DoStopTaskCommand(false), () => Active);
+            DeleteCommand = new RelayCommand(() => DoDeleteTask(), () => !Active);
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
             ExportCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => { }, () => false);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
@@ -76,6 +80,8 @@ namespace Algoloop.ViewModel
         public RelayCommand ExportCommand { get; }
         public RelayCommand CloneCommand { get; }
         public RelayCommand CloneAlgorithmCommand { get; }
+        public RelayCommand<IList> ExportSymbolsCommand { get; }
+
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
@@ -90,7 +96,7 @@ namespace Algoloop.ViewModel
             set => Set(ref _statistics, value);
         }
 
-        public StrategyJobModel Model
+        public StrategyTaskModel Model
         {
             get => _model;
             set => Set(ref _model, value);
@@ -160,7 +166,7 @@ namespace Algoloop.ViewModel
             return _model.Name;
         }
 
-        public void DoDeleteJob()
+        public void DoDeleteTask()
         {
             var charts = Charts;
             charts.Clear();
@@ -168,12 +174,12 @@ namespace Algoloop.ViewModel
             Charts = charts;
 
             _cancel?.Cancel();
-            _parent?.DeleteJob(this);
+            _parent?.DeleteTask(this);
         }
 
         public int CompareTo(object obj)
         {
-            var a = obj as StrategyJobViewModel;
+            var a = obj as StrategyTaskViewModel;
             return string.Compare(Model.Name, a?.Model.Name);
         }
 
@@ -208,7 +214,7 @@ namespace Algoloop.ViewModel
                 StrategyViewModel.AddPath(folder);
             }
 
-            StrategyJobModel model = Model;
+            StrategyTaskModel model = Model;
             try
             {
                 if (Desktop)
@@ -435,16 +441,47 @@ namespace Algoloop.ViewModel
             _parent?.UseParameters(this);
         }
 
-        private async void DoStartJobCommand()
+        private async void DoStartTaskCommand()
         {
             Active = true;
             await StartTaskAsync();
         }
 
-        private void DoStopJobCommand(bool v)
+        private void DoStopTaskCommand(bool v)
         {
             StopTask();
             Active = false;
+        }
+
+        private void DoExportSymbols(IList symbols)
+        {
+            Debug.Assert(symbols != null);
+            if (symbols.Count == 0)
+                return;
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                string fileName = saveFileDialog.FileName;
+                using (StreamWriter file = File.CreateText(fileName))
+                {
+                    foreach (SymbolSummaryViewModel symbol in symbols)
+                    {
+                        file.WriteLine(symbol.Symbol);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
         }
 
         private void StopTask()

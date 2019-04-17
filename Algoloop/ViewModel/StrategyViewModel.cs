@@ -46,8 +46,8 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SymbolViewModel _selectedSymbol;
-        private ObservableCollection<DataGridColumn> _jobColumns = new ObservableCollection<DataGridColumn>();
-        private StrategyJobViewModel _selectedJob;
+        private ObservableCollection<DataGridColumn> _taskColumns = new ObservableCollection<DataGridColumn>();
+        private StrategyTaskViewModel _selectedTask;
         private string _displayName;
         private readonly SettingsModel _settingsModel;
 
@@ -63,14 +63,14 @@ namespace Algoloop.ViewModel
             CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !string.IsNullOrEmpty(Model.AlgorithmName));
             ExportCommand = new RelayCommand(() => DoExportStrategy(), () => true);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => true);
-            DeleteAllJobsCommand = new RelayCommand(() => DoDeleteAllJobs(), () => true);
-            DeleteSelectedJobsCommand = new RelayCommand<IList>(m => DoDeleteJobs(m), m => true);
+            DeleteAllTasksCommand = new RelayCommand(() => DoDeleteAllTasks(), () => true);
+            DeleteSelectedTasksCommand = new RelayCommand<IList>(m => DoDeleteTasks(m), m => true);
             UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => true);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => true);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => true);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
-            TaskDoubleClickCommand = new RelayCommand<StrategyJobViewModel>(m => DoSelectItem(m));
+            TaskDoubleClickCommand = new RelayCommand<StrategyTaskViewModel>(m => DoSelectItem(m));
             MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => SelectedSymbol != null);
             MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => SelectedSymbol != null);
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => true);
@@ -88,15 +88,15 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand ExportCommand { get; }
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand DeleteAllJobsCommand { get; }
-        public RelayCommand<IList> DeleteSelectedJobsCommand { get; }
+        public RelayCommand DeleteAllTasksCommand { get; }
+        public RelayCommand<IList> DeleteSelectedTasksCommand { get; }
         public RelayCommand<IList> UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
-        public RelayCommand<StrategyJobViewModel> TaskDoubleClickCommand { get; }
+        public RelayCommand<StrategyTaskViewModel> TaskDoubleClickCommand { get; }
         public RelayCommand<IList> MoveUpSymbolsCommand { get; }
         public RelayCommand<IList> MoveDownSymbolsCommand { get; }
         public RelayCommand SortSymbolsCommand { get; }
@@ -104,7 +104,7 @@ namespace Algoloop.ViewModel
         public StrategyModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-        public SyncObservableCollection<StrategyJobViewModel> Jobs { get; } = new SyncObservableCollection<StrategyJobViewModel>();
+        public SyncObservableCollection<StrategyTaskViewModel> Tasks { get; } = new SyncObservableCollection<StrategyTaskViewModel>();
 
         public string DisplayName
         {
@@ -127,10 +127,10 @@ namespace Algoloop.ViewModel
             set => Set(ref _isExpanded, value);
         }
 
-        public ObservableCollection<DataGridColumn> JobColumns
+        public ObservableCollection<DataGridColumn> TaskColumns
         {
-            get => _jobColumns;
-            set => Set(ref _jobColumns, value);
+            get => _taskColumns;
+            set => Set(ref _taskColumns, value);
         }
 
         public SymbolViewModel SelectedSymbol
@@ -146,12 +146,12 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public StrategyJobViewModel SelectedJob
+        public StrategyTaskViewModel SelectedTask
         {
-            get => _selectedJob;
+            get => _selectedTask;
             set
             {
-                Set(ref _selectedJob, value);
+                Set(ref _selectedTask, value);
             }
         }
 
@@ -170,13 +170,13 @@ namespace Algoloop.ViewModel
             Environment.SetEnvironmentVariable("PATH", pathValue);
         }
 
-        internal void UseParameters(StrategyJobViewModel job)
+        internal void UseParameters(StrategyTaskViewModel task)
         {
-            if (job == null)
+            if (task == null)
                 return;
 
             Parameters.Clear();
-            foreach (ParameterViewModel parameter in job.Parameters)
+            foreach (ParameterViewModel parameter in task.Parameters)
             {
                 Parameters.Add(parameter);
             }
@@ -196,49 +196,49 @@ namespace Algoloop.ViewModel
                 Model.Parameters.Add(parameter.Model);
             }
 
-            Model.Jobs.Clear();
-            foreach (StrategyJobViewModel job in Jobs)
+            Model.Tasks.Clear();
+            foreach (StrategyTaskViewModel task in Tasks)
             {
-                Model.Jobs.Add(job.Model);
-                job.DataToModel();
+                Model.Tasks.Add(task.Model);
+                task.DataToModel();
             }
         }
 
-        internal bool DeleteJob(StrategyJobViewModel job)
+        internal bool DeleteTask(StrategyTaskViewModel task)
         {
-            bool ok = Jobs.Remove(job);
+            bool ok = Tasks.Remove(task);
             return ok;
         }
 
-        private void DoDeleteAllJobs()
+        private void DoDeleteAllTasks()
         {
-            Jobs.Clear();
+            Tasks.Clear();
             DataToModel();
         }
 
-        private void DoDeleteJobs(IList jobs)
+        private void DoDeleteTasks(IList tasks)
         {
-            Debug.Assert(jobs != null);
-            if (Jobs.Count == 0 || jobs.Count == 0)
+            Debug.Assert(tasks != null);
+            if (Tasks.Count == 0 || tasks.Count == 0)
                 return;
 
-            List<StrategyJobViewModel> list = jobs.Cast<StrategyJobViewModel>()?.ToList();
-            foreach (StrategyJobViewModel job in list)
+            List<StrategyTaskViewModel> list = tasks.Cast<StrategyTaskViewModel>()?.ToList();
+            foreach (StrategyTaskViewModel task in list)
             {
-                if (job != null)
+                if (task != null)
                 {
-                    job.DoDeleteJob();
+                    task.DoDeleteTask();
                 }
             }
         }
 
-        private void DoSelectItem(StrategyJobViewModel job)
+        private void DoSelectItem(StrategyTaskViewModel task)
         {
-            if (job == null)
+            if (task == null)
                 return;
 
-            job.IsSelected = true;
-            _parent.SelectedItem = job;
+            task.IsSelected = true;
+            _parent.SelectedItem = task;
             IsExpanded = true;
         }
 
@@ -253,9 +253,9 @@ namespace Algoloop.ViewModel
             if (selected == null)
                 return;
 
-            foreach (StrategyJobViewModel job in selected)
+            foreach (StrategyTaskViewModel task in selected)
             {
-                UseParameters(job);
+                UseParameters(task);
                 break; // skip rest
             }
         }
@@ -267,29 +267,29 @@ namespace Algoloop.ViewModel
             int count = 0;
             var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
-            var tasks = new List<Task>();
+            var jobs = new List<Task>();
             using (var throttler = new SemaphoreSlim(_settingsModel.MaxBacktests))
             {
                 foreach (StrategyModel model in models)
                 {
                     await throttler.WaitAsync();
                     count++;
-                    var jobModel = new StrategyJobModel(model.AlgorithmName, model);
-                    Log.Trace($"Strategy {jobModel.AlgorithmName} {jobModel.Name} {count}({total})");
-                    var job = new StrategyJobViewModel(this, jobModel, _settingsModel);
-                    Jobs.Add(job);
-                    Task task = job
+                    var taskModel = new StrategyTaskModel(model.AlgorithmName, model);
+                    Log.Trace($"Strategy {taskModel.AlgorithmName} {taskModel.Name} {count}({total})");
+                    var task = new StrategyTaskViewModel(this, taskModel, _settingsModel);
+                    Tasks.Add(task);
+                    Task job = task
                         .StartTaskAsync()
                         .ContinueWith(m =>
                         {
-                            ExDataGridColumns.AddPropertyColumns(JobColumns, job.Statistics, "Statistics");
+                            ExDataGridColumns.AddPropertyColumns(TaskColumns, task.Statistics, "Statistics");
                             throttler.Release();
                         },
                         TaskScheduler.FromCurrentSynchronizationContext());
-                    tasks.Add(task);
+                    jobs.Add(job);
                 }
 
-                await Task.WhenAll(tasks);
+                await Task.WhenAll(jobs);
             }
         }
 
@@ -342,26 +342,26 @@ namespace Algoloop.ViewModel
 
             AlgorithmNameChanged(Model.AlgorithmName);
 
-            UpdateJobsAndColumns();
+            UpdateTasksAndColumns();
         }
 
-        private void UpdateJobsAndColumns()
+        private void UpdateTasksAndColumns()
         {
-            JobColumns.Clear();
-            Jobs.Clear();
+            TaskColumns.Clear();
+            Tasks.Clear();
 
-            JobColumns.Add(new DataGridCheckBoxColumn()
+            TaskColumns.Add(new DataGridCheckBoxColumn()
             {
                 Header = "Active",
                 Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
-            ExDataGridColumns.AddTextColumn(JobColumns, "Name", "Model.Name", false);
-            foreach (StrategyJobModel strategyJobModel in Model.Jobs)
+            ExDataGridColumns.AddTextColumn(TaskColumns, "Name", "Model.Name", false);
+            foreach (StrategyTaskModel strategyTaskModel in Model.Tasks)
             {
-                var strategyJobViewModel = new StrategyJobViewModel(this, strategyJobModel, _settingsModel);
-                Jobs.Add(strategyJobViewModel);
-                ExDataGridColumns.AddPropertyColumns(JobColumns, strategyJobViewModel.Statistics, "Statistics");
+                var strategyTaskViewModel = new StrategyTaskViewModel(this, strategyTaskModel, _settingsModel);
+                Tasks.Add(strategyTaskViewModel);
+                ExDataGridColumns.AddPropertyColumns(TaskColumns, strategyTaskViewModel.Statistics, "Statistics");
             }
         }
 

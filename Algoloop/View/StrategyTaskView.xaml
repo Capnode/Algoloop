@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Algoloop.View.StrategyJobView"
+﻿<UserControl x:Class="Algoloop.View.StrategyTaskView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -126,7 +126,8 @@
                 </DataGrid>
             </TabItem>
             <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
-                <DataGrid HorizontalAlignment="Stretch"
+                <DataGrid
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
@@ -153,7 +154,22 @@
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
-                    FilteredItemsSource="{Binding SummarySymbols}"/>
+                    FilteredItemsSource="{Binding SummarySymbols}">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem
+                                Header="Export symbols..."
+                                Command="{Binding ExportSymbolsCommand}"
+                                CommandParameter="{Binding
+                                    Path=PlacementTarget.SelectedItems,
+                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
+                                <MenuItem.Icon>
+                                    <Image Source="/Resources/Export.png" Width="16" Height="16"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </wpfControls:FilterGrid>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox

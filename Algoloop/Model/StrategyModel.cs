@@ -187,7 +187,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<StrategyJobModel> Jobs { get; } = new List<StrategyJobModel>();
+        public List<StrategyTaskModel> Tasks { get; } = new List<StrategyTaskModel>();
 
         public void Refresh()
         {
