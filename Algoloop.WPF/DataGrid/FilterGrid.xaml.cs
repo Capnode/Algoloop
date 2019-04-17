@@ -20,6 +20,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Collections;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Algoloop.WPF.DataGrid
 {
@@ -37,19 +39,85 @@ namespace Algoloop.WPF.DataGrid
 
         private List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
         private PropertyChangedEventHandler _filterHandler;
+        public static readonly DependencyProperty ExColumnsProperty = DependencyProperty.Register("ExColumns",
+            typeof(ObservableCollection<DataGridColumn>), typeof(FilterGrid),
+                new PropertyMetadata(OnDataGridColumnsPropertyChanged));
 
         protected bool IsResetting { get; set; }
 
         public List<ColumnFilterControl> Filters { get; set; }
+
         public Type FilterType { get; set; }
+
         protected ICollectionView CollectionView
         {
             get { return this.ItemsSource as ICollectionView; }
         }
+
+        public ObservableCollection<DataGridColumn> ExColumns
+        {
+            get { return (ObservableCollection<DataGridColumn>)base.GetValue(ExColumnsProperty); }
+            set { base.SetValue(ExColumnsProperty, value); }
+        }
+
+        private static void OnDataGridColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
+        {
+            var context = source as FilterGrid;
+
+            var oldItems = e.OldValue as ObservableCollection<DataGridColumn>;
+
+            if (oldItems != null)
+            {
+                foreach (var one in oldItems)
+                    context.Columns.Remove(one);
+
+                oldItems.CollectionChanged -= context.collectionChanged;
+            }
+
+            var newItems = e.NewValue as ObservableCollection<DataGridColumn>;
+
+            if (newItems != null)
+            {
+                foreach (var one in newItems)
+                    context.Columns.Add(one);
+
+                newItems.CollectionChanged += context.collectionChanged;
+            }
+        }
+
+        private void collectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewItems != null)
+                        foreach (DataGridColumn one in e.NewItems)
+                            Columns.Add(one);
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    if (e.OldItems != null)
+                        foreach (DataGridColumn one in e.OldItems)
+                            Columns.Remove(one);
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    Columns.Move(e.OldStartingIndex, e.NewStartingIndex);
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    Columns.Clear();
+                    if (e.NewItems != null)
+                        foreach (DataGridColumn one in e.NewItems)
+                            Columns.Add(one);
+                    break;
+            }
+        }
+
         #region FilteredItemsSource DependencyProperty
         public static readonly DependencyProperty FilteredItemsSourceProperty =
-                                                                DependencyProperty.Register("FilteredItemsSource", typeof(IEnumerable), typeof(FilterGrid),
-                                                                new PropertyMetadata(null, new PropertyChangedCallback(OnFilteredItemsSourceChanged)));
+            DependencyProperty.Register("FilteredItemsSource", typeof(IEnumerable), typeof(FilterGrid),
+            new PropertyMetadata(null, new PropertyChangedCallback(OnFilteredItemsSourceChanged)));
 
         public IEnumerable FilteredItemsSource
         {
@@ -65,12 +133,19 @@ namespace Algoloop.WPF.DataGrid
                 var list = (IEnumerable)e.NewValue;
                 var view = new CollectionViewSource();
                 view.Source = list;
+                if (list == null)
+                    return;
+
                 Type srcT = e.NewValue.GetType().GetInterfaces().First(i => i.Name.StartsWith("IEnumerable"));
                 g.FilterType = srcT.GetGenericArguments().First();
                 g.ItemsSource = CollectionViewSource.GetDefaultView(list);
                 if (g.Filters != null)
+                {
                     foreach (var filter in g.Filters)
+                    {
                         filter.ResetControl();
+                    }
+                }
 
             }
         }

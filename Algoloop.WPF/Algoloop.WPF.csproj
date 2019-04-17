@@ -69,6 +69,7 @@
       <DependentUpon>ColumnOptionControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataGrid\Enums.cs" />
+    <Compile Include="DataGrid\FilterDataGridColumns.cs" />
     <Compile Include="DataGrid\ExpressionHelper.cs" />
     <Compile Include="DataGrid\FilterChangedEventArgs.cs" />
     <Compile Include="DataGrid\FilterOperationItem.cs" />

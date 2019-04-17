@@ -42,7 +42,9 @@ namespace Algoloop.WPF.DataGrid
                 {
                     System.Reflection.PropertyInfo propInfo = null;
                     if (boundObjectType != null)
+                    {
                         propInfo = boundObjectType.GetProperty(binding.Path.Path);
+                    }
 
                     if (propInfo != null)
                     {
@@ -57,7 +59,7 @@ namespace Algoloop.WPF.DataGrid
                     {
                         if (Debugger.IsAttached && Debugger.IsLogging())
                         {
-                            Debug.WriteLine("Algoloop.WPF.DataGrid.FilterGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType.ToString());
+                            Debug.WriteLine("Algoloop.WPF.DataGrid.FilterGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType?.ToString());
                         }
                     }
                 }
