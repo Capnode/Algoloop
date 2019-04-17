@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.ViewSupport;
+using Algoloop.WPF.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
@@ -143,7 +144,7 @@ namespace Algoloop.ViewModel
         internal void DataFromModel()
         {
             SymbolColumns.Clear();
-            ExDataGridColumns.AddTextColumn(SymbolColumns, "Symbol", "Model.Name", false);
+            FilterDataGridColumns.AddTextColumn(SymbolColumns, "Symbol", "Model.Name", false);
 
             Symbols.Clear();
             foreach (SymbolViewModel marketSymbol in _market.Symbols)
@@ -156,7 +157,7 @@ namespace Algoloop.ViewModel
                         Symbols.Add(marketSymbol);
                     }
 
-                    ExDataGridColumns.AddPropertyColumns(SymbolColumns, marketSymbol.Model.Properties, "Model.Properties");
+                    FilterDataGridColumns.AddPropertyColumns(SymbolColumns, marketSymbol.Model.Properties, "Model.Properties");
                 }
             }
         }

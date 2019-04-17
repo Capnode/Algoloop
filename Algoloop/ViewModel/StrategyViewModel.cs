@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.ViewSupport;
+using Algoloop.WPF.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
@@ -282,7 +283,7 @@ namespace Algoloop.ViewModel
                         .StartTaskAsync()
                         .ContinueWith(m =>
                         {
-                            ExDataGridColumns.AddPropertyColumns(TaskColumns, task.Statistics, "Statistics");
+                            FilterDataGridColumns.AddPropertyColumns(TaskColumns, task.Statistics, "Statistics");
                             throttler.Release();
                         },
                         TaskScheduler.FromCurrentSynchronizationContext());
@@ -356,12 +357,12 @@ namespace Algoloop.ViewModel
                 Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
-            ExDataGridColumns.AddTextColumn(TaskColumns, "Name", "Model.Name", false);
+            FilterDataGridColumns.AddTextColumn(TaskColumns, "Name", "Model.Name", false);
             foreach (StrategyTaskModel strategyTaskModel in Model.Tasks)
             {
                 var strategyTaskViewModel = new StrategyTaskViewModel(this, strategyTaskModel, _settingsModel);
                 Tasks.Add(strategyTaskViewModel);
-                ExDataGridColumns.AddPropertyColumns(TaskColumns, strategyTaskViewModel.Statistics, "Statistics");
+                FilterDataGridColumns.AddPropertyColumns(TaskColumns, strategyTaskViewModel.Statistics, "Statistics");
             }
         }
 

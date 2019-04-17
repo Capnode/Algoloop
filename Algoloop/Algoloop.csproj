@@ -247,7 +247,6 @@
     <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />
     <Compile Include="ViewModel\SymbolSummaryViewModel.cs" />
-    <Compile Include="ViewSupport\ExDataGridColumns.cs" />
     <Compile Include="Model\FolderModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\OrderModel.cs" />
@@ -273,7 +272,6 @@
     <Compile Include="ViewModel\ITreeViewModel.cs" />
     <Compile Include="ViewModel\OrderViewModel.cs" />
     <Compile Include="ViewSupport\BooleanToVisibilityConverter.cs" />
-    <Compile Include="ViewSupport\ExDataGrid.cs" />
     <Compile Include="ViewSupport\ProviderNameConverter.cs" />
     <Compile Include="View\DesktopView.xaml.cs">
       <DependentUpon>DesktopView.xaml</DependentUpon>

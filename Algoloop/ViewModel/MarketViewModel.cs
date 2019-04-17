@@ -17,6 +17,7 @@ using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Provider;
 using Algoloop.ViewSupport;
+using Algoloop.WPF.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
@@ -526,7 +527,7 @@ namespace Algoloop.ViewModel
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
-                ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties");
+                FilterDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties");
             }
         }
     }

@@ -31,8 +31,11 @@ namespace Algoloop.ViewModel
 {
     public class SymbolViewModel : ViewModelBase, ITreeViewModel, IComparable
     {
+        public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         private ITreeViewModel _parent;
         private Resolution _selectedResolution = Resolution.Daily;
+        private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
+        private DateTime _date = DateTime.Today;
 
         public SymbolViewModel(ITreeViewModel parent, SymbolModel model)
         {
@@ -49,11 +52,7 @@ namespace Algoloop.ViewModel
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
         public RelayCommand UpdateCommand { get; }
-
         public SymbolModel Model { get; }
-        public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
-        private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
-        private DateTime _date = DateTime.Today;
 
         public bool Active
         {

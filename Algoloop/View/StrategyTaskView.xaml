@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
     xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"
-    xmlns:wpfControls="clr-namespace:Algoloop.WPF.DataGrid;assembly=Algoloop.WPF"             
+    xmlns:wpf="clr-namespace:Algoloop.WPF.DataGrid;assembly=Algoloop.WPF"             
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -148,9 +148,9 @@
                 <view:DesktopView Port="{Binding Port}"/>
             </TabItem>
             <TabItem Header="{Binding SummarySymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Summary symbols ({0}), FallbackValue=Summary symbols}">
-                <wpfControls:FilterGrid
+                <wpf:FilterGrid
                     AutoGenerateColumns="True"
-                    CanUserFreeze="True"
+                    CanUserFreeze="False"
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
@@ -169,7 +169,7 @@
                             </MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
-                </wpfControls:FilterGrid>
+                </wpf:FilterGrid>
             </TabItem>
             <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <TextBox

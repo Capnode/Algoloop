@@ -6,6 +6,7 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
+    xmlns:wpf="clr-namespace:Algoloop.WPF.DataGrid;assembly=Algoloop.WPF"                     
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
     xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"
@@ -209,14 +210,18 @@
                                             <Image Source="/Resources\AddList.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <viewsupport:ExDataGrid
-                                        x:Name="marketSymbolList"
+                                    <wpf:FilterGrid
+                                        x:Name="marketSymbolList"                                        
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
+                                        CanUserFreeze="False"
+                                        CanUserSelectDistinct="True"
+                                        CanUserGroup="False"
+                                        CanUserFilter="True"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                        ItemsSource="{Binding Symbols}"
+                                        FilteredItemsSource="{Binding Symbols}"                                        
                                         ExColumns="{Binding SymbolColumns}">
-                                    </viewsupport:ExDataGrid>
+                                    </wpf:FilterGrid>
                                 </DockPanel>
                             </TabItem>
                         </TabControl>
@@ -257,14 +262,14 @@
                                             <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <viewsupport:ExDataGrid
+                                    <wpf:FilterGrid
                                         x:Name="listbox"
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                         ItemsSource="{Binding Symbols}"
                                         ExColumns="{Binding SymbolColumns}">
-                                    </viewsupport:ExDataGrid>
+                                    </wpf:FilterGrid>
                                 </DockPanel>
                             </TabItem>
                         </TabControl>
