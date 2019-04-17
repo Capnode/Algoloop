@@ -14,7 +14,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -22,8 +21,6 @@ namespace Algoloop.WPF.DataGrid
 {
     public class OptionColumnInfo
     {
-        private static readonly Style _rightCellStyle = CellStyle(TextAlignment.Right);
-
         public DataGridColumn Column { get; set; }
         public bool IsValid { get; set; }
         public string PropertyPath { get; set; }
@@ -55,10 +52,6 @@ namespace Algoloop.WPF.DataGrid
                         Converter = binding.Converter;
                         ConverterCultureInfo = binding.ConverterCulture;
                         ConverterParameter = binding.ConverterParameter;
-                        if (TypeHelper.IsNumbericType(PropertyType))
-                        {
-                            boundColumn.ElementStyle = _rightCellStyle;
-                        }
                     }
                     else
                     {
@@ -74,13 +67,6 @@ namespace Algoloop.WPF.DataGrid
                 PropertyPath = column.SortMemberPath;
                 PropertyType = boundObjectType.GetProperty(column.SortMemberPath).PropertyType;
             }
-        }
-
-        private static Style CellStyle(TextAlignment alignment)
-        {
-            var style = new Style(typeof(TextBlock));
-            style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, alignment));
-            return style;
         }
 
         public override string ToString()

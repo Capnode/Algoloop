@@ -1,16 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/*
+ * Copyright 2019 Capnode AB
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls.Primitives;
@@ -19,6 +24,8 @@ namespace Algoloop.WPF.DataGrid
 {
     public partial class ColumnOptionControl : UserControl, INotifyPropertyChanged
     {
+        private static readonly Style _rightCellStyle = CellStyle(TextAlignment.Right);
+
         private FilterOperationItem _addPin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Pin Column", "/Algoloop.WPF;component/Images/PinUp.png");
         private FilterOperationItem _addGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Add Grouping", "/Algoloop.WPF;component/Images/GroupBy.png");
         private FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Algoloop.WPF;component/Images/pinDown.png");
@@ -97,6 +104,7 @@ namespace Algoloop.WPF.DataGrid
                 else
                     ColumnOptions.Add(_addPin);
             }
+
             if (CanUserGroup)
             {
                 if (Grid.IsGrouped(FilterColumnInfo.PropertyPath))
@@ -104,7 +112,6 @@ namespace Algoloop.WPF.DataGrid
                 else
                     ColumnOptions.Add(_addGroup);
             }
-
         }
 
         void ColumnOptionControl_Loaded(object sender, RoutedEventArgs e)
@@ -125,9 +132,20 @@ namespace Algoloop.WPF.DataGrid
             }
 
             if (colHeader != null)
+            {
                 column = colHeader.Column;
+            }
 
             FilterColumnInfo = new OptionColumnInfo(column, Grid.FilterType);
+
+            // Right adjust numeric column
+            if (column is DataGridBoundColumn boundColumn)
+            {
+                if (TypeHelper.IsNumbericType(FilterColumnInfo.PropertyType))
+                {
+                    boundColumn.ElementStyle = _rightCellStyle;
+                }
+            }
 
             CanUserFreeze = Grid.CanUserFreeze;
             CanUserGroup = Grid.CanUserGroup;
@@ -144,9 +162,7 @@ namespace Algoloop.WPF.DataGrid
 
             Grid.RegisterColumnOptionControl(this);
             ResetVisibility();
-
         }
-
         #region IPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string p)
@@ -187,6 +203,13 @@ namespace Algoloop.WPF.DataGrid
                 }
                 cbOptions.IsDropDownOpen = false;
             }
+        }
+
+        private static Style CellStyle(TextAlignment alignment)
+        {
+            var style = new Style(typeof(TextBlock));
+            style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, alignment));
+            return style;
         }
     }
 }
