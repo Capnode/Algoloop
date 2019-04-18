@@ -34,7 +34,7 @@ namespace Algoloop.WPF.DataGrid
             return Expression.NotEqual(prop, System.Linq.Expressions.Expression.Constant(null));
         }
 
-        public static Predicate<object> GenerateGeneric(MemberExpression prop, ConstantExpression val, Type type, ParameterExpression objParam, string methodName)
+        public static Predicate<object> GenerateGeneric(Expression prop, ConstantExpression val, Type type, ParameterExpression objParam, string methodName)
         {
             if (TypeHelper.IsNullable(type))
             {
@@ -51,7 +51,7 @@ namespace Algoloop.WPF.DataGrid
             }
         }
 
-        public static Predicate<object> GenerateEquals(MemberExpression prop, string value, Type type, ParameterExpression objParam)
+        public static Predicate<object> GenerateEquals(Expression prop, string value, Type type, ParameterExpression objParam)
         {
             BinaryExpression equalExpresion = null;
             if (TypeHelper.IsValueType(type))
@@ -82,7 +82,7 @@ namespace Algoloop.WPF.DataGrid
                 return null;
         }
 
-        public static Predicate<object> GenerateNotEquals(MemberExpression prop, string value, Type type, ParameterExpression objParam)
+        public static Predicate<object> GenerateNotEquals(Expression prop, string value, Type type, ParameterExpression objParam)
         {
             BinaryExpression notEqualExpresion = null;
             if (TypeHelper.IsValueType(type))
@@ -109,7 +109,7 @@ namespace Algoloop.WPF.DataGrid
                 return null;
         }
 
-        public static Predicate<object> GenerateGreaterThanEqual(MemberExpression prop, string value, Type type, ParameterExpression objParam)
+        public static Predicate<object> GenerateGreaterThanEqual(Expression prop, string value, Type type, ParameterExpression objParam)
         {
             object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
@@ -125,7 +125,7 @@ namespace Algoloop.WPF.DataGrid
             }
         }
 
-        public static Predicate<object> GenerateLessThanEqual(MemberExpression prop, string value, Type type, ParameterExpression objParam)
+        public static Predicate<object> GenerateLessThanEqual(Expression prop, string value, Type type, ParameterExpression objParam)
         {
             object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
@@ -140,7 +140,7 @@ namespace Algoloop.WPF.DataGrid
                 return null;
             }
         }
-        public static Predicate<object> GenerateLessThan(MemberExpression prop, string value, Type type, ParameterExpression objParam)
+        public static Predicate<object> GenerateLessThan(Expression prop, string value, Type type, ParameterExpression objParam)
         {
             object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
@@ -155,7 +155,7 @@ namespace Algoloop.WPF.DataGrid
                 return null;
             }
         }
-        public static Predicate<object> GenerateGreaterThan(MemberExpression prop, string value, Type type, ParameterExpression objParam)
+        public static Predicate<object> GenerateGreaterThan(Expression prop, string value, Type type, ParameterExpression objParam)
         {
             object typedInput = TypeHelper.ValueConverter(type, value);
             if (typedInput != null)
