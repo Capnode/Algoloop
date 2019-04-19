@@ -304,13 +304,13 @@ namespace Algoloop.WPF.DataGrid
             CalcControlVisibility();          
         }
 
-        private static System.Linq.Expressions.Expression PropertyExpression(Type baseType, string propertyName, ParameterExpression arg)
+        private static linq.Expression PropertyExpression(Type baseType, string propertyName, ParameterExpression arg)
         {
-            System.Linq.Expressions.Expression expr = System.Linq.Expressions.Expression.Convert(arg, baseType);
+            linq.Expression expr = linq.Expression.Convert(arg, baseType);
             var parts = propertyName.Split('.');
             foreach (string part in parts.Take(parts.Length - 1))
             {
-                expr = System.Linq.Expressions.Expression.PropertyOrField(expr, part);
+                expr = linq.Expression.PropertyOrField(expr, part);
             }
 
             propertyName = parts.Last();
@@ -320,12 +320,12 @@ namespace Algoloop.WPF.DataGrid
                 string collection = match.Groups[1].Value;
                 string member = match.Groups[2].Value;
 
-                expr = System.Linq.Expressions.Expression.Property(expr, collection);
-                System.Linq.Expressions.Expression[] key = new System.Linq.Expressions.Expression[] { System.Linq.Expressions.Expression.Constant(member) };
-                return System.Linq.Expressions.Expression.Property(expr, "Item", key);
+                expr = linq.Expression.Property(expr, collection);
+                linq.Expression[] key = new linq.Expression[] { linq.Expression.Constant(member) };
+                return linq.Expression.Property(expr, "Item", key);
             }
 
-            return System.Linq.Expressions.Expression.PropertyOrField(expr, propertyName);
+            return linq.Expression.PropertyOrField(expr, propertyName);
         }
 
         private void TxtFilter_Loaded(object sender, RoutedEventArgs e)
@@ -360,10 +360,13 @@ namespace Algoloop.WPF.DataGrid
 
         protected Predicate<object> GenerateFilterPredicate(string propertyName, string filterValue, Type objType, Type propType, FilterOperationItem filterItem)
         {
-            ParameterExpression objParam = System.Linq.Expressions.Expression.Parameter(typeof(object), "x");
-            UnaryExpression param = System.Linq.Expressions.Expression.TypeAs(objParam, objType);
-            System.Linq.Expressions.Expression prop = ExpressionProperty(propertyName, param);
-            ConstantExpression val = System.Linq.Expressions.Expression.Constant(filterValue);
+            ParameterExpression objParam = linq.Expression.Parameter(typeof(object), "x");
+            linq.UnaryExpression param = objType.IsByRef ? 
+                linq.Expression.TypeAs(objParam, objType) :
+                linq.Expression.Convert(objParam, objType);
+
+            linq.Expression prop = ExpressionProperty(propertyName, param);
+            ConstantExpression val = linq.Expression.Constant(filterValue);
 
             switch (filterItem.FilterOption)
             {
@@ -390,9 +393,8 @@ namespace Algoloop.WPF.DataGrid
             }
         }
 
-        private static linq.Expression ExpressionProperty(string propertyName, UnaryExpression param)
+        private static linq.Expression ExpressionProperty(string propertyName, linq.Expression expr)
         {
-            linq.Expression expr = param;
             var parts = propertyName.Split('.');
             foreach (string part in parts.Take(parts.Length - 1))
             {
