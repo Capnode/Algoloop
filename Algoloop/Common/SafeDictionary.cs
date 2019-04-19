@@ -17,14 +17,14 @@ using System.Collections.Generic;
 
 namespace Algoloop.Common
 {
-    public class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue> where TValue : class
+    public class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {
         public new TValue this[TKey key]
         {
             get
             {
                 if (!ContainsKey(key))
-                    return null;
+                    return default;
                 else
                     return base[key];
             }
