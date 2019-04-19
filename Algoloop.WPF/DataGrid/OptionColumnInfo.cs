@@ -104,30 +104,5 @@ namespace Algoloop.WPF.DataGrid
 
             return baseType.GetProperty(propertyName);
         }
-
-        public static object GetPropertyValue(Type baseType, string propertyName, object item)
-        {
-            string[] parts = propertyName.Split('.');
-            if (parts.Length > 1)
-            {
-                return GetProperty(baseType.GetProperty(parts[0]).PropertyType, parts.Skip(1).Aggregate((a, i) => a + "." + i));
-            }
-
-            Match match = Regex.Match(propertyName, @"(.*?)\[(.*?)\]");
-            if (match.Success)
-            {
-                string collection = match.Groups[1].Value;
-                string member = match.Groups[2].Value;
-
-                PropertyInfo nestedProperty = baseType.GetProperty(collection);
-                object collectionItem = nestedProperty.GetValue(item);
-                DefaultMemberAttribute defaultMember = (DefaultMemberAttribute)Attribute.GetCustomAttribute(nestedProperty.PropertyType, typeof(DefaultMemberAttribute));
-                PropertyInfo nestedIndexer = nestedProperty.PropertyType.GetProperty(defaultMember.MemberName);
-                return nestedIndexer.GetValue(collectionItem, new object[] { member });
-            }
-
-            PropertyInfo propInfo = baseType.GetProperty(propertyName);
-            return propInfo.GetValue(item);
-        }
     }
 }

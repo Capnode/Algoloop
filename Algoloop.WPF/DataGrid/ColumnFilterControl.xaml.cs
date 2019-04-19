@@ -247,21 +247,23 @@ namespace Algoloop.WPF.DataGrid
             FilterOperations.Clear();
             if (FilterColumnInfo.PropertyType != null)
             {
+                FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.Equals, "Equals", "/Algoloop.WPF;component/Images/Equal.png"));
                 if (TypeHelper.IsStringType(FilterColumnInfo.PropertyType))
                 {
                     FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.Contains, "Contains", "/Algoloop.WPF;component/Images/Contains.png"));
                     FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.StartsWith, "Starts With", "/Algoloop.WPF;component/Images/StartsWith.png"));
                     FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.EndsWith, "Ends With", "/Algoloop.WPF;component/Images/EndsWith.png"));
                 }
-                FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.Equals, "Equals", "/Algoloop.WPF;component/Images/Equal.png"));
+
                 if (TypeHelper.IsNumbericType(FilterColumnInfo.PropertyType))
                 {
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.NotEquals, "Not Equal", "/Algoloop.WPF;component/Images/NotEqual.png"));
                     FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.GreaterThan, "Greater Than", "/Algoloop.WPF;component/Images/GreaterThan.png"));
                     FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.GreaterThanEqual, "Greater Than or Equal", "/Algoloop.WPF;component/Images/GreaterThanEqual.png"));
                     FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.LessThan, "Less Than", "/Algoloop.WPF;component/Images/LessThan.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.LessThanEqual, "Greater Than or Equal", "/Algoloop.WPF;component/Images/GreaterThanEqual.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.NotEquals, "Not Equal", "/Algoloop.WPF;component/Images/NotEqual.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.LessThanEqual, "Less Than or Equal", "/Algoloop.WPF;component/Images/LessThanEqual.png"));
                 }
+
                 SelectedFilterOperation = FilterOperations[0];
             }
 
@@ -276,17 +278,22 @@ namespace Algoloop.WPF.DataGrid
                 FilterText = string.Empty;
                 _boundColumnPropertyAccessor = null;
 
-                if (!string.IsNullOrWhiteSpace(FilterColumnInfo.PropertyPath))
+                if (TypeHelper.IsNumbericType(FilterColumnInfo.PropertyType))
                 {
-                    this.Visibility = System.Windows.Visibility.Visible;
-                    ParameterExpression arg = System.Linq.Expressions.Expression.Parameter(typeof(object), "x");
-                    System.Linq.Expressions.Expression expr = PropertyExpression(Grid.FilterType, FilterColumnInfo.PropertyPath, arg);                        
-                    System.Linq.Expressions.Expression conversion = System.Linq.Expressions.Expression.Convert(expr, typeof(object));
-                    _boundColumnPropertyAccessor = System.Linq.Expressions.Expression.Lambda<Func<object, object>>(conversion, arg).Compile();
+                    CanUserSelectDistinct = false;
+                    Visibility = Visibility.Visible;
+                }
+                else if (!string.IsNullOrWhiteSpace(FilterColumnInfo.PropertyPath))
+                {
+                    Visibility = Visibility.Visible;
+                    ParameterExpression arg = linq.Expression.Parameter(typeof(object), "x");
+                    linq.Expression expr = PropertyExpression(Grid.FilterType, FilterColumnInfo.PropertyPath, arg);
+                    linq.Expression conversion = linq.Expression.Convert(expr, typeof(object));
+                    _boundColumnPropertyAccessor = linq.Expression.Lambda<Func<object, object>>(conversion, arg).Compile();
                 }
                 else
                 {
-                    this.Visibility = System.Windows.Visibility.Collapsed;
+                    Visibility = Visibility.Collapsed;
                 }
 
                 object oDefaultFilter = column.GetValue(ColumnConfiguration.DefaultFilterProperty);
