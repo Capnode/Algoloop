@@ -154,7 +154,7 @@
                     IsReadOnly="True"
                     FilteredItemsSource="{Binding Statistics}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
                     </DataGrid.Columns>
                 </wpf:FilterDataGrid>

@@ -283,8 +283,7 @@ namespace Algoloop.ViewModel
                         .StartTaskAsync()
                         .ContinueWith(m =>
                         {
-                            Dictionary<string, object> columns = task.Statistics.ToDictionary(v => v.Name, v => v.Value);
-                            FilterDataGridColumns.AddPropertyColumns(TaskColumns, columns, "Statistics");
+                            FilterDataGridColumns.AddPropertyColumns(TaskColumns, task.Statistics, "Statistics");
                             throttler.Release();
                         },
                         TaskScheduler.FromCurrentSynchronizationContext());
@@ -363,8 +362,7 @@ namespace Algoloop.ViewModel
             {
                 var strategyTaskViewModel = new StrategyTaskViewModel(this, strategyTaskModel, _settingsModel);
                 Tasks.Add(strategyTaskViewModel);
-                Dictionary<string, object> columns = strategyTaskViewModel.Statistics.ToDictionary(v => v.Name, v => v.Value);
-                FilterDataGridColumns.AddPropertyColumns(TaskColumns, columns, "Statistics");
+                FilterDataGridColumns.AddPropertyColumns(TaskColumns, strategyTaskViewModel.Statistics, "Statistics");
             }
         }
 

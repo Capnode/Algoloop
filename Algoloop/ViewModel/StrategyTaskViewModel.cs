@@ -89,7 +89,11 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolSummaryViewModel> SummarySymbols { get; } = new SyncObservableCollection<SymbolSummaryViewModel>();
         public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<HoldingViewModel> Holdings { get; } = new SyncObservableCollection<HoldingViewModel>();
-        public SyncObservableCollection<NameValueViewModel> Statistics { get; set; } = new SyncObservableCollection<NameValueViewModel>();
+        public IDictionary<string, object> Statistics
+        {
+            get => _statistics;
+            set => Set(ref _statistics, value);
+        }
 
         public StrategyTaskModel Model
         {
@@ -321,7 +325,7 @@ namespace Algoloop.ViewModel
             SummarySymbols.ReplaceRange(summarySymbols);
 
             // Statistics results
-            var  statistics = new SyncObservableCollection<NameValueViewModel>();
+            IDictionary<string, object> statistics = new SafeDictionary<string, object>();
             AddCustomStatistics(statistics, result);
             foreach (KeyValuePair<string, string> item in result.Statistics)
             {
@@ -385,34 +389,34 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void AddStatisticItem(ICollection<NameValueViewModel> statistics, string name, string text)
+        private void AddStatisticItem(IDictionary<string, object> statistics, string name, string text)
         {
             decimal value;
             if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "$";
-                statistics.Add(new NameValueViewModel(header, value));
+                statistics.Add(header, value);
             }
             else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "%";
-                statistics.Add(new NameValueViewModel(header, value));
+                statistics.Add(header, value);
             }
             else if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
-                statistics.Add(new NameValueViewModel(name, value));
+                statistics.Add(name, value);
             }
             else if (bool.TryParse(text, out bool boolVal))
             {
-                statistics.Add(new NameValueViewModel(name, boolVal));
+                statistics.Add(name, boolVal);
             }
             else
             {
-                statistics.Add(new NameValueViewModel(name, text));
+                statistics.Add(name, text);
             }
         }
 
-        private void AddCustomStatistics(ICollection<NameValueViewModel> statistics, BacktestResult result)
+        private void AddCustomStatistics(IDictionary<string, object> statistics, BacktestResult result)
         {
             if (result.Statistics.Count == 0)
                 return;
@@ -427,7 +431,7 @@ namespace Algoloop.ViewModel
             if (isNetProfit && isDrawdown && drawdown != 0)
             {
                 decimal ratio = (netProfit / drawdown).RoundToSignificantDigits(4);
-                statistics.Add(new NameValueViewModel("Profit-DD", ratio));
+                statistics.Add("Profit-DD", ratio);
             }
         }
 

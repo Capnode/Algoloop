@@ -346,7 +346,7 @@
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedTask, Mode=TwoWay}"
-                                    ItemsSource="{Binding Tasks}"
+                                    FilteredItemsSource="{Binding Tasks}"
                                     ExColumns="{Binding TaskColumns}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDoubleClick">
