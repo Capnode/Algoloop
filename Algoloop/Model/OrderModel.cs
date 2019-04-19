@@ -54,6 +54,12 @@ namespace Algoloop.Model
         public decimal Price { get; set; }
 
         /// <summary>
+        /// Limit price of the Order.
+        /// </summary>
+        [DataMember]
+        public decimal LimitPrice { get; set; }
+
+        /// <summary>
         /// Currency for the order price
         /// </summary>
         [DataMember]
@@ -136,7 +142,7 @@ namespace Algoloop.Model
         /// then this will return zero.
         /// </summary>
         [DataMember]
-        public decimal Value { get; set; }
+        public decimal OrderValue { get; set; }
 
         /// <summary>
         /// Gets the price data at the time the order was submitted

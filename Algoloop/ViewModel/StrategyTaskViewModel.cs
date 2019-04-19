@@ -87,14 +87,9 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<Trade> Trades { get; } = new SyncObservableCollection<Trade>();
         public SyncObservableCollection<SymbolSummaryViewModel> SummarySymbols { get; } = new SyncObservableCollection<SymbolSummaryViewModel>();
-        public SyncObservableCollection<Order> Orders { get; } = new SyncObservableCollection<Order>();
+        public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<HoldingViewModel> Holdings { get; } = new SyncObservableCollection<HoldingViewModel>();
-
-        public IDictionary<string, object> Statistics
-        {
-            get => _statistics;
-            set => Set(ref _statistics, value);
-        }
+        public SyncObservableCollection<NameValueViewModel> Statistics { get; set; } = new SyncObservableCollection<NameValueViewModel>();
 
         public StrategyTaskModel Model
         {
@@ -326,7 +321,7 @@ namespace Algoloop.ViewModel
             SummarySymbols.ReplaceRange(summarySymbols);
 
             // Statistics results
-            IDictionary<string, object> statistics = new SafeDictionary<string, object>();
+            var  statistics = new SyncObservableCollection<NameValueViewModel>();
             AddCustomStatistics(statistics, result);
             foreach (KeyValuePair<string, string> item in result.Statistics)
             {
@@ -344,7 +339,7 @@ namespace Algoloop.ViewModel
             foreach (var pair in result.Orders.OrderBy(o => o.Key))
             {
                 Order order = pair.Value;
-                Orders.Add(order);
+                Orders.Add(new OrderViewModel(order));
                 if (order.Status.Equals(OrderStatus.Submitted)
                     || order.Status.Equals(OrderStatus.Canceled)
                     || order.Status.Equals(OrderStatus.CancelPending)
@@ -362,7 +357,7 @@ namespace Algoloop.ViewModel
                         Quantity = order.Quantity,
                         Profit = order.Value,
                         Duration = (order.LastUpdateTime ?? Model.EndDate) - order.CreatedTime
-                };
+                    };
 
                     Holdings.Add(holding);
                 }
@@ -390,34 +385,34 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void AddStatisticItem(IDictionary<string, object> statistics, string name, string text)
+        private void AddStatisticItem(ICollection<NameValueViewModel> statistics, string name, string text)
         {
             decimal value;
             if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "$";
-                statistics.Add(header, value);
+                statistics.Add(new NameValueViewModel(header, value));
             }
             else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
                 string header = name + "%";
-                statistics.Add(header, value);
+                statistics.Add(new NameValueViewModel(header, value));
             }
             else if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
-                statistics.Add(name, value);
+                statistics.Add(new NameValueViewModel(name, value));
             }
             else if (bool.TryParse(text, out bool boolVal))
             {
-                statistics.Add(name, boolVal);
+                statistics.Add(new NameValueViewModel(name, boolVal));
             }
             else
             {
-                statistics.Add(name, text);
+                statistics.Add(new NameValueViewModel(name, text));
             }
         }
 
-        private void AddCustomStatistics(IDictionary<string, object> statistics, BacktestResult result)
+        private void AddCustomStatistics(ICollection<NameValueViewModel> statistics, BacktestResult result)
         {
             if (result.Statistics.Count == 0)
                 return;
@@ -432,7 +427,7 @@ namespace Algoloop.ViewModel
             if (isNetProfit && isDrawdown && drawdown != 0)
             {
                 decimal ratio = (netProfit / drawdown).RoundToSignificantDigits(4);
-                statistics.Add("Profit-DD", ratio);
+                statistics.Add(new NameValueViewModel("Profit-DD", ratio));
             }
         }
 

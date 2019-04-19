@@ -7,6 +7,7 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
+    xmlns:wpf="clr-namespace:Algoloop.WPF.DataGrid;assembly=Algoloop.WPF"            
     xmlns:properties="clr-namespace:Algoloop.Properties"
     DataContext="{Binding Source={StaticResource Locator}, Path=AccountsViewModel}" 
     mc:Ignorable="d"
@@ -113,13 +114,13 @@
                     <DockPanel>
                         <TabControl>
                             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
-                                <DataGrid
+                                <wpf:FilterGrid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding Orders}">
+                                    FilteredItemsSource="{Binding Orders}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
@@ -151,7 +152,7 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </DataGrid>
+                                </wpf:FilterGrid>
                             </TabItem>
                             <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}">
                                 <DataGrid

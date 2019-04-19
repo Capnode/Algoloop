@@ -24,16 +24,18 @@ namespace Algoloop.ViewModel
     {
         public OrderViewModel(Order order)
         {
+            Model = new OrderModel();
             Update(order);
         }
 
-        public OrderViewModel(OrderModel order)
+        public OrderViewModel(OrderModel orderModel)
         {
-            Update(order);
+            Model = orderModel;
         }
 
         public OrderViewModel(OrderEvent message)
         {
+            Model = new OrderModel();
             Update(message);
         }
 
@@ -98,6 +100,27 @@ namespace Algoloop.ViewModel
             {
                 Model.Price = value;
                 RaisePropertyChanged(() => Price);
+            }
+        }
+
+        /// <summary>
+        /// Limit price of the Order.
+        /// </summary>
+        public decimal? LimitPrice
+        {
+            get
+            {
+                if (Model.LimitPrice == 0)
+                {
+                    return null;
+                }
+
+                return Model.LimitPrice;
+            }
+            set
+            {
+                Model.LimitPrice = value ?? 0;
+                RaisePropertyChanged(() => LimitPrice);
             }
         }
 
@@ -274,13 +297,13 @@ namespace Algoloop.ViewModel
         /// Gets the executed value of this order. If the order has not yet filled,
         /// then this will return zero.
         /// </summary>
-        public decimal Value
+        public decimal OrderValue
         {
-            get => Model.Value;
+            get => Model.OrderValue;
             set
             {
-                Model.Value = value;
-                RaisePropertyChanged(() => Value);
+                Model.OrderValue = value;
+                RaisePropertyChanged(() => OrderValue);
             }
         }
 
@@ -318,6 +341,7 @@ namespace Algoloop.ViewModel
             BrokerId = order.BrokerId;
             Symbol = order.Symbol.Value;
             Price = order.Price;
+            LimitPrice = (order as LimitOrder)?.LimitPrice;
             PriceCurrency = order.PriceCurrency;
             Time = order.Time;
             LastFillTime = order.LastFillTime;
@@ -331,7 +355,7 @@ namespace Algoloop.ViewModel
             Properties = (OrderProperties)order.Properties;
             SecurityType = order.SecurityType.ToString();
             Direction = order.Direction.ToString();
-            Value = order.Value;
+            OrderValue = order.Value;
             OrderSubmissionData = order.OrderSubmissionData;
             IsMarketable = order.IsMarketable;
         }
@@ -357,7 +381,7 @@ namespace Algoloop.ViewModel
             Properties = order.Properties;
             SecurityType = order.SecurityType.ToString();
             Direction = order.Direction.ToString();
-            Value = order.Value;
+            OrderValue = order.OrderValue;
             OrderSubmissionData = order.OrderSubmissionData;
             IsMarketable = order.IsMarketable;
         }

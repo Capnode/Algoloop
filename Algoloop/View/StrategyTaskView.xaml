@@ -48,12 +48,17 @@
                 </ListBox>
             </TabItem>
             <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
-                <DataGrid HorizontalAlignment="Stretch"
+                <wpf:FilterGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
                     IsReadOnly="True"
-                    ItemsSource="{Binding Parameters}">
+                    FilteredItemsSource="{Binding Parameters}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
                         <DataGridCheckBoxColumn Header="Use" Binding="{Binding Model.UseValue}" />
@@ -61,14 +66,18 @@
                         <DataGridCheckBoxColumn Header="Use range" Binding="{Binding Model.UseRange}" />
                         <DataGridTextColumn Header="Range" Binding="{Binding Model.Range}" />
                     </DataGrid.Columns>
-                </DataGrid>
+                </wpf:FilterGrid>
             </TabItem>
             <TabItem Header="{Binding Holdings.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Holdings ({0}), FallbackValue=Holdings}">
-                <DataGrid
+                <wpf:FilterGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    ItemsSource="{Binding Holdings}">
+                    FilteredItemsSource="{Binding Holdings}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
@@ -77,14 +86,18 @@
                         <DataGridTextColumn Header="Profit" Binding="{Binding Profit}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Duration" Binding="{Binding Duration, StringFormat='{}{0:d\\.hh\\:mm\\:ss}'}" ElementStyle="{StaticResource RightCell}"/>
                     </DataGrid.Columns>
-                </DataGrid>
+                </wpf:FilterGrid>
             </TabItem>
             <TabItem Header="{Binding Trades.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
-                <DataGrid
+                <wpf:FilterGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    ItemsSource="{Binding Trades}">
+                    FilteredItemsSource="{Binding Trades}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
                         <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>
@@ -101,43 +114,50 @@
                         <DataGridTextColumn Header="MAE" Binding="{Binding MAE}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="MFE" Binding="{Binding MFE}" ElementStyle="{StaticResource RightCell}"/>
                     </DataGrid.Columns>
-                </DataGrid>
+                </wpf:FilterGrid>
             </TabItem>
             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
-                <DataGrid
+                <wpf:FilterGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"                  
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    ItemsSource="{Binding Orders}">
+                    FilteredItemsSource="{Binding Orders}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
-                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
-                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
                         <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
                         <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Limit" Binding="{Binding LimitPrice}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Price" Binding="{Binding Price}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}" ElementStyle="{StaticResource RightCell}"/>
-                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Value" Binding="{Binding OrderValue}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
                         <DataGridTextColumn Header="Tag" Binding="{Binding Tag}"/>
                     </DataGrid.Columns>
-                </DataGrid>
+                </wpf:FilterGrid>
             </TabItem>
             <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
-                <DataGrid
+                <wpf:FilterGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"                   
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
                     IsReadOnly="True"
-                    ItemsSource="{Binding Statistics}">
+                    FilteredItemsSource="{Binding Statistics}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
                     </DataGrid.Columns>
-                </DataGrid>
+                </wpf:FilterGrid>
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
                 <view:AmChart ItemsSource="{Binding Charts}"/>

@@ -288,13 +288,13 @@
                                 </DockPanel>
                             </TabItem>
                             <TabItem Header="{Binding Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
-                                <DataGrid
+                                <wpf:FilterGrid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding Parameters}">
+                                    FilteredItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Model.Name}" />
                                         <DataGridCheckBoxColumn IsReadOnly="False" Header="Use" Binding="{Binding Model.UseValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -331,7 +331,7 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </DataGrid>
+                                </wpf:FilterGrid>
                             </TabItem>
                             <TabItem Header="{Binding Tasks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
                                 <wpf:FilterGrid
