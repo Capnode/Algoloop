@@ -360,6 +360,9 @@ namespace Algoloop.WPF.DataGrid
 
         protected Predicate<object> GenerateFilterPredicate(string propertyName, string filterValue, Type objType, Type propType, FilterOperationItem filterItem)
         {
+            if (filterItem == null)
+                return null;
+
             ParameterExpression objParam = linq.Expression.Parameter(typeof(object), "x");
             linq.UnaryExpression param = objType.IsByRef ? 
                 linq.Expression.TypeAs(objParam, objType) :

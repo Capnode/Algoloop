@@ -39,12 +39,18 @@ namespace Algoloop.WPF.DataGrid
 
             foreach (var property in properties)
             {
-                bool isNumber = property.Value is int
-                    || property.Value is long
-                    || property.Value is float
-                    || property.Value is double
-                    || property.Value is decimal;
-                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", isNumber);
+                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", false);
+            }
+        }
+
+        public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, decimal?> properties, string binding)
+        {
+            if (properties == null)
+                return;
+
+            foreach (var property in properties)
+            {
+                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", true);
             }
         }
 
