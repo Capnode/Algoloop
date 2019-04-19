@@ -143,8 +143,6 @@ namespace Capnode.Algorithm.CSharp
             QCAlgorithm algorithm,
             Slice data)
         {
-            algorithm.Log($"Update");
-
             var insights = new List<Insight>();
             foreach (var kvp in algorithm.ActiveSecurities)
             {
