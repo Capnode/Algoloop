@@ -20,7 +20,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using QuantConnect.Brokerages;
 using QuantConnect.Configuration;
 using QuantConnect.Data;
@@ -49,7 +51,8 @@ namespace QuantConnect.Lean.Engine
         private readonly bool _liveMode;
         private readonly LeanEngineSystemHandlers _systemHandlers;
         private readonly LeanEngineAlgorithmHandlers _algorithmHandlers;
-        private readonly StackExceptionInterpreter _exceptionInterpreter = StackExceptionInterpreter.CreateFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+        private readonly Lazy<StackExceptionInterpreter> _exceptionInterpreter
+            = new Lazy<StackExceptionInterpreter>(() => StackExceptionInterpreter.CreateFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 
         /// <summary>
         /// Gets the configured system handlers for this engine instance
@@ -88,11 +91,14 @@ namespace QuantConnect.Lean.Engine
         /// <param name="assemblyPath">The path to the algorithm's assembly</param>
         public void Run(AlgorithmNodePacket job, AlgorithmManager manager, string assemblyPath)
         {
+            var marketHoursDatabaseTask = Task.Run(() => StaticInitializations());
+
             var algorithm = default(IAlgorithm);
             var algorithmManager = manager;
 
             try
             {
+
                 //Reset thread holders.
                 var initializeComplete = false;
                 Thread threadTransactions = null;
@@ -114,6 +120,10 @@ namespace QuantConnect.Lean.Engine
                 var synchronizer = new Synchronizer();
                 try
                 {
+                    // we get the mhdb before creating the algorithm instance,
+                    // since the algorithm constructor will use it
+                    var marketHoursDatabase = marketHoursDatabaseTask.Result;
+
                     // Save algorithm to cache, load algorithm instance:
                     algorithm = _algorithmHandlers.Setup.CreateAlgorithmInstance(job, assemblyPath);
 
@@ -127,7 +137,6 @@ namespace QuantConnect.Lean.Engine
                     IBrokerageFactory factory;
                     brokerage = _algorithmHandlers.Setup.CreateBrokerage(job, algorithm, out factory);
 
-                    var marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
                     var symbolPropertiesDatabase = SymbolPropertiesDatabase.FromDataFolder();
 
                     var securityService = new SecurityService(algorithm.Portfolio.CashBook,
@@ -226,8 +235,8 @@ namespace QuantConnect.Lean.Engine
                             var message = e.Message;
                             if (e.InnerException != null)
                             {
-                                var err = _exceptionInterpreter.Interpret(e.InnerException, _exceptionInterpreter);
-                                message += _exceptionInterpreter.GetExceptionMessageHeader(err);
+                                var err = _exceptionInterpreter.Value.Interpret(e.InnerException, _exceptionInterpreter.Value);
+                                message += _exceptionInterpreter.Value.GetExceptionMessageHeader(err);
                             }
                             return message;
                         }));
@@ -512,9 +521,9 @@ namespace QuantConnect.Lean.Engine
             if (_algorithmHandlers.Results != null)
             {
                 // perform exception interpretation
-                err = _exceptionInterpreter.Interpret(err, _exceptionInterpreter);
+                err = _exceptionInterpreter.Value.Interpret(err, _exceptionInterpreter.Value);
 
-                var message = "Runtime Error: " + _exceptionInterpreter.GetExceptionMessageHeader(err);
+                var message = "Runtime Error: " + _exceptionInterpreter.Value.GetExceptionMessageHeader(err);
                 Log.Trace("Engine.Run(): Sending runtime error to user...");
                 _algorithmHandlers.Results.LogMessage(message);
                 _algorithmHandlers.Results.RuntimeError(message, err.ToString());
@@ -561,5 +570,18 @@ namespace QuantConnect.Lean.Engine
                 }
             }
         }
+
+        /// <summary>
+        /// Initialize slow static variables
+        /// </summary>
+        [MethodImpl(MethodImplOptions.NoOptimization | MethodImplOptions.NoInlining)]
+        private static MarketHoursDatabase StaticInitializations()
+        {
+            // This is slow because it create all static timezones
+            var nyTime = TimeZones.NewYork;
+            // slow because if goes to disk and parses json
+            return MarketHoursDatabase.FromDataFolder();
+        }
+
     } // End Algorithm Node Core Thread
 } // End Namespace
