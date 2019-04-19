@@ -143,6 +143,16 @@ namespace Algoloop.WPF.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap NotEqual {
+            get {
+                object obj = ResourceManager.GetObject("NotEqual", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap pinDown {
             get {
                 object obj = ResourceManager.GetObject("pinDown", resourceCulture);

@@ -90,7 +90,6 @@
   <ItemGroup>
     <Resource Include="Images\Contains.png" />
     <Resource Include="Images\EndsWith.png" />
-    <Resource Include="Images\ensign-crusher-report-to-my-ready-room.jpg" />
     <Resource Include="Images\Equal.png" />
     <Resource Include="Images\GreaterThan.png" />
     <Resource Include="Images\GreaterThanEqual.png" />
@@ -121,6 +120,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\NotEqual.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
