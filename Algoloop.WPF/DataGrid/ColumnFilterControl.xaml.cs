@@ -46,7 +46,7 @@ namespace Algoloop.WPF.DataGrid
 
         public OptionColumnInfo FilterColumnInfo { get; set; }
 
-        public FilterGrid Grid { get; set; }
+        public FilterDataGrid Grid { get; set; }
 
         private bool _CanUserFreeze = true;
         public bool CanUserFreeze
@@ -205,7 +205,7 @@ namespace Algoloop.WPF.DataGrid
                     colHeader = parent as DataGridColumnHeader;
 
                 if (Grid == null)
-                    Grid = parent as FilterGrid;
+                    Grid = parent as FilterDataGrid;
             }
 
             if (colHeader != null)

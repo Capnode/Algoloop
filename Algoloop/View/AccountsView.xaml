@@ -114,7 +114,7 @@
                     <DockPanel>
                         <TabControl>
                             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
-                                <wpf:FilterGrid
+                                <wpf:FilterDataGrid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -152,7 +152,7 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </wpf:FilterGrid>
+                                </wpf:FilterDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}">
                                 <DataGrid

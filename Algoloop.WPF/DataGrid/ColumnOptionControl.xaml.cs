@@ -31,7 +31,7 @@ namespace Algoloop.WPF.DataGrid
         private FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Algoloop.WPF;component/Images/pinDown.png");
         private FilterOperationItem _removeGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Remove Grouping", "/Algoloop.WPF;component/Images/RemoveGroupBy.png");
 
-        public FilterGrid Grid { get; set; }
+        public FilterDataGrid Grid { get; set; }
 
         public OptionColumnInfo FilterColumnInfo { get; set; }
 
@@ -128,7 +128,7 @@ namespace Algoloop.WPF.DataGrid
                     colHeader = parent as DataGridColumnHeader;
 
                 if (Grid == null)
-                    Grid = parent as FilterGrid;
+                    Grid = parent as FilterDataGrid;
             }
 
             if (colHeader != null)

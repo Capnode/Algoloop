@@ -210,7 +210,7 @@
                                             <Image Source="/Resources\AddList.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <wpf:FilterGrid
+                                    <wpf:FilterDataGrid
                                         x:Name="marketSymbolList"                                        
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
@@ -221,7 +221,7 @@
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                         FilteredItemsSource="{Binding Symbols}"                                        
                                         ExColumns="{Binding SymbolColumns}">
-                                    </wpf:FilterGrid>
+                                    </wpf:FilterDataGrid>
                                 </DockPanel>
                             </TabItem>
                         </TabControl>
@@ -262,14 +262,14 @@
                                             <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <wpf:FilterGrid
+                                    <wpf:FilterDataGrid
                                         x:Name="listbox"
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                         ItemsSource="{Binding Symbols}"
                                         ExColumns="{Binding SymbolColumns}">
-                                    </wpf:FilterGrid>
+                                    </wpf:FilterDataGrid>
                                 </DockPanel>
                             </TabItem>
                         </TabControl>

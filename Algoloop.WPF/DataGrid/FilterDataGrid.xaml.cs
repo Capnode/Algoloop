@@ -29,10 +29,10 @@ namespace Algoloop.WPF.DataGrid
     public delegate void CancelableFilterChangedEvent(object sender, CancelableFilterChangedEventArgs e);
 
     /// <summary>
-    /// Interaction logic for FilterGrid.xaml
+    /// Interaction logic for FilterDataGrid.xaml
     /// Based on JibGridWPF https://archive.codeplex.com/?p=jibgridwpf
     /// </summary>
-    public partial class FilterGrid : System.Windows.Controls.DataGrid, INotifyPropertyChanged
+    public partial class FilterDataGrid : System.Windows.Controls.DataGrid, INotifyPropertyChanged
     {
         public event CancelableFilterChangedEvent BeforeFilterChanged;
         public event FilterChangedEvent AfterFilterChanged;
@@ -40,7 +40,7 @@ namespace Algoloop.WPF.DataGrid
         private List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
         private PropertyChangedEventHandler _filterHandler;
         public static readonly DependencyProperty ExColumnsProperty = DependencyProperty.Register("ExColumns",
-            typeof(ObservableCollection<DataGridColumn>), typeof(FilterGrid),
+            typeof(ObservableCollection<DataGridColumn>), typeof(FilterDataGrid),
                 new PropertyMetadata(OnDataGridColumnsPropertyChanged));
 
         protected bool IsResetting { get; set; }
@@ -62,7 +62,7 @@ namespace Algoloop.WPF.DataGrid
 
         private static void OnDataGridColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            var context = source as FilterGrid;
+            var context = source as FilterDataGrid;
 
             var oldItems = e.OldValue as ObservableCollection<DataGridColumn>;
 
@@ -116,7 +116,7 @@ namespace Algoloop.WPF.DataGrid
 
         #region FilteredItemsSource DependencyProperty
         public static readonly DependencyProperty FilteredItemsSourceProperty =
-            DependencyProperty.Register("FilteredItemsSource", typeof(IEnumerable), typeof(FilterGrid),
+            DependencyProperty.Register("FilteredItemsSource", typeof(IEnumerable), typeof(FilterDataGrid),
             new PropertyMetadata(null, new PropertyChangedCallback(OnFilteredItemsSourceChanged)));
 
         public IEnumerable FilteredItemsSource
@@ -127,7 +127,7 @@ namespace Algoloop.WPF.DataGrid
 
         public static void OnFilteredItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            FilterGrid g = sender as FilterGrid;
+            FilterDataGrid g = sender as FilterDataGrid;
             if (g != null)
             {
                 var list = (IEnumerable)e.NewValue;
@@ -254,7 +254,7 @@ namespace Algoloop.WPF.DataGrid
             }
         }
         #endregion Filter Properties
-        public FilterGrid()
+        public FilterDataGrid()
         {
             Filters = new List<ColumnFilterControl>();
             _filterHandler = new PropertyChangedEventHandler(filter_PropertyChanged);

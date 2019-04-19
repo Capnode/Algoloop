@@ -288,7 +288,7 @@
                                 </DockPanel>
                             </TabItem>
                             <TabItem Header="{Binding Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
-                                <wpf:FilterGrid
+                                <wpf:FilterDataGrid
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -331,10 +331,10 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </wpf:FilterGrid>
+                                </wpf:FilterDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Tasks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
-                                <wpf:FilterGrid
+                                <wpf:FilterDataGrid
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedTask, Mode=TwoWay}"
@@ -373,7 +373,7 @@
                                             </MenuItem>
                                         </ContextMenu>
                                     </DataGrid.ContextMenu>
-                                </wpf:FilterGrid>
+                                </wpf:FilterDataGrid>
                             </TabItem>
                         </TabControl>
                     </DockPanel>
