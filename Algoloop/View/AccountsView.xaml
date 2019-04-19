@@ -115,6 +115,10 @@
                         <TabControl>
                             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
                                 <wpf:FilterDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"                                   
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -155,13 +159,17 @@
                                 </wpf:FilterDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}">
-                                <DataGrid
+                                <wpf:FilterDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding Positions}">
+                                    FilteredItemsSource="{Binding Positions}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
                                         <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
@@ -191,21 +199,25 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </DataGrid>
+                                </wpf:FilterDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}">
-                                <DataGrid
+                                <wpf:FilterDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ItemsSource="{Binding Balances}">
+                                    FilteredItemsSource="{Binding Balances}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
                                         <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
                                     </DataGrid.Columns>
-                                </DataGrid>
+                                </wpf:FilterDataGrid>
                             </TabItem>
                             <TabItem Header="Settings">
                                 <xctk:PropertyGrid

@@ -212,12 +212,12 @@
                                     </ToolBar>
                                     <wpf:FilterDataGrid
                                         x:Name="marketSymbolList"                                        
-                                        AutoGenerateColumns="False"
-                                        GridLinesVisibility="None"
                                         CanUserFreeze="False"
                                         CanUserSelectDistinct="True"
                                         CanUserGroup="False"
                                         CanUserFilter="True"
+                                        AutoGenerateColumns="False"
+                                        GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                         FilteredItemsSource="{Binding Symbols}"                                        
                                         ExColumns="{Binding SymbolColumns}">
@@ -264,6 +264,10 @@
                                     </ToolBar>
                                     <wpf:FilterDataGrid
                                         x:Name="listbox"
+                                        CanUserFreeze="False"
+                                        CanUserSelectDistinct="True"
+                                        CanUserGroup="False"
+                                        CanUserFilter="True"
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
