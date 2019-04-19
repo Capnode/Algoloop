@@ -154,16 +154,6 @@
                 <DataTemplate DataType="{x:Type vm:MarketViewModel}">
                     <DockPanel>
                         <TabControl>
-                            <TabItem Header="Settings">
-                                <xctk:PropertyGrid
-                                    ShowTitle="False"
-                                    ShowSearchBox="False"
-                                    ShowSummary="True"
-                                    ShowAdvancedOptions="False"
-                                    ShowSortOptions="False"
-                                    SelectedObject="{Binding Model}">
-                                </xctk:PropertyGrid>
-                            </TabItem>
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top">
@@ -224,12 +214,6 @@
                                     </wpf:FilterDataGrid>
                                 </DockPanel>
                             </TabItem>
-                        </TabControl>
-                    </DockPanel>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:FolderViewModel}">
-                    <DockPanel>
-                        <TabControl>
                             <TabItem Header="Settings">
                                 <xctk:PropertyGrid
                                     ShowTitle="False"
@@ -240,6 +224,12 @@
                                     SelectedObject="{Binding Model}">
                                 </xctk:PropertyGrid>
                             </TabItem>
+                        </TabControl>
+                    </DockPanel>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:FolderViewModel}">
+                    <DockPanel>
+                        <TabControl>
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top">
@@ -271,10 +261,20 @@
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                        ItemsSource="{Binding Symbols}"
+                                        FilteredItemsSource="{Binding Symbols}"
                                         ExColumns="{Binding SymbolColumns}">
                                     </wpf:FilterDataGrid>
                                 </DockPanel>
+                            </TabItem>
+                            <TabItem Header="Settings">
+                                <xctk:PropertyGrid
+                                    ShowTitle="False"
+                                    ShowSearchBox="False"
+                                    ShowSummary="True"
+                                    ShowAdvancedOptions="False"
+                                    ShowSortOptions="False"
+                                    SelectedObject="{Binding Model}">
+                                </xctk:PropertyGrid>
                             </TabItem>
                         </TabControl>
                     </DockPanel>
