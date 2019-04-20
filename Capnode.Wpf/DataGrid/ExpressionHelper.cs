@@ -15,7 +15,7 @@
 using System;
 using System.Linq.Expressions;
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public class ExpressionHelper
     {

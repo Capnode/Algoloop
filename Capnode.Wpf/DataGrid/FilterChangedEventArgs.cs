@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public class FilterChangedEventArgs : EventArgs
     {

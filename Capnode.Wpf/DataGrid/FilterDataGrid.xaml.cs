@@ -23,7 +23,7 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public delegate void FilterChangedEvent(object sender, FilterChangedEventArgs e);
     public delegate void CancelableFilterChangedEvent(object sender, CancelableFilterChangedEventArgs e);

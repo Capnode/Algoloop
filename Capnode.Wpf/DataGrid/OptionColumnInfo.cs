@@ -20,7 +20,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public class OptionColumnInfo
     {
@@ -62,7 +62,7 @@ namespace Algoloop.WPF.DataGrid
                     {
                         if (Debugger.IsAttached && Debugger.IsLogging())
                         {
-                            Debug.WriteLine("Algoloop.WPF.DataGrid.FilterDataGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType?.ToString());
+                            Debug.WriteLine("Capnode.Wpf.DataGrid.FilterDataGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType?.ToString());
                         }
                     }
                 }

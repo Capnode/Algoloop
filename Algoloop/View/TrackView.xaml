@@ -8,7 +8,7 @@
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
     xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"
-    xmlns:wpf="clr-namespace:Algoloop.WPF.DataGrid;assembly=Algoloop.WPF"             
+    xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"             
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>

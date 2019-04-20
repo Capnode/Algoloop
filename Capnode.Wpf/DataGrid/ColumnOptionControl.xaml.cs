@@ -20,16 +20,16 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls.Primitives;
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public partial class ColumnOptionControl : UserControl, INotifyPropertyChanged
     {
         private static readonly Style _rightCellStyle = CellStyle(TextAlignment.Right);
 
-        private FilterOperationItem _addPin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Pin Column", "/Algoloop.WPF;component/Images/PinUp.png");
-        private FilterOperationItem _addGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Add Grouping", "/Algoloop.WPF;component/Images/GroupBy.png");
-        private FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Algoloop.WPF;component/Images/pinDown.png");
-        private FilterOperationItem _removeGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Remove Grouping", "/Algoloop.WPF;component/Images/RemoveGroupBy.png");
+        private FilterOperationItem _addPin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Pin Column", "/Capnode.Wpf;component/Images/PinUp.png");
+        private FilterOperationItem _addGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Add Grouping", "/Capnode.Wpf;component/Images/GroupBy.png");
+        private FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Capnode.Wpf;component/Images/pinDown.png");
+        private FilterOperationItem _removeGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Remove Grouping", "/Capnode.Wpf;component/Images/RemoveGroupBy.png");
 
         public FilterDataGrid Grid { get; set; }
 

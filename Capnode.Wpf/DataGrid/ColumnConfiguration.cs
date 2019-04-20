@@ -13,7 +13,7 @@
  */
 
 using System.Windows;
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public class ColumnConfiguration : DependencyObject
     {

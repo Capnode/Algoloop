@@ -14,7 +14,7 @@
 
 using System.ComponentModel;
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public class CheckboxComboItem : INotifyPropertyChanged
     {

@@ -64,7 +64,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Tests", "Algoloop.
 		{F65DA573-DB1B-4524-A254-2034954CAE66} = {F65DA573-DB1B-4524-A254-2034954CAE66}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.WPF", "Algoloop.WPF\Algoloop.WPF.csproj", "{769D993C-2867-4212-BE80-B70E4862EBC5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capnode.Wpf", "Capnode.Wpf\Capnode.Wpf.csproj", "{769D993C-2867-4212-BE80-B70E4862EBC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

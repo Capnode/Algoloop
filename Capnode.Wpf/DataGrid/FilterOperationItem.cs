@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     public class FilterOperationItem
     {

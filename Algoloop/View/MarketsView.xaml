@@ -6,7 +6,7 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
-    xmlns:wpf="clr-namespace:Algoloop.WPF.DataGrid;assembly=Algoloop.WPF"
+    xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
     xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"

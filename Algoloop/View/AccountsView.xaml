@@ -7,7 +7,7 @@
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:viewsupport="clr-namespace:Algoloop.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
-    xmlns:wpf="clr-namespace:Algoloop.WPF.DataGrid;assembly=Algoloop.WPF"            
+    xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"            
     xmlns:properties="clr-namespace:Algoloop.Properties"
     DataContext="{Binding Source={StaticResource Locator}, Path=AccountsViewModel}" 
     mc:Ignorable="d"

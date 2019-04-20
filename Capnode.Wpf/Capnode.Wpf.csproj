@@ -8,8 +8,8 @@
     <ProjectGuid>{769D993C-2867-4212-BE80-B70E4862EBC5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Algoloop.WPF</RootNamespace>
-    <AssemblyName>Algoloop.WPF</AssemblyName>
+    <RootNamespace>Capnode.Wpf</RootNamespace>
+    <AssemblyName>Capnode.Wpf</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>

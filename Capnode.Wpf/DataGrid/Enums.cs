@@ -12,20 +12,30 @@
  * limitations under the License.
  */
 
-using System;
-
-namespace Algoloop.WPF
+namespace Capnode.Wpf.DataGrid
 {
-    public static class PredicateExtensions
+    public class Enums
     {
-        public static Predicate<T> And<T>(this Predicate<T> original, Predicate<T> newPredicate)
+        public enum FilterOperation
         {
-            return t => original(t) && newPredicate(t);
+            Unknown,
+            Contains,
+            Equals,
+            StartsWith,
+            EndsWith,
+            GreaterThanEqual,
+            LessThanEqual,
+            GreaterThan,
+            LessThan,
+            NotEquals
         }
-
-        public static Predicate<T> Or<T>(this Predicate<T> original, Predicate<T> newPredicate)
+        public enum ColumnOption
         {
-            return t => original(t) || newPredicate(t);
+            Unknown = 0,
+            AddGrouping,
+            RemoveGrouping,
+            PinColumn,
+            UnpinColumn
         }
     }
 }

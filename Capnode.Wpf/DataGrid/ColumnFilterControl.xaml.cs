@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using linq = System.Linq.Expressions;
 
-namespace Algoloop.WPF.DataGrid
+namespace Capnode.Wpf.DataGrid
 {
     /// <summary>
     /// Interaction logic for ColumnFilterControl.xaml
@@ -247,21 +247,21 @@ namespace Algoloop.WPF.DataGrid
             FilterOperations.Clear();
             if (FilterColumnInfo.PropertyType != null)
             {
-                FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.Equals, "Equals", "/Algoloop.WPF;component/Images/Equal.png"));
+                FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.Equals, "Equals", "/Capnode.Wpf;component/Images/Equal.png"));
                 if (TypeHelper.IsStringType(FilterColumnInfo.PropertyType))
                 {
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.Contains, "Contains", "/Algoloop.WPF;component/Images/Contains.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.StartsWith, "Starts With", "/Algoloop.WPF;component/Images/StartsWith.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.EndsWith, "Ends With", "/Algoloop.WPF;component/Images/EndsWith.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.Contains, "Contains", "/Capnode.Wpf;component/Images/Contains.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.StartsWith, "Starts With", "/Capnode.Wpf;component/Images/StartsWith.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.EndsWith, "Ends With", "/Capnode.Wpf;component/Images/EndsWith.png"));
                 }
 
                 if (TypeHelper.IsNumbericType(FilterColumnInfo.PropertyType))
                 {
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.NotEquals, "Not Equal", "/Algoloop.WPF;component/Images/NotEqual.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.GreaterThan, "Greater Than", "/Algoloop.WPF;component/Images/GreaterThan.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.GreaterThanEqual, "Greater Than or Equal", "/Algoloop.WPF;component/Images/GreaterThanEqual.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.LessThan, "Less Than", "/Algoloop.WPF;component/Images/LessThan.png"));
-                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.LessThanEqual, "Less Than or Equal", "/Algoloop.WPF;component/Images/LessThanEqual.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.NotEquals, "Not Equal", "/Capnode.Wpf;component/Images/NotEqual.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.GreaterThan, "Greater Than", "/Capnode.Wpf;component/Images/GreaterThan.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.GreaterThanEqual, "Greater Than or Equal", "/Capnode.Wpf;component/Images/GreaterThanEqual.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.LessThan, "Less Than", "/Capnode.Wpf;component/Images/LessThan.png"));
+                    FilterOperations.Add(new FilterOperationItem(Enums.FilterOperation.LessThanEqual, "Less Than or Equal", "/Capnode.Wpf;component/Images/LessThanEqual.png"));
                 }
 
                 SelectedFilterOperation = FilterOperations[0];

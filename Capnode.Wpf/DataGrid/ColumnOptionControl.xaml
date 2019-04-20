@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Algoloop.WPF.DataGrid.ColumnOptionControl"
+﻿<UserControl x:Class="Capnode.Wpf.DataGrid.ColumnOptionControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
