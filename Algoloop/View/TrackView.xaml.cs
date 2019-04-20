@@ -17,11 +17,11 @@ using System.Windows.Controls;
 namespace Algoloop.View
 {
     /// <summary>
-    /// Interaction logic for StrategyTaskView.xaml
+    /// Interaction logic for TrackView.xaml
     /// </summary>
-    public partial class StrategyTaskView : UserControl
+    public partial class TrackView : UserControl
     {
-        public StrategyTaskView()
+        public TrackView()
         {
             InitializeComponent();
         }

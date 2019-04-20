@@ -187,7 +187,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<StrategyTaskModel> Tasks { get; } = new List<StrategyTaskModel>();
+        public List<TrackModel> Tracks { get; } = new List<TrackModel>();
 
         public void Refresh()
         {

@@ -41,20 +41,20 @@ using System.Windows;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyTaskViewModel: ViewModelBase, ITreeViewModel, IComparable
+    public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable
     {
         private StrategyViewModel _parent;
         private readonly SettingsModel _settingsModel;
         private CancellationTokenSource _cancel;
         private Isolated<LeanLauncher> _leanEngine;
-        private StrategyTaskModel _model;
+        private TrackModel _model;
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
         public IDictionary<string, decimal?> _statistics;
         private string _port;
 
-        public StrategyTaskViewModel(StrategyViewModel parent, StrategyTaskModel model, SettingsModel settingsModel)
+        public TrackViewModel(StrategyViewModel parent, TrackModel model, SettingsModel settingsModel)
         {
             _parent = parent;
             Model = model;
@@ -62,7 +62,7 @@ namespace Algoloop.ViewModel
 
             StartCommand = new RelayCommand(() => DoStartTaskCommand(), () => !Active);
             StopCommand = new RelayCommand(() => DoStopTaskCommand(false), () => Active);
-            DeleteCommand = new RelayCommand(() => DoDeleteTask(), () => !Active);
+            DeleteCommand = new RelayCommand(() => DoDeleteTrack(), () => !Active);
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
             ExportCommand = new RelayCommand(() => { }, () => false);
@@ -95,7 +95,7 @@ namespace Algoloop.ViewModel
             set => Set(ref _statistics, value);
         }
 
-        public StrategyTaskModel Model
+        public TrackModel Model
         {
             get => _model;
             set => Set(ref _model, value);
@@ -165,7 +165,7 @@ namespace Algoloop.ViewModel
             return _model.Name;
         }
 
-        public void DoDeleteTask()
+        public void DoDeleteTrack()
         {
             var charts = Charts;
             charts.Clear();
@@ -173,12 +173,12 @@ namespace Algoloop.ViewModel
             Charts = charts;
 
             _cancel?.Cancel();
-            _parent?.DeleteTask(this);
+            _parent?.DeleteTrack(this);
         }
 
         public int CompareTo(object obj)
         {
-            var a = obj as StrategyTaskViewModel;
+            var a = obj as TrackViewModel;
             return string.Compare(Model.Name, a?.Model.Name);
         }
 
@@ -213,7 +213,7 @@ namespace Algoloop.ViewModel
                 StrategyViewModel.AddPath(folder);
             }
 
-            StrategyTaskModel model = Model;
+            TrackModel model = Model;
             try
             {
                 if (Desktop)

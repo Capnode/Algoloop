@@ -131,13 +131,13 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Tasks}">
+                    <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Tracks}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{} {0} ({1})">
                                         <Binding Path="DisplayName"/>
-                                        <Binding Path="Tasks.Count"/>
+                                        <Binding Path="Tracks.Count"/>
                                     </MultiBinding>
                                 </TextBlock.Text>
                                 <TextBlock.ContextMenu>
@@ -164,8 +164,8 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
-                                            Header="Delete Tasks"
-                                            Command="{Binding DeleteAllTasksCommand}">
+                                            Header="Delete Tracks"
+                                            Command="{Binding DeleteAllTracksCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
@@ -182,14 +182,14 @@
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type vm:StrategyTaskViewModel}">
+                    <DataTemplate DataType="{x:Type vm:TrackViewModel}">
                         <StackPanel Orientation="Horizontal">
                             <CheckBox IsChecked="{Binding Active}" />
                             <TextBlock Text="{Binding Model.Name}" />
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem
-                                        Header="Delete Task"
+                                        Header="Delete Track"
                                         Command="{Binding DeleteCommand}">
                                         <MenuItem.Icon>
                                             <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
@@ -337,7 +337,7 @@
                                     </DataGrid.RowStyle>
                                 </wpf:FilterDataGrid>
                             </TabItem>
-                            <TabItem Header="{Binding Tasks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tasks ({0}), FallbackValue=Tasks}">
+                            <TabItem Header="{Binding Tracks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tracks ({0}), FallbackValue=Tracks}">
                                 <wpf:FilterDataGrid
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
@@ -345,13 +345,13 @@
                                     CanUserFilter="True"                                        
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
-                                    SelectedValue="{Binding SelectedTask, Mode=TwoWay}"
-                                    FilteredItemsSource="{Binding Tasks}"
-                                    ExColumns="{Binding TaskColumns}">
+                                    SelectedValue="{Binding SelectedTrack, Mode=TwoWay}"
+                                    FilteredItemsSource="{Binding Tracks}"
+                                    ExColumns="{Binding TrackColumns}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDoubleClick">
                                             <i:InvokeCommandAction
-                                                Command="{Binding TaskDoubleClickCommand}"
+                                                Command="{Binding TrackDoubleClickCommand}"
                                                 CommandParameter="{Binding
                                                     Path=SelectedItem,
                                                     RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
@@ -360,8 +360,8 @@
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem
-                                                Header="Delete Tasks"
-                                                Command="{Binding DeleteSelectedTasksCommand}"
+                                                Header="Delete Tracks"
+                                                Command="{Binding DeleteSelectedTracksCommand}"
                                                 CommandParameter="{Binding
                                                     Path=PlacementTarget.SelectedItems,
                                                     RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
@@ -386,8 +386,8 @@
                         </TabControl>
                     </DockPanel>
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:StrategyTaskViewModel}">
-                    <view:StrategyTaskView />
+                <DataTemplate DataType="{x:Type vm:TrackViewModel}">
+                    <view:TrackView />
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

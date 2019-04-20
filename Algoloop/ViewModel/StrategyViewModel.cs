@@ -47,8 +47,8 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SymbolViewModel _selectedSymbol;
-        private ObservableCollection<DataGridColumn> _taskColumns = new ObservableCollection<DataGridColumn>();
-        private StrategyTaskViewModel _selectedTask;
+        private ObservableCollection<DataGridColumn> _trackColumns = new ObservableCollection<DataGridColumn>();
+        private TrackViewModel _selectedTrack;
         private string _displayName;
         private readonly SettingsModel _settingsModel;
 
@@ -64,14 +64,14 @@ namespace Algoloop.ViewModel
             CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !string.IsNullOrEmpty(Model.AlgorithmName));
             ExportCommand = new RelayCommand(() => DoExportStrategy(), () => true);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => true);
-            DeleteAllTasksCommand = new RelayCommand(() => DoDeleteAllTasks(), () => true);
-            DeleteSelectedTasksCommand = new RelayCommand<IList>(m => DoDeleteTasks(m), m => true);
+            DeleteAllTracksCommand = new RelayCommand(() => DoDeleteAllTracks(), () => true);
+            DeleteSelectedTracksCommand = new RelayCommand<IList>(m => DoDeleteTracks(m), m => true);
             UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => true);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => true);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => true);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
-            TaskDoubleClickCommand = new RelayCommand<StrategyTaskViewModel>(m => DoSelectItem(m));
+            TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(m => DoSelectItem(m));
             MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => SelectedSymbol != null);
             MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => SelectedSymbol != null);
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => true);
@@ -89,15 +89,15 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand ExportCommand { get; }
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand DeleteAllTasksCommand { get; }
-        public RelayCommand<IList> DeleteSelectedTasksCommand { get; }
+        public RelayCommand DeleteAllTracksCommand { get; }
+        public RelayCommand<IList> DeleteSelectedTracksCommand { get; }
         public RelayCommand<IList> UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
-        public RelayCommand<StrategyTaskViewModel> TaskDoubleClickCommand { get; }
+        public RelayCommand<TrackViewModel> TrackDoubleClickCommand { get; }
         public RelayCommand<IList> MoveUpSymbolsCommand { get; }
         public RelayCommand<IList> MoveDownSymbolsCommand { get; }
         public RelayCommand SortSymbolsCommand { get; }
@@ -105,7 +105,7 @@ namespace Algoloop.ViewModel
         public StrategyModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-        public SyncObservableCollection<StrategyTaskViewModel> Tasks { get; } = new SyncObservableCollection<StrategyTaskViewModel>();
+        public SyncObservableCollection<TrackViewModel> Tracks { get; } = new SyncObservableCollection<TrackViewModel>();
 
         public string DisplayName
         {
@@ -128,10 +128,10 @@ namespace Algoloop.ViewModel
             set => Set(ref _isExpanded, value);
         }
 
-        public ObservableCollection<DataGridColumn> TaskColumns
+        public ObservableCollection<DataGridColumn> TrackColumns
         {
-            get => _taskColumns;
-            set => Set(ref _taskColumns, value);
+            get => _trackColumns;
+            set => Set(ref _trackColumns, value);
         }
 
         public SymbolViewModel SelectedSymbol
@@ -147,12 +147,12 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public StrategyTaskViewModel SelectedTask
+        public TrackViewModel SelectedTrack
         {
-            get => _selectedTask;
+            get => _selectedTrack;
             set
             {
-                Set(ref _selectedTask, value);
+                Set(ref _selectedTrack, value);
             }
         }
 
@@ -171,13 +171,13 @@ namespace Algoloop.ViewModel
             Environment.SetEnvironmentVariable("PATH", pathValue);
         }
 
-        internal void UseParameters(StrategyTaskViewModel task)
+        internal void UseParameters(TrackViewModel track)
         {
-            if (task == null)
+            if (track == null)
                 return;
 
             Parameters.Clear();
-            foreach (ParameterViewModel parameter in task.Parameters)
+            foreach (ParameterViewModel parameter in track.Parameters)
             {
                 Parameters.Add(parameter);
             }
@@ -197,49 +197,49 @@ namespace Algoloop.ViewModel
                 Model.Parameters.Add(parameter.Model);
             }
 
-            Model.Tasks.Clear();
-            foreach (StrategyTaskViewModel task in Tasks)
+            Model.Tracks.Clear();
+            foreach (TrackViewModel track in Tracks)
             {
-                Model.Tasks.Add(task.Model);
-                task.DataToModel();
+                Model.Tracks.Add(track.Model);
+                track.DataToModel();
             }
         }
 
-        internal bool DeleteTask(StrategyTaskViewModel task)
+        internal bool DeleteTrack(TrackViewModel track)
         {
-            bool ok = Tasks.Remove(task);
+            bool ok = Tracks.Remove(track);
             return ok;
         }
 
-        private void DoDeleteAllTasks()
+        private void DoDeleteAllTracks()
         {
-            Tasks.Clear();
+            Tracks.Clear();
             DataToModel();
         }
 
-        private void DoDeleteTasks(IList tasks)
+        private void DoDeleteTracks(IList tracks)
         {
-            Debug.Assert(tasks != null);
-            if (Tasks.Count == 0 || tasks.Count == 0)
+            Debug.Assert(tracks != null);
+            if (Tracks.Count == 0 || tracks.Count == 0)
                 return;
 
-            List<StrategyTaskViewModel> list = tasks.Cast<StrategyTaskViewModel>()?.ToList();
-            foreach (StrategyTaskViewModel task in list)
+            List<TrackViewModel> list = tracks.Cast<TrackViewModel>()?.ToList();
+            foreach (TrackViewModel track in list)
             {
-                if (task != null)
+                if (track != null)
                 {
-                    task.DoDeleteTask();
+                    track.DoDeleteTrack();
                 }
             }
         }
 
-        private void DoSelectItem(StrategyTaskViewModel task)
+        private void DoSelectItem(TrackViewModel track)
         {
-            if (task == null)
+            if (track == null)
                 return;
 
-            task.IsSelected = true;
-            _parent.SelectedItem = task;
+            track.IsSelected = true;
+            _parent.SelectedItem = track;
             IsExpanded = true;
         }
 
@@ -254,9 +254,9 @@ namespace Algoloop.ViewModel
             if (selected == null)
                 return;
 
-            foreach (StrategyTaskViewModel task in selected)
+            foreach (TrackViewModel track in selected)
             {
-                UseParameters(task);
+                UseParameters(track);
                 break; // skip rest
             }
         }
@@ -268,29 +268,29 @@ namespace Algoloop.ViewModel
             int count = 0;
             var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
-            var jobs = new List<Task>();
+            var tasks = new List<Task>();
             using (var throttler = new SemaphoreSlim(_settingsModel.MaxBacktests))
             {
                 foreach (StrategyModel model in models)
                 {
                     await throttler.WaitAsync();
                     count++;
-                    var taskModel = new StrategyTaskModel(model.AlgorithmName, model);
-                    Log.Trace($"Strategy {taskModel.AlgorithmName} {taskModel.Name} {count}({total})");
-                    var task = new StrategyTaskViewModel(this, taskModel, _settingsModel);
-                    Tasks.Add(task);
-                    Task job = task
+                    var trackModel = new TrackModel(model.AlgorithmName, model);
+                    Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
+                    var track = new TrackViewModel(this, trackModel, _settingsModel);
+                    Tracks.Add(track);
+                    Task task = track
                         .StartTaskAsync()
                         .ContinueWith(m =>
                         {
-                            FilterDataGridColumns.AddPropertyColumns(TaskColumns, task.Statistics, "Statistics");
+                            FilterDataGridColumns.AddPropertyColumns(TrackColumns, track.Statistics, "Statistics");
                             throttler.Release();
                         },
                         TaskScheduler.FromCurrentSynchronizationContext());
-                    jobs.Add(job);
+                    tasks.Add(task);
                 }
 
-                await Task.WhenAll(jobs);
+                await Task.WhenAll(tasks);
             }
         }
 
@@ -343,26 +343,26 @@ namespace Algoloop.ViewModel
 
             AlgorithmNameChanged(Model.AlgorithmName);
 
-            UpdateTasksAndColumns();
+            UpdateTracksAndColumns();
         }
 
-        private void UpdateTasksAndColumns()
+        private void UpdateTracksAndColumns()
         {
-            TaskColumns.Clear();
-            Tasks.Clear();
+            TrackColumns.Clear();
+            Tracks.Clear();
 
-            TaskColumns.Add(new DataGridCheckBoxColumn()
+            TrackColumns.Add(new DataGridCheckBoxColumn()
             {
                 Header = "Active",
                 Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
-            FilterDataGridColumns.AddTextColumn(TaskColumns, "Name", "Model.Name", false);
-            foreach (StrategyTaskModel strategyTaskModel in Model.Tasks)
+            FilterDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false);
+            foreach (TrackModel TrackModel in Model.Tracks)
             {
-                var strategyTaskViewModel = new StrategyTaskViewModel(this, strategyTaskModel, _settingsModel);
-                Tasks.Add(strategyTaskViewModel);
-                FilterDataGridColumns.AddPropertyColumns(TaskColumns, strategyTaskViewModel.Statistics, "Statistics");
+                var TrackViewModel = new TrackViewModel(this, TrackModel, _settingsModel);
+                Tracks.Add(TrackViewModel);
+                FilterDataGridColumns.AddPropertyColumns(TrackColumns, TrackViewModel.Statistics, "Statistics");
             }
         }
 

@@ -314,9 +314,9 @@
     <Compile Include="ViewSupport\FilenameEditor.cs" />
     <Compile Include="Model\StrategiesModel.cs" />
     <Compile Include="Model\StrategyModel.cs" />
-    <Compile Include="Model\StrategyTaskModel.cs" />
+    <Compile Include="Model\TrackModel.cs" />
     <Compile Include="Model\SymbolModel.cs" />
-    <Compile Include="ViewModel\StrategyTaskViewModel.cs" />
+    <Compile Include="ViewModel\TrackViewModel.cs" />
     <Compile Include="ViewModel\SymbolViewModel.cs" />
     <Compile Include="ViewModel\StrategyViewModel.cs" />
     <Compile Include="ViewSupport\SyncObservableCollection.cs" />
@@ -341,8 +341,8 @@
       <DependentUpon>StrategiesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewSupport\WindowPlacement.cs" />
-    <Compile Include="View\StrategyTaskView.xaml.cs">
-      <DependentUpon>StrategyTaskView.xaml</DependentUpon>
+    <Compile Include="View\TrackView.xaml.cs">
+      <DependentUpon>TrackView.xaml</DependentUpon>
     </Compile>
     <Page Include="View\DesktopView.xaml">
       <SubType>Designer</SubType>
@@ -399,7 +399,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\StrategyTaskView.xaml">
+    <Page Include="View\TrackView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

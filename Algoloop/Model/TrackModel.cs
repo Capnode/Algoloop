@@ -24,15 +24,15 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class StrategyTaskModel : ModelBase
+    public class TrackModel : ModelBase
     {
         private string _account;
 
-        public StrategyTaskModel()
+        public TrackModel()
         {
         }
 
-        public StrategyTaskModel(string name, StrategyModel strategy)
+        public TrackModel(string name, StrategyModel strategy)
         {
             Name = name;
             Desktop = strategy.Desktop;
@@ -53,7 +53,7 @@ namespace Algoloop.Model
             // Clone parameters
             Parameters.AddRange(strategy.Parameters.Select(m => new ParameterModel(m)));
 
-            // Use paramerter list as task name
+            // Use paramerter list as track name
             string parameters = string.Join(" ", Parameters.Where(m => m.UseValue).Select(m => m.Value));
             if (!string.IsNullOrWhiteSpace(parameters))
             {
@@ -63,11 +63,11 @@ namespace Algoloop.Model
 
         [Category("Information")]
         [DisplayName("Name")]
-        [Description("Name of the task.")]
+        [Description("Name of the track.")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
-        public string Name { get; set; } = "Task";
+        public string Name { get; set; } = "Track";
 
         [Category("Information")]
         [DisplayName("Desktop")]

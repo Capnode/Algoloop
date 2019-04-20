@@ -31,7 +31,7 @@ namespace Algoloop.Lean
 {
     public class LeanLauncher : MarshalByRefObject
     {
-        public StrategyTaskModel Run(StrategyTaskModel model, AccountModel account, SettingsModel settings, HostDomainLogger logger)
+        public TrackModel Run(TrackModel model, AccountModel account, SettingsModel settings, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
             if (!SetConfig(model, account, settings))
@@ -72,7 +72,7 @@ namespace Algoloop.Lean
             return model;
         }
 
-        private static bool SetConfig(StrategyTaskModel model, AccountModel account, SettingsModel settings)
+        private static bool SetConfig(TrackModel model, AccountModel account, SettingsModel settings)
         {
             var parameters = new Dictionary<string, string>();
             SetModel(model, settings);
@@ -112,7 +112,7 @@ namespace Algoloop.Lean
             return true;
         }
 
-        private static void SetModel(StrategyTaskModel model, SettingsModel settings)
+        private static void SetModel(TrackModel model, SettingsModel settings)
         {
             Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
             Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
@@ -156,7 +156,7 @@ namespace Algoloop.Lean
                 Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
         }
 
-        private static void SetParameters(StrategyTaskModel model, Dictionary<string, string> parameters)
+        private static void SetParameters(TrackModel model, Dictionary<string, string> parameters)
         {
             parameters.Add("startdate", model.StartDate.ToString());
             parameters.Add("enddate", model.EndDate.ToString());
@@ -183,7 +183,7 @@ namespace Algoloop.Lean
             Config.Set("parameters", parametersConfigString);
         }
 
-        private static void SetBacktest(StrategyTaskModel model, Dictionary<string, string> parameters)
+        private static void SetBacktest(TrackModel model, Dictionary<string, string> parameters)
         {
             Config.Set("environment", "backtesting");
             Config.Set("live-mode", "false");
@@ -201,7 +201,7 @@ namespace Algoloop.Lean
             }
         }
 
-        private static void SetBacktestDesktop(StrategyTaskModel model, Dictionary<string, string> parameters)
+        private static void SetBacktestDesktop(TrackModel model, Dictionary<string, string> parameters)
         {
             Config.Set("environment", "backtesting-desktop");
             Config.Set("live-mode", "false");
@@ -220,7 +220,7 @@ namespace Algoloop.Lean
             }
         }
 
-        private static void SetPaper(StrategyTaskModel model, Dictionary<string, string> parameters)
+        private static void SetPaper(TrackModel model, Dictionary<string, string> parameters)
         {
             Config.Set("environment", "live-paper");
             Config.Set("live-mode", "true");
