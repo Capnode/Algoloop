@@ -494,10 +494,8 @@ namespace Algoloop.ViewModel
             try
             {
                 _parent.IsBusy = true;
-//                DataToModel();
-                list.ForEach(m => m.Active = true);
                 var folder = new FolderViewModel(this, new FolderModel());
-                folder.AddSymbols(list);
+                folder.AddSymbols(list.Where(m => m.Active));
                 Folders.Add(folder);
             }
             finally
@@ -514,7 +512,7 @@ namespace Algoloop.ViewModel
             SymbolColumns.Clear();
             SymbolColumns.Add(new DataGridCheckBoxColumn()
             {
-                Header = "Download",
+                Header = "Active",
                 Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
             SymbolColumns.Add(new DataGridTextColumn()

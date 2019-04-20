@@ -36,8 +36,8 @@ namespace Algoloop.Provider
             using (var writer = new StreamLogger(logger))
             {
                 Console.SetOut(writer);
-                IList<string> list = market.Symbols.Where(m => m.Active).Select(m => m.Name).ToList();
-                if (!list.Any())
+                IList<string> symbols = market.Symbols.Select(m => m.Name).ToList();
+                if (!symbols.Any())
                 {
                     Log.Trace($"No symbols selected");
                     market.Active = false;
@@ -52,7 +52,7 @@ namespace Algoloop.Provider
 
                 try
                 {
-                    provider.Download(market, settings, list);
+                    provider.Download(market, settings, symbols);
                 }
                 catch (Exception ex)
                 {

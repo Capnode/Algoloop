@@ -108,7 +108,7 @@ namespace Algoloop.ViewModel
             AddSymbolCommand.RaiseCanExecuteChanged();
         }
 
-        public void AddSymbols(List<SymbolViewModel> symbols)
+        public void AddSymbols(IEnumerable<SymbolViewModel> symbols)
         {
             Debug.Assert(symbols != null);
             foreach (SymbolViewModel symbol in symbols)
