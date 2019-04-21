@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Data;
 
@@ -69,10 +68,8 @@ namespace Algoloop.ViewSupport
 
             foreach (var i in collection)
             {
-                Items.Add(i);
+                Add(i);
             }
-
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         /// <summary> 
@@ -84,10 +81,8 @@ namespace Algoloop.ViewSupport
 
             foreach (var i in collection)
             {
-                Items.Remove(i);
+                Remove(i);
             }
-
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         /// <summary> 
@@ -105,13 +100,11 @@ namespace Algoloop.ViewSupport
         {
             if (collection == null) throw new ArgumentNullException("collection");
 
-            Items.Clear();
+            Clear();
             foreach (var i in collection)
             {
-                Items.Add(i);
+                Add(i);
             }
-
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
     }
 }

@@ -85,7 +85,7 @@ namespace Algoloop.ViewModel
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => true);
 
             Model.NameChanged += StrategyNameChanged;
-            Model.ProviderChanged += ProviderChanged;
+            Model.MarketChanged += MarketChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
             DataFromModel();
 
@@ -121,10 +121,10 @@ namespace Algoloop.ViewModel
             get
             {
                 var list = new List<FolderModel> { new FolderModel { Name = string.Empty } };
-                MarketModel provider = _markets.GetProvider(Model.Provider);
-                if (provider != null)
+                MarketModel market = _markets.GetMarket(Model.Market);
+                if (market != null)
                 {
-                    list.AddRange(provider.Folders);
+                    list.AddRange(market.Folders);
                 }
 
                 _folders.ReplaceRange(list);
@@ -291,6 +291,8 @@ namespace Algoloop.ViewModel
                     .Select(m => new SymbolViewModel(this, new SymbolModel() { Name = m }));
                 Symbols.AddRange(symbols);
             }
+
+            DataToModel();
         }
 
         private void DoUseParameters(IList selected)
@@ -426,8 +428,10 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void ProviderChanged()
+        private void MarketChanged()
         {
+            MarketModel market = _markets.GetMarket(Model.Market);
+            Model.Provider = market.Provider;
             RaisePropertyChanged(() => Folders);
         }
 

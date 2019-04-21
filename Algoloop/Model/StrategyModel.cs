@@ -26,13 +26,13 @@ namespace Algoloop.Model
     public class StrategyModel : ModelBase
     {
         public event Action NameChanged;
-        public event Action ProviderChanged;
+        public event Action MarketChanged;
         public event Action<string> AlgorithmNameChanged;
 
         private string _name;
         private string _algorithmName;
         private string _account = AccountModel.AccountType.Backtest.ToString();
-        private string _provider;
+        private string _market;
 
         public StrategyModel()
         {
@@ -42,7 +42,7 @@ namespace Algoloop.Model
         {
             Name = model.Name;
             Desktop = model.Desktop;
-            Provider = model.Provider;
+            Market = model.Market;
             Account = model.Account;
             BarsBack = model.BarsBack;
             StartDate = model.StartDate;
@@ -99,22 +99,32 @@ namespace Algoloop.Model
         }
 
         [Category("Broker")]
-        [DisplayName("Backtest data")]
-        [Description("Market data provider for backtest")]
+        [DisplayName("Market data")]
+        [Description("Market data for backtest")]
         [RefreshProperties(RefreshProperties.Repaint)]
-        [TypeConverter(typeof(ProviderNameConverter))]
+        [TypeConverter(typeof(MarketNameConverter))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Provider
+        public string Market
         {
-            get => _provider;
+            get => _market;
             set
             {
-                _provider = value;
-                ProviderChanged?.Invoke();
+                _market = value;
+                MarketChanged?.Invoke();
             }
         }
+
+        [Category("Broker")]
+        [DisplayName("Market provider")]
+        [Description("Market data provider for backtest")]
+        [RefreshProperties(RefreshProperties.Repaint)]
+        [TypeConverter(typeof(MarketNameConverter))]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public string Provider { get; set; }
 
         [Category("Time")]
         [DisplayName("Bars back")]
@@ -206,11 +216,13 @@ namespace Algoloop.Model
              || Account.Equals(AccountModel.AccountType.Backtest.ToString())
              || Account.Equals(AccountModel.AccountType.Paper.ToString()))
             {
+                SetBrowsable("Market", true);
                 SetBrowsable("Provider", true);
             }
             else
             {
                 Provider = null;
+                SetBrowsable("Market", false);
                 SetBrowsable("Provider", false);
             }
         }

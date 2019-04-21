@@ -12,16 +12,23 @@
  * limitations under the License.
 */
 
-using Algoloop.Provider;
-using System;
+using Algoloop.Model;
+using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
 namespace Algoloop.ViewSupport
 {
-    public class ProviderNameConverter : TypeConverter
+    public class MarketNameConverter : TypeConverter
     {
+        private readonly MarketsModel _markets;
+
+        public MarketNameConverter()
+        {
+            _markets = SimpleIoc.Default.GetInstance<MarketsModel>();
+        }
+
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
             // true means show a combobox
@@ -36,10 +43,9 @@ namespace Algoloop.ViewSupport
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            // Request list of providers
-            List<string> names = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
+            // Get list of providers
+            IReadOnlyList<MarketModel> providers = _markets.GetMarkets();
+            List<string> names = providers
                 .Select(m => m.Name)
                 .ToList();
             names.Sort();
