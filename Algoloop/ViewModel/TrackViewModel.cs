@@ -18,7 +18,6 @@ using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -44,7 +43,10 @@ namespace Algoloop.ViewModel
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable
     {
         private StrategyViewModel _parent;
-        private readonly SettingsModel _settingsModel;
+        private readonly MarketsModel _markets;
+        private readonly AccountsModel _accounts;
+        private readonly SettingsModel _settings;
+
         private CancellationTokenSource _cancel;
         private Isolated<LeanLauncher> _leanEngine;
         private TrackModel _model;
@@ -54,11 +56,13 @@ namespace Algoloop.ViewModel
         public IDictionary<string, decimal?> _statistics;
         private string _port;
 
-        public TrackViewModel(StrategyViewModel parent, TrackModel model, SettingsModel settingsModel)
+        public TrackViewModel(StrategyViewModel parent, TrackModel model, MarketsModel markets, AccountsModel accounts, SettingsModel settings)
         {
             _parent = parent;
             Model = model;
-            _settingsModel = settingsModel;
+            _markets = markets;
+            _accounts = accounts;
+            _settings = settings;
 
             StartCommand = new RelayCommand(() => DoStartTaskCommand(), () => !Active);
             StopCommand = new RelayCommand(() => DoStopTaskCommand(false), () => Active);
@@ -200,11 +204,8 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            // Get account
-            IReadOnlyList<AccountModel> accounts = null;
-            var message = new NotificationMessageAction<List<AccountModel>>(Model.Account, m => accounts = m);
-            Messenger.Default.Send(message);
-            AccountModel account = accounts?.FirstOrDefault();
+            // Find account
+            AccountModel account = _accounts.FindAccount(Model.Account);
 
             // Set search path if not base directory
             string folder = Path.GetDirectoryName(Model.AlgorithmLocation);
@@ -218,17 +219,17 @@ namespace Algoloop.ViewModel
             {
                 if (Desktop)
                 {
-                    Port = _settingsModel.DesktopPort > 0 ? _settingsModel.DesktopPort.ToString() : null;
+                    Port = _settings.DesktopPort > 0 ? _settings.DesktopPort.ToString() : null;
                     _leanEngine = new Isolated<LeanLauncher>();
                     _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settingsModel, new HostDomainLogger()), _cancel.Token);
+                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
                     Port = null;
                 }
                 else
                 {
                     _leanEngine = new Isolated<LeanLauncher>();
                     _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settingsModel, new HostDomainLogger()), _cancel.Token);
+                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
                 }
 
                 _leanEngine.Dispose();

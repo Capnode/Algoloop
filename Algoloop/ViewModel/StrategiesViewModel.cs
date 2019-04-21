@@ -28,14 +28,19 @@ namespace Algoloop.ViewModel
 {
     public class StrategiesViewModel : ViewModelBase
     {
-        private readonly SettingsModel _settingsModel;
+        private readonly MarketsModel _markets;
+        private readonly AccountsModel _accounts;
+        private readonly SettingsModel _settings;
+
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
 
-        public StrategiesViewModel(StrategiesModel model, SettingsModel settingsModel)
+        public StrategiesViewModel(StrategiesModel model, MarketsModel markets, AccountsModel accounts, SettingsModel settings)
         {
             Model = model;
-            _settingsModel = settingsModel;
+            _markets = markets;
+            _accounts = accounts;
+            _settings = settings;
 
             AddCommand = new RelayCommand(() => DoAddStrategy(), () => !IsBusy);
             ImportCommand = new RelayCommand(() => DoImportStrategies(), () => !IsBusy);
@@ -51,6 +56,8 @@ namespace Algoloop.ViewModel
         public RelayCommand ExportCommand { get; }
 
         public StrategiesModel Model { get; set; }
+
+
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
 
         /// <summary>
@@ -153,7 +160,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                var strategy = new StrategyViewModel(this, new StrategyModel(), _settingsModel);
+                var strategy = new StrategyViewModel(this, new StrategyModel(), _markets, _accounts, _settings);
                 Strategies.Add(strategy);
             }
             finally
@@ -255,7 +262,7 @@ namespace Algoloop.ViewModel
             Strategies.Clear();
             foreach (StrategyModel strategyModel in Model.Strategies)
             {
-                var strategyViewModel = new StrategyViewModel(this, strategyModel, _settingsModel);
+                var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
                 Strategies.Add(strategyViewModel);
             }
         }

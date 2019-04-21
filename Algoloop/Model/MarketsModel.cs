@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -29,6 +30,16 @@ namespace Algoloop.Model
         {
             Markets.Clear();
             Markets.AddRange(marketsModel.Markets);
+        }
+
+        internal IReadOnlyList<MarketModel> GetProviders()
+        {
+            return Markets;
+        }
+
+        internal MarketModel GetProvider(string provider)
+        {
+            return Markets.Find(m => m.Name.Equals(provider));
         }
     }
 }

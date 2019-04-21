@@ -230,6 +230,11 @@
                             <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top">
+                                        <ComboBox
+                                            SelectedValue="{Binding SelectedFolder, Mode=TwoWay}"
+                                            DisplayMemberPath="Name"
+                                            ItemsSource="{Binding Folders}"
+                                            MinWidth="120"/>
                                         <Button
                                             ToolTip="Add symbol" 
                                             Command="{Binding AddSymbolCommand}">

@@ -13,16 +13,22 @@
 */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Algoloop.ViewSupport
 {
     public class AccountNameConverter : TypeConverter
     {
+        private readonly AccountsModel _accounts;
+
+        public AccountNameConverter()
+        {
+            _accounts = SimpleIoc.Default.GetInstance<AccountsModel>();
+        }
+
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
             // true means show a combobox
@@ -38,10 +44,7 @@ namespace Algoloop.ViewSupport
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
             // Request list of accounts
-            IReadOnlyList<AccountModel> accounts = null;
-            var message = new NotificationMessageAction<List<AccountModel>>(string.Empty, m => accounts = m);
-            Messenger.Default.Send(message);
-            Debug.Assert(accounts != null);
+            IReadOnlyList<AccountModel> accounts = _accounts.GetAccounts();
             List<string> list = accounts
                 .Select(m => m.Name)
                 .ToList();

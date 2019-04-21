@@ -13,17 +13,14 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
 
 namespace Algoloop.ViewModel
@@ -32,18 +29,12 @@ namespace Algoloop.ViewModel
     {
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
-        private static readonly AccountModel[] _standardAccounts = new []
-        {
-            new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
-            new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
-        };
 
         public AccountsViewModel(AccountsModel model)
         {
             Model = model;
             AddCommand = new RelayCommand(() => AddAccount(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => DoSelectedChanged(market), (market) => market != null);
-            Messenger.Default.Register<NotificationMessageAction<List<AccountModel>>>(this, (message) => OnNotificationMessage(message));
             DataFromModel();
         }
 
@@ -144,19 +135,6 @@ namespace Algoloop.ViewModel
             finally
             {
                 IsBusy = false;
-            }
-        }
-
-        private void OnNotificationMessage(NotificationMessageAction<List<AccountModel>> message)
-        {
-            IEnumerable<AccountModel> accounts = Accounts.Select(m => m.Model).Concat(_standardAccounts);
-            if (string.IsNullOrEmpty(message.Notification))
-            {
-                message.Execute(accounts.ToList());
-            }
-            else
-            {
-                message.Execute(accounts.Where(s => s.Name.Equals(message.Notification)).ToList());
             }
         }
 

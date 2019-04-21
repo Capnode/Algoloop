@@ -16,13 +16,10 @@ using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -41,7 +38,6 @@ namespace Algoloop.ViewModel
 
             AddCommand = new RelayCommand(() => DoAddMarket(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => vm != null);
-            Messenger.Default.Register<NotificationMessageAction<List<MarketModel>>>(this, (message) => OnNotificationMessage(message));
 
             DataFromModel();
         }
@@ -128,18 +124,6 @@ namespace Algoloop.ViewModel
         {
             vm.Refresh();
             SelectedItem = vm;
-        }
-
-        private void OnNotificationMessage(NotificationMessageAction<List<MarketModel>> message)
-        {
-            if (string.IsNullOrEmpty(message.Notification))
-            {
-                message.Execute(Markets.Select(m => m.Model).ToList());
-            }
-            else
-            {
-                message.Execute(Markets.Where(s => s.Model.Name.Equals(message.Notification)).Select(m => m.Model).ToList());
-            }
         }
 
         private void DoAddMarket()

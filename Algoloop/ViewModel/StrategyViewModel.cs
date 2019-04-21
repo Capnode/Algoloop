@@ -42,21 +42,29 @@ namespace Algoloop.ViewModel
     {
         public const string DefaultName = "Strategy";
 
-        private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
         private readonly StrategiesViewModel _parent;
+        private readonly MarketsModel _markets;
+        private readonly AccountsModel _accounts;
+        private readonly SettingsModel _settings;
+
+        private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
         private bool _isSelected;
         private bool _isExpanded;
-        private SymbolViewModel _selectedSymbol;
-        private ObservableCollection<DataGridColumn> _trackColumns = new ObservableCollection<DataGridColumn>();
-        private TrackViewModel _selectedTrack;
         private string _displayName;
-        private readonly SettingsModel _settingsModel;
+        private ObservableCollection<DataGridColumn> _trackColumns = new ObservableCollection<DataGridColumn>();
+        private SyncObservableCollection<FolderModel> _folders = new SyncObservableCollection<FolderModel>();
 
-        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, SettingsModel settingsModel)
+        private SymbolViewModel _selectedSymbol;
+        private TrackViewModel _selectedTrack;
+        private FolderModel _selectedFolder;
+
+        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingsModel settings)
         {
             _parent = parent;
             Model = model;
-            _settingsModel = settingsModel;
+            _markets = markets;
+            _accounts = accounts;
+            _settings = settings;
 
             StartCommand = new RelayCommand(() => DoRunStrategy(), () => true);
             StopCommand = new RelayCommand(() => { }, () => false);
@@ -77,6 +85,7 @@ namespace Algoloop.ViewModel
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => true);
 
             Model.NameChanged += StrategyNameChanged;
+            Model.ProviderChanged += ProviderChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
             DataFromModel();
 
@@ -103,9 +112,25 @@ namespace Algoloop.ViewModel
         public RelayCommand SortSymbolsCommand { get; }
 
         public StrategyModel Model { get; }
+
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<TrackViewModel> Tracks { get; } = new SyncObservableCollection<TrackViewModel>();
+        public SyncObservableCollection<FolderModel> Folders
+        {
+            get
+            {
+                var list = new List<FolderModel> { new FolderModel { Name = string.Empty } };
+                MarketModel provider = _markets.GetProvider(Model.Provider);
+                if (provider != null)
+                {
+                    list.AddRange(provider.Folders);
+                }
+
+                _folders.ReplaceRange(list);
+                return _folders;
+            }
+        }
 
         public string DisplayName
         {
@@ -153,6 +178,15 @@ namespace Algoloop.ViewModel
             set
             {
                 Set(ref _selectedTrack, value);
+            }
+        }
+
+        public FolderModel SelectedFolder
+        {
+            get => _selectedFolder;
+            set
+            {
+                Set(ref _selectedFolder, value);
             }
         }
 
@@ -245,8 +279,18 @@ namespace Algoloop.ViewModel
 
         private void DoAddSymbol()
         {
-            var symbol = new SymbolViewModel(this, new SymbolModel());
-            Symbols.Add(symbol);
+            if (string.IsNullOrEmpty(SelectedFolder?.Name))
+            {
+                var symbol = new SymbolViewModel(this, new SymbolModel());
+                Symbols.Add(symbol);
+            }
+            else
+            {
+                IEnumerable<SymbolViewModel> symbols = SelectedFolder.Symbols
+                    .Where(s => !Symbols.Any(p => p.Model.Name.Equals(s)))
+                    .Select(m => new SymbolViewModel(this, new SymbolModel() { Name = m }));
+                Symbols.AddRange(symbols);
+            }
         }
 
         private void DoUseParameters(IList selected)
@@ -269,7 +313,7 @@ namespace Algoloop.ViewModel
             var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
             var tasks = new List<Task>();
-            using (var throttler = new SemaphoreSlim(_settingsModel.MaxBacktests))
+            using (var throttler = new SemaphoreSlim(_settings.MaxBacktests))
             {
                 foreach (StrategyModel model in models)
                 {
@@ -277,7 +321,7 @@ namespace Algoloop.ViewModel
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
-                    var track = new TrackViewModel(this, trackModel, _settingsModel);
+                    var track = new TrackViewModel(this, trackModel, _markets, _accounts, _settings);
                     Tracks.Add(track);
                     Task task = track
                         .StartTaskAsync()
@@ -360,7 +404,7 @@ namespace Algoloop.ViewModel
             FilterDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false);
             foreach (TrackModel TrackModel in Model.Tracks)
             {
-                var TrackViewModel = new TrackViewModel(this, TrackModel, _settingsModel);
+                var TrackViewModel = new TrackViewModel(this, TrackModel, _markets, _accounts, _settings);
                 Tracks.Add(TrackViewModel);
                 FilterDataGridColumns.AddPropertyColumns(TrackColumns, TrackViewModel.Statistics, "Statistics");
             }
@@ -380,6 +424,11 @@ namespace Algoloop.ViewModel
             {
                 DisplayName = DefaultName;
             }
+        }
+
+        private void ProviderChanged()
+        {
+            RaisePropertyChanged(() => Folders);
         }
 
         private void AlgorithmNameChanged(string algorithmName)
@@ -491,7 +540,7 @@ namespace Algoloop.ViewModel
                 _parent.IsBusy = true;
                 DataToModel();
                 var strategyModel = new StrategyModel(Model);
-                var strategy = new StrategyViewModel(_parent, strategyModel, _settingsModel);
+                var strategy = new StrategyViewModel(_parent, strategyModel, _markets, _accounts, _settings);
                 _parent.Strategies.Add(strategy);
             }
             finally
@@ -531,7 +580,7 @@ namespace Algoloop.ViewModel
                         AlgorithmName = algorithm,
                         Name = null
                     };
-                    var strategy = new StrategyViewModel(_parent, strategyModel, _settingsModel);
+                    var strategy = new StrategyViewModel(_parent, strategyModel, _markets, _accounts, _settings);
                     _parent.Strategies.Add(strategy);
                 }
             }

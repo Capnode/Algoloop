@@ -78,14 +78,6 @@ namespace Algoloop.Model
         public bool Desktop { get; set; }
 
         [Category("Broker")]
-        [DisplayName("Data provider")]
-        [Description("Market data provider")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public string Provider { get; set; }
-
-        [Category("Broker")]
         [DisplayName("Account")]
         [Description("Trading account for live or paper trading.")]
         [Browsable(true)]
@@ -100,6 +92,14 @@ namespace Algoloop.Model
                 Refresh();
             }
         }
+
+        [Category("Broker")]
+        [DisplayName("Backtest data")]
+        [Description("Market data provider for backtest")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public string Provider { get; set; }
 
         [Category("Time")]
         [DisplayName("Bars back")]

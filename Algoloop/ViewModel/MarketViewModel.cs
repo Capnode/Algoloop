@@ -179,15 +179,17 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DeleteFolder(FolderViewModel symbol)
+        internal void DeleteFolder(FolderViewModel symbol)
         {
-            return Folders.Remove(symbol);
+            Folders.Remove(symbol);
+            DataToModel();
         }
 
 
-        internal bool DeleteSymbol(SymbolViewModel symbol)
+        internal void DeleteSymbol(SymbolViewModel symbol)
         {
-            return Symbols.Remove(symbol);
+            Symbols.Remove(symbol);
+            DataToModel();
         }
 
         internal async Task StartTaskAsync()
@@ -299,6 +301,7 @@ namespace Algoloop.ViewModel
                 _parent.IsBusy = true;
                 var symbol = new SymbolViewModel(this, new SymbolModel());
                 Symbols.Add(symbol);
+                DataToModel();
                 Folders.ToList().ForEach(m => m.Refresh());
             }
             finally
@@ -453,7 +456,6 @@ namespace Algoloop.ViewModel
             if (symbols.Count == 0)
                 return;
 
-            DataToModel();
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
@@ -497,6 +499,7 @@ namespace Algoloop.ViewModel
                 var folder = new FolderViewModel(this, new FolderModel());
                 folder.AddSymbols(list.Where(m => m.Active));
                 Folders.Add(folder);
+                DataToModel();
             }
             finally
             {

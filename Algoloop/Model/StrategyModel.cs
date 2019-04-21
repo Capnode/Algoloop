@@ -26,11 +26,13 @@ namespace Algoloop.Model
     public class StrategyModel : ModelBase
     {
         public event Action NameChanged;
+        public event Action ProviderChanged;
         public event Action<string> AlgorithmNameChanged;
 
+        private string _name;
         private string _algorithmName;
         private string _account = AccountModel.AccountType.Backtest.ToString();
-        private string _name;
+        private string _provider;
 
         public StrategyModel()
         {
@@ -79,15 +81,6 @@ namespace Algoloop.Model
         public bool Desktop { get; set; }
 
         [Category("Broker")]
-        [DisplayName("Data provider")]
-        [Description("Market data provider for backtest")]
-        [TypeConverter(typeof(ProviderNameConverter))]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        [DataMember]
-        public string Provider { get; set; }
-
-        [Category("Broker")]
         [DisplayName("Account")]
         [Description("Name of trading account.")]
         [RefreshProperties(RefreshProperties.Repaint)]
@@ -102,6 +95,24 @@ namespace Algoloop.Model
             {
                 _account = value;
                 Refresh();
+            }
+        }
+
+        [Category("Broker")]
+        [DisplayName("Backtest data")]
+        [Description("Market data provider for backtest")]
+        [RefreshProperties(RefreshProperties.Repaint)]
+        [TypeConverter(typeof(ProviderNameConverter))]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string Provider
+        {
+            get => _provider;
+            set
+            {
+                _provider = value;
+                ProviderChanged?.Invoke();
             }
         }
 
@@ -199,6 +210,7 @@ namespace Algoloop.Model
             }
             else
             {
+                Provider = null;
                 SetBrowsable("Provider", false);
             }
         }

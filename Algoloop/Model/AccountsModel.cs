@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -21,6 +22,12 @@ namespace Algoloop.Model
     [DataContract]
     public class AccountsModel
     {
+        private static readonly AccountModel[] _standardAccounts = new[]
+        {
+            new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
+            new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
+        };
+
         [Browsable(false)]
         [DataMember]
         public List<AccountModel> Accounts { get; } = new List<AccountModel>();
@@ -29,6 +36,17 @@ namespace Algoloop.Model
         {
             Accounts.Clear();
             Accounts.AddRange(accountsModel.Accounts);
+        }
+
+        internal AccountModel FindAccount(string account)
+        {
+            return Accounts.Find(m => m.Name.Equals(account));
+        }
+
+        internal IReadOnlyList<AccountModel> GetAccounts()
+        {
+            IEnumerable<AccountModel> accounts = Accounts.Concat(_standardAccounts);
+            return accounts.ToList();
         }
     }
 }
