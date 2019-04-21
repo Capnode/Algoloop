@@ -43,6 +43,7 @@ namespace Algoloop.Model
             Name = model.Name;
             Desktop = model.Desktop;
             Market = model.Market;
+            Provider = model.Provider;
             Account = model.Account;
             BarsBack = model.BarsBack;
             StartDate = model.StartDate;

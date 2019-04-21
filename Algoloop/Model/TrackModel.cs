@@ -37,6 +37,7 @@ namespace Algoloop.Model
             Name = name;
             Desktop = strategy.Desktop;
             Account = strategy.Account;
+            Market = strategy.Market;
             Provider = strategy.Provider;
             BarsBack = strategy.BarsBack;
             StartDate = strategy.StartDate;
@@ -94,7 +95,15 @@ namespace Algoloop.Model
         }
 
         [Category("Broker")]
-        [DisplayName("Backtest data")]
+        [DisplayName("Market data")]
+        [Description("Market data for backtest")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public string Market { get; set; }
+
+        [Category("Broker")]
+        [DisplayName("Market provider")]
         [Description("Market data provider for backtest")]
         [Browsable(true)]
         [ReadOnly(true)]
