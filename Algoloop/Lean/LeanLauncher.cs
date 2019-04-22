@@ -55,6 +55,7 @@ namespace Algoloop.Lean
                     var engine = new Engine(systemHandlers, algorithmHandlers, liveMode);
                     var algorithmManager = new AlgorithmManager(liveMode);
                     AlgorithmNodePacket job = systemHandlers.JobQueue.NextJob(out assemblyPath);
+                    job.UserPlan = UserPlan.Professional;
                     systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
                     engine.Run(job, algorithmManager, assemblyPath);
                     systemHandlers.JobQueue.AcknowledgeJob(job);
