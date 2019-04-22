@@ -246,6 +246,12 @@ namespace Algoloop.ViewModel
             return ok;
         }
 
+        internal void CloneStrategy(StrategyModel strategyModel)
+        {
+            var strategy = new StrategyViewModel(_parent, strategyModel, _markets, _accounts, _settings);
+            _parent.Strategies.Add(strategy);
+        }
+
         private void DoDeleteAllTracks()
         {
             Tracks.Clear();
@@ -289,7 +295,7 @@ namespace Algoloop.ViewModel
             {
                 IEnumerable<SymbolViewModel> symbols = SelectedFolder.Symbols
                     .Where(s => !Symbols.Any(p => p.Model.Name.Equals(s)))
-                    .Select(m => new SymbolViewModel(this, new SymbolModel() { Name = m }));
+                    .Select(m => new SymbolViewModel(this, new SymbolModel(m)));
                 Symbols.AddRange(symbols);
             }
 
@@ -522,7 +528,7 @@ namespace Algoloop.ViewModel
                             {
                                 if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
                                 {
-                                    var symbol = new SymbolModel() { Name = name };
+                                    var symbol = new SymbolModel(name);
                                     Model.Symbols.Add(symbol);
                                 }
                             }
@@ -538,15 +544,14 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoCloneStrategy()
+        internal void DoCloneStrategy()
         {
             try
             {
                 _parent.IsBusy = true;
                 DataToModel();
                 var strategyModel = new StrategyModel(Model);
-                var strategy = new StrategyViewModel(_parent, strategyModel, _markets, _accounts, _settings);
-                _parent.Strategies.Add(strategy);
+                CloneStrategy(strategyModel);
             }
             finally
             {

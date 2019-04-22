@@ -57,6 +57,24 @@ namespace Algoloop.Model
             Parameters = model.Parameters.Select(m => new ParameterModel(m)).ToList();
         }
 
+        public StrategyModel(TrackModel model)
+        {
+            Desktop = model.Desktop;
+            Market = model.Market;
+            Provider = model.Provider;
+            Account = model.Account;
+            BarsBack = model.BarsBack;
+            StartDate = model.StartDate;
+            EndDate = model.EndDate;
+            Resolution = model.Resolution;
+            InitialCapital = model.InitialCapital;
+            PcntCapitalPerPosition = model.PcntCapitalPerPosition;
+            AlgorithmLocation = model.AlgorithmLocation;
+            AlgorithmName = model.AlgorithmName;
+            Symbols = model.Symbols.Select(m => new SymbolModel(m)).ToList();
+            Parameters = model.Parameters.Select(m => new ParameterModel(m)).ToList();
+        }
+
         [Category("Information")]
         [DisplayName("Name")]
         [Description("Name of the strategy.")]

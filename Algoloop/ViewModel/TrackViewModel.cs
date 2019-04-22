@@ -70,8 +70,9 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => DoDeleteTrack(), () => !Active);
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
+            CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => true);
             ExportCommand = new RelayCommand(() => { }, () => false);
-            CloneCommand = new RelayCommand(() => { }, () => false);
+            CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => true);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
 
             DataFromModel();
@@ -86,6 +87,7 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneCommand { get; }
         public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
+        public RelayCommand<IList> CloneStrategyCommand { get; }
 
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -475,6 +477,19 @@ namespace Algoloop.ViewModel
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+        }
+
+        private void DoCloneStrategy(IList symbols)
+        {
+            var strategyModel = new StrategyModel(Model);
+            if (symbols != null)
+            {
+                strategyModel.Symbols.Clear();
+                IEnumerable<SymbolModel> symbolModels = symbols.Cast<SymbolSummaryViewModel>().Select(m => new SymbolModel(m.Symbol));
+                strategyModel.Symbols.AddRange(symbolModels);
+            }
+
+            _parent.CloneStrategy(strategyModel);
         }
 
         private void StopTask()

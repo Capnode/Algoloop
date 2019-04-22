@@ -430,7 +430,7 @@ namespace Algoloop.ViewModel
                             {
                                 if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
                                 {
-                                    var symbol = new SymbolModel() { Name = name };
+                                    var symbol = new SymbolModel(name);
                                     Model.Symbols.Add(symbol);
                                 }
                             }

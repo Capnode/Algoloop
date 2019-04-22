@@ -26,6 +26,11 @@ namespace Algoloop.Model
         {
         }
 
+        public SymbolModel(string name)
+        {
+            Name = name;
+        }
+
         public SymbolModel(SymbolModel model)
         {
             Name = model.Name;
