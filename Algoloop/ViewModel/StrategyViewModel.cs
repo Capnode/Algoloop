@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
@@ -43,9 +44,9 @@ namespace Algoloop.ViewModel
         public const string DefaultName = "Strategy";
 
         private readonly StrategiesViewModel _parent;
-        private readonly MarketsModel _markets;
-        private readonly AccountsModel _accounts;
-        private readonly SettingsModel _settings;
+        private readonly MarketService _markets;
+        private readonly AccountService _accounts;
+        private readonly SettingService _settings;
 
         private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
         private bool _isSelected;
@@ -58,7 +59,7 @@ namespace Algoloop.ViewModel
         private TrackViewModel _selectedTrack;
         private FolderModel _selectedFolder;
 
-        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingsModel settings)
+        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
             _parent = parent;
             Model = model;
@@ -613,7 +614,7 @@ namespace Algoloop.ViewModel
                 using (StreamWriter file = File.CreateText(fileName))
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    var strategies = new StrategiesModel();
+                    var strategies = new StrategyService();
                     strategies.Strategies.Add(Model);
                     serializer.Serialize(file, strategies);
                 }

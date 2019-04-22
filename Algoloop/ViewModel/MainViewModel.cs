@@ -18,9 +18,9 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using Algoloop.Model;
 using Algoloop.Properties;
 using Algoloop.Provider;
+using Algoloop.Service;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -127,7 +127,7 @@ namespace Algoloop.ViewModel
 
         private void DoSettings()
         {
-            SettingsModel oldSettings = SettingsViewModel.Model;
+            SettingService oldSettings = SettingsViewModel.Model;
             var settings = new SettingsView();
             if ((bool)settings.ShowDialog())
             {

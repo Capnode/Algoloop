@@ -15,6 +15,7 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
+using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -28,7 +29,7 @@ namespace Algoloop.Provider
 {
     public class ProviderFactory : MarshalByRefObject
     {
-        public MarketModel Run(MarketModel market, SettingsModel settings, HostDomainLogger logger)
+        public MarketModel Run(MarketModel market, SettingService settings, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
             PrepareDataFolder(settings.DataFolder);

@@ -13,6 +13,7 @@
 */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,11 +23,11 @@ namespace Algoloop.ViewSupport
 {
     public class AccountNameConverter : TypeConverter
     {
-        private readonly AccountsModel _accounts;
+        private readonly AccountService _accounts;
 
         public AccountNameConverter()
         {
-            _accounts = SimpleIoc.Default.GetInstance<AccountsModel>();
+            _accounts = SimpleIoc.Default.GetInstance<AccountService>();
         }
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)

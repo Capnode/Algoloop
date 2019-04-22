@@ -13,13 +13,14 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
     public interface IProvider
     {
-        void Download(MarketModel market, SettingsModel settings, IList<string> symbols);
+        void Download(MarketModel market, SettingService settings, IList<string> symbols);
         IEnumerable<SymbolModel> GetAllSymbols(MarketModel market);
     }
 }

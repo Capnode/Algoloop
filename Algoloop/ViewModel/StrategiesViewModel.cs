@@ -18,6 +18,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -28,16 +29,16 @@ namespace Algoloop.ViewModel
 {
     public class StrategiesViewModel : ViewModelBase
     {
-        private readonly MarketsModel _markets;
-        private readonly AccountsModel _accounts;
-        private readonly SettingsModel _settings;
+        private readonly MarketService _markets;
+        private readonly AccountService _accounts;
+        private readonly SettingService _settings;
 
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
 
-        public StrategiesViewModel(StrategiesModel model, MarketsModel markets, AccountsModel accounts, SettingsModel settings)
+        public StrategiesViewModel(StrategyService strategies, MarketService markets, AccountService accounts, SettingService settings)
         {
-            Model = model;
+            Model = strategies;
             _markets = markets;
             _accounts = accounts;
             _settings = settings;
@@ -55,7 +56,7 @@ namespace Algoloop.ViewModel
         public RelayCommand ImportCommand { get; }
         public RelayCommand ExportCommand { get; }
 
-        public StrategiesModel Model { get; set; }
+        public StrategyService Model { get; set; }
 
 
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
@@ -119,7 +120,7 @@ namespace Algoloop.ViewModel
                         using (JsonReader reader = new JsonTextReader(r))
                         {
                             JsonSerializer serializer = new JsonSerializer();
-                            Model = serializer.Deserialize<StrategiesModel>(reader);
+                            Model = serializer.Deserialize<StrategyService>(reader);
                         }
                     }
                 });
@@ -202,7 +203,7 @@ namespace Algoloop.ViewModel
                     using (StreamReader r = new StreamReader(fileName))
                     {
                         string json = r.ReadToEnd();
-                        StrategiesModel strategies = JsonConvert.DeserializeObject<StrategiesModel>(json);
+                        StrategyService strategies = JsonConvert.DeserializeObject<StrategyService>(json);
                         foreach (StrategyModel strategy in strategies.Strategies)
                         {
                             foreach (TrackModel track in strategy.Tracks)

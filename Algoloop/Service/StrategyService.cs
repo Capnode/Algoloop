@@ -12,33 +12,24 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Model
+namespace Algoloop.Service
 {
     [DataContract]
-    public class MarketsModel
+    public class StrategyService
     {
         [Browsable(false)]
         [DataMember]
-        public List<MarketModel> Markets { get; } = new List<MarketModel>();
+        public List<StrategyModel> Strategies { get; } = new List<StrategyModel>();
 
-        internal void Copy(MarketsModel marketsModel)
+        internal void Copy(StrategyService strategiesModel)
         {
-            Markets.Clear();
-            Markets.AddRange(marketsModel.Markets);
-        }
-
-        internal IReadOnlyList<MarketModel> GetMarkets()
-        {
-            return Markets;
-        }
-
-        internal MarketModel GetMarket(string provider)
-        {
-            return Markets.Find(m => m.Name.Equals(provider));
+            Strategies.Clear();
+            Strategies.AddRange(strategiesModel.Strategies);
         }
     }
 }

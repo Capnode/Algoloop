@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Model
+namespace Algoloop.Service
 {
     [DataContract]
-    public class AccountsModel
+    public class AccountService
     {
         private static readonly AccountModel[] _standardAccounts = new[]
         {
@@ -32,7 +33,7 @@ namespace Algoloop.Model
         [DataMember]
         public List<AccountModel> Accounts { get; } = new List<AccountModel>();
 
-        internal void Copy(AccountsModel accountsModel)
+        internal void Copy(AccountService accountsModel)
         {
             Accounts.Clear();
             Accounts.AddRange(accountsModel.Accounts);

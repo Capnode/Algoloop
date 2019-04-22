@@ -16,6 +16,7 @@ using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Provider;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
@@ -40,7 +41,7 @@ namespace Algoloop.ViewModel
     public class MarketViewModel : ViewModelBase, ITreeViewModel
     {
         private readonly MarketsViewModel _parent;
-        private readonly SettingsModel _settingsModel;
+        private readonly SettingService _settings;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
         private Isolated<ProviderFactory> _factory;
@@ -48,11 +49,11 @@ namespace Algoloop.ViewModel
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private bool _checkAll;
 
-        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingsModel settingsModel)
+        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingService settings)
         {
             _parent = marketsViewModel;
             Model = marketModel;
-            _settingsModel = settingsModel;
+            _settings = settings;
 
             CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !_parent.IsBusy);
@@ -87,7 +88,7 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
-        public string DataFolder => _settingsModel.DataFolder;
+        public string DataFolder => _settings.DataFolder;
 
         public bool Active
         {
@@ -205,7 +206,7 @@ namespace Algoloop.ViewModel
                 {
                     _factory = new Isolated<ProviderFactory>();
                     _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _factory.Value.Run(model, _settingsModel, logger), _cancel.Token);
+                    await Task.Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token);
                     _factory.Dispose();
                     _factory = null;
                 }

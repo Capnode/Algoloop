@@ -26,7 +26,7 @@
   See http://www.galasoft.ch/mvvm
 */
 
-using Algoloop.Model;
+using Algoloop.Service;
 using GalaSoft.MvvmLight.Ioc;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -46,10 +46,10 @@ namespace Algoloop.ViewModel
         public ViewModelLocator()
         {
             // Register Algoloop types
-            SimpleIoc.Default.Register<SettingsModel>();
-            SimpleIoc.Default.Register<MarketsModel>();
-            SimpleIoc.Default.Register<AccountsModel>();
-            SimpleIoc.Default.Register<StrategiesModel>();
+            SimpleIoc.Default.Register<SettingService>();
+            SimpleIoc.Default.Register<MarketService>();
+            SimpleIoc.Default.Register<AccountService>();
+            SimpleIoc.Default.Register<StrategyService>();
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MarketsViewModel>();
             SimpleIoc.Default.Register<AccountsViewModel>();

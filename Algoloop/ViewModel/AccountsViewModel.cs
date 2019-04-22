@@ -18,6 +18,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -30,9 +31,9 @@ namespace Algoloop.ViewModel
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
 
-        public AccountsViewModel(AccountsModel model)
+        public AccountsViewModel(AccountService accounts)
         {
-            Model = model;
+            Model = accounts;
             AddCommand = new RelayCommand(() => AddAccount(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => DoSelectedChanged(market), (market) => market != null);
             DataFromModel();
@@ -41,7 +42,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
 
-        public AccountsModel Model { get; }
+        public AccountService Model { get; }
         public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
 
         /// <summary>
@@ -91,7 +92,7 @@ namespace Algoloop.ViewModel
                 using (StreamReader r = new StreamReader(fileName))
                 {
                     string json = r.ReadToEnd();
-                    Model.Copy(JsonConvert.DeserializeObject<AccountsModel>(json));
+                    Model.Copy(JsonConvert.DeserializeObject<AccountService>(json));
                 }
 
                 DataFromModel();

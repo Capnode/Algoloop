@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.Provider;
+using Algoloop.Service;
 using NetMQ;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -31,7 +32,7 @@ namespace Algoloop.Lean
 {
     public class LeanLauncher : MarshalByRefObject
     {
-        public TrackModel Run(TrackModel model, AccountModel account, SettingsModel settings, HostDomainLogger logger)
+        public TrackModel Run(TrackModel model, AccountModel account, SettingService settings, HostDomainLogger logger)
         {
             Log.LogHandler = logger;
             if (!SetConfig(model, account, settings))
@@ -72,7 +73,7 @@ namespace Algoloop.Lean
             return model;
         }
 
-        private static bool SetConfig(TrackModel model, AccountModel account, SettingsModel settings)
+        private static bool SetConfig(TrackModel model, AccountModel account, SettingService settings)
         {
             var parameters = new Dictionary<string, string>();
             SetModel(model, settings);
@@ -112,7 +113,7 @@ namespace Algoloop.Lean
             return true;
         }
 
-        private static void SetModel(TrackModel model, SettingsModel settings)
+        private static void SetModel(TrackModel model, SettingService settings)
         {
             Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
             Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");

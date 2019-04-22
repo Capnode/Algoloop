@@ -13,13 +13,14 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
     class Gdax : IProvider
     {
-        public void Download(MarketModel model, SettingsModel settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {
         }
 

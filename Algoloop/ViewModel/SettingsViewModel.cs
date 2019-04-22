@@ -12,11 +12,10 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 using Algoloop.Provider;
+using Algoloop.Service;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
-using QuantConnect.Configuration;
 using System;
 using System.IO;
 using System.Windows;
@@ -25,15 +24,15 @@ namespace Algoloop.ViewModel
 {
     public class SettingsViewModel
     {
-        public SettingsViewModel(SettingsModel model)
+        public SettingsViewModel(SettingService settings)
         {
-            Model = model;
+            Model = settings;
             OkCommand = new RelayCommand<Window>(window => DoOk(window));
         }
 
         public RelayCommand<Window> OkCommand { get; private set; }
 
-        public SettingsModel Model { get; }
+        public SettingService Model { get; }
 
         internal bool Read(string fileName)
         {
@@ -45,7 +44,7 @@ namespace Algoloop.ViewModel
                 using (StreamReader r = new StreamReader(fileName))
                 {
                     string json = r.ReadToEnd();
-                    SettingsModel settings = JsonConvert.DeserializeObject<SettingsModel>(json);
+                    SettingService settings = JsonConvert.DeserializeObject<SettingService>(json);
                     Model.Copy(settings);
                 }
 

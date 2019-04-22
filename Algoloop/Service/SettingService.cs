@@ -17,11 +17,11 @@ using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Model
+namespace Algoloop.Service
 {
     [Serializable]
     [DataContract]
-    public class SettingsModel : ModelBase
+    public class SettingService
     {
         [Category("API")]
         [DisplayName("API access token")]
@@ -70,7 +70,7 @@ namespace Algoloop.Model
         [DataMember]
         public int MaxBacktests { get; set; } = Environment.ProcessorCount;
 
-        internal void Copy(SettingsModel oldSettings)
+        internal void Copy(SettingService oldSettings)
         {
             ApiToken = oldSettings.ApiToken;
             ApiUser = oldSettings.ApiUser;

@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.FxcmVolumeDownload;
@@ -22,7 +23,7 @@ namespace Algoloop.Provider
 {
     class FxcmVolume : IProvider
     {
-        public void Download(MarketModel model, SettingsModel settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {
             Config.Set("data-directory", settings.DataFolder);
             switch (model.Access)

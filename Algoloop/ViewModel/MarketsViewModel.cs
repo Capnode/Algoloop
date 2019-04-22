@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -27,14 +28,14 @@ namespace Algoloop.ViewModel
 {
     public class MarketsViewModel : ViewModelBase
     {
-        private readonly SettingsModel _settingsModel;
+        private readonly SettingService _settings;
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
 
-        public MarketsViewModel(MarketsModel model, SettingsModel settingsModel)
+        public MarketsViewModel(MarketService markets, SettingService settings)
         {
-            Model = model;
-            _settingsModel = settingsModel;
+            Model = markets;
+            _settings = settings;
 
             AddCommand = new RelayCommand(() => DoAddMarket(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => vm != null);
@@ -45,7 +46,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
 
-        public MarketsModel Model { get; }
+        public MarketService Model { get; }
         public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace Algoloop.ViewModel
                 using (StreamReader r = new StreamReader(fileName))
                 {
                     string json = r.ReadToEnd();
-                    Model.Copy(JsonConvert.DeserializeObject<MarketsModel>(json));
+                    Model.Copy(JsonConvert.DeserializeObject<MarketService>(json));
                 }
 
                 DataFromModel();
@@ -128,7 +129,7 @@ namespace Algoloop.ViewModel
 
         private void DoAddMarket()
         {
-            var loginViewModel = new MarketViewModel(this, new MarketModel(), _settingsModel);
+            var loginViewModel = new MarketViewModel(this, new MarketModel(), _settings);
             Markets.Add(loginViewModel);
         }
 
@@ -147,7 +148,7 @@ namespace Algoloop.ViewModel
             Markets.Clear();
             foreach (MarketModel market in Model.Markets)
             {
-                var viewModel = new MarketViewModel(this, market, _settingsModel);
+                var viewModel = new MarketViewModel(this, market, _settings);
                 Markets.Add(viewModel);
             }
         }

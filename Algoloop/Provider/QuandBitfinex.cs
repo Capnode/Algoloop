@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.QuandlBitfinexDownloader;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace Algoloop.Provider
 {
     class QuandBitfinex : IProvider
     {
-        public void Download(MarketModel model, SettingsModel settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", settings.DataFolder);

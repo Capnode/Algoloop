@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.FxcmDownloader;
@@ -23,7 +24,7 @@ namespace Algoloop.Provider
 {
     class Fxcm : IProvider
     {
-        public void Download(MarketModel model, SettingsModel settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", settings.DataFolder);

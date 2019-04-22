@@ -15,6 +15,7 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -43,9 +44,9 @@ namespace Algoloop.ViewModel
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable
     {
         private StrategyViewModel _parent;
-        private readonly MarketsModel _markets;
-        private readonly AccountsModel _accounts;
-        private readonly SettingsModel _settings;
+        private readonly MarketService _markets;
+        private readonly AccountService _accounts;
+        private readonly SettingService _settings;
 
         private CancellationTokenSource _cancel;
         private Isolated<LeanLauncher> _leanEngine;
@@ -56,7 +57,7 @@ namespace Algoloop.ViewModel
         public IDictionary<string, decimal?> _statistics;
         private string _port;
 
-        public TrackViewModel(StrategyViewModel parent, TrackModel model, MarketsModel markets, AccountsModel accounts, SettingsModel settings)
+        public TrackViewModel(StrategyViewModel parent, TrackModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
             _parent = parent;
             Model = model;
