@@ -110,7 +110,6 @@
                         <DataGridTextColumn Header="Profit" Binding="{Binding ProfitLoss}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Fees" Binding="{Binding TotalFees}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="Duration" Binding="{Binding Duration, StringFormat='{}{0:d\\.hh\\:mm\\:ss}'}" ElementStyle="{StaticResource RightCell}"/>
-                        <DataGridTextColumn Header="Drawdown" Binding="{Binding EndTradeDrawdown}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="MAE" Binding="{Binding MAE}" ElementStyle="{StaticResource RightCell}"/>
                         <DataGridTextColumn Header="MFE" Binding="{Binding MFE}" ElementStyle="{StaticResource RightCell}"/>
                     </DataGrid.Columns>
