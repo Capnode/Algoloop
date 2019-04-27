@@ -51,9 +51,14 @@ namespace Algoloop.ViewModel
         public decimal ProfitLoss { get; private set; }
 
         /// <summary>
-        /// The sharpe quote of the trades (as account currency)
+        /// The maximum drawdown of the trades (as account currency)
         /// </summary>
-        public decimal Sharpe { get; private set; }
+        public decimal Drawdown { get; private set; }
+
+        /// <summary>
+        /// Total profit to max drawdown ratio
+        /// </summary>
+        public decimal DDRatio { get; private set; }
 
         public void AddTrade(Trade trade)
         {
@@ -64,10 +69,37 @@ namespace Algoloop.ViewModel
         {
             decimal profitLoss = _trades.Sum(m => m.ProfitLoss);
             ProfitLoss = Math.Round(profitLoss, 2);
-
-            decimal stddev = StandardDeviation(_trades.Select(m => m.ProfitLoss));
+            IEnumerable<decimal> range = _trades.Select(m => m.MFE - m.MAE);
+            decimal stddev = StandardDeviation(range);
             decimal sharpe = stddev == 0 ? 0 : ProfitLoss / stddev;
-            Sharpe = Math.Round(sharpe, 2);
+            decimal drawdown = MaxDrawdown();
+            Drawdown = Math.Round(drawdown, 2);
+            decimal ratio = drawdown == 0 ? 0 : ProfitLoss / -drawdown;
+            DDRatio = Math.Round(ratio, 2);
+        }
+
+        private decimal MaxDrawdown()
+        {
+            decimal top = 0;
+            decimal bottom = 0;
+            decimal close = 0;
+            decimal drawdown = 0;
+            decimal mdd = 0;
+            foreach(var trade in _trades)
+            {
+                if (close + trade.MFE > top)
+                {
+                    top = close + trade.MFE;
+                    bottom = 0;
+                }
+
+                bottom = Math.Min(bottom, close + trade.MAE);
+                drawdown = Math.Min(drawdown, top + bottom);
+                mdd = Math.Max(mdd, top == 0 ? 0 : (top - bottom) / top);
+                close = close + trade.ProfitLoss;
+            }
+
+            return drawdown;
         }
 
         private static decimal StandardDeviation(IEnumerable<decimal> values)

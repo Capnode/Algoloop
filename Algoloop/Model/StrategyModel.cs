@@ -72,7 +72,7 @@ namespace Algoloop.Model
             AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
             Symbols = model.Symbols.Select(m => new SymbolModel(m)).ToList();
-            Parameters = model.Parameters.Select(m => new ParameterModel(m)).ToList();
+            Parameters = model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList();
         }
 
         [Category("Information")]
