@@ -15,10 +15,12 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
+using Algoloop.Properties;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -72,6 +74,7 @@ namespace Algoloop.ViewModel
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
             CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => true);
             CreateFolderCommand = new RelayCommand<IList>(m => DoCreateFolder(m), m => true);
+            SelectedItemsCommand = new RelayCommand<IList>(m => OnSelectedItemsCommand(m), m => true);
             ExportCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => true);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
@@ -90,6 +93,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<IList> CloneStrategyCommand { get; }
         public RelayCommand<IList> CreateFolderCommand { get; }
+        public RelayCommand<IList> SelectedItemsCommand { get; }
 
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -496,11 +500,22 @@ namespace Algoloop.ViewModel
 
         private void DoCreateFolder(IList list)
         {
-            if (list != null)
+            if (list == null)
+                return;
+
+            IEnumerable<string> symbols = list.Cast<SymbolSummaryViewModel>().Select(m => m.Symbol);
+            _parent.CreateFolder(symbols);
+        }
+
+        private void OnSelectedItemsCommand(IList list)
+        {
+            string message = string.Empty;
+            if (list.Count > 0)
             {
-                IEnumerable<string> symbols = list.Cast<SymbolSummaryViewModel>().Select(m => m.Symbol);
-                _parent.CreateFolder(symbols);
+                message = string.Format(Resources.SelectedCount, list.Count);
             }
+
+            Messenger.Default.Send(new NotificationMessage(message));
         }
 
         private void StopTask()

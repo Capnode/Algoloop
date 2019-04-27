@@ -13,11 +13,13 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Properties;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect.AlgorithmFactory;
@@ -321,6 +323,9 @@ namespace Algoloop.ViewModel
             int count = 0;
             var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
+            string message = string.Format(Resources.RunStrategyWithTracks, total);
+            Messenger.Default.Send(new NotificationMessage(message));
+
             var tasks = new List<Task>();
             using (var throttler = new SemaphoreSlim(_settings.MaxBacktests))
             {
@@ -345,6 +350,8 @@ namespace Algoloop.ViewModel
 
                 await Task.WhenAll(tasks);
             }
+
+            Messenger.Default.Send(new NotificationMessage(Resources.CompletedStrategy));
         }
 
         private List<StrategyModel> GridOptimizerModels(StrategyModel rawModel, int index)

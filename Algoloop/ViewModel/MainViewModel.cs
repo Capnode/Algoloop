@@ -24,7 +24,9 @@ using Algoloop.Service;
 using Algoloop.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using QuantConnect.Configuration;
+using QuantConnect.Logging;
 
 namespace Algoloop.ViewModel
 {
@@ -57,6 +59,7 @@ namespace Algoloop.ViewModel
             SettingsCommand = new RelayCommand(() => DoSettings(), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             AboutCommand = new RelayCommand(() => DoAbout(), () => !IsBusy);
+            Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
 
@@ -109,6 +112,15 @@ namespace Algoloop.ViewModel
         {
             string appData = GetAppDataFolder();
             SaveConfig(appData);
+        }
+
+        private void OnStatusMessage(NotificationMessage message)
+        {
+            StatusMessage = message.Notification;
+            if (string.IsNullOrWhiteSpace(message.Notification))
+                return;
+
+            Log.Trace(message.Notification);
         }
 
         private void DoExit(Window window)
@@ -174,7 +186,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                StatusMessage = Resources.LoadingConfiguration;
+                Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfiguration));
                 SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
@@ -182,7 +194,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                StatusMessage = string.Empty;
+                Messenger.Default.Send(new NotificationMessage(string.Empty));
                 IsBusy = false;
             }
         }
@@ -192,7 +204,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                StatusMessage = Resources.SavingConfiguration;
+                Messenger.Default.Send(new NotificationMessage(Resources.SavingConfiguration));
 
                 if (!Directory.Exists(appData))
                 {
@@ -206,7 +218,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                StatusMessage = string.Empty;
+                Messenger.Default.Send(new NotificationMessage(string.Empty));
                 IsBusy = false;
             }
         }

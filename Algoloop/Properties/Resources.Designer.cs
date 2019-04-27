@@ -121,6 +121,15 @@ namespace Algoloop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Completed strategy.
+        /// </summary>
+        internal static string CompletedStrategy {
+            get {
+                return ResourceManager.GetString("CompletedStrategy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Delete {
@@ -270,6 +279,15 @@ namespace Algoloop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Run strategy with {0} track(s).
+        /// </summary>
+        internal static string RunStrategyWithTracks {
+            get {
+                return ResourceManager.GetString("RunStrategyWithTracks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Save {
@@ -285,6 +303,15 @@ namespace Algoloop.Properties {
         internal static string SavingConfiguration {
             get {
                 return ResourceManager.GetString("SavingConfiguration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected: {0}.
+        /// </summary>
+        internal static string SelectedCount {
+            get {
+                return ResourceManager.GetString("SelectedCount", resourceCulture);
             }
         }
         
