@@ -68,6 +68,8 @@ namespace Algoloop.ViewModel
             StartCommand = new RelayCommand(() => DoStartCommand(), () => !_parent.IsBusy && !Active);
             StopCommand = new RelayCommand(() => DoStopCommand(), () => !_parent.IsBusy && Active);
 
+            Model.ModelChanged += DataFromModel;
+
             DataFromModel();
             DoActiveCommand(Active);
         }

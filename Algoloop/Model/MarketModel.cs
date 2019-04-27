@@ -25,6 +25,8 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketModel : ModelBase
     {
+        public event Action ModelChanged;
+
         private string _provider;
 
         public enum AccessType { Demo, Real };
@@ -124,6 +126,14 @@ namespace Algoloop.Model
         {
             switch (Provider)
             {
+                case nameof(Algoloop.Provider.Borsdata):
+                    SetBrowsable("Access", false);
+                    SetBrowsable("Login", false);
+                    SetBrowsable("Password", false);
+                    SetBrowsable("ApiKey", true);
+                    SetReadonly("Resolution", true);
+                    Resolution = Resolution.Daily;
+                    break;
                 case nameof(Algoloop.Provider.Fxcm):
                     SetBrowsable("Access", true);
                     SetBrowsable("Login", true);
@@ -139,6 +149,12 @@ namespace Algoloop.Model
                     SetReadonly("Resolution", false);
                     break;
             }
+        }
+
+        internal void AddFolder(FolderModel folder)
+        {
+            Folders.Add(folder);
+            ModelChanged?.Invoke();
         }
     }
 }

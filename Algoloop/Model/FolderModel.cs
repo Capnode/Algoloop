@@ -27,6 +27,11 @@ namespace Algoloop.Model
         {
         }
 
+        public FolderModel(IEnumerable<string> symbols)
+        {
+            Symbols.AddRange(symbols);
+        }
+
         [DisplayName("List name")]
         [Description("Name of the list")]
         [Browsable(true)]

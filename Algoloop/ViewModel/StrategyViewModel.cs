@@ -544,6 +544,15 @@ namespace Algoloop.ViewModel
             }
         }
 
+        internal void CreateFolder(IEnumerable<string> symbols)
+        {
+            MarketModel market = _markets.GetMarket(Model.Market);
+            if (market == null)
+                return;
+
+            market.AddFolder(new FolderModel(symbols));
+        }
+
         internal void DoCloneStrategy()
         {
             try

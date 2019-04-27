@@ -71,6 +71,7 @@ namespace Algoloop.ViewModel
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
             CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => true);
+            CreateFolderCommand = new RelayCommand<IList>(m => DoCreateFolder(m), m => true);
             ExportCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => true);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
@@ -88,6 +89,7 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<IList> CloneStrategyCommand { get; }
+        public RelayCommand<IList> CreateFolderCommand { get; }
 
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -490,6 +492,15 @@ namespace Algoloop.ViewModel
             }
 
             _parent.CloneStrategy(strategyModel);
+        }
+
+        private void DoCreateFolder(IList list)
+        {
+            if (list != null)
+            {
+                IEnumerable<string> symbols = list.Cast<SymbolSummaryViewModel>().Select(m => m.Symbol);
+                _parent.CreateFolder(symbols);
+            }
         }
 
         private void StopTask()
