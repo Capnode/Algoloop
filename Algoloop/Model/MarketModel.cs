@@ -25,7 +25,8 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketModel : ModelBase
     {
-        public event Action ModelChanged;
+        [NonSerialized]
+        public Action ModelChanged;
 
         private string _provider;
 

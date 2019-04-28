@@ -25,9 +25,9 @@ namespace Algoloop.Model
     [DataContract]
     public class StrategyModel : ModelBase
     {
-        public event Action NameChanged;
-        public event Action MarketChanged;
-        public event Action<string> AlgorithmNameChanged;
+        public Action NameChanged;
+        public Action MarketChanged;
+        public Action<string> AlgorithmNameChanged;
 
         private string _name;
         private string _algorithmName;
