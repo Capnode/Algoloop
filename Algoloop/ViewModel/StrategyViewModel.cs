@@ -76,7 +76,7 @@ namespace Algoloop.ViewModel
             CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !string.IsNullOrEmpty(Model.AlgorithmName));
             ExportCommand = new RelayCommand(() => DoExportStrategy(), () => true);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => true);
-            DeleteAllTracksCommand = new RelayCommand(() => DoDeleteAllTracks(), () => true);
+            DeleteAllTracksCommand = new RelayCommand(() => DoDeleteTracks(null), () => true);
             DeleteSelectedTracksCommand = new RelayCommand<IList>(m => DoDeleteTracks(m), m => true);
             UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => true);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => true);
@@ -272,25 +272,15 @@ namespace Algoloop.ViewModel
             _parent.Strategies.Add(strategy);
         }
 
-        private void DoDeleteAllTracks()
-        {
-            Tracks.Clear();
-            DataToModel();
-        }
-
         private void DoDeleteTracks(IList tracks)
         {
-            Debug.Assert(tracks != null);
-            if (Tracks.Count == 0 || tracks.Count == 0)
-                return;
+            List<TrackViewModel> list = tracks == null
+                ? Tracks.ToList()
+                : tracks.Cast<TrackViewModel>().ToList();
 
-            List<TrackViewModel> list = tracks.Cast<TrackViewModel>()?.ToList();
             foreach (TrackViewModel track in list)
             {
-                if (track != null)
-                {
-                    track.DoDeleteTrack();
-                }
+               track.DoDeleteTrack();
             }
         }
 

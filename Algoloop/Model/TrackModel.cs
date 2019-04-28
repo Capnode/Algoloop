@@ -198,6 +198,11 @@ namespace Algoloop.Model
         [DataMember]
         public string Logs { get; set; }
 
+        [ReadOnly(true)]
+        [Browsable(false)]
+        [DataMember]
+        public IDictionary<string, decimal?> Statistics { get; set; }
+
         public void Refresh()
         {
             if (Account == null

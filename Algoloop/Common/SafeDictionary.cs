@@ -19,6 +19,16 @@ namespace Algoloop.Common
 {
     public class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {
+        public SafeDictionary()
+            : base()
+        {
+        }
+
+        public SafeDictionary(IDictionary<TKey, TValue> dict)
+            : base(dict)
+        {
+        }
+
         public new TValue this[TKey key]
         {
             get
