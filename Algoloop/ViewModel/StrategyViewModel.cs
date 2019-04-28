@@ -60,6 +60,7 @@ namespace Algoloop.ViewModel
         private SymbolViewModel _selectedSymbol;
         private TrackViewModel _selectedTrack;
         private FolderModel _selectedFolder;
+        private IList _selectedItems;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
@@ -119,6 +120,23 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<TrackViewModel> Tracks { get; } = new SyncObservableCollection<TrackViewModel>();
+
+        public IList SelectedItems
+        {
+            get { return _selectedItems; }
+            set
+            {
+                _selectedItems = value;
+                string message = string.Empty;
+                if (_selectedItems?.Count > 0)
+                {
+                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                }
+
+                Messenger.Default.Send(new NotificationMessage(message));
+            }
+        }
+
         public SyncObservableCollection<FolderModel> Folders
         {
             get

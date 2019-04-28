@@ -303,7 +303,8 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    FilteredItemsSource="{Binding Parameters}">
+                                    ExSelectedItems="{Binding SelectedItems}"                                       
+                                    ExItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Model.Name}" />
                                         <DataGridCheckBoxColumn IsReadOnly="False" Header="Use" Binding="{Binding Model.UseValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -351,7 +352,8 @@
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedTrack, Mode=TwoWay}"
-                                    FilteredItemsSource="{Binding Tracks}"
+                                    ExSelectedItems="{Binding SelectedItems}"                                       
+                                    ExItemsSource="{Binding Tracks}"
                                     ExColumns="{Binding TrackColumns}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDoubleClick">

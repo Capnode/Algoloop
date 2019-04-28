@@ -15,12 +15,14 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
+using Algoloop.Properties;
 using Algoloop.Provider;
 using Algoloop.Service;
 using Algoloop.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using QuantConnect.Logging;
 using System;
@@ -48,6 +50,7 @@ namespace Algoloop.ViewModel
         private SymbolViewModel _selectedSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private bool _checkAll;
+        private IList _selectedItems;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingService settings)
         {
@@ -91,6 +94,22 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
         public string DataFolder => _settings.DataFolder;
+
+        public IList SelectedItems
+        {
+            get { return _selectedItems; }
+            set
+            {
+                _selectedItems = value;
+                string message = string.Empty;
+                if (_selectedItems?.Count > 0)
+                {
+                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                }
+
+                Messenger.Default.Send(new NotificationMessage(message));
+            }
+        }
 
         public bool Active
         {

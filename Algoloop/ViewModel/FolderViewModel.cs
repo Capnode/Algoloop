@@ -13,10 +13,12 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Properties;
 using Algoloop.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using System;
 using System.Collections;
@@ -37,6 +39,7 @@ namespace Algoloop.ViewModel
         private SymbolViewModel _selectedSymbol;
         private SymbolViewModel _marketSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
+        private IList _selectedItems;
 
         public FolderViewModel(MarketViewModel market, FolderModel model)
         {
@@ -81,6 +84,22 @@ namespace Algoloop.ViewModel
         {
             get => _marketSymbol;
             set => Set(ref _marketSymbol, value);
+        }
+
+        public IList SelectedItems
+        {
+            get { return _selectedItems; }
+            set
+            {
+                _selectedItems = value;
+                string message = string.Empty;
+                if (_selectedItems?.Count > 0)
+                {
+                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                }
+
+                Messenger.Default.Send(new NotificationMessage(message));
+            }
         }
 
         public SymbolViewModel SelectedSymbol

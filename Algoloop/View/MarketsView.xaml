@@ -209,7 +209,8 @@
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                        FilteredItemsSource="{Binding Symbols}"                                        
+                                        ExSelectedItems="{Binding SelectedItems}"                                       
+                                        ExItemsSource="{Binding Symbols}"                                        
                                         ExColumns="{Binding SymbolColumns}">
                                     </wpf:FilterDataGrid>
                                 </DockPanel>
@@ -261,7 +262,8 @@
                                         AutoGenerateColumns="False"
                                         GridLinesVisibility="None"
                                         SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                        FilteredItemsSource="{Binding Symbols}"
+                                        ExSelectedItems="{Binding SelectedItems}"                                       
+                                        ExItemsSource="{Binding Symbols}"
                                         ExColumns="{Binding SymbolColumns}">
                                     </wpf:FilterDataGrid>
                                 </DockPanel>

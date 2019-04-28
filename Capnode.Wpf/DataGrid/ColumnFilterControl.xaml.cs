@@ -463,7 +463,7 @@ namespace Capnode.Wpf.DataGrid
             if (DistinctPropertyValues.Count == 0)
             {
                 List<object> result = new List<object>();
-                foreach (var i in Grid.FilteredItemsSource)
+                foreach (var i in Grid.ExItemsSource)
                 {
                     object value = _boundColumnPropertyAccessor(i);
                     if (value != null)

@@ -13,13 +13,16 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
+using Algoloop.Properties;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using QuantConnect;
 using QuantConnect.Brokerages;
 using QuantConnect.Brokerages.Fxcm;
@@ -35,6 +38,7 @@ namespace Algoloop.ViewModel
         private CancellationTokenSource _cancel;
         private FxcmBrokerage _brokerage;
         private Task _task;
+        private IList _selectedItems;
         private const string FxcmServer = "http://www.fxcorporate.com/Hosts.jsp";
 
         public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel)
@@ -59,6 +63,22 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
+
+        public IList SelectedItems
+        {
+            get { return _selectedItems; }
+            set
+            {
+                _selectedItems = value;
+                string message = string.Empty;
+                if (_selectedItems?.Count > 0)
+                {
+                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                }
+
+                Messenger.Default.Send(new NotificationMessage(message));
+            }
+        }
 
         public bool Active
         {

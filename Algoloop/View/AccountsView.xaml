@@ -124,7 +124,8 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    FilteredItemsSource="{Binding Orders}">
+                                    ExSelectedItems="{Binding SelectedItems}"                                    
+                                    ExItemsSource="{Binding Orders}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
@@ -169,7 +170,8 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    FilteredItemsSource="{Binding Positions}">
+                                    ExSelectedItems="{Binding SelectedItems}"                                    
+                                    ExItemsSource="{Binding Positions}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
                                         <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
@@ -212,7 +214,8 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    FilteredItemsSource="{Binding Balances}">
+                                    ExSelectedItems="{Binding SelectedItems}"                                   
+                                    ExItemsSource="{Binding Balances}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
                                         <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />

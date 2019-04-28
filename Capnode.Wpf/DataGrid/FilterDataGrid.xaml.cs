@@ -39,9 +39,76 @@ namespace Capnode.Wpf.DataGrid
 
         private List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
         private PropertyChangedEventHandler _filterHandler;
-        public static readonly DependencyProperty ExColumnsProperty = DependencyProperty.Register("ExColumns",
-            typeof(ObservableCollection<DataGridColumn>), typeof(FilterDataGrid),
-                new PropertyMetadata(OnDataGridColumnsPropertyChanged));
+
+        public static readonly DependencyProperty ExItemsSourceProperty = DependencyProperty.Register(
+            "ExItemsSource",
+            typeof(IEnumerable),
+            typeof(FilterDataGrid),
+            new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
+
+        public static readonly DependencyProperty ExColumnsProperty = DependencyProperty.Register(
+            "ExColumns",
+            typeof(ObservableCollection<DataGridColumn>),
+            typeof(FilterDataGrid),
+            new PropertyMetadata(OnDataGridColumnsPropertyChanged));
+
+        public static readonly DependencyProperty ExSelectedItemsProperty = DependencyProperty.Register(
+            "ExSelectedItems",
+            typeof(IList),
+            typeof(FilterDataGrid),
+            new FrameworkPropertyMetadata { BindsTwoWayByDefault = true, DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
+
+        public FilterDataGrid()
+        {
+            Filters = new List<ColumnFilterControl>();
+            _filterHandler = new PropertyChangedEventHandler(filter_PropertyChanged);
+            InitializeComponent();
+
+            SelectionChanged += (object sender, SelectionChangedEventArgs e) => { ExSelectedItems = base.SelectedItems; };
+        }
+
+        public IEnumerable ExItemsSource
+        {
+            get { return (IEnumerable)GetValue(ExItemsSourceProperty); }
+            set { SetValue(ExItemsSourceProperty, value); }
+        }
+
+        public ObservableCollection<DataGridColumn> ExColumns
+        {
+            get { return (ObservableCollection<DataGridColumn>)base.GetValue(ExColumnsProperty); }
+            set { base.SetValue(ExColumnsProperty, value); }
+        }
+
+        public IList ExSelectedItems
+        {
+            get { return (IList)GetValue(ExSelectedItemsProperty); }
+            set { SetValue(ExSelectedItemsProperty, value); }
+        }
+
+        public static void OnItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            FilterDataGrid g = sender as FilterDataGrid;
+            if (g != null)
+            {
+                var list = (IEnumerable)e.NewValue;
+                var view = new CollectionViewSource();
+                view.Source = list;
+                if (list == null)
+                    return;
+
+                Type srcT = e.NewValue.GetType().GetInterfaces().First(i => i.Name.StartsWith("IEnumerable"));
+                g.FilterType = srcT.GetGenericArguments().First();
+                g.ItemsSource = CollectionViewSource.GetDefaultView(list);
+                if (g.Filters != null)
+                {
+                    foreach (var filter in g.Filters)
+                    {
+                        filter.ResetControl();
+                    }
+                }
+
+            }
+        }
 
         protected bool IsResetting { get; set; }
 
@@ -52,12 +119,6 @@ namespace Capnode.Wpf.DataGrid
         protected ICollectionView CollectionView
         {
             get { return this.ItemsSource as ICollectionView; }
-        }
-
-        public ObservableCollection<DataGridColumn> ExColumns
-        {
-            get { return (ObservableCollection<DataGridColumn>)base.GetValue(ExColumnsProperty); }
-            set { base.SetValue(ExColumnsProperty, value); }
         }
 
         private static void OnDataGridColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -113,43 +174,6 @@ namespace Capnode.Wpf.DataGrid
                     break;
             }
         }
-
-        #region FilteredItemsSource DependencyProperty
-        public static readonly DependencyProperty FilteredItemsSourceProperty =
-            DependencyProperty.Register("FilteredItemsSource", typeof(IEnumerable), typeof(FilterDataGrid),
-            new PropertyMetadata(null, new PropertyChangedCallback(OnFilteredItemsSourceChanged)));
-
-        public IEnumerable FilteredItemsSource
-        {
-            get { return (IEnumerable)GetValue(FilteredItemsSourceProperty); }
-            set { SetValue(FilteredItemsSourceProperty, value); }
-        }
-
-        public static void OnFilteredItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            FilterDataGrid g = sender as FilterDataGrid;
-            if (g != null)
-            {
-                var list = (IEnumerable)e.NewValue;
-                var view = new CollectionViewSource();
-                view.Source = list;
-                if (list == null)
-                    return;
-
-                Type srcT = e.NewValue.GetType().GetInterfaces().First(i => i.Name.StartsWith("IEnumerable"));
-                g.FilterType = srcT.GetGenericArguments().First();
-                g.ItemsSource = CollectionViewSource.GetDefaultView(list);
-                if (g.Filters != null)
-                {
-                    foreach (var filter in g.Filters)
-                    {
-                        filter.ResetControl();
-                    }
-                }
-
-            }
-        }
-#endregion
 
         #region Grouping Properties
 
@@ -254,12 +278,6 @@ namespace Capnode.Wpf.DataGrid
             }
         }
         #endregion Filter Properties
-        public FilterDataGrid()
-        {
-            Filters = new List<ColumnFilterControl>();
-            _filterHandler = new PropertyChangedEventHandler(filter_PropertyChanged);
-            InitializeComponent();
-        }
 
         /// <summary>
         /// Whenever any registered OptionControl raises the FilterChanged property changed event, we need to rebuild

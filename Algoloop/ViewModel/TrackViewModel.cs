@@ -58,6 +58,7 @@ namespace Algoloop.ViewModel
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
         public IDictionary<string, decimal?> _statistics;
         private string _port;
+        private IList _selectedItems;
 
         public TrackViewModel(StrategyViewModel parent, TrackModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
@@ -74,7 +75,6 @@ namespace Algoloop.ViewModel
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
             CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => true);
             CreateFolderCommand = new RelayCommand<IList>(m => DoCreateFolder(m), m => true);
-            SelectedItemsCommand = new RelayCommand<IList>(m => OnSelectedItemsCommand(m), m => true);
             ExportCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => true);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
@@ -93,7 +93,6 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<IList> CloneStrategyCommand { get; }
         public RelayCommand<IList> CreateFolderCommand { get; }
-        public RelayCommand<IList> SelectedItemsCommand { get; }
 
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -102,6 +101,22 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolSummaryViewModel> SummarySymbols { get; } = new SyncObservableCollection<SymbolSummaryViewModel>();
         public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<HoldingViewModel> Holdings { get; } = new SyncObservableCollection<HoldingViewModel>();
+        public IList SelectedItems
+        {
+            get { return _selectedItems; }
+            set
+            {
+                _selectedItems = value;
+                string message = string.Empty;
+                if (_selectedItems?.Count > 0)
+                {
+                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                }
+
+                Messenger.Default.Send(new NotificationMessage(message));
+            }
+        }
+
         public IDictionary<string, decimal?> Statistics
         {
             get => _statistics;
@@ -505,17 +520,6 @@ namespace Algoloop.ViewModel
 
             IEnumerable<string> symbols = list.Cast<SymbolSummaryViewModel>().Select(m => m.Symbol);
             _parent.CreateFolder(symbols);
-        }
-
-        private void OnSelectedItemsCommand(IList list)
-        {
-            string message = string.Empty;
-            if (list.Count > 0)
-            {
-                message = string.Format(Resources.SelectedCount, list.Count);
-            }
-
-            Messenger.Default.Send(new NotificationMessage(message));
         }
 
         private void StopTask()

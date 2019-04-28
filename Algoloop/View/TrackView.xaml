@@ -59,7 +59,8 @@
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
                     IsReadOnly="True"
-                    FilteredItemsSource="{Binding Parameters}">
+                    ExSelectedItems="{Binding SelectedItems}"                                       
+                    ExItemsSource="{Binding Parameters}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
                         <DataGridCheckBoxColumn Header="Use" Binding="{Binding Model.UseValue}" />
@@ -78,7 +79,8 @@
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    FilteredItemsSource="{Binding Holdings}">
+                    ExSelectedItems="{Binding SelectedItems}"                                       
+                    ExItemsSource="{Binding Holdings}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
@@ -98,7 +100,8 @@
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    FilteredItemsSource="{Binding Trades}">
+                    ExSelectedItems="{Binding SelectedItems}"                                       
+                    ExItemsSource="{Binding Trades}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
                         <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>
@@ -125,7 +128,8 @@
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    FilteredItemsSource="{Binding Orders}">
+                    ExSelectedItems="{Binding SelectedItems}"                                       
+                    ExItemsSource="{Binding Orders}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
@@ -152,7 +156,8 @@
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
                     IsReadOnly="True"
-                    FilteredItemsSource="{Binding Statistics}">
+                    ExSelectedItems="{Binding SelectedItems}"                                       
+                    ExItemsSource="{Binding Statistics}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
                         <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
@@ -174,16 +179,8 @@
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
-                    FilteredItemsSource="{Binding SummarySymbols}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction
-                                Command="{Binding SelectedItemsCommand}"
-                                CommandParameter="{Binding
-                                    Path=SelectedItems,
-                                    RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding SummarySymbols}">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem
