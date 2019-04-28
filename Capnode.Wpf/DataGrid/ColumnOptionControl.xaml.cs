@@ -31,7 +31,7 @@ namespace Capnode.Wpf.DataGrid
         private FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Capnode.Wpf;component/Images/pinDown.png");
         private FilterOperationItem _removeGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Remove Grouping", "/Capnode.Wpf;component/Images/RemoveGroupBy.png");
 
-        public FilterDataGrid Grid { get; set; }
+        public ExDataGrid Grid { get; set; }
 
         public OptionColumnInfo FilterColumnInfo { get; set; }
 
@@ -128,7 +128,7 @@ namespace Capnode.Wpf.DataGrid
                     colHeader = parent as DataGridColumnHeader;
 
                 if (Grid == null)
-                    Grid = parent as FilterDataGrid;
+                    Grid = parent as ExDataGrid;
             }
 
             if (colHeader != null)

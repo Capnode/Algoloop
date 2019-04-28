@@ -70,12 +70,12 @@
       <DependentUpon>ColumnOptionControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataGrid\Enums.cs" />
-    <Compile Include="DataGrid\FilterDataGridColumns.cs" />
+    <Compile Include="DataGrid\ExDataGridColumns.cs" />
     <Compile Include="DataGrid\ExpressionHelper.cs" />
     <Compile Include="DataGrid\FilterChangedEventArgs.cs" />
     <Compile Include="DataGrid\FilterOperationItem.cs" />
-    <Compile Include="DataGrid\FilterDataGrid.xaml.cs">
-      <DependentUpon>FilterDataGrid.xaml</DependentUpon>
+    <Compile Include="DataGrid\ExDataGrid.xaml.cs">
+      <DependentUpon>ExDataGrid.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataGrid\OptionColumnInfo.cs" />
     <Compile Include="DataGrid\TypeHelper.cs" />
@@ -116,7 +116,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DataGrid\FilterDataGrid.xaml">
+    <Page Include="DataGrid\ExDataGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

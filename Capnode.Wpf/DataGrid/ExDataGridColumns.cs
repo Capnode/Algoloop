@@ -21,12 +21,12 @@ using System.Windows.Data;
 
 namespace Capnode.Wpf.DataGrid
 {
-    public static class FilterDataGridColumns
+    public static class ExDataGridColumns
     {
         static readonly Style _rightCellStyle = new Style(typeof(TextBlock));
         static readonly Style _leftCellStyle = new Style(typeof(TextBlock));
 
-        static FilterDataGridColumns()
+        static ExDataGridColumns()
         {
             _rightCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Right));
             _leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));

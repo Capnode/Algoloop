@@ -62,7 +62,7 @@ namespace Capnode.Wpf.DataGrid
                     {
                         if (Debugger.IsAttached && Debugger.IsLogging())
                         {
-                            Debug.WriteLine("Capnode.Wpf.DataGrid.FilterDataGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType?.ToString());
+                            Debug.WriteLine("Capnode.Wpf.DataGrid.ExDataGrid: BindingExpression path error: '{0}' property not found on '{1}'", binding.Path.Path, boundObjectType?.ToString());
                         }
                     }
                 }

@@ -46,7 +46,7 @@ namespace Capnode.Wpf.DataGrid
 
         public OptionColumnInfo FilterColumnInfo { get; set; }
 
-        public FilterDataGrid Grid { get; set; }
+        public ExDataGrid Grid { get; set; }
 
         private bool _CanUserFreeze = true;
         public bool CanUserFreeze
@@ -205,7 +205,7 @@ namespace Capnode.Wpf.DataGrid
                     colHeader = parent as DataGridColumnHeader;
 
                 if (Grid == null)
-                    Grid = parent as FilterDataGrid;
+                    Grid = parent as ExDataGrid;
             }
 
             if (colHeader != null)

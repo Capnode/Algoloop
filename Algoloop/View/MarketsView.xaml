@@ -200,7 +200,7 @@
                                             <Image Source="/Resources\AddList.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <wpf:FilterDataGrid
+                                    <wpf:ExDataGrid
                                         x:Name="marketSymbolList"                                        
                                         CanUserFreeze="False"
                                         CanUserSelectDistinct="True"
@@ -212,7 +212,7 @@
                                         ExSelectedItems="{Binding SelectedItems}"                                       
                                         ExItemsSource="{Binding Symbols}"                                        
                                         ExColumns="{Binding SymbolColumns}">
-                                    </wpf:FilterDataGrid>
+                                    </wpf:ExDataGrid>
                                 </DockPanel>
                             </TabItem>
                             <TabItem Header="Settings">
@@ -253,7 +253,7 @@
                                             <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                         </Button>
                                     </ToolBar>
-                                    <wpf:FilterDataGrid
+                                    <wpf:ExDataGrid
                                         x:Name="listbox"
                                         CanUserFreeze="False"
                                         CanUserSelectDistinct="True"
@@ -265,7 +265,7 @@
                                         ExSelectedItems="{Binding SelectedItems}"                                       
                                         ExItemsSource="{Binding Symbols}"
                                         ExColumns="{Binding SymbolColumns}">
-                                    </wpf:FilterDataGrid>
+                                    </wpf:ExDataGrid>
                                 </DockPanel>
                             </TabItem>
                             <TabItem Header="Settings">

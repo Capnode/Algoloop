@@ -114,7 +114,7 @@
                     <DockPanel>
                         <TabControl>
                             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
-                                <wpf:FilterDataGrid
+                                <wpf:ExDataGrid
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
@@ -157,10 +157,10 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </wpf:FilterDataGrid>
+                                </wpf:ExDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}">
-                                <wpf:FilterDataGrid
+                                <wpf:ExDataGrid
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
@@ -201,10 +201,10 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </wpf:FilterDataGrid>
+                                </wpf:ExDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}">
-                                <wpf:FilterDataGrid
+                                <wpf:ExDataGrid
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
@@ -220,7 +220,7 @@
                                         <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
                                         <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
                                     </DataGrid.Columns>
-                                </wpf:FilterDataGrid>
+                                </wpf:ExDataGrid>
                             </TabItem>
                             <TabItem Header="Settings">
                                 <xctk:PropertyGrid

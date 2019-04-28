@@ -29,10 +29,10 @@ namespace Capnode.Wpf.DataGrid
     public delegate void CancelableFilterChangedEvent(object sender, CancelableFilterChangedEventArgs e);
 
     /// <summary>
-    /// Interaction logic for FilterDataGrid.xaml
+    /// Interaction logic for ExDataGrid.xaml
     /// Based on JibGridWPF https://archive.codeplex.com/?p=jibgridwpf
     /// </summary>
-    public partial class FilterDataGrid : System.Windows.Controls.DataGrid, INotifyPropertyChanged
+    public partial class ExDataGrid : System.Windows.Controls.DataGrid, INotifyPropertyChanged
     {
         public event CancelableFilterChangedEvent BeforeFilterChanged;
         public event FilterChangedEvent AfterFilterChanged;
@@ -43,22 +43,22 @@ namespace Capnode.Wpf.DataGrid
         public static readonly DependencyProperty ExItemsSourceProperty = DependencyProperty.Register(
             "ExItemsSource",
             typeof(IEnumerable),
-            typeof(FilterDataGrid),
+            typeof(ExDataGrid),
             new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
 
         public static readonly DependencyProperty ExColumnsProperty = DependencyProperty.Register(
             "ExColumns",
             typeof(ObservableCollection<DataGridColumn>),
-            typeof(FilterDataGrid),
+            typeof(ExDataGrid),
             new PropertyMetadata(OnDataGridColumnsPropertyChanged));
 
         public static readonly DependencyProperty ExSelectedItemsProperty = DependencyProperty.Register(
             "ExSelectedItems",
             typeof(IList),
-            typeof(FilterDataGrid),
+            typeof(ExDataGrid),
             new FrameworkPropertyMetadata { BindsTwoWayByDefault = true, DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
 
-        public FilterDataGrid()
+        public ExDataGrid()
         {
             Filters = new List<ColumnFilterControl>();
             _filterHandler = new PropertyChangedEventHandler(filter_PropertyChanged);
@@ -87,7 +87,7 @@ namespace Capnode.Wpf.DataGrid
 
         public static void OnItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            FilterDataGrid g = sender as FilterDataGrid;
+            ExDataGrid g = sender as ExDataGrid;
             if (g != null)
             {
                 var list = (IEnumerable)e.NewValue;
@@ -123,7 +123,7 @@ namespace Capnode.Wpf.DataGrid
 
         private static void OnDataGridColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
         {
-            var context = source as FilterDataGrid;
+            var context = source as ExDataGrid;
 
             var oldItems = e.OldValue as ObservableCollection<DataGridColumn>;
 

@@ -550,7 +550,7 @@ namespace Algoloop.ViewModel
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
-                FilterDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties");
+                ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties");
             }
         }
     }

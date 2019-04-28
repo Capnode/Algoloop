@@ -359,7 +359,7 @@ namespace Algoloop.ViewModel
                         .StartTaskAsync()
                         .ContinueWith(m =>
                         {
-                            FilterDataGridColumns.AddPropertyColumns(TrackColumns, track.Statistics, "Statistics");
+                            ExDataGridColumns.AddPropertyColumns(TrackColumns, track.Statistics, "Statistics");
                             throttler.Release();
                         },
                         TaskScheduler.FromCurrentSynchronizationContext());
@@ -435,12 +435,12 @@ namespace Algoloop.ViewModel
                 Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
-            FilterDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false);
+            ExDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false);
             foreach (TrackModel TrackModel in Model.Tracks)
             {
                 var TrackViewModel = new TrackViewModel(this, TrackModel, _markets, _accounts, _settings);
                 Tracks.Add(TrackViewModel);
-                FilterDataGridColumns.AddPropertyColumns(TrackColumns, TrackViewModel.Statistics, "Statistics");
+                ExDataGridColumns.AddPropertyColumns(TrackColumns, TrackViewModel.Statistics, "Statistics");
             }
         }
 

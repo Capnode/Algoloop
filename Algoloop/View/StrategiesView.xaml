@@ -293,7 +293,7 @@
                                 </DockPanel>
                             </TabItem>
                             <TabItem Header="{Binding Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
-                                <wpf:FilterDataGrid
+                                <wpf:ExDataGrid
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
@@ -341,10 +341,10 @@
                                             <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
                                         </Style>
                                     </DataGrid.RowStyle>
-                                </wpf:FilterDataGrid>
+                                </wpf:ExDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Tracks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tracks ({0}), FallbackValue=Tracks}">
-                                <wpf:FilterDataGrid
+                                <wpf:ExDataGrid
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
@@ -388,7 +388,7 @@
                                             </MenuItem>
                                         </ContextMenu>
                                     </DataGrid.ContextMenu>
-                                </wpf:FilterDataGrid>
+                                </wpf:ExDataGrid>
                             </TabItem>
                         </TabControl>
                     </DockPanel>
