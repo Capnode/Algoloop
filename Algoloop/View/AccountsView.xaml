@@ -137,7 +137,7 @@
                                         <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
                                         <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
                                         <DataGridTextColumn Header="Direction" Binding="{Binding Direction}" />
-                                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" />
+                                        <DataGridTextColumn Header="Value" Binding="{Binding OrderValue}" />
                                     </DataGrid.Columns>
                                     <DataGrid.Resources>
                                         <ContextMenu
