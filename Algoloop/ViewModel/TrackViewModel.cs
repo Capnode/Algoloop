@@ -269,8 +269,16 @@ namespace Algoloop.ViewModel
 
         public void DoDeleteTrack()
         {
-            File.Delete(Model.Result);
-            File.Delete(Model.Logs);
+            if (File.Exists(Model.Result))
+            {
+                File.Delete(Model.Result);
+            }
+
+            if (File.Exists(Model.Logs))
+            {
+                File.Delete(Model.Logs);
+            }
+
             var charts = Charts;
             charts.Clear();
             Charts = null;
