@@ -78,6 +78,7 @@ namespace Algoloop.View
         private void OnItemsSourceChanged(IReadOnlyList<ChartViewModel> charts)
         {
             // Clear charts
+            _combobox.Items.Clear();
             _models.Clear();
             if (charts == null)
                 return;
@@ -89,6 +90,9 @@ namespace Algoloop.View
                 _combobox.Items.Add(model);
                 selected = false;
             }
+
+            _combobox.SelectedIndex = 0;
+            _combobox.Visibility = _combobox.Items.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
 
             RedrawCharts();
         }
