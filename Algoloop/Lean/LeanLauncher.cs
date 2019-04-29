@@ -74,6 +74,11 @@ namespace Algoloop.Lean
             return model;
         }
 
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
+
         private static bool SetConfig(TrackModel model, AccountModel account, SettingService settings)
         {
             var parameters = new Dictionary<string, string>();

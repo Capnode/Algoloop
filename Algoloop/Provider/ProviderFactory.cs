@@ -66,6 +66,11 @@ namespace Algoloop.Provider
             return market;
         }
 
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
+
         public static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
         {
             IProvider provider = CreateProvider(market.Provider);

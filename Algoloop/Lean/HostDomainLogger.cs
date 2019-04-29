@@ -42,5 +42,10 @@ namespace Algoloop.Lean
         {
             Log.Trace(text);
         }
+
+        public override object InitializeLifetimeService()
+        {
+            return null;
+        }
     }
 }
