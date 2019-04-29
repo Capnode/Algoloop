@@ -13,8 +13,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
@@ -251,10 +253,27 @@ namespace Algoloop.ViewModel
         private void DataToModel()
         {
             Model.Strategies.Clear();
+            string folder = Directory.GetCurrentDirectory();
+            var inUse = new List<string>();
             foreach (StrategyViewModel strategy in Strategies)
             {
                 Model.Strategies.Add(strategy.Model);
                 strategy.DataToModel();
+
+                // Collect files in use
+                inUse.AddRange(strategy.Model.Tracks.Select(m => Path.Combine(folder, m.Result)));
+                inUse.AddRange(strategy.Model.Tracks.Select(m => Path.Combine(folder, m.Logs)));
+            }
+
+            // Remove Track files not in use
+            DirectoryInfo d = new DirectoryInfo(TrackViewModel.Folder);
+            FileInfo[] Files = d.GetFiles(Path.Combine("*"));
+            foreach (FileInfo file in Files)
+            {
+                if (!inUse.Contains(file.FullName))
+                {
+                    File.Delete(file.FullName);
+                }
             }
         }
 

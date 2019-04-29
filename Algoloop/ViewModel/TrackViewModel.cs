@@ -45,6 +45,8 @@ namespace Algoloop.ViewModel
 {
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable
     {
+        public const string Folder = "Tracks";
+
         private StrategyViewModel _parent;
         private readonly MarketService _markets;
         private readonly AccountService _accounts;
@@ -269,16 +271,6 @@ namespace Algoloop.ViewModel
 
         public void DoDeleteTrack()
         {
-            if (File.Exists(Model.Result))
-            {
-                File.Delete(Model.Result);
-            }
-
-            if (File.Exists(Model.Logs))
-            {
-                File.Delete(Model.Logs);
-            }
-
             var charts = Charts;
             charts.Clear();
             Charts = null;
@@ -554,11 +546,10 @@ namespace Algoloop.ViewModel
         private void SplitModelToFiles(TrackModel model)
         {
             // Create folder for track files
-            string folder = "Tracks";
-            Directory.CreateDirectory(folder);
+            Directory.CreateDirectory(Folder);
 
             // Save result
-            string resultFileTemplate = Path.Combine(folder, "result.json");
+            string resultFileTemplate = Path.Combine(Folder, "result.json");
             string resultFile = UniqueFileName(resultFileTemplate);
             using (StreamWriter file = File.CreateText(resultFile))
             {
@@ -566,7 +557,7 @@ namespace Algoloop.ViewModel
             }
 
             // Save logs
-            string logFileTemplate = Path.Combine(folder, "log.log");
+            string logFileTemplate = Path.Combine(Folder, "log.log");
             string logFile = UniqueFileName(logFileTemplate);
             using (StreamWriter file = File.CreateText(logFile))
             {
