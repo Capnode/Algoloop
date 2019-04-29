@@ -7,6 +7,19 @@
     mc:Ignorable="d"
     d:DesignHeight="126" d:DesignWidth="225">
     <DockPanel>
+        <ComboBox
+            DockPanel.Dock="Top"
+            DropDownClosed="_combobox_DropDownClosed"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            x:Name="_combobox">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding Title}"
+                          IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"
+                          Tag="{RelativeSource FindAncestor, AncestorType={x:Type ComboBox}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
         <ams:StockChart
             Name="stockChart"
             Height="Auto"
@@ -64,7 +77,7 @@
                         <ams:PresetPeriodButton Interval="Year" Quantity="0" ToolTip="Year to date">YTD</ams:PresetPeriodButton>
                         <ams:PresetPeriodButton Interval="Year" Quantity="1" ToolTip="1 year">1Y</ams:PresetPeriodButton>
                         <ams:PresetPeriodButton Interval="Year" Quantity="3" ToolTip="3 years">3Y</ams:PresetPeriodButton>
-                        <ams:PresetPeriodButton Quantity="NaN" ToolTip="All available data">MAX</ams:PresetPeriodButton>
+                        <ams:PresetPeriodButton Interval="Year" Quantity="NaN"  ToolTip="All available data">MAX</ams:PresetPeriodButton>
                     </ams:PeriodSelector.PresetPeriods>
                 </ams:PeriodSelector>
             </ams:StockChart.PeriodSelector>

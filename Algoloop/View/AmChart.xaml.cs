@@ -33,6 +33,8 @@ namespace Algoloop.View
             DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
             typeof(AmChart), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
 
+        private List<Model> _models = new List<Model>();
+
         public AmChart()
         {
             InitializeComponent();
@@ -76,58 +78,79 @@ namespace Algoloop.View
         private void OnItemsSourceChanged(IReadOnlyList<ChartViewModel> charts)
         {
             // Clear charts
-            stockChart.DataSets.Clear();
-            Debug.Assert(stockChart.Charts.Count == 1);
-            stockChart.Charts[0].Graphs.Clear();
+            _models.Clear();
             if (charts == null)
                 return;
 
-            Visibility visibility = Visibility.Visible;
+            bool selected = true;
             foreach (ChartViewModel chart in charts)
             {
-                DataSet dataset = null;
-                QuantConnect.Data.BaseData item = chart.Data?.FirstOrDefault();
-                if (item == null)
-                {
-                    dataset = ChartSeries(chart);
-                }
-                else if (item.GetType() == typeof(QuoteBar))
-                {
-                    dataset = QuoteBarData(chart);
-                }
-                else if (item.GetType() == typeof(TradeBar))
-                {
-                    dataset = QuoteBarData(chart);
-                }
-                else if (item.GetType() == typeof(Tick))
-                {
-                    dataset = TickData(chart);
-                }
-
-                stockChart.DataSets.Add(dataset);
-
-                var graph = new Graph
-                {
-                    GraphType = ToGraphType(chart.Series.SeriesType),
-                    Brush = ToMediaBrush(chart.Series.Color),
-                    BulletType = GraphBulletType.RoundOutline,
-                    CursorBrush = ToMediaBrush(chart.Series.Color),
-                    CursorSize = 6,
-                    DataField = DataItemField.Value,
-                    ShowLegendKey = true,
-                    ShowLegendTitle = true,
-                    LegendItemType = AmCharts.Windows.Stock.Primitives.LegendItemType.Value,
-                    LegendValueLabelText = "",
-                    LegendPeriodItemType = AmCharts.Windows.Stock.Primitives.LegendItemType.Value,
-                    LegendValueFormatString = "0.0000",
-                    PeriodValue = PeriodValue.Last,
-                    DataSet = dataset,
-                    Visibility = visibility
-                };
-
-                stockChart.Charts[0].Graphs.Add(graph);
-                visibility = Visibility.Hidden;
+                var model = new Model(chart, selected);
+                _combobox.Items.Add(model);
+                selected = false;
             }
+
+            RedrawCharts();
+        }
+
+        private void RedrawCharts()
+        {
+            stockChart.DataSets.Clear();
+            Debug.Assert(stockChart.Charts.Count == 1);
+            stockChart.Charts[0].Graphs.Clear();
+
+            foreach (var item in _combobox.Items)
+            {
+                if (item is Model model && model.IsSelected)
+                {
+                    RedrawChart(model);
+                }
+            }
+        }
+
+        private void RedrawChart(Model model)
+        {
+            DataSet dataset = null;
+            QuantConnect.Data.BaseData item = model.Chart.Data?.FirstOrDefault();
+            if (item == null)
+            {
+                dataset = ChartSeries(model.Chart);
+            }
+            else if (item.GetType() == typeof(QuoteBar))
+            {
+                dataset = QuoteBarData(model.Chart);
+            }
+            else if (item.GetType() == typeof(TradeBar))
+            {
+                dataset = QuoteBarData(model.Chart);
+            }
+            else if (item.GetType() == typeof(Tick))
+            {
+                dataset = TickData(model.Chart);
+            }
+
+            stockChart.DataSets.Add(dataset);
+
+            var graph = new Graph
+            {
+                GraphType = ToGraphType(model.Chart.Series.SeriesType),
+                Brush = ToMediaBrush(model.Chart.Series.Color),
+                BulletType = GraphBulletType.RoundOutline,
+                CursorBrush = ToMediaBrush(model.Chart.Series.Color),
+                CursorSize = 6,
+                DataField = DataItemField.Value,
+                ShowLegendKey = true,
+                ShowLegendTitle = true,
+                LegendItemType = AmCharts.Windows.Stock.Primitives.LegendItemType.Value,
+                LegendValueLabelText = "",
+                LegendPeriodItemType = AmCharts.Windows.Stock.Primitives.LegendItemType.Value,
+                LegendValueFormatString = "0.0000",
+                PeriodValue = PeriodValue.Last,
+                DataSet = dataset,
+                Visibility = Visibility.Visible
+            };
+
+            stockChart.Charts[0].Graphs.Add(graph);
         }
 
         private static DataSet ChartSeries(ChartViewModel chart)
@@ -226,5 +249,24 @@ namespace Algoloop.View
         {
             return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, color.R, color.G, color.B));
         }
+
+        private void _combobox_DropDownClosed(object sender, EventArgs e)
+        {
+            RedrawCharts();
+        }
+    }
+
+    class Model
+    {
+        public Model(ChartViewModel chart, bool selected)
+        {
+            Chart = chart;
+            Title = chart.Title;
+            IsSelected = selected;
+        }
+
+        public ChartViewModel Chart { get; }
+        public string Title { get; }
+        public bool IsSelected { get; set; }
     }
 }
