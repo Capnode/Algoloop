@@ -137,7 +137,7 @@ namespace Algoloop.Lean
             Config.Set("symbol-minute-limit", "10000");
             Config.Set("symbol-second-limit", "10000");
             Config.Set("symbol-tick-limit", "10000");
-            Config.Set("maximum-data-points-per-chart-series", "4000");
+            Config.Set("maximum-data-points-per-chart-series", "10000");
             Config.Set("force-exchange-always-open", "false");
             Config.Set("version-id", "");
             Config.Set("security-data-feeds", "");
