@@ -49,7 +49,6 @@ namespace QuantConnect
                 //Create our output
                 using (var stream = new ZipOutputStream(File.Create(zipPath)))
                 {
-                    stream.SetLevel(0);
                     foreach (var filename in filenamesAndData.Keys)
                     {
                         //Create the space in the zip file:
