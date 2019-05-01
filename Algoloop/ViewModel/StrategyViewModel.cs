@@ -262,8 +262,7 @@ namespace Algoloop.ViewModel
 
         internal bool DeleteTrack(TrackViewModel track)
         {
-            bool ok = Tracks.Remove(track);
-            return ok;
+            return Tracks.Remove(track);
         }
 
         internal void CloneStrategy(StrategyModel strategyModel)
@@ -280,8 +279,10 @@ namespace Algoloop.ViewModel
 
             foreach (TrackViewModel track in list)
             {
-               track.DoDeleteTrack();
+               Tracks.Remove(track);
             }
+
+            DataToModel();
         }
 
         private void DoSelectItem(TrackViewModel track)
