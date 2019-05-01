@@ -261,14 +261,14 @@ namespace Algoloop.ViewModel
                 strategy.DataToModel();
 
                 // Collect files in use
-                inUse.AddRange(strategy.Model.Tracks.Select(m => Path.Combine(folder, m.Result)));
-                inUse.AddRange(strategy.Model.Tracks.Select(m => Path.Combine(folder, m.Logs)));
+                inUse.AddRange(strategy.Model.Tracks
+                    .Where(m => !string.IsNullOrEmpty(m.ZipFile))
+                    .Select(p => Path.Combine(folder, p.ZipFile)));
             }
 
             // Remove Track files not in use
             DirectoryInfo d = new DirectoryInfo(TrackViewModel.Folder);
-            FileInfo[] Files = d.GetFiles(Path.Combine("*"));
-            foreach (FileInfo file in Files)
+            foreach (FileInfo file in d.GetFiles())
             {
                 if (!inUse.Contains(file.FullName))
                 {

@@ -201,6 +201,11 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
+        public string ZipFile { get; set; }
+
+        [ReadOnly(true)]
+        [Browsable(false)]
+        [DataMember]
         public IDictionary<string, decimal?> Statistics { get; set; }
 
         public void Refresh()

@@ -21,6 +21,7 @@ using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using Ionic.Zip;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -46,6 +47,9 @@ namespace Algoloop.ViewModel
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable
     {
         public const string Folder = "Tracks";
+        private const string _logFile = "Logs.log";
+        private const string _resultFile = "Result.json";
+        private const string _zipFile = "track.zip";
 
         private StrategyViewModel _parent;
         private readonly MarketService _markets;
@@ -407,38 +411,40 @@ namespace Algoloop.ViewModel
                 _parameters.Add(parameterViewModel);
             }
 
-            // Read Logs
-            if (File.Exists(Model.Logs))
-            {
-                using (StreamReader r = new StreamReader(Model.Logs))
-                {
-                    _logs = r.ReadToEnd();
-                }
-            }
-            else
-            {
-                _logs = string.Empty;
-            }
-
-            // Read results
-            BacktestResult result = null;
-            if (File.Exists(Model.Logs))
-            {
-                using (StreamReader r = new StreamReader(Model.Result))
-                {
-                    using (JsonReader reader = new JsonTextReader(r))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        serializer.Converters.Add(new OrderJsonConverter());
-                        result = serializer.Deserialize<BacktestResult>(reader);
-                    }
-                }
-            }
-
-            // Process results
-            if (result == null)
+            // Find track zipfile
+            if (!File.Exists(Model.ZipFile))
                 return;
 
+            // Unzip log file
+            ZipFile zipFile;
+            using (StreamReader logStream = Compression.Unzip(Model.ZipFile, _logFile, out zipFile))
+            using (zipFile)
+            {
+                if (logStream != null)
+                {
+                    _logs = logStream.ReadToEnd();
+                }
+            }
+
+            // Unzip result file
+            BacktestResult result = null;
+            using (StreamReader resultStream = Compression.Unzip(Model.ZipFile, _resultFile, out zipFile))
+            using (zipFile)
+            {
+                if (resultStream == null)
+                    return;
+
+                using (JsonReader reader = new JsonTextReader(resultStream))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Converters.Add(new OrderJsonConverter());
+                    result = serializer.Deserialize<BacktestResult>(reader);
+                }
+            }
+
+            if (result == null)
+                return;
+            
             // Closed trades result
             result.TotalPerformance.ClosedTrades.ForEach(m => _trades.Add(m));
             foreach (Trade trade in _trades)
@@ -548,21 +554,14 @@ namespace Algoloop.ViewModel
             // Create folder for track files
             Directory.CreateDirectory(Folder);
 
-            // Save result
-            string resultFileTemplate = Path.Combine(Folder, "result.json");
-            string resultFile = UniqueFileName(resultFileTemplate);
-            using (StreamWriter file = File.CreateText(resultFile))
+            // Save logs and result to zipfile
+            string zipFileTemplate = Path.Combine(Folder, _zipFile);
+            string zipFile = UniqueFileName(zipFileTemplate);
+            Compression.ZipData(zipFile, new Dictionary<string, string>
             {
-                file.Write(model.Result);
-            }
-
-            // Save logs
-            string logFileTemplate = Path.Combine(Folder, "log.log");
-            string logFile = UniqueFileName(logFileTemplate);
-            using (StreamWriter file = File.CreateText(logFile))
-            {
-                file.Write(model.Logs);
-            }
+                { _logFile, model.Logs },
+                { _resultFile, model.Result }
+            });
 
             // Process results
             BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(model.Result, new[] { new OrderJsonConverter() });
@@ -584,8 +583,9 @@ namespace Algoloop.ViewModel
             }
 
             // Replace results and logs with file references
-            model.Result = resultFile;
-            model.Logs = logFile;
+            model.Result = string.Empty;
+            model.Logs = string.Empty;
+            model.ZipFile = zipFile;
         }
 
         private static string UniqueFileName(string path)
