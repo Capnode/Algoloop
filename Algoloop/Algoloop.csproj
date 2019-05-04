@@ -260,7 +260,6 @@
     <Compile Include="Provider\Fxcm.cs" />
     <Compile Include="Provider\FxcmVolume.cs" />
     <Compile Include="Provider\Gdax.cs" />
-    <Compile Include="Provider\Google.cs" />
     <Compile Include="Provider\Ib.cs" />
     <Compile Include="Provider\Iex.cs" />
     <Compile Include="Provider\IProvider.cs" />
