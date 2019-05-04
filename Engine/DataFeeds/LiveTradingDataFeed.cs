@@ -210,6 +210,12 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                         Tiingo.SetAuthCode(Config.Get("tiingo-auth-token"));
                     }
 
+                    if (!USEnergyInformation.IsAuthCodeSet)
+                    {
+                        // we're not using the SubscriptionDataReader, so be sure to set the auth token here
+                        USEnergyInformation.SetAuthCode(Config.Get("us-energy-information-auth-token"));
+                    }
+
                     var factory = new LiveCustomDataSubscriptionEnumeratorFactory(_timeProvider);
                     var enumeratorStack = factory.CreateEnumerator(request, _dataProvider);
 
@@ -219,6 +225,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     _customExchange.SetDataHandler(request.Configuration.Symbol, data =>
                     {
                         enqueable.Enqueue(data);
+
+                        subscription.OnNewDataAvailable();
 
                         UpdateSubscriptionRealTimePrice(
                             subscription,
@@ -235,7 +243,13 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     switch (request.Configuration.TickType)
                     {
                         case TickType.Quote:
-                            var quoteBarAggregator = new QuoteBarBuilderEnumerator(request.Configuration.Increment, request.Security.Exchange.TimeZone, _timeProvider);
+                            var quoteBarAggregator = new QuoteBarBuilderEnumerator(
+                                request.Configuration.Increment,
+                                request.Security.Exchange.TimeZone,
+                                _timeProvider,
+                                true,
+                                (sender, args) => subscription.OnNewDataAvailable());
+
                             _exchange.AddDataHandler(request.Configuration.Symbol, data =>
                             {
                                 var tick = data as Tick;
@@ -256,7 +270,13 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
                         case TickType.Trade:
                         default:
-                            var tradeBarAggregator = new TradeBarBuilderEnumerator(request.Configuration.Increment, request.Security.Exchange.TimeZone, _timeProvider);
+                            var tradeBarAggregator = new TradeBarBuilderEnumerator(
+                                request.Configuration.Increment,
+                                request.Security.Exchange.TimeZone,
+                                _timeProvider,
+                                true,
+                                (sender, args) => subscription.OnNewDataAvailable());
+
                             var auxDataEnumerator = new LiveAuxiliaryDataEnumerator(request.Security.Exchange.TimeZone, _timeProvider);
 
                             _exchange.AddDataHandler(request.Configuration.Symbol, data =>
@@ -264,6 +284,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                                 if (data.DataType == MarketDataType.Auxiliary)
                                 {
                                     auxDataEnumerator.Enqueue(data);
+
+                                    subscription.OnNewDataAvailable();
                                 }
                                 else
                                 {
@@ -287,7 +309,13 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                             break;
 
                         case TickType.OpenInterest:
-                            var oiAggregator = new OpenInterestEnumerator(request.Configuration.Increment, request.Security.Exchange.TimeZone, _timeProvider);
+                            var oiAggregator = new OpenInterestEnumerator(
+                                request.Configuration.Increment,
+                                request.Security.Exchange.TimeZone,
+                                _timeProvider,
+                                true,
+                                (sender, args) => subscription.OnNewDataAvailable());
+
                             _exchange.AddDataHandler(request.Configuration.Symbol, data =>
                             {
                                 var tick = data as Tick;
@@ -308,6 +336,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     _exchange.SetDataHandler(request.Configuration.Symbol, data =>
                     {
                         tickEnumerator.Enqueue(data);
+
+                        subscription.OnNewDataAvailable();
 
                         if (data.DataType != MarketDataType.Auxiliary)
                         {
@@ -354,6 +384,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// <param name="request">The subscription request</param>
         private Subscription CreateUniverseSubscription(SubscriptionRequest request)
         {
+            Subscription subscription = null;
+
             // TODO : Consider moving the creating of universe subscriptions to a separate, testable class
 
             // grab the relevant exchange hours
@@ -397,6 +429,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                         var collection = new BaseDataCollection(currentFrontierUtcTime, symbol);
                         var changes = _universeSelection.ApplyUniverseSelection(userDefined, currentFrontierUtcTime, collection);
                         _algorithm.OnSecuritiesChanged(changes);
+
+                        subscription.OnNewDataAvailable();
                     };
                 }
             }
@@ -417,6 +451,9 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 _exchange.AddDataHandler(normalizedSymbol, data =>
                 {
                     enqueable.Enqueue(data);
+
+                    subscription.OnNewDataAvailable();
+
                 });
                 enumerator = enqueable;
             }
@@ -483,7 +520,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
             // create the subscription
             var subscriptionDataEnumerator = SubscriptionData.Enumerator(request.Configuration, request.Security, tzOffsetProvider, enumerator);
-            var subscription = new Subscription(request, subscriptionDataEnumerator, tzOffsetProvider);
+            subscription = new Subscription(request, subscriptionDataEnumerator, tzOffsetProvider);
 
             return subscription;
         }
