@@ -17,6 +17,7 @@ using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -148,6 +149,11 @@ namespace Algoloop.Model
         {
             Folders.Add(folder);
             ModelChanged?.Invoke();
+        }
+
+        internal IEnumerable<SymbolModel> GetActiveSymbols(FolderModel folder)
+        {
+            return Symbols.Where(s => s.Active && folder.Symbols.Contains(s.Name));
         }
     }
 }

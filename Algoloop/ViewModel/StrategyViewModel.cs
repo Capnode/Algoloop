@@ -304,9 +304,10 @@ namespace Algoloop.ViewModel
             }
             else
             {
-                IEnumerable<SymbolViewModel> symbols = SelectedFolder.Symbols
+                IEnumerable<SymbolViewModel> symbols = _markets
+                    .GetActiveSymbols(Model.Provider, SelectedFolder)
                     .Where(s => !Symbols.Any(p => p.Model.Name.Equals(s)))
-                    .Select(m => new SymbolViewModel(this, new SymbolModel(m)));
+                    .Select(m => new SymbolViewModel(this, m));
                 Symbols.AddRange(symbols);
             }
 

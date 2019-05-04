@@ -41,5 +41,10 @@ namespace Algoloop.Service
         {
             return Markets.Find(m => m.Name.Equals(provider));
         }
+
+        internal IEnumerable<SymbolModel> GetActiveSymbols(string provider, FolderModel folder)
+        {
+            return GetMarket(provider)?.GetActiveSymbols(folder);
+        }
     }
 }
