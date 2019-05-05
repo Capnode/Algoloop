@@ -151,71 +151,43 @@ namespace Algoloop.ViewModel
 
         public SyncObservableCollection<SymbolViewModel> Symbols
         {
-            get
-            {
-                LoadTrack();
-                return _symbols;
-            }
+            get => _symbols;
             set => Set(ref _symbols, value);
         }
 
         public SyncObservableCollection<ParameterViewModel> Parameters
         {
-            get
-            {
-                LoadTrack();
-                return _parameters;
-            }
+            get => _parameters;
             set => Set(ref _parameters, value);        
         }
 
         public SyncObservableCollection<Trade> Trades
         {
-            get
-            {
-                LoadTrack();
-                return _trades;
-            }
+            get => _trades;
             set => Set(ref _trades, value);
         }
 
         public SyncObservableCollection<SymbolSummaryViewModel> SummarySymbols
         {
-            get
-            {
-                LoadTrack();
-                return _summarySymbols;
-            }
+            get => _summarySymbols;
             set => Set(ref _summarySymbols, value);
         }
 
         public SyncObservableCollection<OrderViewModel> Orders
         {
-            get
-            {
-                LoadTrack();
-                return _orders;
-            }
+            get => _orders;
             set => Set(ref _orders, value);
         }
 
         public SyncObservableCollection<HoldingViewModel> Holdings
         {
-            get
-            {
-                LoadTrack();
-                return _holdings;
-            }
+            get => _holdings;
             set => Set(ref _holdings, value);
         }
 
         public SyncObservableCollection<ChartViewModel> Charts
         {
-            get
-            {
-                LoadTrack();
-                return _charts;
-            }
+            get => _charts;
             set => Set(ref _charts, value);
         }
 
@@ -293,6 +265,11 @@ namespace Algoloop.ViewModel
         public void Refresh()
         {
             Model.Refresh();
+            if (!_loaded)
+            {
+                _loaded = true;
+                LoadTrack();
+            }
         }
 
         internal async Task StartTaskAsync()
@@ -392,11 +369,6 @@ namespace Algoloop.ViewModel
 
         private void LoadTrack()
         {
-            if (_loaded)
-                return;
-
-            _loaded = true;
-
             // Get symbols from model
             foreach (SymbolModel symbolModel in Model.Symbols)
             {

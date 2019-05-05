@@ -178,7 +178,9 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = true;
                 if (vm != null)
+                {
                     vm.Refresh();
+                }
 
                 SelectedItem = vm;
             }
