@@ -242,7 +242,7 @@ namespace Algoloop.ViewModel
 
         public override string ToString()
         {
-            return _model.Name;
+            return Model.Name;
         }
 
         public void DoDeleteTrack()
@@ -267,8 +267,7 @@ namespace Algoloop.ViewModel
             Model.Refresh();
             if (!_loaded)
             {
-                _loaded = true;
-                LoadTrack();
+                _loaded = LoadTrack();
             }
         }
 
@@ -349,43 +348,49 @@ namespace Algoloop.ViewModel
         internal void DataFromModel()
         {
             // Cleanup
-            _symbols.Clear();
-            _parameters.Clear();
-            _trades.Clear();
-            _orders.Clear();
-            _holdings.Clear();
-            var charts = _charts;
+            Symbols.Clear();
+            Parameters.Clear();
+            Trades.Clear();
+            Orders.Clear();
+            Holdings.Clear();
+
+            var charts = Charts;
             charts.Clear();
-            _charts = null;
+            Charts = null;
             Charts = charts;
-            RaisePropertyChanged(() => Logs);
-            RaisePropertyChanged(() => Loglines);
+
+            Logs = string.Empty;
 
             // Statistics results
             Statistics = Model.Statistics == null 
                 ? new SafeDictionary<string, decimal?>() 
                 : new SafeDictionary<string, decimal?>(Model.Statistics);
+
+            if (!_loaded && IsSelected)
+            {
+                _loaded = LoadTrack();
+            }
         }
 
-        private void LoadTrack()
+        private bool LoadTrack()
         {
             // Get symbols from model
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 var symbolViewModel = new SymbolViewModel(null, symbolModel);
-                _symbols.Add(symbolViewModel);
+                Symbols.Add(symbolViewModel);
             }
 
             // Get parameters from model
             foreach (ParameterModel parameterModel in Model.Parameters)
             {
                 var parameterViewModel = new ParameterViewModel(null, parameterModel);
-                _parameters.Add(parameterViewModel);
+                Parameters.Add(parameterViewModel);
             }
 
             // Find track zipfile
             if (!File.Exists(Model.ZipFile))
-                return;
+                return false;
 
             // Unzip log file
             ZipFile zipFile;
@@ -394,7 +399,7 @@ namespace Algoloop.ViewModel
             {
                 if (logStream != null)
                 {
-                    _logs = logStream.ReadToEnd();
+                    Logs = logStream.ReadToEnd();
                 }
             }
 
@@ -404,7 +409,7 @@ namespace Algoloop.ViewModel
             using (zipFile)
             {
                 if (resultStream == null)
-                    return;
+                    return true;
 
                 using (JsonReader reader = new JsonTextReader(resultStream))
                 {
@@ -415,29 +420,29 @@ namespace Algoloop.ViewModel
             }
 
             if (result == null)
-                return;
+                return true;
             
             // Closed trades result
-            result.TotalPerformance.ClosedTrades.ForEach(m => _trades.Add(m));
-            foreach (Trade trade in _trades)
+            result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
+            foreach (Trade trade in Trades)
             {
-                SymbolSummaryViewModel summary = _summarySymbols.FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value));
+                SymbolSummaryViewModel summary = SummarySymbols.FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value));
                 if (summary == null)
                 {
                     summary = new SymbolSummaryViewModel(trade.Symbol);
-                    _summarySymbols.Add(summary);
+                    SummarySymbols.Add(summary);
                 }
 
                 summary.AddTrade(trade);
             }
 
-            _summarySymbols.ToList().ForEach(m => m.Calculate());
+            SummarySymbols.ToList().ForEach(m => m.Calculate());
 
             // Orders result
             foreach (var pair in result.Orders.OrderBy(o => o.Key))
             {
                 Order order = pair.Value;
-                _orders.Add(new OrderViewModel(order));
+                Orders.Add(new OrderViewModel(order));
                 if (order.Status.Equals(OrderStatus.Submitted)
                     || order.Status.Equals(OrderStatus.Canceled)
                     || order.Status.Equals(OrderStatus.CancelPending)
@@ -446,7 +451,7 @@ namespace Algoloop.ViewModel
                     || order.Status.Equals(OrderStatus.Invalid))
                     continue;
 
-                HoldingViewModel holding = _holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
+                HoldingViewModel holding = Holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
                 if (holding == null)
                 {
                     holding = new HoldingViewModel(order.Symbol)
@@ -457,7 +462,7 @@ namespace Algoloop.ViewModel
                         Duration = (order.LastUpdateTime ?? Model.EndDate) - order.CreatedTime
                     };
 
-                    _holdings.Add(holding);
+                    Holdings.Add(holding);
                 }
                 else
                 {
@@ -467,7 +472,7 @@ namespace Algoloop.ViewModel
                     holding.Profit += order.Value;
                     if (holding.Quantity == 0)
                     {
-                        _holdings.Remove(holding);
+                        Holdings.Remove(holding);
                     }
                 }
             }
@@ -481,6 +486,8 @@ namespace Algoloop.ViewModel
             {
                 Log.Trace($"Strategy {Model.Name} {ex.GetType()}: {ex.Message}");
             }
+
+            return true;
         }
 
         private void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
@@ -671,20 +678,20 @@ namespace Algoloop.ViewModel
             Model.Result = null;
             Model.Statistics = null;
 
-            var charts = _charts;
+            var charts = Charts;
             charts.Clear();
             Charts = null;
             Charts = charts;
 
             Logs = null;
 
-            _orders.Clear();
-            _holdings.Clear();
-            _trades.Clear();
-            _summarySymbols.Clear();
+            Orders.Clear();
+            Holdings.Clear();
+            Trades.Clear();
+            SummarySymbols.Clear();
 
-            _statistics.Clear();
-            IDictionary<string, decimal?> statistics = _statistics;
+            Statistics.Clear();
+            IDictionary<string, decimal?> statistics = Statistics;
             Statistics = null;
             Statistics = statistics;
 
@@ -693,7 +700,7 @@ namespace Algoloop.ViewModel
 
         private void ParseCharts(Result result)
         {
-            SyncObservableCollection<ChartViewModel> workCharts = _charts;
+            SyncObservableCollection<ChartViewModel> workCharts = Charts;
             Debug.Assert(workCharts.Count == 0);
 
             var series = new Series("Net profit", SeriesType.Line, "$", Color.Green, ScatterMarkerSymbol.Diamond);
