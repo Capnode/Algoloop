@@ -314,6 +314,12 @@ namespace Algoloop.ViewModel
 
                 _leanEngine.Dispose();
                 model.Completed = true;
+
+                // Split result and logs to separate files
+                lock (mutex)
+                {
+                    SplitModelToFiles(model);
+                }
             }
             catch (AppDomainUnloadedException)
             {
@@ -323,12 +329,6 @@ namespace Algoloop.ViewModel
             {
                 Log.Trace($"{ex.GetType()}: {ex.Message}");
                 _leanEngine.Dispose();
-            }
-
-            // Split result and logs to separate files
-            lock (mutex)
-            {
-                SplitModelToFiles(model);
             }
 
             // Update view
