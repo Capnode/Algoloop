@@ -21,6 +21,7 @@ using QuantConnect.ToolBox.AlgoSeekFuturesConverter;
 using QuantConnect.ToolBox.AlgoSeekOptionsConverter;
 using QuantConnect.ToolBox.BitfinexDownloader;
 using QuantConnect.ToolBox.CoarseUniverseGenerator;
+using QuantConnect.ToolBox.CoinApiDataConverter;
 using QuantConnect.ToolBox.CryptoiqDownloader;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using QuantConnect.ToolBox.FxcmDownloader;
@@ -142,6 +143,10 @@ namespace QuantConnect.ToolBox
                                                                      GetParameterOrExit(optionsObject, "date"),
                                                                      GetParameterOrDefault(optionsObject, "exchange", string.Empty));
                         break;
+                    case "cadc":
+                    case "coinapidataconverter":
+                        CoinApiDataConverterProgram.CoinApiDataConverter(GetParameterOrExit(optionsObject, "source-dir"));
+                        break;
                     case "nmdc":
                     case "nsemarketdataconverter":
                         NseMarketDataConverterProgram.NseMarketDataConverter(GetParameterOrExit(optionsObject, "source-dir"),
@@ -160,15 +165,21 @@ namespace QuantConnect.ToolBox
                     case "rdg":
                     case "randomdatagenerator":
                         RandomDataGeneratorProgram.RandomDataGenerator(
-                            GetParameterOrExit(optionsObject, "from-date"),
-                            GetParameterOrExit(optionsObject, "to-date"),
+                            GetParameterOrExit(optionsObject, "start"),
+                            GetParameterOrExit(optionsObject, "end"),
                             GetParameterOrExit(optionsObject, "symbol-count"),
                             GetParameterOrDefault(optionsObject, "market", null),
                             GetParameterOrDefault(optionsObject, "security-type", "Equity"),
                             GetParameterOrDefault(optionsObject, "resolution", "Minute"),
                             GetParameterOrDefault(optionsObject, "data-density", "Dense"),
                             GetParameterOrDefault(optionsObject, "include-coarse", "true"),
-                            GetParameterOrDefault(optionsObject, "quote-trade-ratio", "1")
+                            GetParameterOrDefault(optionsObject, "quote-trade-ratio", "1"),
+                            GetParameterOrDefault(optionsObject, "random-seed", null),
+                            GetParameterOrDefault(optionsObject, "ipo-percentage", "5.0"),
+                            GetParameterOrDefault(optionsObject, "rename-percentage", "30.0"),
+                            GetParameterOrDefault(optionsObject, "splits-percentage", "15.0"),
+                            GetParameterOrDefault(optionsObject, "dividends-percentage", "60.0"),
+                            GetParameterOrDefault(optionsObject, "dividend-every-quarter-percentage", "30.0")
                         );
                         break;
                     default:

@@ -207,6 +207,9 @@
   <ItemGroup>
     <Compile Include="BitfinexDownloader\BitfinexDataDownloader.cs" />
     <Compile Include="BitfinexDownloader\BitfinexDownloaderProgram.cs" />
+    <Compile Include="CoinApiDataConverter\CoinApiDataConverterProgram.cs" />
+    <Compile Include="CoinApiDataConverter\CoinApiDataReader.cs" />
+    <Compile Include="CoinApiDataConverter\CoinApiEntryData.cs" />
     <Compile Include="GDAXDownloader\GDAXDownloader.cs" />
     <Compile Include="GDAXDownloader\GDAXDownloaderProgram.cs" />
     <Compile Include="GzipStreamProvider.cs" />
@@ -216,6 +219,7 @@
     <Compile Include="IEX\IEXDownloaderProgram.cs" />
     <Compile Include="IVolatilityEquityConverter\IVolatilityEquityConverterProgram.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="RandomDataGenerator\DividendSplitMapGenerator.cs" />
     <Compile Include="RandomDataGenerator\ConsoleLeveledOutput.cs" />
     <Compile Include="RandomDataGenerator\DataDensity.cs" />
     <Compile Include="RandomDataGenerator\RandomDataGeneratorSettings.cs" />
