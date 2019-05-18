@@ -37,14 +37,14 @@ namespace Algoloop.Service
             return Markets;
         }
 
-        internal MarketModel GetMarket(string provider)
+        internal MarketModel GetMarket(string market)
         {
-            return Markets.Find(m => m.Name.Equals(provider));
+            return Markets.Find(m => m.Name.Equals(market));
         }
 
-        internal IEnumerable<SymbolModel> GetActiveSymbols(string provider, FolderModel folder)
+        internal IEnumerable<SymbolModel> GetActiveSymbols(string market, FolderModel folder)
         {
-            return GetMarket(provider)?.GetActiveSymbols(folder);
+            return GetMarket(market)?.GetActiveSymbols(folder);
         }
     }
 }
