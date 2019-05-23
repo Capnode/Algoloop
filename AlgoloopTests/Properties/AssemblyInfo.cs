@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Algoloop.Tests")]
+[assembly: AssemblyTitle("AlgoloopTests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Algoloop.Tests")]
+[assembly: AssemblyProduct("AlgoloopTests")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1a681009-799a-4ba8-8b92-314018515060")]
+[assembly: Guid("4355918b-3b14-4bbb-b1a2-d8155fed4e64")]
 
 // Version information for an assembly consists of the following four values:
 //

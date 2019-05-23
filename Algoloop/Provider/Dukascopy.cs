@@ -23,7 +23,7 @@ using System.Linq;
 
 namespace Algoloop.Provider
 {
-    class Dukascopy : IProvider
+    public class Dukascopy : IProvider
     {
         private readonly DateTime FirstDate = new DateTime(2003, 05, 05);
 
