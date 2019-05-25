@@ -4,7 +4,6 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -13,22 +12,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+using System.Collections.Generic;
 
-using System;
-using System.Globalization;
-
-namespace QuantConnect.ToolBox.CoinApiDataConverter
+namespace QuantConnect.Interfaces
 {
     /// <summary>
-    /// Coin API Main entry point for ToolBox.
+    /// Wrapper on the API for downloading data for an algorithm.
     /// </summary>
-    public static class CoinApiDataConverterProgram
+    public interface IDownloadProvider
     {
-        public static void CoinApiDataProgram(string date, string market, string rawDataFolder, string destinationFolder)
-        {
-            var processingDate = DateTime.ParseExact(date, DateFormat.EightCharacter, CultureInfo.InvariantCulture);
-            var converter  = new CoinApiDataConverter(processingDate, market, rawDataFolder, destinationFolder);
-            converter.Run();
-        }
+        /// <summary>
+        /// Method for downloading data for an algorithm
+        /// </summary>
+        /// <param name="address">Source URL to download from</param>
+        /// <param name="headers">Headers to pass to the site</param>
+        /// <param name="userName">Username for basic authentication</param>
+        /// <param name="password">Password for basic authentication</param>
+        /// <returns>String contents of file</returns>
+        string Download(string address, IEnumerable<KeyValuePair<string, string>> headers, string userName, string password);
     }
 }

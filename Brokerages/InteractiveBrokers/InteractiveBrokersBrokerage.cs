@@ -50,6 +50,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
     {
         private readonly IBAutomater.IBAutomater _ibAutomater;
         private readonly AutoResetEvent _ibAutomaterInitializeEvent = new AutoResetEvent(false);
+        private bool _loginFailed;
         private bool _existingSessionDetected;
         private bool _securityDialogDetected;
 
@@ -2824,24 +2825,42 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
             Log.Trace($"InteractiveBrokersBrokerage.OnIbAutomaterOutputDataReceived(): {e.Data}");
 
+            // login failed
+            if (e.Data.Contains("Login failed"))
+            {
+                _loginFailed = true;
+                _ibAutomaterInitializeEvent.Set();
+            }
+
             // an existing session was detected and IBAutomater clicked the "Exit Application" button
-            if (e.Data.Contains("Existing session detected"))
+            else if (e.Data.Contains("Existing session detected"))
             {
                 _existingSessionDetected = true;
                 _ibAutomaterInitializeEvent.Set();
             }
 
             // a security dialog (2FA/code card) was detected by IBAutomater
-            if (e.Data.Contains("Second Factor Authentication") || e.Data.Contains("Security Code Card Authentication"))
+            else if (e.Data.Contains("Second Factor Authentication") ||
+                e.Data.Contains("Security Code Card Authentication") ||
+                e.Data.Contains("Enter security code"))
             {
                 _securityDialogDetected = true;
                 _ibAutomaterInitializeEvent.Set();
             }
 
             // initialization completed
-            if (e.Data.Contains("Configuration settings updated"))
+            else if (e.Data.Contains("Configuration settings updated"))
             {
                 _ibAutomaterInitializeEvent.Set();
+            }
+
+            // the IB session was disconnected by the user logging in from another location
+            else if (e.Data.Contains("Re-login is required"))
+            {
+                const string message = "A new competing session was started from another location and the current session has been terminated.";
+
+                _algorithm.Error("Brokerage Error: " + message);
+                _algorithm.RunTimeError = new Exception(message);
             }
         }
 
@@ -2859,6 +2878,14 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
         private void CheckIbAutomaterErrors()
         {
+            if (_loginFailed)
+            {
+                throw new Exception(
+                    "InteractiveBrokersBrokerage.CheckIbAutomaterErrors(): " +
+                    "Login failed. " +
+                    "Please check the validity of your login credentials.");
+            }
+
             if (_existingSessionDetected)
             {
                 throw new Exception(
@@ -2866,6 +2893,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                     "An existing session was detected and will not be automatically disconnected. " +
                     "Please close the existing session manually.");
             }
+
             if (_securityDialogDetected)
             {
                 throw new Exception(

@@ -231,6 +231,7 @@
     <Compile Include="Interfaces\IAccountCurrencyProvider.cs" />
     <Compile Include="Interfaces\IAlgorithmSubscriptionManager.cs" />
     <Compile Include="Interfaces\IBusyCollection.cs" />
+    <Compile Include="Interfaces\IDownloadProvider.cs" />
     <Compile Include="Interfaces\IHistoryProvider.cs" />
     <Compile Include="Interfaces\IOptionPrice.cs" />
     <Compile Include="Interfaces\ISecurityInitializerProvider.cs" />
@@ -337,7 +338,6 @@
     <Compile Include="Data\Consolidators\OpenInterestConsolidator.cs" />
     <Compile Include="Data\Market\OpenInterest.cs" />
     <Compile Include="Data\Market\RenkoType.cs" />
-    <Compile Include="Data\Custom\DailyFx.cs" />
     <Compile Include="Data\Fundamental\FineFundamental.cs" />
     <Compile Include="Data\Fundamental\Generated\BalanceSheet.cs" />
     <Compile Include="Data\Fundamental\Generated\CashFlowStatement.cs" />
