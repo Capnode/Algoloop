@@ -262,4 +262,4 @@ Launcher/Plugins/*
 /ApiPython/quantconnect.egg-info/*
 
 QuantConnect.Lean.sln.DotSettings*
-*.key
+secret.config

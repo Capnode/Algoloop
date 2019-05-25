@@ -16,6 +16,7 @@ using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Configuration;
 
 namespace Algoloop.Provider.Tests
 {
@@ -42,13 +43,14 @@ namespace Algoloop.Provider.Tests
         [TestMethod()]
         public void Run_Dukascopy()
         {
+            var key = ConfigurationManager.AppSettings["dukascopy"];
             var market = new MarketModel
             {
                 Name = "Dukascopy",
                 Provider = "dukascopy"
             };
 
-            MarketModel result = _dut.Run(market, _settings, _logger);
+//            MarketModel result = _dut.Run(market, _settings, _logger);
         }
     }
 }
