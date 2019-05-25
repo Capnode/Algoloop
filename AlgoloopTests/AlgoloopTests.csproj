@@ -58,15 +58,20 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\DukascopyTests.cs" />
+    <Compile Include="Provider\ProviderFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Provider\borsdata.key" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop\Algoloop.csproj">
       <Project>{F65DA573-DB1B-4524-A254-2034954CAE66}</Project>
       <Name>Algoloop</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
