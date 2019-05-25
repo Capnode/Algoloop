@@ -12,10 +12,11 @@
  * limitations under the License.
  */
 
-using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantConnect.Logging;
+using System.Collections.Generic;
 using System.Configuration;
 
 namespace Algoloop.Provider.Tests
@@ -24,7 +25,6 @@ namespace Algoloop.Provider.Tests
     public class ProviderFactoryTests
     {
         private SettingService _settings;
-        private HostDomainLogger _logger;
         private ProviderFactory _dut;
 
         [TestInitialize()]
@@ -34,8 +34,6 @@ namespace Algoloop.Provider.Tests
             {
                 DataFolder = "Data"
             };
-
-            _logger = new HostDomainLogger();
 
             _dut = new ProviderFactory();
         }
@@ -49,8 +47,9 @@ namespace Algoloop.Provider.Tests
                 Name = "Dukascopy",
                 Provider = "dukascopy"
             };
+            market.Symbols.Add(new SymbolModel("EURUSD"));
 
-//            MarketModel result = _dut.Run(market, _settings, _logger);
+            MarketModel result = _dut.Run(market, _settings, Log.LogHandler);
         }
     }
 }

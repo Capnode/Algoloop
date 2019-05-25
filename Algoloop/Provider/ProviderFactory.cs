@@ -29,7 +29,7 @@ namespace Algoloop.Provider
 {
     public class ProviderFactory : MarshalByRefObject
     {
-        public MarketModel Run(MarketModel market, SettingService settings, HostDomainLogger logger)
+        public MarketModel Run(MarketModel market, SettingService settings, ILogHandler logger)
         {
             Log.LogHandler = logger;
             PrepareDataFolder(settings.DataFolder);

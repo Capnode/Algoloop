@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Lean;
+using QuantConnect.Logging;
 using System.IO;
 using System.Text;
 
@@ -21,9 +21,9 @@ namespace Algoloop.Common
     public class StreamLogger : TextWriter
     {
         private StringBuilder _sb = new StringBuilder();
-        private HostDomainLogger _logger;
+        private ILogHandler _logger;
 
-        public StreamLogger(HostDomainLogger logger)
+        public StreamLogger(ILogHandler logger)
         {
             _logger = logger;
         }

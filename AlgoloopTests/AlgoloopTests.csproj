@@ -64,12 +64,18 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="secret.config" />
+    <None Include="secret.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop\Algoloop.csproj">
       <Project>{F65DA573-DB1B-4524-A254-2034954CAE66}</Project>
       <Name>Algoloop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj">
+      <Project>{01911409-86be-4e7d-9947-df714138610d}</Project>
+      <Name>QuantConnect.Logging</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
