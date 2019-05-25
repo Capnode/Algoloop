@@ -62,7 +62,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Provider\borsdata.key" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop\Algoloop.csproj">
