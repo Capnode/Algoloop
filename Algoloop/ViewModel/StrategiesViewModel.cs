@@ -269,8 +269,13 @@ namespace Algoloop.ViewModel
             }
 
             // Remove Track files not in use
-            DirectoryInfo d = new DirectoryInfo(TrackViewModel.Folder);
-            foreach (FileInfo file in d.GetFiles())
+            DirectoryInfo dir = new DirectoryInfo(TrackViewModel.Folder);
+            if (!dir.Exists)
+            {
+                return;
+            }
+
+            foreach (FileInfo file in dir.GetFiles())
             {
                 if (!inUse.Contains(file.FullName))
                 {
