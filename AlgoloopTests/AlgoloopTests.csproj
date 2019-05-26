@@ -84,9 +84,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <None Include="secret.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="secret.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop\Algoloop.csproj">
