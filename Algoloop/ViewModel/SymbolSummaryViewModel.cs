@@ -84,18 +84,19 @@ namespace Algoloop.ViewModel
             decimal bottom = 0;
             decimal close = 0;
             decimal drawdown = 0;
-            decimal mdd = 0;
             foreach(var trade in _trades)
             {
                 if (close + trade.MFE > top)
                 {
                     top = close + trade.MFE;
-                    bottom = 0;
+                    bottom = close + trade.ProfitLoss;
+                }
+                else
+                {
+                    bottom = Math.Min(bottom, close + trade.MAE);
                 }
 
-                bottom = Math.Min(bottom, close + trade.MAE);
-                drawdown = Math.Min(drawdown, top + bottom);
-                mdd = Math.Max(mdd, top == 0 ? 0 : (top - bottom) / top);
+                drawdown = Math.Min(drawdown, bottom - top);
                 close = close + trade.ProfitLoss;
             }
 
