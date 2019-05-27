@@ -58,7 +58,6 @@ namespace Algoloop.ViewModel
         private static object mutex = new object();
 
         private CancellationTokenSource _cancel;
-        private Isolated<LeanLauncher> _leanEngine;
         private TrackModel _model;
         private bool _isSelected;
         private bool _isExpanded;
@@ -297,22 +296,17 @@ namespace Algoloop.ViewModel
             TrackModel model = Model;
             try
             {
-                if (Desktop)
+                if (Desktop && _settings.DesktopPort > 0)
                 {
-                    Port = _settings.DesktopPort > 0 ? _settings.DesktopPort.ToString() : null;
-                    _leanEngine = new Isolated<LeanLauncher>();
-                    _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
+                    Port = _settings.DesktopPort.ToString();
+                    model = await RunTrack(account, model);
                     Port = null;
                 }
                 else
                 {
-                    _leanEngine = new Isolated<LeanLauncher>();
-                    _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
+                    model = await RunTrack(account, model);
                 }
 
-                _leanEngine.Dispose();
                 model.Completed = true;
 
                 // Split result and logs to separate files
@@ -328,7 +322,6 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 Log.Trace($"{ex.GetType()}: {ex.Message}");
-                _leanEngine.Dispose();
             }
 
             // Update view
@@ -337,8 +330,6 @@ namespace Algoloop.ViewModel
 
             Active = false;
             DataFromModel();
-            _cancel = null;
-            _leanEngine = null;
         }
 
         internal void DataToModel()
@@ -370,6 +361,24 @@ namespace Algoloop.ViewModel
             {
                 _loaded = LoadTrack();
             }
+        }
+
+        private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
+        {
+            try
+            {
+                using (Isolated<LeanLauncher> leanEngine = new Isolated<LeanLauncher>())
+                {
+                    _cancel = new CancellationTokenSource();
+                    await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
+                }
+            }
+            finally
+            {
+                _cancel = null;
+            }
+
+            return model;
         }
 
         private bool LoadTrack()
@@ -662,12 +671,7 @@ namespace Algoloop.ViewModel
             if (_cancel != null)
             {
                 _cancel.Cancel();
-            }
-
-            if (_leanEngine != null)
-            {
-                _leanEngine.Dispose();
-                _leanEngine = null;
+                _cancel = null;
             }
         }
 
