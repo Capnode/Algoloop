@@ -61,7 +61,7 @@ namespace QuantConnect.Util
                     // pass, when the token gets cancelled
                 }
             })
-            { IsBackground = true, Name = "Isolator Thread" };
+            { IsBackground = true, Name = "Isolator Thread", Priority = ThreadPriority.BelowNormal };
             _workerThread.Start();
         }
 
