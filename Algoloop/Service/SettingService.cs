@@ -72,6 +72,11 @@ namespace Algoloop.Service
 
         internal void Copy(SettingService oldSettings)
         {
+            if (oldSettings == null)
+            {
+                return;
+            }
+
             ApiToken = oldSettings.ApiToken;
             ApiUser = oldSettings.ApiUser;
             ApiDownload = oldSettings.ApiDownload;
