@@ -58,7 +58,6 @@ namespace Algoloop.ViewModel
         private static object mutex = new object();
 
         private CancellationTokenSource _cancel;
-        private Isolated<LeanLauncher> _leanEngine;
         private TrackModel _model;
         private bool _isSelected;
         private bool _isExpanded;
@@ -265,9 +264,10 @@ namespace Algoloop.ViewModel
         public void Refresh()
         {
             Model.Refresh();
-            if (!_loaded)
+            if (!_loaded && Model.Completed)
             {
-                _loaded = LoadTrack();
+                LoadTrack();
+                _loaded = true;
             }
         }
 
@@ -297,22 +297,17 @@ namespace Algoloop.ViewModel
             TrackModel model = Model;
             try
             {
-                if (Desktop)
+                if (Desktop && _settings.DesktopPort > 0)
                 {
-                    Port = _settings.DesktopPort > 0 ? _settings.DesktopPort.ToString() : null;
-                    _leanEngine = new Isolated<LeanLauncher>();
-                    _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
+                    Port = _settings.DesktopPort.ToString();
+                    model = await RunTrack(account, model);
                     Port = null;
                 }
                 else
                 {
-                    _leanEngine = new Isolated<LeanLauncher>();
-                    _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
+                    model = await RunTrack(account, model);
                 }
 
-                _leanEngine.Dispose();
                 model.Completed = true;
 
                 // Split result and logs to separate files
@@ -328,7 +323,6 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 Log.Trace($"{ex.GetType()}: {ex.Message}");
-                _leanEngine.Dispose();
             }
 
             // Update view
@@ -337,8 +331,6 @@ namespace Algoloop.ViewModel
 
             Active = false;
             DataFromModel();
-            _cancel = null;
-            _leanEngine = null;
         }
 
         internal void DataToModel()
@@ -368,11 +360,30 @@ namespace Algoloop.ViewModel
 
             if (!_loaded && IsSelected)
             {
-                _loaded = LoadTrack();
+                LoadTrack();
+                _loaded = true;
             }
         }
 
-        private bool LoadTrack()
+        private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
+        {
+            try
+            {
+                using (Isolated<LeanLauncher> leanEngine = new Isolated<LeanLauncher>())
+                {
+                    _cancel = new CancellationTokenSource();
+                    await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
+                }
+            }
+            finally
+            {
+                _cancel = null;
+            }
+
+            return model;
+        }
+
+        private void LoadTrack()
         {
             // Get symbols from model
             foreach (SymbolModel symbolModel in Model.Symbols)
@@ -390,38 +401,41 @@ namespace Algoloop.ViewModel
 
             // Find track zipfile
             if (!File.Exists(Model.ZipFile))
-                return false;
-
-            // Unzip log file
-            ZipFile zipFile;
-            using (StreamReader logStream = Compression.Unzip(Model.ZipFile, _logFile, out zipFile))
-            using (zipFile)
             {
-                if (logStream != null)
-                {
-                    Logs = logStream.ReadToEnd();
-                }
+                return;
             }
 
             // Unzip result file
+            ZipFile zipFile;
             BacktestResult result = null;
             using (StreamReader resultStream = Compression.Unzip(Model.ZipFile, _resultFile, out zipFile))
             using (zipFile)
             {
                 if (resultStream == null)
-                    return true;
+                {
+                    return;
+                }
 
                 using (JsonReader reader = new JsonTextReader(resultStream))
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     serializer.Converters.Add(new OrderJsonConverter());
                     result = serializer.Deserialize<BacktestResult>(reader);
+                    if (result == null)
+                    {
+                        return;
+                    }
                 }
             }
 
-            if (result == null)
-                return true;
-            
+            // Validate if statistics same
+            IDictionary<string, decimal?> statistics = ReadStatistics(result);
+            if (Model.Statistics.Count != statistics.Count
+                || Model.Statistics.Except(statistics).Any())
+            {
+                return;
+            }
+
             // Closed trades result
             result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
             foreach (Trade trade in Trades)
@@ -487,7 +501,15 @@ namespace Algoloop.ViewModel
                 Log.Trace($"Strategy {Model.Name} {ex.GetType()}: {ex.Message}");
             }
 
-            return true;
+            // Unzip log file
+            using (StreamReader logStream = Compression.Unzip(Model.ZipFile, _logFile, out zipFile))
+            using (zipFile)
+            {
+                if (logStream != null)
+                {
+                    Logs = logStream.ReadToEnd();
+                }
+            }
         }
 
         private void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
@@ -546,25 +568,30 @@ namespace Algoloop.ViewModel
             BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(model.Result, new[] { new OrderJsonConverter() });
             if (result != null)
             {
-                IDictionary<string, decimal?> statistics = new SafeDictionary<string, decimal?>();
-                AddCustomStatistics(statistics, result);
-                foreach (KeyValuePair<string, string> item in result.Statistics)
-                {
-                    AddStatisticItem(statistics, item.Key, item.Value);
-                }
-
-                foreach (KeyValuePair<string, string> item in result.RuntimeStatistics)
-                {
-                    AddStatisticItem(statistics, item.Key, item.Value);
-                }
-
-                model.Statistics = statistics;
+                model.Statistics = ReadStatistics(result);
             }
 
             // Replace results and logs with file references
             model.Result = string.Empty;
             model.Logs = string.Empty;
             model.ZipFile = zipFile;
+        }
+
+        private IDictionary<string, decimal?> ReadStatistics(BacktestResult result)
+        {
+            IDictionary<string, decimal?> statistics = new SafeDictionary<string, decimal?>();
+            AddCustomStatistics(statistics, result);
+            foreach (KeyValuePair<string, string> item in result.Statistics)
+            {
+                AddStatisticItem(statistics, item.Key, item.Value);
+            }
+
+            foreach (KeyValuePair<string, string> item in result.RuntimeStatistics)
+            {
+                AddStatisticItem(statistics, item.Key, item.Value);
+            }
+
+            return statistics;
         }
 
         private static string UniqueFileName(string path)
@@ -662,12 +689,7 @@ namespace Algoloop.ViewModel
             if (_cancel != null)
             {
                 _cancel.Cancel();
-            }
-
-            if (_leanEngine != null)
-            {
-                _leanEngine.Dispose();
-                _leanEngine = null;
+                _cancel = null;
             }
         }
 
