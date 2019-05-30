@@ -465,8 +465,12 @@ namespace Algoloop.ViewModel
 
             StrategyNameChanged();
 
-            if (string.IsNullOrEmpty(Model.AlgorithmLocation) || string.IsNullOrEmpty(algorithmName))
+            if (string.IsNullOrEmpty(Model.AlgorithmLocation)
+                || !File.Exists(Model.AlgorithmLocation)
+                || string.IsNullOrEmpty(algorithmName))
+            {
                 return;
+            }
 
             Assembly assembly = Assembly.LoadFrom(Model.AlgorithmLocation);
             if (assembly == null)
