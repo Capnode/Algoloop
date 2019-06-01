@@ -13,7 +13,10 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantConnect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,6 +26,7 @@ namespace Algoloop.Provider.Tests
     public class DukascopyTests
     {
         private MarketModel _model;
+        private SettingService _settings;
         private Dukascopy _dut;
 
         [TestInitialize()]
@@ -30,7 +34,15 @@ namespace Algoloop.Provider.Tests
         {
             _model = new MarketModel
             {
-                Name = "Dukascopy"
+                Name = "Dukascopy",
+                Provider = "dukascopy",
+                LastDate = new DateTime(2019, 05, 01),
+                Resolution = Resolution.Daily
+            };
+
+            _settings = new SettingService
+            {
+                DataFolder = "Data"
             };
 
             _dut = new Dukascopy();
@@ -39,6 +51,9 @@ namespace Algoloop.Provider.Tests
         [TestMethod()]
         public void DownloadTest()
         {
+            var symbols = new List<string> { "EURUSD" };
+            _dut.Download(_model, _settings, symbols);
+            Assert.AreEqual(true, _model.Active);
         }
 
         [TestMethod()]

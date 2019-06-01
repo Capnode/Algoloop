@@ -15,8 +15,9 @@
 using Algoloop.Model;
 using Algoloop.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantConnect;
 using QuantConnect.Logging;
-using System.Collections.Generic;
+using System;
 using System.Configuration;
 
 namespace Algoloop.Provider.Tests
@@ -45,11 +46,14 @@ namespace Algoloop.Provider.Tests
             var market = new MarketModel
             {
                 Name = "Dukascopy",
-                Provider = "dukascopy"
+                Provider = "dukascopy",
+                LastDate = new DateTime(2019, 05, 01),
+                Resolution = Resolution.Daily
             };
             market.Symbols.Add(new SymbolModel("EURUSD"));
 
             MarketModel result = _dut.Run(market, _settings, Log.LogHandler);
+            Assert.IsTrue(result.LastDate > market.LastDate);
         }
     }
 }
