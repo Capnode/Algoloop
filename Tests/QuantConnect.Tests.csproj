@@ -232,6 +232,7 @@
     <Compile Include="Engine\DataFeeds\MockDataFeed.cs" />
     <Compile Include="Engine\DataFeeds\PendingRemovalsManagerTests.cs" />
     <Compile Include="Engine\DataFeeds\TextSubscriptionDataSourceReaderTests.cs" />
+    <Compile Include="Engine\DataFeeds\Transport\RemoteFileSubscriptionStreamReaderTests.cs" />
     <Compile Include="Engine\DataFeeds\UniverseSelectionTests.cs" />
     <Compile Include="Engine\DataFeeds\SubscriptionTests.cs" />
     <Compile Include="PythonSetup.cs" />
@@ -480,6 +481,7 @@
     <Compile Include="Symbols.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Indicators\LinearWeightedMovingAverageTests.cs" />
+    <Compile Include="ToolBox\CoinApiSymbolMapperTests.cs" />
     <Compile Include="ToolBox\ForexVolume\FxcmVolumeDownloaderTest.cs" />
     <Compile Include="ToolBox\LeanDataReaderTests.cs" />
     <Compile Include="ToolBox\LeanDataWriterTests.cs" />

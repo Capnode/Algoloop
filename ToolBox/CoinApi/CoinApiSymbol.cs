@@ -13,27 +13,25 @@
  * limitations under the License.
 */
 
-using NUnit.Framework;
-using QuantConnect.Data.Market;
-using QuantConnect.Indicators;
-using System;
+using Newtonsoft.Json;
 
-namespace QuantConnect.Tests.Indicators
+namespace QuantConnect.ToolBox.CoinApi
 {
-    [TestFixture]
-    public class OnBalanceVolumeTests : CommonIndicatorTests<TradeBar>
+    public class CoinApiSymbol
     {
-        protected override IndicatorBase<TradeBar> CreateIndicator()
-        {
-            return new OnBalanceVolume();
-        }
+        [JsonProperty("symbol_id")]
+        public string SymbolId { get; set; }
 
-        protected override string TestFileName => "spy_with_obv.txt";
+        [JsonProperty("exchange_id")]
+        public string ExchangeId { get; set; }
 
-        protected override string TestColumnName => "OBV";
+        [JsonProperty("symbol_type")]
+        public string SymbolType { get; set; }
 
-        protected override Action<IndicatorBase<TradeBar>, double> Assertion =>
-            (indicator, expected) =>
-                Assert.AreEqual(expected.ToString("0.##E-00"), indicator.Current.Value.ToString("0.##E-00"));
+        [JsonProperty("asset_id_base")]
+        public string AssetIdBase { get; set; }
+
+        [JsonProperty("asset_id_quote")]
+        public string AssetIdQuote { get; set; }
     }
 }

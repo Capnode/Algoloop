@@ -20,6 +20,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using QuantConnect.Brokerages;
 using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using CompressionMode = System.IO.Compression.CompressionMode;
@@ -31,6 +32,17 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
     /// </summary>
     public class CoinApiDataReader
     {
+        private readonly ISymbolMapper _symbolMapper;
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="CoinApiDataReader"/> class
+        /// </summary>
+        /// <param name="symbolMapper">The symbol mapper</param>
+        public CoinApiDataReader(ISymbolMapper symbolMapper)
+        {
+            _symbolMapper = symbolMapper;
+        }
+
         /// <summary>
         /// Gets the coin API entry data.
         /// </summary>
@@ -43,11 +55,9 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
             // crypto/<market>/<date>/<ticktype>-563-BITFINEX_SPOT_BTC_USD.csv.gz
             var tickType = file.FullName.Contains("trade") ? TickType.Trade : TickType.Quote;
 
-            var filenameParts = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(file.Name)).Split('_');
-            var pairs = filenameParts.Skip(filenameParts.Length - 2).ToArray();
+            var symbolId = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(file.Name)).Split('-').Last();
 
-            var ticker = pairs[0] + pairs[1];
-            var symbol = Symbol.Create(ticker, SecurityType.Crypto, market);
+            var symbol = _symbolMapper.GetLeanSymbol(symbolId, SecurityType.Crypto, market);
 
             return new CoinApiEntryData
             {
@@ -72,8 +82,6 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
                       $"for {entryData.Date:yyyy-MM-dd}");
 
 
-            var tickList = new List<Tick>();
-
             using (var stream = new GZipStream(file.OpenRead(), CompressionMode.Decompress))
             using (var reader = new StreamReader(stream))
             {
@@ -85,11 +93,15 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
 
                 var headerParts = headerLine.Split(';').ToList();
 
-                tickList = entryData.TickType == TickType.Trade
+                var tickList = entryData.TickType == TickType.Trade
                     ? ParseTradeData(entryData.Symbol, reader, headerParts)
                     : ParseQuoteData(entryData.Symbol, reader, headerParts);
+
+                foreach (var tick in tickList)
+                {
+                    yield return tick;
+                }
             }
-            return tickList;
         }
 
         /// <summary>
@@ -99,13 +111,11 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
         /// <param name="reader">The reader.</param>
         /// <param name="headerParts">The header parts.</param>
         /// <returns></returns>
-        private List<Tick> ParseTradeData(Symbol symbol, StreamReader reader, List<string> headerParts)
+        private IEnumerable<Tick> ParseTradeData(Symbol symbol, StreamReader reader, List<string> headerParts)
         {
             var columnTime = headerParts.FindIndex(x => x == "time_exchange");
             var columnPrice = headerParts.FindIndex(x => x == "price");
             var columnQuantity = headerParts.FindIndex(x => x == "base_amount");
-
-            var tickList = new List<Tick>();
 
             string line;
             while ((line = reader.ReadLine()) != null)
@@ -116,18 +126,15 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
                 var price = lineParts[columnPrice].ToDecimal();
                 var quantity = lineParts[columnQuantity].ToDecimal();
 
-
-                tickList.Add(new Tick
+                yield return new Tick
                 {
                     Symbol = symbol,
                     Time = time,
                     Value = price,
                     Quantity = quantity,
                     TickType = TickType.Trade
-                });
+                };
             }
-
-            return tickList;
         }
 
         /// <summary>
@@ -137,7 +144,7 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
         /// <param name="reader">The reader.</param>
         /// <param name="headerParts">The header parts.</param>
         /// <returns></returns>
-        private List<Tick> ParseQuoteData(Symbol symbol, StreamReader reader, List<string> headerParts)
+        private IEnumerable<Tick> ParseQuoteData(Symbol symbol, StreamReader reader, List<string> headerParts)
         {
             var columnTime = headerParts.FindIndex(x => x == "time_exchange");
             var columnAskPrice = headerParts.FindIndex(x => x == "ask_px");
@@ -145,7 +152,8 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
             var columnBidPrice = headerParts.FindIndex(x => x == "bid_px");
             var columnBidSize = headerParts.FindIndex(x => x == "bid_sx");
 
-            var tickList = new List<Tick>();
+            var previousAskPrice = 0m;
+            var previousBidPrice = 0m;
 
             string line;
             while ((line = reader.ReadLine()) != null)
@@ -158,7 +166,16 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
                 var bidPrice = lineParts[columnBidPrice].ToDecimal();
                 var bidSize = lineParts[columnBidSize].ToDecimal();
 
-                tickList.Add(new Tick
+                if (askPrice == previousAskPrice && bidPrice == previousBidPrice)
+                {
+                    // only save quote if bid price or ask price changed
+                    continue;
+                }
+
+                previousAskPrice = askPrice;
+                previousBidPrice = bidPrice;
+
+                yield return new Tick
                 {
                     Symbol = symbol,
                     Time = time,
@@ -167,10 +184,8 @@ namespace QuantConnect.ToolBox.CoinApiDataConverter
                     BidPrice = bidPrice,
                     BidSize = bidSize,
                     TickType = TickType.Quote
-                });
+                };
             }
-
-            return tickList;
         }
     }
 }
