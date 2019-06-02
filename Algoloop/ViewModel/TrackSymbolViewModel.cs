@@ -16,17 +16,16 @@ using QuantConnect;
 using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolSummaryViewModel
+    public class TrackSymbolViewModel
     {
         List<Trade> _trades = new List<Trade>();
         private readonly Symbol _symbol;
 
-        public SymbolSummaryViewModel(Symbol symbol)
+        public TrackSymbolViewModel(Symbol symbol)
         {
             _symbol = symbol;
         }

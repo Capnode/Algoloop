@@ -172,7 +172,7 @@
                 Visibility="{Binding Desktop, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <view:DesktopView Port="{Binding Port}"/>
             </TabItem>
-            <TabItem Header="{Binding SummarySymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Summary symbols ({0}), FallbackValue=Summary symbols}">
+            <TabItem Header="{Binding TrackSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Details ({0}), FallbackValue=Details}">
                 <wpf:ExDataGrid
                     AutoGenerateColumns="True"
                     CanUserFreeze="False"
@@ -180,7 +180,7 @@
                     CanUserGroup="False"
                     CanUserFilter="True"
                     ExSelectedItems="{Binding SelectedItems}"
-                    ExItemsSource="{Binding SummarySymbols}">
+                    ExItemsSource="{Binding TrackSymbols}">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem

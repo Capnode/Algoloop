@@ -70,7 +70,7 @@ namespace Algoloop.ViewModel
         private SyncObservableCollection<SymbolViewModel> _symbols = new SyncObservableCollection<SymbolViewModel>();
         private SyncObservableCollection<ParameterViewModel> _parameters = new SyncObservableCollection<ParameterViewModel>();
         private SyncObservableCollection<Trade> _trades = new SyncObservableCollection<Trade>();
-        private SyncObservableCollection<SymbolSummaryViewModel> _summarySymbols = new SyncObservableCollection<SymbolSummaryViewModel>();
+        private SyncObservableCollection<TrackSymbolViewModel> _trackSymbols = new SyncObservableCollection<TrackSymbolViewModel>();
         private SyncObservableCollection<OrderViewModel> _orders = new SyncObservableCollection<OrderViewModel>();
         private SyncObservableCollection<HoldingViewModel> _holdings = new SyncObservableCollection<HoldingViewModel>();
         private bool _loaded;
@@ -168,10 +168,10 @@ namespace Algoloop.ViewModel
             set => Set(ref _trades, value);
         }
 
-        public SyncObservableCollection<SymbolSummaryViewModel> SummarySymbols
+        public SyncObservableCollection<TrackSymbolViewModel> TrackSymbols
         {
-            get => _summarySymbols;
-            set => Set(ref _summarySymbols, value);
+            get => _trackSymbols;
+            set => Set(ref _trackSymbols, value);
         }
 
         public SyncObservableCollection<OrderViewModel> Orders
@@ -485,17 +485,17 @@ namespace Algoloop.ViewModel
             // Trade details
             foreach (Trade trade in Trades)
             {
-                SymbolSummaryViewModel summary = SummarySymbols.FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value));
-                if (summary == null)
+                TrackSymbolViewModel trackSymbol = TrackSymbols.FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value));
+                if (trackSymbol == null)
                 {
-                    summary = new SymbolSummaryViewModel(trade.Symbol);
-                    SummarySymbols.Add(summary);
+                    trackSymbol = new TrackSymbolViewModel(trade.Symbol);
+                    TrackSymbols.Add(trackSymbol);
                 }
 
-                summary.AddTrade(trade);
+                trackSymbol.AddTrade(trade);
             }
 
-            SummarySymbols.ToList().ForEach(m => m.Calculate());
+            TrackSymbols.ToList().ForEach(m => m.Calculate());
 
             // Orders result
             foreach (var pair in result.Orders.OrderBy(o => o.Key))
@@ -708,7 +708,7 @@ namespace Algoloop.ViewModel
                 string fileName = saveFileDialog.FileName;
                 using (StreamWriter file = File.CreateText(fileName))
                 {
-                    foreach (SymbolSummaryViewModel symbol in symbols)
+                    foreach (TrackSymbolViewModel symbol in symbols)
                     {
                         file.WriteLine(symbol.Symbol);
                     }
@@ -726,7 +726,7 @@ namespace Algoloop.ViewModel
             if (symbols != null)
             {
                 strategyModel.Symbols.Clear();
-                IEnumerable<SymbolModel> symbolModels = symbols.Cast<SymbolSummaryViewModel>().Select(m => new SymbolModel(m.Symbol));
+                IEnumerable<SymbolModel> symbolModels = symbols.Cast<TrackSymbolViewModel>().Select(m => new SymbolModel(m.Symbol));
                 strategyModel.Symbols.AddRange(symbolModels);
             }
 
@@ -738,7 +738,7 @@ namespace Algoloop.ViewModel
             if (list == null)
                 return;
 
-            IEnumerable<string> symbols = list.Cast<SymbolSummaryViewModel>().Select(m => m.Symbol);
+            IEnumerable<string> symbols = list.Cast<TrackSymbolViewModel>().Select(m => m.Symbol);
             _parent.CreateFolder(symbols);
         }
 
@@ -768,7 +768,7 @@ namespace Algoloop.ViewModel
             Orders.Clear();
             Holdings.Clear();
             Trades.Clear();
-            SummarySymbols.Clear();
+            TrackSymbols.Clear();
 
             Statistics.Clear();
             IDictionary<string, decimal?> statistics = Statistics;
