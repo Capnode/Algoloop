@@ -386,7 +386,6 @@ namespace Algoloop.ViewModel
             {
                 expectancy = profitLoss / count / risk;
                 score = (count / years) * expectancy;
-                score = Scale(score);
             }
 
             return score;
