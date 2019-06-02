@@ -38,6 +38,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -50,6 +51,7 @@ namespace Algoloop.ViewModel
         private const string _logFile = "Logs.log";
         private const string _resultFile = "Result.json";
         private const string _zipFile = "track.zip";
+        private const double _daysInYear = 365.24;
 
         private StrategyViewModel _parent;
         private readonly MarketService _markets;
@@ -311,10 +313,7 @@ namespace Algoloop.ViewModel
                 model.Completed = true;
 
                 // Split result and logs to separate files
-                lock (mutex)
-                {
-                    SplitModelToFiles(model);
-                }
+                SplitModelToFiles(model);
             }
             catch (AppDomainUnloadedException)
             {
@@ -363,6 +362,53 @@ namespace Algoloop.ViewModel
                 LoadTrack();
                 _loaded = true;
             }
+        }
+
+        internal static double CalculateScore(IList<Trade> trades, out double expectancy)
+        {
+            expectancy = 0;
+            if (trades == null || !trades.Any())
+            {
+                return 0;
+            }
+
+            double score = 0;
+            Debug.Assert(!trades.Min(m => m.EntryTime).Equals(DateTime.FromBinary(0)));
+            Debug.Assert(!trades.Min(m => m.ExitTime).Equals(DateTime.FromBinary(0)));
+            double profitLoss = (double)trades.Sum(m => m.ProfitLoss);
+            int count = trades.Count();
+            double risk = -(double)trades.Min(m => m.MAE);
+            DateTime first = trades.Min(m => m.EntryTime);
+            DateTime last = trades.Max(m => m.ExitTime);
+            TimeSpan duration = last - first;
+            double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
+            if (years > 0 && count > 0 && risk > 0)
+            {
+                expectancy = profitLoss / count / risk;
+                score = (count / years) * expectancy;
+                score = Scale(score);
+            }
+
+            return score;
+        }
+
+        private void AddCustomStatistics(IDictionary<string, decimal?> statistics, BacktestResult result)
+        {
+            double score = CalculateScore(Trades, out double expectancy);
+            score = score.RoundToSignificantDigits(4);
+            expectancy = expectancy.RoundToSignificantDigits(4);
+            statistics.Add("Score", (decimal)score);
+            statistics.Add("Expectancy", (decimal)expectancy);
+        }
+
+        private static double Scale(double x)
+        {
+            return x / Math.Sqrt(1 + x * x);
+        }
+
+        private static double ScaleToRange(double x, double minimum, double maximum)
+        {
+            return (x - minimum) / (maximum - minimum);
         }
 
         private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
@@ -436,8 +482,7 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            // Closed trades result
-            result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
+            // Trade details
             foreach (Trade trade in Trades)
             {
                 SymbolSummaryViewModel summary = SummarySymbols.FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value));
@@ -514,6 +559,12 @@ namespace Algoloop.ViewModel
 
         private void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
         {
+            // Make unique name
+            while (statistics.TryGetValue(name, out _))
+            {
+                name += "+";
+            }
+
             decimal value;
             if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
@@ -531,54 +582,45 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void AddCustomStatistics(IDictionary<string, decimal?> statistics, BacktestResult result)
-        {
-            if (result.Statistics.Count == 0)
-                return;
-
-            string profit = result.Statistics["Net Profit"];
-            string dd = result.Statistics["Drawdown"];
-            bool isNetProfit = decimal.TryParse(profit.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal netProfit)
-                && profit.Contains("%");
-            bool isDrawdown = decimal.TryParse(dd.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal drawdown)
-                && dd.Contains("%");
-
-            if (isNetProfit && isDrawdown && drawdown != 0)
-            {
-                decimal ratio = (netProfit / drawdown).RoundToSignificantDigits(4);
-                statistics.Add("Profit-DD", ratio);
-            }
-        }
-
         private void SplitModelToFiles(TrackModel model)
         {
             // Create folder for track files
             Directory.CreateDirectory(Folder);
+            string zipFileTemplate = Path.Combine(Folder, _zipFile);
 
             // Save logs and result to zipfile
-            string zipFileTemplate = Path.Combine(Folder, _zipFile);
-            string zipFile = UniqueFileName(zipFileTemplate);
-            Compression.ZipData(zipFile, new Dictionary<string, string>
+            lock (mutex)
             {
-                { _logFile, model.Logs },
-                { _resultFile, model.Result }
-            });
+                string zipFile = UniqueFileName(zipFileTemplate);
+                Compression.ZipData(zipFile, new Dictionary<string, string>
+                {
+                    { _logFile, model.Logs },
+                    { _resultFile, model.Result }
+                });
+
+                model.ZipFile = zipFile;
+            }
 
             // Process results
             BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(model.Result, new[] { new OrderJsonConverter() });
             if (result != null)
             {
+                // Statistics
                 model.Statistics = ReadStatistics(result);
+                Trades.Clear();
             }
 
             // Replace results and logs with file references
             model.Result = string.Empty;
             model.Logs = string.Empty;
-            model.ZipFile = zipFile;
         }
 
         private IDictionary<string, decimal?> ReadStatistics(BacktestResult result)
         {
+            // Closed trades result
+            Trades.Clear();
+            result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
+
             IDictionary<string, decimal?> statistics = new SafeDictionary<string, decimal?>();
             AddCustomStatistics(statistics, result);
             foreach (KeyValuePair<string, string> item in result.Statistics)
@@ -589,6 +631,22 @@ namespace Algoloop.ViewModel
             foreach (KeyValuePair<string, string> item in result.RuntimeStatistics)
             {
                 AddStatisticItem(statistics, item.Key, item.Value);
+            }
+
+            PortfolioStatistics portfolioStatistics = result.TotalPerformance.PortfolioStatistics;
+            PropertyInfo[] portfolioProperties = typeof(PortfolioStatistics).GetProperties();
+            foreach (PropertyInfo property in portfolioProperties)
+            {
+                object value = property.GetValue(portfolioStatistics);
+                AddStatisticItem(statistics,property.Name, Convert.ToString(value, CultureInfo.InvariantCulture));
+            }
+
+            TradeStatistics tradeStatistics = result.TotalPerformance.TradeStatistics;
+            PropertyInfo[] tradeProperties = typeof(TradeStatistics).GetProperties();
+            foreach (PropertyInfo property in tradeProperties)
+            {
+                object value = property.GetValue(tradeStatistics);
+                AddStatisticItem(statistics, property.Name, Convert.ToString(value, CultureInfo.InvariantCulture));
             }
 
             return statistics;
