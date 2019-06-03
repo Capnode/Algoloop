@@ -88,7 +88,7 @@ namespace Capnode.Algorithm.CSharp
             var closeTimeShort = TimeSpan.FromHours(double.Parse(_closeHourShort));
 
             // Set zero transaction fees
-            SetSecurityInitializer(s => s.SetFeeModel(new ConstantFeeModel(0m)));
+            SetSecurityInitializer(s => s.SetFeeModel(new FxcmFeeModel()));
 
             // Universe Selection
             IEnumerable<Symbol> symbols = _symbols
