@@ -16,8 +16,10 @@ using Algoloop.Model;
 using Algoloop.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 
 namespace Algoloop.Provider.Tests
@@ -25,41 +27,53 @@ namespace Algoloop.Provider.Tests
     [TestClass()]
     public class DukascopyTests
     {
-        private MarketModel _model;
         private SettingService _settings;
-        private Dukascopy _dut;
+        private ProviderFactory _dut;
 
         [TestInitialize()]
         public void Initialize()
         {
-            _model = new MarketModel
-            {
-                Name = "Dukascopy",
-                Provider = "dukascopy",
-                LastDate = new DateTime(2019, 05, 01),
-                Resolution = Resolution.Daily
-            };
-
             _settings = new SettingService
             {
                 DataFolder = "Data"
             };
 
-            _dut = new Dukascopy();
+            _dut = new ProviderFactory();
         }
 
         [TestMethod()]
-        public void DownloadTest()
+        public void Run()
         {
-            var symbols = new List<string> { "EURUSD" };
-            _dut.Download(_model, _settings, symbols);
-            Assert.AreEqual(true, _model.Active);
+            var key = ConfigurationManager.AppSettings["dukascopy"];
+            DateTime date = new DateTime(2019, 05, 01);
+            var market = new MarketModel
+            {
+                Name = "Dukascopy",
+                Provider = "Dukascopy",
+                LastDate = date,
+                Resolution = Resolution.Daily,
+            };
+            market.Symbols.Add(new SymbolModel("EURUSD"));
+
+            MarketModel result = _dut.Run(market, _settings, Log.LogHandler);
+            Assert.IsTrue(result.Active);
+            Assert.IsTrue(result.LastDate > date);
         }
 
         [TestMethod()]
-        public void GetAllSymbolsTest()
+        public void GetAllSymbols()
         {
-            IEnumerable<SymbolModel> symbols = _dut.GetAllSymbols(_model);
+            var key = ConfigurationManager.AppSettings["dukascopy"];
+            DateTime date = new DateTime(2019, 05, 01);
+            var market = new MarketModel
+            {
+                Name = "Dukascopy",
+                Provider = "Dukascopy",
+                LastDate = date,
+                Resolution = Resolution.Daily,
+            };
+
+            IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(market);
             Assert.AreEqual(78, symbols.ToList().Count());
         }
     }
