@@ -393,7 +393,7 @@ namespace Algoloop.ViewModel
                 score = (count / years) * expectancy;
             }
 
-            return score;
+            return Scale(score);
         }
 
         internal static decimal CalcRoMaD(IList<Trade> trades)
@@ -476,15 +476,13 @@ namespace Algoloop.ViewModel
         private void AddCustomStatistics(IDictionary<string, decimal?> statistics, BacktestResult result)
         {
             double score = CalculateScore(Trades, out double expectancy);
-            score = score.RoundToSignificantDigits(4);
-            expectancy = expectancy.RoundToSignificantDigits(4);
-            statistics.Add("Score", (decimal)score);
-            statistics.Add("Expectancy", (decimal)expectancy);
+            statistics.Add("Score", (decimal)score.RoundToSignificantDigits(4));
+            statistics.Add("Expectancy", (decimal)expectancy.RoundToSignificantDigits(4));
         }
 
         private static double Scale(double x)
         {
-            return x / Math.Sqrt(1 + x * x);
+            return x / Math.Sqrt(10 + x * x);
         }
 
         private static double ScaleToRange(double x, double minimum, double maximum)
