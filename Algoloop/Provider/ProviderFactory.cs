@@ -68,6 +68,7 @@ namespace Algoloop.Provider
 
         public override object InitializeLifetimeService()
         {
+            // No lifetime timeout
             return null;
         }
 
