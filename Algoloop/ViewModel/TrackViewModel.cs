@@ -373,22 +373,104 @@ namespace Algoloop.ViewModel
             }
 
             double score = 0;
-            Debug.Assert(!trades.Min(m => m.EntryTime).Equals(DateTime.FromBinary(0)));
-            Debug.Assert(!trades.Min(m => m.ExitTime).Equals(DateTime.FromBinary(0)));
-            double profitLoss = (double)trades.Sum(m => m.ProfitLoss);
+            double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
             int count = trades.Count();
-            double risk = -(double)trades.Min(m => m.MAE);
+
+            double worstTrade = (double)trades.Min(m => m.MAE);
+            double maxDrawdown = (double)MaxDrawdown(trades, out _);
+            Debug.Assert(worstTrade <= 0);
+            Debug.Assert(maxDrawdown <= 0);
+            double risk = Math.Sqrt(worstTrade * maxDrawdown);
+
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
             TimeSpan duration = last - first;
             double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
+
             if (years > 0 && count > 0 && risk > 0)
             {
-                expectancy = profitLoss / count / risk;
+                expectancy = netProfit / count / risk;
                 score = (count / years) * expectancy;
             }
 
             return score;
+        }
+
+        internal static decimal CalcRoMaD(IList<Trade> trades)
+        {
+            decimal netProfit = trades.Sum(m => m.ProfitLoss - m.TotalFees);
+            decimal drawdown = MaxDrawdown(trades, out TimeSpan period);
+            decimal roMaD = drawdown == 0 ? 0 : netProfit / -drawdown;
+            return roMaD;
+        }
+
+        internal static decimal CalcSharpe(IList<Trade> trades)
+        {
+            IEnumerable<decimal> range = trades.Select(m => m.ProfitLoss - m.TotalFees);
+            decimal netProfit = range.Sum();
+            decimal stddev = StandardDeviation(range);
+            decimal sharpe = stddev == 0 ? 0 : netProfit / stddev;
+            return sharpe;
+        }
+
+        internal static decimal MaxDrawdown(IList<Trade> trades, out TimeSpan period)
+        {
+            period = TimeSpan.Zero;
+            if (trades == null || !trades.Any())
+            {
+                return 0;
+            }
+
+            decimal drawdown = 0;
+            decimal top = 0;
+            decimal bottom = 0;
+            decimal close = 0;
+            DateTime topTime = trades.First().EntryTime;
+            foreach (var trade in trades)
+            {
+                if (close + trade.MFE > top)
+                {
+                    top = close + trade.MFE;
+                    bottom = close + trade.ProfitLoss;
+                    topTime = trade.ExitTime;
+                }
+                else
+                {
+                    bottom = Math.Min(bottom, close + trade.MAE);
+                    TimeSpan span = trade.ExitTime - topTime;
+                    if (span > period)
+                    {
+                        period = span;
+                    }
+                }
+
+                drawdown = Math.Min(drawdown, bottom - top);
+                close += trade.ProfitLoss;
+            }
+
+            return drawdown;
+        }
+
+        internal static decimal Variance(IEnumerable<decimal> values)
+        {
+            int count = values.Count();
+            if (count == 0)
+            {
+                return 0;
+            }
+
+            //Compute the Average
+            decimal avg = values.Average();
+
+            //Perform the Sum of (value-avg)^2
+            decimal sum = values.Sum(d => (d - avg) * (d - avg));
+            return sum / count;
+        }
+
+        internal static decimal StandardDeviation(IEnumerable<decimal> values)
+        {
+            decimal variance = Variance(values);
+            return (decimal)Math.Sqrt((double)variance);
         }
 
         private void AddCustomStatistics(IDictionary<string, decimal?> statistics, BacktestResult result)
@@ -473,11 +555,15 @@ namespace Algoloop.ViewModel
                 }
             }
 
+            // Load trades
+            LoadTrades(result);
+
             // Validate if statistics same
             IDictionary<string, decimal?> statistics = ReadStatistics(result);
             if (Model.Statistics.Count != statistics.Count
                 || Model.Statistics.Except(statistics).Any())
             {
+                Trades.Clear();
                 return;
             }
 
@@ -604,8 +690,13 @@ namespace Algoloop.ViewModel
             BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(model.Result, new[] { new OrderJsonConverter() });
             if (result != null)
             {
-                // Statistics
+                // Load trades
+                LoadTrades(result);
+
+                // Load statistics
                 model.Statistics = ReadStatistics(result);
+
+                // Clear trades
                 Trades.Clear();
             }
 
@@ -616,10 +707,6 @@ namespace Algoloop.ViewModel
 
         private IDictionary<string, decimal?> ReadStatistics(BacktestResult result)
         {
-            // Closed trades result
-            Trades.Clear();
-            result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
-
             IDictionary<string, decimal?> statistics = new SafeDictionary<string, decimal?>();
             AddCustomStatistics(statistics, result);
             foreach (KeyValuePair<string, string> item in result.Statistics)
@@ -637,7 +724,7 @@ namespace Algoloop.ViewModel
             foreach (PropertyInfo property in portfolioProperties)
             {
                 object value = property.GetValue(portfolioStatistics);
-                AddStatisticItem(statistics,property.Name, Convert.ToString(value, CultureInfo.InvariantCulture));
+                AddStatisticItem(statistics, property.Name, Convert.ToString(value, CultureInfo.InvariantCulture));
             }
 
             TradeStatistics tradeStatistics = result.TotalPerformance.TradeStatistics;
@@ -649,6 +736,12 @@ namespace Algoloop.ViewModel
             }
 
             return statistics;
+        }
+
+        private void LoadTrades(BacktestResult result)
+        {
+            Debug.Assert(!Trades.Any());
+            result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
         }
 
         private static string UniqueFileName(string path)
