@@ -67,8 +67,6 @@ namespace Algoloop.ViewModel
         /// </summary>
         public TimeSpan DrawdownPeriod { get; private set; }
 
-        public decimal Expectancy { get; private set; }
-
         public void AddTrade(Trade trade)
         {
             _trades.Add(trade);
@@ -92,9 +90,8 @@ namespace Algoloop.ViewModel
             RoMaD = roMaD.RoundToSignificantDigits(4);
 
             // Calculate score
-            double score = TrackViewModel.CalculateScore(_trades, out double expectancy);
+            double score = TrackViewModel.CalculateScore(_trades);
             Score = (decimal)score.RoundToSignificantDigits(4);
-            Expectancy = (decimal)expectancy.RoundToSignificantDigits(4);
         }
     }
 }

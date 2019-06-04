@@ -364,17 +364,12 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal static double CalculateScore(IList<Trade> trades, out double expectancy)
+        internal static double CalculateScore(IList<Trade> trades)
         {
-            expectancy = 0;
             if (trades == null || !trades.Any())
             {
                 return 0;
             }
-
-            double score = 0;
-            double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
-            int count = trades.Count();
 
             double worstTrade = (double)trades.Min(m => m.MAE);
             double maxDrawdown = (double)MaxDrawdown(trades, out _);
@@ -387,10 +382,11 @@ namespace Algoloop.ViewModel
             TimeSpan duration = last - first;
             double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
 
-            if (years > 0 && count > 0 && risk > 0)
+            double score = 0;
+            double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
+            if (years > 0 && risk > 0)
             {
-                expectancy = netProfit / count / risk;
-                score = (count / years) * expectancy;
+                score = netProfit / risk / years;
             }
 
             return Scale(score);
@@ -475,14 +471,13 @@ namespace Algoloop.ViewModel
 
         private void AddCustomStatistics(IDictionary<string, decimal?> statistics, BacktestResult result)
         {
-            double score = CalculateScore(Trades, out double expectancy);
+            double score = CalculateScore(Trades);
             statistics.Add("Score", (decimal)score.RoundToSignificantDigits(4));
-            statistics.Add("Expectancy", (decimal)expectancy.RoundToSignificantDigits(4));
         }
 
         private static double Scale(double x)
         {
-            return x / Math.Sqrt(10 + x * x);
+            return x / Math.Sqrt(100 + x * x);
         }
 
         private static double ScaleToRange(double x, double minimum, double maximum)
