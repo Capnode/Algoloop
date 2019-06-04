@@ -477,12 +477,15 @@ namespace Algoloop.ViewModel
 
         private static double Scale(double x)
         {
+            // Negative returns zero
             if (x < 0)
             {
                 return 0;
             }
 
-            return x / Math.Sqrt(300 + x * x);
+            // Adjust scale that x = 1 returns 0.1
+            const int c = 99;
+            return x / Math.Sqrt(c + x * x);
         }
 
         private static double ScaleToRange(double x, double minimum, double maximum)
