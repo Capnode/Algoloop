@@ -60,8 +60,8 @@ namespace Algoloop.Lean
                     engine.Run(job, algorithmManager, assemblyPath);
                     systemHandlers.JobQueue.AcknowledgeJob(job);
                     BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
-                    model.Result = resultHandler?.JsonResult;
-                    model.Logs = resultHandler?.Logs;
+                    model.Result = resultHandler?.JsonResult ?? string.Empty;
+                    model.Logs = resultHandler?.Logs ?? string.Empty;
                 }
             }
             catch (Exception ex)
