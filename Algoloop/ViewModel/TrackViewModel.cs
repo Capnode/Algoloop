@@ -352,9 +352,23 @@ namespace Algoloop.ViewModel
 
             Logs = string.Empty;
 
+            // Get symbols from model
+            foreach (SymbolModel symbolModel in Model.Symbols)
+            {
+                var symbolViewModel = new SymbolViewModel(null, symbolModel);
+                Symbols.Add(symbolViewModel);
+            }
+
+            // Get parameters from model
+            foreach (ParameterModel parameterModel in Model.Parameters)
+            {
+                var parameterViewModel = new ParameterViewModel(null, parameterModel);
+                Parameters.Add(parameterViewModel);
+            }
+
             // Statistics results
-            Statistics = Model.Statistics == null 
-                ? new SafeDictionary<string, decimal?>() 
+            Statistics = Model.Statistics == null
+                ? new SafeDictionary<string, decimal?>()
                 : new SafeDictionary<string, decimal?>(Model.Statistics);
 
             if (!_loaded && IsSelected)
@@ -513,20 +527,6 @@ namespace Algoloop.ViewModel
 
         private void LoadTrack()
         {
-            // Get symbols from model
-            foreach (SymbolModel symbolModel in Model.Symbols)
-            {
-                var symbolViewModel = new SymbolViewModel(null, symbolModel);
-                Symbols.Add(symbolViewModel);
-            }
-
-            // Get parameters from model
-            foreach (ParameterModel parameterModel in Model.Parameters)
-            {
-                var parameterViewModel = new ParameterViewModel(null, parameterModel);
-                Parameters.Add(parameterViewModel);
-            }
-
             // Find track zipfile
             if (!File.Exists(Model.ZipFile))
             {
