@@ -263,4 +263,3 @@ Launcher/Plugins/*
 
 QuantConnect.Lean.sln.DotSettings*
 secret.config
-*.csv
