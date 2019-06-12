@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Data\market-hours\market-hours-database.json" />
     <None Include="packages.config" />
     <None Include="secret.config" />
   </ItemGroup>
@@ -174,9 +175,7 @@
       <Name>QuantConnect.Logging</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

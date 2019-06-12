@@ -90,7 +90,7 @@
                                 <TextBlock.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem
-                                            Header="Delete Market"
+                                            Header="Delete market"
                                             Command="{Binding DeleteCommand}" >
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
@@ -98,9 +98,16 @@
                                         </MenuItem>
                                         <MenuItem
                                             Header="New list"
-                                            Command="{Binding NewListCommand}" >
+                                            Command="{Binding NewFolderCommand}" >
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Add.png" Width="16" Height="16"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem
+                                            Header="Import list..."
+                                            Command="{Binding ImportFolderCommand}" >
+                                            <MenuItem.Icon>
+                                                <Image Source="/Resources/Import.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>

@@ -153,6 +153,7 @@
     <Compile Include="HistoryWithSymbolChangesRegressionAlgorithm.cs" />
     <Compile Include="FeeModelNotUsingAccountCurrency.cs" />
     <Compile Include="InvalidEmitInsightsAlgorithm.cs" />
+    <Compile Include="InsightWeightingFrameworkAlgorithm.cs" />
     <Compile Include="MaximumPortfolioDrawdownFrameworkAlgorithm.cs" />
     <Compile Include="CompositeRiskManagementModelFrameworkAlgorithm.cs" />
     <Compile Include="OrderBasedInsightGeneratedAlgorithm.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="SmaCrossUniverseSelectionAlgorithm.cs" />
     <Compile Include="StartingCapitalRegressionAlgorithm.cs" />
     <Compile Include="StopLossOnOrderEventRegressionAlgorithm.cs" />
+    <Compile Include="TotalPortfolioValueRegressionAlgorithm.cs" />
     <Compile Include="TrailingStopRiskFrameworkAlgorithm.cs" />
     <Compile Include="BasicTemplateFuturesFrameworkAlgorithm.cs" />
     <Compile Include="BasicTemplateOptionsFrameworkAlgorithm.cs" />

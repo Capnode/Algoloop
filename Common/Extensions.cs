@@ -147,6 +147,24 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Lazy string to upper implementation.
+        /// Will first verify the string is not already upper and avoid
+        /// the call to <see cref="string.ToUpper()"/> if possible.
+        /// </summary>
+        /// <param name="data">The string to upper</param>
+        /// <returns>The upper string</returns>
+        public static string LazyToUpper(this string data)
+        {
+            // for performance only call to upper if required
+            var alreadyUpper = true;
+            for (int i = 0; i < data.Length && alreadyUpper; i++)
+            {
+                alreadyUpper = char.IsUpper(data[i]);
+            }
+            return alreadyUpper ? data : data.ToUpper();
+        }
+
+        /// <summary>
         /// Extension method to automatically set the update value to same as "add" value for TryAddUpdate.
         /// This makes the API similar for traditional and concurrent dictionaries.
         /// </summary>
@@ -224,6 +242,22 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Will truncate the provided decimal, without rounding, to 3 decimal places
+        /// </summary>
+        /// <param name="value">The value to truncate</param>
+        /// <returns>New instance with just 3 decimal places</returns>
+        public static decimal TruncateTo3DecimalPlaces(this decimal value)
+        {
+            if (value == decimal.MaxValue
+                || value == decimal.MinValue
+                || value == 0)
+            {
+                return value;
+            }
+            return Math.Truncate(1000 * value) / 1000;
+        }
+
+        /// <summary>
         /// Provides global smart rounding, numbers larger than 1000 will round to 4 decimal places,
         /// while numbers smaller will round to 7 significant digits
         /// </summary>
@@ -250,6 +284,7 @@ namespace QuantConnect
         /// as a decimal, then the closest decimal value will be returned</returns>
         public static decimal SafeDecimalCast(this double input)
         {
+            if (input.IsNaNOrZero()) return 0;
             if (input <= (double) decimal.MinValue) return decimal.MinValue;
             if (input >= (double) decimal.MaxValue) return decimal.MaxValue;
             return (decimal) input;
@@ -519,7 +554,13 @@ namespace QuantConnect
                 // divide by zero exception
                 return dateTime;
             }
-            return dateTime.AddTicks(-(dateTime.Ticks % interval.Ticks));
+
+            var amount = dateTime.Ticks % interval.Ticks;
+            if (amount > 0)
+            {
+                return dateTime.AddTicks(-amount);
+            }
+            return dateTime;
         }
 
         /// <summary>
@@ -1375,6 +1416,24 @@ namespace QuantConnect
         public static void SynchronouslyAwaitTask(this Task task)
         {
             task.ConfigureAwait(false).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Returns a new string in which specified ending in the current instance is removed.
+        /// </summary>
+        /// <param name="s">original string value</param>
+        /// <param name="ending">the string to be removed</param>
+        /// <returns></returns>
+        public static string RemoveFromEnd(this string s, string ending)
+        {
+            if (s.EndsWith(ending))
+            {
+                return s.Substring(0, s.Length - ending.Length);
+            }
+            else
+            {
+                return s;
+            }
         }
     }
 }

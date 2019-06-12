@@ -195,7 +195,7 @@ namespace QuantConnect.Statistics
             }
 
             var fractionOfYears = (decimal) (equity.Keys.LastOrDefault() - equity.Keys.FirstOrDefault()).TotalDays / 365;
-            CompoundingAnnualReturn = CompoundingAnnualPerformance(startingCapital, equity.Values.LastOrDefault(), fractionOfYears);
+            CompoundingAnnualReturn = Statistics.CompoundingAnnualPerformance(startingCapital, equity.Values.LastOrDefault(), fractionOfYears);
 
             Drawdown = DrawdownPercent(equity, 3);
 
@@ -228,15 +228,11 @@ namespace QuantConnect.Statistics
         }
 
         /// <summary>
-        /// Annual compounded returns statistic based on the final-starting capital and years.
+        /// Gets the current defined risk free annual return rate
         /// </summary>
-        /// <param name="startingCapital">Algorithm starting capital</param>
-        /// <param name="finalCapital">Algorithm final capital</param>
-        /// <param name="years">Years trading</param>
-        /// <returns>Decimal fraction for annual compounding performance</returns>
-        private static decimal CompoundingAnnualPerformance(decimal startingCapital, decimal finalCapital, decimal years)
+        public static decimal GetRiskFreeRate()
         {
-            return (years == 0 ? 0d : Math.Pow((double)finalCapital / (double)startingCapital, 1 / (double)years) - 1).SafeDecimalCast();
+            return RiskFreeRate;
         }
 
         /// <summary>

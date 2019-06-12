@@ -66,7 +66,8 @@ namespace Algoloop.ViewModel
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
             AddToSymbolListCommand = new RelayCommand<IList>(m => DoAddToSymbolList(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteMarket(this), () => !_parent.IsBusy && !Active);
-            NewListCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !_parent.IsBusy && !Active);
+            NewFolderCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !_parent.IsBusy && !Active);
+            ImportFolderCommand = new RelayCommand(() => DoImportFolder(), () => !_parent.IsBusy && !Active);
             ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !_parent.IsBusy);
             StartCommand = new RelayCommand(() => DoStartCommand(), () => !_parent.IsBusy && !Active);
             StopCommand = new RelayCommand(() => DoStopCommand(), () => !_parent.IsBusy && Active);
@@ -86,7 +87,8 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<IList> AddToSymbolListCommand { get; }
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand NewListCommand { get; }
+        public RelayCommand NewFolderCommand { get; }
+        public RelayCommand ImportFolderCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
@@ -522,6 +524,55 @@ namespace Algoloop.ViewModel
                 folder.AddSymbols(list.Where(m => m.Active));
                 Folders.Add(folder);
                 DataToModel();
+            }
+            finally
+            {
+                _parent.IsBusy = false;
+            }
+        }
+
+        private void DoImportFolder()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Multiselect = true,
+                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
+
+            if (openFileDialog.ShowDialog() == false)
+            {
+                return;
+            }
+
+            try
+            {
+                _parent.IsBusy = true;
+                foreach (string fileName in openFileDialog.FileNames)
+                {
+                    var model = new FolderModel { Name = Path.GetFileNameWithoutExtension(fileName) };
+                    Model.Folders.Add(model);
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        while (!r.EndOfStream)
+                        {
+                            string line = r.ReadLine();
+                            foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
+                            {
+                                if (Model.Symbols.Exists(m => m.Name.Equals(name) && m.Active))
+                                {
+                                    model.Symbols.Add(name);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                DataFromModel();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
             finally
             {
