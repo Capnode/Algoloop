@@ -296,7 +296,17 @@ namespace QuantConnect.ToolBox.CoarseUniverseGenerator
                             }
 
                             // sid,symbol,close,volume,dollar volume,has fundamental data,price factor,split factor
-                            var coarseFileLine = $"{sid},{ticker},{close},{volume},{Math.Truncate(dollarVolume)},{hasFundamentalDataForDate},{priceFactor},{splitFactor}";
+                            var coarseFileLine = string.Format(
+                                CultureInfo.InvariantCulture,
+                                "{0},{1},{2},{3},{4},{5},{6},{7}",
+                                sid,
+                                ticker,
+                                close,
+                                volume,
+                                Math.Truncate(dollarVolume),
+                                hasFundamentalDataForDate,
+                                priceFactor,
+                                splitFactor);
 
                             StreamWriter writer;
                             if (!writers.TryGetValue(coarseFile, out writer))
