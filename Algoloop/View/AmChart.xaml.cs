@@ -86,7 +86,7 @@ namespace Algoloop.View
             bool selected = true;
             foreach (ChartViewModel chart in charts)
             {
-                var model = new Model(chart, selected);
+                var model = new Model(chart, selected || IsDefaultSelected(chart.Title));
                 _combobox.Items.Add(model);
                 selected = false;
             }
@@ -95,6 +95,16 @@ namespace Algoloop.View
             _combobox.Visibility = _combobox.Items.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
 
             RedrawCharts();
+        }
+
+        private bool IsDefaultSelected(string title)
+        {
+            switch (title)
+            {
+                case "Net profit": return true;
+                case "Equity": return true;
+                default: return false;
+            }
         }
 
         private void RedrawCharts()
