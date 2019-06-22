@@ -40,7 +40,7 @@ namespace Algoloop
             EnsureBrowserEmulationEnabled("Algoloop.exe");
 
             // Prevent going to sleep mode
-            SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+            SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
         }
 
         protected override void OnExit(ExitEventArgs e)
