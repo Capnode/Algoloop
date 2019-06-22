@@ -23,7 +23,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>$(SelectedOptimization)</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -137,6 +137,7 @@
     <Message Text="IsOSX $(IsOSX)" Importance="high" />
     <Message Text="IsLinux $(IsLinux)" Importance="high" />
     <Message Text="ForceLinuxBuild $(ForceLinuxBuild)" Importance="high" />
+    <Message Text="SelectedOptimization $(SelectedOptimization)" Importance="high" />
   </Target>
   <Choose>
     <When Condition="$(IsWindows) AND '$(ForceLinuxBuild)' != 'true'">
@@ -220,6 +221,29 @@
     <Compile Include="Data\Consolidators\CalendarType.cs" />
     <Compile Include="Data\Consolidators\FilteredIdentityDataConsolidator.cs" />
     <Compile Include="Data\Custom\FxcmVolume.cs" />
+    <Compile Include="Data\Custom\SEC\ISECReport.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportBusinessAddress.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportCompanyData.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportConverters.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportDocument.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportFiler.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportFilingValues.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportFormerCompany.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportMailAddress.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportFactory.cs" />
+    <Compile Include="Data\Custom\SEC\SECReport8K.cs" />
+    <Compile Include="Data\Custom\SEC\SECReport10Q.cs" />
+    <Compile Include="Data\Custom\SEC\SECReport10K.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportIndexFile.cs" />
+    <Compile Include="Data\Custom\SEC\SECReportSubmission.cs" />
+    <Compile Include="Data\Custom\TradingEconomics\TradingEconomics.cs" />
+    <Compile Include="Data\Custom\TradingEconomics\TradingEconomicsEarnings.cs" />
+    <Compile Include="Data\Custom\TradingEconomics\TradingEconomicsIndicator.cs" />
+    <Compile Include="Data\Custom\TradingEconomics\TradingEconomicsDateTimeConverter.cs" />
+    <Compile Include="Data\Custom\TradingEconomics\TradingEconomicsCalendar.cs" />
+    <Compile Include="Data\Custom\Estimize\EstimizeConsensus.cs" />
+    <Compile Include="Data\Custom\Estimize\EstimizeEstimate.cs" />
+    <Compile Include="Data\Custom\Estimize\EstimizeRelease.cs" />
     <Compile Include="Data\Custom\USEnergyInformation.cs" />
     <Compile Include="Data\Fundamental\AssetClassificationHelper.cs" />
     <Compile Include="Data\HistoryProviderBase.cs" />
@@ -721,6 +745,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Import Project="..\packages\QuantConnect.pythonnet.1.0.5.20\build\QuantConnect.pythonnet.targets" Condition="Exists('..\packages\QuantConnect.pythonnet.1.0.5.20\build\QuantConnect.pythonnet.targets')" />
