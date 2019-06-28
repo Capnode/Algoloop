@@ -1274,13 +1274,13 @@ namespace QuantConnect.Algorithm
             }
 
             //3. Check end date greater:
-            if (_endDate != new DateTime())
-            {
-                if (start > _endDate)
-                {
-                    throw new Exception("Please select start date less than end date.");
-                }
-            }
+            //if (_endDate != new DateTime())
+            //{
+            //    if (start > _endDate)
+            //    {
+            //        throw new Exception("Please select start date less than end date.");
+            //    }
+            //}
 
             //4. Check not locked already:
             if (!_locked)
@@ -1311,10 +1311,10 @@ namespace QuantConnect.Algorithm
 
             //Validate:
             //1. Check Range:
-            if (end > DateTime.Now.Date.AddDays(-1))
-            {
-                end = DateTime.Now.Date.AddDays(-1);
-            }
+            //if (end > DateTime.Now.Date.AddDays(-1))
+            //{
+            //    end = DateTime.Now.Date.AddDays(-1);
+            //}
 
             //2. Check start date less:
             if (_startDate != new DateTime())
