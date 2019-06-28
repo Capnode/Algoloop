@@ -29,7 +29,7 @@ namespace Algoloop.Provider
             Config.Set("data-directory", settings.DataFolder);
 
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.LastDate, model.LastDate);
+            IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.LastDate, model.LastDate, model.ApiKey);
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
