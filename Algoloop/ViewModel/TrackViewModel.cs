@@ -386,10 +386,12 @@ namespace Algoloop.ViewModel
             }
 
             double worstTrade = (double)trades.Min(m => m.MAE);
-            double maxDrawdown = (double)MaxDrawdown(trades, out _);
+//            double maxDrawdown = (double)MaxDrawdown(trades, out _);
+            double linearError = -LinearDeviation(trades);
             Debug.Assert(worstTrade <= 0);
-            Debug.Assert(maxDrawdown <= 0);
-            double risk = Math.Sqrt(worstTrade * maxDrawdown);
+//            Debug.Assert(maxDrawdown <= 0);
+            Debug.Assert(linearError <= 0);
+            double risk = Math.Sqrt(worstTrade * linearError);
 
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
@@ -461,7 +463,7 @@ namespace Algoloop.ViewModel
             return drawdown;
         }
 
-        internal static decimal Variance(IEnumerable<decimal> values)
+        internal static decimal StandardDeviation(IEnumerable<decimal> values)
         {
             int count = values.Count();
             if (count == 0)
@@ -474,13 +476,34 @@ namespace Algoloop.ViewModel
 
             //Perform the Sum of (value-avg)^2
             decimal sum = values.Sum(d => (d - avg) * (d - avg));
-            return sum / count;
+            double variance = (double)sum / count;
+            return (decimal)Math.Sqrt(variance);
         }
 
-        internal static decimal StandardDeviation(IEnumerable<decimal> values)
+        private static double LinearDeviation(IList<Trade> trades)
         {
-            decimal variance = Variance(values);
-            return (decimal)Math.Sqrt((double)variance);
+            int count = trades.Count();
+            if (count == 0)
+            {
+                return 0;
+            }
+
+            IEnumerable<decimal> range = trades.Select(m => m.ProfitLoss - m.TotalFees);
+            decimal netProfit = range.Sum();
+            decimal avg = netProfit / count;
+            decimal profit = 0;
+            decimal ideal = 0;
+            decimal sum = 0;
+            foreach (decimal trade in range)
+            {
+                profit += trade;
+                ideal += avg;
+                decimal epsilon = profit - ideal;
+                sum += epsilon * epsilon;
+            }
+
+            double variance = (double)sum / count;
+            return Math.Sqrt(variance);
         }
 
         private void AddCustomStatistics(IDictionary<string, decimal?> statistics, BacktestResult result)
