@@ -31,6 +31,7 @@ using QuantConnect.ToolBox.FxcmVolumeDownload;
 using QuantConnect.ToolBox.GDAXDownloader;
 using QuantConnect.ToolBox.IBDownloader;
 using QuantConnect.ToolBox.IEX;
+using QuantConnect.ToolBox.IQFeedDownloader;
 using QuantConnect.ToolBox.IVolatilityEquityConverter;
 using QuantConnect.ToolBox.KaikoDataConverter;
 using QuantConnect.ToolBox.KrakenDownloader;
@@ -97,6 +98,10 @@ namespace QuantConnect.ToolBox
                     case "iexdownloader":
                         IEXDownloaderProgram.IEXDownloader(tickers, resolution, fromDate, toDate, GetParameterOrExit(optionsObject, "api-key"));
                         break;
+                    case "iqfdl":
+                    case "iqfeeddownloader":
+                        IQFeedDownloaderProgram.IQFeedDownloader(tickers, resolution, fromDate, toDate);
+                        break;
                     case "kdl":
                     case "krakendownloader":
                         KrakenDownloaderProgram.KrakenDownloader(tickers, resolution, fromDate, toDate);
@@ -119,19 +124,10 @@ namespace QuantConnect.ToolBox
                         break;
                     case "secdl":
                     case "secdownloader":
-                        var equityFolder = Path.Combine(Globals.DataFolder, "equity", Market.USA);
-                        var secFolder = Path.Combine(Globals.DataFolder, "alternative", "sec");
-
                         SECDataDownloaderProgram.SECDataDownloader(
-                            GetParameterOrDefault(optionsObject, "source-dir", Path.Combine(secFolder, "raw-sec")),
-                            GetParameterOrDefault(optionsObject, "destination-dir", secFolder),
+                            GetParameterOrExit(optionsObject, "destination-dir"),
                             fromDate,
-                            toDate,
-                            GetParameterOrDefault(
-                                optionsObject,
-                                "source-meta-dir",
-                                Path.Combine(equityFolder, "daily")
-                            )
+                            toDate
                         );
                         break;
                     case "ecdl":
@@ -216,6 +212,14 @@ namespace QuantConnect.ToolBox
                             GetParameterOrDefault(optionsObject, "dividends-percentage", "60.0"),
                             GetParameterOrDefault(optionsObject, "dividend-every-quarter-percentage", "30.0")
                         );
+                        break;
+                    case "seccv":
+                    case "secconverter":
+                        var start = DateTime.ParseExact(GetParameterOrExit(optionsObject, "date"), "yyyyMMdd", CultureInfo.InvariantCulture);
+                        SECDataDownloaderProgram.SECDataConverter(
+                            GetParameterOrExit(optionsObject, "source-dir"),
+                            GetParameterOrDefault(optionsObject, "destination-dir", Globals.DataFolder),
+                            start);
                         break;
                     default:
                         PrintMessageAndExit(1, "ERROR: Unrecognized --app value");

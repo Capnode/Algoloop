@@ -266,6 +266,7 @@
     <Compile Include="Interfaces\ISubscriptionDataConfigService.cs" />
     <Compile Include="Interfaces\ITimeKeeper.cs" />
     <Compile Include="IsolatorLimitResult.cs" />
+    <Compile Include="Orders\Fees\AlphaStreamsFeeModel.cs" />
     <Compile Include="Orders\Fills\Fill.cs" />
     <Compile Include="Orders\Fills\FillModelParameters.cs" />
     <Compile Include="Orders\Fees\FeeModel.cs" />
@@ -723,6 +724,7 @@
     <Compile Include="Util\ReaderWriterLockSlimExtensions.cs" />
     <Compile Include="Util\Ref.cs" />
     <Compile Include="Util\SingleValueListConverter.cs" />
+    <Compile Include="Util\Validate.cs" />
     <Compile Include="Util\VersionHelper.cs" />
     <Compile Include="Util\WorkerThread.cs" />
     <Compile Include="Util\XElementExtensions.cs" />
