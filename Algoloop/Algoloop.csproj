@@ -422,6 +422,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Resource Include="Doc\Chart.png" />
     <Content Include="Extern\AmCharts.Windows.Stock.dll" />
     <Resource Include="Resources\Exit.png" />
     <Resource Include="Resources\Tools.png" />
@@ -456,6 +457,9 @@
       <Link>Data\symbol-properties-database.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="..\readme.md">
+      <Link>Doc\readme.md</Link>
+    </None>
     <None Include="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -560,9 +564,7 @@
   <ItemGroup>
     <Content Include="Algoloop.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Doc\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
