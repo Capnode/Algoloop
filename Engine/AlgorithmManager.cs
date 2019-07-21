@@ -209,6 +209,12 @@ namespace QuantConnect.Lean.Engine
             Log.Trace("AlgorithmManager.Run(): Begin DataStream - Start: " + algorithm.StartDate + " Stop: " + algorithm.EndDate);
             foreach (var timeSlice in Stream(algorithm, synchronizer, results, token))
             {
+                // Check if end date reached
+                if (timeSlice.Time > algorithm.EndDate)
+                {
+                    break;
+                }
+
                 // reset our timer on each loop
                 _currentTimeStepTime = DateTime.MinValue;
 
