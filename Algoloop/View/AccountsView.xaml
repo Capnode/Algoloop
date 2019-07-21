@@ -14,9 +14,13 @@
     d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}" x:Key="RightCell">
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
         <ObjectDataProvider
             x:Key="settings"
-            ObjectInstance="{x:Static properties:Settings.Default}"/>
+            ObjectInstance="{x:Static properties:Settings.Default}">
+        </ObjectDataProvider>
     </UserControl.Resources>
 
     <UserControl.Cursor>
@@ -113,6 +117,25 @@
                 <DataTemplate DataType="{x:Type vm:AccountViewModel}">
                     <DockPanel>
                         <TabControl>
+                            <TabItem Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}">
+                                <wpf:ExDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    ExSelectedItems="{Binding SelectedItems}"                                   
+                                    ExItemsSource="{Binding Balances}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
+                                        <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
+                                    </DataGrid.Columns>
+                                </wpf:ExDataGrid>
+                            </TabItem>
                             <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
                                 <wpf:ExDataGrid
                                     CanUserFreeze="False"
@@ -203,22 +226,29 @@
                                     </DataGrid.RowStyle>
                                 </wpf:ExDataGrid>
                             </TabItem>
-                            <TabItem Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}">
+                            <TabItem Header="{Binding ClosedTrades.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
                                 <wpf:ExDataGrid
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
                                     CanUserFilter="True"
-                                    HorizontalAlignment="Stretch"
-                                    VerticalAlignment="Stretch"
-                                    AutoGenerateColumns="False"
-                                    IsReadOnly="False"
+                                    IsReadOnly="True"
                                     GridLinesVisibility="None"
-                                    ExSelectedItems="{Binding SelectedItems}"                                   
-                                    ExItemsSource="{Binding Balances}">
+                                    AutoGenerateColumns="False"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding ClosedTrades}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
-                                        <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
+                                        <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
+                                        <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>
+                                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction}"/>
+                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                                        <DataGridTextColumn Header="Entry price" Binding="{Binding EntryPrice}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Exit price" Binding="{Binding ExitPrice}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Profit" Binding="{Binding ProfitLoss}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Fees" Binding="{Binding TotalFees}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Duration" Binding="{Binding Duration, StringFormat='{}{0:d\\.hh\\:mm\\:ss}'}" ElementStyle="{StaticResource RightCell}"/>
                                     </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </TabItem>

@@ -22,6 +22,7 @@ using com.sun.rowset;
 using java.util;
 using NodaTime;
 using QuantConnect.Orders;
+using QuantConnect.Statistics;
 
 namespace QuantConnect.Brokerages.Fxcm
 {
@@ -106,6 +107,28 @@ namespace QuantConnect.Brokerages.Fxcm
                 Quantity = Convert.ToDecimal(fxcmPosition.getPositionQty().getLongQty() > 0
                     ? fxcmPosition.getPositionQty().getLongQty()
                     : -fxcmPosition.getPositionQty().getShortQty())
+            };
+        }
+
+        /// <summary>
+        /// Converts an FXCM closed position to a QuantConnect Trade.
+        /// </summary>
+        /// <param name="fxcmPosition">The FXCM position</param>
+        private Trade ConvertTrade(ClosedPositionReport fxcmPosition)
+        {
+            var securityType = _symbolMapper.GetBrokerageSecurityType(fxcmPosition.getInstrument().getSymbol());
+
+            return new Trade
+            {
+                Symbol = _symbolMapper.GetLeanSymbol(fxcmPosition.getInstrument().getSymbol(), securityType, Market.FXCM),
+                EntryPrice = Convert.ToDecimal(fxcmPosition.getSettlPrice()),
+                ExitPrice = Convert.ToDecimal(fxcmPosition.getFXCMCloseSettlPrice()),
+                EntryTime = FromJavaDate(fxcmPosition.getFXCMPosOpenTime().toDate()),
+                ExitTime = FromJavaDate(fxcmPosition.getFXCMPosCloseTime().toDate()),
+                Direction = fxcmPosition.getPositionQty().getLongQty() > 0 ? TradeDirection.Long : TradeDirection.Short,
+                Quantity = Convert.ToDecimal(fxcmPosition.getPositionQty().getQty()),
+                ProfitLoss = Convert.ToDecimal(fxcmPosition.getFXCMPosClosePNL()),
+                TotalFees = Convert.ToDecimal(fxcmPosition.getFXCMPosCommission())
             };
         }
 

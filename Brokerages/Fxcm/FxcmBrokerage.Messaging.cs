@@ -53,6 +53,7 @@ namespace QuantConnect.Brokerages.Fxcm
         private readonly Dictionary<string, ExecutionReport> _openOrders = new Dictionary<string, ExecutionReport>();
         // Map key: fxcmPositionId (can have multiple positions for the same symbol)
         private readonly Dictionary<string, PositionReport> _openPositions = new Dictionary<string, PositionReport>();
+        private readonly Dictionary<string, ClosedPositionReport> _closedPositions = new Dictionary<string, ClosedPositionReport>();
 
         private readonly Dictionary<string, Order> _mapRequestsToOrders = new Dictionary<string, Order>();
         private readonly Dictionary<string, Order> _mapFxcmOrderIdsToOrders = new Dictionary<string, Order>();
@@ -127,6 +128,21 @@ namespace QuantConnect.Brokerages.Fxcm
             }
             if (!autoResetEvent.WaitOne(ResponseTimeout))
                 throw new TimeoutException(string.Format("FxcmBrokerage.LoadOpenPositions(): Operation took longer than {0} seconds.", (decimal)ResponseTimeout / 1000));
+        }
+
+        private void LoadClosedPositions()
+        {
+            AutoResetEvent autoResetEvent;
+            lock (_locker)
+            {
+                _currentRequest = _terminal.Equals("Demo") ?
+                    _gateway.requestClosedPositions(Convert.ToInt64(_accountId)) :
+                    _gateway.requestClosedPositions(_accountId);
+                autoResetEvent = new AutoResetEvent(false);
+                _mapRequestsToAutoResetEvents[_currentRequest] = autoResetEvent;
+            }
+            if (!autoResetEvent.WaitOne(ResponseTimeout))
+                throw new TimeoutException(string.Format("FxcmBrokerage.LoadClosedPositions(): Operation took longer than {0} seconds.", (decimal)ResponseTimeout / 1000));
         }
 
         /// <summary>
@@ -495,6 +511,11 @@ namespace QuantConnect.Brokerages.Fxcm
                 if (_openPositions.ContainsKey(fxcmPositionId) && message is ClosedPositionReport)
                 {
                     _openPositions.Remove(fxcmPositionId);
+                    _closedPositions[fxcmPositionId] = message as ClosedPositionReport;
+                }
+                else if (message is ClosedPositionReport)
+                {
+                    _closedPositions[fxcmPositionId] = message as ClosedPositionReport;
                 }
                 else
                 {

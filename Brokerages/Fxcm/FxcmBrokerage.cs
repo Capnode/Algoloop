@@ -32,6 +32,7 @@ using QuantConnect.Interfaces;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
+using QuantConnect.Statistics;
 
 namespace QuantConnect.Brokerages.Fxcm
 {
@@ -255,6 +256,7 @@ namespace QuantConnect.Brokerages.Fxcm
                                         LoadAccounts();
                                         LoadOpenOrders();
                                         LoadOpenPositions();
+                                        LoadClosedPositions();
                                     }
 
                                     _connectionLost = false;
@@ -290,6 +292,7 @@ namespace QuantConnect.Brokerages.Fxcm
                 LoadAccounts();
                 LoadOpenOrders();
                 LoadOpenPositions();
+                LoadClosedPositions();
             }
         }
 
@@ -395,11 +398,25 @@ namespace QuantConnect.Brokerages.Fxcm
                     if (quotes.TryGetValue(_symbolMapper.GetBrokerageSymbol(holding.Symbol), out quote))
                     {
                         holding.MarketPrice = Convert.ToDecimal((quote.getBidClose() + quote.getAskClose()) / 2);
+                        holding.UnrealizedPnL = holding.Quantity * (holding.MarketPrice - holding.AveragePrice);
                     }
                 }
             }
 
             return holdings;
+        }
+
+        /// <summary>
+        /// Gets all closed trades for the account
+        /// </summary>
+        /// <returns>The closed trades from the account</returns>
+        public override List<Trade> GetClosedTrades()
+        {
+            List<Trade> trades = _closedPositions.Values
+                .Select(ConvertTrade)
+                .ToList();
+
+            return trades;
         }
 
         /// <summary>

@@ -29,6 +29,7 @@ using QuantConnect.Brokerages.Fxcm;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
+using QuantConnect.Statistics;
 
 namespace Algoloop.ViewModel
 {
@@ -62,6 +63,7 @@ namespace Algoloop.ViewModel
         public AccountModel Model { get; }
         public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
+        public SyncObservableCollection<Trade> ClosedTrades { get; } = new SyncObservableCollection<Trade>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
 
         public IList SelectedItems
@@ -175,6 +177,7 @@ namespace Algoloop.ViewModel
                 UpdateOrder();
                 UpdatePosition();
                 UpdateBalance();
+                UpdateClosedTrades();
                 loop = !_cancel.Token.WaitHandle.WaitOne(1000);
             }
 
@@ -237,6 +240,16 @@ namespace Algoloop.ViewModel
                 {
                     Positions.Remove(vm);
                 }
+            }
+        }
+
+        private void UpdateClosedTrades()
+        {
+            ClosedTrades.Clear();
+            List<Trade> trades = _brokerage.GetClosedTrades();
+            foreach (Trade trade in trades)
+            {
+                ClosedTrades.Add(trade);
             }
         }
 

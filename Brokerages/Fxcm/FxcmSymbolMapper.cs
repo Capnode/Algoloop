@@ -119,7 +119,19 @@ namespace QuantConnect.Brokerages.Fxcm
             { "XAU/USD", "XAUUSD" },
             { "XPD/USD", "XPDUSD" },
             { "XPT/USD", "XPTUSD" },
-            { "ZAR/JPY", "ZARJPY" }
+            { "ZAR/JPY", "ZARJPY" },
+            { "US2000", "US2000USD" },
+            { "CHN50", "CHN50CHN" },
+            { "SOYF", "SOYFUSD" },
+            { "CORNF", "CORNFUSD" },
+            { "EMBasket", "EMBasketUSD" },
+            { "JPYBasket", "JPYBasketJPY" },
+            { "BCH/USD", "BCHUSD" },
+            { "BTC/USD", "BTCUSD" },
+            { "ETH/USD", "ETHUSD" },
+            { "LTC/USD", "LTCUSD" },
+            { "XRP/USD", "XRPUSD" },
+            { "WHEATF", "WHEATFUSD" }
         };
 
         private static readonly Dictionary<string, string> MapFxcmToLean = new Dictionary<string, string>();

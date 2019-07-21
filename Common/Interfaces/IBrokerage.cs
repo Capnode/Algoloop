@@ -20,6 +20,7 @@ using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
+using QuantConnect.Statistics;
 
 namespace QuantConnect.Interfaces
 {
@@ -70,6 +71,12 @@ namespace QuantConnect.Interfaces
         /// </summary>
         /// <returns>The current holdings from the account</returns>
         List<Holding> GetAccountHoldings();
+
+        /// <summary>
+        /// Gets all trades for the account
+        /// </summary>
+        /// <returns>The tradess from the account</returns>
+        List<Trade> GetClosedTrades();
 
         /// <summary>
         /// Gets the current cash balance for each currency held in the brokerage account

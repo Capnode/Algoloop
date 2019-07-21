@@ -32,6 +32,7 @@ using QuantConnect.Lean.Engine.TransactionHandlers;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
 using QuantConnect.Securities;
+using QuantConnect.Statistics;
 using QuantConnect.Tests.Engine.DataFeeds;
 using HistoryRequest = QuantConnect.Data.HistoryRequest;
 
@@ -451,6 +452,11 @@ namespace QuantConnect.Tests.Engine.Setup
         {
         }
         public List<Holding> GetAccountHoldings()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Trade> GetClosedTrades()
         {
             throw new NotImplementedException();
         }

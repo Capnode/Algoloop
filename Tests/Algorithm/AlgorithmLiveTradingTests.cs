@@ -27,6 +27,7 @@ using QuantConnect.Lean.Engine.Results;
 using QuantConnect.Lean.Engine.TransactionHandlers;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
+using QuantConnect.Statistics;
 using QuantConnect.Tests.Engine.DataFeeds;
 
 namespace QuantConnect.Tests.Algorithm
@@ -81,6 +82,7 @@ namespace QuantConnect.Tests.Algorithm
             public bool IsConnected { get; } = true;
             public List<Order> GetOpenOrders() { return new List<Order>(); }
             public List<Holding> GetAccountHoldings() { return new List<Holding>(); }
+            public List<Trade> GetClosedTrades() { return new List<Trade>(); }
             public List<CashAmount> GetCashBalance() { return new List<CashAmount>(); }
             public bool PlaceOrder(Order order) { return true; }
             public bool UpdateOrder(Order order) { return true; }
