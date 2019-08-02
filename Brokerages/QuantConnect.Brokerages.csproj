@@ -151,9 +151,8 @@
     <Reference Include="QuantConnect.IBAutomater, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QuantConnect.IBAutomater.1.0.4\lib\net45\QuantConnect.IBAutomater.exe</HintPath>
     </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="RestSharp, Version=106.6.10.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.6.10\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -161,6 +160,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -268,7 +268,6 @@
     <Compile Include="Backtesting\BasicOptionAssignmentSimulation.cs" />
     <Compile Include="Backtesting\IBacktestingMarketSimulation.cs" />
     <Compile Include="BaseWebsocketsBrokerage.cs" />
-    <Compile Include="Bitfinex\BestBidAskUpdatedEventArgs.cs" />
     <Compile Include="Bitfinex\BitfinexBrokerage.Messaging.cs" />
     <Compile Include="Bitfinex\BitfinexBrokerage.cs" />
     <Compile Include="Bitfinex\BitfinexBrokerageFactory.cs" />
@@ -277,7 +276,8 @@
     <Compile Include="Bitfinex\BitfinexWebSocketWrapper.cs" />
     <Compile Include="Bitfinex\Messages.cs" />
     <Compile Include="Bitfinex\BitfinexSymbolMapper.cs" />
-    <Compile Include="Bitfinex\OrderBook.cs" />
+    <Compile Include="IOrderBookUpdater.cs" />
+    <Compile Include="DefaultOrderBook.cs" />
     <Compile Include="Brokerage.cs" />
     <Compile Include="BrokerageException.cs" />
     <Compile Include="BrokerageFactory.cs" />
@@ -289,14 +289,13 @@
     <Compile Include="Fxcm\FxcmBrokerageFactory.cs" />
     <Compile Include="Fxcm\FxcmSymbolMapper.cs" />
     <Compile Include="GDAX\AuthenticationToken.cs" />
-    <Compile Include="GDAX\BestBidAskUpdatedEventArgs.cs" />
+    <Compile Include="BestBidAskUpdatedEventArgs.cs" />
     <Compile Include="GDAX\GDAXBrokerage.Utility.cs" />
     <Compile Include="GDAX\GDAXBrokerage.cs" />
     <Compile Include="GDAX\GDAXBrokerageFactory.cs" />
     <Compile Include="GDAX\GDAXDataQueueHandler.cs" />
     <Compile Include="GDAX\GDAXFill.cs" />
     <Compile Include="GDAX\GDAXBrokerage.Messaging.cs" />
-    <Compile Include="GDAX\OrderBook.cs" />
     <Compile Include="IConnectionHandler.cs" />
     <Compile Include="IWebSocket.cs" />
     <Compile Include="GDAX\Messages.cs" />

@@ -246,6 +246,7 @@
     <Compile Include="Data\Custom\Estimize\EstimizeRelease.cs" />
     <Compile Include="Data\Custom\PsychSignal\PsychSignalSentimentData.cs" />
     <Compile Include="Data\Custom\USEnergyInformation.cs" />
+    <Compile Include="Data\Custom\USTreasury\USTreasuryYieldCurveRate.cs" />
     <Compile Include="Data\Fundamental\AssetClassificationHelper.cs" />
     <Compile Include="Data\HistoryProviderBase.cs" />
     <Compile Include="Data\HistoryProviderInitializeParameters.cs" />
@@ -256,6 +257,7 @@
     <Compile Include="Indicators\IIndicatorWarmUpPeriodProvider.cs" />
     <Compile Include="Interfaces\IAccountCurrencyProvider.cs" />
     <Compile Include="Interfaces\IAlgorithmSubscriptionManager.cs" />
+    <Compile Include="Interfaces\IBrokerageCashSynchronizer.cs" />
     <Compile Include="Interfaces\IBusyCollection.cs" />
     <Compile Include="Interfaces\IDownloadProvider.cs" />
     <Compile Include="Interfaces\IHistoryProvider.cs" />
@@ -291,6 +293,7 @@
     <Compile Include="Securities\AccountCurrencyImmediateSettlementModel.cs" />
     <Compile Include="Securities\InitialMarginRequiredForOrderParameters.cs" />
     <Compile Include="Securities\IOrderEventProvider.cs" />
+    <Compile Include="Securities\GetMinimumPriceVariationParameters.cs" />
     <Compile Include="Securities\ReservedBuyingPowerForPosition.cs" />
     <Compile Include="Securities\ReservedBuyingPowerForPositionParameters.cs" />
     <Compile Include="Securities\SecurityService.cs" />
@@ -670,6 +673,7 @@
     <Compile Include="Algorithm\Framework\Alphas\InsightType.cs" />
     <Compile Include="Statistics\AlgorithmPerformance.cs" />
     <Compile Include="Statistics\FitnessScoreManager.cs" />
+    <Compile Include="Statistics\KellyCriterionManager.cs" />
     <Compile Include="Statistics\PortfolioStatistics.cs" />
     <Compile Include="Statistics\StatisticsBuilder.cs" />
     <Compile Include="Statistics\StatisticsResults.cs" />

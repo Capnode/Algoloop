@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using QuantConnect.Brokerages;
 using QuantConnect.Data;
-using QuantConnect.Data.Market;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
 using QuantConnect.Statistics;
@@ -28,7 +27,7 @@ namespace QuantConnect.Interfaces
     /// Brokerage interface that defines the operations all brokerages must implement. The IBrokerage implementation
     /// must have a matching IBrokerageFactory implementation.
     /// </summary>
-    public interface IBrokerage : IDisposable
+    public interface IBrokerage : IBrokerageCashSynchronizer, IDisposable
     {
         /// <summary>
         /// Event that fires each time an order is filled
