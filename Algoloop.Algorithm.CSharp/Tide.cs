@@ -14,7 +14,6 @@
 
 using QuantConnect;
 using QuantConnect.Algorithm;
-using QuantConnect.Algorithm.Framework;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Execution;
 using QuantConnect.Algorithm.Framework.Portfolio;
@@ -27,6 +26,7 @@ using QuantConnect.Parameters;
 using QuantConnect.Securities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -139,6 +139,8 @@ namespace Capnode.Algorithm.CSharp
             _closeTimeShort = closeTimeShort;
         }
 
+        public List<Symbol> Symbols { get; } = new List<Symbol>();
+
         public override IEnumerable<Insight> Update(
             QCAlgorithm algorithm,
             Slice data)
@@ -147,16 +149,18 @@ namespace Capnode.Algorithm.CSharp
             foreach (var kvp in algorithm.ActiveSecurities)
             {
                 Symbol symbol = kvp.Key;
-
-                if (!algorithm.IsMarketOpen(symbol))
+                if (!Symbols.Contains(symbol)
+                    || !algorithm.IsMarketOpen(symbol))
+                {
                     continue;
+                }
 
                 TimeSpan now = data.Time.TimeOfDay;
                 bool longInHours = InHours(_openTimeLong, now, _closeTimeLong);
                 bool shortInHours = InHours(_openTimeShort, now, _closeTimeShort);
 
                 SecurityHolding holding = algorithm.Portfolio[symbol];
-                if (!holding.IsLong && longInHours)
+                if (!holding.Invested && longInHours)
                 {
                     TimeSpan duration = (_closeTimeLong - now).Subtract(TimeSpan.FromSeconds(1));
                     if (duration < TimeSpan.Zero)
@@ -167,7 +171,7 @@ namespace Capnode.Algorithm.CSharp
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Up));
                     algorithm.Log($"Insight Up");
                 }
-                else if (!holding.IsShort && shortInHours)
+                else if (!holding.Invested && shortInHours)
                 {
                     TimeSpan duration = (_closeTimeShort - now).Subtract(TimeSpan.FromSeconds(1));
                     if (duration < TimeSpan.Zero)
@@ -178,11 +182,35 @@ namespace Capnode.Algorithm.CSharp
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Down));
                     algorithm.Log($"Insight Down");
                 }
+                else if (holding.IsLong && !longInHours || holding.IsShort && !shortInHours)
+                {
+                    insights.Add(Insight.Price(symbol, _resolution, 1, InsightDirection.Flat));
+                    algorithm.Log($"Insight Flat");
+                }
             }
 
             return insights;
         }
 
+        public override void OnSecuritiesChanged(QCAlgorithm algorithm, SecurityChanges changes)
+        {
+            foreach (Symbol symbol in changes.RemovedSecurities.Select(x => x.Symbol))
+            {
+                Symbol prospect = Symbols.Find(m => m.Equals(symbol));
+                if (prospect != null)
+                {
+                    Symbols.Remove(prospect);
+                }
+            }
+
+            // Initialize data for added securities
+            IEnumerable<Symbol> symbols = changes.AddedSecurities.Select(x => x.Symbol);
+            foreach (Symbol symbol in symbols)
+            {
+                Debug.Assert(!Symbols.Exists(m => m.Equals(symbol)));
+                Symbols.Add(symbol);
+            }
+        }
 
         private bool InHours(TimeSpan open, TimeSpan now, TimeSpan close)
         {
