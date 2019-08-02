@@ -458,15 +458,6 @@ namespace QuantConnect.Tests.Engine.Setup
             return new List<CashAmount> { new CashAmount(10, Currencies.USD) };
         }
 
-        public List<Trade> GetClosedTrades()
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<CashAmount> GetCashBalance()
-        {
-            throw new NotImplementedException();
-        }
         #region UnusedMethods
 
         public override List<Holding> GetAccountHoldings()
