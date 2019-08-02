@@ -101,16 +101,22 @@ namespace Algoloop.Provider
             string marketHoursFolder = Path.Combine(dataFolder, "market-hours");
             const string marketHoursFile = "market-hours-database.json";
             string marketHoursPath = Path.Combine(marketHoursFolder, marketHoursFile);
-            Directory.CreateDirectory(marketHoursFolder);
-            string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", marketHoursFile);
-            File.Copy(file, marketHoursPath, true);
+            if (!File.Exists(marketHoursPath))
+            {
+                Directory.CreateDirectory(marketHoursFolder);
+                string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", marketHoursFile);
+                File.Copy(file, marketHoursPath);
+            }
 
             string symbolPropertiesFolder = Path.Combine(dataFolder, "symbol-properties");
             const string symbolPropertiesFile = "symbol-properties-database.csv";
             string symbolPropertiesPath = Path.Combine(symbolPropertiesFolder, symbolPropertiesFile);
-            Directory.CreateDirectory(symbolPropertiesFolder);
-            file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", symbolPropertiesFile);
-            File.Copy(file, symbolPropertiesPath, true);
+            if (!File.Exists(symbolPropertiesPath))
+            {
+                Directory.CreateDirectory(symbolPropertiesFolder);
+                string file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", symbolPropertiesFile);
+                File.Copy(file, symbolPropertiesPath);
+            }
         }
 
         private static IProvider CreateProvider(string name)
