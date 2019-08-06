@@ -102,7 +102,7 @@ namespace Capnode.Algorithm.CSharp
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
 
             // Alpha Model
-            SetAlpha(new TideAlphaModel(resolution, openTimeLong, closeTimeLong, openTimeShort, closeTimeShort));
+            SetAlpha(new TideAlphaModel(symbols, resolution, openTimeLong, closeTimeLong, openTimeShort, closeTimeShort));
 
             // Portfolio Construction
             SetPortfolioConstruction(new EqualWeightingPortfolioConstructionModel());
@@ -119,27 +119,28 @@ namespace Capnode.Algorithm.CSharp
 
     public class TideAlphaModel : AlphaModel
     {
-        private Resolution _resolution;
-        private TimeSpan _openTimeLong;
-        private TimeSpan _closeTimeLong;
-        private TimeSpan _openTimeShort;
-        private TimeSpan _closeTimeShort;
+        private readonly IEnumerable<Symbol> _symbols;
+        private readonly Resolution _resolution;
+        private readonly TimeSpan _openTimeLong;
+        private readonly TimeSpan _closeTimeLong;
+        private readonly TimeSpan _openTimeShort;
+        private readonly TimeSpan _closeTimeShort;
 
         public TideAlphaModel(
+            IEnumerable<Symbol> symbols,
             Resolution resolution,
             TimeSpan openTimeLong,
             TimeSpan closeTimeLong,
             TimeSpan openTimeShort,
             TimeSpan closeTimeShort)
         {
+            _symbols = symbols;
             _resolution = resolution;
             _openTimeLong = openTimeLong;
             _closeTimeLong = closeTimeLong;
             _openTimeShort = openTimeShort;
             _closeTimeShort = closeTimeShort;
         }
-
-        public List<Symbol> Symbols { get; } = new List<Symbol>();
 
         public override IEnumerable<Insight> Update(
             QCAlgorithm algorithm,
@@ -149,7 +150,7 @@ namespace Capnode.Algorithm.CSharp
             foreach (var kvp in algorithm.ActiveSecurities)
             {
                 Symbol symbol = kvp.Key;
-                if (!Symbols.Contains(symbol)
+                if (!_symbols.Contains(symbol)
                     || !algorithm.IsMarketOpen(symbol))
                 {
                     continue;
@@ -190,26 +191,6 @@ namespace Capnode.Algorithm.CSharp
             }
 
             return insights;
-        }
-
-        public override void OnSecuritiesChanged(QCAlgorithm algorithm, SecurityChanges changes)
-        {
-            foreach (Symbol symbol in changes.RemovedSecurities.Select(x => x.Symbol))
-            {
-                Symbol prospect = Symbols.Find(m => m.Equals(symbol));
-                if (prospect != null)
-                {
-                    Symbols.Remove(prospect);
-                }
-            }
-
-            // Initialize data for added securities
-            IEnumerable<Symbol> symbols = changes.AddedSecurities.Select(x => x.Symbol);
-            foreach (Symbol symbol in symbols)
-            {
-                Debug.Assert(!Symbols.Exists(m => m.Equals(symbol)));
-                Symbols.Add(symbol);
-            }
         }
 
         private bool InHours(TimeSpan open, TimeSpan now, TimeSpan close)
