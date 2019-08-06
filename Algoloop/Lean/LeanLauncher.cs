@@ -133,7 +133,7 @@ namespace Algoloop.Lean
             Config.Set("job-project-id", "0");
             Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
             Config.Set("regression-update-statistics", "false");
-            Config.Set("algorithm-manager-time-loop-maximum", "20");
+            Config.Set("algorithm-manager-time-loop-maximum", "60");
             Config.Set("symbol-minute-limit", "10000");
             Config.Set("symbol-second-limit", "10000");
             Config.Set("symbol-tick-limit", "10000");
