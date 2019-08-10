@@ -13,34 +13,49 @@
  * limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
-using QuantConnect.Algorithm.Framework.Alphas;
+using System.Linq;
 using QuantConnect.Data;
-using QuantConnect.Brokerages;
+using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// This algorithm showcases an <see cref="AccountType.Cash"/> emitting insights
-    /// and manually trading.
+    /// Test algorithm that reproduces GH issues 3410 and 3409.
+    /// Coarse universe selection should start from the algorithm start date.
+    /// Data returned by history requests performed from the selection method should be up to date.
     /// </summary>
-    public class EmitInsightCryptoCashAccountType : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class CoarseSelectionTimeRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private Symbol _symbol;
+        private Symbol _spy;
+        private decimal _historyCoarseSpyPrice;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2018, 4, 4); // Set Start Date
-            SetEndDate(2018, 4, 4); // Set End Date
-            SetAccountCurrency("EUR");
-            SetCash("EUR", 10000);
-            _symbol = AddCrypto("BTCEUR").Symbol;
+            SetStartDate(2014, 03, 25);
+            SetEndDate(2014, 04, 01);
 
-            SetBrokerageModel(BrokerageName.GDAX, AccountType.Cash);
+            _spy = AddEquity("SPY", Resolution.Daily).Symbol;
+
+            UniverseSettings.Resolution = Resolution.Daily;
+            AddUniverse(CoarseSelectionFunction);
+        }
+
+        public IEnumerable<Symbol> CoarseSelectionFunction(IEnumerable<CoarseFundamental> coarse)
+        {
+            var sortedByDollarVolume = coarse.OrderByDescending(x => x.DollarVolume);
+            var top = sortedByDollarVolume
+                .Where(fundamental => fundamental.Symbol != _spy) // ignore spy
+                .Take(1);
+
+            _historyCoarseSpyPrice = History(_spy, 1).First().Close;
+
+            return top.Select(x => x.Symbol);
         }
 
         /// <summary>
@@ -49,10 +64,24 @@ namespace QuantConnect.Algorithm.CSharp
         /// <param name="data">Slice object keyed by symbol containing the stock data</param>
         public override void OnData(Slice data)
         {
+            if (data.Count != 2)
+            {
+                throw new Exception($"Unexpected data count: {data.Count}");
+            }
+            if (ActiveSecurities.Count != 2)
+            {
+                throw new Exception($"Unexpected ActiveSecurities count: {ActiveSecurities.Count}");
+            }
+            // the price obtained by the previous coarse selection should be the same as the current price
+            if (_historyCoarseSpyPrice != 0 && _historyCoarseSpyPrice != Securities[_spy].Price)
+            {
+                throw new Exception($"Unexpected SPY price: {_historyCoarseSpyPrice}");
+            }
+            _historyCoarseSpyPrice = 0;
             if (!Portfolio.Invested)
             {
-                EmitInsights(Insight.Price(_symbol, Resolution.Daily, 1, InsightDirection.Up));
-                SetHoldings(_symbol, 0.5);
+                SetHoldings(_spy, 1);
+                Debug("Purchased Stock");
             }
         }
 
@@ -74,35 +103,22 @@ namespace QuantConnect.Algorithm.CSharp
             {"Total Trades", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
-            {"Compounding Annual Return", "-100.000%"},
-            {"Drawdown", "5.500%"},
+            {"Compounding Annual Return", "57.953%"},
+            {"Drawdown", "0.900%"},
             {"Expectancy", "0"},
-            {"Net Profit", "-3.802%"},
-            {"Sharpe Ratio", "-12.079"},
+            {"Net Profit", "1.007%"},
+            {"Sharpe Ratio", "4.212"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "-9.255"},
-            {"Beta", "272.062"},
-            {"Annual Standard Deviation", "0.397"},
-            {"Annual Variance", "0.158"},
-            {"Information Ratio", "-12.165"},
-            {"Tracking Error", "0.396"},
-            {"Treynor Ratio", "-0.018"},
-            {"Total Fees", "$14.92"},
-            {"Total Insights Generated", "1"},
-            {"Total Insights Closed", "1"},
-            {"Total Insights Analysis Completed", "1"},
-            {"Long Insight Count", "1"},
-            {"Short Insight Count", "0"},
-            {"Long/Short Ratio", "100%"},
-            {"Estimated Monthly Alpha Value", "€-7.1039"},
-            {"Total Accumulated Estimated Alpha Value", "€-0.2762628"},
-            {"Mean Population Estimated Insight Value", "€-0.2762628"},
-            {"Mean Population Direction", "0%"},
-            {"Mean Population Magnitude", "0%"},
-            {"Rolling Averaged Population Direction", "0%"},
-            {"Rolling Averaged Population Magnitude", "0%"}
+            {"Alpha", "0.103"},
+            {"Beta", "0.83"},
+            {"Annual Standard Deviation", "0.086"},
+            {"Annual Variance", "0.007"},
+            {"Information Ratio", "0.917"},
+            {"Tracking Error", "0.054"},
+            {"Treynor Ratio", "0.439"},
+            {"Total Fees", "$2.91"}
         };
     }
 }

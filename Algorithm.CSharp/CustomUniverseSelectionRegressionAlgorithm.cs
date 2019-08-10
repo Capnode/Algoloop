@@ -13,34 +13,38 @@
  * limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
-using QuantConnect.Algorithm.Framework.Alphas;
+using System.Linq;
 using QuantConnect.Data;
-using QuantConnect.Brokerages;
 using QuantConnect.Interfaces;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// This algorithm showcases an <see cref="AccountType.Cash"/> emitting insights
-    /// and manually trading.
+    /// Test algorithm that verifies that securities added through
+    /// <see cref="QCAlgorithm.AddEquity"/> API and universe selection
+    /// both start sending data at the same time
     /// </summary>
-    public class EmitInsightCryptoCashAccountType : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class CustomUniverseSelectionRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private Symbol _symbol;
-
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2018, 4, 4); // Set Start Date
-            SetEndDate(2018, 4, 4); // Set End Date
-            SetAccountCurrency("EUR");
-            SetCash("EUR", 10000);
-            _symbol = AddCrypto("BTCEUR").Symbol;
+            SetStartDate(2013, 10, 07);
+            SetEndDate(2013, 10, 11);
 
-            SetBrokerageModel(BrokerageName.GDAX, AccountType.Cash);
+            AddEquity("AAPL", Resolution.Daily);
+
+            UniverseSettings.Resolution = Resolution.Daily;
+            AddUniverse(SecurityType.Equity,
+                "SecondUniverse",
+                Resolution.Daily,
+                Market.USA,
+                UniverseSettings,
+                time => new[] { "SPY" });
         }
 
         /// <summary>
@@ -49,10 +53,18 @@ namespace QuantConnect.Algorithm.CSharp
         /// <param name="data">Slice object keyed by symbol containing the stock data</param>
         public override void OnData(Slice data)
         {
+            if (data.Count != 2)
+            {
+                throw new Exception($"Unexpected data count: {data.Count}");
+            }
+            if (ActiveSecurities.Count != 2)
+            {
+                throw new Exception($"Unexpected ActiveSecurities count: {ActiveSecurities.Count}");
+            }
             if (!Portfolio.Invested)
             {
-                EmitInsights(Insight.Price(_symbol, Resolution.Daily, 1, InsightDirection.Up));
-                SetHoldings(_symbol, 0.5);
+                SetHoldings(Securities.Keys.First(symbol => symbol.Value == "SPY"), 1);
+                Debug("Purchased Stock");
             }
         }
 
@@ -74,35 +86,22 @@ namespace QuantConnect.Algorithm.CSharp
             {"Total Trades", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
-            {"Compounding Annual Return", "-100.000%"},
-            {"Drawdown", "5.500%"},
+            {"Compounding Annual Return", "238.977%"},
+            {"Drawdown", "1.100%"},
             {"Expectancy", "0"},
-            {"Net Profit", "-3.802%"},
-            {"Sharpe Ratio", "-12.079"},
+            {"Net Profit", "1.686%"},
+            {"Sharpe Ratio", "4.159"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "-9.255"},
-            {"Beta", "272.062"},
-            {"Annual Standard Deviation", "0.397"},
-            {"Annual Variance", "0.158"},
-            {"Information Ratio", "-12.165"},
-            {"Tracking Error", "0.396"},
-            {"Treynor Ratio", "-0.018"},
-            {"Total Fees", "$14.92"},
-            {"Total Insights Generated", "1"},
-            {"Total Insights Closed", "1"},
-            {"Total Insights Analysis Completed", "1"},
-            {"Long Insight Count", "1"},
-            {"Short Insight Count", "0"},
-            {"Long/Short Ratio", "100%"},
-            {"Estimated Monthly Alpha Value", "€-7.1039"},
-            {"Total Accumulated Estimated Alpha Value", "€-0.2762628"},
-            {"Mean Population Estimated Insight Value", "€-0.2762628"},
-            {"Mean Population Direction", "0%"},
-            {"Mean Population Magnitude", "0%"},
-            {"Rolling Averaged Population Direction", "0%"},
-            {"Rolling Averaged Population Magnitude", "0%"}
+            {"Alpha", "0.638"},
+            {"Beta", "0.881"},
+            {"Annual Standard Deviation", "0.172"},
+            {"Annual Variance", "0.03"},
+            {"Information Ratio", "10.327"},
+            {"Tracking Error", "0.061"},
+            {"Treynor Ratio", "0.812"},
+            {"Total Fees", "$3.26"}
         };
     }
 }

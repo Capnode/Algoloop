@@ -292,6 +292,12 @@ namespace QuantConnect.Lean.Engine
                 //Set the algorithm and real time handler's time
                 algorithm.SetDateTime(time);
 
+                // the time pulse are just to advance algorithm time, lets shortcut the loop here
+                if (timeSlice.IsTimePulse)
+                {
+                    continue;
+                }
+
                 // Update the current slice before firing scheduled events or any other task
                 algorithm.SetCurrentSlice(timeSlice.Slice);
 
@@ -344,8 +350,11 @@ namespace QuantConnect.Lean.Engine
                         security.SetMarketPrice(data);
                     }
 
-                    // Send market price updates to the TradeBuilder
-                    algorithm.TradeBuilder.SetMarketPrice(security.Symbol, security.Price);
+                    if (!update.IsInternalConfig)
+                    {
+                        // Send market price updates to the TradeBuilder
+                        algorithm.TradeBuilder.SetMarketPrice(security.Symbol, security.Price);
+                    }
                 }
 
                 //Update the securities properties with any universe data
@@ -952,6 +961,11 @@ namespace QuantConnect.Lean.Engine
                 }
                 if (algorithm.LiveMode && algorithm.IsWarmingUp)
                 {
+                    if (timeSlice.IsTimePulse)
+                    {
+                        continue;
+                    }
+
                     // this is hand-over logic, we spin up the data feed first and then request
                     // the history for warmup, so there will be some overlap between the data
                     if (lastHistoryTimeUtc.HasValue)
