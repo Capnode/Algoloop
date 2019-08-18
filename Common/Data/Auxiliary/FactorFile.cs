@@ -169,7 +169,7 @@ namespace QuantConnect.Data.Auxiliary
             {
                 return true;
             }
-            Log.Trace("FactorFile.HasScalingFactors(): Factor file not found: " + permtick);
+//            Log.Trace("FactorFile.HasScalingFactors(): Factor file not found: " + permtick);
             return false;
         }
 
