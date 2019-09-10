@@ -159,169 +159,195 @@
             Content="{Binding Path=SelectedItem}">
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:MarketViewModel}">
-                    <DockPanel>
-                        <TabControl>
-                            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
-                                <DockPanel>
-                                    <ToolBar DockPanel.Dock="Top">
-                                        <Grid>
-                                            <CheckBox
-                                                ToolTip="Check all selected"
-                                                VerticalAlignment="Center"
-                                                IsChecked="{Binding CheckAll}"
-                                                Command="{Binding CheckAllCommand}"
-                                                CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
-                                            </CheckBox>
-                                        </Grid>
-                                        <Button
-                                            ToolTip="Add symbol" 
-                                            Command="{Binding AddSymbolCommand}">
-                                            <Image Source="/Resources\Add.png" Width="16" Height="16"/>
-                                        </Button>
-                                        <Button
-                                            ToolTip="Delete symbols"
-                                            Command="{Binding DeleteSymbolsCommand}"
+                    <TabControl>
+                        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <Grid>
+                                        <CheckBox
+                                            ToolTip="Check all selected"
+                                            VerticalAlignment="Center"
+                                            IsChecked="{Binding CheckAll}"
+                                            Command="{Binding CheckAllCommand}"
                                             CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
-                                            <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
-                                        </Button>
-                                        <Button
-                                            ToolTip="Download symbol list"
-                                            Command="{Binding DownloadSymbolListCommand}">
-                                            <Image Source="/Resources\Download1.png" Width="16" Height="16"/>
-                                        </Button>
-                                        <Button
-                                            ToolTip="Import symbol list..."
-                                            Command="{Binding ImportSymbolsCommand}">
-                                            <Image Source="/Resources\Import.png" Width="16" Height="16"/>
-                                        </Button>
-                                        <Button
-                                            ToolTip="Export symbol list..."
-                                            Command="{Binding ExportSymbolsCommand}"
-                                            CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
-                                            <Image Source="/Resources\Export.png" Width="16" Height="16"/>
-                                        </Button>
-                                        <Button
-                                            ToolTip="Add to new symbol list"
-                                            Command="{Binding AddToSymbolListCommand}"
-                                            CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
-                                            <Image Source="/Resources\AddList.png" Width="16" Height="16"/>
-                                        </Button>
-                                    </ToolBar>
-                                    <wpf:ExDataGrid
-                                        x:Name="marketSymbolList"                                        
-                                        CanUserFreeze="False"
-                                        CanUserSelectDistinct="True"
-                                        CanUserGroup="False"
-                                        CanUserFilter="True"
-                                        AutoGenerateColumns="False"
-                                        GridLinesVisibility="None"
-                                        SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                        ExSelectedItems="{Binding SelectedItems}"                                       
-                                        ExItemsSource="{Binding Symbols}"                                        
-                                        ExColumns="{Binding SymbolColumns}">
-                                    </wpf:ExDataGrid>
-                                </DockPanel>
-                            </TabItem>
-                            <TabItem Header="Settings">
-                                <xctk:PropertyGrid
-                                    ShowTitle="False"
-                                    ShowSearchBox="False"
-                                    ShowSummary="True"
-                                    ShowAdvancedOptions="False"
-                                    ShowSortOptions="False"
-                                    SelectedObject="{Binding Model}">
-                                </xctk:PropertyGrid>
-                            </TabItem>
-                        </TabControl>
-                    </DockPanel>
+                                        </CheckBox>
+                                    </Grid>
+                                    <Button
+                                        ToolTip="Add symbol" 
+                                        Command="{Binding AddSymbolCommand}">
+                                        <Image Source="/Resources\Add.png" Width="16" Height="16"/>
+                                    </Button>
+                                    <Button
+                                        ToolTip="Delete symbols"
+                                        Command="{Binding DeleteSymbolsCommand}"
+                                        CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
+                                        <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
+                                    </Button>
+                                    <Button
+                                        ToolTip="Download symbol list"
+                                        Command="{Binding DownloadSymbolListCommand}">
+                                        <Image Source="/Resources\Download1.png" Width="16" Height="16"/>
+                                    </Button>
+                                    <Button
+                                        ToolTip="Import symbol list..."
+                                        Command="{Binding ImportSymbolsCommand}">
+                                        <Image Source="/Resources\Import.png" Width="16" Height="16"/>
+                                    </Button>
+                                    <Button
+                                        ToolTip="Export symbol list..."
+                                        Command="{Binding ExportSymbolsCommand}"
+                                        CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
+                                        <Image Source="/Resources\Export.png" Width="16" Height="16"/>
+                                    </Button>
+                                    <Button
+                                        ToolTip="Add to new symbol list"
+                                        Command="{Binding AddToSymbolListCommand}"
+                                        CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}">
+                                        <Image Source="/Resources\AddList.png" Width="16" Height="16"/>
+                                    </Button>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    x:Name="marketSymbolList"
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    AutoGenerateColumns="False"
+                                    GridLinesVisibility="None"
+                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding Symbols}"
+                                    ExColumns="{Binding SymbolColumns}">
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="Settings">
+                            <xctk:PropertyGrid
+                                ShowTitle="False"
+                                ShowSearchBox="False"
+                                ShowSummary="True"
+                                ShowAdvancedOptions="False"
+                                ShowSortOptions="False"
+                                SelectedObject="{Binding Model}">
+                            </xctk:PropertyGrid>
+                        </TabItem>
+                    </TabControl>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:FolderViewModel}">
-                    <DockPanel>
-                        <TabControl>
-                            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
-                                <DockPanel>
-                                    <ToolBar DockPanel.Dock="Top">
-                                        <ComboBox
-                                            Name="combobox"
-                                            SelectedValue="{Binding MarketSymbol, Mode=TwoWay}"
-                                            DisplayMemberPath="Model.Name"
-                                            ItemsSource="{Binding MarketSymbols.View}"
-                                            MinWidth="120"/>
-                                        <Button
-                                            ToolTip="Add symbol" 
-                                            Command="{Binding AddSymbolCommand}"
-                                            CommandParameter="{Binding ElementName=combobox, Path=SelectedValue}">
-                                            <Image Source="/Resources\Add.png" Width="16" Height="16"/>
-                                        </Button>
-                                        <Button
-                                            ToolTip="Remove symbols"
-                                            Command="{Binding RemoveSymbolsCommand}"
-                                            CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
-                                            <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
-                                        </Button>
-                                    </ToolBar>
-                                    <wpf:ExDataGrid
-                                        x:Name="listbox"
-                                        CanUserFreeze="False"
-                                        CanUserSelectDistinct="True"
-                                        CanUserGroup="False"
-                                        CanUserFilter="True"
-                                        AutoGenerateColumns="False"
-                                        GridLinesVisibility="None"
-                                        SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                        ExSelectedItems="{Binding SelectedItems}"                                       
-                                        ExItemsSource="{Binding Symbols}"
-                                        ExColumns="{Binding SymbolColumns}">
-                                    </wpf:ExDataGrid>
-                                </DockPanel>
-                            </TabItem>
-                            <TabItem Header="Settings">
-                                <xctk:PropertyGrid
-                                    ShowTitle="False"
-                                    ShowSearchBox="False"
-                                    ShowSummary="True"
-                                    ShowAdvancedOptions="False"
-                                    ShowSortOptions="False"
-                                    SelectedObject="{Binding Model}">
-                                </xctk:PropertyGrid>
-                            </TabItem>
-                        </TabControl>
-                    </DockPanel>
+                    <TabControl>
+                        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        Name="combobox"
+                                        SelectedValue="{Binding MarketSymbol, Mode=TwoWay}"
+                                        DisplayMemberPath="Model.Name"
+                                        ItemsSource="{Binding MarketSymbols.View}"
+                                        MinWidth="120"/>
+                                    <Button
+                                        ToolTip="Add symbol" 
+                                        Command="{Binding AddSymbolCommand}"
+                                        CommandParameter="{Binding ElementName=combobox, Path=SelectedValue}">
+                                        <Image Source="/Resources\Add.png" Width="16" Height="16"/>
+                                    </Button>
+                                    <Button
+                                        ToolTip="Remove symbols"
+                                        Command="{Binding RemoveSymbolsCommand}"
+                                        CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
+                                        <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
+                                    </Button>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    x:Name="listbox"
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    AutoGenerateColumns="False"
+                                    GridLinesVisibility="None"
+                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                    ExSelectedItems="{Binding SelectedItems}"                                       
+                                    ExItemsSource="{Binding Symbols}"
+                                    ExColumns="{Binding SymbolColumns}">
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="Settings">
+                            <xctk:PropertyGrid
+                                ShowTitle="False"
+                                ShowSearchBox="False"
+                                ShowSummary="True"
+                                ShowAdvancedOptions="False"
+                                ShowSortOptions="False"
+                                SelectedObject="{Binding Model}">
+                            </xctk:PropertyGrid>
+                        </TabItem>
+                    </TabControl>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
-                    <DockPanel>
-                        <ToolBar DockPanel.Dock="Top">
-                            <Label
-                                Content="{Binding Model.Name}"
-                                FontSize="20"
-                                Margin="10 0 10 0"
-                                MinWidth="60"/>
-                            <ComboBox
-                                SelectedValue="{Binding SelectedResolution, Mode=TwoWay}"
-                                ItemsSource="{Binding ResolutionList}"
-                                MinWidth="120">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SelectionChanged">
-                                        <i:InvokeCommandAction Command="{Binding UpdateCommand}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </ComboBox>
-                            <xctk:DateTimePicker
-                                AutoCloseCalendar="True"
-                                BorderThickness="0"
-                                Value="{Binding Date}"
-                                Format="ShortDate"
-                                Margin="6"
-                                TimePickerVisibility="Collapsed">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="ValueChanged">
-                                        <i:InvokeCommandAction Command="{Binding UpdateCommand}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </xctk:DateTimePicker>
-                        </ToolBar>
-                        <view:AmChart ItemsSource="{Binding Charts}"/>
-                    </DockPanel>
+                    <TabControl>
+                        <TabItem Header ="Chart">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <Label
+                                        Content="{Binding Model.Name}"
+                                        FontSize="20"
+                                        Margin="10 0 10 0"
+                                        MinWidth="60"/>
+                                    <ComboBox
+                                        SelectedValue="{Binding SelectedResolution, Mode=TwoWay}"
+                                        ItemsSource="{Binding ResolutionList}"
+                                        MinWidth="120">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction Command="{Binding UpdateCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                    <xctk:DateTimePicker
+                                        AutoCloseCalendar="True"
+                                        BorderThickness="0"
+                                        Value="{Binding Date}"
+                                        Format="ShortDate"
+                                        Margin="6"
+                                        TimePickerVisibility="Collapsed">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="ValueChanged">
+                                                <i:InvokeCommandAction Command="{Binding UpdateCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </xctk:DateTimePicker>
+                                </ToolBar>
+                                <view:AmChart ItemsSource="{Binding Charts}"/>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header ="Fundamentals">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        SelectedValue="{Binding SelectedReportPeriod, Mode=TwoWay}"
+                                        ItemsSource="{Binding ReportPeriodList}"
+                                        MinWidth="120">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction Command="{Binding UpdateCommand}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="False"
+                                    CanUserGroup="False"
+                                    CanUserFilter="False"
+                                    AutoGenerateColumns="False"
+                                    GridLinesVisibility="None"
+                                    ExItemsSource="{Binding Fundamentals}"
+                                    ExColumns="{Binding PeriodColumns}">
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                    </TabControl>
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>
