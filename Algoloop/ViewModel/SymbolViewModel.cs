@@ -250,7 +250,7 @@ namespace Algoloop.ViewModel
 
             foreach (ExDataGridRow item in FundamentalRows)
             {
-                ExDataGridColumns.AddPropertyColumns(PeriodColumns, item.Columns, "FundamentalItems");
+                ExDataGridColumns.AddPropertyColumns(PeriodColumns, item.Columns, "Columns");
             }
         }
 
