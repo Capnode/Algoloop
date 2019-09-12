@@ -342,7 +342,7 @@
                                     CanUserFilter="False"
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
-                                    ExItemsSource="{Binding Fundamentals}"
+                                    ExItemsSource="{Binding FundamentalRows}"
                                     ExColumns="{Binding PeriodColumns}">
                                 </wpf:ExDataGrid>
                             </DockPanel>
