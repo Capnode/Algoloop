@@ -14,16 +14,16 @@
 
 using System.Collections.Generic;
 
-namespace Algoloop.ViewModel
+namespace Capnode.Wpf.DataGrid
 {
-    public class FundamentalItemViewModel
+    public class ExDataGridRow
     {
-        public FundamentalItemViewModel(string header)
+        public ExDataGridRow(string header)
         {
             Header = header;
         }
 
         public string Header { get; }
-        public IDictionary<string, object> FundamentalItems { get; } = new Dictionary<string, object>();
+        public IDictionary<string, object> Columns { get; } = new Dictionary<string, object>();
     }
 }

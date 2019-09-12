@@ -71,6 +71,7 @@
     </Compile>
     <Compile Include="DataGrid\Enums.cs" />
     <Compile Include="DataGrid\ExDataGridColumns.cs" />
+    <Compile Include="DataGrid\ExDataGridRow.cs" />
     <Compile Include="DataGrid\ExpressionHelper.cs" />
     <Compile Include="DataGrid\FilterChangedEventArgs.cs" />
     <Compile Include="DataGrid\FilterOperationItem.cs" />

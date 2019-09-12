@@ -73,7 +73,7 @@ namespace Algoloop.ViewModel
 
         public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
-        public SyncObservableCollection<FundamentalItemViewModel> Fundamentals { get; } = new SyncObservableCollection<FundamentalItemViewModel>();
+        public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; } = new SyncObservableCollection<ExDataGridRow>();
 
         public bool Active
         {
@@ -208,7 +208,7 @@ namespace Algoloop.ViewModel
         private void DoLoadFundamentals(MarketViewModel market)
         {
             // Reset Fundamentals
-            Fundamentals.Clear();
+            FundamentalRows.Clear();
             PeriodColumns.Clear();
             ExDataGridColumns.AddTextColumn(PeriodColumns, "Item", "Header", false);
 
@@ -248,9 +248,9 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            foreach (FundamentalItemViewModel item in Fundamentals)
+            foreach (ExDataGridRow item in FundamentalRows)
             {
-                ExDataGridColumns.AddPropertyColumns(PeriodColumns, item.FundamentalItems, "FundamentalItems");
+                ExDataGridColumns.AddPropertyColumns(PeriodColumns, item.Columns, "FundamentalItems");
             }
         }
 
@@ -279,14 +279,14 @@ namespace Algoloop.ViewModel
 
         private void SetFundamentals(string row, string column, decimal value)
         {
-            FundamentalItemViewModel item = Fundamentals.SingleOrDefault(m => m.Header.Equals(row));
+            ExDataGridRow item = FundamentalRows.SingleOrDefault(m => m.Header.Equals(row));
             if (item == default)
             {
-                item = new FundamentalItemViewModel(row);
-                Fundamentals.Add(item);
+                item = new ExDataGridRow(row);
+                FundamentalRows.Add(item);
             }
 
-            item.FundamentalItems[column] = value;
+            item.Columns[column] = value;
         }
 
         private void FundamentalYear(FineFundamental fine, string period)
