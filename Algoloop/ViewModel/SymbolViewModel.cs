@@ -209,13 +209,6 @@ namespace Algoloop.ViewModel
         {
             // Reset Fundamentals
             Fundamentals.Clear();
-            Fundamentals.Add(new FundamentalItemViewModel(_totalRevenue));
-            Fundamentals.Add(new FundamentalItemViewModel(_netIncome));
-            Fundamentals.Add(new FundamentalItemViewModel(_revenueGrowth));
-            Fundamentals.Add(new FundamentalItemViewModel(_netIncomeGrowth));
-            Fundamentals.Add(new FundamentalItemViewModel(_netMargin));
-            Fundamentals.Add(new FundamentalItemViewModel(_peRatio));
-
             PeriodColumns.Clear();
             ExDataGridColumns.AddTextColumn(PeriodColumns, "Item", "Header", false);
 
@@ -284,7 +277,19 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void FundamentalYear(FineFundamental fine, string key)
+        private void SetFundamentals(string row, string column, decimal value)
+        {
+            FundamentalItemViewModel item = Fundamentals.SingleOrDefault(m => m.Header.Equals(row));
+            if (item == default)
+            {
+                item = new FundamentalItemViewModel(row);
+                Fundamentals.Add(item);
+            }
+
+            item.FundamentalItems[column] = value;
+        }
+
+        private void FundamentalYear(FineFundamental fine, string period)
         {
             decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / 1e6m, 4); ;
             decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / 1e6m, 4);
@@ -293,15 +298,15 @@ namespace Algoloop.ViewModel
             decimal netMargin = decimal.Round(fine.OperationRatios.NetMargin.OneYear * 100, 4);
             decimal peRatio = decimal.Round(fine.ValuationRatios.PERatio, 4);
 
-            Fundamentals.Single(m => m.Header.Equals(_totalRevenue)).FundamentalItems[key] = totalRevenue;
-            Fundamentals.Single(m => m.Header.Equals(_netIncome)).FundamentalItems[key] = netIncome;
-            Fundamentals.Single(m => m.Header.Equals(_revenueGrowth)).FundamentalItems[key] = revenueGrowth;
-            Fundamentals.Single(m => m.Header.Equals(_netIncomeGrowth)).FundamentalItems[key] = netIncomeGrowth;
-            Fundamentals.Single(m => m.Header.Equals(_netMargin)).FundamentalItems[key] = netMargin;
-            Fundamentals.Single(m => m.Header.Equals(_peRatio)).FundamentalItems[key] = peRatio;
+            SetFundamentals(_totalRevenue, period, totalRevenue);
+            SetFundamentals(_netIncome, period, netIncome);
+            SetFundamentals(_revenueGrowth, period, revenueGrowth);
+            SetFundamentals(_netIncomeGrowth, period, netIncomeGrowth);
+            SetFundamentals(_netMargin, period, netMargin);
+            SetFundamentals(_peRatio, period, peRatio);
         }
 
-        private void FundamentalQuarter(FineFundamental fine, string key)
+        private void FundamentalQuarter(FineFundamental fine, string period)
         {
             decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths / 1e6m, 4); ;
             decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths / 1e6m, 4);
@@ -317,12 +322,12 @@ namespace Algoloop.ViewModel
                 && netMargin == 0)
                 return;
 
-            Fundamentals.Single(m => m.Header.Equals(_totalRevenue)).FundamentalItems[key] = totalRevenue;
-            Fundamentals.Single(m => m.Header.Equals(_netIncome)).FundamentalItems[key] = netIncome;
-            Fundamentals.Single(m => m.Header.Equals(_revenueGrowth)).FundamentalItems[key] = revenueGrowth;
-            Fundamentals.Single(m => m.Header.Equals(_netIncomeGrowth)).FundamentalItems[key] = netIncomeGrowth;
-            Fundamentals.Single(m => m.Header.Equals(_netMargin)).FundamentalItems[key] = netMargin;
-            Fundamentals.Single(m => m.Header.Equals(_peRatio)).FundamentalItems[key] = peRatio;
+            SetFundamentals(_totalRevenue, period, totalRevenue);
+            SetFundamentals(_netIncome, period, netIncome);
+            SetFundamentals(_revenueGrowth, period, revenueGrowth);
+            SetFundamentals(_netIncomeGrowth, period, netIncomeGrowth);
+            SetFundamentals(_netMargin, period, netMargin);
+            SetFundamentals(_peRatio, period, peRatio);
         }
     }
 }
