@@ -73,7 +73,7 @@ namespace Algoloop.ViewModel
 
         public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
-        public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; } = new SyncObservableCollection<ExDataGridRow>();
+        public SyncObservableCollection<ExDataGridRow<decimal?>> FundamentalRows { get; } = new SyncObservableCollection<ExDataGridRow<decimal?>>();
 
         public bool Active
         {
@@ -247,17 +247,17 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
-
-            foreach (ExDataGridRow item in FundamentalRows)
-            {
-                ExDataGridColumns.AddPropertyColumns(PeriodColumns, item.Columns, "Columns");
-            }
         }
 
         private void LoadFundamentals(FineFundamental fine)
         {
             string periodType = fine.FinancialStatements.PeriodType;
             DateTime date = fine.FinancialStatements.PeriodEndingDate;
+            if (date.Equals(DateTime.MinValue))
+            {
+                return;
+            }
+
             switch (SelectedReportPeriod)
             {
                 case ReportPeriod.Year:
@@ -279,14 +279,17 @@ namespace Algoloop.ViewModel
 
         private void SetFundamentals(string row, string column, decimal value)
         {
-            ExDataGridRow item = FundamentalRows.SingleOrDefault(m => m.Header.Equals(row));
-            if (item == default)
+            ExDataGridRow<decimal?> gridRow = FundamentalRows.SingleOrDefault(m => m.Header.Equals(row));
+            if (gridRow == default)
             {
-                item = new ExDataGridRow(row);
-                FundamentalRows.Add(item);
+                gridRow = new ExDataGridRow<decimal?>(row);
+                FundamentalRows.Add(gridRow);
             }
 
-            item.Columns[column] = value;
+            gridRow.Columns[column] = value;
+
+            // Create Grid Column and set format if needed
+            ExDataGridColumns.AddPropertyColumns(PeriodColumns, gridRow.Columns, "Columns");
         }
 
         private void FundamentalYear(FineFundamental fine, string period)
