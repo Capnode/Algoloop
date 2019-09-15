@@ -72,13 +72,13 @@ namespace Algoloop.Provider
             return null;
         }
 
-        public static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
+        public static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
             IProvider provider = CreateProvider(market.Provider);
             if (provider == null)
                 return null;
 
-            return provider.GetAllSymbols(market);
+            return provider.GetAllSymbols(market, settings);
         }
 
         public static void RegisterProviders()

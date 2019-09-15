@@ -341,7 +341,7 @@ namespace Algoloop.ViewModel
                 _parent.IsBusy = true;
                 List<SymbolModel> oldSymbols = Model.Symbols.ToList();
 
-                IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model);
+                IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model, _settings);
                 foreach (SymbolModel symbol in symbols)
                 {
                     symbol.Name = symbol.Name.Trim();

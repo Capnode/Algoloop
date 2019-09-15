@@ -73,7 +73,7 @@ namespace Algoloop.Provider.Tests
                 Resolution = Resolution.Daily,
             };
 
-            IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(market);
+            IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(market, _settings);
             Assert.AreEqual(78, symbols.ToList().Count());
         }
     }

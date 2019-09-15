@@ -64,7 +64,7 @@ namespace Algoloop.Provider
             model.Active = model.LastDate.AddDays(1) < DateTime.Today;
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
             var list = new List<SymbolModel>();
             list.AddRange(_majors.Select(m => new SymbolModel(m) { Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));

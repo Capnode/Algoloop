@@ -31,7 +31,7 @@ namespace Algoloop.Provider
             QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.LastDate, apiKey);
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
             throw new System.NotImplementedException();
         }

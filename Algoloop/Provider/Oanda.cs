@@ -32,7 +32,7 @@ namespace Algoloop.Provider
             OandaDownloaderProgram.OandaDownloader(symbols, resolution, model.LastDate, model.LastDate);
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
             throw new System.NotImplementedException();
         }

@@ -254,6 +254,7 @@
     </ApplicationDefinition>
     <Compile Include="Common\SafeDictionary.cs" />
     <Compile Include="Lean\AlphaHandler.cs" />
+    <Compile Include="Provider\Usa.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />
     <Compile Include="ViewModel\TrackSymbolViewModel.cs" />
     <Compile Include="Model\FolderModel.cs" />

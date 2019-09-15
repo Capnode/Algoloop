@@ -32,7 +32,7 @@ namespace Algoloop.Provider
             IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.LastDate, model.LastDate, model.ApiKey);
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market)
+        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
             throw new System.NotImplementedException();
         }
