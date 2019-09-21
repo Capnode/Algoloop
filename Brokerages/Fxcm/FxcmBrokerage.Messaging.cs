@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using com.fxcm.external.api.transport;
@@ -145,13 +146,13 @@ namespace QuantConnect.Brokerages.Fxcm
             lock (_locker)
             {
                 _currentRequest = _terminal.Equals("Demo") ?
-                    _gateway.requestClosedPositions(Convert.ToInt64(_accountId)) :
+                    _gateway.requestClosedPositions(Convert.ToInt64(_accountId, CultureInfo.InvariantCulture)) :
                     _gateway.requestClosedPositions(_accountId);
                 autoResetEvent = new AutoResetEvent(false);
                 _mapRequestsToAutoResetEvents[_currentRequest] = autoResetEvent;
             }
             if (!autoResetEvent.WaitOne(ResponseTimeout))
-                throw new TimeoutException(string.Format("FxcmBrokerage.LoadClosedPositions(): Operation took longer than {0} seconds.", (decimal)ResponseTimeout / 1000));
+                throw new TimeoutException(string.Format(CultureInfo.InvariantCulture, "FxcmBrokerage.LoadClosedPositions(): Operation took longer than {0} seconds.", (decimal)ResponseTimeout / 1000));
         }
 
         /// <summary>
