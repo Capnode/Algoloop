@@ -39,6 +39,7 @@ namespace Algoloop.ViewModel
     {
         public enum ReportPeriod { Year, R12, Quarter};
 
+        private const decimal _million = 1e6m;
         private const string _totalRevenue = "Total Revenue (M)";
         private const string _netIncome = "Net Income (M)";
         private const string _revenueGrowth = "Revenue Growth %";
@@ -46,6 +47,9 @@ namespace Algoloop.ViewModel
         private const string _netMargin = "Net Margin %";
         private const string _peRatio = "PE Ratio";
         private const string _annual = "Annual";
+        private const string _financingCashFlow = "Financing cash flow";
+        private const string _investingCashFlow = "Investing cash flow";
+        private const string _operatingCashFlow = "Operating cash flow";
 
         private ITreeViewModel _parent;
         private Resolution _selectedResolution = Resolution.Daily;
@@ -294,12 +298,15 @@ namespace Algoloop.ViewModel
 
         private void FundamentalYear(FineFundamental fine, string period)
         {
-            decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / 1e6m, 4); ;
-            decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / 1e6m, 4);
+            decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / _million, 4); ;
+            decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / _million, 4);
             decimal revenueGrowth = decimal.Round(fine.OperationRatios.RevenueGrowth.OneYear * 100, 4);
             decimal netIncomeGrowth = decimal.Round(fine.OperationRatios.NetIncomeGrowth.OneYear * 100, 4);
             decimal netMargin = decimal.Round(fine.OperationRatios.NetMargin.OneYear * 100, 4);
             decimal peRatio = decimal.Round(fine.ValuationRatios.PERatio, 4);
+            decimal financingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths / _million, 4);
+            decimal investingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths / _million, 4);
+            decimal operatingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths / _million, 4);
 
             SetFundamentals(_totalRevenue, period, totalRevenue);
             SetFundamentals(_netIncome, period, netIncome);
@@ -307,16 +314,22 @@ namespace Algoloop.ViewModel
             SetFundamentals(_netIncomeGrowth, period, netIncomeGrowth);
             SetFundamentals(_netMargin, period, netMargin);
             SetFundamentals(_peRatio, period, peRatio);
+            SetFundamentals(_financingCashFlow, period, financingCashFlow);
+            SetFundamentals(_investingCashFlow, period, investingCashFlow);
+            SetFundamentals(_operatingCashFlow, period, operatingCashFlow);
         }
 
         private void FundamentalQuarter(FineFundamental fine, string period)
         {
-            decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths / 1e6m, 4); ;
-            decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths / 1e6m, 4);
+            decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths / _million, 4); ;
+            decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths / _million, 4);
             decimal revenueGrowth = decimal.Round(fine.OperationRatios.RevenueGrowth.ThreeMonths * 100, 4);
             decimal netIncomeGrowth = decimal.Round(fine.OperationRatios.NetIncomeGrowth.ThreeMonths * 100, 4);
             decimal netMargin = decimal.Round(fine.OperationRatios.NetMargin.ThreeMonths * 100, 4);
             decimal peRatio = decimal.Round(fine.ValuationRatios.PERatio, 4);
+            decimal financingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths / _million, 4);
+            decimal investingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths / _million, 4);
+            decimal operatingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths / _million, 4);
 
             if (totalRevenue == 0
                 && netIncome == 0
@@ -331,6 +344,9 @@ namespace Algoloop.ViewModel
             SetFundamentals(_netIncomeGrowth, period, netIncomeGrowth);
             SetFundamentals(_netMargin, period, netMargin);
             SetFundamentals(_peRatio, period, peRatio);
+            SetFundamentals(_financingCashFlow, period, financingCashFlow);
+            SetFundamentals(_investingCashFlow, period, investingCashFlow);
+            SetFundamentals(_operatingCashFlow, period, operatingCashFlow);
         }
     }
 }
