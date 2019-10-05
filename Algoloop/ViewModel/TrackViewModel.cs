@@ -45,8 +45,10 @@ using System.Windows;
 
 namespace Algoloop.ViewModel
 {
-    public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "<Pending>")]
+    public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {
+        private bool _isDisposed = false; // To detect redundant calls
         public const string Folder = "Tracks";
         private const string _logFile = "Logs.log";
         private const string _resultFile = "Result.json";
@@ -319,10 +321,12 @@ namespace Algoloop.ViewModel
             {
                 Log.Trace($"Strategy {Model.Name} canceled by user");
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Trace($"{ex.GetType()}: {ex.Message}");
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             // Update view
             Model = null;
@@ -650,10 +654,12 @@ namespace Algoloop.ViewModel
             {
                 ParseCharts(result);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Trace($"Strategy {Model.Name} {ex.GetType()}: {ex.Message}");
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             // Unzip log file
             using (StreamReader logStream = Compression.Unzip(Model.ZipFile, _logFile, out zipFile))
@@ -830,10 +836,12 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private void DoCloneStrategy(IList symbols)
@@ -923,6 +931,25 @@ namespace Algoloop.ViewModel
 
             Charts = null;
             Charts = workCharts;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _cancel.Dispose();
+                }
+
+                _isDisposed = true;
+            }
         }
     }
 }

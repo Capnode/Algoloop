@@ -23,7 +23,7 @@ namespace Algoloop.Lean
     /// </summary>
     public class LogItemHandler : ILogItemHandler
     {
-        private bool _disposed;
+        private bool _isDisposed = false; // To detect redundant calls
         private Action<LogItem> _logger;
 
         // we need to control synchronization to our stream writer since it's not inherently thread-safe
@@ -69,31 +69,40 @@ namespace Algoloop.Lean
         }
 
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public void Dispose()
-        {
-            lock (_lock)
-            {
-                _disposed = true;
-            }
-        }
-
-        /// <summary>
         /// Writes the message to the log
         /// </summary>
         private void WriteMessage(LogType level, string text)
         {
             lock (_lock)
             {
-                if (_disposed || _logger == null)
+                if (_isDisposed || _logger == null)
                 {
                     return;
                 }
 
                 var logItem = new LogItem(DateTime.UtcNow, level, text);
                 _logger(logItem);
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                }
+
+                lock (_lock)
+                {
+                    _isDisposed = true;
+                }
             }
         }
     }

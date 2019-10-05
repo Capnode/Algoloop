@@ -54,12 +54,8 @@ namespace Algoloop.ViewModel
         /// </summary>
         public bool IsBusy
         {
-            get { return _isBusy; }
-            set
-            {
-                _isBusy = value;
-                RaisePropertyChanged("IsBusy");
-            }
+            get =>_isBusy;
+            set => Set(ref _isBusy, value);
         }
 
         public ITreeViewModel SelectedItem
@@ -94,11 +90,13 @@ namespace Algoloop.ViewModel
                 DataFromModel();
                 return true;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         internal bool Save(string fileName)
@@ -114,11 +112,13 @@ namespace Algoloop.ViewModel
                     return true;
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private void DoSelectedChanged(ITreeViewModel vm)

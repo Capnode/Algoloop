@@ -35,6 +35,7 @@ using System.Windows.Controls;
 
 namespace Algoloop.ViewModel
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "<Pending>")]
     public class SymbolViewModel : ViewModelBase, ITreeViewModel, IComparable
     {
         public enum ReportPeriod { Year, R12, Quarter};

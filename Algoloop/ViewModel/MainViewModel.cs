@@ -84,22 +84,15 @@ namespace Algoloop.ViewModel
         public AccountsViewModel AccountsViewModel { get; }
         public StrategiesViewModel StrategiesViewModel { get; }
 
-        public string Title
-        {
-            get => AboutViewModel.AssemblyTitle;
-        }
+        public static string Title => AboutViewModel.AssemblyTitle;
 
         /// <summary>
         /// Mark ongoing operation
         /// </summary>
         public bool IsBusy
         {
-            get { return _isBusy; }
-            set
-            {
-                _isBusy = value;
-                RaisePropertyChanged("IsBusy");
-            }
+            get => _isBusy;
+            set => Set(ref _isBusy, value);
         }
 
         public string StatusMessage

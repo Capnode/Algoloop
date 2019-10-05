@@ -55,11 +55,13 @@ namespace Algoloop.Provider
                 {
                     provider.Download(market, settings, symbols);
                 }
+#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception ex)
                 {
                     Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
                     market.Active = false;
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
 
             Log.LogHandler.Dispose();

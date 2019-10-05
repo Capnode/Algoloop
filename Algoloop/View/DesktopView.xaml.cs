@@ -32,10 +32,11 @@ namespace Algoloop.View
     /// <summary>
     /// Interaction logic for DesktopView.xaml
     /// </summary>
-    public partial class DesktopView : UserControl
+    public partial class DesktopView : UserControl, IDisposable
     {
         public static readonly DependencyProperty PortProperty = DependencyProperty.Register("Port", typeof(string), typeof(DesktopView));
 
+        private bool _isDisposed = false; // To detect redundant calls
         private QueueLogHandler _logging;
         private Thread _thread;
         private AlgorithmNodePacket _job;
@@ -318,6 +319,25 @@ namespace Algoloop.View
 //                        LogTextBox.AppendText(log.ToString(), Color.DarkRed);
                         break;
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _logging.Dispose();
+                }
+
+                _isDisposed = true;
             }
         }
     }

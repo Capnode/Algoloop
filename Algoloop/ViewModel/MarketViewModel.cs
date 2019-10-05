@@ -40,8 +40,9 @@ using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
-    public class MarketViewModel : ViewModelBase, ITreeViewModel
+    public class MarketViewModel : ViewModelBase, ITreeViewModel, IDisposable
     {
+        private bool _isDisposed = false; // To detect redundant calls
         private readonly MarketsViewModel _parent;
         private readonly SettingService _settings;
         private CancellationTokenSource _cancel;
@@ -224,38 +225,42 @@ namespace Algoloop.ViewModel
             while (!_cancel.Token.IsCancellationRequested && model.Active)
             {
                 Log.Trace($"{model.Provider} download {model.Resolution} {model.LastDate:d}");
-                var logger = new HostDomainLogger();
-                try
+                using (var logger = new HostDomainLogger())
                 {
-                    _factory = new Isolated<ProviderFactory>();
-                    _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token);
-                    _factory.Dispose();
-                    _factory = null;
-                }
-                catch (AppDomainUnloadedException)
-                {
-                    Log.Trace($"Market {model.Name} canceled by user");
-                    _factory = null;
-                    model.Active = false;
-                }
-                catch (Exception ex)
-                {
-                    Log.Trace($"{ex.GetType()}: {ex.Message}");
-                    _factory.Dispose();
-                    _factory = null;
-                    model.Active = false;
-                }
+                    try
+                    {
+                        _factory = new Isolated<ProviderFactory>();
+                        _cancel = new CancellationTokenSource();
+                        await Task.Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token);
+                        _factory.Dispose();
+                        _factory = null;
+                    }
+                    catch (AppDomainUnloadedException)
+                    {
+                        Log.Trace($"Market {model.Name} canceled by user");
+                        _factory = null;
+                        model.Active = false;
+                    }
+#pragma warning disable CA1031 // Do not catch general exception types
+                    catch (Exception ex)
+                    {
+                        Log.Trace($"{ex.GetType()}: {ex.Message}");
+                        _factory.Dispose();
+                        _factory = null;
+                        model.Active = false;
+                    }
+#pragma warning restore CA1031 // Do not catch general exception types
 
-                if (logger.IsError)
-                {
-                    Log.Trace($"{Model.Provider} download failed");
-                }
+                    if (logger.IsError)
+                    {
+                        Log.Trace($"{Model.Provider} download failed");
+                    }
 
-                // Update view
-                Model = null;
-                Model = model;
-                DataFromModel();
+                    // Update view
+                    Model = null;
+                    Model = model;
+                    DataFromModel();
+                }
             }
 
             _cancel = null;
@@ -469,10 +474,12 @@ namespace Algoloop.ViewModel
                 Folders.ToList().ForEach(m => m.Refresh());
                 DataFromModel();
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;
@@ -505,10 +512,12 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;
@@ -575,10 +584,12 @@ namespace Algoloop.ViewModel
 
                 DataFromModel();
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;
@@ -607,6 +618,26 @@ namespace Algoloop.ViewModel
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
                 ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties");
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _cancel.Dispose();
+                    _factory.Dispose();
+                }
+
+                _isDisposed = true;
             }
         }
     }

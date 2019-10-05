@@ -64,10 +64,12 @@ namespace Algoloop.Lean
                     model.Logs = resultHandler?.Logs ?? string.Empty;
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Error("{0}: {1}", ex.GetType(), ex.Message);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             NetMQConfig.Cleanup(false);
             Log.LogHandler.Dispose();

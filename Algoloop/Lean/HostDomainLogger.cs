@@ -19,6 +19,7 @@ namespace Algoloop.Lean
 {
     public class HostDomainLogger : MarshalByRefObject, ILogHandler
     {
+        private bool _isDisposed = false; // To detect redundant calls
         private int _errCount = 0;
 
         public bool IsError => _errCount > 0;
@@ -26,10 +27,6 @@ namespace Algoloop.Lean
         public void Debug(string text)
         {
             Log.Debug(text);
-        }
-
-        public void Dispose()
-        {
         }
 
         public void Error(string text)
@@ -46,6 +43,24 @@ namespace Algoloop.Lean
         public override object InitializeLifetimeService()
         {
             return null;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                }
+
+                _isDisposed = true;
+            }
         }
     }
 }

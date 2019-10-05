@@ -35,22 +35,22 @@ namespace Capnode.Algorithm.CSharp
     public class Tide : QCAlgorithm
     {
         [Parameter("symbols")]
-        protected string _symbols = "EURUSD";
+        private string _symbols = "EURUSD";
 
         [Parameter("resolution")]
-        protected string _resolution = "Hour";
+        private string _resolution = "Hour";
 
         [Parameter("market")]
-        protected string _market = Market.FXCM;
+        private string _market = Market.FXCM;
 
         [Parameter("startdate")]
-        protected string _startdate = "01/01/2018 00:00:00";
+        private string _startdate = "01/01/2018 00:00:00";
 
         [Parameter("enddate")]
-        protected string _enddate = "01/01/2019 00:00:00";
+        private string _enddate = "01/01/2019 00:00:00";
 
         [Parameter("cash")]
-        protected string _cash = "100000";
+        private string _cash = "100000";
 
         [Parameter("OpenHourLong")]
         private string _openHourLong = "1";

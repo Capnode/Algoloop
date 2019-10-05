@@ -559,10 +559,12 @@ namespace Algoloop.ViewModel
 
                 DataFromModel();
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         internal void CreateFolder(IEnumerable<string> symbols)
@@ -654,10 +656,12 @@ namespace Algoloop.ViewModel
                     serializer.Serialize(file, strategies);
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;
@@ -690,10 +694,12 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private void OnMoveUpSymbols(IList symbols)

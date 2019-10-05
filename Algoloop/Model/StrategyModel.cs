@@ -25,10 +25,6 @@ namespace Algoloop.Model
     [DataContract]
     public class StrategyModel : ModelBase
     {
-        public Action NameChanged;
-        public Action MarketChanged;
-        public Action<string> AlgorithmNameChanged;
-
         private string _name;
         private string _algorithmName;
         private string _account = AccountModel.AccountType.Backtest.ToString();
@@ -74,6 +70,10 @@ namespace Algoloop.Model
             Symbols = model.Symbols.Select(m => new SymbolModel(m)).ToList();
             Parameters = model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList();
         }
+
+        public Action NameChanged { get; set; }
+        public Action MarketChanged { get; set; }
+        public Action<string> AlgorithmNameChanged { get; set; }
 
         [Category("Information")]
         [DisplayName("Name")]

@@ -18,6 +18,7 @@ namespace Algoloop.Common
 {
     public sealed class Isolated<T> : IDisposable where T : MarshalByRefObject
     {
+        private bool _isDisposed = false; // To detect redundant calls
         private AppDomain _domain;
         private T _value;
 
@@ -50,20 +51,27 @@ namespace Algoloop.Common
             }
         }
 
-        public void Dispose()
+        void Dispose(bool disposing)
         {
-            if (_domain != null)
+            if (!_isDisposed)
             {
-                try
+                if (disposing)
                 {
-                    AppDomain.Unload(_domain);
-                }
-                catch
-                {
+                    if (_domain != null)
+                    {
+                        AppDomain.Unload(_domain);
+                        _domain = null;
+                    }
                 }
 
-                _domain = null;
+                _isDisposed = true;
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
     }
 }

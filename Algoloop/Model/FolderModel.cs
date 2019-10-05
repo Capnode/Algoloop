@@ -21,6 +21,7 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "<Pending>")]
     public class FolderModel : ModelBase, IComparable
     {
         public FolderModel()
@@ -47,7 +48,7 @@ namespace Algoloop.Model
         public int CompareTo(object obj)
         {
             var a = obj as FolderModel;
-            return string.Compare(Name, a?.Name);
+            return string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
         }
 
         internal void Refresh()

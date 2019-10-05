@@ -33,8 +33,9 @@ using QuantConnect.Statistics;
 
 namespace Algoloop.ViewModel
 {
-    public class AccountViewModel : ViewModelBase, ITreeViewModel
+    public class AccountViewModel : ViewModelBase, ITreeViewModel, IDisposable
     {
+        private bool _isDisposed = false; // To detect redundant calls
         private AccountsViewModel _parent;
         private CancellationTokenSource _cancel;
         private FxcmBrokerage _brokerage;
@@ -119,10 +120,12 @@ namespace Algoloop.ViewModel
                 _cancel = new CancellationTokenSource();
                 _task = Task.Run(() => MainLoop(), _cancel.Token);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             if (!Active)
             {
@@ -321,6 +324,27 @@ namespace Algoloop.ViewModel
         {
             var brokerage = sender as Brokerage;
             Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _brokerage.Dispose();
+                    _task.Dispose();
+                    _cancel.Dispose();
+                }
+
+                _isDisposed = true;
+            }
         }
     }
 }

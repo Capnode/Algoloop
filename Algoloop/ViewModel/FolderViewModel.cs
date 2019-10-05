@@ -226,10 +226,12 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
     }
 }

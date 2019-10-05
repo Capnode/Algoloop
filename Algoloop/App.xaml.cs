@@ -26,12 +26,12 @@ namespace Algoloop
     /// </summary>
     public partial class App : Application
     {
-        public const uint ES_CONTINUOUS = 0x80000000;
-        public const uint ES_SYSTEM_REQUIRED = 0x00000001;
-        public const uint ES_DISPLAY_REQUIRED = 0x00000002;
+        private const uint _esContinous = 0x80000000;
+        private const uint _esSystemRequired = 0x00000001;
+        private const uint _esDisplayRequired = 0x00000002;
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern uint SetThreadExecutionState([In] uint esFlags);
+        private static extern uint SetThreadExecutionState([In] uint esFlags);
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -40,13 +40,13 @@ namespace Algoloop
             EnsureBrowserEmulationEnabled("Algoloop.exe");
 
             // Prevent going to sleep mode
-            SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED);
+            _ = SetThreadExecutionState(_esContinous | _esSystemRequired);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             // Enable sleep mode
-            SetThreadExecutionState(ES_CONTINUOUS);
+            _ = SetThreadExecutionState(_esContinous);
 
             ViewModelLocator locator = Resources["Locator"] as ViewModelLocator;
             Debug.Assert(locator != null);
@@ -84,7 +84,7 @@ namespace Algoloop
                         rk.DeleteValue(exename);
                 }
             }
-            catch
+            finally
             {
             }
         }
