@@ -189,7 +189,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             }
 
             // If Tiingo data, set the access token in data factory
-            var tiingo = _dataFactory as TiingoDailyData;
+            var tiingo = _dataFactory as TiingoPrice;
             if (tiingo != null)
             {
                 if (!Tiingo.IsAuthCodeSet)
@@ -482,7 +482,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 var textSubscriptionFactory = (TextSubscriptionDataSourceReader)dataSourceReader;
                 textSubscriptionFactory.CreateStreamReaderError += (sender, args) =>
                 {
-                    if (_config.IsCustomData)
+                    if (_config.IsCustomData && !_config.Type.GetBaseDataInstance().IsSparseData())
                     {
                         OnDownloadFailed(
                             new DownloadFailedEventArgs(

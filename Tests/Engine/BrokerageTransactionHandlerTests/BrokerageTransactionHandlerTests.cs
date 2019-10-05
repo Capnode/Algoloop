@@ -303,7 +303,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             var order = Order.CreateOrder(orderRequest);
             var actual = transactionHandler.RoundOffOrder(order, security);
 
-            Assert.AreEqual(123.12345678m, actual);
+            Assert.AreEqual(123.123m, actual);
         }
 
         [Test]
@@ -327,7 +327,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             var order = Order.CreateOrder(orderRequest);
             var actual = transactionHandler.RoundOffOrder(order, security);
 
-            Assert.AreEqual(-123.12345678m, actual);
+            Assert.AreEqual(-123.123m, actual);
         }
 
         [Test]
@@ -897,7 +897,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             var algorithm = new QCAlgorithm();
             var marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
             var symbolPropertiesDataBase = SymbolPropertiesDatabase.FromDataFolder();
-            var securityService = new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm);
+            var securityService = new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm, RegisteredSecurityDataTypesProvider.Null);
             algorithm.Securities.SetSecurityService(securityService);
             algorithm.SetLiveMode(true);
 

@@ -49,10 +49,11 @@ namespace QuantConnect.Tests.Engine
             var thursday = LocalMarketHours.OpenAllDay(DayOfWeek.Thursday);
             var friday = new LocalMarketHours(DayOfWeek.Friday, TimeSpan.Zero, new TimeSpan(17, 0, 0));
             var earlyCloses = new Dictionary<DateTime, TimeSpan>();
+            var lateOpens = new Dictionary<DateTime, TimeSpan>();
             _exchangeHours = new SecurityExchangeHours(TimeZones.NewYork, USHoliday.Dates.Select(x => x.Date), new[]
             {
                 sunday, monday, tuesday, wednesday, thursday, friday
-            }.ToDictionary(x => x.DayOfWeek), earlyCloses);
+            }.ToDictionary(x => x.DayOfWeek), earlyCloses, lateOpens);
 
             _liveTradingDataFeed = new TestableLiveTradingDataFeed();
 
@@ -69,11 +70,12 @@ namespace QuantConnect.Tests.Engine
             var dataManager = new DataManager(_liveTradingDataFeed,
                 new UniverseSelection(
                     algo,
-                    new SecurityService(algo.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algo)),
+                    new SecurityService(algo.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algo, RegisteredSecurityDataTypesProvider.Null)),
                 algo,
                 algo.TimeKeeper,
                 marketHoursDatabase,
-                true);
+                true,
+                RegisteredSecurityDataTypesProvider.Null);
             algo.SubscriptionManager.SetDataManager(dataManager);
             var synchronizer = new LiveSynchronizer();
             synchronizer.Initialize(algo, dataManager);
@@ -114,7 +116,8 @@ namespace QuantConnect.Tests.Engine
                 _exchangeHours,
                 new Cash("USA", 100m, 1m),
                 SymbolProperties.GetDefault("USA"),
-                ErrorCurrencyConverter.Instance
+                ErrorCurrencyConverter.Instance,
+                RegisteredSecurityDataTypesProvider.Null
             );
 
             var subscriptionRequest = new SubscriptionRequest(false, null, security, _config, DateTime.MinValue, DateTime.MaxValue);
@@ -130,7 +133,8 @@ namespace QuantConnect.Tests.Engine
                 _exchangeHours,
                 new Cash("USA", 100m, 1m),
                 SymbolProperties.GetDefault("USA"),
-                ErrorCurrencyConverter.Instance
+                ErrorCurrencyConverter.Instance,
+                RegisteredSecurityDataTypesProvider.Null
             );
 
             var subscriptionRequest = new SubscriptionRequest(false, null, security, _config, DateTime.MinValue, DateTime.MaxValue);

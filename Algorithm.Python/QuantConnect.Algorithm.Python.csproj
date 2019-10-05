@@ -60,14 +60,19 @@
     <Content Include="Alphas\ShareClassMeanReversionAlpha.py" />
     <Content Include="Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py" />
     <Content Include="Alphas\VIXDualThrustAlpha.py" />
+    <Content Include="AltData\PsychSignalSentimentAlgorithm.py" />
+    <Content Include="AltData\TradingEconomicsAlgorithm.py" />
+    <Content Include="AltData\TiingoNewsAlgorithm.py" />
     <Content Include="BasicCSharpIntegrationTemplateAlgorithm.py" />
     <Content Include="BasicSetAccountCurrencyAlgorithm.py" />
+    <None Include="InceptionDateSelectionRegressionAlgorithm.py" />
     <None Include="USTreasuryYieldCurveDataAlgorithm.py" />
     <None Include="SmartInsiderDataAlgorithm.py" />
     <None Include="PandasDataFrameHistoryAlgorithm.py" />
     <None Include="CustomDataAddDataRegressionAlgorithm.py" />
     <Content Include="CustomDataAddDataOnSecuritiesChangedRegressionAlgorithm.py" />
     <Content Include="CustomDataAddDataCoarseSelectionRegressionAlgorithm.py" />
+    <Content Include="DynamicSecurityDataAlgorithm.py" />
     <Content Include="KerasNeuralNetworkAlgorithm.py" />
     <None Include="PsychSignalSentimentRegressionAlgorithm.py" />
     <Content Include="CustomDataUsingMapFileRegressionAlgorithm.py" />
@@ -94,7 +99,7 @@
     <None Include="BlackLittermanPortfolioOptimizationFrameworkAlgorithm.py" />
     <None Include="packages.config" />
     <None Include="TensorFlowNeuralNetworkAlgorithm.py" />
-    <None Include="TiingoDailyDataAlgorithm.py" />
+    <None Include="TiingoPriceAlgorithm.py" />
     <None Include="PearsonCorrelationPairsTradingAlphaModelFrameworkAlgorithm.py" />
   </ItemGroup>
   <ItemGroup>

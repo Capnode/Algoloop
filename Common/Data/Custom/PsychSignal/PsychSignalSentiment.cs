@@ -17,6 +17,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using NodaTime;
 using static QuantConnect.StringExtensions;
 
 namespace QuantConnect.Data.Custom.PsychSignal
@@ -26,7 +27,7 @@ namespace QuantConnect.Data.Custom.PsychSignal
     /// Created as part of a subscription request from AddData{T}
     /// and consumed by algorithms running on LEAN.
     /// </summary>
-    public class PsychSignalSentimentData : BaseData
+    public class PsychSignalSentiment : BaseData
     {
         /// <summary>
         /// Bullish intensity as reported by psychsignal
@@ -119,7 +120,7 @@ namespace QuantConnect.Data.Custom.PsychSignal
                 var bullBearMessageRatio = Convert.ToDecimal(csv[6], CultureInfo.InvariantCulture);
                 var totalScannedMessages = Convert.ToInt32(csv[7], CultureInfo.InvariantCulture);
 
-                return new PsychSignalSentimentData
+                return new PsychSignalSentiment
                 {
                     Time = timestamp,
                     Symbol = config.Symbol,
@@ -145,7 +146,7 @@ namespace QuantConnect.Data.Custom.PsychSignal
         /// <returns>New BaseData derived instance containing the same data as the original object</returns>
         public override BaseData Clone()
         {
-            return new PsychSignalSentimentData
+            return new PsychSignalSentiment
             {
                 Time = Time,
                 Symbol = Symbol,
@@ -166,6 +167,15 @@ namespace QuantConnect.Data.Custom.PsychSignal
         public override bool RequiresMapping()
         {
             return true;
+        }
+
+        /// <summary>
+        /// Specifies the data time zone for this data type. This is useful for custom data types
+        /// </summary>
+        /// <returns>The <see cref="DateTimeZone"/> of this data type</returns>
+        public override DateTimeZone DataTimeZone()
+        {
+            return TimeZones.Utc;
         }
     }
 }

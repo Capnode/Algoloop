@@ -294,7 +294,8 @@ namespace QuantConnect.Tests.Common.Securities
                 CreateTradeBarConfig(),
                 new Cash(Currencies.USD, 0, 1m),
                 SymbolProperties.GetDefault(Currencies.USD),
-                ErrorCurrencyConverter.Instance
+                ErrorCurrencyConverter.Instance,
+                RegisteredSecurityDataTypesProvider.Null
             );
             TimeKeeper.SetUtcDateTime(newLocalTime.ConvertToUtc(security.Exchange.TimeZone));
             security.Exchange.SetLocalDateTimeFrontier(newLocalTime);
@@ -314,10 +315,11 @@ namespace QuantConnect.Tests.Common.Securities
             var saturday = LocalMarketHours.ClosedAllDay(DayOfWeek.Saturday);
 
             var earlyCloses = new Dictionary<DateTime, TimeSpan>();
+            var lateOpens = new Dictionary<DateTime, TimeSpan>();
             return new SecurityExchangeHours(TimeZones.NewYork, USHoliday.Dates.Select(x => x.Date), new[]
             {
                 sunday, monday, tuesday, wednesday, thursday, friday, saturday
-            }.ToDictionary(x => x.DayOfWeek), earlyCloses);
+            }.ToDictionary(x => x.DayOfWeek), earlyCloses, lateOpens);
         }
 
         private static SubscriptionDataConfig CreateTradeBarConfig()
