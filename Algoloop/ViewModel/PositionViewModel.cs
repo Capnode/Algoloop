@@ -91,6 +91,8 @@ namespace Algoloop.ViewModel
 
         public void Update(Holding holding)
         {
+            if (holding == null) throw new ArgumentNullException(nameof(holding));
+
             Symbol = holding.Symbol.ID.Symbol;
             SecurityType = Enum.GetName(typeof(SecurityType), holding.Type);
             CurrencySymbol = holding.CurrencySymbol;

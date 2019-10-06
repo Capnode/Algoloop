@@ -35,6 +35,8 @@ namespace Algoloop.ViewModel
 
         public OrderViewModel(OrderEvent message)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             Model = new OrderModel();
             Update(message);
         }

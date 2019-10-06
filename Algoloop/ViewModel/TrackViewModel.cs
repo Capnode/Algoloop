@@ -66,7 +66,7 @@ namespace Algoloop.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
-        public IDictionary<string, decimal?> _statistics;
+        private IDictionary<string, decimal?> _statistics;
         private string _port;
         private IList _selectedItems;
         private SyncObservableCollection<SymbolViewModel> _symbols = new SyncObservableCollection<SymbolViewModel>();

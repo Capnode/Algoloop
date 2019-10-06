@@ -8,8 +8,6 @@ using System.Windows.Data;
 using System.Xml.Serialization;
 using System.Diagnostics;
 using System.IO;
-using System.Windows.Input;
-using System.Windows.Controls.Primitives;
 using System.Collections;
 
 namespace Algoloop.ViewSupport
@@ -46,9 +44,9 @@ namespace Algoloop.ViewSupport
 
 		protected override void OnInitialized(EventArgs e)
 		{
-			EventHandler sortDirectionChangedHandler = (sender, x) => UpdateColumnInfo();
-			EventHandler widthPropertyChangedHandler = (sender, x) => inWidthChange = true;
-			var sortDirectionPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.SortDirectionProperty, typeof(DataGridColumn));
+            void sortDirectionChangedHandler(object sender, EventArgs x) => UpdateColumnInfo();
+            void widthPropertyChangedHandler(object sender, EventArgs x) => inWidthChange = true;
+            var sortDirectionPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.SortDirectionProperty, typeof(DataGridColumn));
 			var widthPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.WidthProperty, typeof(DataGridColumn));
 
 			Loaded += (sender, x) =>
@@ -81,11 +79,14 @@ namespace Algoloop.ViewSupport
 			base.ContextMenu.Items.Clear();
 			foreach (var column in base.Columns)
 			{
-				MenuItem item = new MenuItem();
-				item.Header = column.Header;
-				item.IsCheckable = true;
-				item.IsChecked = column.Visibility.Equals(Visibility.Visible);
-				item.Checked += new RoutedEventHandler(MenuItem_CheckedChanged);
+                MenuItem item = new MenuItem
+                {
+                    Header = column.Header,
+                    IsCheckable = true,
+                    IsChecked = column.Visibility.Equals(Visibility.Visible)
+                };
+
+                item.Checked += new RoutedEventHandler(MenuItem_CheckedChanged);
 				item.Unchecked += new RoutedEventHandler(MenuItem_CheckedChanged);
 				base.ContextMenu.Items.Add(item);
 			}
@@ -196,7 +197,9 @@ namespace Algoloop.ViewSupport
 	{
 		public ColumnInfo(DataGridColumn column)
 		{
-			Header = column.Header;
+            if (column == null) throw new ArgumentNullException(nameof(column));
+
+            Header = column.Header;
 			if (!(column is DataGridComboBoxColumn))
 				PropertyPath = ((Binding)((DataGridBoundColumn)column).Binding).Path.Path;
 			else
@@ -210,7 +213,10 @@ namespace Algoloop.ViewSupport
 
 		public void Apply(DataGridColumn column, int gridColumnCount, SortDescriptionCollection sortDescriptions)
 		{
-			column.Visibility = Visibility;
+            if (column == null) throw new ArgumentNullException(nameof(column));
+            if (sortDescriptions == null) throw new ArgumentNullException(nameof(sortDescriptions));
+
+            column.Visibility = Visibility;
 			column.Width = new DataGridLength(WidthValue, WidthType);
 			column.SortDirection = SortDirection;
 			if (SortDirection != null)

@@ -31,6 +31,9 @@ namespace Algoloop.Provider
     {
         public MarketModel Run(MarketModel market, SettingService settings, ILogHandler logger)
         {
+            if (market == null) throw new ArgumentNullException(nameof(market));
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
             Log.LogHandler = logger;
             PrepareDataFolder(settings.DataFolder);
 
@@ -76,6 +79,8 @@ namespace Algoloop.Provider
 
         public static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
+            if (market == null) throw new ArgumentNullException(nameof(market));
+
             IProvider provider = CreateProvider(market.Provider);
             if (provider == null)
                 return null;

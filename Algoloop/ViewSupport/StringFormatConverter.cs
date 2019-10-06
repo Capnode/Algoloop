@@ -22,6 +22,8 @@ namespace Algoloop.ViewSupport
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+
             string format = parameter as string;
             if (!string.IsNullOrEmpty(format))
                 return string.Format(culture, format, value);

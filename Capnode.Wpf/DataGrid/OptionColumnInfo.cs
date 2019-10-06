@@ -34,8 +34,8 @@ namespace Capnode.Wpf.DataGrid
 
         public OptionColumnInfo(DataGridColumn column, Type boundObjectType)
         {
-            if (column == null)
-                return;
+            if (column == null) return;
+            if (boundObjectType == null) throw new ArgumentNullException(nameof(boundObjectType));
 
             Column = column;
             if (column is DataGridBoundColumn boundColumn)
@@ -84,6 +84,9 @@ namespace Capnode.Wpf.DataGrid
 
         public static PropertyInfo GetProperty(Type baseType, string propertyName)
         {
+            if (baseType == null) throw new ArgumentNullException(nameof(baseType));
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+
             string[] parts = propertyName.Split('.');
             if (parts.Length > 1)
             {

@@ -25,6 +25,7 @@ using QuantConnect.Packets;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -32,8 +33,12 @@ namespace Algoloop.Lean
 {
     public class LeanLauncher : MarshalByRefObject
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Static does not work")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "account may be null")]
         public TrackModel Run(TrackModel model, AccountModel account, SettingService settings, HostDomainLogger logger)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             Log.LogHandler = logger;
             if (!SetConfig(model, account, settings))
             {
@@ -85,7 +90,7 @@ namespace Algoloop.Lean
         {
             var parameters = new Dictionary<string, string>();
             SetModel(model, settings);
-            if (model.Account.Equals(AccountModel.AccountType.Backtest.ToString()))
+            if (model.Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 if (model.Desktop)
                 {
@@ -96,7 +101,7 @@ namespace Algoloop.Lean
                     SetBacktest(model, parameters);
                 }
             }
-            else if (model.Account.Equals(AccountModel.AccountType.Paper.ToString()))
+            else if (model.Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 SetPaper(model, parameters);
             }
@@ -131,7 +136,7 @@ namespace Algoloop.Lean
             Config.Set("alpha-handler", "Algoloop.Lean.AlphaHandler");
             Config.Set("api-access-token", settings.ApiToken ?? string.Empty);
             Config.Set("job-user-id", settings.ApiUser ?? "0");
-            Config.Set("desktop-http-port", settings.DesktopPort.ToString());
+            Config.Set("desktop-http-port", settings.DesktopPort.ToString(CultureInfo.InvariantCulture));
             Config.Set("job-project-id", "0");
             Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
             Config.Set("regression-update-statistics", "false");
@@ -167,9 +172,9 @@ namespace Algoloop.Lean
 
         private static void SetParameters(TrackModel model, Dictionary<string, string> parameters)
         {
-            parameters.Add("startdate", model.StartDate.ToString());
-            parameters.Add("enddate", model.EndDate.ToString());
-            parameters.Add("cash", model.InitialCapital.ToString());
+            parameters.Add("startdate", model.StartDate.ToString(CultureInfo.InvariantCulture));
+            parameters.Add("enddate", model.EndDate.ToString(CultureInfo.InvariantCulture));
+            parameters.Add("cash", model.InitialCapital.ToString(CultureInfo.InvariantCulture));
             parameters.Add("resolution", model.Resolution.ToString());
             if (!model.Symbols.IsNullOrEmpty())
             {
@@ -206,7 +211,7 @@ namespace Algoloop.Lean
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             if (!model.Provider.IsNullOrEmpty())
             {
-                parameters.Add("market", model.Provider.ToString());
+                parameters.Add("market", model.Provider.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -225,7 +230,7 @@ namespace Algoloop.Lean
             Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
             if (!model.Provider.IsNullOrEmpty())
             {
-                parameters.Add("market", model.Provider.ToString());
+                parameters.Add("market", model.Provider.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -242,7 +247,7 @@ namespace Algoloop.Lean
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             if (!model.Provider.IsNullOrEmpty())
             {
-                parameters.Add("market", model.Provider.ToString());
+                parameters.Add("market", model.Provider.ToString(CultureInfo.InvariantCulture));
             }
         }
 
@@ -262,7 +267,7 @@ namespace Algoloop.Lean
             Config.Set("fxcm-user-name", account.Login);
             Config.Set("fxcm-password", account.Password);
             Config.Set("fxcm-account-id", account.Id);
-            parameters.Add("market", Market.FXCM.ToString());
+            parameters.Add("market", Market.FXCM.ToString(CultureInfo.InvariantCulture));
             switch (account.Access)
             {
                 case AccountModel.AccessType.Demo:
@@ -294,7 +299,7 @@ namespace Algoloop.Lean
             Config.Set("fxcm-account-id", account.Id);
             Config.Set("log-handler", "QuantConnect.Logging.QueueLogHandler");
             Config.Set("desktop-exe", @"../../../UserInterface/bin/Release/QuantConnect.Views.exe");
-            parameters.Add("market", Market.FXCM.ToString());
+            parameters.Add("market", Market.FXCM.ToString(CultureInfo.InvariantCulture));
             switch (account.Access)
             {
                 case AccountModel.AccessType.Demo:

@@ -19,6 +19,7 @@ using QuantConnect.Data;
 using QuantConnect.Parameters;
 using QuantConnect.Securities.Forex;
 using System;
+using System.Globalization;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -65,8 +66,8 @@ namespace Algoloop.Algorithm.CSharp
         /// </summary>
         public override void Initialize()
         {
-            _startdate = DateTime.Parse(__startdate);
-            _enddate = DateTime.Parse(__enddate);
+            _startdate = DateTime.Parse(__startdate, CultureInfo.InvariantCulture);
+            _enddate = DateTime.Parse(__enddate, CultureInfo.InvariantCulture);
             _symbol = __symbols.Split(';')[0];
             Enum.TryParse(__resolution, out _resolution);
             _cash = int.Parse(__cash);

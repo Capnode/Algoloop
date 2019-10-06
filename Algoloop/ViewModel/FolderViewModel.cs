@@ -43,6 +43,8 @@ namespace Algoloop.ViewModel
 
         public FolderViewModel(MarketViewModel market, FolderModel model)
         {
+            if (market == null) throw new ArgumentNullException(nameof(market));
+
             _market = market;
             Model = model;
 
@@ -57,8 +59,7 @@ namespace Algoloop.ViewModel
 
             MarketSymbols.Filter += (object sender, FilterEventArgs e) =>
             {
-                SymbolViewModel marketSymbol = e.Item as SymbolViewModel;
-                if (marketSymbol != null)
+                if (e.Item is SymbolViewModel marketSymbol)
                 {
                     e.Accepted = marketSymbol.Active && !Symbols.Any(m => m.Model.Name.Equals(marketSymbol.Model.Name));
                 }
@@ -129,7 +130,8 @@ namespace Algoloop.ViewModel
 
         public void AddSymbols(IEnumerable<SymbolViewModel> symbols)
         {
-            Debug.Assert(symbols != null);
+            if (symbols == null) throw new ArgumentNullException(nameof(symbols));
+
             foreach (SymbolViewModel symbol in symbols)
             {
                 if (!Symbols.Contains(symbol))
@@ -209,9 +211,11 @@ namespace Algoloop.ViewModel
         private void DoExportFolder()
         {
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
             if (saveFileDialog.ShowDialog() == false)
                 return;
 

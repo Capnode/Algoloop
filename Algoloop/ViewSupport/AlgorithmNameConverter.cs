@@ -36,6 +36,8 @@ namespace Algoloop.ViewSupport
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
             var model = context.Instance as StrategyModel;
             string assemblyPath = model?.AlgorithmLocation;
             if (string.IsNullOrEmpty(assemblyPath))

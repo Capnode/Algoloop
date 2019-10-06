@@ -97,7 +97,9 @@ namespace Algoloop.Algorithm.CSharp
         /// <param name="data">TradeBars IDictionary object with your stock data</param>
         public void OnData(TradeBars data)
         {
-//            Log($"OnData() {Time}");
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+            //            Log($"OnData() {Time}");
             // only once per day
             if (_previous.Date == Time.Date) return;
 

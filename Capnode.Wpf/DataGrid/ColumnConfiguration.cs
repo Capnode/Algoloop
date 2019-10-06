@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Windows;
 namespace Capnode.Wpf.DataGrid
 {
@@ -25,11 +26,15 @@ namespace Capnode.Wpf.DataGrid
 
         public static void SetCanUserFreeze(DependencyObject element, object o)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             element.SetValue(CanUserFreezeProperty, o);
         }
 
         public static bool GetCanUserFreeze(DependencyObject element)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             return (bool)element.GetValue(CanUserFreezeProperty);
         }
 
@@ -38,11 +43,15 @@ DependencyProperty.RegisterAttached("CanUserFilter", typeof(bool?), typeof(Colum
 
         public static void SetCanUserFilter(DependencyObject element, object o)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             element.SetValue(CanUserFilterProperty, o);
         }
 
         public static bool GetCanUserFilter(DependencyObject element)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             return (bool)element.GetValue(CanUserFilterProperty);
         }
 
@@ -51,11 +60,15 @@ DependencyProperty.RegisterAttached("CanUserGroup", typeof(bool?), typeof(Column
 
         public static void SetCanUserGroup(DependencyObject element, object o)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             element.SetValue(CanUserGroupProperty, o);
         }
 
         public static bool GetCanUserGroup(DependencyObject element)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             return (bool)element.GetValue(CanUserGroupProperty);
         }
 
@@ -64,11 +77,15 @@ DependencyProperty.RegisterAttached("CanUserSelectDistinct", typeof(bool?), type
 
         public static void SetCanUserSelectDistinct(DependencyObject element, object o)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             element.SetValue(CanUserSelectDistinctProperty, o);
         }
 
         public static bool GetCanUserSelectDistinct(DependencyObject element)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             return (bool)element.GetValue(CanUserSelectDistinctProperty);
         }
 
@@ -77,11 +94,15 @@ DependencyProperty.RegisterAttached("DefaultFilter", typeof(string), typeof(Colu
 
         public static void SetDefaultFilter(DependencyObject element, object o)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             element.SetValue(DefaultFilterProperty, o);
         }
 
         public static string GetDefaultFilter(DependencyObject element)
         {
+            if (element == null) throw new ArgumentNullException(nameof(element));
+
             return (string)element.GetValue(DefaultFilterProperty);
         }
 

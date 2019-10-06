@@ -28,8 +28,10 @@ namespace Algoloop
     {
         private const uint _esContinous = 0x80000000;
         private const uint _esSystemRequired = 0x00000001;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private const uint _esDisplayRequired = 0x00000002;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint SetThreadExecutionState([In] uint esFlags);
 

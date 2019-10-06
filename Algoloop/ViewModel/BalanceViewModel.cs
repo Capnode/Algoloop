@@ -14,6 +14,7 @@
 
 using GalaSoft.MvvmLight;
 using QuantConnect.Securities;
+using System;
 
 namespace Algoloop.ViewModel
 {
@@ -55,6 +56,8 @@ namespace Algoloop.ViewModel
 
         public void Update(AccountEvent message)
         {
+            if (message == null) throw new ArgumentNullException(nameof(message));
+
             Currency = message.CurrencySymbol;
             Amount = message.CashBalance;
         }

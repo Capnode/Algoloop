@@ -45,6 +45,9 @@ namespace Algoloop.Provider
 
         public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", settings.DataFolder);
 

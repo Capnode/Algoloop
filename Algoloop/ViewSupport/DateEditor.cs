@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Windows;
 using System.Windows.Data;
 using Xceed.Wpf.Toolkit;
@@ -24,17 +25,23 @@ namespace Algoloop.ViewSupport
     {
         public FrameworkElement ResolveEditor(PropertyItem propertyItem)
         {
-            DateTimePicker picker = new DateTimePicker();
-            picker.Format = DateTimeFormat.ShortDate;
-            picker.HorizontalAlignment = HorizontalAlignment.Left;
-            picker.IsEnabled = !propertyItem.IsReadOnly;
+            if (propertyItem == null) throw new ArgumentNullException(nameof(propertyItem));
+
+            DateTimePicker picker = new DateTimePicker
+            {
+                Format = DateTimeFormat.ShortDate,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                IsEnabled = !propertyItem.IsReadOnly
+            };
 
             //create the binding from the bound property item to the editor
-            var binding = new Binding("Value"); //bind to the Value property of the PropertyItem
-            binding.Source = propertyItem;
-            binding.ValidatesOnExceptions = true;
-            binding.ValidatesOnDataErrors = true;
-            binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
+            var binding = new Binding("Value")
+            {
+                Source = propertyItem,
+                ValidatesOnExceptions = true,
+                ValidatesOnDataErrors = true,
+                Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay
+            }; //bind to the Value property of the PropertyItem
             BindingOperations.SetBinding(picker, DateTimePicker.ValueProperty, binding);
             return picker;
         }

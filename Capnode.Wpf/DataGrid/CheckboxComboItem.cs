@@ -27,7 +27,7 @@ namespace Capnode.Wpf.DataGrid
                 if (_IsChecked != value)
                 {
                     _IsChecked = value;
-                    OnPropertChanged("IsChecked");
+                    OnPropertChanged(nameof(IsChecked));
                 }
             }
         }
@@ -41,7 +41,7 @@ namespace Capnode.Wpf.DataGrid
                 if (_Description != value)
                 {
                     _Description = value;
-                    OnPropertChanged("Description");
+                    OnPropertChanged(nameof(Description));
                 }
             }
         }

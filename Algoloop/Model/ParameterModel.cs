@@ -27,6 +27,8 @@ namespace Algoloop.Model
 
         public ParameterModel(ParameterModel model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             Name = model.Name;
             UseValue = model.UseValue && !string.IsNullOrWhiteSpace(model.Value);
             Value = model.Value;

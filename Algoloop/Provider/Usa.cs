@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,6 +36,9 @@ namespace Algoloop.Provider
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
+            if (market == null) throw new ArgumentNullException(nameof(market));
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
             string directory = Path.Combine(settings.DataFolder, SecurityType.Equity.ToString().ToLower(), market.Provider.ToLower());
             string dailyFolder = Path.Combine(directory, "daily");
 

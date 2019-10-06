@@ -64,6 +64,8 @@ namespace Algoloop.ViewModel
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             _parent = parent;
             Model = model;
             _markets = markets;

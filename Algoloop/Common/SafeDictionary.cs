@@ -17,6 +17,7 @@ using System.Collections.Generic;
 
 namespace Algoloop.Common
 {
+    [Serializable]
     public class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {
         public SafeDictionary()

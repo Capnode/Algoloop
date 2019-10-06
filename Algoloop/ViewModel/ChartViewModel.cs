@@ -15,12 +15,15 @@
 using GalaSoft.MvvmLight;
 using QuantConnect;
 using QuantConnect.Data;
+using System;
 using System.Collections.Generic;
 
 public class ChartViewModel : ViewModelBase
 {
     public ChartViewModel(Series series)
     {
+        if (series == null) throw new ArgumentNullException(nameof(series));
+
         Title = series.Name;
         Series = series;
         Data = null;
@@ -28,6 +31,8 @@ public class ChartViewModel : ViewModelBase
 
     public ChartViewModel(Series series, IEnumerable<BaseData> data)
     {
+        if (series == null) throw new ArgumentNullException(nameof(series));
+
         Title = series.Name;
         Series = series;
         Data = data;

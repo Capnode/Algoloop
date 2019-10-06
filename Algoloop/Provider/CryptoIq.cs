@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
-    class CryptoIq : IProvider
+    public class CryptoIq : IProvider
     {
         public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {

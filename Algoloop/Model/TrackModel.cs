@@ -34,6 +34,8 @@ namespace Algoloop.Model
 
         public TrackModel(string name, StrategyModel strategy)
         {
+            if (strategy == null) throw new ArgumentNullException(nameof(strategy));
+
             Name = name;
             Desktop = strategy.Desktop;
             Account = strategy.Account;

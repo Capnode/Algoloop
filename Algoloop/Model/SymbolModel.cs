@@ -34,6 +34,8 @@ namespace Algoloop.Model
 
         public SymbolModel(SymbolModel model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             Name = model.Name;
             Active = model.Active;
         }
@@ -54,7 +56,7 @@ namespace Algoloop.Model
         public int CompareTo(object obj)
         {
             var a = obj as SymbolModel;
-            return string.Compare(Name, a?.Name);
+            return string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

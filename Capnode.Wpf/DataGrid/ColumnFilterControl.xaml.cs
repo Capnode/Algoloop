@@ -360,8 +360,10 @@ namespace Capnode.Wpf.DataGrid
 
         protected Predicate<object> GenerateFilterPredicate(string propertyName, string filterValue, Type objType, Type propType, FilterOperationItem filterItem)
         {
-            if (filterItem == null)
-                return null;
+            if (filterItem == null) return null;
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+            if (filterValue == null) throw new ArgumentNullException(nameof(filterValue));
+            if (objType == null) throw new ArgumentNullException(nameof(objType));
 
             ParameterExpression objParam = linq.Expression.Parameter(typeof(object), "x");
             linq.UnaryExpression param = objType.IsByRef ? 

@@ -14,7 +14,6 @@
 
 using System;
 using System.IO;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -27,6 +26,8 @@ namespace Algoloop.ViewSupport
     {
         public FrameworkElement ResolveEditor(PropertyItem propertyItem)
         {
+            if (propertyItem == null) throw new ArgumentNullException(nameof(propertyItem));
+
             Grid panel = new Grid();
             panel.ColumnDefinitions.Add(new ColumnDefinition());
             panel.ColumnDefinitions.Add(new ColumnDefinition()
@@ -40,17 +41,24 @@ namespace Algoloop.ViewSupport
             textBox.IsEnabled = !propertyItem.IsReadOnly;
             panel.Children.Add(textBox);
 
-            Binding binding = new Binding("Value"); //bind to the Value property of the PropertyItem
-            binding.Source = propertyItem;
-            binding.Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay;
+            Binding binding = new Binding("Value")
+            {
+                Source = propertyItem,
+                Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay
+            };
+            
+            //bind to the Value property of the PropertyItem
             BindingOperations.SetBinding(textBox, TextBox.TextProperty, binding);
 
             if (!propertyItem.IsReadOnly)
             {
-                Button button = new Button();
-                button.Content = "   . . .   ";
-                button.Tag = propertyItem;
-                button.Click += button_Click;
+                Button button = new Button
+                {
+                    Content = "   . . .   ",
+                    Tag = propertyItem
+                };
+
+                button.Click += Button_Click;
                 Grid.SetColumn(button, 1);
                 panel.Children.Add(button);
             }
@@ -58,10 +66,9 @@ namespace Algoloop.ViewSupport
             return panel;
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            PropertyItem item = ((Button)sender).Tag as PropertyItem;
-            if (null == item)
+            if (!(((Button)sender).Tag is PropertyItem item))
             {
                 return;
             }

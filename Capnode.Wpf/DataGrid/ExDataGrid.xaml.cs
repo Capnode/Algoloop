@@ -61,7 +61,7 @@ namespace Capnode.Wpf.DataGrid
         public ExDataGrid()
         {
             Filters = new List<ColumnFilterControl>();
-            _filterHandler = new PropertyChangedEventHandler(filter_PropertyChanged);
+            _filterHandler = new PropertyChangedEventHandler(Filter_PropertyChanged);
             InitializeComponent();
 
             SelectionChanged += (object sender, SelectionChangedEventArgs e) => { ExSelectedItems = base.SelectedItems; };
@@ -87,14 +87,16 @@ namespace Capnode.Wpf.DataGrid
 
         public static void OnItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            ExDataGrid g = sender as ExDataGrid;
-            if (g != null)
+            if (sender is ExDataGrid g)
             {
                 var list = (IEnumerable)e.NewValue;
-                var view = new CollectionViewSource();
-                view.Source = list;
                 if (list == null)
                     return;
+
+                var view = new CollectionViewSource
+                {
+                    Source = list
+                };
 
                 Type srcT = e.NewValue.GetType().GetInterfaces().First(i => i.Name.StartsWith("IEnumerable"));
                 g.FilterType = srcT.GetGenericArguments().First();
@@ -125,28 +127,24 @@ namespace Capnode.Wpf.DataGrid
         {
             var context = source as ExDataGrid;
 
-            var oldItems = e.OldValue as ObservableCollection<DataGridColumn>;
-
-            if (oldItems != null)
+            if (e.OldValue is ObservableCollection<DataGridColumn> oldItems)
             {
                 foreach (var one in oldItems)
                     context.Columns.Remove(one);
 
-                oldItems.CollectionChanged -= context.collectionChanged;
+                oldItems.CollectionChanged -= context.CollectionChanged;
             }
 
-            var newItems = e.NewValue as ObservableCollection<DataGridColumn>;
-
-            if (newItems != null)
+            if (e.NewValue is ObservableCollection<DataGridColumn> newItems)
             {
                 foreach (var one in newItems)
                     context.Columns.Add(one);
 
-                newItems.CollectionChanged += context.collectionChanged;
+                newItems.CollectionChanged += context.CollectionChanged;
             }
         }
 
-        private void collectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -286,7 +284,7 @@ namespace Capnode.Wpf.DataGrid
         /// </summary>
         /// <param name="sender">The object which has risen the event</param>
         /// <param name="e">The property which has been changed</param>
-        void filter_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        void Filter_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "FilterChanged")
             {
@@ -313,8 +311,7 @@ namespace Capnode.Wpf.DataGrid
                         view.CommitNew();
                     if (CollectionView != null)
                         CollectionView.Filter = predicate;
-                    if (AfterFilterChanged != null)
-                        AfterFilterChanged(this, new FilterChangedEventArgs(predicate));
+                    AfterFilterChanged?.Invoke(this, new FilterChangedEventArgs(predicate));
                 }
                 else
                 {
@@ -344,9 +341,7 @@ namespace Capnode.Wpf.DataGrid
             {
                 foreach (var groupedCol in CollectionView.GroupDescriptions)
                 {
-                    var propertyGroup = groupedCol as PropertyGroupDescription;
-
-                    if (propertyGroup != null && propertyGroup.PropertyName == boundPropertyName)
+                    if (groupedCol is PropertyGroupDescription propertyGroup && propertyGroup.PropertyName == boundPropertyName)
                         return;
                 }
 
@@ -360,9 +355,7 @@ namespace Capnode.Wpf.DataGrid
             {
                 foreach (var g in CollectionView.GroupDescriptions)
                 {
-                    var pgd = g as PropertyGroupDescription;
-
-                    if (pgd != null)
+                    if (g is PropertyGroupDescription pgd)
                         if (pgd.PropertyName == boundPropertyName)
                             return true;
                 }
@@ -379,9 +372,7 @@ namespace Capnode.Wpf.DataGrid
 
                 foreach (var groupedCol in CollectionView.GroupDescriptions)
                 {
-                    var propertyGroup = groupedCol as PropertyGroupDescription;
-
-                    if (propertyGroup != null && propertyGroup.PropertyName == boundPropertyName)
+                    if (groupedCol is PropertyGroupDescription propertyGroup && propertyGroup.PropertyName == boundPropertyName)
                     {
                         selectedGroup = propertyGroup;
                     }
@@ -407,6 +398,8 @@ namespace Capnode.Wpf.DataGrid
 
         public void FreezeColumn(DataGridColumn column)
         {
+            if (column == null) throw new ArgumentNullException(nameof(column));
+
             if (this.Columns != null && this.Columns.Contains(column))
             {
                 column.DisplayIndex = this.FrozenColumnCount;
@@ -415,6 +408,8 @@ namespace Capnode.Wpf.DataGrid
         }
         public bool IsFrozenColumn(DataGridColumn column)
         {
+            if (column == null) throw new ArgumentNullException(nameof(column));
+
             if (this.Columns != null && this.Columns.Contains(column))
             {
                 return column.DisplayIndex < this.FrozenColumnCount;
@@ -426,6 +421,8 @@ namespace Capnode.Wpf.DataGrid
         }
         public void UnFreezeColumn(DataGridColumn column)
         {
+            if (column == null) throw new ArgumentNullException(nameof(column));
+
             if (this.FrozenColumnCount > 0 && column.IsFrozen && this.Columns != null && this.Columns.Contains(column))
             {
                 this.FrozenColumnCount--;
@@ -450,6 +447,8 @@ namespace Capnode.Wpf.DataGrid
 
         public void ConfigureFilter(DataGridColumn column, bool canUserSelectDistinct, bool canUserGroup, bool canUserFreeze, bool canUserFilter)
         {
+            if (column == null) throw new ArgumentNullException(nameof(column));
+
             column.SetValue(ColumnConfiguration.CanUserFilterProperty, canUserFilter);
             column.SetValue(ColumnConfiguration.CanUserFreezeProperty, canUserFreeze);
             column.SetValue(ColumnConfiguration.CanUserGroupProperty, canUserGroup);
@@ -489,8 +488,7 @@ namespace Capnode.Wpf.DataGrid
 
         protected void OnPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

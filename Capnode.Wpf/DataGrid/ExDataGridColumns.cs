@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -56,6 +57,8 @@ namespace Capnode.Wpf.DataGrid
 
         public static void AddTextColumn(ObservableCollection<DataGridColumn> columns, string header, string binding, bool rightAligned)
         {
+            if (columns == null) throw new ArgumentNullException(nameof(columns));
+
             DataGridColumn column = columns.FirstOrDefault(m => m.Header.Equals(header));
             if (column != null)
             {

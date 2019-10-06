@@ -26,7 +26,6 @@ using QuantConnect.Parameters;
 using QuantConnect.Securities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -142,10 +141,11 @@ namespace Capnode.Algorithm.CSharp
             _closeTimeShort = closeTimeShort;
         }
 
-        public override IEnumerable<Insight> Update(
-            QCAlgorithm algorithm,
-            Slice data)
+        public override IEnumerable<Insight> Update(QCAlgorithm algorithm, Slice data)
         {
+            if (algorithm == null) throw new ArgumentNullException(nameof(algorithm));
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
             var insights = new List<Insight>();
             foreach (var kvp in algorithm.ActiveSecurities)
             {

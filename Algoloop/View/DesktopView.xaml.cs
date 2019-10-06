@@ -22,6 +22,7 @@ using QuantConnect.Orders;
 using QuantConnect.Packets;
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -288,6 +289,7 @@ namespace Algoloop.View
             var embedPage = liveMode ? "embeddedLive" : "embedded";
 
             url = string.Format(
+                CultureInfo.InvariantCulture,
                 "https://www.quantconnect.com/terminal/{0}?user={1}&token={2}&pid={3}&version={4}&holdReady={5}&bid={6}",
                 embedPage, job.UserId, job.Channel, job.ProjectId, Globals.Version, hold, job.AlgorithmId);
 

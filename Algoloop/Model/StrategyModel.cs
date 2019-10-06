@@ -36,6 +36,8 @@ namespace Algoloop.Model
 
         public StrategyModel(StrategyModel model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             Name = model.Name;
             Desktop = model.Desktop;
             Market = model.Market;
@@ -55,6 +57,8 @@ namespace Algoloop.Model
 
         public StrategyModel(TrackModel model)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             Desktop = model.Desktop;
             Market = model.Market;
             Provider = model.Provider;
@@ -232,8 +236,8 @@ namespace Algoloop.Model
         public void Refresh()
         {
             if (Account == null
-             || Account.Equals(AccountModel.AccountType.Backtest.ToString())
-             || Account.Equals(AccountModel.AccountType.Paper.ToString()))
+             || Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase)
+             || Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable("Market", true);
                 SetBrowsable("Provider", true);
