@@ -95,13 +95,11 @@ namespace Algoloop.ViewModel
                 StartTasks();
                 return true;
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         internal bool Save(string fileName)
@@ -117,13 +115,11 @@ namespace Algoloop.ViewModel
                     return true;
                 }
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
                 return false;
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private void DoSelectedChanged(ITreeViewModel vm)

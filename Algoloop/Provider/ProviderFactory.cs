@@ -58,13 +58,11 @@ namespace Algoloop.Provider
                 {
                     provider.Download(market, settings, symbols);
                 }
-#pragma warning disable CA1031 // Do not catch general exception types
                 catch (Exception ex)
                 {
                     Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
                     market.Active = false;
                 }
-#pragma warning restore CA1031 // Do not catch general exception types
             }
 
             Log.LogHandler.Dispose();
@@ -131,7 +129,7 @@ namespace Algoloop.Provider
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
-                .FirstOrDefault(m => m.Name.Equals(name));
+                .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 
             if (type == null)
             {
@@ -153,7 +151,7 @@ namespace Algoloop.Provider
 
         private static void RegisterProvider(Type provider)
         {
-            string name = provider.Name.ToLower();
+            string name = provider.Name.ToLowerInvariant();
             if (Market.Encode(name) == null)
             {
                 // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out

@@ -25,7 +25,7 @@ namespace Algoloop.ViewSupport
     /// </summary>
     public class SyncObservableCollection<T> : ObservableCollection<T>
     {
-        private object _lock = new object();
+        private readonly object _lock = new object();
 
         /// <summary> 
         /// Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class. 
@@ -64,7 +64,7 @@ namespace Algoloop.ViewSupport
         /// </summary> 
         public void AddRange(IEnumerable<T> collection)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
 
             foreach (var i in collection)
             {
@@ -77,7 +77,7 @@ namespace Algoloop.ViewSupport
         /// </summary> 
         public void RemoveRange(IEnumerable<T> collection)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
 
             foreach (var i in collection)
             {
@@ -98,7 +98,7 @@ namespace Algoloop.ViewSupport
         /// </summary> 
         public void ReplaceRange(IEnumerable<T> collection)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
 
             Clear();
             foreach (var i in collection)

@@ -61,7 +61,7 @@ namespace Algoloop.ViewModel
             {
                 if (e.Item is SymbolViewModel marketSymbol)
                 {
-                    e.Accepted = marketSymbol.Active && !Symbols.Any(m => m.Model.Name.Equals(marketSymbol.Model.Name));
+                    e.Accepted = marketSymbol.Active && !Symbols.Any(m => m.Model.Name.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase));
                 }
             };
 
@@ -172,7 +172,7 @@ namespace Algoloop.ViewModel
             {
                 if (marketSymbol.Active)
                 {
-                    string symbol = Model.Symbols.Find(m => m.Equals(marketSymbol.Model.Name));
+                    string symbol = Model.Symbols.Find(m => m.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase));
                     if (symbol != null)
                     {
                         Symbols.Add(marketSymbol);
@@ -230,12 +230,10 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
     }
 }

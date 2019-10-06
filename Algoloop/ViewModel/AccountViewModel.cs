@@ -120,12 +120,10 @@ namespace Algoloop.ViewModel
                 _cancel = new CancellationTokenSource();
                 _task = Task.Run(() => MainLoop(), _cancel.Token);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
             }
-#pragma warning restore CA1031 // Do not catch general exception types
 
             if (!Active)
             {

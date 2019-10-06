@@ -213,8 +213,8 @@ namespace Algoloop.Model
         public void Refresh()
         {
             if (Account == null
-             || Account.Equals(AccountModel.AccountType.Backtest.ToString())
-             || Account.Equals(AccountModel.AccountType.Paper.ToString()))
+             || Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase)
+             || Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable("Provider", true);
             }

@@ -53,12 +53,10 @@ namespace Algoloop.ViewModel
         private bool _checkAll;
         private IList _selectedItems;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "<Pending>")]
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingService settings)
         {
-            if (marketsViewModel == null)
-            {
-                throw new ArgumentNullException(nameof(marketsViewModel));
-            }
+            if (marketsViewModel == null) throw new ArgumentNullException(nameof(marketsViewModel));
 
             _parent = marketsViewModel;
             Model = marketModel;
@@ -230,42 +228,38 @@ namespace Algoloop.ViewModel
             while (!_cancel.Token.IsCancellationRequested && model.Active)
             {
                 Log.Trace($"{model.Provider} download {model.Resolution} {model.LastDate:d}");
-                using (var logger = new HostDomainLogger())
+                using var logger = new HostDomainLogger();
+                try
                 {
-                    try
-                    {
-                        _factory = new Isolated<ProviderFactory>();
-                        _cancel = new CancellationTokenSource();
-                        await Task.Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token);
-                        _factory.Dispose();
-                        _factory = null;
-                    }
-                    catch (AppDomainUnloadedException)
-                    {
-                        Log.Trace($"Market {model.Name} canceled by user");
-                        _factory = null;
-                        model.Active = false;
-                    }
-#pragma warning disable CA1031 // Do not catch general exception types
-                    catch (Exception ex)
-                    {
-                        Log.Trace($"{ex.GetType()}: {ex.Message}");
-                        _factory.Dispose();
-                        _factory = null;
-                        model.Active = false;
-                    }
-#pragma warning restore CA1031 // Do not catch general exception types
-
-                    if (logger.IsError)
-                    {
-                        Log.Trace($"{Model.Provider} download failed");
-                    }
-
-                    // Update view
-                    Model = null;
-                    Model = model;
-                    DataFromModel();
+                    _factory = new Isolated<ProviderFactory>();
+                    _cancel = new CancellationTokenSource();
+                    await Task.Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token);
+                    _factory.Dispose();
+                    _factory = null;
                 }
+                catch (AppDomainUnloadedException)
+                {
+                    Log.Trace($"Market {model.Name} canceled by user");
+                    _factory = null;
+                    model.Active = false;
+                }
+                catch (Exception ex)
+                {
+                    Log.Trace($"{ex.GetType()}: {ex.Message}");
+                    _factory.Dispose();
+                    _factory = null;
+                    model.Active = false;
+                }
+
+                if (logger.IsError)
+                {
+                    Log.Trace($"{Model.Provider} download failed");
+                }
+
+                // Update view
+                Model = null;
+                Model = model;
+                DataFromModel();
             }
 
             _cancel = null;
@@ -355,7 +349,7 @@ namespace Algoloop.ViewModel
                 foreach (SymbolModel symbol in symbols)
                 {
                     symbol.Name = symbol.Name.Trim();
-                    SymbolModel sym = Model.Symbols.Find(m => m.Name.Equals(symbol.Name));
+                    SymbolModel sym = Model.Symbols.Find(m => m.Name.Equals(symbol.Name, StringComparison.OrdinalIgnoreCase));
                     if (sym != null)
                     {
                         sym.Properties = symbol.Properties;
@@ -454,23 +448,21 @@ namespace Algoloop.ViewModel
                 _parent.IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
-                    using (StreamReader r = new StreamReader(fileName))
+                    using StreamReader r = new StreamReader(fileName);
+                    while (!r.EndOfStream)
                     {
-                        while (!r.EndOfStream)
+                        string line = r.ReadLine();
+                        foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            string line = r.ReadLine();
-                            foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
+                            SymbolModel symbol = Model.Symbols.Find(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                            if (symbol != null)
                             {
-                                SymbolModel symbol = Model.Symbols.Find(m => m.Name.Equals(name));
-                                if (symbol != null)
-                                {
-                                    symbol.Active = true;
-                                }
-                                else
-                                {
-                                    symbol = new SymbolModel(name);
-                                    Model.Symbols.Add(symbol);
-                                }
+                                symbol.Active = true;
+                            }
+                            else
+                            {
+                                symbol = new SymbolModel(name);
+                                Model.Symbols.Add(symbol);
                             }
                         }
                     }
@@ -479,12 +471,10 @@ namespace Algoloop.ViewModel
                 Folders.ToList().ForEach(m => m.Refresh());
                 DataFromModel();
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;
@@ -509,20 +499,16 @@ namespace Algoloop.ViewModel
             {
                 _parent.IsBusy = true;
                 string fileName = saveFileDialog.FileName;
-                using (StreamWriter file = File.CreateText(fileName))
+                using StreamWriter file = File.CreateText(fileName);
+                foreach (SymbolViewModel symbol in symbols)
                 {
-                    foreach (SymbolViewModel symbol in symbols)
-                    {
-                        file.WriteLine(symbol.Model.Name);
-                    }
+                    file.WriteLine(symbol.Model.Name);
                 }
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;
@@ -571,17 +557,15 @@ namespace Algoloop.ViewModel
                 {
                     var model = new FolderModel { Name = Path.GetFileNameWithoutExtension(fileName) };
                     Model.Folders.Add(model);
-                    using (StreamReader r = new StreamReader(fileName))
+                    using StreamReader r = new StreamReader(fileName);
+                    while (!r.EndOfStream)
                     {
-                        while (!r.EndOfStream)
+                        string line = r.ReadLine();
+                        foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            string line = r.ReadLine();
-                            foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
+                            if (Model.Symbols.Exists(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && m.Active))
                             {
-                                if (Model.Symbols.Exists(m => m.Name.Equals(name) && m.Active))
-                                {
-                                    model.Symbols.Add(name);
-                                }
+                                model.Symbols.Add(name);
                             }
                         }
                     }
@@ -589,12 +573,10 @@ namespace Algoloop.ViewModel
 
                 DataFromModel();
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;

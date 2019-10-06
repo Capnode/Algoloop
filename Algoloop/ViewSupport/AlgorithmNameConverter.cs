@@ -56,12 +56,10 @@ namespace Algoloop.ViewSupport
                 list.Sort();
                 return new StandardValuesCollection(list);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception)
             {
                 return null;
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
     }
 }

@@ -34,11 +34,11 @@ namespace Capnode.Wpf.DataGrid
     /// </summary>
     public partial class ExDataGrid : System.Windows.Controls.DataGrid, INotifyPropertyChanged
     {
-        public event CancelableFilterChangedEvent BeforeFilterChanged;
+        public event CancelableFilterChangedEvent BeforeFilterChangedEventHandler;
         public event FilterChangedEvent AfterFilterChanged;
 
-        private List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
-        private PropertyChangedEventHandler _filterHandler;
+        private readonly List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
+        private readonly PropertyChangedEventHandler _filterHandler;
 
         public static readonly DependencyProperty ExItemsSourceProperty = DependencyProperty.Register(
             "ExItemsSource",
@@ -98,7 +98,7 @@ namespace Capnode.Wpf.DataGrid
                     Source = list
                 };
 
-                Type srcT = e.NewValue.GetType().GetInterfaces().First(i => i.Name.StartsWith("IEnumerable"));
+                Type srcT = e.NewValue.GetType().GetInterfaces().First(i => i.Name.StartsWith("IEnumerable", StringComparison.OrdinalIgnoreCase));
                 g.FilterType = srcT.GetGenericArguments().First();
                 g.ItemsSource = CollectionViewSource.GetDefaultView(list);
                 if (g.Filters != null)
@@ -187,7 +187,7 @@ namespace Capnode.Wpf.DataGrid
                 if (_collapseLastGroup != value)
                 {
                     _collapseLastGroup = value;
-                    OnPropertyChanged("CollapseLastGroup");
+                    OnPropertyChanged(nameof(CollapseLastGroup));
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace Capnode.Wpf.DataGrid
                 if (_canUserGroup != value)
                 {
                     _canUserGroup = value;
-                    OnPropertyChanged("CanUserGroup");
+                    OnPropertyChanged(nameof(CanUserGroup));
                     foreach (var optionControl in Filters)
                         optionControl.CanUserGroup = _canUserGroup;
                 }
@@ -227,7 +227,7 @@ namespace Capnode.Wpf.DataGrid
                 if (_canUserFreeze != value)
                 {
                     _canUserFreeze = value;
-                    OnPropertyChanged("CanUserFreeze");
+                    OnPropertyChanged(nameof(CanUserFreeze));
                     foreach (var optionControl in Filters)
                         optionControl.CanUserFreeze = _canUserFreeze;
                 }
@@ -250,7 +250,7 @@ namespace Capnode.Wpf.DataGrid
                 if (_canUserSelectDistinct != value)
                 {
                     _canUserSelectDistinct = value;
-                    OnPropertyChanged("CanUserSelectDistinct");
+                    OnPropertyChanged(nameof(CanUserSelectDistinct));
                     foreach (var optionControl in Filters)
                         optionControl.CanUserSelectDistinct = _canUserSelectDistinct;
                 }
@@ -269,7 +269,7 @@ namespace Capnode.Wpf.DataGrid
                 if (_canUserFilter != value)
                 {
                     _canUserFilter = value;
-                    OnPropertyChanged("CanUserFilter");
+                    OnPropertyChanged(nameof(CanUserFilter));
                     foreach (var optionControl in Filters)
                         optionControl.CanUserFilter = _canUserFilter;
                 }
@@ -297,9 +297,9 @@ namespace Capnode.Wpf.DataGrid
                             predicate = predicate.And(filter.GeneratePredicate());
                 bool canContinue = true;
                 var args = new CancelableFilterChangedEventArgs(predicate);
-                if (BeforeFilterChanged != null && !IsResetting)
+                if (BeforeFilterChangedEventHandler != null && !IsResetting)
                 {
-                    BeforeFilterChanged(this, args);
+                    BeforeFilterChangedEventHandler(this, args);
                     canContinue = !args.Cancel;
                 }
                 if (canContinue)

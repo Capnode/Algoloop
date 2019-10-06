@@ -75,16 +75,16 @@ namespace Capnode.Algorithm.CSharp
             // Standard parameters
             SetStartDate(DateTime.Parse(_startdate, CultureInfo.InvariantCulture));
             SetEndDate(DateTime.Parse(_enddate, CultureInfo.InvariantCulture));
-            SetCash(int.Parse(_cash));
+            SetCash(int.Parse(_cash, CultureInfo.InvariantCulture));
 
             Resolution resolution = Resolution.Hour;
-            Enum.TryParse(_resolution, out resolution);
+            _ = Enum.TryParse(_resolution, out resolution);
 
             // Algorithm parameters
-            var openTimeLong = TimeSpan.FromHours(double.Parse(_openHourLong));
-            var closeTimeLong = TimeSpan.FromHours(double.Parse(_closeHourLong));
-            var openTimeShort = TimeSpan.FromHours(double.Parse(_openHourShort));
-            var closeTimeShort = TimeSpan.FromHours(double.Parse(_closeHourShort));
+            var openTimeLong = TimeSpan.FromHours(double.Parse(_openHourLong, CultureInfo.InvariantCulture));
+            var closeTimeLong = TimeSpan.FromHours(double.Parse(_closeHourLong, CultureInfo.InvariantCulture));
+            var openTimeShort = TimeSpan.FromHours(double.Parse(_openHourShort, CultureInfo.InvariantCulture));
+            var closeTimeShort = TimeSpan.FromHours(double.Parse(_closeHourShort, CultureInfo.InvariantCulture));
 
             // Set zero transaction fees
             SetSecurityInitializer(s => s.SetFeeModel(new FxcmFeeModel()));

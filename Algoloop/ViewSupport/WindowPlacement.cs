@@ -75,8 +75,8 @@ namespace Algoloop.ViewSupport
 
     public static class WindowPlacement
     {
-        private static Encoding encoding = new UTF8Encoding();
-        private static XmlSerializer serializer = new XmlSerializer(typeof(WINDOWPLACEMENT));
+        private static readonly Encoding encoding = new UTF8Encoding();
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(WINDOWPLACEMENT));
 
         [DllImport("user32.dll")]
         private static extern bool SetWindowPlacement(IntPtr hWnd, [In] ref WINDOWPLACEMENT lpwndpl);
@@ -117,18 +117,13 @@ namespace Algoloop.ViewSupport
 
         public static string GetPlacement(IntPtr windowHandle)
         {
-            WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
-            GetWindowPlacement(windowHandle, out placement);
+            GetWindowPlacement(windowHandle, out WINDOWPLACEMENT placement);
 
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8))
-                {
-                    serializer.Serialize(xmlTextWriter, placement);
-                    byte[] xmlBytes = memoryStream.ToArray();
-                    return encoding.GetString(xmlBytes);
-                }
-            }
+            using MemoryStream memoryStream = new MemoryStream();
+            using XmlTextWriter xmlTextWriter = new XmlTextWriter(memoryStream, Encoding.UTF8);
+            serializer.Serialize(xmlTextWriter, placement);
+            byte[] xmlBytes = memoryStream.ToArray();
+            return encoding.GetString(xmlBytes);
         }
 
         public static void SetPlacement(this Window window, string placementXml)

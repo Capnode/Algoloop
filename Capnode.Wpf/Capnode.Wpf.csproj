@@ -133,6 +133,7 @@
     <Resource Include="Images\NotEqual.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

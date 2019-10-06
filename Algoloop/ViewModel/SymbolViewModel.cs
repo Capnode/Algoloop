@@ -53,7 +53,7 @@ namespace Algoloop.ViewModel
         private const string _investingCashFlow = "Investing cash flow (M)";
         private const string _financingCashFlow = "Financing cash flow (M)";
 
-        private ITreeViewModel _parent;
+        private readonly ITreeViewModel _parent;
         private Resolution _selectedResolution = Resolution.Daily;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
         private ObservableCollection<DataGridColumn> _periodColumns = new ObservableCollection<DataGridColumn>();
@@ -140,7 +140,7 @@ namespace Algoloop.ViewModel
         {
             if (obj is SymbolViewModel other)
             {
-                return string.Compare(Model.Name, other.Model.Name);
+                return string.Compare(Model.Name, other.Model.Name, StringComparison.OrdinalIgnoreCase);
             }
 
             return 0;
@@ -222,10 +222,10 @@ namespace Algoloop.ViewModel
             string folder = Path.Combine(
                 market.DataFolder,
                 SecurityType.Equity.ToString(),
-                market.Model.Provider.ToLower(),
+                market.Model.Provider.ToLowerInvariant(),
                 "fundamental",
                 "fine",
-                Model.Name.ToLower());
+                Model.Name.ToLowerInvariant());
 
             DirectoryInfo d = new DirectoryInfo(folder);
             if (!d.Exists)
@@ -233,7 +233,7 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            string jsonFile = $"{Model.Name.ToLower()}.json";
+            string jsonFile = $"{Model.Name.ToLowerInvariant()}.json";
             FileInfo[] files = d.GetFiles("*.zip");
             foreach (FileInfo file in files)
             {
@@ -245,12 +245,10 @@ namespace Algoloop.ViewModel
                         continue;
                     }
 
-                    using (JsonReader reader = new JsonTextReader(resultStream))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        FineFundamental fine = serializer.Deserialize<FineFundamental>(reader);
-                        LoadFundamentals(fine);
-                    }
+                    using JsonReader reader = new JsonTextReader(resultStream);
+                    JsonSerializer serializer = new JsonSerializer();
+                    FineFundamental fine = serializer.Deserialize<FineFundamental>(reader);
+                    LoadFundamentals(fine);
                 }
             }
         }
@@ -267,7 +265,7 @@ namespace Algoloop.ViewModel
             switch (SelectedReportPeriod)
             {
                 case ReportPeriod.Year:
-                    if (periodType != null && periodType.Equals(_annual))
+                    if (periodType != null && periodType.Equals(_annual, StringComparison.OrdinalIgnoreCase))
                     {
                         FundamentalYear(fine, date.Year.ToString());
                     }
@@ -285,7 +283,7 @@ namespace Algoloop.ViewModel
 
         private void SetFundamentals(string row, string column, decimal value)
         {
-            ExDataGridRow<decimal?> gridRow = FundamentalRows.SingleOrDefault(m => m.Header.Equals(row));
+            ExDataGridRow<decimal?> gridRow = FundamentalRows.SingleOrDefault(m => m.Header.Equals(row, StringComparison.OrdinalIgnoreCase));
             if (gridRow == default)
             {
                 gridRow = new ExDataGridRow<decimal?>(row);

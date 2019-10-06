@@ -34,30 +34,30 @@ namespace Algoloop.Algorithm.CSharp
     public class ForexSchedule : QCAlgorithm
     {
         [Parameter("symbols")]
-        private string __symbols = "EURUSD";
+        private readonly string __symbols = "EURUSD";
         private string _symbol;
 
         [Parameter("resolution")]
-        private string __resolution = null;
+        private readonly string __resolution = null;
         private Resolution _resolution = Resolution.Minute;
 
         [Parameter("market")]
-        private string __market = Market.FXCM;
+        private readonly string __market = Market.FXCM;
 
         [Parameter("startdate")]
-        private string __startdate = "20180101 00:00:00";
+        private readonly string __startdate = "20180101 00:00:00";
         private DateTime _startdate;
 
         [Parameter("enddate")]
-        private string __enddate = "20180901 00:00:00";
+        private readonly string __enddate = "20180901 00:00:00";
         private DateTime _enddate;
 
         [Parameter("cash")]
-        private string __cash = "100000";
+        private readonly string __cash = "100000";
         private int _cash;
 
         [Parameter("period")]
-        private string __period = "10";
+        private readonly string __period = "10";
         private int _period;
         private Forex _forex;
 
@@ -69,9 +69,9 @@ namespace Algoloop.Algorithm.CSharp
             _startdate = DateTime.Parse(__startdate, CultureInfo.InvariantCulture);
             _enddate = DateTime.Parse(__enddate, CultureInfo.InvariantCulture);
             _symbol = __symbols.Split(';')[0];
-            Enum.TryParse(__resolution, out _resolution);
-            _cash = int.Parse(__cash);
-            _period = int.Parse(__period);
+            _ = Enum.TryParse(__resolution, out _resolution);
+            _cash = int.Parse(__cash, CultureInfo.InvariantCulture);
+            _period = int.Parse(__period, CultureInfo.InvariantCulture);
             Log($"Period: {_period}");
 
             SetStartDate(_startdate);

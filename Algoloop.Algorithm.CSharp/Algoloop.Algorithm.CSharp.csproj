@@ -75,6 +75,7 @@
     <Compile Include="Tide.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>

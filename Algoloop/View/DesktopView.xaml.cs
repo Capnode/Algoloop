@@ -38,7 +38,7 @@ namespace Algoloop.View
         public static readonly DependencyProperty PortProperty = DependencyProperty.Register("Port", typeof(string), typeof(DesktopView));
 
         private bool _isDisposed = false; // To detect redundant calls
-        private QueueLogHandler _logging;
+        private readonly QueueLogHandler _logging;
         private Thread _thread;
         private AlgorithmNodePacket _job;
         private bool _liveMode;
@@ -62,19 +62,24 @@ namespace Algoloop.View
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var wb = sender as WebBrowser;
-            if (wb != null)
+            if (sender is WebBrowser wb)
             {
                 // Silent
                 FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField(
                     "_axIWebBrowser2",
                     BindingFlags.Instance | BindingFlags.NonPublic);
                 if (fiComWebBrowser == null) return;
+
                 object objComWebBrowser = fiComWebBrowser.GetValue(wb);
                 if (objComWebBrowser == null) return;
+
                 objComWebBrowser.GetType().InvokeMember(
-                    "Silent", BindingFlags.SetProperty, null, objComWebBrowser,
-                    new object[] { true });
+                    "Silent",
+                    BindingFlags.SetProperty,
+                    null,
+                    objComWebBrowser,
+                    new object[] { true },
+                    CultureInfo.InvariantCulture);
             }
         }
 
@@ -127,51 +132,49 @@ namespace Algoloop.View
                 Converters = { new OrderJsonConverter() }
             };
 
-            using (var pullSocket = new PullSocket(">tcp://localhost:" + port))
+            using var pullSocket = new PullSocket(">tcp://localhost:" + port);
+            while (!_stopServer)
             {
-                while (!_stopServer)
+                NetMQMessage message = null;
+                if (!pullSocket.TryReceiveMultipartMessage(TimeSpan.FromSeconds(1), ref message))
+                    continue;
+
+                // There should only be 1 part messages
+                if (message.FrameCount != 1) continue;
+
+                var payload = message[0].ConvertToString();
+                var packet = JsonConvert.DeserializeObject<Packet>(payload);
+
+                switch (packet.Type)
                 {
-                    NetMQMessage message = null;
-                    if (!pullSocket.TryReceiveMultipartMessage(TimeSpan.FromSeconds(1), ref message))
-                        continue;
-
-                    // There should only be 1 part messages
-                    if (message.FrameCount != 1) continue;
-
-                    var payload = message[0].ConvertToString();
-                    var packet = JsonConvert.DeserializeObject<Packet>(payload);
-
-                    switch (packet.Type)
-                    {
-                        case PacketType.BacktestNode:
-                            var backtestJobModel = JsonConvert.DeserializeObject<BacktestNodePacket>(payload);
-                            Initialize(backtestJobModel);
-                            break;
-                        case PacketType.LiveNode:
-                            var liveJobModel = JsonConvert.DeserializeObject<LiveNodePacket>(payload);
-                            Initialize(liveJobModel);
-                            break;
-                        case PacketType.Debug:
-                            var debugEventModel = JsonConvert.DeserializeObject<DebugPacket>(payload);
-                            DisplayDebugPacket(debugEventModel);
-                            break;
-                        case PacketType.HandledError:
-                            var handleErrorEventModel = JsonConvert.DeserializeObject<HandledErrorPacket>(payload);
-                            DisplayHandledErrorPacket(handleErrorEventModel);
-                            break;
-                        case PacketType.BacktestResult:
-                            var backtestResultEventModel = JsonConvert.DeserializeObject<BacktestResultPacket>(payload);
-                            DisplayBacktestResultsPacket(backtestResultEventModel);
-                            break;
-                        case PacketType.RuntimeError:
-                            var runtimeErrorEventModel = JsonConvert.DeserializeObject<RuntimeErrorPacket>(payload);
-                            DisplayRuntimeErrorPacket(runtimeErrorEventModel);
-                            break;
-                        case PacketType.Log:
-                            var logEventModel = JsonConvert.DeserializeObject<LogPacket>(payload);
-                            DisplayLogPacket(logEventModel);
-                            break;
-                    }
+                    case PacketType.BacktestNode:
+                        var backtestJobModel = JsonConvert.DeserializeObject<BacktestNodePacket>(payload);
+                        Initialize(backtestJobModel);
+                        break;
+                    case PacketType.LiveNode:
+                        var liveJobModel = JsonConvert.DeserializeObject<LiveNodePacket>(payload);
+                        Initialize(liveJobModel);
+                        break;
+                    case PacketType.Debug:
+                        var debugEventModel = JsonConvert.DeserializeObject<DebugPacket>(payload);
+                        DisplayDebugPacket(debugEventModel);
+                        break;
+                    case PacketType.HandledError:
+                        var handleErrorEventModel = JsonConvert.DeserializeObject<HandledErrorPacket>(payload);
+                        DisplayHandledErrorPacket(handleErrorEventModel);
+                        break;
+                    case PacketType.BacktestResult:
+                        var backtestResultEventModel = JsonConvert.DeserializeObject<BacktestResultPacket>(payload);
+                        DisplayBacktestResultsPacket(backtestResultEventModel);
+                        break;
+                    case PacketType.RuntimeError:
+                        var runtimeErrorEventModel = JsonConvert.DeserializeObject<RuntimeErrorPacket>(payload);
+                        DisplayRuntimeErrorPacket(runtimeErrorEventModel);
+                        break;
+                    case PacketType.Log:
+                        var logEventModel = JsonConvert.DeserializeObject<LogPacket>(payload);
+                        DisplayLogPacket(logEventModel);
+                        break;
                 }
             }
         }
@@ -215,8 +218,8 @@ namespace Algoloop.View
             var jObj = new JObject();
             var dateFormat = "yyyy-MM-dd HH:mm:ss";
             dynamic final = jObj;
-            final.dtPeriodStart = packet.PeriodStart.ToString(dateFormat);
-            final.dtPeriodFinished = packet.PeriodFinish.AddDays(1).ToString(dateFormat);
+            final.dtPeriodStart = packet.PeriodStart.ToString(dateFormat, CultureInfo.InvariantCulture);
+            final.dtPeriodFinished = packet.PeriodFinish.AddDays(1).ToString(dateFormat, CultureInfo.InvariantCulture);
             dynamic resultData = new JObject();
             resultData.version = 3;
             resultData.results = JObject.FromObject(packet.Results);
@@ -284,11 +287,10 @@ namespace Algoloop.View
         /// <param name="holdReady">Hold the ready signal to inject data</param>
         private static string GetUrl(AlgorithmNodePacket job, bool liveMode = false, bool holdReady = false)
         {
-            var url = "";
             var hold = holdReady == false ? "0" : "1";
             var embedPage = liveMode ? "embeddedLive" : "embedded";
 
-            url = string.Format(
+            string url = string.Format(
                 CultureInfo.InvariantCulture,
                 "https://www.quantconnect.com/terminal/{0}?user={1}&token={2}&pid={3}&version={4}&holdReady={5}&bid={6}",
                 embedPage, job.UserId, job.Channel, job.ProjectId, Globals.Version, hold, job.AlgorithmId);
@@ -299,14 +301,13 @@ namespace Algoloop.View
         /// <summary>
         /// Update the status label at the bottom of the form
         /// </summary>
-        private void timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object sender, EventArgs e)
         {
 //            StatisticsToolStripStatusLabel.Text = string.Concat("Performance: CPU: ", OS.CpuUsage.ToString("0.0"), "%", " Ram: ", OS.TotalPhysicalMemoryUsed, " Mb");
 
             if (_logging == null) return;
 
-            LogEntry log;
-            while (_logging.Logs.TryDequeue(out log))
+            while (_logging.Logs.TryDequeue(out LogEntry log))
             {
                 switch (log.MessageType)
                 {

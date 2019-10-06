@@ -55,13 +55,14 @@ namespace Algoloop.ViewModel
         private bool _isExpanded;
         private string _displayName;
         private ObservableCollection<DataGridColumn> _trackColumns = new ObservableCollection<DataGridColumn>();
-        private SyncObservableCollection<FolderModel> _folders = new SyncObservableCollection<FolderModel>();
+        private readonly SyncObservableCollection<FolderModel> _folders = new SyncObservableCollection<FolderModel>();
 
         private SymbolViewModel _selectedSymbol;
         private TrackViewModel _selectedTrack;
         private FolderModel _selectedFolder;
         private IList _selectedItems;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "<Pending>")]
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
@@ -347,7 +348,7 @@ namespace Algoloop.ViewModel
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
-                    var track = new TrackViewModel(this, trackModel, _markets, _accounts, _settings);
+                    var track = new TrackViewModel(this, trackModel, _accounts, _settings);
                     Tracks.Add(track);
                     Task task = track
                         .StartTaskAsync()
@@ -432,7 +433,7 @@ namespace Algoloop.ViewModel
             ExDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false);
             foreach (TrackModel TrackModel in Model.Tracks)
             {
-                var TrackViewModel = new TrackViewModel(this, TrackModel, _markets, _accounts, _settings);
+                var TrackViewModel = new TrackViewModel(this, TrackModel, _accounts, _settings);
                 Tracks.Add(TrackViewModel);
                 ExDataGridColumns.AddPropertyColumns(TrackColumns, TrackViewModel.Statistics, "Statistics");
             }
@@ -542,18 +543,16 @@ namespace Algoloop.ViewModel
             {
                 foreach (string fileName in openFileDialog.FileNames)
                 {
-                    using (StreamReader r = new StreamReader(fileName))
+                    using StreamReader r = new StreamReader(fileName);
+                    while (!r.EndOfStream)
                     {
-                        while (!r.EndOfStream)
+                        string line = r.ReadLine();
+                        foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            string line = r.ReadLine();
-                            foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
+                            if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
                             {
-                                if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
-                                {
-                                    var symbol = new SymbolModel(name);
-                                    Model.Symbols.Add(symbol);
-                                }
+                                var symbol = new SymbolModel(name);
+                                Model.Symbols.Add(symbol);
                             }
                         }
                     }
@@ -561,12 +560,10 @@ namespace Algoloop.ViewModel
 
                 DataFromModel();
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         internal void CreateFolder(IEnumerable<string> symbols)
@@ -650,20 +647,16 @@ namespace Algoloop.ViewModel
             {
                 _parent.IsBusy = true;
                 string fileName = saveFileDialog.FileName;
-                using (StreamWriter file = File.CreateText(fileName))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    var strategies = new StrategyService();
-                    strategies.Strategies.Add(Model);
-                    serializer.Serialize(file, strategies);
-                }
+                using StreamWriter file = File.CreateText(fileName);
+                JsonSerializer serializer = new JsonSerializer();
+                var strategies = new StrategyService();
+                strategies.Strategies.Add(Model);
+                serializer.Serialize(file, strategies);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
             finally
             {
                 _parent.IsBusy = false;
@@ -688,20 +681,16 @@ namespace Algoloop.ViewModel
             try
             {
                 string fileName = saveFileDialog.FileName;
-                using (StreamWriter file = File.CreateText(fileName))
+                using StreamWriter file = File.CreateText(fileName);
+                foreach (SymbolViewModel symbol in symbols)
                 {
-                    foreach (SymbolViewModel symbol in symbols)
-                    {
-                        file.WriteLine(symbol.Model.Name);
-                    }
+                    file.WriteLine(symbol.Model.Name);
                 }
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private void OnMoveUpSymbols(IList symbols)

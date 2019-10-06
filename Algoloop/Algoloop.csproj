@@ -478,6 +478,7 @@
     <None Include="..\readme.md">
       <Link>Doc\readme.md</Link>
     </None>
+    <None Include=".editorconfig" />
     <None Include="config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

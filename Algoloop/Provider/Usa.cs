@@ -39,7 +39,7 @@ namespace Algoloop.Provider
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            string directory = Path.Combine(settings.DataFolder, SecurityType.Equity.ToString().ToLower(), market.Provider.ToLower());
+            string directory = Path.Combine(settings.DataFolder, SecurityType.Equity.ToString().ToLowerInvariant(), market.Provider.ToLowerInvariant());
             string dailyFolder = Path.Combine(directory, "daily");
 
             DirectoryInfo d = new DirectoryInfo(dailyFolder);

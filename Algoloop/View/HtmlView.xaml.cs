@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System.Globalization;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,8 +49,7 @@ namespace Algoloop.View
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            var wb = sender as WebBrowser;
-            if (wb != null)
+            if (sender is WebBrowser wb)
             {
                 // Silent
                 FieldInfo fiComWebBrowser = typeof(WebBrowser).GetField(
@@ -59,8 +59,12 @@ namespace Algoloop.View
                 object objComWebBrowser = fiComWebBrowser.GetValue(wb);
                 if (objComWebBrowser == null) return;
                 objComWebBrowser.GetType().InvokeMember(
-                    "Silent", BindingFlags.SetProperty, null, objComWebBrowser,
-                    new object[] { true });
+                    "Silent",
+                    BindingFlags.SetProperty,
+                    null,
+                    objComWebBrowser,
+                    new object[] { true },
+                    CultureInfo.InvariantCulture);
             }
         }
 

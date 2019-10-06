@@ -72,16 +72,17 @@ namespace Algoloop.ViewSupport
                 return;
             }
 
-            using (var dlg = new System.Windows.Forms.FolderBrowserDialog())
+            using var dlg = new System.Windows.Forms.FolderBrowserDialog
             {
-                dlg.Description = "Select data folder";
-                dlg.SelectedPath = item.Value?.ToString();
-                dlg.ShowNewFolderButton = true;
-                if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                    return;
+                Description = "Select data folder",
+                SelectedPath = item.Value?.ToString(),
+                ShowNewFolderButton = true
+            };
 
-                item.Value = dlg.SelectedPath;
-            }
+            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+
+            item.Value = dlg.SelectedPath;
         }
     }
 }

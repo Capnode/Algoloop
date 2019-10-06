@@ -55,11 +55,10 @@ namespace Algoloop.ViewModel
         private const string _zipFile = "track.zip";
         private const double _daysInYear = 365.24;
 
-        private StrategyViewModel _parent;
-        private readonly MarketService _markets;
+        private readonly StrategyViewModel _parent;
         private readonly AccountService _accounts;
         private readonly SettingService _settings;
-        private static object mutex = new object();
+        private static readonly object _mutex = new object();
 
         private CancellationTokenSource _cancel;
         private TrackModel _model;
@@ -78,16 +77,15 @@ namespace Algoloop.ViewModel
         private bool _loaded;
         private string _logs;
 
-        public TrackViewModel(StrategyViewModel parent, TrackModel model, MarketService markets, AccountService accounts, SettingService settings)
+        public TrackViewModel(StrategyViewModel parent, TrackModel model, AccountService accounts, SettingService settings)
         {
             _parent = parent;
             Model = model;
-            _markets = markets;
             _accounts = accounts;
             _settings = settings;
 
             StartCommand = new RelayCommand(() => DoStartTaskCommand(), () => !Active);
-            StopCommand = new RelayCommand(() => DoStopTaskCommand(false), () => Active);
+            StopCommand = new RelayCommand(() => DoStopTaskCommand(), () => Active);
             DeleteCommand = new RelayCommand(() => DoDeleteTrack(), () => !Active);
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
@@ -303,7 +301,7 @@ namespace Algoloop.ViewModel
             {
                 if (Desktop && _settings.DesktopPort > 0)
                 {
-                    Port = _settings.DesktopPort.ToString();
+                    Port = _settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
                     model = await RunTrack(account, model);
                     Port = null;
                 }
@@ -321,12 +319,10 @@ namespace Algoloop.ViewModel
             {
                 Log.Trace($"Strategy {Model.Name} canceled by user");
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Trace($"{ex.GetType()}: {ex.Message}");
             }
-#pragma warning restore CA1031 // Do not catch general exception types
 
             // Update view
             Model = null;
@@ -510,7 +506,7 @@ namespace Algoloop.ViewModel
             return Math.Sqrt(variance);
         }
 
-        private void AddCustomStatistics(IDictionary<string, decimal?> statistics, BacktestResult result)
+        private void AddCustomStatistics(IDictionary<string, decimal?> statistics)
         {
             double score = CalculateScore(Trades);
             statistics.Add("Score", (decimal)score.RoundToSignificantDigits(4));
@@ -529,6 +525,7 @@ namespace Algoloop.ViewModel
             return x / Math.Sqrt(c + x * x);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "For future use")]
         private static double ScaleToRange(double x, double minimum, double maximum)
         {
             return (x - minimum) / (maximum - minimum);
@@ -538,11 +535,9 @@ namespace Algoloop.ViewModel
         {
             try
             {
-                using (Isolated<LeanLauncher> leanEngine = new Isolated<LeanLauncher>())
-                {
-                    _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
-                }
+                using Isolated<LeanLauncher> leanEngine = new Isolated<LeanLauncher>();
+                _cancel = new CancellationTokenSource();
+                await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
             }
             finally
             {
@@ -571,15 +566,13 @@ namespace Algoloop.ViewModel
                     return;
                 }
 
-                using (JsonReader reader = new JsonTextReader(resultStream))
+                using JsonReader reader = new JsonTextReader(resultStream);
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Converters.Add(new OrderJsonConverter());
+                result = serializer.Deserialize<BacktestResult>(reader);
+                if (result == null)
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Converters.Add(new OrderJsonConverter());
-                    result = serializer.Deserialize<BacktestResult>(reader);
-                    if (result == null)
-                    {
-                        return;
-                    }
+                    return;
                 }
             }
 
@@ -654,12 +647,10 @@ namespace Algoloop.ViewModel
             {
                 ParseCharts(result);
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 Log.Trace($"Strategy {Model.Name} {ex.GetType()}: {ex.Message}");
             }
-#pragma warning restore CA1031 // Do not catch general exception types
 
             // Unzip log file
             using (StreamReader logStream = Compression.Unzip(Model.ZipFile, _logFile, out zipFile))
@@ -680,8 +671,7 @@ namespace Algoloop.ViewModel
                 name += "+";
             }
 
-            decimal value;
-            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
             {
                 string header = name + "$";
                 statistics.Add(header, value);
@@ -704,7 +694,7 @@ namespace Algoloop.ViewModel
             string zipFileTemplate = Path.Combine(Folder, _zipFile);
 
             // Save logs and result to zipfile
-            lock (mutex)
+            lock (_mutex)
             {
                 string zipFile = UniqueFileName(zipFileTemplate);
                 Compression.ZipData(zipFile, new Dictionary<string, string>
@@ -738,7 +728,7 @@ namespace Algoloop.ViewModel
         private IDictionary<string, decimal?> ReadStatistics(BacktestResult result)
         {
             IDictionary<string, decimal?> statistics = new SafeDictionary<string, decimal?>();
-            AddCustomStatistics(statistics, result);
+            AddCustomStatistics(statistics);
             foreach (KeyValuePair<string, string> item in result.Statistics)
             {
                 AddStatisticItem(statistics, item.Key, item.Value);
@@ -783,6 +773,7 @@ namespace Algoloop.ViewModel
             {
                 count++;
                 candidate = string.Format(
+                    CultureInfo.InvariantCulture,
                     @"{0}\{1}{2}{3}",
                     Path.GetDirectoryName(path),
                     Path.GetFileNameWithoutExtension(path),
@@ -805,7 +796,7 @@ namespace Algoloop.ViewModel
             await StartTaskAsync();
         }
 
-        private void DoStopTaskCommand(bool v)
+        private void DoStopTaskCommand()
         {
             StopTask();
             Active = false;
@@ -828,20 +819,16 @@ namespace Algoloop.ViewModel
             try
             {
                 string fileName = saveFileDialog.FileName;
-                using (StreamWriter file = File.CreateText(fileName))
+                using StreamWriter file = File.CreateText(fileName);
+                foreach (TrackSymbolViewModel symbol in symbols)
                 {
-                    foreach (TrackSymbolViewModel symbol in symbols)
-                    {
-                        file.WriteLine(symbol.Symbol);
-                    }
+                    file.WriteLine(symbol.Symbol);
                 }
             }
-#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private void DoCloneStrategy(IList symbols)
