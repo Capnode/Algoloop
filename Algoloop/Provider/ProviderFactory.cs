@@ -22,6 +22,7 @@ using QuantConnect.Logging;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -60,7 +61,11 @@ namespace Algoloop.Provider
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(string.Format("{0}: {1}", ex.GetType(), ex.Message));
+                    Log.Error(string.Format(
+                        CultureInfo.InvariantCulture, 
+                        "{0}: {1}",
+                        ex.GetType(),
+                        ex.Message));
                     market.Active = false;
                 }
             }
@@ -149,6 +154,7 @@ namespace Algoloop.Provider
             return provider;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Market stored in lower case")]
         private static void RegisterProvider(Type provider)
         {
             string name = provider.Name.ToLowerInvariant();

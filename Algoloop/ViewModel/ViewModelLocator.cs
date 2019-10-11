@@ -63,13 +63,13 @@ namespace Algoloop.ViewModel
                 () => Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Lean.LogItemHandler")));
         }
 
-        public MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
-        public MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
-        public AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
-        public StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
-        public LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
-        public SettingsViewModel SettingsViewModel => SimpleIoc.Default.GetInstance<SettingsViewModel>();
-        public AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
+        public static MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
+        public static MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
+        public static AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
+        public static StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
+        public static LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
+        public static SettingsViewModel SettingsViewModel => SimpleIoc.Default.GetInstance<SettingsViewModel>();
+        public static AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
 
         public static void Cleanup()
         {

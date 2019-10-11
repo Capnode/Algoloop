@@ -20,7 +20,7 @@ using System.Windows.Data;
 namespace Algoloop.ViewSupport
 {
     [ValueConversion(typeof(int), typeof(GridLength))]
-    class Int32FromGridLengthConverter : BaseConverter, IValueConverter
+    public class Int32FromGridLengthConverter : BaseConverter, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

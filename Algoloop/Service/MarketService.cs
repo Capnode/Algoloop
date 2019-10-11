@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -39,7 +40,7 @@ namespace Algoloop.Service
 
         internal MarketModel GetMarket(string market)
         {
-            return Markets.Find(m => m.Name.Equals(market));
+            return Markets.Find(m => m.Name.Equals(market, StringComparison.OrdinalIgnoreCase));
         }
 
         internal IEnumerable<SymbolModel> GetActiveSymbols(string market, FolderModel folder)

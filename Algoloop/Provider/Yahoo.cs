@@ -17,14 +17,18 @@ using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.YahooDownloader;
+using System;
 using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
-    class Yahoo : IProvider
+    public class Yahoo : IProvider
     {
         public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", settings.DataFolder);
 

@@ -34,12 +34,16 @@ namespace Algoloop.Provider
             throw new System.NotImplementedException();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Filename in lowercase")]
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            string directory = Path.Combine(settings.DataFolder, SecurityType.Equity.ToString().ToLowerInvariant(), market.Provider.ToLowerInvariant());
+            string directory = Path.Combine(
+                settings.DataFolder,
+                SecurityType.Equity.ToString().ToLowerInvariant(),
+                market.Provider.ToLowerInvariant());
             string dailyFolder = Path.Combine(directory, "daily");
 
             DirectoryInfo d = new DirectoryInfo(dailyFolder);

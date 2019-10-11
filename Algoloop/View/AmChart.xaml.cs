@@ -97,7 +97,7 @@ namespace Algoloop.View
             RedrawCharts();
         }
 
-        private bool IsDefaultSelected(string title)
+        private static bool IsDefaultSelected(string title)
         {
             switch (title)
             {
@@ -222,7 +222,7 @@ namespace Algoloop.View
             };
         }
 
-        private DataSet TickData(ChartViewModel chart)
+        private static DataSet TickData(ChartViewModel chart)
         {
             return new DataSet()
             {

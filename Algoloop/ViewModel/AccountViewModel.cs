@@ -15,6 +15,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
@@ -49,8 +50,8 @@ namespace Algoloop.ViewModel
             Model = accountModel;
 
             ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), true);
-            StartCommand = new RelayCommand(async () => await DoConnectAsync(), () => !Active);
-            StopCommand = new RelayCommand(async () => await DoDisconnectAsync(), () => Active);
+            StartCommand = new RelayCommand(async () => await DoConnectAsync().ConfigureAwait(true), () => !Active);
+            StopCommand = new RelayCommand(async () => await DoDisconnectAsync().ConfigureAwait(true), () => Active);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteAccount(this), () => !Active);
 
             DataFromModel();
@@ -76,7 +77,7 @@ namespace Algoloop.ViewModel
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
                 }
 
                 Messenger.Default.Send(new NotificationMessage(message));
@@ -127,7 +128,7 @@ namespace Algoloop.ViewModel
 
             if (!Active)
             {
-                await DoDisconnectAsync();
+                await DoDisconnectAsync().ConfigureAwait(true);
             }
         }
 
@@ -140,13 +141,13 @@ namespace Algoloop.ViewModel
 
             Active = false;
             _cancel.Cancel();
-            await _task;
+            await _task.ConfigureAwait(true);
             _cancel = null;
             _task = null;
 
             if (Active)
             {
-                await DoConnectAsync();
+                await DoConnectAsync().ConfigureAwait(true);
             }
         }
 
@@ -292,11 +293,11 @@ namespace Algoloop.ViewModel
         {
             if (value)
             {
-                await DoConnectAsync();
+                await DoConnectAsync().ConfigureAwait(true);
             }
             else
             {
-                await DoDisconnectAsync();
+                await DoDisconnectAsync().ConfigureAwait(true);
             }
         }
 

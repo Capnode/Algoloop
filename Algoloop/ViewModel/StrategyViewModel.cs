@@ -30,6 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -133,7 +134,7 @@ namespace Algoloop.ViewModel
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
                 }
 
                 Messenger.Default.Send(new NotificationMessage(message));
@@ -336,7 +337,7 @@ namespace Algoloop.ViewModel
             int count = 0;
             var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
-            string message = string.Format(Resources.RunStrategyWithTracks, total);
+            string message = string.Format(CultureInfo.InvariantCulture, Resources.RunStrategyWithTracks, total);
             Messenger.Default.Send(new NotificationMessage(message));
 
             var tasks = new List<Task>();
@@ -344,7 +345,7 @@ namespace Algoloop.ViewModel
             {
                 foreach (StrategyModel model in models)
                 {
-                    await throttler.WaitAsync();
+                    await throttler.WaitAsync().ConfigureAwait(true);
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
@@ -361,7 +362,7 @@ namespace Algoloop.ViewModel
                     tasks.Add(task);
                 }
 
-                await Task.WhenAll(tasks);
+                await Task.WhenAll(tasks).ConfigureAwait(true);
             }
 
             Messenger.Default.Send(new NotificationMessage(Resources.CompletedStrategy));
@@ -397,7 +398,7 @@ namespace Algoloop.ViewModel
             return list;
         }
 
-        private IEnumerable<string> SplitRange(string range)
+        private static IEnumerable<string> SplitRange(string range)
         {
             foreach (string value in range.Split(','))
             {
@@ -479,8 +480,10 @@ namespace Algoloop.ViewModel
             if (assembly == null)
                 return;
 
-            IEnumerable<Type> type = assembly.GetTypes().Where(m => m.Name.Equals(algorithmName));
-            if (type == null || type.Count() == 0)
+            IEnumerable<Type> type = assembly
+                .GetTypes()
+                .Where(m => m.Name.Equals(algorithmName, StringComparison.OrdinalIgnoreCase));
+            if (type == null || !type.Any())
                 return;
 
             Parameters.Clear();
@@ -492,7 +495,9 @@ namespace Algoloop.ViewModel
                 if (_exclude.Contains(parameterName))
                     continue;
 
-                ParameterModel parameterModel = Model.Parameters.FirstOrDefault(m => m.Name.Equals(parameterName));
+                ParameterModel parameterModel = Model
+                    .Parameters
+                    .FirstOrDefault(m => m.Name.Equals(parameterName, StringComparison.OrdinalIgnoreCase));
                 if (parameterModel == null)
                 {
                     parameterModel = new ParameterModel() { Name = parameterName };
@@ -549,7 +554,7 @@ namespace Algoloop.ViewModel
                         string line = r.ReadLine();
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            if (!Model.Symbols.Exists(m => m.Name.Equals(name)))
+                            if (!Model.Symbols.Exists(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
                             {
                                 var symbol = new SymbolModel(name);
                                 Model.Symbols.Add(symbol);
@@ -613,7 +618,7 @@ namespace Algoloop.ViewModel
                 // Iterate and clone strategies
                 foreach (string algorithm in list)
                 {
-                    if (algorithm.Equals(Model.AlgorithmName))
+                    if (algorithm.Equals(Model.AlgorithmName, StringComparison.OrdinalIgnoreCase))
                         continue; // Skip this algorithm
 
                     var strategyModel = new StrategyModel(Model)

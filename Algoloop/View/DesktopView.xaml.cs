@@ -192,7 +192,7 @@ namespace Algoloop.View
             {
                 _logging.Error("Your user id is not set. Please check your config.json file 'job-user-id' property.");
             }
-            if (_job.Channel == "")
+            if (string.IsNullOrEmpty(job.Channel))
             {
                 _logging.Error("Your API token is not set. Please check your config.json file 'api-access-token' property.");
             }

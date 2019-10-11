@@ -174,12 +174,10 @@ namespace Algoloop.ViewSupport
 		private string SerializeObjectToXML<T>(T item)
 		{
 			var xs = new XmlSerializer(typeof(T));
-			using (var stringWriter = new StringWriter())
-			{
-				xs.Serialize(stringWriter, item);
-				return stringWriter.ToString();
-			}
-		}
+            using var stringWriter = new StringWriter();
+            xs.Serialize(stringWriter, item);
+            return stringWriter.ToString();
+        }
 
 		private T DeserializeFromXml<T>(string xml)
 		{

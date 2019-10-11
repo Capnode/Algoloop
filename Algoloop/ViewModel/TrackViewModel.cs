@@ -119,7 +119,7 @@ namespace Algoloop.ViewModel
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
                 }
 
                 Messenger.Default.Send(new NotificationMessage(message));
@@ -260,7 +260,7 @@ namespace Algoloop.ViewModel
         public int CompareTo(object obj)
         {
             var a = obj as TrackViewModel;
-            return string.Compare(Model.Name, a?.Model.Name);
+            return string.Compare(Model.Name, a?.Model.Name, StringComparison.OrdinalIgnoreCase);
         }
 
         public void Refresh()
@@ -291,7 +291,7 @@ namespace Algoloop.ViewModel
 
             // Set search path if not base directory
             string folder = Path.GetDirectoryName(Model.AlgorithmLocation);
-            if (!AppDomain.CurrentDomain.BaseDirectory.Equals(folder))
+            if (!AppDomain.CurrentDomain.BaseDirectory.Equals(folder, StringComparison.OrdinalIgnoreCase))
             {
                 StrategyViewModel.AddPath(folder);
             }
@@ -302,12 +302,14 @@ namespace Algoloop.ViewModel
                 if (Desktop && _settings.DesktopPort > 0)
                 {
                     Port = _settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
-                    model = await RunTrack(account, model);
+                    model = await RunTrack(account, model)
+                        .ConfigureAwait(true);
                     Port = null;
                 }
                 else
                 {
-                    model = await RunTrack(account, model);
+                    model = await RunTrack(account, model)
+                        .ConfigureAwait(true);
                 }
 
                 model.Completed = true;
@@ -482,7 +484,7 @@ namespace Algoloop.ViewModel
 
         private static double LinearDeviation(IList<Trade> trades)
         {
-            int count = trades.Count();
+            int count = trades.Count;
             if (count == 0)
             {
                 return 0;
@@ -537,7 +539,8 @@ namespace Algoloop.ViewModel
             {
                 using Isolated<LeanLauncher> leanEngine = new Isolated<LeanLauncher>();
                 _cancel = new CancellationTokenSource();
-                await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token);
+                await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token)
+                    .ConfigureAwait(true);
             }
             finally
             {
@@ -591,7 +594,8 @@ namespace Algoloop.ViewModel
             // Trade details
             foreach (Trade trade in Trades)
             {
-                TrackSymbolViewModel trackSymbol = TrackSymbols.FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value));
+                TrackSymbolViewModel trackSymbol = TrackSymbols
+                    .FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value, StringComparison.OrdinalIgnoreCase));
                 if (trackSymbol == null)
                 {
                     trackSymbol = new TrackSymbolViewModel(trade.Symbol);
@@ -663,7 +667,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
+        private static void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
         {
             // Make unique name
             while (statistics.TryGetValue(name, out _))
@@ -793,7 +797,7 @@ namespace Algoloop.ViewModel
         private async void DoStartTaskCommand()
         {
             Active = true;
-            await StartTaskAsync();
+            await StartTaskAsync().ConfigureAwait(true);
         }
 
         private void DoStopTaskCommand()

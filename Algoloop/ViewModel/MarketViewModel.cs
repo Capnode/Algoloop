@@ -30,6 +30,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -110,7 +111,7 @@ namespace Algoloop.ViewModel
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(Resources.SelectedCount, _selectedItems.Count);
+                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
                 }
 
                 Messenger.Default.Send(new NotificationMessage(message));
@@ -233,7 +234,9 @@ namespace Algoloop.ViewModel
                 {
                     _factory = new Isolated<ProviderFactory>();
                     _cancel = new CancellationTokenSource();
-                    await Task.Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token);
+                    await Task
+                        .Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token)
+                        .ConfigureAwait(true);
                     _factory.Dispose();
                     _factory = null;
                 }
@@ -286,7 +289,7 @@ namespace Algoloop.ViewModel
         {
             if (value)
             {
-                await StartTaskAsync();
+                await StartTaskAsync().ConfigureAwait(true);
             }
             else
             {
@@ -300,7 +303,7 @@ namespace Algoloop.ViewModel
             {
                 _parent.IsBusy = true;
                 Active = true;
-                await StartTaskAsync();
+                await StartTaskAsync().ConfigureAwait(true);
             }
             finally
             {

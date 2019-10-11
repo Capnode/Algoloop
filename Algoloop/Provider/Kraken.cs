@@ -17,14 +17,18 @@ using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.KrakenDownloader;
+using System;
 using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
-    class Kraken : IProvider
+    public class Kraken : IProvider
     {
         public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", settings.DataFolder);
 

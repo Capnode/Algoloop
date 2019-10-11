@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace Algoloop.Service
 
         internal AccountModel FindAccount(string account)
         {
-            return Accounts.Find(m => m.Name.Equals(account));
+            return Accounts.Find(m => m.Name.Equals(account, StringComparison.OrdinalIgnoreCase));
         }
 
         internal IReadOnlyList<AccountModel> GetAccounts()

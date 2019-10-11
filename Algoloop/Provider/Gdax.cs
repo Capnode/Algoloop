@@ -18,7 +18,7 @@ using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
-    class Gdax : IProvider
+    public class Gdax : IProvider
     {
         public void Download(MarketModel model, SettingService settings, IList<string> symbols)
         {

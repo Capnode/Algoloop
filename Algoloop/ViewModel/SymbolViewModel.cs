@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Controls;
@@ -170,7 +171,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private string PriceFilePath(MarketViewModel market, string symbol, Resolution resolution, DateTime date)
+        private static string PriceFilePath(MarketViewModel market, string symbol, Resolution resolution, DateTime date)
         {
             DirectoryInfo basedir = new DirectoryInfo(market.DataFolder);
             DirectoryInfo[] subdirs = basedir.GetDirectories("*");
@@ -199,7 +200,7 @@ namespace Algoloop.ViewModel
                         continue;
 
                     var dir = new DirectoryInfo(path);
-                    string date1 = date.ToString("yyyyMMdd");
+                    string date1 = date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
                     var files = dir.GetFiles(date1 + "*.zip").Select(x => x.FullName);
                     if (files.Count() == 1)
                     {
@@ -211,6 +212,7 @@ namespace Algoloop.ViewModel
             return null;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Filename in lowercase")]
         private void DoLoadFundamentals(MarketViewModel market)
         {
             // Reset Fundamentals
@@ -267,7 +269,7 @@ namespace Algoloop.ViewModel
                 case ReportPeriod.Year:
                     if (periodType != null && periodType.Equals(_annual, StringComparison.OrdinalIgnoreCase))
                     {
-                        FundamentalYear(fine, date.Year.ToString());
+                        FundamentalYear(fine, date.Year.ToStringInvariant());
                     }
                     break;
 

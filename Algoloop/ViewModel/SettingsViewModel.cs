@@ -84,7 +84,7 @@ namespace Algoloop.ViewModel
             window.Close();
         }
 
-        private void DataToModel()
+        private static void DataToModel()
         {
         }
 

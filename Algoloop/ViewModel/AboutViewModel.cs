@@ -15,6 +15,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System;
+using System.Globalization;
 using System.Reflection;
 using System.Windows;
 
@@ -53,7 +54,11 @@ namespace Algoloop.ViewModel
         {
             get
             {
-                return String.Format("{0}.{1}", Assembly.GetEntryAssembly().GetName().Version.Major, Assembly.GetEntryAssembly().GetName().Version.Minor);
+                return String.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}.{1}",
+                    Assembly.GetEntryAssembly().GetName().Version.Major,
+                    Assembly.GetEntryAssembly().GetName().Version.Minor);
             }
         }
 
@@ -61,7 +66,11 @@ namespace Algoloop.ViewModel
         {
             get
             {
-                return String.Format("{0}.{1}", Assembly.GetEntryAssembly().GetName().Version.Build, Assembly.GetEntryAssembly().GetName().Version.Revision);
+                return String.Format(
+                    CultureInfo.InvariantCulture, 
+                    "{0}.{1}",
+                    Assembly.GetEntryAssembly().GetName().Version.Build,
+                    Assembly.GetEntryAssembly().GetName().Version.Revision);
             }
         }
 
@@ -125,10 +134,10 @@ namespace Algoloop.ViewModel
         {
             OkCommand = new RelayCommand<Window>(window => window.Close());
 
-            Title = String.Format("About {0}", AssemblyTitle);
+            Title = String.Format(CultureInfo.InvariantCulture, "About {0}", AssemblyTitle);
             ProductName = AssemblyProduct;
-            Version = String.Format("Version: {0}", AssemblyVersion);
-            Build = String.Format("Build: {0}", AssemblyBuild);
+            Version = String.Format(CultureInfo.InvariantCulture, "Version: {0}", AssemblyVersion);
+            Build = String.Format(CultureInfo.InvariantCulture, "Build: {0}", AssemblyBuild);
             Copyright = AssemblyCopyright;
             Description = AssemblyDescription;
         }

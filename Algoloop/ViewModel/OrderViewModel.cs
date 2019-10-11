@@ -17,6 +17,7 @@ using GalaSoft.MvvmLight;
 using QuantConnect.Orders;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Algoloop.ViewModel
 {
@@ -381,8 +382,8 @@ namespace Algoloop.ViewModel
             TimeInForce = order.TimeInForce;
             Tag = order.Tag;
             Properties = order.Properties;
-            SecurityType = order.SecurityType.ToString();
-            Direction = order.Direction.ToString();
+            SecurityType = order.SecurityType.ToString(CultureInfo.InvariantCulture);
+            Direction = order.Direction.ToString(CultureInfo.InvariantCulture);
             OrderValue = order.OrderValue;
             OrderSubmissionData = order.OrderSubmissionData;
             IsMarketable = order.IsMarketable;

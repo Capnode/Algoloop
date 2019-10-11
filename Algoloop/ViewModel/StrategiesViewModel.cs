@@ -121,7 +121,7 @@ namespace Algoloop.ViewModel
                             Model = serializer.Deserialize<StrategyService>(reader);
                         }
                     }
-                });
+                }).ConfigureAwait(true);
 
                 DataFromModel();
                 StartTasks();

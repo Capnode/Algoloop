@@ -150,7 +150,7 @@ namespace Algoloop.ViewModel
             about.ShowDialog();
         }
 
-        private string GetAppDataFolder()
+        private static string GetAppDataFolder()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
@@ -183,7 +183,7 @@ namespace Algoloop.ViewModel
                 SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
-                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json"));
+                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
             }
             finally
             {

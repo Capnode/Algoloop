@@ -28,7 +28,6 @@ namespace Algoloop
     {
         private const uint _esContinous = 0x80000000;
         private const uint _esSystemRequired = 0x00000001;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
         private const uint _esDisplayRequired = 0x00000002;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
@@ -50,9 +49,7 @@ namespace Algoloop
             // Enable sleep mode
             _ = SetThreadExecutionState(_esContinous);
 
-            ViewModelLocator locator = Resources["Locator"] as ViewModelLocator;
-            Debug.Assert(locator != null);
-            locator.MainViewModel.SaveAll();
+            ViewModelLocator.MainViewModel.SaveAll();
             Algoloop.Properties.Settings.Default.Save();
             base.OnExit(e);
         }
