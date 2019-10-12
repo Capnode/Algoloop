@@ -16,6 +16,7 @@ using Algoloop.ViewSupport;
 using QuantConnect;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -117,12 +118,12 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
+        public Collection<SymbolModel> Symbols { get; } = new Collection<SymbolModel>();
 
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<FolderModel> Folders { get; } = new List<FolderModel>();
+        public Collection<FolderModel> Folders { get; } = new Collection<FolderModel>();
 
         public void Refresh()
         {

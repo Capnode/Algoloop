@@ -13,7 +13,7 @@
  */
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -98,7 +98,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<OrderModel> Orders { get; } = new List<OrderModel>();
+        public Collection<OrderModel> Orders { get; } = new Collection<OrderModel>();
 
         public void Refresh()
         {

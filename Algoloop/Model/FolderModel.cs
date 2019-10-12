@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -30,7 +31,10 @@ namespace Algoloop.Model
 
         public FolderModel(IEnumerable<string> symbols)
         {
-            Symbols.AddRange(symbols);
+            foreach (string symbol in symbols)
+            {
+                Symbols.Add(symbol);
+            }
         }
 
         [DisplayName("List name")]
@@ -43,7 +47,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<string> Symbols { get; } = new List<string>();
+        public Collection<string> Symbols { get; } = new Collection<string>();
 
         public int CompareTo(object obj)
         {

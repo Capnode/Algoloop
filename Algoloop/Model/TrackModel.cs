@@ -16,6 +16,7 @@ using Algoloop.ViewSupport;
 using QuantConnect;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -30,6 +31,8 @@ namespace Algoloop.Model
 
         public TrackModel()
         {
+            Symbols = new Collection<SymbolModel>();
+            Parameters = new Collection<ParameterModel>();
         }
 
         public TrackModel(string name, StrategyModel strategy)
@@ -51,10 +54,10 @@ namespace Algoloop.Model
             Resolution = strategy.Resolution;
 
             // Clone symbols
-            Symbols.AddRange(strategy.Symbols.Select(m => new SymbolModel(m)));
+            Symbols = new Collection<SymbolModel>(strategy.Symbols.Select(m => new SymbolModel(m)).ToList());
 
             // Clone parameters
-            Parameters.AddRange(strategy.Parameters.Select(m => new ParameterModel(m)));
+            Parameters = new Collection<ParameterModel>(strategy.Parameters.Select(m => new ParameterModel(m)).ToList());
 
             // Use paramerter list as track name
             string parameters = string.Join(" ", Parameters.Where(m => m.UseValue).Select(m => m.Value));
@@ -178,12 +181,12 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
-        public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
+        public Collection<SymbolModel> Symbols { get; }
 
         [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
-        public List<ParameterModel> Parameters { get; } = new List<ParameterModel>();
+        public Collection<ParameterModel> Parameters { get; }
 
         [ReadOnly(true)]
         [Browsable(false)]

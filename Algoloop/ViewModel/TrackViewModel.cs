@@ -842,7 +842,10 @@ namespace Algoloop.ViewModel
             {
                 strategyModel.Symbols.Clear();
                 IEnumerable<SymbolModel> symbolModels = symbols.Cast<TrackSymbolViewModel>().Select(m => new SymbolModel(m.Symbol));
-                strategyModel.Symbols.AddRange(symbolModels);
+                foreach (SymbolModel symbol in symbolModels)
+                {
+                    strategyModel.Symbols.Add(symbol);
+                }
             }
 
             _parent.CloneStrategy(strategyModel);

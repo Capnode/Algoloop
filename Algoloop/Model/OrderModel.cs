@@ -14,7 +14,7 @@
 
 using QuantConnect.Orders;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -39,7 +39,7 @@ namespace Algoloop.Model
         /// Brokerage Id for this order for when the brokerage splits orders into multiple pieces
         /// </summary>
         [DataMember]
-        public List<string> BrokerId { get; set; }
+        public Collection<string> BrokerId { get; set; }
 
         /// <summary>
         /// Symbol of the Asset

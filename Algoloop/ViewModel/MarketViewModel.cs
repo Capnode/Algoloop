@@ -200,8 +200,7 @@ namespace Algoloop.ViewModel
 
             // Update Folders
             Folders.Clear();
-            Model.Folders.Sort();
-            foreach (FolderModel folderModel in Model.Folders)
+            foreach (FolderModel folderModel in Model.Folders.OrderBy(m => m.Name))
             {
                 var folderViewModel = new FolderViewModel(this, folderModel);
                 Folders.Add(folderViewModel);
@@ -352,7 +351,7 @@ namespace Algoloop.ViewModel
                 foreach (SymbolModel symbol in symbols)
                 {
                     symbol.Name = symbol.Name.Trim();
-                    SymbolModel sym = Model.Symbols.Find(m => m.Name.Equals(symbol.Name, StringComparison.OrdinalIgnoreCase));
+                    SymbolModel sym = Model.Symbols.FirstOrDefault(m => m.Name.Equals(symbol.Name, StringComparison.OrdinalIgnoreCase));
                     if (sym != null)
                     {
                         sym.Properties = symbol.Properties;
@@ -457,7 +456,7 @@ namespace Algoloop.ViewModel
                         string line = r.ReadLine();
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            SymbolModel symbol = Model.Symbols.Find(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                            SymbolModel symbol = Model.Symbols.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
                             if (symbol != null)
                             {
                                 symbol.Active = true;
@@ -566,7 +565,7 @@ namespace Algoloop.ViewModel
                         string line = r.ReadLine();
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            if (Model.Symbols.Exists(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && m.Active))
+                            if (Model.Symbols.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && m.Active) != null)
                             {
                                 model.Symbols.Add(name);
                             }

@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
@@ -24,12 +25,15 @@ namespace Algoloop.Service
     {
         [Browsable(false)]
         [DataMember]
-        public List<StrategyModel> Strategies { get; } = new List<StrategyModel>();
+        public Collection<StrategyModel> Strategies { get; } = new Collection<StrategyModel>();
 
         internal void Copy(StrategyService strategiesModel)
         {
             Strategies.Clear();
-            Strategies.AddRange(strategiesModel.Strategies);
+            foreach (StrategyModel strategy in strategiesModel.Strategies)
+            {
+                Strategies.Add(strategy);
+            }
         }
     }
 }

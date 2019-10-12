@@ -15,7 +15,9 @@
 using Algoloop.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Service
@@ -25,12 +27,15 @@ namespace Algoloop.Service
     {
         [Browsable(false)]
         [DataMember]
-        public List<MarketModel> Markets { get; } = new List<MarketModel>();
+        public Collection<MarketModel> Markets { get; } = new Collection<MarketModel>();
 
         internal void Copy(MarketService marketsModel)
         {
             Markets.Clear();
-            Markets.AddRange(marketsModel.Markets);
+            foreach (var market in marketsModel.Markets)
+            {
+                Markets.Add(market);
+            }
         }
 
         internal IReadOnlyList<MarketModel> GetMarkets()
@@ -40,7 +45,7 @@ namespace Algoloop.Service
 
         internal MarketModel GetMarket(string market)
         {
-            return Markets.Find(m => m.Name.Equals(market, StringComparison.OrdinalIgnoreCase));
+            return Markets.FirstOrDefault(m => m.Name.Equals(market, StringComparison.OrdinalIgnoreCase));
         }
 
         internal IEnumerable<SymbolModel> GetActiveSymbols(string market, FolderModel folder)

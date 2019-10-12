@@ -554,7 +554,7 @@ namespace Algoloop.ViewModel
                         string line = r.ReadLine();
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            if (!Model.Symbols.Exists(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+                            if (Model.Symbols.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == null)
                             {
                                 var symbol = new SymbolModel(name);
                                 Model.Symbols.Add(symbol);

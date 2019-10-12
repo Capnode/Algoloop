@@ -15,7 +15,7 @@
 using Algoloop.ViewSupport;
 using QuantConnect;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -32,6 +32,9 @@ namespace Algoloop.Model
 
         public StrategyModel()
         {
+            Symbols = new Collection<SymbolModel>();
+            Parameters = new Collection<ParameterModel>();
+            Tracks = new Collection<TrackModel>();
         }
 
         public StrategyModel(StrategyModel model)
@@ -51,8 +54,10 @@ namespace Algoloop.Model
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
             AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
-            Symbols = model.Symbols.Select(m => new SymbolModel(m)).ToList();
-            Parameters = model.Parameters.Select(m => new ParameterModel(m)).ToList();
+
+            Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
+            Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList());
+            Tracks = new Collection<TrackModel>();
         }
 
         public StrategyModel(TrackModel model)
@@ -71,8 +76,10 @@ namespace Algoloop.Model
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
             AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
-            Symbols = model.Symbols.Select(m => new SymbolModel(m)).ToList();
-            Parameters = model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList();
+
+            Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
+            Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList());
+            Tracks = new Collection<TrackModel>();
         }
 
         public Action NameChanged { get; set; }
@@ -221,17 +228,17 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<SymbolModel> Symbols { get; } = new List<SymbolModel>();
+        public Collection<SymbolModel> Symbols { get; }
 
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<ParameterModel> Parameters { get; } = new List<ParameterModel>();
+        public Collection<ParameterModel> Parameters { get; }
 
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public List<TrackModel> Tracks { get; } = new List<TrackModel>();
+        public Collection<TrackModel> Tracks { get; }
 
         public void Refresh()
         {

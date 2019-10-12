@@ -15,6 +15,7 @@
 using Algoloop.Model;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -32,17 +33,20 @@ namespace Algoloop.Service
 
         [Browsable(false)]
         [DataMember]
-        public List<AccountModel> Accounts { get; } = new List<AccountModel>();
+        public Collection<AccountModel> Accounts { get; } = new Collection<AccountModel>();
 
         internal void Copy(AccountService accountsModel)
         {
             Accounts.Clear();
-            Accounts.AddRange(accountsModel.Accounts);
+            foreach (AccountModel account in accountsModel.Accounts)
+            {
+                Accounts.Add(account);
+            }
         }
 
         internal AccountModel FindAccount(string account)
         {
-            return Accounts.Find(m => m.Name.Equals(account, StringComparison.OrdinalIgnoreCase));
+            return Accounts.FirstOrDefault(m => m.Name.Equals(account, StringComparison.OrdinalIgnoreCase));
         }
 
         internal IReadOnlyList<AccountModel> GetAccounts()

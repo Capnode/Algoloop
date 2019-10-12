@@ -36,12 +36,13 @@ namespace Algoloop.ViewModel
 {
     public class FolderViewModel : ViewModelBase, ITreeViewModel
     {
-        private MarketViewModel _market;
+        private readonly MarketViewModel _market;
         private SymbolViewModel _selectedSymbol;
         private SymbolViewModel _marketSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private IList _selectedItems;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "<Pending>")]
         public FolderViewModel(MarketViewModel market, FolderModel model)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
@@ -173,7 +174,7 @@ namespace Algoloop.ViewModel
             {
                 if (marketSymbol.Active)
                 {
-                    string symbol = Model.Symbols.Find(m => m.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase));
+                    string symbol = Model.Symbols.FirstOrDefault(m => m.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase));
                     if (symbol != null)
                     {
                         Symbols.Add(marketSymbol);
@@ -223,12 +224,10 @@ namespace Algoloop.ViewModel
             try
             {
                 string fileName = saveFileDialog.FileName;
-                using (StreamWriter file = File.CreateText(fileName))
+                using StreamWriter file = File.CreateText(fileName);
+                foreach (SymbolViewModel symbol in Symbols)
                 {
-                    foreach (SymbolViewModel symbol in Symbols)
-                    {
-                        file.WriteLine(symbol.Model.Name);
-                    }
+                    file.WriteLine(symbol.Model.Name);
                 }
             }
             catch (Exception ex)

@@ -16,7 +16,7 @@ using Algoloop.Model;
 using GalaSoft.MvvmLight;
 using QuantConnect.Orders;
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 
 namespace Algoloop.ViewModel
@@ -70,7 +70,7 @@ namespace Algoloop.ViewModel
         /// <summary>
         /// Brokerage Id for this order for when the brokerage splits orders into multiple pieces
         /// </summary>
-        public List<string> BrokerId
+        public Collection<string> BrokerId
         {
             get => Model.BrokerId;
             set
@@ -341,7 +341,7 @@ namespace Algoloop.ViewModel
             Id = order.Id;
             ContingentId = order.ContingentId;
             Symbol = order.Symbol.Value;
-            BrokerId = order.BrokerId;
+            BrokerId = new Collection<string>(order.BrokerId);
             Symbol = order.Symbol.Value;
             Price = order.Price;
             LimitPrice = (order as LimitOrder)?.LimitPrice;
