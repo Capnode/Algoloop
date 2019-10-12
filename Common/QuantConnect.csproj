@@ -31,13 +31,16 @@
     <DebugType>full</DebugType>
     <Optimize>$(SelectedOptimization)</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\QuantConnect.Common.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>6</LangVersion>
     <CodeAnalysisRuleSet>..\QuantConnect.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' AND '$(SelectedOptimization)' == ''">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -253,6 +256,10 @@
     <Compile Include="Data\Custom\SEC\SECReport10K.cs" />
     <Compile Include="Data\Custom\SEC\SECReportIndexFile.cs" />
     <Compile Include="Data\Custom\SEC\SECReportSubmission.cs" />
+    <Compile Include="Data\Custom\SmartInsider\SmartInsiderExecutionHolding.cs" />
+    <Compile Include="Data\Custom\SmartInsider\SmartInsiderExecutionEntity.cs" />
+    <Compile Include="Data\Custom\SmartInsider\SmartInsiderEventType.cs" />
+    <Compile Include="Data\Custom\SmartInsider\SmartInsiderExecutionType.cs" />
     <Compile Include="Data\Custom\Tiingo\TiingoDailyData.cs" />
     <Compile Include="Data\Custom\Tiingo\TiingoNews.cs" />
     <Compile Include="Data\Custom\Tiingo\TiingoNewsJsonConverter.cs" />

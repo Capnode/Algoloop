@@ -297,6 +297,8 @@
     <Compile Include="Common\Data\Auxiliary\MapFileTests.cs" />
     <Compile Include="Common\Data\BaseDataTests.cs" />
     <Compile Include="Common\Data\CalendarConsolidatorsTests.cs" />
+    <Compile Include="Common\Data\Custom\SECReportTests.cs" />
+    <Compile Include="Common\Data\Custom\SmartInsiderTests.cs" />
     <Compile Include="Common\Data\Custom\EstimizeTests.cs" />
     <Compile Include="Common\Data\DynamicDataTests.cs" />
     <Compile Include="Common\Data\Custom\TiingoNewsJsonConverterTests.cs" />
@@ -338,6 +340,7 @@
     <Compile Include="Common\Util\ValidateTests.cs" />
     <Compile Include="Engine\Alphas\InsightAnalysisContextTests.cs" />
     <Compile Include="Engine\BrokerageTransactionHandlerTests\BacktestingTransactionHandlerTests.cs" />
+    <Compile Include="Engine\DataFeeds\BacktestingFutureChainProviderTests.cs" />
     <Compile Include="Engine\DataFeeds\DataManagerStub.cs" />
     <Compile Include="Engine\DataFeeds\Enumerators\Factories\OptionChainUniverseSubscriptionEnumeratorFactoryTests.cs" />
     <Compile Include="Engine\DataFeeds\Enumerators\DelistingEnumeratorTests.cs" />
@@ -355,6 +358,7 @@
     <Compile Include="Engine\DataFeeds\SubscriptionTests.cs" />
     <Compile Include="Engine\HistoricalData\SubscriptionDataReaderHistoryProviderTests.cs" />
     <Compile Include="Engine\RealTime\BacktestingRealTimeHandlerTests.cs" />
+    <Compile Include="Indicators\PythonIndicatorNoinheritanceTestsLegacy.cs" />
     <Compile Include="Indicators\PythonIndicatorNoinheritanceTests.cs" />
     <Compile Include="Indicators\PythonIndicatorTests.cs" />
     <Compile Include="PythonSetup.cs" />
