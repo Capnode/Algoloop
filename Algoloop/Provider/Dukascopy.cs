@@ -25,7 +25,7 @@ namespace Algoloop.Provider
 {
     public class Dukascopy : IProvider
     {
-        private readonly DateTime FirstDate = new DateTime(2003, 05, 05);
+        private readonly DateTime _firstDate = new DateTime(2003, 05, 05);
 
         private readonly IEnumerable<string> _majors = new[] { "AUDUSD", "EURUSD", "GBPUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY" };
         private readonly IEnumerable<string> _crosses = new[]
@@ -53,18 +53,20 @@ namespace Algoloop.Provider
 
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             DateTime fromDate = model.LastDate.Date.AddDays(1);
-            if (fromDate < FirstDate )
+            if (fromDate >= DateTime.Today)
             {
-                fromDate = FirstDate;
+                // Do not download today data
+                model.Active = false;
+                return;
             }
 
-            if (fromDate < DateTime.Today)
+            if (fromDate < _firstDate )
             {
-                DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, fromDate.AddDays(1).AddMilliseconds(-1));
-                model.LastDate = fromDate;
+                fromDate = _firstDate;
             }
 
-            model.Active = model.LastDate.AddDays(1) < DateTime.Today;
+            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, fromDate.AddDays(1).AddTicks(-1));
+            model.LastDate = fromDate;
         }
 
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
