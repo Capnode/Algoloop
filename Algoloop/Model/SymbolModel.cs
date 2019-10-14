@@ -20,7 +20,6 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "<Pending>")]
     public class SymbolModel : ModelBase, IComparable
     {
         public SymbolModel()

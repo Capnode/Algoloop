@@ -45,7 +45,6 @@ using System.Windows;
 
 namespace Algoloop.ViewModel
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "<Pending>")]
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {
         private bool _isDisposed = false; // To detect redundant calls
@@ -527,7 +526,6 @@ namespace Algoloop.ViewModel
             return x / Math.Sqrt(c + x * x);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Code Quality", "IDE0051:Remove unused private members", Justification = "For future use")]
         private static double ScaleToRange(double x, double minimum, double maximum)
         {
             return (x - minimum) / (maximum - minimum);

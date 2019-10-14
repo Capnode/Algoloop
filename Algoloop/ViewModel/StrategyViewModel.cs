@@ -63,7 +63,6 @@ namespace Algoloop.ViewModel
         private FolderModel _selectedFolder;
         private IList _selectedItems;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "<Pending>")]
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));

@@ -36,7 +36,6 @@ using System.Windows.Controls;
 
 namespace Algoloop.ViewModel
 {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "<Pending>")]
     public class SymbolViewModel : ViewModelBase, ITreeViewModel, IComparable
     {
         public enum ReportPeriod { Year, R12, Quarter};
@@ -212,7 +211,6 @@ namespace Algoloop.ViewModel
             return null;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Filename in lowercase")]
         private void DoLoadFundamentals(MarketViewModel market)
         {
             // Reset Fundamentals

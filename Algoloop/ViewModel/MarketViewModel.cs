@@ -54,7 +54,6 @@ namespace Algoloop.ViewModel
         private bool _checkAll;
         private IList _selectedItems;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "<Pending>")]
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingService settings)
         {
             if (marketsViewModel == null) throw new ArgumentNullException(nameof(marketsViewModel));

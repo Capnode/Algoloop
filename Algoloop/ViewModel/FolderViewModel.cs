@@ -42,7 +42,6 @@ namespace Algoloop.ViewModel
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private IList _selectedItems;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0016:Use 'throw' expression", Justification = "<Pending>")]
         public FolderViewModel(MarketViewModel market, FolderModel model)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));

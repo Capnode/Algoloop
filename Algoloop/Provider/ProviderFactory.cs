@@ -154,7 +154,6 @@ namespace Algoloop.Provider
             return provider;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Market stored in lower case")]
         private static void RegisterProvider(Type provider)
         {
             string name = provider.Name.ToLowerInvariant();

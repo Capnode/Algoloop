@@ -16,7 +16,7 @@ using System;
 
 namespace Capnode.Wpf.DataGrid
 {
-    public class TypeHelper
+    public static class TypeHelper
     {
         public static object ValueConverter(Type type, string value)
         {

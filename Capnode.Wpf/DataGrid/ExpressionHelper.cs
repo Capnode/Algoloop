@@ -17,7 +17,7 @@ using System.Linq.Expressions;
 
 namespace Capnode.Wpf.DataGrid
 {
-    public class ExpressionHelper
+    public static class ExpressionHelper
     {
         public static MethodCallExpression ToString(Expression prop)
         {

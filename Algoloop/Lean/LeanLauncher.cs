@@ -33,8 +33,6 @@ namespace Algoloop.Lean
 {
     public class LeanLauncher : MarshalByRefObject
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Static does not work")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "account may be null")]
         public TrackModel Run(TrackModel model, AccountModel account, SettingService settings, HostDomainLogger logger)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));

@@ -30,7 +30,6 @@ namespace Algoloop
         private const uint _esSystemRequired = 0x00000001;
         private const uint _esDisplayRequired = 0x00000002;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1060:MovePInvokesToNativeMethodsClass")]
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint SetThreadExecutionState([In] uint esFlags);
 

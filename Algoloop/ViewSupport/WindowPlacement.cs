@@ -26,7 +26,6 @@ namespace Algoloop.ViewSupport
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "<Pending>")]
     public struct RECT
     {
         public int Left { get; set; }
@@ -46,7 +45,6 @@ namespace Algoloop.ViewSupport
     // POINT structure required by WINDOWPLACEMENT structure
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "<Pending>")]
     public struct POINT
     {
         public int X { get; set; }
@@ -62,7 +60,6 @@ namespace Algoloop.ViewSupport
     // WINDOWPLACEMENT stores the position, size, and state of a window
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1815:Override equals and operator equals on value types", Justification = "<Pending>")]
     public struct WINDOWPLACEMENT
     {
         public int length;

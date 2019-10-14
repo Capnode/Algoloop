@@ -14,7 +14,7 @@
 
 namespace Capnode.Wpf.DataGrid
 {
-    public class Enums
+    public static class Enums
     {
         public enum FilterOperation
         {

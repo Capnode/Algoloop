@@ -52,6 +52,7 @@ namespace Algoloop.Provider.Tests
                 Provider = "Dukascopy",
                 LastDate = date,
                 Resolution = Resolution.Daily,
+                ApiKey = key
             };
             market.Symbols.Add(new SymbolModel("EURUSD"));
 
@@ -71,10 +72,11 @@ namespace Algoloop.Provider.Tests
                 Provider = "Dukascopy",
                 LastDate = date,
                 Resolution = Resolution.Daily,
+                ApiKey = key
             };
 
             IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(market, _settings);
-            Assert.AreEqual(78, symbols.ToList().Count());
+            Assert.AreEqual(78, symbols.ToList().Count);
         }
     }
 }

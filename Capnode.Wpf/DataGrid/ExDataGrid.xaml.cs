@@ -25,8 +25,8 @@ using System.Collections.Specialized;
 
 namespace Capnode.Wpf.DataGrid
 {
-    public delegate void FilterChangedEvent(object sender, FilterChangedEventArgs e);
-    public delegate void CancelableFilterChangedEvent(object sender, CancelableFilterChangedEventArgs e);
+    public delegate void FilterChangedEventHandler(object sender, FilterChangedEventArgs e);
+    public delegate void CancelableFilterChangedEventHandler(object sender, CancelableFilterChangedEventArgs e);
 
     /// <summary>
     /// Interaction logic for ExDataGrid.xaml
@@ -34,8 +34,8 @@ namespace Capnode.Wpf.DataGrid
     /// </summary>
     public partial class ExDataGrid : System.Windows.Controls.DataGrid, INotifyPropertyChanged
     {
-        public event CancelableFilterChangedEvent BeforeFilterChangedEventHandler;
-        public event FilterChangedEvent AfterFilterChanged;
+        public event CancelableFilterChangedEventHandler BeforeFilterChangedEventHandler;
+        public event FilterChangedEventHandler AfterFilterChanged;
 
         private readonly List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
         private readonly PropertyChangedEventHandler _filterHandler;

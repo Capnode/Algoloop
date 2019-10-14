@@ -26,6 +26,7 @@ using System.Windows.Controls.Primitives;
 using System.Text.RegularExpressions;
 using System.Windows;
 using linq = System.Linq.Expressions;
+using System.Globalization;
 
 namespace Capnode.Wpf.DataGrid
 {
@@ -358,7 +359,8 @@ namespace Capnode.Wpf.DataGrid
             return predicate;
         }
 
-        protected Predicate<object> GenerateFilterPredicate(string propertyName, string filterValue, Type objType, Type propType, FilterOperationItem filterItem)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
+        protected static Predicate<object> GenerateFilterPredicate(string propertyName, string filterValue, Type objType, Type propType, FilterOperationItem filterItem)
         {
             if (filterItem == null) return null;
             if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
@@ -457,6 +459,7 @@ namespace Capnode.Wpf.DataGrid
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         private void CbDistinctProperties_DropDownOpened(object sender, EventArgs e)
         {
             if (_boundColumnPropertyAccessor == null)
@@ -518,7 +521,10 @@ namespace Capnode.Wpf.DataGrid
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (var i in DistinctPropertyValues.Where(i => i.IsChecked))
-                    sb.AppendFormat("{0}{1}", sb.Length > 0 ? "," : "", i);
+                {
+                    sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}", sb.Length > 0 ? "," : "", i);
+                }
+
                 FilterText = sb.ToString();
             }
             else

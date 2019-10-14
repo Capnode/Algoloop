@@ -34,7 +34,6 @@ namespace Algoloop.Provider
             throw new System.NotImplementedException();
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Filename in lowercase")]
         public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));

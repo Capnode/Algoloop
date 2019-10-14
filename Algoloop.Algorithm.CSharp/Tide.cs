@@ -141,6 +141,7 @@ namespace Capnode.Algorithm.CSharp
             _closeTimeShort = closeTimeShort;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "TODO")]
         public override IEnumerable<Insight> Update(QCAlgorithm algorithm, Slice data)
         {
             if (algorithm == null) throw new ArgumentNullException(nameof(algorithm));
