@@ -60,7 +60,7 @@ namespace QuantConnect.Algorithm.Framework.Portfolio
         {
             var result = new Dictionary<Insight, double>();
             // We will adjust weights proportionally in case the sum is > 1 so it sums to 1.
-            var weightSums = activeInsights.Sum(insight => insight.Weight.Value);
+            var weightSums = activeInsights.Sum(insight => GetValue(insight));
             var weightFactor = 1.0;
             if (weightSums > 1)
             {
@@ -68,9 +68,16 @@ namespace QuantConnect.Algorithm.Framework.Portfolio
             }
             foreach (var insight in activeInsights)
             {
-                result[insight] = (int)insight.Direction * insight.Weight.Value * weightFactor;
+                result[insight] = (int)insight.Direction * GetValue(insight) * weightFactor;
             }
             return result;
         }
+
+        /// <summary>
+        /// Method that will determine which member will be used to compute the weights and gets its value
+        /// </summary>
+        /// <param name="insight">The insight to create a target for</param>
+        /// <returns>The value of the selected insight member</returns>
+        protected virtual double GetValue(Insight insight) => insight.Weight ?? 0;
     }
 }

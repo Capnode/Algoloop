@@ -210,10 +210,10 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                         Tiingo.SetAuthCode(Config.Get("tiingo-auth-token"));
                     }
 
-                    if (!USEnergyInformation.IsAuthCodeSet)
+                    if (!USEnergyAPI.IsAuthCodeSet)
                     {
                         // we're not using the SubscriptionDataReader, so be sure to set the auth token here
-                        USEnergyInformation.SetAuthCode(Config.Get("us-energy-information-auth-token"));
+                        USEnergyAPI.SetAuthCode(Config.Get("us-energy-information-auth-token"));
                     }
 
                     var factory = new LiveCustomDataSubscriptionEnumeratorFactory(_timeProvider);
@@ -367,7 +367,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 {
                     var fillForwardResolution = _subscriptions.UpdateAndGetFillForwardResolution(request.Configuration);
 
-                    enumerator = new LiveFillForwardEnumerator(_frontierTimeProvider, enumerator, request.Security.Exchange, fillForwardResolution, request.Configuration.ExtendedMarketHours, localEndTime, request.Configuration.Increment, request.Configuration.DataTimeZone);
+                    enumerator = new LiveFillForwardEnumerator(_frontierTimeProvider, enumerator, request.Security.Exchange, fillForwardResolution, request.Configuration.ExtendedMarketHours, localEndTime, request.Configuration.Increment, request.Configuration.DataTimeZone, request.StartTimeLocal);
                 }
 
                 // define market hours and user filters to incoming data
@@ -489,7 +489,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
                     var fillForwardResolution = _subscriptions.UpdateAndGetFillForwardResolution(request.Configuration);
 
-                    return new LiveFillForwardEnumerator(_frontierTimeProvider, input, request.Security.Exchange, fillForwardResolution, request.Configuration.ExtendedMarketHours, localEndTime, request.Configuration.Increment, request.Configuration.DataTimeZone);
+                    return new LiveFillForwardEnumerator(_frontierTimeProvider, input, request.Security.Exchange, fillForwardResolution, request.Configuration.ExtendedMarketHours, localEndTime, request.Configuration.Increment, request.Configuration.DataTimeZone, request.StartTimeLocal);
                 };
 
                 var symbolUniverse = _dataQueueHandler as IDataQueueUniverseProvider;

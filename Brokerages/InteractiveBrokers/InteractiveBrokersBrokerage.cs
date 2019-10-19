@@ -38,6 +38,7 @@ using NodaTime;
 using QuantConnect.IBAutomater;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Orders.TimeInForces;
+using QuantConnect.Securities.Option;
 using Bar = QuantConnect.Data.Market.Bar;
 using HistoryRequest = QuantConnect.Data.HistoryRequest;
 
@@ -501,7 +502,29 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 Connect();
             }
 
-            var holdings = _accountData.AccountHoldings.Select(x => ObjectActivator.Clone(x.Value)).Where(x => x.Quantity != 0).ToList();
+            var utcNow = DateTime.UtcNow;
+            var holdings = new List<Holding>();
+
+            foreach (var kvp in _accountData.AccountHoldings)
+            {
+                var holding = ObjectActivator.Clone(kvp.Value);
+
+                if (holding.Quantity != 0)
+                {
+                    if (OptionSymbol.IsOptionContractExpired(holding.Symbol, utcNow))
+                    {
+                        OnMessage(
+                            new BrokerageMessageEvent(
+                                BrokerageMessageType.Warning,
+                                "ExpiredOptionHolding",
+                                $"The option holding for [{holding.Symbol.Value}] is expired and will be excluded from the account holdings."));
+
+                        continue;
+                    }
+
+                    holdings.Add(holding);
+                }
+            }
 
             return holdings;
         }
@@ -923,7 +946,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 throw new ArgumentException("Expected order with populated BrokerId for updating orders.");
             }
 
-            _requestInformation[ibOrderId] = "IBPlaceOrder: " + contract;
+            _requestInformation[ibOrderId] = $"IBPlaceOrder: {order.Symbol.Value} ({contract})";
 
             CheckRateLimiting();
 
@@ -943,7 +966,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             return $"{contract} {contract.LastTradeDateOrContractMonth.ToStringInvariant()} {contract.Strike.ToStringInvariant()} {contract.Right}";
         }
 
-        private string GetPrimaryExchange(Contract contract)
+        private string GetPrimaryExchange(Contract contract, Symbol symbol)
         {
             ContractDetails details;
             if (_contractDetails.TryGetValue(GetUniqueKey(contract), out details))
@@ -951,7 +974,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 return details.Summary.PrimaryExch;
             }
 
-            details = GetContractDetails(contract);
+            details = GetContractDetails(contract, symbol);
             if (details == null)
             {
                 // we were unable to find the contract details
@@ -961,7 +984,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             return details.Summary.PrimaryExch;
         }
 
-        private string GetTradingClass(Contract contract)
+        private string GetTradingClass(Contract contract, Symbol symbol)
         {
             ContractDetails details;
             if (_contractDetails.TryGetValue(GetUniqueKey(contract), out details))
@@ -969,7 +992,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 return details.Summary.TradingClass;
             }
 
-            details = GetContractDetails(contract);
+            details = GetContractDetails(contract, symbol);
             if (details == null)
             {
                 // we were unable to find the contract details
@@ -979,7 +1002,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             return details.Summary.TradingClass;
         }
 
-        private decimal GetMinTick(Contract contract)
+        private decimal GetMinTick(Contract contract, Symbol symbol)
         {
             ContractDetails details;
             if (_contractDetails.TryGetValue(GetUniqueKey(contract), out details))
@@ -987,7 +1010,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 return (decimal) details.MinTick;
             }
 
-            details = GetContractDetails(contract);
+            details = GetContractDetails(contract, symbol);
             if (details == null)
             {
                 // we were unable to find the contract details
@@ -997,14 +1020,14 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             return (decimal) details.MinTick;
         }
 
-        private ContractDetails GetContractDetails(Contract contract)
+        private ContractDetails GetContractDetails(Contract contract, Symbol symbol)
         {
             const int timeout = 60; // sec
 
             ContractDetails details = null;
             var requestId = GetNextRequestId();
 
-            _requestInformation[requestId] = "GetContractDetails: " + contract;
+            _requestInformation[requestId] = $"GetContractDetails: {symbol.Value} ({contract})";
 
             var manualResetEvent = new ManualResetEvent(false);
 
@@ -1038,10 +1061,10 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             return details;
         }
 
-        private string GetFuturesContractExchange(Contract contract)
+        private string GetFuturesContractExchange(Contract contract, string ticker)
         {
             // searching for available contracts on different exchanges
-            var contractDetails = FindContracts(contract);
+            var contractDetails = FindContracts(contract, ticker);
 
             var exchanges = _futuresExchanges.Values.Reverse().ToArray();
 
@@ -1052,13 +1075,13 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                     .FirstOrDefault();
         }
 
-        private IEnumerable<ContractDetails> FindContracts(Contract contract)
+        private IEnumerable<ContractDetails> FindContracts(Contract contract, string ticker)
         {
             const int timeout = 60; // sec
 
             var requestId = GetNextRequestId();
 
-            _requestInformation[requestId] = "FindContracts: " + contract;
+            _requestInformation[requestId] = $"FindContracts: {ticker} ({contract})";
 
             var manualResetEvent = new ManualResetEvent(false);
             var contractDetails = new List<ContractDetails>();
@@ -1233,7 +1256,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 subscribedSymbols = _subscribedSymbols.Keys.ToList();
 
                 _subscribedSymbols.Clear();
-                _subscribedTickets.Clear();
+                _subscribedTickers.Clear();
                 _underlyings.Clear();
             }
 
@@ -1626,15 +1649,15 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             var stopLimitOrder = order as StopLimitOrder;
             if (limitOrder != null)
             {
-                ibOrder.LmtPrice = Convert.ToDouble(RoundPrice(limitOrder.LimitPrice, GetMinTick(contract)));
+                ibOrder.LmtPrice = Convert.ToDouble(RoundPrice(limitOrder.LimitPrice, GetMinTick(contract, order.Symbol)));
             }
             else if (stopMarketOrder != null)
             {
-                ibOrder.AuxPrice = Convert.ToDouble(RoundPrice(stopMarketOrder.StopPrice, GetMinTick(contract)));
+                ibOrder.AuxPrice = Convert.ToDouble(RoundPrice(stopMarketOrder.StopPrice, GetMinTick(contract, order.Symbol)));
             }
             else if (stopLimitOrder != null)
             {
-                var minTick = GetMinTick(contract);
+                var minTick = GetMinTick(contract, order.Symbol);
                 ibOrder.LmtPrice = Convert.ToDouble(RoundPrice(stopLimitOrder.LimitPrice, minTick));
                 ibOrder.AuxPrice = Convert.ToDouble(RoundPrice(stopLimitOrder.StopPrice, minTick));
             }
@@ -1777,7 +1800,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
             if (symbol.ID.SecurityType == SecurityType.Equity)
             {
-                contract.PrimaryExch = GetPrimaryExchange(contract);
+                contract.PrimaryExch = GetPrimaryExchange(contract, symbol);
             }
 
             if (symbol.ID.SecurityType == SecurityType.Option)
@@ -1787,7 +1810,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 contract.Strike = Convert.ToDouble(symbol.ID.StrikePrice);
                 contract.Symbol = ibSymbol;
                 contract.Multiplier = _securityProvider.GetSecurity(symbol)?.SymbolProperties.ContractMultiplier.ToString(CultureInfo.InvariantCulture) ?? "100";
-                contract.TradingClass = GetTradingClass(contract);
+                contract.TradingClass = GetTradingClass(contract, symbol);
             }
 
             if (symbol.ID.SecurityType == SecurityType.Future)
@@ -1801,7 +1824,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 if (symbol.ID.Market == Market.USA)
                 {
                     contract.Exchange = "";
-                    contract.Exchange = GetFuturesContractExchange(contract);
+                    contract.Exchange = GetFuturesContractExchange(contract, symbol.Value);
                 }
                 else
                 {
@@ -2354,7 +2377,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                                 var id = GetNextTickerId();
                                 var contract = CreateContract(subscribeSymbol);
 
-                                _requestInformation[id] = "Subscribe: " + contract;
+                                _requestInformation[id] = $"Subscribe: {symbol.Value} ({contract})";
 
                                 CheckRateLimiting();
 
@@ -2372,9 +2395,9 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                                 Client.ClientSocket.reqMktData(id, contract, "101", false, false, new List<TagValue>());
 
                                 _subscribedSymbols[symbol] = id;
-                                _subscribedTickets[id] = subscribeSymbol;
+                                _subscribedTickers[id] = new SubscriptionEntry { Symbol = subscribeSymbol };
 
-                                Log.Trace("InteractiveBrokersBrokerage.Subscribe(): Subscribe Processed: {0} ({1}) # {2}", symbol.Value, contract.ToString(), id);
+                                Log.Trace($"InteractiveBrokersBrokerage.Subscribe(): Subscribe Processed: {symbol.Value} ({contract}) # {id}");
                             }
                         }
                     }
@@ -2429,8 +2452,8 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
                                 Client.ClientSocket.cancelMktData(id);
 
-                                Symbol s;
-                                _subscribedTickets.TryRemove(id, out s);
+                                SubscriptionEntry entry;
+                                _subscribedTickers.TryRemove(id, out entry);
                             }
                         }
                     }
@@ -2481,62 +2504,79 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
         private void HandleTickPrice(object sender, IB.TickPriceEventArgs e)
         {
-            Symbol symbol;
+            // tickPrice events are always followed by tickSize events,
+            // so we save off the bid/ask/last prices and only emit ticks in the tickSize event handler.
 
-            if (!_subscribedTickets.TryGetValue(e.TickerId, out symbol)) return;
-
-            var price = Convert.ToDecimal(e.Price);
-
-            var tick = new Tick();
-            // in the event of a symbol change this will break since we'll be assigning the
-            // new symbol to the permtick which won't be known by the algorithm
-            tick.Symbol = symbol;
-            tick.Time = GetRealTimeTickTime(symbol);
-            var securityType = symbol.ID.SecurityType;
-            tick.Value = price;
-
-            if (e.Price <= 0 &&
-                securityType != SecurityType.Future &&
-                securityType != SecurityType.Option)
+            SubscriptionEntry entry;
+            if (!_subscribedTickers.TryGetValue(e.TickerId, out entry))
+            {
                 return;
+            }
 
-            int quantity;
+            var symbol = entry.Symbol;
+
+            // negative price (-1) means no price available, normalize to zero
+            var price = e.Price < 0 ? 0 : Convert.ToDecimal(e.Price);
+
             switch (e.Field)
             {
                 case IBApi.TickType.BID:
                 case IBApi.TickType.DELAYED_BID:
 
-                    tick.TickType = TickType.Quote;
-                    tick.BidPrice = price;
-                    _lastBidSizes.TryGetValue(symbol, out quantity);
-                    tick.Quantity = quantity;
-                    _lastBidPrices[symbol] = price;
+                    if (entry.LastQuoteTick == null)
+                    {
+                        entry.LastQuoteTick = new Tick
+                        {
+                            // in the event of a symbol change this will break since we'll be assigning the
+                            // new symbol to the permtick which won't be known by the algorithm
+                            Symbol = symbol,
+                            TickType = TickType.Quote
+                        };
+                    }
+
+                    // set the last bid price
+                    entry.LastQuoteTick.BidPrice = price;
                     break;
 
                 case IBApi.TickType.ASK:
                 case IBApi.TickType.DELAYED_ASK:
 
-                    tick.TickType = TickType.Quote;
-                    tick.AskPrice = price;
-                    _lastAskSizes.TryGetValue(symbol, out quantity);
-                    tick.Quantity = quantity;
-                    _lastAskPrices[symbol] = price;
+                    if (entry.LastQuoteTick == null)
+                    {
+                        entry.LastQuoteTick = new Tick
+                        {
+                            // in the event of a symbol change this will break since we'll be assigning the
+                            // new symbol to the permtick which won't be known by the algorithm
+                            Symbol = symbol,
+                            TickType = TickType.Quote
+                        };
+                    }
+
+                    // set the last ask price
+                    entry.LastQuoteTick.AskPrice = price;
                     break;
 
                 case IBApi.TickType.LAST:
                 case IBApi.TickType.DELAYED_LAST:
 
-                    tick.TickType = TickType.Trade;
-                    tick.Value = price;
-                    _lastPrices[symbol] = price;
+                    if (entry.LastTradeTick == null)
+                    {
+                        entry.LastTradeTick = new Tick
+                        {
+                            // in the event of a symbol change this will break since we'll be assigning the
+                            // new symbol to the permtick which won't be known by the algorithm
+                            Symbol = symbol,
+                            TickType = TickType.Trade
+                        };
+                    }
+
+                    // set the last traded price
+                    entry.LastTradeTick.Value = price;
                     break;
 
                 default:
                     return;
             }
-
-            lock (_ticks)
-                if (tick.IsValid()) _ticks.Add(tick);
         }
 
         /// <summary>
@@ -2555,79 +2595,146 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
         private void HandleTickSize(object sender, IB.TickSizeEventArgs e)
         {
-            Symbol symbol;
+            SubscriptionEntry entry;
+            if (!_subscribedTickers.TryGetValue(e.TickerId, out entry))
+            {
+                return;
+            }
 
-            if (!_subscribedTickets.TryGetValue(e.TickerId, out symbol)) return;
+            var symbol = entry.Symbol;
 
-            var tick = new Tick();
-            // in the event of a symbol change this will break since we'll be assigning the
-            // new symbol to the permtick which won't be known by the algorithm
-            tick.Symbol = symbol;
             var securityType = symbol.ID.SecurityType;
-            tick.Quantity = AdjustQuantity(securityType, e.Size);
-            tick.Time = GetRealTimeTickTime(symbol);
 
-            if (tick.Quantity == 0) return;
+            // negative size (-1) means no quantity available, normalize to zero
+            var quantity = e.Size < 0 ? 0 : AdjustQuantity(securityType, e.Size);
 
+            Tick tick;
             switch (e.Field)
             {
                 case IBApi.TickType.BID_SIZE:
                 case IBApi.TickType.DELAYED_BID_SIZE:
 
-                    tick.TickType = TickType.Quote;
+                    tick = entry.LastQuoteTick;
 
-                    _lastBidPrices.TryGetValue(symbol, out tick.BidPrice);
-                    _lastBidSizes[symbol] = (int)tick.Quantity;
+                    if (tick == null)
+                    {
+                        // tick size message must be preceded by a tick price message
+                        return;
+                    }
 
-                    tick.Value = tick.BidPrice;
-                    tick.BidSize = tick.Quantity;
+                    tick.BidSize = quantity;
+
+                    if (tick.BidPrice == 0)
+                    {
+                        // no bid price, do not emit tick
+                        return;
+                    }
+
+                    if (tick.BidPrice > 0 && tick.AskPrice > 0 && tick.BidPrice >= tick.AskPrice)
+                    {
+                        // new bid price jumped at or above previous ask price, wait for new ask price
+                        return;
+                    }
+
+                    if (tick.AskPrice == 0)
+                    {
+                        // we have a bid price but no ask price, use bid price as value
+                        tick.Value = tick.BidPrice;
+                    }
+                    else
+                    {
+                        // we have both bid price and ask price, use mid price as value
+                        tick.Value = (tick.BidPrice + tick.AskPrice) / 2;
+                    }
                     break;
 
                 case IBApi.TickType.ASK_SIZE:
                 case IBApi.TickType.DELAYED_ASK_SIZE:
 
-                    tick.TickType = TickType.Quote;
+                    tick = entry.LastQuoteTick;
 
-                    _lastAskPrices.TryGetValue(symbol, out tick.AskPrice);
-                    _lastAskSizes[symbol] = (int)tick.Quantity;
+                    if (tick == null)
+                    {
+                        // tick size message must be preceded by a tick price message
+                        return;
+                    }
 
-                    tick.Value = tick.AskPrice;
-                    tick.AskSize = tick.Quantity;
+                    tick.AskSize = quantity;
+
+                    if (tick.AskPrice == 0)
+                    {
+                        // no ask price, do not emit tick
+                        return;
+                    }
+
+                    if (tick.BidPrice > 0 && tick.AskPrice > 0 && tick.BidPrice >= tick.AskPrice)
+                    {
+                        // new ask price jumped at or below previous bid price, wait for new bid price
+                        return;
+                    }
+
+                    if (tick.BidPrice == 0)
+                    {
+                        // we have an ask price but no bid price, use ask price as value
+                        tick.Value = tick.AskPrice;
+                    }
+                    else
+                    {
+                        // we have both bid price and ask price, use mid price as value
+                        tick.Value = (tick.BidPrice + tick.AskPrice) / 2;
+                    }
                     break;
-
 
                 case IBApi.TickType.LAST_SIZE:
                 case IBApi.TickType.DELAYED_LAST_SIZE:
-                    tick.TickType = TickType.Trade;
 
-                    decimal lastPrice;
-                    _lastPrices.TryGetValue(symbol, out lastPrice);
-                    _lastVolumes[symbol] = (int)tick.Quantity;
+                    tick = entry.LastTradeTick;
 
-                    tick.Value = lastPrice;
+                    if (tick == null)
+                    {
+                        // tick size message must be preceded by a tick price message
+                        return;
+                    }
 
+                    // set the traded quantity
+                    tick.Quantity = quantity;
                     break;
 
                 case IBApi.TickType.OPEN_INTEREST:
                 case IBApi.TickType.OPTION_CALL_OPEN_INTEREST:
                 case IBApi.TickType.OPTION_PUT_OPEN_INTEREST:
 
-                    if (symbol.ID.SecurityType == SecurityType.Option || symbol.ID.SecurityType == SecurityType.Future)
+                    if (symbol.ID.SecurityType != SecurityType.Option && symbol.ID.SecurityType != SecurityType.Future)
                     {
-                        if (!_openInterests.ContainsKey(symbol) || _openInterests[symbol] != e.Size)
-                        {
-                            tick.TickType = TickType.OpenInterest;
-                            tick.Value = e.Size;
-                            _openInterests[symbol] = e.Size;
-                        }
+                        return;
                     }
+
+                    if (entry.LastOpenInterestTick == null)
+                    {
+                        entry.LastOpenInterestTick = new Tick { Symbol = symbol, TickType = TickType.OpenInterest };
+                    }
+
+                    tick = entry.LastOpenInterestTick;
+
+                    tick.Value = e.Size;
                     break;
 
                 default:
                     return;
             }
+
             lock (_ticks)
-                if (tick.IsValid()) _ticks.Add(tick);
+            {
+                if (tick.IsValid())
+                {
+                    tick = new Tick(tick)
+                    {
+                        Time = GetRealTimeTickTime(symbol)
+                    };
+
+                    _ticks.Add(tick);
+                }
+            }
         }
 
         /// <summary>
@@ -2671,7 +2778,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             else
             {
                 // processing request
-                var results = FindContracts(contract);
+                var results = FindContracts(contract, contract.Symbol);
 
                 // filtering results
                 var filteredResults =
@@ -2734,8 +2841,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             var startTime = request.Resolution == Resolution.Daily ? request.StartTimeUtc.Date : request.StartTimeUtc;
             var endTime = request.Resolution == Resolution.Daily ? request.EndTimeUtc.Date : request.EndTimeUtc;
 
-            Log.Trace("InteractiveBrokersBrokerage::GetHistory(): Submitting request: {0}({1}): {2} {3} UTC -> {4} UTC",
-                request.Symbol.Value, contract, request.Resolution, startTime, endTime);
+            Log.Trace($"InteractiveBrokersBrokerage::GetHistory(): Submitting request: {request.Symbol.Value} ({contract}): {request.Resolution} {startTime} UTC -> {endTime} UTC");
 
             DateTimeZone exchangeTimeZone;
             if (!_symbolExchangeTimeZones.TryGetValue(request.Symbol, out exchangeTimeZone))
@@ -2808,7 +2914,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                 var historyPiece = new List<TradeBar>();
                 var historicalTicker = GetNextTickerId();
 
-                _requestInformation[historicalTicker] = "GetHistory: " + contract;
+                _requestInformation[historicalTicker] = $"GetHistory: {request.Symbol.Value} ({contract})";
 
                 EventHandler<IB.HistoricalDataEventArgs> clientOnHistoricalData = (sender, args) =>
                 {
@@ -3044,16 +3150,18 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
         }
 
         private readonly ConcurrentDictionary<Symbol, int> _subscribedSymbols = new ConcurrentDictionary<Symbol, int>();
-        private readonly ConcurrentDictionary<int, Symbol> _subscribedTickets = new ConcurrentDictionary<int, Symbol>();
+        private readonly ConcurrentDictionary<int, SubscriptionEntry> _subscribedTickers = new ConcurrentDictionary<int, SubscriptionEntry>();
         private readonly Dictionary<Symbol, Symbol> _underlyings = new Dictionary<Symbol, Symbol>();
-        private readonly ConcurrentDictionary<Symbol, decimal> _lastPrices = new ConcurrentDictionary<Symbol, decimal>();
-        private readonly ConcurrentDictionary<Symbol, int> _lastVolumes = new ConcurrentDictionary<Symbol, int>();
-        private readonly ConcurrentDictionary<Symbol, decimal> _lastBidPrices = new ConcurrentDictionary<Symbol, decimal>();
-        private readonly ConcurrentDictionary<Symbol, int> _lastBidSizes = new ConcurrentDictionary<Symbol, int>();
-        private readonly ConcurrentDictionary<Symbol, decimal> _lastAskPrices = new ConcurrentDictionary<Symbol, decimal>();
-        private readonly ConcurrentDictionary<Symbol, int> _lastAskSizes = new ConcurrentDictionary<Symbol, int>();
-        private readonly ConcurrentDictionary<Symbol, int> _openInterests = new ConcurrentDictionary<Symbol, int>();
+
         private readonly List<Tick> _ticks = new List<Tick>();
+
+        private class SubscriptionEntry
+        {
+            public Symbol Symbol { get; set; }
+            public Tick LastTradeTick { get; set; }
+            public Tick LastQuoteTick { get; set; }
+            public Tick LastOpenInterestTick { get; set; }
+        }
 
         private static class AccountValueKeys
         {
