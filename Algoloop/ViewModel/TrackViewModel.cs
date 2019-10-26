@@ -582,7 +582,8 @@ namespace Algoloop.ViewModel
 
             // Validate if statistics same
             IDictionary<string, decimal?> statistics = ReadStatistics(result);
-            if (Model.Statistics.Count != statistics.Count
+            if (Model.Statistics == null
+                || Model.Statistics.Count != statistics.Count
                 || Model.Statistics.Except(statistics).Any())
             {
                 Trades.Clear();
@@ -667,26 +668,27 @@ namespace Algoloop.ViewModel
 
         private static void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
         {
+            decimal value = 0;
+            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            {
+                name = name + "$";
+            }
+            else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            {
+                name = name + "%";
+            }
+            else if (!decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            {
+                return;
+            }
+
             // Make unique name
             while (statistics.TryGetValue(name, out _))
             {
                 name += "+";
             }
 
-            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
-            {
-                string header = name + "$";
-                statistics.Add(header, value);
-            }
-            else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
-            {
-                string header = name + "%";
-                statistics.Add(header, value);
-            }
-            else if (decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
-            {
-                statistics.Add(name, value);
-            }
+            statistics.Add(name, value);
         }
 
         private void SplitModelToFiles(TrackModel model)
