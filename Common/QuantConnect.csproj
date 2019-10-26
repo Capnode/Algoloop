@@ -241,6 +241,16 @@
     <Compile Include="Data\Consolidators\CalendarType.cs" />
     <Compile Include="Data\Consolidators\FilteredIdentityDataConsolidator.cs" />
     <Compile Include="Data\Custom\CBOE\CBOE.cs" />
+    <Compile Include="Data\Custom\Fred\CBOE.cs" />
+    <Compile Include="Data\Custom\Fred\CentralBankInterventions.cs" />
+    <Compile Include="Data\Custom\Fred\CommercialPaper.cs" />
+    <Compile Include="Data\Custom\Fred\Fred.cs" />
+    <Compile Include="Data\Custom\Fred\FredApi.cs" />
+    <Compile Include="Data\Custom\Fred\ICEBofAML.cs" />
+    <Compile Include="Data\Custom\Fred\LIBOR.cs" />
+    <Compile Include="Data\Custom\Fred\OECDRecessionIndicators.cs" />
+    <Compile Include="Data\Custom\Fred\TradeWeightedIndexes.cs" />
+    <Compile Include="Data\Custom\Fred\Wilshire.cs" />
     <Compile Include="Data\Custom\FxcmVolume.cs" />
     <Compile Include="Data\Custom\SEC\ISECReport.cs" />
     <Compile Include="Data\Custom\SEC\SECReportBusinessAddress.cs" />
@@ -290,6 +300,7 @@
     <Compile Include="Data\SubscriptionDataConfigExtensions.cs" />
     <Compile Include="Expiry.cs" />
     <Compile Include="HistoryProviderEvents.cs" />
+    <Compile Include="IIsolatorLimitResultProvider.cs" />
     <Compile Include="Indicators\IIndicatorWarmUpPeriodProvider.cs" />
     <Compile Include="Interfaces\IAccountCurrencyProvider.cs" />
     <Compile Include="Interfaces\IAlgorithmSubscriptionManager.cs" />
@@ -305,6 +316,8 @@
     <Compile Include="Interfaces\ISubscriptionDataConfigService.cs" />
     <Compile Include="Interfaces\ITimeKeeper.cs" />
     <Compile Include="IsolatorLimitResult.cs" />
+    <Compile Include="IsolatorLimitResultProvider.cs" />
+    <Compile Include="ITimeProvider.cs" />
     <Compile Include="Orders\Fees\AlphaStreamsFeeModel.cs" />
     <Compile Include="Orders\Fills\Fill.cs" />
     <Compile Include="Orders\Fills\FillModelParameters.cs" />
@@ -313,10 +326,13 @@
     <Compile Include="Orders\Fees\OrderFeeParameters.cs" />
     <Compile Include="Orders\Slippage\AlphaStreamsSlippageModel.cs" />
     <Compile Include="Packets\Breakpoint.cs" />
+    <Compile Include="Packets\LeakyBucketControlParameters.cs" />
     <Compile Include="Python\BrokerageMessageHandlerPythonWrapper.cs" />
     <Compile Include="Python\MarginCallModelPythonWrapper.cs" />
     <Compile Include="Python\PythonInitializer.cs" />
     <Compile Include="Python\PythonWrapper.cs" />
+    <Compile Include="RealTimeProvider.cs" />
+    <Compile Include="Scheduling\ScheduledEventException.cs" />
     <Compile Include="Securities\BuyingPower.cs" />
     <Compile Include="Securities\BuyingPowerParameters.cs" />
     <Compile Include="Securities\BuyingPowerModel.cs" />
@@ -338,6 +354,7 @@
     <Compile Include="Securities\ReservedBuyingPowerForPositionParameters.cs" />
     <Compile Include="Securities\SecurityCacheDataStoredEventArgs.cs" />
     <Compile Include="Securities\DynamicSecurityData.cs" />
+    <Compile Include="Securities\SecurityCacheProvider.cs" />
     <Compile Include="Securities\SecurityService.cs" />
     <Compile Include="Securities\Volatility\BaseVolatilityModel.cs" />
     <Compile Include="Series.cs" />
@@ -755,6 +772,13 @@
     <Compile Include="Util\FixedSizeHashQueue.cs" />
     <Compile Include="Util\FuncTextWriter.cs" />
     <Compile Include="Util\JsonRoundingConverter.cs" />
+    <Compile Include="Util\RateLimit\BusyWaitSleepStrategy.cs" />
+    <Compile Include="Util\RateLimit\FixedIntervalRefillStrategy.cs" />
+    <Compile Include="Util\RateLimit\IRefillStrategy.cs" />
+    <Compile Include="Util\RateLimit\ISleepStrategy.cs" />
+    <Compile Include="Util\RateLimit\ITokenBucket.cs" />
+    <Compile Include="Util\RateLimit\LeakyBucket.cs" />
+    <Compile Include="Util\RateLimit\ThreadSleepStrategy.cs" />
     <Compile Include="Util\LeanData.cs" />
     <Compile Include="Util\LeanDataPathComponents.cs" />
     <Compile Include="Util\ListComparer.cs" />
@@ -762,6 +786,7 @@
     <Compile Include="Util\ColorJsonConverter.cs" />
     <Compile Include="Util\PythonUtil.cs" />
     <Compile Include="Util\RateGate.cs" />
+    <Compile Include="Util\RateLimit\TokenBucket.cs" />
     <Compile Include="Util\SecurityExtensions.cs" />
     <Compile Include="Util\SecurityIdentifierJsonConverter.cs" />
     <Compile Include="Util\SeriesJsonConverter.cs" />

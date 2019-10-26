@@ -263,10 +263,11 @@ namespace QuantConnect.Tests.Common.Scheduling
                     new Cash(Currencies.USD, 0, 1m),
                     SymbolProperties.GetDefault(Currencies.USD),
                     ErrorCurrencyConverter.Instance,
-                    RegisteredSecurityDataTypesProvider.Null
+                    RegisteredSecurityDataTypesProvider.Null,
+                    new SecurityCache()
                 )
             );
-            var rules = new DateRules(manager);
+            var rules = new DateRules(manager, TimeZones.NewYork);
             return rules;
         }
     }

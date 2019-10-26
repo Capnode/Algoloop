@@ -37,7 +37,6 @@ using QuantConnect.Orders;
 using QuantConnect.Packets;
 using QuantConnect.Scheduling;
 using QuantConnect.Securities;
-using QuantConnect.Statistics;
 using Log = QuantConnect.Logging.Log;
 
 namespace QuantConnect.Tests.Engine
@@ -57,7 +56,12 @@ namespace QuantConnect.Tests.Engine
             var dataManager = new DataManager(feed,
                 new UniverseSelection(
                     algorithm,
-                    new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm, RegisteredSecurityDataTypesProvider.Null)),
+                    new SecurityService(algorithm.Portfolio.CashBook,
+                        marketHoursDatabase,
+                        symbolPropertiesDataBase,
+                        algorithm,
+                        RegisteredSecurityDataTypesProvider.Null,
+                        new SecurityCacheProvider(algorithm.Portfolio))),
                 algorithm,
                 algorithm.TimeKeeper,
                 marketHoursDatabase,
@@ -281,7 +285,7 @@ namespace QuantConnect.Tests.Engine
             }
 
             public bool IsActive { get; }
-            public void Setup(IAlgorithm algorithm, AlgorithmNodePacket job, IResultHandler resultHandler, IApi api)
+            public void Setup(IAlgorithm algorithm, AlgorithmNodePacket job, IResultHandler resultHandler, IApi api, IIsolatorLimitResultProvider isolatorLimitProvider)
             {
             }
 

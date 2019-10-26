@@ -33,6 +33,7 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>6</LangVersion>
     <CodeAnalysisRuleSet>..\QuantConnect.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -298,6 +299,7 @@
     <Compile Include="Common\Data\Auxiliary\MapFileTests.cs" />
     <Compile Include="Common\Data\BaseDataTests.cs" />
     <Compile Include="Common\Data\CalendarConsolidatorsTests.cs" />
+    <Compile Include="Common\Data\Custom\FredApiTest.cs" />
     <Compile Include="Common\Data\Custom\SECReportTests.cs" />
     <Compile Include="Common\Data\Custom\SmartInsiderTests.cs" />
     <Compile Include="Common\Data\Custom\EstimizeTests.cs" />
@@ -305,7 +307,9 @@
     <Compile Include="Common\Data\Custom\TiingoNewsJsonConverterTests.cs" />
     <Compile Include="Common\Data\Fundamental\MultiPeriodFieldTests.cs" />
     <Compile Include="Common\Data\MockSubscriptionDataConfigProvider.cs" />
+    <Compile Include="Common\Data\UniverseSelection\SecurityChangesTests.cs" />
     <Compile Include="Common\Data\UniverseSelection\UniverseTests.cs" />
+    <Compile Include="Common\IsolatorLimitResultProviderTests.cs" />
     <Compile Include="Common\IsolatorTests.cs" />
     <Compile Include="Common\Orders\Fees\AlphaStreamsFeeModelTests.cs" />
     <Compile Include="Common\Notifications\NotificationEmailTests.cs" />
@@ -327,16 +331,20 @@
     <Compile Include="Common\Securities\Options\OptionSymbolTests.cs" />
     <Compile Include="Common\Securities\ProcessVolatilityHistoryRequirementsTests.cs" />
     <Compile Include="Common\Securities\DynamicSecurityDataTests.cs" />
+    <Compile Include="Common\Securities\SecurityCacheProviderTests.cs" />
     <Compile Include="Common\Securities\SecurityHoldingTests.cs" />
     <Compile Include="Common\Securities\SecurityServiceTests.cs" />
     <Compile Include="Common\Securities\TestAccountCurrencyProvider.cs" />
     <Compile Include="Common\Statistics\FitnessScoreManagerTests.cs" />
     <Compile Include="Common\Statistics\KellyCriterionManagerTests.cs" />
     <Compile Include="Common\ParseTests.cs" />
+    <Compile Include="Common\Statistics\ProbabilisticSharpeRatioTests.cs" />
     <Compile Include="Common\StringExtensionsTests.cs" />
     <Compile Include="Common\Util\ConcurrentSetTests.cs" />
     <Compile Include="Common\Util\RateGateTests.cs" />
     <Compile Include="Common\Util\ListComparerTests.cs" />
+    <Compile Include="Common\Util\RateLimit\FixedIntervalRefillStrategyTests.cs" />
+    <Compile Include="Common\Util\RateLimit\LeakyBucketTests.cs" />
     <Compile Include="Common\Util\SeriesJsonConverterTests.cs" />
     <Compile Include="Common\Util\StreamReaderEnumerableTests.cs" />
     <Compile Include="Common\Util\ValidateTests.cs" />
@@ -743,6 +751,9 @@
     </Content>
     <Content Include="TestData\frama.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\FredVixData.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="TestData\fxVolumeDaily.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
