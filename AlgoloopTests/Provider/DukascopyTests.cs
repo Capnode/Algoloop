@@ -57,7 +57,7 @@ namespace Algoloop.Provider.Tests
             market.Symbols.Add(new SymbolModel("EURUSD"));
 
             MarketModel result = _dut.Run(market, _settings, Log.LogHandler);
-            Assert.IsTrue(result.Active);
+            Assert.IsFalse(result.Active);
             Assert.IsTrue(result.LastDate > date);
         }
 
