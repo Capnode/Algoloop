@@ -56,7 +56,7 @@ namespace Algoloop.Model
             AlgorithmName = model.AlgorithmName;
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
-            Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList());
+            Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m)).ToList());
             Tracks = new Collection<TrackModel>();
         }
 
