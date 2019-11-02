@@ -169,6 +169,7 @@
     <Compile Include="DynamicSecurityDataAlgorithm.cs" />
     <Compile Include="ConfidenceWeightedFrameworkAlgorithm.cs" />
     <Compile Include="FreePortfolioValueRegressionAlgorithm.cs" />
+    <Compile Include="MarginRemainingRegressionAlgorithm.cs" />
     <Compile Include="SmartInsiderDataAlgorithm.cs" />
     <Compile Include="BasicTemplateAlgorithm.cs" />
     <Compile Include="Benchmarks\StatefulCoarseUniverseSelectionBenchmark.cs" />
@@ -179,7 +180,7 @@
     <Compile Include="CustomUniverseSelectionRegressionAlgorithm.cs" />
     <Compile Include="OnEndOfDayRegressionAlgorithm.cs" />
     <Compile Include="TrainingInitializeRegressionAlgorithm.cs" />
-    <Compile Include="TrainingScheduledRegressionAlgorithm.cs" />
+    <Compile Include="TrainingExampleAlgorithm.cs" />
     <Compile Include="UniverseUnchangedRegressionAlgorithm.cs" />
     <Compile Include="USTreasuryYieldCurveDataAlgorithm.cs" />
     <Compile Include="SECReportDataAlgorithm.cs" />
