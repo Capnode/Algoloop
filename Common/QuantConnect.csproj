@@ -298,6 +298,8 @@
     <Compile Include="Data\Custom\SmartInsider\SmartInsiderTransaction.cs" />
     <Compile Include="Data\IndexedBasedData.cs" />
     <Compile Include="Data\SubscriptionDataConfigExtensions.cs" />
+    <Compile Include="Data\UniverseSelection\ConstituentsUniverse.cs" />
+    <Compile Include="Data\UniverseSelection\ConstituentsUniverseData.cs" />
     <Compile Include="Expiry.cs" />
     <Compile Include="DataProviderEvents.cs" />
     <Compile Include="IIsolatorLimitResultProvider.cs" />
@@ -792,6 +794,7 @@
     <Compile Include="Util\SecurityIdentifierJsonConverter.cs" />
     <Compile Include="Util\SeriesJsonConverter.cs" />
     <Compile Include="Util\StreamReaderEnumerable.cs" />
+    <Compile Include="Util\StreamReaderExtensions.cs" />
     <Compile Include="Util\TypeChangeJsonConverter.cs" />
     <Compile Include="Util\LinqExtensions.cs" />
     <Compile Include="Util\MemoizingEnumerable.cs" />

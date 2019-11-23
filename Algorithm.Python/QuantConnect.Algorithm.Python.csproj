@@ -75,6 +75,7 @@
     <None Include="PandasDataFrameHistoryAlgorithm.py" />
     <None Include="CustomDataAddDataRegressionAlgorithm.py" />
     <None Include="TrainingExampleAlgorithm.py" />
+    <Content Include="BasicTemplateConstituentUniverseAlgorithm.py" />
     <Content Include="Benchmarks\SECReportBenchmarkAlgorithm.py" />
     <Content Include="Benchmarks\SmartInsiderEventBenchmarkAlgorithm.py" />
     <Content Include="CustomDataAddDataOnSecuritiesChangedRegressionAlgorithm.py" />
@@ -100,6 +101,7 @@
     <None Include="SmaCrossUniverseSelectionAlgorithm.py" />
     <Content Include="Benchmarks\StatefulCoarseUniverseSelectionBenchmark.py" />
     <Content Include="Benchmarks\StatelessCoarseUniverseSelectionBenchmark.py" />
+    <Content Include="ConstituentsUniverseRegressionAlgorithm.py" />
     <Content Include="G10CurrencySelectionModelFrameworkAlgorithm.py" />
     <Content Include="ExpiryHelperAlphaModelFrameworkAlgorithm.py" />
     <Content Include="BasicTemplateFuturesFrameworkAlgorithm.py" />
