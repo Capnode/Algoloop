@@ -29,6 +29,8 @@ namespace QuantConnect.Data.Consolidators
         where T : IBaseData
         where TConsolidated : BaseData
     {
+        // The symbol that we are consolidating for.
+        private Symbol symbol;
         //The number of data updates between creating new bars.
         private readonly int? _maxCount;
         //
@@ -112,9 +114,19 @@ namespace QuantConnect.Data.Consolidators
         /// For example, if time span is 1 minute, we have [10:00, 10:01): so data at 10:01 is not 
         /// included in the bar starting at 10:00.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when multiple symbols are being consolidated.</exception>
         /// <param name="data">The new data for the consolidator</param>
         public override void Update(T data)
         {
+            if (symbol == null)
+            {
+                symbol = data.Symbol;
+            }
+            else if (symbol != data.Symbol)
+            {
+                throw new InvalidOperationException($"Consolidators can only be used with a single symbol. The previous consolidated symbol ({symbol}) is not the same as in the current data ({data.Symbol}).");
+            }
+
             if (!ShouldProcess(data))
             {
                 // first allow the base class a chance to filter out data it doesn't want
@@ -232,7 +244,7 @@ namespace QuantConnect.Data.Consolidators
         protected TimeSpan? Period => _period;
 
         /// <summary>
-        /// Determines whether or not the specified data should be processd
+        /// Determines whether or not the specified data should be processed
         /// </summary>
         /// <param name="data">The data to check</param>
         /// <returns>True if the consolidator should process this data, false otherwise</returns>
@@ -324,7 +336,7 @@ namespace QuantConnect.Data.Consolidators
         }
 
         /// <summary>
-        /// Special case for bars which open time is defined by a function
+        /// Special case for bars where the open time is defined by a function
         /// </summary>
         private class FuncPeriodSpecification : IPeriodSpecification
         {
