@@ -392,7 +392,8 @@ namespace Algoloop.ViewModel
             Debug.Assert(worstTrade <= 0);
 //            Debug.Assert(maxDrawdown <= 0);
             Debug.Assert(linearError <= 0);
-            double risk = Math.Sqrt(worstTrade * linearError);
+//            double risk = Math.Sqrt(worstTrade * linearError);
+            double risk = linearError;
 
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
