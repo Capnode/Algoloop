@@ -386,20 +386,18 @@ namespace Algoloop.ViewModel
                 return 0;
             }
 
-            double worstTrade = (double)trades.Min(m => m.MAE);
+            // Calculate risk
+            //double worstTrade = (double)trades.Min(m => m.MAE);
 //            double maxDrawdown = (double)MaxDrawdown(trades, out _);
-            double linearError = -LinearDeviation(trades);
-            Debug.Assert(worstTrade <= 0);
-//            Debug.Assert(maxDrawdown <= 0);
-            Debug.Assert(linearError <= 0);
-//            double risk = Math.Sqrt(worstTrade * linearError);
-            double risk = -linearError;
+            double risk = LinearDeviation(trades);
 
+            // Calculate period
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
             TimeSpan duration = last - first;
             double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
 
+            // Calculate score
             double score = 0;
             double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
             if (years > 0 && risk > 0)
@@ -407,7 +405,7 @@ namespace Algoloop.ViewModel
                 score = netProfit / risk / years;
             }
 
-            return Scale(score);
+            return score;
         }
 
         internal static decimal CalcRoMaD(IList<Trade> trades)
