@@ -1,11 +1,11 @@
 ﻿/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Python.Runtime;
 using QuantConnect.Data.Consolidators;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
@@ -26,8 +27,51 @@ namespace QuantConnect.Tests.Common.Data
     [TestFixture]
     public class CalendarConsolidatorsTests
     {
+        private Dictionary<Language, dynamic> _dailyFuncDictionary;
+        private Dictionary<Language, dynamic> _weeklyFuncDictionary;
+        private Dictionary<Language, dynamic> _monthlyFuncDictionary;
+
+        [TestFixtureSetUp]
+        public void SetUp()
+        {
+            _dailyFuncDictionary = new Dictionary<Language, dynamic> { { Language.CSharp, TimeSpan.FromDays(1) } };
+            _weeklyFuncDictionary = new Dictionary<Language, dynamic> { { Language.CSharp, CalendarType.Weekly } };
+            _monthlyFuncDictionary = new Dictionary<Language, dynamic> {{Language.CSharp, CalendarType.Monthly}};
+
+            using (Py.GIL())
+            {
+                var module = PythonEngine.ModuleFromString(
+                    "PythonCalendarType",
+                    @"
+from datetime import timedelta
+from clr import AddReference
+AddReference('QuantConnect.Common')
+from QuantConnect.Data.Consolidators import CalendarInfo
+oneday = timedelta(1)
+
+def Weekly(dt):
+    value = 8 - dt.isoweekday()
+    if value == 8: value = 1   # Sunday
+    start = (dt + timedelta(value)).date() - timedelta(7)
+    return CalendarInfo(start, timedelta(7))
+
+def Monthly(dt):
+    start = dt.replace(day=1).date()
+    end = dt.replace(day=28) + timedelta(4)
+    end = (end - timedelta(end.day-1)).date()
+    return CalendarInfo(start, end - start)"
+                );
+
+                _dailyFuncDictionary[Language.Python] = module.GetAttr("oneday");
+                _weeklyFuncDictionary[Language.Python] = module.GetAttr("Weekly");
+                _monthlyFuncDictionary[Language.Python] = module.GetAttr("Monthly");
+            }
+        }
+
         [Test]
-        public void AggregatesTradeBarToCalendarTradeBarProperly()
+        [TestCase(Language.CSharp)]
+        [TestCase(Language.Python)]
+        public void AggregatesTradeBarToCalendarTradeBarProperly(Language language)
         {
             // Monday
             var reference = new DateTime(2019, 3, 18);
@@ -40,7 +84,7 @@ namespace QuantConnect.Tests.Common.Data
                 new TradeBar(reference.AddDays(14), Symbols.SPY, 11, 13, 9, 11, 100, Time.OneDay)
             };
 
-            var weeklyConsolidator = new TradeBarConsolidator(CalendarType.Weekly);
+            var weeklyConsolidator = new TradeBarConsolidator(_weeklyFuncDictionary[language]);
             weeklyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertTradeBar(
@@ -51,7 +95,7 @@ namespace QuantConnect.Tests.Common.Data
                     e);
             };
 
-            var monthlyConsolidator = new TradeBarConsolidator(CalendarType.Monthly);
+            var monthlyConsolidator = new TradeBarConsolidator(_monthlyFuncDictionary[language]);
             monthlyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertTradeBar(
@@ -87,7 +131,9 @@ namespace QuantConnect.Tests.Common.Data
         }
 
         [Test]
-        public void AggregatesQuoteBarToCalendarQuoteBarProperly()
+        [TestCase(Language.CSharp)]
+        [TestCase(Language.Python)]
+        public void AggregatesQuoteBarToCalendarQuoteBarProperly(Language language)
         {
             // Monday
             var reference = new DateTime(2019, 3, 18);
@@ -100,7 +146,7 @@ namespace QuantConnect.Tests.Common.Data
                 new QuoteBar(reference.AddDays(14), Symbols.EURUSD, new Bar(11, 13, 9, 11), 10, new Bar(11, 13, 9, 11), 10, Time.OneDay)
             };
 
-            var weeklyConsolidator = new QuoteBarConsolidator(CalendarType.Weekly);
+            var weeklyConsolidator = new QuoteBarConsolidator(_weeklyFuncDictionary[language]);
             weeklyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertQuoteBar(
@@ -111,7 +157,7 @@ namespace QuantConnect.Tests.Common.Data
                     e);
             };
 
-            var monthlyConsolidator = new QuoteBarConsolidator(CalendarType.Monthly);
+            var monthlyConsolidator = new QuoteBarConsolidator(_monthlyFuncDictionary[language]);
             monthlyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertQuoteBar(
@@ -152,7 +198,9 @@ namespace QuantConnect.Tests.Common.Data
         }
 
         [Test]
-        public void AggregatesTickToCalendarTradeBarProperly()
+        [TestCase(Language.CSharp)]
+        [TestCase(Language.Python)]
+        public void AggregatesTickToCalendarTradeBarProperly(Language language)
         {
             // Monday
             var reference = new DateTime(2019, 3, 18);
@@ -165,7 +213,7 @@ namespace QuantConnect.Tests.Common.Data
                 new Tick(reference.AddDays(14), Symbols.SPY, 11, 13, 9){ TickType = TickType.Trade,  Quantity = 10 }
             };
 
-            var weeklyConsolidator = new TickConsolidator(CalendarType.Weekly);
+            var weeklyConsolidator = new TickConsolidator(_weeklyFuncDictionary[language]);
             weeklyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertTickTradeBar(
@@ -176,7 +224,7 @@ namespace QuantConnect.Tests.Common.Data
                     e);
             };
 
-            var monthlyConsolidator = new TickConsolidator(CalendarType.Monthly);
+            var monthlyConsolidator = new TickConsolidator(_monthlyFuncDictionary[language]);
             monthlyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertTickTradeBar(
@@ -212,7 +260,9 @@ namespace QuantConnect.Tests.Common.Data
         }
 
         [Test]
-        public void AggregatesTickToCalendarQuoteBarProperly()
+        [TestCase(Language.CSharp)]
+        [TestCase(Language.Python)]
+        public void AggregatesTickToCalendarQuoteBarProperly(Language language)
         {
             // Monday
             var reference = new DateTime(2019, 3, 18);
@@ -225,7 +275,7 @@ namespace QuantConnect.Tests.Common.Data
                 new Tick(reference.AddDays(14), Symbols.EURUSD, 11, 13, 9){ Quantity = 10 }
             };
 
-            var weeklyConsolidator = new TickQuoteBarConsolidator(CalendarType.Weekly);
+            var weeklyConsolidator = new TickQuoteBarConsolidator(_weeklyFuncDictionary[language]);
             weeklyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertTickQuoteBar(
@@ -236,7 +286,7 @@ namespace QuantConnect.Tests.Common.Data
                     e);
             };
 
-            var monthlyConsolidator = new TickQuoteBarConsolidator(CalendarType.Monthly);
+            var monthlyConsolidator = new TickQuoteBarConsolidator(_monthlyFuncDictionary[language]);
             monthlyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertTickQuoteBar(
@@ -275,7 +325,9 @@ namespace QuantConnect.Tests.Common.Data
         }
 
         [Test]
-        public void AggregatesBaseDataToCalendarTradeBarProperly()
+        [TestCase(Language.CSharp)]
+        [TestCase(Language.Python)]
+        public void AggregatesBaseDataToCalendarTradeBarProperly(Language language)
         {
             // Monday
             var reference = new DateTime(2019, 3, 18);
@@ -288,7 +340,7 @@ namespace QuantConnect.Tests.Common.Data
                 new Tick(reference.AddDays(14), Symbols.SPY, 11, 13, 9){ Quantity = 10 }
             };
 
-            var weeklyConsolidator = new BaseDataConsolidator(CalendarType.Weekly);
+            var weeklyConsolidator = new BaseDataConsolidator(_weeklyFuncDictionary[language]);
             weeklyConsolidator.DataConsolidated += (s, e) => 
             {
                 AssertBaseTradeBar(
@@ -299,7 +351,7 @@ namespace QuantConnect.Tests.Common.Data
                     e);
             };
 
-            var monthlyConsolidator = new BaseDataConsolidator(CalendarType.Monthly);
+            var monthlyConsolidator = new BaseDataConsolidator(_monthlyFuncDictionary[language]);
             monthlyConsolidator.DataConsolidated += (s, e) =>
             {
                 AssertBaseTradeBar(
@@ -321,6 +373,7 @@ namespace QuantConnect.Tests.Common.Data
             }
         }
 
+
         private void AssertBaseTradeBar(IEnumerable<Tick> ticks, DateTime openTime, DateTime closeTime, Symbol symbol, TradeBar consolidated)
         {
             Assert.AreEqual(openTime, consolidated.Time);
@@ -333,16 +386,65 @@ namespace QuantConnect.Tests.Common.Data
             Assert.AreEqual(0, consolidated.Volume);
         }
 
+        [Test]
+        [TestCase(Language.CSharp)]
+        [TestCase(Language.Python)]
+        public void AggregatesTradeBarToDailyTradeBarProperly(Language language)
+        {
+            // Monday
+            var reference = new DateTime(2019, 3, 18);
+            var bars = new List<TradeBar>
+            {
+                new TradeBar(reference.AddHours(6), Symbols.SPY, 9, 11, 8, 10, 100, Time.OneHour),
+                new TradeBar(reference.AddHours(12), Symbols.SPY, 10, 12, 8, 11, 100, Time.OneHour),
+                new TradeBar(reference.AddHours(18), Symbols.SPY, 11, 13, 9, 10, 100, Time.OneHour),
+                new TradeBar(reference.AddHours(21), Symbols.SPY, 11, 13, 9, 11, 100, Time.OneHour),
+                new TradeBar(reference.AddHours(25), Symbols.SPY, 11, 13, 9, 11, 100, Time.OneHour)
+            };
+
+            var dailyConsolidator = new TradeBarConsolidator(_dailyFuncDictionary[language]);
+            dailyConsolidator.DataConsolidated += (s, e) =>
+            {
+                AssertTradeBar(
+                    bars.Take(4),
+                    reference,
+                    reference.AddDays(1),
+                    Symbols.SPY,
+                    e);
+            };
+
+            foreach (var bar in bars)
+            {
+                dailyConsolidator.Update(bar);
+            }
+        }
+
+        private void AssertDailyTradeBar(IEnumerable<TradeBar> tradeBars, DateTime openTime, DateTime closeTime, Symbol symbol, TradeBar consolidated)
+        {
+            Assert.IsNotNull(consolidated);
+            Assert.AreEqual(openTime, consolidated.Time);
+            Assert.AreEqual(closeTime, consolidated.EndTime);
+            Assert.AreEqual(symbol, consolidated.Symbol);
+            Assert.AreEqual(tradeBars.First().Open, consolidated.Open);
+            Assert.AreEqual(tradeBars.Max(x => x.High), consolidated.High);
+            Assert.AreEqual(tradeBars.Min(x => x.Low), consolidated.Low);
+            Assert.AreEqual(tradeBars.Last().Close, consolidated.Close);
+            Assert.AreEqual(tradeBars.Sum(x => x.Volume), consolidated.Volume);
+        }
+
+
         private SimpleMovingAverage indicator;
 
         [Test]
-        public void AllCalendarsConsolidatesWithRegisterIndicator()
+        [TestCase(Language.CSharp)]
+        [TestCase(Language.Python)]
+        public void AllCalendarsConsolidatesWithRegisterIndicator(Language language)
         {
-            CalendarConsolidatesWithRegisterIndicator(CalendarType.Weekly);
-            CalendarConsolidatesWithRegisterIndicator(CalendarType.Monthly);
+            CalendarConsolidatesWithRegisterIndicator(_weeklyFuncDictionary[language]);
+            CalendarConsolidatesWithRegisterIndicator(_monthlyFuncDictionary[language]);
         }
 
-        private void CalendarConsolidatesWithRegisterIndicator(Func<DateTime, CalendarInfo> calendarType)
+        private void CalendarConsolidatesWithRegisterIndicator(dynamic calendarType)
         {
             var consolidator = new TradeBarConsolidator(calendarType);
             consolidator.DataConsolidated += (s, e) =>
