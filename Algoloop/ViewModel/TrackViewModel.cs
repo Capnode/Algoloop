@@ -52,7 +52,7 @@ namespace Algoloop.ViewModel
         private const string _logFile = "Logs.log";
         private const string _resultFile = "Result.json";
         private const string _zipFile = "track.zip";
-        private const double _daysInYear = 365.24;
+        private const double _daysInYear = 365;
 
         private readonly StrategyViewModel _parent;
         private readonly AccountService _accounts;
@@ -390,20 +390,19 @@ namespace Algoloop.ViewModel
             //double worstTrade = (double)trades.Min(m => m.MAE);
 //            double maxDrawdown = (double)MaxDrawdown(trades, out _);
             double risk = LinearDeviation(trades);
+            if (risk == 0) return double.NaN;
 
             // Calculate period
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
             TimeSpan duration = last - first;
             double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
+            if (years == 0) return double.NaN;
 
             // Calculate score
             double score = 0;
             double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
-            if (years > 0 && risk > 0)
-            {
-                score = netProfit / risk / years;
-            }
+            score = netProfit / risk / years;
 
             return score;
         }
