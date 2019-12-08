@@ -387,9 +387,10 @@ namespace Algoloop.ViewModel
             }
 
             // Calculate risk
-            //double worstTrade = (double)trades.Min(m => m.MAE);
+            double worstTrade = (double)trades.Min(m => m.MAE);
 //            double maxDrawdown = (double)MaxDrawdown(trades, out _);
-            double risk = LinearDeviation(trades);
+            double linearError = -LinearDeviation(trades);
+            double risk = Math.Sqrt(worstTrade * linearError);
 
             // Calculate period
             DateTime first = trades.Min(m => m.EntryTime);
