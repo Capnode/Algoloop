@@ -390,21 +390,21 @@ namespace Algoloop.ViewModel
             //double worstTrade = (double)trades.Min(m => m.MAE);
 //            double maxDrawdown = (double)MaxDrawdown(trades, out _);
             double risk = LinearDeviation(trades);
-            if (risk == 0) return double.NaN;
+            if (risk == 0) return 1;
 
             // Calculate period
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
             TimeSpan duration = last - first;
             double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
-            if (years == 0) return double.NaN;
+            if (years == 0) return 1;
 
             // Calculate score
             double score = 0;
             double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
             score = netProfit / risk / years;
 
-            return score;
+            return Scale(score);
         }
 
         internal static decimal CalcRoMaD(IList<Trade> trades)
@@ -522,11 +522,6 @@ namespace Algoloop.ViewModel
             // Adjust scale that x = 1 returns 0.1
             const int c = 99;
             return x / Math.Sqrt(c + x * x);
-        }
-
-        private static double ScaleToRange(double x, double minimum, double maximum)
-        {
-            return (x - minimum) / (maximum - minimum);
         }
 
         private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
@@ -666,14 +661,13 @@ namespace Algoloop.ViewModel
 
         private static void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
         {
-            decimal value = 0;
-            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
             {
-                name = name + "$";
+                name += "$";
             }
             else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
-                name = name + "%";
+                name += "%";
             }
             else if (!decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
             {
