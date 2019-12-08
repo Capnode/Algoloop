@@ -34,7 +34,7 @@ namespace Algoloop.ViewModel.Tests
             };
 
             double score = TrackViewModel.CalculateScore(trades);
-            Assert.IsTrue(double.IsNaN(score));
+            Assert.IsTrue(score == 1);
         }
 
         [TestMethod()]
@@ -49,7 +49,7 @@ namespace Algoloop.ViewModel.Tests
             };
 
             double score = TrackViewModel.CalculateScore(trades);
-            Assert.IsTrue(3 * score == 16);
+            Assert.IsTrue(Math.Abs(score - 0.4724) < 0.0001);
         }
     }
 }
