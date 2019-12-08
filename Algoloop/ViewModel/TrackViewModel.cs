@@ -390,18 +390,18 @@ namespace Algoloop.ViewModel
             //double worstTrade = (double)trades.Min(m => m.MAE);
 //            double maxDrawdown = (double)MaxDrawdown(trades, out _);
             double risk = LinearDeviation(trades);
-            if (risk == 0) return 1;
 
             // Calculate period
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
             TimeSpan duration = last - first;
             double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
-            if (years == 0) return 1;
 
             // Calculate score
             double score = 0;
             double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
+
+            if (risk == 0 || years == 0) return netProfit.CompareTo(0);
             score = netProfit / risk / years;
 
             return Scale(score);
@@ -513,12 +513,6 @@ namespace Algoloop.ViewModel
 
         private static double Scale(double x)
         {
-            // Negative returns zero
-            if (x < 0)
-            {
-                return 0;
-            }
-
             // Adjust scale that x = 1 returns 0.1
             const int c = 99;
             return x / Math.Sqrt(c + x * x);

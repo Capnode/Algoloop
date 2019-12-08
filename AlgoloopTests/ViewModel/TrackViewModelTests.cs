@@ -23,7 +23,7 @@ namespace Algoloop.ViewModel.Tests
     public class TrackViewModelTests
     {
         [TestMethod()]
-        public void CalculateScoreTest_ideal()
+        public void CalculateScoreTest_idealProfit()
         {
             var trades = new List<Trade>
             {
@@ -38,7 +38,37 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_example()
+        public void CalculateScoreTest_idealLoss()
+        {
+            var trades = new List<Trade>
+            {
+                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+            };
+
+            double score = TrackViewModel.CalculateScore(trades);
+            Assert.IsTrue(score == -1);
+        }
+
+        [TestMethod()]
+        public void CalculateScoreTest_breakeven()
+        {
+            var trades = new List<Trade>
+            {
+                new Trade{ ProfitLoss = 5, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new Trade{ ProfitLoss = 3, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new Trade{ ProfitLoss = -5, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new Trade{ ProfitLoss = -3, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+            };
+
+            double score = TrackViewModel.CalculateScore(trades);
+            Assert.IsTrue(score == 0);
+        }
+
+        [TestMethod()]
+        public void CalculateScoreTest_profit()
         {
             var trades = new List<Trade>
             {
@@ -50,6 +80,21 @@ namespace Algoloop.ViewModel.Tests
 
             double score = TrackViewModel.CalculateScore(trades);
             Assert.IsTrue(Math.Abs(score - 0.4726) < 0.0001);
+        }
+
+        [TestMethod()]
+        public void CalculateScoreTest_loss()
+        {
+            var trades = new List<Trade>
+            {
+                new Trade{ ProfitLoss = -5, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new Trade{ ProfitLoss = -3, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new Trade{ ProfitLoss = -2, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new Trade{ ProfitLoss = 2, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+            };
+
+            double score = TrackViewModel.CalculateScore(trades);
+            Assert.IsTrue(Math.Abs(score + 0.2437) < 0.0001);
         }
     }
 }
