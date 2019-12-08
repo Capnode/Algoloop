@@ -52,7 +52,7 @@ namespace Algoloop.ViewModel
         private const string _logFile = "Logs.log";
         private const string _resultFile = "Result.json";
         private const string _zipFile = "track.zip";
-        private const double _daysInYear = 365;
+        private const double _daysInYear = 365.24;
 
         private readonly StrategyViewModel _parent;
         private readonly AccountService _accounts;

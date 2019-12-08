@@ -49,7 +49,7 @@ namespace Algoloop.ViewModel.Tests
             };
 
             double score = TrackViewModel.CalculateScore(trades);
-            Assert.IsTrue(Math.Abs(score - 0.4724) < 0.0001);
+            Assert.IsTrue(Math.Abs(score - 0.4726) < 0.0001);
         }
     }
 }
