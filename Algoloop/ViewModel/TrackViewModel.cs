@@ -399,12 +399,32 @@ namespace Algoloop.ViewModel
             double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
 
             // Calculate score
-            double score = 0;
             double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
-
             if (risk == 0 || years == 0) return netProfit.CompareTo(0);
-            score = netProfit / risk / years;
+            double score = netProfit / risk / years;
+            return Scale(score);
+        }
 
+        private double CalculateScore(List<ChartPoint> series)
+        {
+            if (series == null || !series.Any())
+            {
+                return 0;
+            }
+
+            // Calculate risk
+            double risk = LinearDeviation(series);
+
+            // Calculate period
+            DateTime first = Time.UnixTimeStampToDateTime(series.First().x);
+            DateTime last = Time.UnixTimeStampToDateTime(series.Last().x);
+            TimeSpan duration = last - first;
+            double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
+
+            // Calculate score
+            double netProfit = (double)(series.Last().y - series.First().y);
+            if (risk == 0 || years == 0) return netProfit.CompareTo(0);
+            double score = netProfit / risk / years;
             return Scale(score);
         }
 
@@ -506,9 +526,41 @@ namespace Algoloop.ViewModel
             return Math.Sqrt(variance);
         }
 
-        private void AddCustomStatistics(IDictionary<string, decimal?> statistics)
+        private double LinearDeviation(List<ChartPoint> series)
         {
-            double score = CalculateScore(Trades);
+            int count = series.Count;
+            if (count < 2)
+            {
+                return 0;
+            }
+
+            decimal first = series.First().y;
+            decimal last = series.Last().y;
+            decimal netProfit =  last - first;
+            decimal avg = netProfit / (count - 1);
+            decimal ideal = first;
+            decimal sum = 0;
+            foreach (ChartPoint trade in series)
+            {
+                decimal epsilon = trade.y - ideal;
+                sum += epsilon * epsilon;
+                ideal += avg;
+            }
+
+            double variance = (double)sum / (count - 1);
+            return Math.Sqrt(variance);
+        }
+
+        private void AddCustomStatistics(BacktestResult result, IDictionary<string, decimal?> statistics)
+        {
+            KeyValuePair<string, Chart> chart = result.Charts.FirstOrDefault(m => m.Key.Equals("Strategy Equity"));
+            if (chart.Equals(default)) return;
+
+            KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(m => m.Key.Equals("Equity"));
+            if (equity.Equals(default)) return;
+            List<ChartPoint> series = equity.Value.Values;
+
+            double score = CalculateScore(series);
             statistics.Add("Score", (decimal)score.RoundToSignificantDigits(4));
         }
 
@@ -719,7 +771,7 @@ namespace Algoloop.ViewModel
         private IDictionary<string, decimal?> ReadStatistics(BacktestResult result)
         {
             IDictionary<string, decimal?> statistics = new SafeDictionary<string, decimal?>();
-            AddCustomStatistics(statistics);
+            AddCustomStatistics(result, statistics);
             foreach (KeyValuePair<string, string> item in result.Statistics)
             {
                 AddStatisticItem(statistics, item.Key, item.Value);
