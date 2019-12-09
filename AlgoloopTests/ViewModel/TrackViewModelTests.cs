@@ -13,6 +13,7 @@
  */
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantConnect;
 using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
@@ -72,14 +73,14 @@ namespace Algoloop.ViewModel.Tests
         {
             var trades = new List<Trade>
             {
-                new Trade{ ProfitLoss = 5, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new Trade{ ProfitLoss = 5, MAE = -4, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
                 new Trade{ ProfitLoss = 3, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
                 new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
                 new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
             double score = TrackViewModel.CalculateScore(trades);
-            Assert.IsTrue(Math.Abs(score - 0.4726) < 0.0001);
+            Assert.IsTrue(Math.Abs(score - 0.3120) < 0.0001);
         }
 
         [TestMethod()]
@@ -87,14 +88,74 @@ namespace Algoloop.ViewModel.Tests
         {
             var trades = new List<Trade>
             {
-                new Trade{ ProfitLoss = -5, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new Trade{ ProfitLoss = -5,  MAE = -4, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
                 new Trade{ ProfitLoss = -3, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
                 new Trade{ ProfitLoss = -2, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
                 new Trade{ ProfitLoss = 2, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
             double score = TrackViewModel.CalculateScore(trades);
-            Assert.IsTrue(Math.Abs(score + 0.2437) < 0.0001);
+            Assert.IsTrue(Math.Abs(score + 0.2193) < 0.0001);
+        }
+
+        [TestMethod()]
+        public void CalculateScoreTest_chartpoint_idealProfit()
+        {
+            List<ChartPoint> trades = new List<ChartPoint>
+            {
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 11000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 12000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 13000 },
+            };
+
+            double score = TrackViewModel.CalculateScore(trades);
+            Assert.IsTrue(score == 1);
+        }
+
+        [TestMethod()]
+        public void CalculateScoreTest_chartpoint_idealLoss()
+        {
+            List<ChartPoint> trades = new List<ChartPoint>
+            {
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 9000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 8000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 7000 },
+            };
+
+            double score = TrackViewModel.CalculateScore(trades);
+            Assert.IsTrue(score == -1);
+        }
+
+        [TestMethod()]
+        public void CalculateScoreTest_chartpoint_breakeven()
+        {
+            List<ChartPoint> trades = new List<ChartPoint>
+            {
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 9000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 8000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 10000 },
+            };
+
+            double score = TrackViewModel.CalculateScore(trades);
+            Assert.IsTrue(score == 0);
+        }
+
+        [TestMethod()]
+        public void CalculateScoreTest_chartpoint_profit()
+        {
+            List<ChartPoint> trades = new List<ChartPoint>
+            {
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 11000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 13000 },
+                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 16000 },
+            };
+
+            double score = TrackViewModel.CalculateScore(trades);
+            Assert.IsTrue(Math.Abs(score - 0.5943) < 0.0001);
         }
     }
 }

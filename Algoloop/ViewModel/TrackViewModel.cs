@@ -405,7 +405,7 @@ namespace Algoloop.ViewModel
             return Scale(score);
         }
 
-        private double CalculateScore(List<ChartPoint> series)
+        internal static double CalculateScore(IList<ChartPoint> series)
         {
             if (series == null || !series.Any())
             {
@@ -526,7 +526,7 @@ namespace Algoloop.ViewModel
             return Math.Sqrt(variance);
         }
 
-        private double LinearDeviation(List<ChartPoint> series)
+        private static double LinearDeviation(IList<ChartPoint> series)
         {
             int count = series.Count;
             if (count < 2)
