@@ -407,24 +407,27 @@ namespace Algoloop.ViewModel
 
         private double CalculateScore(List<ChartPoint> series)
         {
-            if (series == null || !series.Any())
+            int count = series.Count;
+            if (count < 2)
             {
                 return 0;
             }
 
-            // Calculate risk
-            double risk = LinearDeviation(series);
+            decimal first = series.First().y;
+            decimal last = series.Last().y;
+            decimal netProfit = last - first;
+            decimal avg = netProfit / (count - 1);
+            decimal ideal = first;
+            decimal error = 0;
+            foreach (ChartPoint trade in series)
+            {
+                decimal diff = trade.y - ideal;
+                error += Math.Abs(diff);
+                ideal += avg;
+            }
 
-            // Calculate period
-            DateTime first = Time.UnixTimeStampToDateTime(series.First().x);
-            DateTime last = Time.UnixTimeStampToDateTime(series.Last().x);
-            TimeSpan duration = last - first;
-            double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
-
-            // Calculate score
-            double netProfit = (double)(series.Last().y - series.First().y);
-            if (risk == 0 || years == 0) return netProfit.CompareTo(0);
-            double score = netProfit / risk / years;
+            if (error == 0) return decimal.Compare(netProfit, 0);
+            double score = (double)(netProfit * count / error / 2);
             return Scale(score);
         }
 
@@ -523,31 +526,6 @@ namespace Algoloop.ViewModel
             }
 
             double variance = (double)sum / count;
-            return Math.Sqrt(variance);
-        }
-
-        private double LinearDeviation(List<ChartPoint> series)
-        {
-            int count = series.Count;
-            if (count < 2)
-            {
-                return 0;
-            }
-
-            decimal first = series.First().y;
-            decimal last = series.Last().y;
-            decimal netProfit =  last - first;
-            decimal avg = netProfit / (count - 1);
-            decimal ideal = first;
-            decimal sum = 0;
-            foreach (ChartPoint trade in series)
-            {
-                decimal epsilon = trade.y - ideal;
-                sum += epsilon * epsilon;
-                ideal += avg;
-            }
-
-            double variance = (double)sum / (count - 1);
             return Math.Sqrt(variance);
         }
 
