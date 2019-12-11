@@ -427,7 +427,7 @@ namespace Algoloop.ViewModel
             }
 
             if (error == 0) return decimal.Compare(netProfit, 0);
-            double score = (double)(netProfit * count / error / 2);
+            double score = (double)(netProfit * count / error);
             return Scale(score);
         }
 
