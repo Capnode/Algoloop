@@ -405,7 +405,7 @@ namespace Algoloop.ViewModel
             return Scale(score);
         }
 
-        private double CalculateScore(List<ChartPoint> series)
+        internal static double CalculateScore(IList<ChartPoint> series)
         {
             int count = series.Count;
             if (count < 2)
