@@ -48,6 +48,11 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
         private readonly IAlgorithm _baseAlgorithm;
 
         /// <summary>
+        /// True if the underlying python algorithm implements "OnEndOfDay"
+        /// </summary>
+        public bool IsOnEndOfDayImplemented { get; }
+
+        /// <summary>
         /// <see cref = "AlgorithmPythonWrapper"/> constructor.
         /// Creates and wraps the algorithm written in python.
         /// </summary>
@@ -90,6 +95,8 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
                             _onMarginCall = pyAlgorithm.GetPythonMethod("OnMarginCall");
 
                             _onOrderEvent = pyAlgorithm.GetAttr("OnOrderEvent");
+
+                            IsOnEndOfDayImplemented = pyAlgorithm.GetPythonMethod("OnEndOfDay") != null;
                         }
                         attr.Dispose();
                     }
@@ -276,6 +283,11 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
         /// Gets the future chain provider, used to get the list of future contracts for an underlying symbol
         /// </summary>
         public IFutureChainProvider FutureChainProvider => _baseAlgorithm.FutureChainProvider;
+
+        /// <summary>
+        /// Gets the object store, used for persistence
+        /// </summary>
+        public IObjectStore ObjectStore => _baseAlgorithm.ObjectStore;
 
         /// <summary>
         /// Returns the current Slice object
@@ -904,6 +916,12 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
         /// </summary>
         /// <param name="api">Initiated API</param>
         public void SetApi(IApi api) => _baseAlgorithm.SetApi(api);
+
+        /// <summary>
+        /// Sets the object store
+        /// </summary>
+        /// <param name="objectStore">The object store</param>
+        public void SetObjectStore(IObjectStore objectStore) => _baseAlgorithm.SetObjectStore(objectStore);
 
         /// <summary>
         /// Sets the order event provider
