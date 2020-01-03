@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
@@ -25,11 +26,23 @@ namespace Algoloop.View
     public partial class HtmlView : UserControl
     {
         public static readonly DependencyProperty HtmlTextProperty = DependencyProperty.Register("HtmlText", typeof(string), typeof(HtmlView));
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register("Source", typeof(string), typeof(HtmlView));
 
         public HtmlView()
         {
             InitializeComponent();
             browser.Loaded += OnLoaded;
+            Unloaded += OnUnloaded;
+            browser.Navigating += Browser_Navigating;
+            browser.SourceUpdated += Browser_SourceUpdated;
+        }
+
+        private void Browser_SourceUpdated(object sender, System.Windows.Data.DataTransferEventArgs e)
+        {
+        }
+
+        private void Browser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        {
         }
 
         public string HtmlText
@@ -38,12 +51,28 @@ namespace Algoloop.View
             set { SetValue(HtmlTextProperty, value); }
         }
 
+        public string Source
+        {
+            get { return (string)GetValue(SourceProperty); }
+            set { SetValue(SourceProperty, value); }
+        }
+
         protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             base.OnPropertyChanged(e);
             if (e.Property == HtmlTextProperty)
             {
-                DoBrowse();
+                if (!string.IsNullOrEmpty(HtmlText))
+                {
+                    browser.NavigateToString(HtmlText);
+                }
+            }
+            else if (e.Property == SourceProperty)
+            {
+                if (!string.IsNullOrEmpty(Source))
+                {
+                    Dispatcher.BeginInvoke((Action)(() => browser.Navigate(Source)));
+                }
             }
         }
 
@@ -56,8 +85,10 @@ namespace Algoloop.View
                     "_axIWebBrowser2",
                     BindingFlags.Instance | BindingFlags.NonPublic);
                 if (fiComWebBrowser == null) return;
+
                 object objComWebBrowser = fiComWebBrowser.GetValue(wb);
                 if (objComWebBrowser == null) return;
+
                 objComWebBrowser.GetType().InvokeMember(
                     "Silent",
                     BindingFlags.SetProperty,
@@ -68,12 +99,8 @@ namespace Algoloop.View
             }
         }
 
-        private void DoBrowse()
+        private void OnUnloaded(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(HtmlText))
-            {
-                browser.NavigateToString(HtmlText);
-            }
         }
     }
 }

@@ -74,6 +74,11 @@
             <TabItem Header="{Binding StrategiesViewModel.Strategies.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Strategies ({0}), FallbackValue=Strategies}">
                 <view:StrategiesView />
             </TabItem>
+            <TabItem Header="Research">
+                <view:HtmlView
+                    HtmlText="{Binding ResearchViewModel.HtmlText}"
+                    Source="{Binding ResearchViewModel.Source}"/>
+            </TabItem>
             <TabItem Header="{Binding LogViewModel.Logs.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <view:LogView />
             </TabItem>

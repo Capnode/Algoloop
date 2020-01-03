@@ -281,6 +281,7 @@
     <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="Provider\Usa.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />
+    <Compile Include="ViewModel\ResearchViewModel.cs" />
     <Compile Include="ViewModel\TrackSymbolViewModel.cs" />
     <Compile Include="Model\FolderModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
@@ -555,6 +556,10 @@
       <Project>{73fb2522-c3ed-4e47-8e3d-afad48a6b888}</Project>
       <Name>QuantConnect.Indicators</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jupyter\QuantConnect.Jupyter.csproj">
+      <Project>{9561d14a-467e-40ad-928e-ee9f758d7d98}</Project>
+      <Name>QuantConnect.Jupyter</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj">
       <Project>{01911409-86be-4e7d-9947-df714138610d}</Project>
       <Name>QuantConnect.Logging</Name>
@@ -566,6 +571,10 @@
     <ProjectReference Include="..\Queues\QuantConnect.Queues.csproj">
       <Project>{d6633172-1368-4df6-9444-825c3e00c819}</Project>
       <Name>QuantConnect.Queues</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Report\QuantConnect.Report.csproj">
+      <Project>{2431419f-8bc6-4f59-944e-9a1cd28982df}</Project>
+      <Name>QuantConnect.Report</Name>
     </ProjectReference>
     <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj">
       <Project>{ac9a142c-b485-44d7-91ff-015c22c43d05}</Project>

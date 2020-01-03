@@ -47,12 +47,14 @@ namespace Algoloop.ViewModel
             MarketsViewModel marketsViewModel,
             AccountsViewModel accountsViewModel,
             StrategiesViewModel strategiesViewModel,
+            ResearchViewModel researchViewModel,
             LogViewModel logViewModel)
         {
             SettingsViewModel = settingsViewModel;
             MarketsViewModel = marketsViewModel;
             AccountsViewModel = accountsViewModel;
             StrategiesViewModel = strategiesViewModel;
+            ResearchViewModel = researchViewModel;
             LogViewModel = logViewModel;
 
             SaveCommand = new RelayCommand(() => SaveAll(), () => !IsBusy);
@@ -79,10 +81,11 @@ namespace Algoloop.ViewModel
         public RelayCommand AboutCommand { get; }
 
         public SettingsViewModel SettingsViewModel { get; }
-        public LogViewModel LogViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
         public AccountsViewModel AccountsViewModel { get; }
         public StrategiesViewModel StrategiesViewModel { get; }
+        public ResearchViewModel ResearchViewModel { get; }
+        public LogViewModel LogViewModel { get; }
 
         public static string Title => AboutViewModel.AssemblyTitle;
 
@@ -137,6 +140,7 @@ namespace Algoloop.ViewModel
             if ((bool)settings.ShowDialog())
             {
                 SaveAll();
+                ResearchViewModel.StartJupyter();
             }
             else
             {
@@ -184,6 +188,7 @@ namespace Algoloop.ViewModel
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
+                ResearchViewModel.StartJupyter();
             }
             finally
             {

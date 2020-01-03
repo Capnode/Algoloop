@@ -54,6 +54,7 @@ namespace Algoloop.ViewModel
             SimpleIoc.Default.Register<MarketsViewModel>();
             SimpleIoc.Default.Register<AccountsViewModel>();
             SimpleIoc.Default.Register<StrategiesViewModel>();
+            SimpleIoc.Default.Register<ResearchViewModel>();
             SimpleIoc.Default.Register<LogViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<AboutViewModel>();
@@ -67,6 +68,7 @@ namespace Algoloop.ViewModel
         public static MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
         public static AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
         public static StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
+        public static ResearchViewModel ResearchViewModel => SimpleIoc.Default.GetInstance<ResearchViewModel>();
         public static LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
         public static SettingsViewModel SettingsViewModel => SimpleIoc.Default.GetInstance<SettingsViewModel>();
         public static AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
