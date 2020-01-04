@@ -16,6 +16,7 @@ using QuantConnect.Lean.Engine.Results;
 using QuantConnect;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using QuantConnect.Logging;
 
 namespace Algoloop.Lean
 {
@@ -30,7 +31,7 @@ namespace Algoloop.Lean
         /// <param name="id">Id that will be incorporated into the algorithm log name</param>
         /// <param name="logs">The logs to save</param>
         /// <returns>The path to the logs</returns>
-        public override string SaveLogs(string id, IEnumerable<string> logs)
+        public override string SaveLogs(string id, List<LogEntry> logs)
         {
             Logs = string.Join("\r\n", logs);
             return string.Empty;
