@@ -54,6 +54,7 @@ namespace Algoloop.Model
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
             AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
+            AlgorithmLanguage = model.AlgorithmLanguage;
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m)).ToList());
@@ -76,6 +77,7 @@ namespace Algoloop.Model
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
             AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
+            AlgorithmLanguage = model.AlgorithmLanguage;
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList());
@@ -224,6 +226,13 @@ namespace Algoloop.Model
                 AlgorithmNameChanged?.Invoke(_algorithmName);
             }
         }
+
+        [Category("Algorithm")]
+        [DisplayName("Algorithm language")]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public Language AlgorithmLanguage { get; set; }
 
         [Browsable(false)]
         [ReadOnly(false)]

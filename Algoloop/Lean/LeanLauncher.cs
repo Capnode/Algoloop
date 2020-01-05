@@ -134,7 +134,7 @@ namespace Algoloop.Lean
             Config.Set("job-user-id", settings.ApiUser ?? "0");
             Config.Set("desktop-http-port", settings.DesktopPort.ToString(CultureInfo.InvariantCulture));
             Config.Set("job-project-id", "0");
-            Config.Set("algorithm-path-python", "../../../Algorithm.Python/");
+            Config.Set("algorithm-path-python", ".");
             Config.Set("regression-update-statistics", "false");
             Config.Set("algorithm-manager-time-loop-maximum", "60");
             Config.Set("symbol-minute-limit", "10000");
@@ -148,13 +148,13 @@ namespace Algoloop.Lean
             Config.Set("send-via-api", "false");
             Config.Set("lean-manager-type", "LocalLeanManager");
             Config.Set("transaction-log", "");
-            Config.Set("algorithm-language", "CSharp");
+            Config.Set("algorithm-language", model.AlgorithmLanguage.ToString());
             Config.Set("data-folder", settings.DataFolder);
             Config.Set("data-directory", settings.DataFolder);
             Config.Set("cache-location", settings.DataFolder);
             string fullPath = Path.GetFullPath(model.AlgorithmLocation);
             Config.Set("algorithm-location", fullPath);
-            string fullFolder = Path.GetDirectoryName(fullPath);
+            string fullFolder = AppDomain.CurrentDomain.BaseDirectory;
             Config.Set("plugin-directory", fullFolder);
             Config.Set("composer-dll-directory", fullFolder);
             Config.Set("algorithm-type-name", model.AlgorithmName);

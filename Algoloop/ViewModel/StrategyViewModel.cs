@@ -475,35 +475,38 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            Assembly assembly = Assembly.LoadFrom(Model.AlgorithmLocation);
-            if (assembly == null)
-                return;
-
-            IEnumerable<Type> type = assembly
-                .GetTypes()
-                .Where(m => m.Name.Equals(algorithmName, StringComparison.OrdinalIgnoreCase));
-            if (type == null || !type.Any())
-                return;
-
             Parameters.Clear();
-            foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
+            try
             {
-                string parameterName = parameter.Key;
-                string parameterType = parameter.Value;
+                Assembly assembly = Assembly.LoadFrom(Model.AlgorithmLocation);
+                if (assembly == null) return;
 
-                if (_exclude.Contains(parameterName))
-                    continue;
+                IEnumerable<Type> type = assembly
+                    .GetTypes()
+                    .Where(m => m.Name.Equals(algorithmName, StringComparison.OrdinalIgnoreCase));
+                if (type == null || !type.Any()) return;
 
-                ParameterModel parameterModel = Model
-                    .Parameters
-                    .FirstOrDefault(m => m.Name.Equals(parameterName, StringComparison.OrdinalIgnoreCase));
-                if (parameterModel == null)
+                foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
                 {
-                    parameterModel = new ParameterModel() { Name = parameterName };
-                }
+                    string parameterName = parameter.Key;
+                    string parameterType = parameter.Value;
 
-                var parameterViewModel = new ParameterViewModel(this, parameterModel);
-                Parameters.Add(parameterViewModel);
+                    if (_exclude.Contains(parameterName)) continue;
+
+                    ParameterModel parameterModel = Model
+                        .Parameters
+                        .FirstOrDefault(m => m.Name.Equals(parameterName, StringComparison.OrdinalIgnoreCase));
+                    if (parameterModel == null)
+                    {
+                        parameterModel = new ParameterModel() { Name = parameterName };
+                    }
+
+                    var parameterViewModel = new ParameterViewModel(this, parameterModel);
+                    Parameters.Add(parameterViewModel);
+                }
+            }
+            catch (Exception)
+            {
             }
 
             RaisePropertyChanged(() => Parameters);

@@ -17,6 +17,7 @@ using QuantConnect.AlgorithmFactory;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -40,8 +41,7 @@ namespace Algoloop.ViewSupport
 
             var model = context.Instance as StrategyModel;
             string assemblyPath = model?.AlgorithmLocation;
-            if (string.IsNullOrEmpty(assemblyPath))
-                return null;
+            if (string.IsNullOrEmpty(assemblyPath)) return null;
 
             try
             {
@@ -58,8 +58,11 @@ namespace Algoloop.ViewSupport
             }
             catch (Exception)
             {
-                return null;
             }
+
+            string algorithm = Path.GetFileNameWithoutExtension(assemblyPath);
+            var algorithms = new List<string>() { algorithm };
+            return new StandardValuesCollection(algorithms);
         }
     }
 }

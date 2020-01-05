@@ -51,6 +51,7 @@ namespace Algoloop.Model
             PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
             AlgorithmLocation = strategy.AlgorithmLocation;
             AlgorithmName = strategy.AlgorithmName;
+            AlgorithmLanguage = strategy.AlgorithmLanguage;
             Resolution = strategy.Resolution;
 
             // Clone symbols
@@ -172,6 +173,14 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [DataMember]
         public string AlgorithmName { get; set; }
+
+        [Category("Algorithm")]
+        [DisplayName("Algorithm language")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public Language AlgorithmLanguage { get; set; }
+
 
         [ReadOnly(true)]
         [Browsable(false)]
