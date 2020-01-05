@@ -14,9 +14,13 @@
 
 using Algoloop.Service;
 using GalaSoft.MvvmLight;
+using Newtonsoft.Json;
+using QuantConnect;
 using QuantConnect.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Algoloop.ViewModel
@@ -24,6 +28,8 @@ namespace Algoloop.ViewModel
     public class ResearchViewModel : ViewModelBase
     {
         internal const int CTRL_C_EVENT = 0;
+        private const string _configfile = "config.json";
+
         [DllImport("kernel32.dll")]
         internal static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -66,6 +72,8 @@ namespace Algoloop.ViewModel
         {
             StopJupyter();
 
+            CreateConfigFile(_settings.Notebook);
+
             _process = new Process
             {
                 StartInfo = new ProcessStartInfo
@@ -81,8 +89,17 @@ namespace Algoloop.ViewModel
                 }
             };
 
-            //_process.StartInfo.EnvironmentVariables["PYTHONPATH"] = AppDomain.CurrentDomain.BaseDirectory;
-            //_process.StartInfo.EnvironmentVariables["PATH"] = AppDomain.CurrentDomain.BaseDirectory + ";" + _process.StartInfo.EnvironmentVariables["PATH"];
+            // Set PYTHONPATH
+            string pythonpath = _process.StartInfo.EnvironmentVariables["PYTHONPATH"];
+            if (string.IsNullOrEmpty(pythonpath))
+            {
+                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = AppDomain.CurrentDomain.BaseDirectory;
+            }
+            else
+            {
+                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = AppDomain.CurrentDomain.BaseDirectory + ";" + pythonpath;
+            }
+
             _process.OutputDataReceived += (sender, args) => Log.Trace(args.Data);
             _process.ErrorDataReceived += (sender, args) =>
             {
@@ -101,6 +118,26 @@ namespace Algoloop.ViewModel
             _process.Start();
             _process.BeginOutputReadLine();
             _process.BeginErrorReadLine();
+        }
+
+        private void CreateConfigFile(string workFolder)
+        {
+            var config = new Dictionary<string, string>
+            {
+                { "algorithm-language", Language.Python.ToString() },
+                { "composer-dll-directory", AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/") },
+                { "data-folder", _settings.DataFolder.Replace("\\", "/" ) },
+                { "api-handler", "QuantConnect.Api.Api" },
+                { "job-queue-handler", "QuantConnect.Queues.JobQueue" },
+                { "messaging-handler", "QuantConnect.Messaging.Messaging" }
+            };
+
+            using StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile));
+            JsonSerializer serializer = new JsonSerializer
+            {
+                Formatting = Formatting.Indented
+            };
+            serializer.Serialize(file, config);
         }
 
         public void StopJupyter()
