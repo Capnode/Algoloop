@@ -34,34 +34,34 @@ namespace Capnode.Algorithm.CSharp
     public class Tide : QCAlgorithm
     {
         [Parameter("symbols")]
-        private string _symbols = "EURUSD";
+        private readonly string _symbols = "EURUSD";
 
         [Parameter("resolution")]
-        private string _resolution = "Hour";
+        private readonly string _resolution = "Hour";
 
         [Parameter("market")]
-        private string _market = Market.FXCM;
+        private readonly string _market = Market.FXCM;
 
         [Parameter("startdate")]
-        private string _startdate = "01/01/2018 00:00:00";
+        private readonly string _startdate = "01/01/2018 00:00:00";
 
         [Parameter("enddate")]
-        private string _enddate = "01/01/2019 00:00:00";
+        private readonly string _enddate = "01/01/2019 00:00:00";
 
         [Parameter("cash")]
-        private string _cash = "100000";
+        private readonly string _cash = "100000";
 
         [Parameter("OpenHourLong")]
-        private string _openHourLong = "1";
+        private readonly string _openHourLong = "1";
 
         [Parameter("CloseHourLong")]
-        private string _closeHourLong = "4";
+        private readonly string _closeHourLong = "4";
 
         [Parameter("OpenHourShort")]
-        private string _openHourShort = "4";
+        private readonly string _openHourShort = "4";
 
         [Parameter("CloseHourShort")]
-        private string _closeHourShort = "7";
+        private readonly string _closeHourShort = "7";
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash

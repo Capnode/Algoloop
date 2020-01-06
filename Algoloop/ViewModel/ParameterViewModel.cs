@@ -18,11 +18,8 @@ namespace Algoloop.ViewModel
 {
     public class ParameterViewModel
     {
-        private StrategyViewModel _parent;
-
-        public ParameterViewModel(StrategyViewModel parent, ParameterModel model)
+        public ParameterViewModel(ParameterModel model)
         {
-            _parent = parent;
             Model = model;
         }
 

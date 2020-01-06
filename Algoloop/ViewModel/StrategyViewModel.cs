@@ -65,10 +65,8 @@ namespace Algoloop.ViewModel
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
-
             _parent = parent;
-            Model = model;
+            Model = model ?? throw new ArgumentNullException(nameof(model));
             _markets = markets;
             _accounts = accounts;
             _settings = settings;
@@ -501,7 +499,7 @@ namespace Algoloop.ViewModel
                         parameterModel = new ParameterModel() { Name = parameterName };
                     }
 
-                    var parameterViewModel = new ParameterViewModel(this, parameterModel);
+                    var parameterViewModel = new ParameterViewModel(parameterModel);
                     Parameters.Add(parameterViewModel);
                 }
             }

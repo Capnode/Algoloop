@@ -103,12 +103,10 @@ namespace Algoloop.ViewModel
             {
                 DataToModel();
 
-                using (StreamWriter file = File.CreateText(fileName))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(file, Model);
-                    return true;
-                }
+                using StreamWriter file = File.CreateText(fileName);
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, Model);
+                return true;
             }
             catch (Exception ex)
             {
@@ -146,17 +144,6 @@ namespace Algoloop.ViewModel
             {
                 var viewModel = new MarketViewModel(this, market, _settings);
                 Markets.Add(viewModel);
-            }
-        }
-
-        private void StartTasks()
-        {
-            foreach (MarketViewModel market in Markets)
-            {
-                if (market.Active)
-                {
-                    Task task = market.StartTaskAsync();
-                }
             }
         }
     }

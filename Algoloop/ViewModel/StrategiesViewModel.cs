@@ -113,14 +113,10 @@ namespace Algoloop.ViewModel
             {
                 await Task.Run(() =>
                 {
-                    using (StreamReader r = new StreamReader(fileName))
-                    {
-                        using (JsonReader reader = new JsonTextReader(r))
-                        {
-                            JsonSerializer serializer = new JsonSerializer();
-                            Model = serializer.Deserialize<StrategyService>(reader);
-                        }
-                    }
+                    using StreamReader r = new StreamReader(fileName);
+                    using JsonReader reader = new JsonTextReader(r);
+                    JsonSerializer serializer = new JsonSerializer();
+                    Model = serializer.Deserialize<StrategyService>(reader);
                 }).ConfigureAwait(true);
 
                 DataFromModel();
@@ -140,12 +136,10 @@ namespace Algoloop.ViewModel
             {
                 DataToModel();
 
-                using (StreamWriter file = File.CreateText(fileName))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(file, Model);
-                    return true;
-                }
+                using StreamWriter file = File.CreateText(fileName);
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, Model);
+                return true;
             }
             catch (Exception ex)
             {
@@ -188,10 +182,12 @@ namespace Algoloop.ViewModel
 
         private void DoImportStrategies()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            openFileDialog.Multiselect = true;
-            openFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Multiselect = true,
+                Filter = "json file (*.json)|*.json|All files (*.*)|*.*"
+            };
             if (openFileDialog.ShowDialog() != true)
                 return;
 
@@ -200,19 +196,17 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
-                    using (StreamReader r = new StreamReader(fileName))
+                    using StreamReader r = new StreamReader(fileName);
+                    string json = r.ReadToEnd();
+                    StrategyService strategies = JsonConvert.DeserializeObject<StrategyService>(json);
+                    foreach (StrategyModel strategy in strategies.Strategies)
                     {
-                        string json = r.ReadToEnd();
-                        StrategyService strategies = JsonConvert.DeserializeObject<StrategyService>(json);
-                        foreach (StrategyModel strategy in strategies.Strategies)
+                        foreach (TrackModel track in strategy.Tracks)
                         {
-                            foreach (TrackModel track in strategy.Tracks)
-                            {
-                                track.Active = false;
-                            }
-
-                            Model.Strategies.Add(strategy);
+                            track.Active = false;
                         }
+
+                        Model.Strategies.Add(strategy);
                     }
                 }
 
@@ -231,9 +225,11 @@ namespace Algoloop.ViewModel
         private void DoExportStrategies()
         {
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-            saveFileDialog.Filter = "json file (*.json)|*.json|All files (*.*)|*.*";
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directory.GetCurrentDirectory(),
+                Filter = "json file (*.json)|*.json|All files (*.*)|*.*"
+            };
             if (saveFileDialog.ShowDialog() == false)
                 return;
 
@@ -298,7 +294,7 @@ namespace Algoloop.ViewModel
                 {
                     if (track.Active)
                     {
-                        Task task = track.StartTaskAsync();
+                        _ = track.StartTaskAsync();
                     }
                 }
             }

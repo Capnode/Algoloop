@@ -84,8 +84,11 @@ namespace Algoloop.Model
             Tracks = new Collection<TrackModel>();
         }
 
+        [Browsable(false)]
         public Action NameChanged { get; set; }
+        [Browsable(false)]
         public Action MarketChanged { get; set; }
+        [Browsable(false)]
         public Action<string> AlgorithmNameChanged { get; set; }
 
         [Category("Information")]

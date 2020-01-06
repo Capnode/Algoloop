@@ -363,7 +363,7 @@ namespace Algoloop.ViewModel
             // Get parameters from model
             foreach (ParameterModel parameterModel in Model.Parameters)
             {
-                var parameterViewModel = new ParameterViewModel(null, parameterModel);
+                var parameterViewModel = new ParameterViewModel(parameterModel);
                 Parameters.Add(parameterViewModel);
             }
 

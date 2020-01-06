@@ -37,7 +37,7 @@ namespace Algoloop.ViewModel
     public class AccountViewModel : ViewModelBase, ITreeViewModel, IDisposable
     {
         private bool _isDisposed = false; // To detect redundant calls
-        private AccountsViewModel _parent;
+        private readonly AccountsViewModel _parent;
         private CancellationTokenSource _cancel;
         private FxcmBrokerage _brokerage;
         private Task _task;

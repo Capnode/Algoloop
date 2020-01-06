@@ -50,22 +50,19 @@ namespace Algoloop.Lean
             try
             {
                 var liveMode = Config.GetBool("live-mode");
-                using (var algorithmHandlers = LeanEngineAlgorithmHandlers.FromConfiguration(Composer.Instance))
-                using (var systemHandlers = LeanEngineSystemHandlers.FromConfiguration(Composer.Instance))
-                {
-                    string assemblyPath;
-                    systemHandlers.Initialize();
-                    var engine = new Engine(systemHandlers, algorithmHandlers, liveMode);
-                    var algorithmManager = new AlgorithmManager(liveMode);
-                    AlgorithmNodePacket job = systemHandlers.JobQueue.NextJob(out assemblyPath);
-                    job.UserPlan = UserPlan.Professional;
-                    systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
-                    engine.Run(job, algorithmManager, assemblyPath);
-                    systemHandlers.JobQueue.AcknowledgeJob(job);
-                    BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
-                    model.Result = resultHandler?.JsonResult ?? string.Empty;
-                    model.Logs = resultHandler?.Logs ?? string.Empty;
-                }
+                using var algorithmHandlers = LeanEngineAlgorithmHandlers.FromConfiguration(Composer.Instance);
+                using var systemHandlers = LeanEngineSystemHandlers.FromConfiguration(Composer.Instance);
+                systemHandlers.Initialize();
+                var engine = new Engine(systemHandlers, algorithmHandlers, liveMode);
+                var algorithmManager = new AlgorithmManager(liveMode);
+                AlgorithmNodePacket job = systemHandlers.JobQueue.NextJob(out string assemblyPath);
+                job.UserPlan = UserPlan.Professional;
+                systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
+                engine.Run(job, algorithmManager, assemblyPath);
+                systemHandlers.JobQueue.AcknowledgeJob(job);
+                BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
+                model.Result = resultHandler?.JsonResult ?? string.Empty;
+                model.Logs = resultHandler?.Logs ?? string.Empty;
             }
             catch (Exception ex)
             {
@@ -179,8 +176,7 @@ namespace Algoloop.Lean
 
             foreach (ParameterModel parameter in model.Parameters)
             {
-                string value;
-                if (!parameters.TryGetValue(parameter.Name, out value))
+                if (!parameters.TryGetValue(parameter.Name, out string value))
                 {
                     if (parameter.UseValue)
                     {

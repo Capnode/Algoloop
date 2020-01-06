@@ -56,9 +56,7 @@ namespace Algoloop.ViewModel
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingService settings)
         {
-            if (marketsViewModel == null) throw new ArgumentNullException(nameof(marketsViewModel));
-
-            _parent = marketsViewModel;
+            _parent = marketsViewModel ?? throw new ArgumentNullException(nameof(marketsViewModel));
             Model = marketModel;
             _settings = settings;
 

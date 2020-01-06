@@ -20,8 +20,8 @@ namespace Algoloop.Common
 {
     public class StreamLogger : TextWriter
     {
-        private StringBuilder _sb = new StringBuilder();
-        private ILogHandler _logger;
+        private readonly StringBuilder _sb = new StringBuilder();
+        private readonly ILogHandler _logger;
 
         public StreamLogger(ILogHandler logger)
         {

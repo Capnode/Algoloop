@@ -44,9 +44,7 @@ namespace Algoloop.ViewModel
 
         public FolderViewModel(MarketViewModel market, FolderModel model)
         {
-            if (market == null) throw new ArgumentNullException(nameof(market));
-
-            _market = market;
+            _market = market ?? throw new ArgumentNullException(nameof(market));
             Model = model;
 
             DeleteCommand = new RelayCommand(() => _market?.DeleteFolder(this), () => !_market.Active);

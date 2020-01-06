@@ -26,10 +26,10 @@ namespace Capnode.Wpf.DataGrid
     {
         private static readonly Style _rightCellStyle = CellStyle(TextAlignment.Right);
 
-        private FilterOperationItem _addPin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Pin Column", "/Capnode.Wpf;component/Images/PinUp.png");
-        private FilterOperationItem _addGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Add Grouping", "/Capnode.Wpf;component/Images/GroupBy.png");
-        private FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Capnode.Wpf;component/Images/pinDown.png");
-        private FilterOperationItem _removeGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Remove Grouping", "/Capnode.Wpf;component/Images/RemoveGroupBy.png");
+        private readonly FilterOperationItem _addPin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Pin Column", "/Capnode.Wpf;component/Images/PinUp.png");
+        private readonly FilterOperationItem _addGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Add Grouping", "/Capnode.Wpf;component/Images/GroupBy.png");
+        private readonly FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Capnode.Wpf;component/Images/pinDown.png");
+        private readonly FilterOperationItem _removeGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Remove Grouping", "/Capnode.Wpf;component/Images/RemoveGroupBy.png");
 
         public ExDataGrid Grid { get; set; }
 
@@ -80,6 +80,7 @@ namespace Capnode.Wpf.DataGrid
             }
         }
 
+        public FilterOperationItem AddPin => _addPin;
 
         public ColumnOptionControl()
         {
@@ -90,11 +91,11 @@ namespace Capnode.Wpf.DataGrid
             {
                 this.DataContext = this;
                 this.Loaded += new RoutedEventHandler(ColumnOptionControl_Loaded);
-                cbOptions.DropDownOpened += new EventHandler(cbOptions_DropDownOpened);
+                cbOptions.DropDownOpened += new EventHandler(CbOptions_DropDownOpened);
             }
         }
 
-        void cbOptions_DropDownOpened(object sender, EventArgs e)
+        void CbOptions_DropDownOpened(object sender, EventArgs e)
         {
             ColumnOptions.Clear();
             if (CanUserFreeze)
@@ -102,7 +103,7 @@ namespace Capnode.Wpf.DataGrid
                 if (Grid.IsFrozenColumn(FilterColumnInfo.Column))
                     ColumnOptions.Add(_removePin);
                 else
-                    ColumnOptions.Add(_addPin);
+                    ColumnOptions.Add(AddPin);
             }
 
             if (CanUserGroup)
@@ -167,8 +168,7 @@ namespace Capnode.Wpf.DataGrid
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string p)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(p));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
         }
         #endregion
 
@@ -180,7 +180,7 @@ namespace Capnode.Wpf.DataGrid
                 this.Visibility = System.Windows.Visibility.Visible;
         }
 
-        private void cbOptions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CbOptions_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (cbOptions.IsDropDownOpen && SelectedColumnOptionItem != null)
             {

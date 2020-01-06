@@ -214,7 +214,7 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <ComboBox x:Name="cbOptions" SelectionChanged="cbOptions_SelectionChanged" ItemsSource="{Binding ColumnOptions,Mode=OneWay}" SelectedItem="{Binding SelectedColumnOptionItem,Mode=TwoWay}" Height="13"  Width="13" HorizontalAlignment="Left" Margin="0,0,0,0" Style="{DynamicResource ComboBoxStyle}" >
+        <ComboBox x:Name="cbOptions" SelectionChanged="CbOptions_SelectionChanged" ItemsSource="{Binding ColumnOptions,Mode=OneWay}" SelectedItem="{Binding SelectedColumnOptionItem,Mode=TwoWay}" Height="13"  Width="13" HorizontalAlignment="Left" Margin="0,0,0,0" Style="{DynamicResource ComboBoxStyle}" >
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,2,0,2">

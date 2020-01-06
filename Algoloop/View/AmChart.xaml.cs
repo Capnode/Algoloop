@@ -33,7 +33,7 @@ namespace Algoloop.View
             DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
             typeof(AmChart), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
 
-        private List<Model> _models = new List<Model>();
+        private readonly List<Model> _models = new List<Model>();
 
         public AmChart()
         {
@@ -99,12 +99,12 @@ namespace Algoloop.View
 
         private static bool IsDefaultSelected(string title)
         {
-            switch (title)
+            return title switch
             {
-                case "Net profit": return true;
-                case "Equity": return true;
-                default: return false;
-            }
+                "Net profit" => true,
+                "Equity" => true,
+                _ => false,
+            };
         }
 
         private void RedrawCharts()
@@ -246,17 +246,13 @@ namespace Algoloop.View
 
         private static GraphType ToGraphType(SeriesType seriesType)
         {
-            switch (seriesType)
+            return seriesType switch
             {
-                case SeriesType.Bar:
-                    return GraphType.Column;
-                case SeriesType.Candle:
-                    return GraphType.Candlestick;
-                case SeriesType.Line:
-                    return GraphType.Line;
-                default:
-                    return GraphType.Step;
-            }
+                SeriesType.Bar => GraphType.Column,
+                SeriesType.Candle => GraphType.Candlestick,
+                SeriesType.Line => GraphType.Line,
+                _ => GraphType.Step,
+            };
         }
 
         public static System.Windows.Media.Brush ToMediaBrush(System.Drawing.Color color)
@@ -264,7 +260,7 @@ namespace Algoloop.View
             return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, color.R, color.G, color.B));
         }
 
-        private void _combobox_DropDownClosed(object sender, EventArgs e)
+        private void Combobox_DropDownClosed(object sender, EventArgs e)
         {
             RedrawCharts();
         }

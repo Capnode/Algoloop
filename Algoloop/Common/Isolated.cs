@@ -20,7 +20,7 @@ namespace Algoloop.Common
     {
         private bool _isDisposed = false; // To detect redundant calls
         private AppDomain _domain;
-        private T _value;
+        private readonly T _value;
 
         public Isolated()
         {

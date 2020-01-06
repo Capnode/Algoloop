@@ -28,7 +28,9 @@ namespace Algoloop
     {
         private const uint _esContinous = 0x80000000;
         private const uint _esSystemRequired = 0x00000001;
+#pragma warning disable IDE0051 // Remove unused private members
         private const uint _esDisplayRequired = 0x00000002;
+#pragma warning restore IDE0051 // Remove unused private members
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint SetThreadExecutionState([In] uint esFlags);
@@ -70,17 +72,15 @@ namespace Algoloop
         {
             try
             {
-                using (var rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true))
+                using var rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
+                if (!uninstall)
                 {
-                    if (!uninstall)
-                    {
-                        dynamic value = rk.GetValue(exename);
-                        if (value == null)
-                            rk.SetValue(exename, (uint)11001, RegistryValueKind.DWord);
-                    }
-                    else
-                        rk.DeleteValue(exename);
+                    dynamic value = rk.GetValue(exename);
+                    if (value == null)
+                        rk.SetValue(exename, (uint)11001, RegistryValueKind.DWord);
                 }
+                else
+                    rk.DeleteValue(exename);
             }
             finally
             {

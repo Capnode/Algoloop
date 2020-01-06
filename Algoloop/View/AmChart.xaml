@@ -9,7 +9,7 @@
     <DockPanel>
         <ComboBox
             DockPanel.Dock="Top"
-            DropDownClosed="_combobox_DropDownClosed"
+            DropDownClosed="Combobox_DropDownClosed"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             x:Name="_combobox">
             <ComboBox.ItemTemplate>

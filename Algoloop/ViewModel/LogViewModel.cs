@@ -30,8 +30,7 @@ namespace Algoloop.ViewModel
             Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
             Log.DebuggingLevel = Config.GetInt("debug-level", 1);
 
-            ILogItemHandler logService = Log.LogHandler as ILogItemHandler;
-            if (logService != null)
+            if (Log.LogHandler is ILogItemHandler logService)
             {
                 logService.Connect((item) => Logs.Add(item));
             }

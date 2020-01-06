@@ -1,0 +1,8 @@
+{
+  "algorithm-language": "Python",
+  "composer-dll-directory": "C:/Source/Algoloop/Algoloop/bin/Debug/",
+  "data-folder": "C:/Algoloop",
+  "api-handler": "QuantConnect.Api.Api",
+  "job-queue-handler": "QuantConnect.Queues.JobQueue",
+  "messaging-handler": "QuantConnect.Messaging.Messaging"
+}

@@ -64,12 +64,10 @@ namespace Algoloop.ViewModel
             {
                 DataToModel();
 
-                using (StreamWriter file = File.CreateText(fileName))
-                {
-                    JsonSerializer serializer = new JsonSerializer();
-                    serializer.Serialize(file, Model);
-                    return true;
-                }
+                using StreamWriter file = File.CreateText(fileName);
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, Model);
+                return true;
             }
             catch (Exception ex)
             {

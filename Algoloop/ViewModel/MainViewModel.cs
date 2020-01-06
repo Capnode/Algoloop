@@ -36,7 +36,6 @@ namespace Algoloop.ViewModel
     public class MainViewModel : ViewModelBase
     {
         private bool _isBusy;
-        private Task _task;
         private string _statusMessage;
 
         /// <summary>
@@ -72,7 +71,7 @@ namespace Algoloop.ViewModel
             ProviderFactory.RegisterProviders();
 
             // Read configuration
-            _task = ReadConfigAsync(appData);
+            _ = ReadConfigAsync(appData);
         }
 
         public RelayCommand SaveCommand { get; }
