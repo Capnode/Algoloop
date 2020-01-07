@@ -33,14 +33,14 @@ namespace Capnode.Wpf.DataGrid
             _leftCellStyle.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Left));
         }
 
-        public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, object> properties, string binding)
+        public static void AddPropertyColumns(ObservableCollection<DataGridColumn> columns, IDictionary<string, object> properties, string binding, bool rightAligned, bool userSort)
         {
             if (properties == null)
                 return;
 
             foreach (var property in properties)
             {
-                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", false);
+                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", rightAligned, userSort);
             }
         }
 
@@ -51,11 +51,11 @@ namespace Capnode.Wpf.DataGrid
 
             foreach (var property in properties)
             {
-                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", true);
+                AddTextColumn(columns, property.Key, $"{binding}[{property.Key}]", true, true);
             }
         }
 
-        public static void AddTextColumn(ObservableCollection<DataGridColumn> columns, string header, string binding, bool rightAligned)
+        public static void AddTextColumn(ObservableCollection<DataGridColumn> columns, string header, string binding, bool rightAligned, bool userSort)
         {
             if (columns == null) throw new ArgumentNullException(nameof(columns));
 
@@ -68,6 +68,7 @@ namespace Capnode.Wpf.DataGrid
                     if (!rightAligned && textColumn.ElementStyle.Equals(_rightCellStyle))
                     {
                         textColumn.ElementStyle = _leftCellStyle;
+                        textColumn.CanUserSort = userSort;
                     }
                 }
             }
@@ -83,7 +84,8 @@ namespace Capnode.Wpf.DataGrid
                         Mode = BindingMode.OneWay,
                         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                     },
-                    ElementStyle = rightAligned ? _rightCellStyle : _leftCellStyle
+                    ElementStyle = rightAligned ? _rightCellStyle : _leftCellStyle,
+                    CanUserSort = userSort
                 });
             }
         }

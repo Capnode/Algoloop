@@ -164,7 +164,7 @@ namespace Algoloop.ViewModel
         internal void DataFromModel()
         {
             SymbolColumns.Clear();
-            ExDataGridColumns.AddTextColumn(SymbolColumns, "Symbol", "Model.Name", false);
+            ExDataGridColumns.AddTextColumn(SymbolColumns, "Symbol", "Model.Name", false, true);
 
             Symbols.Clear();
             foreach (SymbolViewModel marketSymbol in _market.Symbols)
@@ -177,7 +177,7 @@ namespace Algoloop.ViewModel
                         Symbols.Add(marketSymbol);
                     }
 
-                    ExDataGridColumns.AddPropertyColumns(SymbolColumns, marketSymbol.Model.Properties, "Model.Properties");
+                    ExDataGridColumns.AddPropertyColumns(SymbolColumns, marketSymbol.Model.Properties, "Model.Properties", false, true);
                 }
             }
         }

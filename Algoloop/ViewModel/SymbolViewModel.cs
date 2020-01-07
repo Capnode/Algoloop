@@ -43,6 +43,8 @@ namespace Algoloop.ViewModel
         private const decimal _million = 1e6m;
         private const string _annual = "Annual";
 
+        private const string _periodEndDate = "End date";
+        private const string _fileDate = "File date";
         private const string _totalRevenue = "Total Revenue (M)";
         private const string _netIncome = "Net Income (M)";
         private const string _revenueGrowth = "Revenue Growth %";
@@ -52,6 +54,7 @@ namespace Algoloop.ViewModel
         private const string _operatingCashFlow = "Operating cash flow (M)";
         private const string _investingCashFlow = "Investing cash flow (M)";
         private const string _financingCashFlow = "Financing cash flow (M)";
+        private const string _sharesOutstanding = "Shares outstanding";
 
         private readonly ITreeViewModel _parent;
         private Resolution _selectedResolution = Resolution.Daily;
@@ -79,7 +82,7 @@ namespace Algoloop.ViewModel
 
         public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
-        public SyncObservableCollection<ExDataGridRow<decimal?>> FundamentalRows { get; } = new SyncObservableCollection<ExDataGridRow<decimal?>>();
+        public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; } = new SyncObservableCollection<ExDataGridRow>();
 
         public bool Active
         {
@@ -216,7 +219,7 @@ namespace Algoloop.ViewModel
             // Reset Fundamentals
             FundamentalRows.Clear();
             PeriodColumns.Clear();
-            ExDataGridColumns.AddTextColumn(PeriodColumns, "Item", "Header", false);
+            ExDataGridColumns.AddTextColumn(PeriodColumns, "Item", "Header", false, true);
 
             // Find FineFundamentals folder
             string folder = Path.Combine(
@@ -281,23 +284,25 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void SetFundamentals(string row, string column, decimal value)
+        private void SetFundamentals(string row, string column, object value)
         {
-            ExDataGridRow<decimal?> gridRow = FundamentalRows.SingleOrDefault(m => m.Header.Equals(row, StringComparison.OrdinalIgnoreCase));
+            ExDataGridRow gridRow = FundamentalRows.SingleOrDefault(m => m.Header.Equals(row, StringComparison.OrdinalIgnoreCase));
             if (gridRow == default)
             {
-                gridRow = new ExDataGridRow<decimal?>(row);
+                gridRow = new ExDataGridRow(row);
                 FundamentalRows.Add(gridRow);
             }
 
             gridRow.Columns[column] = value;
 
             // Create Grid Column and set format if needed
-            ExDataGridColumns.AddPropertyColumns(PeriodColumns, gridRow.Columns, "Columns");
+            ExDataGridColumns.AddPropertyColumns(PeriodColumns, gridRow.Columns, "Columns", true, false);
         }
 
         private void FundamentalYear(FineFundamental fine, string period)
         {
+            DateTime periodEndDate = fine.FinancialStatements.PeriodEndingDate;
+            DateTime fileDate = fine.FinancialStatements.FileDate;
             decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / _million, 4); ;
             decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / _million, 4);
             decimal revenueGrowth = decimal.Round(fine.OperationRatios.RevenueGrowth.OneYear * 100, 4);
@@ -307,7 +312,10 @@ namespace Algoloop.ViewModel
             decimal operatingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths / _million, 4);
             decimal investingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths / _million, 4);
             decimal financingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths / _million, 4);
+            decimal sharesOutstanding = fine.CompanyProfile.SharesOutstanding;
 
+            SetFundamentals(_periodEndDate, period, periodEndDate.ToShortDateString());
+            SetFundamentals(_fileDate, period, fileDate.ToShortDateString());
             SetFundamentals(_totalRevenue, period, totalRevenue);
             SetFundamentals(_netIncome, period, netIncome);
             SetFundamentals(_revenueGrowth, period, revenueGrowth);
@@ -317,10 +325,13 @@ namespace Algoloop.ViewModel
             SetFundamentals(_operatingCashFlow, period, operatingCashFlow);
             SetFundamentals(_investingCashFlow, period, investingCashFlow);
             SetFundamentals(_financingCashFlow, period, financingCashFlow);
+            SetFundamentals(_sharesOutstanding, period, sharesOutstanding);
         }
 
         private void FundamentalQuarter(FineFundamental fine, string period)
         {
+            DateTime periodEndDate = fine.FinancialStatements.PeriodEndingDate;
+            DateTime fileDate = fine.FinancialStatements.FileDate;
             decimal totalRevenue = decimal.Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths / _million, 4); ;
             decimal netIncome = decimal.Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths / _million, 4);
             decimal revenueGrowth = decimal.Round(fine.OperationRatios.RevenueGrowth.ThreeMonths * 100, 4);
@@ -330,6 +341,7 @@ namespace Algoloop.ViewModel
             decimal operatingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths / _million, 4);
             decimal investingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths / _million, 4);
             decimal financingCashFlow = decimal.Round(fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths / _million, 4);
+            decimal sharesOutstanding = fine.CompanyProfile.SharesOutstanding;
 
             if (totalRevenue == 0
                 && netIncome == 0
@@ -338,6 +350,8 @@ namespace Algoloop.ViewModel
                 && netMargin == 0)
                 return;
 
+            SetFundamentals(_periodEndDate, period, periodEndDate.ToShortDateString());
+            SetFundamentals(_fileDate, period, fileDate.ToShortDateString());
             SetFundamentals(_totalRevenue, period, totalRevenue);
             SetFundamentals(_netIncome, period, netIncome);
             SetFundamentals(_revenueGrowth, period, revenueGrowth);
@@ -347,6 +361,7 @@ namespace Algoloop.ViewModel
             SetFundamentals(_operatingCashFlow, period, operatingCashFlow);
             SetFundamentals(_investingCashFlow, period, investingCashFlow);
             SetFundamentals(_financingCashFlow, period, financingCashFlow);
+            SetFundamentals(_sharesOutstanding, period, sharesOutstanding);
         }
     }
 }

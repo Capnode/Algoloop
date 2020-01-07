@@ -603,7 +603,7 @@ namespace Algoloop.ViewModel
             {
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
-                ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties");
+                ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
             }
         }
 

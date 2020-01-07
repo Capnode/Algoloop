@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace Capnode.Wpf.DataGrid
 {
-    public class ExDataGridRow<T>
+    public class ExDataGridRow
     {
         public ExDataGridRow(string header)
         {
@@ -24,6 +24,6 @@ namespace Capnode.Wpf.DataGrid
         }
 
         public string Header { get; }
-        public IDictionary<string, T> Columns { get; } = new Dictionary<string, T>();
+        public IDictionary<string, object> Columns { get; } = new Dictionary<string, object>();
     }
 }

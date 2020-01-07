@@ -428,7 +428,7 @@ namespace Algoloop.ViewModel
                 Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
 
-            ExDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false);
+            ExDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false, true);
             foreach (TrackModel TrackModel in Model.Tracks)
             {
                 var TrackViewModel = new TrackViewModel(this, TrackModel, _accounts, _settings);
