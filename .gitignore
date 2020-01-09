@@ -264,3 +264,5 @@ Launcher/Plugins/*
 QuantConnect.Lean.sln.DotSettings*
 secret.config
 /Jupyter/config.json
+.ipynb_checkpoints
+log.txt
