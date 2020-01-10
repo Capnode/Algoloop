@@ -68,8 +68,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Brokerages\InteractiveBrokers\CSharpAPI.dll</HintPath>
     </Reference>
-    <Reference Include="Deedle, Version=2.0.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Deedle.2.0.4\lib\net45\Deedle.dll</HintPath>
+    <Reference Include="Deedle, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Deedle.2.1.0\lib\net45\Deedle.dll</HintPath>
     </Reference>
     <Reference Include="DotNetZip, Version=1.13.3.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.13.3\lib\net40\DotNetZip.dll</HintPath>
@@ -892,6 +892,10 @@
     <ProjectReference Include="..\Jupyter\QuantConnect.Jupyter.csproj">
       <Project>{9561d14a-467e-40ad-928e-ee9f758d7d98}</Project>
       <Name>QuantConnect.Jupyter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj">
+      <Project>{09e7b916-e58b-4021-bd8b-c10b4446e226}</Project>
+      <Name>QuantConnect.Lean.Launcher</Name>
     </ProjectReference>
     <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj">
       <Project>{01911409-86BE-4E7D-9947-DF714138610D}</Project>
