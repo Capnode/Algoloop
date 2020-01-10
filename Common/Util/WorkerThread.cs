@@ -71,7 +71,7 @@ namespace QuantConnect.Util
             {
                 IsBackground = true,
                 Name = "Isolator Thread",
-                Priority = ThreadPriority.Highest
+                Priority = ThreadPriority.BelowNormal
             };
             _workerThread.Start();
         }
