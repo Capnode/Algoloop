@@ -171,7 +171,7 @@ namespace Capnode.Algorithm.CSharp
                     }
 
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Up));
-                    algorithm.Log($"Insight Up");
+//                    algorithm.Log($"Insight Up");
                 }
                 else if (!holding.Invested && shortInHours)
                 {
@@ -182,12 +182,12 @@ namespace Capnode.Algorithm.CSharp
                     }
 
                     insights.Add(Insight.Price(symbol, duration, InsightDirection.Down));
-                    algorithm.Log($"Insight Down");
+//                    algorithm.Log($"Insight Down");
                 }
                 else if (holding.IsLong && !longInHours || holding.IsShort && !shortInHours)
                 {
                     insights.Add(Insight.Price(symbol, _resolution, 1, InsightDirection.Flat));
-                    algorithm.Log($"Insight Flat");
+//                    algorithm.Log($"Insight Flat");
                 }
             }
 
