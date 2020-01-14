@@ -1539,12 +1539,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_74BE878B43974D45AF168429555A30CF"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_77178AB04FB8D60A1DB1685A87F6792E"
         "OwnerKey" = "8:_DD4E9652943643D2B3E8CB8883C9D8D0"
         "MsmSig" = "8:_UNDEFINED"
@@ -2069,6 +2063,12 @@
         {
         "MsmKey" = "8:_A49BBB27CDD6E269B0DA5089F9D7883D"
         "OwnerKey" = "8:_DD4E9652943643D2B3E8CB8883C9D8D0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A50AF8D1553149D48EB4290C12077962"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -3094,6 +3094,12 @@
         "Entry"
         {
         "MsmKey" = "8:_F0BC188BC2E947FD954D63F81616940C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F1DF9BF820CB438ABC4E0824882DD65A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -7096,26 +7102,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_74BE878B43974D45AF168429555A30CF"
-            {
-            "SourcePath" = "8:..\\Algoloop\\Algoloop.ico"
-            "TargetName" = "8:Algoloop.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_42BE970F70324E398A676A34F069CE4A"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_77178AB04FB8D60A1DB1685A87F6792E"
             {
             "AssemblyRegister" = "3:1"
@@ -7949,6 +7935,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A50AF8D1553149D48EB4290C12077962"
+            {
+            "SourcePath" = "8:..\\Algoloop\\Algoloop.ico"
+            "TargetName" = "8:Algoloop.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_42BE970F70324E398A676A34F069CE4A"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A67DEEA62DD9431399FE13D063AAD277"
@@ -9588,6 +9594,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F1DF9BF820CB438ABC4E0824882DD65A"
+            {
+            "SourcePath" = "8:..\\Jupyter\\BasicQuantBookTemplate.ipynb"
+            "TargetName" = "8:BasicQuantBookTemplate.ipynb"
+            "Tag" = "8:"
+            "Folder" = "8:_EF49B159ED564B3EAC3945F1D646A1F9"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F21799C381FC8C82C65A3D3F42CA9AA8"
             {
             "AssemblyRegister" = "3:1"
@@ -9962,6 +9988,17 @@
                             "Property" = "8:_262147A06BE54116A514F5A7760FD3F6"
                                 "Folders"
                                 {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_EF49B159ED564B3EAC3945F1D646A1F9"
+                                    {
+                                    "Name" = "8:Notebook"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_BB3E7332837B4ABFA1F966EBEB48C08E"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -10207,7 +10244,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Algoloop"
         "ProductCode" = "8:{F15D31F4-1208-49B0-AF99-26437B6D1C23}"
-        "PackageCode" = "8:{F842B8F9-DF1E-4628-9D97-19FEBF05842C}"
+        "PackageCode" = "8:{34DC3437-45AC-4783-8F00-68379CE62E62}"
         "UpgradeCode" = "8:{CCE7A8C1-FA08-446C-8A0E-CD5F0C055C7A}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -10224,7 +10261,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:Algorithmic trading application"
         "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:_74BE878B43974D45AF168429555A30CF"
+        "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -10338,7 +10375,7 @@
             "Target" = "8:_DD4E9652943643D2B3E8CB8883C9D8D0"
             "Folder" = "8:_F7664A53FFAB4076A2EA9FB976891288"
             "WorkingFolder" = "8:_42BE970F70324E398A676A34F069CE4A"
-            "Icon" = "8:_74BE878B43974D45AF168429555A30CF"
+            "Icon" = "8:_A50AF8D1553149D48EB4290C12077962"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_DFAB6C6C64B642F0A6BC64FA1B263EEB"
@@ -10352,7 +10389,7 @@
             "Target" = "8:_DD4E9652943643D2B3E8CB8883C9D8D0"
             "Folder" = "8:_778AC9D427F145E28C43BD935DE9FDB8"
             "WorkingFolder" = "8:_42BE970F70324E398A676A34F069CE4A"
-            "Icon" = "8:_74BE878B43974D45AF168429555A30CF"
+            "Icon" = "8:_A50AF8D1553149D48EB4290C12077962"
             "Feature" = "8:"
             }
         }
@@ -10754,7 +10791,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_26258D2068D2472E93ACAD44BE5CFF2F"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1B5CBD1391124CC485B3311A33C268EC"
             {
             "SourcePath" = "8:"
             "TargetName" = "8:"
@@ -10782,7 +10819,7 @@
                 {
                 }
             }
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_734AD9E4E0D9453F90D6230ADA1CB0CC"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_69B7C2D972B946D6B8C938BA730A5AAD"
             {
             "SourcePath" = "8:"
             "TargetName" = "8:"
