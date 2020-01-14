@@ -55,6 +55,9 @@ EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "QuantConnect.PythonToolbox", "PythonToolbox\QuantConnect.PythonToolbox.pyproj", "{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop", "Algoloop\Algoloop.csproj", "{F65DA573-DB1B-4524-A254-2034954CAE66}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7702711A-0C09-40D4-B151-E308D1520738} = {7702711A-0C09-40D4-B151-E308D1520738}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgoloopTests", "AlgoloopTests\AlgoloopTests.csproj", "{4355918B-3B14-4BBB-B1A2-D8155FED4E64}"
 EndProject
