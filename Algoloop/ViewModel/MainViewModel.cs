@@ -109,6 +109,42 @@ namespace Algoloop.ViewModel
             SaveConfig(appData);
         }
 
+        public static string GetAppDataFolder()
+        {
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            GetAssemblyInfo(out string company, out string product);
+            string path = Path.Combine(appData, company, product);
+            Directory.CreateDirectory(path);
+            return path;
+        }
+
+        public static string GetUserDataFolder()
+        {
+            string userData = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            GetAssemblyInfo(out string company, out string product);
+            string path = Path.Combine(userData, company, product);
+            Directory.CreateDirectory(path);
+            return path;
+        }
+
+        private static void GetAssemblyInfo(out string company, out string product)
+        {
+            Assembly assembly = Assembly.GetEntryAssembly();
+            company = string.Empty;
+            product = string.Empty;
+            object[] companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
+            if ((companyAttributes != null) && (companyAttributes.Length > 0))
+            {
+                company = ((AssemblyCompanyAttribute)companyAttributes[0]).Company.Split(' ')[0];
+            }
+
+            object[] productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
+            if ((productAttributes != null) && (productAttributes.Length > 0))
+            {
+                product = ((AssemblyProductAttribute)productAttributes[0]).Product;
+            }
+        }
+
         private void OnStatusMessage(NotificationMessage message)
         {
             StatusMessage = message.Notification;
@@ -151,30 +187,6 @@ namespace Algoloop.ViewModel
         {
             var about = new About();
             about.ShowDialog();
-        }
-
-        private static string GetAppDataFolder()
-        {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
-            Assembly assembly = Assembly.GetEntryAssembly();
-            string company = string.Empty;
-            string product = string.Empty;
-            object[] companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
-            if ((companyAttributes != null) && (companyAttributes.Length > 0))
-            {
-                company = ((AssemblyCompanyAttribute)companyAttributes[0]).Company.Split(' ')[0];
-            }
-
-            object[] productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
-            if ((productAttributes != null) && (productAttributes.Length > 0))
-            {
-                product = ((AssemblyProductAttribute)productAttributes[0]).Product;
-            }
-
-            string path = Path.Combine(appData, company, product);
-            Directory.CreateDirectory(path);
-            return path;
         }
 
         private async Task ReadConfigAsync(string appData)

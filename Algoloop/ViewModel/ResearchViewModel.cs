@@ -29,6 +29,7 @@ namespace Algoloop.ViewModel
     {
         internal const int CTRL_C_EVENT = 0;
         private const string _configfile = "config.json";
+        private const string _notebook = "Notebook";
 
         [DllImport("kernel32.dll")]
         internal static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
@@ -71,7 +72,7 @@ namespace Algoloop.ViewModel
         public void StartJupyter()
         {
             StopJupyter();
-
+            SetNotebookFolder();
             CreateConfigFile(_settings.Notebook);
 
             _process = new Process
@@ -118,6 +119,16 @@ namespace Algoloop.ViewModel
             _process.Start();
             _process.BeginOutputReadLine();
             _process.BeginErrorReadLine();
+        }
+
+        private void SetNotebookFolder()
+        {
+            if (string.IsNullOrEmpty(_settings.Notebook))
+            {
+                string userDataFolder = MainViewModel.GetUserDataFolder();
+                _settings.Notebook = Path.Combine(userDataFolder, _notebook);
+                Directory.CreateDirectory(_settings.Notebook);
+            }
         }
 
         private void CreateConfigFile(string workFolder)

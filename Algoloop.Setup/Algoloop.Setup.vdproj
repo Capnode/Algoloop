@@ -9599,7 +9599,7 @@
             "SourcePath" = "8:..\\Jupyter\\BasicQuantBookTemplate.ipynb"
             "TargetName" = "8:BasicQuantBookTemplate.ipynb"
             "Tag" = "8:"
-            "Folder" = "8:_EF49B159ED564B3EAC3945F1D646A1F9"
+            "Folder" = "8:_915F6A7BAAA14F9C99A2C7DEB866A413"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -9988,13 +9988,46 @@
                             "Property" = "8:_262147A06BE54116A514F5A7760FD3F6"
                                 "Folders"
                                 {
-                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_EF49B159ED564B3EAC3945F1D646A1F9"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_3DB4EA8C82334347BACD8E9EF4679A7D"
+            {
+            "Name" = "8:#1918"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:PersonalFolder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_D4203E9364AB4EC899F3093BB7C07CF1"
+                    {
+                    "Name" = "8:Capnode"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_A5C16AEEF3B14F029D164C62EC855649"
+                        "Folders"
+                        {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_A76BA299F3B940A4B2941FFBDFA7D974"
+                            {
+                            "Name" = "8:Algoloop"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_3EFCE6BB6B5E4376BF6B5E0866F6C823"
+                                "Folders"
+                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_915F6A7BAAA14F9C99A2C7DEB866A413"
                                     {
                                     "Name" = "8:Notebook"
                                     "AlwaysCreate" = "11:FALSE"
                                     "Condition" = "8:"
                                     "Transitive" = "11:FALSE"
-                                    "Property" = "8:_BB3E7332837B4ABFA1F966EBEB48C08E"
+                                    "Property" = "8:_FF8D491815A340109D1E244068F18B56"
                                         "Folders"
                                         {
                                         }

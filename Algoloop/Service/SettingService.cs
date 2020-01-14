@@ -71,12 +71,12 @@ namespace Algoloop.Service
         public int MaxBacktests { get; set; } = Environment.ProcessorCount;
 
         [DisplayName("Research folder")]
-        [Description("Folder for Jupyter notebook. i.e. C://Lean/Launcher/bin/Debug")]
+        [Description("Folder for Jupyter notebook.")]
         [Editor(typeof(FolderEditor), typeof(FolderEditor))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Notebook { get; set; } = @".";
+        public string Notebook { get; set; }
 
         internal void Copy(SettingService oldSettings)
         {
