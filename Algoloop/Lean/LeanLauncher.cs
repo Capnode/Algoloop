@@ -58,7 +58,7 @@ namespace Algoloop.Lean
                 AlgorithmNodePacket job = systemHandlers.JobQueue.NextJob(out string assemblyPath);
                 job.UserPlan = UserPlan.Professional;
                 systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
-                engine.Run(job, algorithmManager, assemblyPath);
+                engine.Run(job, algorithmManager, assemblyPath, WorkerThread.Instance);
                 BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
                 model.Result = resultHandler?.JsonResult ?? string.Empty;
                 model.Logs = resultHandler?.Logs ?? string.Empty;
