@@ -60,7 +60,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\Algoloop.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\AlgoloopColor.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -451,6 +451,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\AlgoloopColor.ico" />
+    <Resource Include="Resources\AlgoloopBlack.png" />
+    <None Include="Resources\AlgoloopBlack.ico" />
+    <None Include="Resources\AlgoloopColor.png" />
+    <Resource Include="Resources\AlgoloopWhite.png" />
     <Resource Include="Doc\Chart.png" />
     <Content Include="Extern\AmCharts.Windows.Stock.dll" />
     <Resource Include="Resources\Exit.png" />
@@ -590,9 +595,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Stop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Algoloop.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Algoloop.ico" />
