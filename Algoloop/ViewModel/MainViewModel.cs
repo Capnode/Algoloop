@@ -111,7 +111,8 @@ namespace Algoloop.ViewModel
         public static string GetAppDataFolder()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            GetAssemblyInfo(out string company, out string product);
+            string company = AboutModel.AssemblyCompany.Split(' ')[0];
+            string product = AboutModel.AssemblyTitle.Split('.')[0];
             string path = Path.Combine(appData, company, product);
             Directory.CreateDirectory(path);
             return path;
@@ -120,28 +121,11 @@ namespace Algoloop.ViewModel
         public static string GetUserDataFolder()
         {
             string userData = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            GetAssemblyInfo(out string company, out string product);
+            string company = AboutModel.AssemblyCompany.Split(' ')[0];
+            string product = AboutModel.AssemblyTitle.Split('.')[0];
             string path = Path.Combine(userData, company, product);
             Directory.CreateDirectory(path);
             return path;
-        }
-
-        private static void GetAssemblyInfo(out string company, out string product)
-        {
-            Assembly assembly = Assembly.GetEntryAssembly();
-            company = string.Empty;
-            product = string.Empty;
-            object[] companyAttributes = assembly.GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
-            if ((companyAttributes != null) && (companyAttributes.Length > 0))
-            {
-                company = ((AssemblyCompanyAttribute)companyAttributes[0]).Company.Split(' ')[0];
-            }
-
-            object[] productAttributes = assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
-            if ((productAttributes != null) && (productAttributes.Length > 0))
-            {
-                product = ((AssemblyProductAttribute)productAttributes[0]).Product;
-            }
         }
 
         private void OnStatusMessage(NotificationMessage message)
@@ -184,14 +168,16 @@ namespace Algoloop.ViewModel
 
         private async Task ReadConfigAsync(string appData)
         {
+            string contentData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+            
             try
             {
                 IsBusy = true;
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfiguration));
-                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
-                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
-                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
-                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
+                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"), Path.Combine(contentData, "Settings.json"));
+                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"), Path.Combine(contentData, "Markets.json"));
+                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"), Path.Combine(contentData, "Accounts.json"));
+                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json"), Path.Combine(contentData, "Strategies.json")).ConfigureAwait(true);
                 ResearchViewModel.StartJupyter();
             }
             finally

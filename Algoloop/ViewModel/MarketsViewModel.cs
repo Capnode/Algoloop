@@ -74,10 +74,13 @@ namespace Algoloop.ViewModel
             return Markets.Remove(market);
         }
 
-        internal bool Read(string fileName)
+        public bool Read(string fileName, string defaultFilename)
         {
             if (!File.Exists(fileName))
-                return false;
+            {
+                fileName = defaultFilename;
+                if (!File.Exists(fileName)) return false;
+            }
 
             try
             {
@@ -104,7 +107,7 @@ namespace Algoloop.ViewModel
                 DataToModel();
 
                 using StreamWriter file = File.CreateText(fileName);
-                JsonSerializer serializer = new JsonSerializer();
+                JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
                 serializer.Serialize(file, Model);
                 return true;
             }

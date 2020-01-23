@@ -1,0 +1,36 @@
+{
+  "Markets": [
+    {
+      "Name": "USA",
+      "Provider": "Usa",
+      "Access": 0,
+      "Login": "",
+      "Password": "",
+      "ApiKey": "",
+      "LastDate": "2020-01-12T00:00:00+01:00",
+      "Resolution": 4,
+      "Active": false,
+      "Symbols": [
+        {
+          "Active": true,
+          "Name": "aapl",
+          "Properties": null
+        },
+        {
+          "Active": true,
+          "Name": "spy",
+          "Properties": null
+        }
+      ],
+      "Folders": [
+        {
+          "Name": "Stock",
+          "Symbols": [
+            "aapl",
+            "spy"
+          ]
+        }
+      ]
+    }
+  ]
+}

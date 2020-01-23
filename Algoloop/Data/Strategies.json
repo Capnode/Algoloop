@@ -1,0 +1,44 @@
+{
+  "Strategies": [
+    {
+      "Name": null,
+      "Desktop": false,
+      "Account": "Backtest",
+      "Market": "USA",
+      "Provider": "Usa",
+      "BarsBack": 0,
+      "StartDate": "2013-10-07T00:00:00+02:00",
+      "EndDate": "2020-01-23T12:11:10.2190234+01:00",
+      "Resolution": 4,
+      "InitialCapital": 0,
+      "PcntCapitalPerPosition": 0.0,
+      "AlgorithmLocation": "C:\\Source\\Algoloop\\Algoloop\\bin\\Debug\\QuantConnect.Algorithm.CSharp.dll",
+      "AlgorithmName": "ParameterizedAlgorithm",
+      "AlgorithmLanguage": "C#",
+      "Symbols": [
+        {
+          "Active": true,
+          "Name": "spy",
+          "Properties": null
+        }
+      ],
+      "Parameters": [
+        {
+          "Name": "ema-fast",
+          "UseValue": false,
+          "Value": "",
+          "UseRange": false,
+          "Range": ""
+        },
+        {
+          "Name": "ema-slow",
+          "UseValue": false,
+          "Value": "",
+          "UseRange": false,
+          "Range": ""
+        }
+      ],
+      "Tracks": []
+    }
+  ]
+}
