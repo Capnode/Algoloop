@@ -18,6 +18,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using Algoloop.Model;
 using Algoloop.Properties;
 using Algoloop.Provider;
 using Algoloop.Service;
@@ -59,7 +60,6 @@ namespace Algoloop.ViewModel
             SaveCommand = new RelayCommand(() => SaveAll(), () => !IsBusy);
             SettingsCommand = new RelayCommand(() => DoSettings(), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
-            AboutCommand = new RelayCommand(() => DoAbout(), () => !IsBusy);
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
@@ -77,7 +77,6 @@ namespace Algoloop.ViewModel
         public RelayCommand SaveCommand { get; }
         public RelayCommand SettingsCommand { get; }
         public RelayCommand<Window> ExitCommand { get; }
-        public RelayCommand AboutCommand { get; }
 
         public SettingsViewModel SettingsViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
@@ -86,7 +85,7 @@ namespace Algoloop.ViewModel
         public ResearchViewModel ResearchViewModel { get; }
         public LogViewModel LogViewModel { get; }
 
-        public static string Title => AboutViewModel.AssemblyTitle;
+        public static string Title => AboutModel.AssemblyTitle;
 
         /// <summary>
         /// Mark ongoing operation
@@ -181,12 +180,6 @@ namespace Algoloop.ViewModel
             {
                 SettingsViewModel.Model.Copy(oldSettings);
             }
-        }
-
-        private void DoAbout()
-        {
-            var about = new About();
-            about.ShowDialog();
         }
 
         private async Task ReadConfigAsync(string appData)

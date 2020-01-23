@@ -50,7 +50,17 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Header="_About" Command="{Binding AboutCommand}">
+                <MenuItem
+                    Header="Technical support"
+                    Click="HelpTechnicalSupport">
+                </MenuItem>
+                <MenuItem
+                    Header="Privacy policy"
+                    Click="HelpPrivacyPolicy">
+                </MenuItem>
+                <MenuItem
+                    Header="_About"
+                    Click="HelpAbout">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Info.png" Width="16" Height="16"/>
                     </MenuItem.Icon>

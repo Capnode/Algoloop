@@ -1,5 +1,5 @@
 ﻿<Window
-    x:Class="Algoloop.View.About"
+    x:Class="Algoloop.View.AboutView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="{Binding Title}"
@@ -14,7 +14,6 @@
     <StackPanel>
         <Label FontWeight="Bold" Content="{Binding ProductName}" />
         <Label FontWeight="Bold" Content="{Binding Version}" />
-        <Label FontWeight="Bold" Content="{Binding Build}" />
         <Label FontWeight="Bold" Content="{Binding Copyright}" />
         <TextBox
             Margin="10"
@@ -27,8 +26,7 @@
             MinWidth="60"
             Margin="10"
             Content="OK"
-            Command="{Binding OkCommand}"
-            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-        HorizontalAlignment="Center" />
+            HorizontalAlignment="Center"
+            Click="OkClick"/>
     </StackPanel>
 </Window>

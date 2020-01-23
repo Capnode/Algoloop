@@ -16,6 +16,7 @@ using Algoloop.Properties;
 using Algoloop.ViewSupport;
 using QuantConnect.Configuration;
 using System;
+using System.Diagnostics;
 using System.Windows;
 
 namespace Algoloop.View
@@ -43,6 +44,35 @@ namespace Algoloop.View
         {
             base.OnSourceInitialized(e);
             this.SetPlacement(Settings.Default.MainWindowPlacement);
+        }
+
+        private void HelpAbout(object sender, RoutedEventArgs e)
+        {
+            var about = new AboutView();
+            about.ShowDialog();
+        }
+
+        private void HelpTechnicalSupport(object sender, RoutedEventArgs e)
+        {
+            OpenUrl("https://github.com/Capnode/Algoloop");
+        }
+
+        private void HelpPrivacyPolicy(object sender, RoutedEventArgs e)
+        {
+            OpenUrl("https://github.com/Capnode/Algoloop/wiki/Privacy-policy");
+        }
+
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch (Exception ex)
+            {
+                // check this: https://github.com/dotnet/corefx/issues/10361
+                Debug.WriteLine($"{ex.GetType()}: {ex.Message}");
+            }
         }
     }
 }

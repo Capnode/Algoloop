@@ -16,11 +16,16 @@ using System.Windows;
 
 namespace Algoloop.View
 {
-    public partial class About : Window
+    public partial class AboutView : Window
     {
-        public About()
+        public AboutView()
         {
             InitializeComponent();
+        }
+
+        private void OkClick(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
         }
     }
 }
