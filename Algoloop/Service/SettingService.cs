@@ -12,9 +12,11 @@
  * limitations under the License.
  */
 
+using Algoloop.ViewModel;
 using Algoloop.ViewSupport;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Service
@@ -61,14 +63,14 @@ namespace Algoloop.Service
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string DataFolder { get; set; } = @"..\..\..\Data";
+        public string DataFolder { get; set; } = MainViewModel.GetProgramDataFolder();
 
         [DisplayName("Max backtests")]
         [Description("Largest number of simultaneous ongoing backtest execution.")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public int MaxBacktests { get; set; } = Environment.ProcessorCount;
+        public int MaxBacktests { get; set; } = Math.Min(Environment.ProcessorCount, 8);
 
         [DisplayName("Research folder")]
         [Description("Folder for Jupyter notebook.")]
@@ -76,7 +78,7 @@ namespace Algoloop.Service
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Notebook { get; set; }
+        public string Notebook { get; set; } = Path.Combine(MainViewModel.GetUserDataFolder(), "Notebook");
 
         internal void Copy(SettingService oldSettings)
         {

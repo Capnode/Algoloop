@@ -466,11 +466,15 @@ namespace Algoloop.ViewModel
 
             StrategyNameChanged();
 
-            if (string.IsNullOrEmpty(Model.AlgorithmLocation)
-                || !File.Exists(Model.AlgorithmLocation)
-                || string.IsNullOrEmpty(algorithmName))
+            if (string.IsNullOrEmpty(algorithmName)) return;
+            if (string.IsNullOrEmpty(Model.AlgorithmLocation)) return;
+
+            // Try to find algorithm file
+            if (!File.Exists(Model.AlgorithmLocation))
             {
-                return;
+                string location = Path.Combine(MainViewModel.GetProgramFolder(), Model.AlgorithmLocation);
+                if (!File.Exists(location)) return;
+                Model.AlgorithmLocation = location;
             }
 
             Parameters.Clear();

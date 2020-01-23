@@ -12,7 +12,7 @@
       "Resolution": 4,
       "InitialCapital": 0,
       "PcntCapitalPerPosition": 0.0,
-      "AlgorithmLocation": "C:\\Source\\Algoloop\\Algoloop\\bin\\Debug\\QuantConnect.Algorithm.CSharp.dll",
+      "AlgorithmLocation": "QuantConnect.Algorithm.CSharp.dll",
       "AlgorithmName": "ParameterizedAlgorithm",
       "AlgorithmLanguage": "C#",
       "Symbols": [

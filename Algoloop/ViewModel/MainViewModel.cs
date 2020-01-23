@@ -70,8 +70,31 @@ namespace Algoloop.ViewModel
 
             ProviderFactory.RegisterProviders();
 
+            // Prepare data files
+            string program = GetProgramFolder();
+            CopyDirectory(Path.Combine(program, "Data/AppData"), appData, false);
+            CopyDirectory(Path.Combine(program, "Data/ProgramData"), GetProgramDataFolder(), false);
+            CopyDirectory(Path.Combine(program, "Data/UserData"), GetUserDataFolder(), false);
+
             // Read configuration
             _ = ReadConfigAsync(appData);
+        }
+
+        public static void CopyDirectory(string sourceDir, string destDir, bool overwiteFiles)
+        {
+            // Create all of the directories
+            foreach (string dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
+                Directory.CreateDirectory(dirPath.Replace(sourceDir, destDir));
+
+            // Copy all the files & Replaces any files with the same name
+            foreach (string source in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            {
+                string dest = source.Replace(sourceDir, destDir);
+                if (!File.Exists(dest) || overwiteFiles)
+                {
+                    File.Copy(source, dest, true);
+                }
+            }
         }
 
         public RelayCommand SaveCommand { get; }
@@ -108,12 +131,27 @@ namespace Algoloop.ViewModel
             SaveConfig(appData);
         }
 
+        public static string GetProgramFolder()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory;
+        }
+
         public static string GetAppDataFolder()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string company = AboutModel.AssemblyCompany.Split(' ')[0];
             string product = AboutModel.AssemblyTitle.Split('.')[0];
             string path = Path.Combine(appData, company, product);
+            Directory.CreateDirectory(path);
+            return path;
+        }
+
+        public static string GetProgramDataFolder()
+        {
+            string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            string company = AboutModel.AssemblyCompany.Split(' ')[0];
+            string product = AboutModel.AssemblyTitle.Split('.')[0];
+            string path = Path.Combine(programData, company, product);
             Directory.CreateDirectory(path);
             return path;
         }
@@ -168,16 +206,14 @@ namespace Algoloop.ViewModel
 
         private async Task ReadConfigAsync(string appData)
         {
-            string contentData = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
-            
             try
             {
                 IsBusy = true;
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfiguration));
-                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"), Path.Combine(contentData, "Settings.json"));
-                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"), Path.Combine(contentData, "Markets.json"));
-                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"), Path.Combine(contentData, "Accounts.json"));
-                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json"), Path.Combine(contentData, "Strategies.json")).ConfigureAwait(true);
+                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
+                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
+                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
+                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
                 ResearchViewModel.StartJupyter();
             }
             finally

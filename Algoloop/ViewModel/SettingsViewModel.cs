@@ -34,31 +34,28 @@ namespace Algoloop.ViewModel
 
         public SettingService Model { get; }
 
-        public bool Read(string fileName, string defaultFilename)
+        public bool Read(string fileName)
         {
-            if (!File.Exists(fileName))
+            if (File.Exists(fileName))
             {
-                fileName = defaultFilename;
-                if (!File.Exists(fileName)) return false;
-            }
-
-            try
-            {
-                using (StreamReader r = new StreamReader(fileName))
+                try
                 {
-                    string json = r.ReadToEnd();
-                    SettingService settings = JsonConvert.DeserializeObject<SettingService>(json);
-                    Model.Copy(settings);
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        string json = r.ReadToEnd();
+                        SettingService settings = JsonConvert.DeserializeObject<SettingService>(json);
+                        Model.Copy(settings);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    return false;
+                }
+            }
 
-                DataFromModel();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
-                return false;
-            }
+            DataFromModel();
+            return true;
         }
 
         internal bool Save(string fileName)

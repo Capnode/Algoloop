@@ -466,10 +466,86 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="Data\Markets.json">
+    <Content Include="Data\AppData\Markets.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\Strategies.json">
+    <Content Include="Data\AppData\Strategies.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\daily\aapl.zip">
+      <Link>Data\ProgramData\equity\usa\daily\aapl.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\daily\spy.zip">
+      <Link>Data\ProgramData\equity\usa\daily\spy.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140228.zip">
+      <Link>Data\ProgramData\equity\usa\fundamental\fine\aapl\20140228.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140331.zip">
+      <Link>Data\ProgramData\equity\usa\fundamental\fine\appl\20140331.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140424.zip">
+      <Link>Data\ProgramData\equity\usa\fundamental\fine\aapl\20140424.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140429.zip">
+      <Link>Data\ProgramData\equity\usa\fundamental\fine\aapl\20140429.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\hour\aapl.zip">
+      <Link>Data\ProgramData\equity\usa\hour\aapl.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\hour\spy.zip">
+      <Link>Data\ProgramData\equity\usa\hour\spy.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\map_files\aapl.csv">
+      <Link>Data\ProgramData\equity\usa\map_files\aapl.csv</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\aapl\20140605_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\appl\20140605_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\aapl\20140606_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\appl\20140606_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\aapl\20140609_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\appl\20140609_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\spy\20131004_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\spy\20131004_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\spy\20131007_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\spy\20131007_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\spy\20131008_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\spy\20131008_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\spy\20131009_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\spy\20131009_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\spy\20131010_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\spy\20131010_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Data\equity\usa\minute\spy\20131011_trade.zip">
+      <Link>Data\ProgramData\equity\usa\minute\spy\20131011_trade.zip</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Jupyter\BasicQuantBookTemplate.ipynb">
+      <Link>Data\UserData\Notebook\BasicQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\AlgoloopColor.ico" />
@@ -505,11 +581,11 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Content Include="..\Data\market-hours\market-hours-database.json">
-      <Link>Data\market-hours-database.json</Link>
+      <Link>Data\ProgramData\market-hours\market-hours-database.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Data\symbol-properties\symbol-properties-database.csv">
-      <Link>Data\symbol-properties-database.csv</Link>
+      <Link>Data\ProgramData\symbol-properties\symbol-properties-database.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="..\readme.md">
@@ -642,6 +718,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

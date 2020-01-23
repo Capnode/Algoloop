@@ -104,33 +104,31 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal async Task<bool> ReadAsync(string fileName, string defaultFilename)
+        internal async Task<bool> ReadAsync(string fileName)
         {
-            if (!File.Exists(fileName))
+            if (File.Exists(fileName))
             {
-                fileName = defaultFilename;
-                if (!File.Exists(fileName)) return false;
-            }
-
-            try
-            {
-                await Task.Run(() =>
+                try
                 {
-                    using StreamReader r = new StreamReader(fileName);
-                    using JsonReader reader = new JsonTextReader(r);
-                    JsonSerializer serializer = new JsonSerializer();
-                    Model = serializer.Deserialize<StrategyService>(reader);
-                }).ConfigureAwait(true);
+                    await Task.Run(() =>
+                    {
+                        using StreamReader r = new StreamReader(fileName);
+                        using JsonReader reader = new JsonTextReader(r);
+                        JsonSerializer serializer = new JsonSerializer();
+                        Model = serializer.Deserialize<StrategyService>(reader);
+                    }).ConfigureAwait(true);
 
-                DataFromModel();
-                StartTasks();
-                return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    return false;
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
-                return false;
-            }
+
+            DataFromModel();
+            StartTasks();
+            return true;
         }
 
         internal bool Save(string fileName)

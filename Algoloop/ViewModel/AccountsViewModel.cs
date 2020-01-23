@@ -78,31 +78,29 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public bool Read(string fileName, string defaultFilename)
+        public bool Read(string fileName)
         {
-            if (!File.Exists(fileName))
+            if (File.Exists(fileName))
             {
-                fileName = defaultFilename;
-                if (!File.Exists(fileName)) return false;
-            }
-
-            try
-            {
-                using (StreamReader r = new StreamReader(fileName))
+                try
                 {
-                    string json = r.ReadToEnd();
-                    Model.Copy(JsonConvert.DeserializeObject<AccountService>(json));
-                }
+                    using (StreamReader r = new StreamReader(fileName))
+                    {
+                        string json = r.ReadToEnd();
+                        Model.Copy(JsonConvert.DeserializeObject<AccountService>(json));
+                    }
 
-                DataFromModel();
-                StartTasks();
-                return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    return false;
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
-                return false;
-            }
+
+            DataFromModel();
+            StartTasks();
+            return true;
         }
 
         internal bool Save(string fileName)
