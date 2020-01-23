@@ -125,7 +125,7 @@ namespace Algoloop.ViewModel
         {
             if (string.IsNullOrEmpty(_settings.Notebook))
             {
-                string userDataFolder = MainViewModel.GetUserDataFolder();
+                string userDataFolder = MainService.GetUserDataFolder();
                 _settings.Notebook = Path.Combine(userDataFolder, _notebook);
                 Directory.CreateDirectory(_settings.Notebook);
             }

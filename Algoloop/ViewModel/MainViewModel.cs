@@ -12,10 +12,8 @@
  * limitations under the License.
  */
 
-using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
@@ -63,38 +61,17 @@ namespace Algoloop.ViewModel
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-
-            // Set working directory
-            string appData = GetAppDataFolder();
-            Directory.SetCurrentDirectory(appData);
-
             ProviderFactory.RegisterProviders();
 
-            // Prepare data files
-            string program = GetProgramFolder();
-            CopyDirectory(Path.Combine(program, "Data/AppData"), appData, false);
-            CopyDirectory(Path.Combine(program, "Data/ProgramData"), GetProgramDataFolder(), false);
-            CopyDirectory(Path.Combine(program, "Data/UserData"), GetUserDataFolder(), false);
+            // Initialize data folders
+            MainService.InitializeFolders();
+
+            // Set working directory
+            string appData = MainService.GetAppDataFolder();
+            Directory.SetCurrentDirectory(appData);
 
             // Read configuration
             _ = ReadConfigAsync(appData);
-        }
-
-        public static void CopyDirectory(string sourceDir, string destDir, bool overwiteFiles)
-        {
-            // Create all of the directories
-            foreach (string dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
-                Directory.CreateDirectory(dirPath.Replace(sourceDir, destDir));
-
-            // Copy all the files & Replaces any files with the same name
-            foreach (string source in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
-            {
-                string dest = source.Replace(sourceDir, destDir);
-                if (!File.Exists(dest) || overwiteFiles)
-                {
-                    File.Copy(source, dest, true);
-                }
-            }
         }
 
         public RelayCommand SaveCommand { get; }
@@ -127,43 +104,8 @@ namespace Algoloop.ViewModel
 
         public void SaveAll()
         {
-            string appData = GetAppDataFolder();
+            string appData =MainService.GetAppDataFolder();
             SaveConfig(appData);
-        }
-
-        public static string GetProgramFolder()
-        {
-            return AppDomain.CurrentDomain.BaseDirectory;
-        }
-
-        public static string GetAppDataFolder()
-        {
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyTitle.Split('.')[0];
-            string path = Path.Combine(appData, company, product);
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        public static string GetProgramDataFolder()
-        {
-            string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyTitle.Split('.')[0];
-            string path = Path.Combine(programData, company, product);
-            Directory.CreateDirectory(path);
-            return path;
-        }
-
-        public static string GetUserDataFolder()
-        {
-            string userData = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyTitle.Split('.')[0];
-            string path = Path.Combine(userData, company, product);
-            Directory.CreateDirectory(path);
-            return path;
         }
 
         private void OnStatusMessage(NotificationMessage message)

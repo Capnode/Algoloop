@@ -297,6 +297,7 @@
     <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="Model\AboutModel.cs" />
     <Compile Include="Provider\Usa.cs" />
+    <Compile Include="Service\MainService.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />
     <Compile Include="ViewModel\ResearchViewModel.cs" />
     <Compile Include="ViewModel\TrackSymbolViewModel.cs" />

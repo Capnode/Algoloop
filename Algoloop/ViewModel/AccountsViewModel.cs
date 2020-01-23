@@ -15,7 +15,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
 using Algoloop.Service;
@@ -84,11 +83,9 @@ namespace Algoloop.ViewModel
             {
                 try
                 {
-                    using (StreamReader r = new StreamReader(fileName))
-                    {
-                        string json = r.ReadToEnd();
-                        Model.Copy(JsonConvert.DeserializeObject<AccountService>(json));
-                    }
+                    using StreamReader r = new StreamReader(fileName);
+                    string json = r.ReadToEnd();
+                    Model.Copy(JsonConvert.DeserializeObject<AccountService>(json));
 
                 }
                 catch (Exception ex)

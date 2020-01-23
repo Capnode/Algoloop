@@ -472,7 +472,7 @@ namespace Algoloop.ViewModel
             // Try to find algorithm file
             if (!File.Exists(Model.AlgorithmLocation))
             {
-                string location = Path.Combine(MainViewModel.GetProgramFolder(), Model.AlgorithmLocation);
+                string location = Path.Combine(MainService.GetProgramFolder(), Model.AlgorithmLocation);
                 if (!File.Exists(location)) return;
                 Model.AlgorithmLocation = location;
             }

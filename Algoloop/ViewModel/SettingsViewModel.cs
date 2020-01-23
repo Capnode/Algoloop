@@ -40,12 +40,10 @@ namespace Algoloop.ViewModel
             {
                 try
                 {
-                    using (StreamReader r = new StreamReader(fileName))
-                    {
-                        string json = r.ReadToEnd();
-                        SettingService settings = JsonConvert.DeserializeObject<SettingService>(json);
-                        Model.Copy(settings);
-                    }
+                    using StreamReader r = new StreamReader(fileName);
+                    string json = r.ReadToEnd();
+                    SettingService settings = JsonConvert.DeserializeObject<SettingService>(json);
+                    Model.Copy(settings);
                 }
                 catch (Exception ex)
                 {

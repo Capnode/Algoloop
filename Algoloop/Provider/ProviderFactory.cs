@@ -110,9 +110,9 @@ namespace Algoloop.Provider
             Config.Set("cache-location", dataFolder);
 
             // Update data
-            string sourceDir = Path.Combine(MainViewModel.GetProgramFolder(), "Data/ProgramData");
-            MainViewModel.CopyDirectory(Path.Combine(sourceDir, "market-hours"), Path.Combine(dataFolder, "market-hours"), true);
-            MainViewModel.CopyDirectory(Path.Combine(sourceDir, "symbol-properties"), Path.Combine(dataFolder, "symbol-properties"), true);
+            string sourceDir = Path.Combine(MainService.GetProgramFolder(), "Data/ProgramData");
+            MainService.CopyDirectory(Path.Combine(sourceDir, "market-hours"), Path.Combine(dataFolder, "market-hours"), true);
+            MainService.CopyDirectory(Path.Combine(sourceDir, "symbol-properties"), Path.Combine(dataFolder, "symbol-properties"), true);
         }
 
         private static IProvider CreateProvider(string name)

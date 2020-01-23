@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
 using Algoloop.ViewSupport;
 using System;
 using System.ComponentModel;
@@ -57,13 +56,23 @@ namespace Algoloop.Service
         [DataMember]
         public int DesktopPort { get; set; } = 1234;
 
+        [Category("Folders")]
         [DisplayName("Data folder")]
         [Description("Folder for market data.")]
         [Editor(typeof(FolderEditor), typeof(FolderEditor))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string DataFolder { get; set; } = MainViewModel.GetProgramDataFolder();
+        public string DataFolder { get; set; } = MainService.GetProgramDataFolder();
+
+        [Category("Folders")]
+        [DisplayName("Research folder")]
+        [Description("Folder for Jupyter notebook.")]
+        [Editor(typeof(FolderEditor), typeof(FolderEditor))]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string Notebook { get; set; } = Path.Combine(MainService.GetUserDataFolder(), "Notebook");
 
         [DisplayName("Max backtests")]
         [Description("Largest number of simultaneous ongoing backtest execution.")]
@@ -71,14 +80,6 @@ namespace Algoloop.Service
         [ReadOnly(false)]
         [DataMember]
         public int MaxBacktests { get; set; } = Math.Min(Environment.ProcessorCount, 8);
-
-        [DisplayName("Research folder")]
-        [Description("Folder for Jupyter notebook.")]
-        [Editor(typeof(FolderEditor), typeof(FolderEditor))]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        [DataMember]
-        public string Notebook { get; set; } = Path.Combine(MainViewModel.GetUserDataFolder(), "Notebook");
 
         internal void Copy(SettingService oldSettings)
         {
