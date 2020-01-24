@@ -35,7 +35,6 @@ namespace Algoloop.Service
             string unc = Assembly.GetExecutingAssembly().Location;
             string folder = Path.GetDirectoryName(unc);
             return folder;
-
         }
 
         public static string GetAppDataFolder()
