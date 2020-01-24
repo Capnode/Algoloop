@@ -13,6 +13,7 @@
 */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using QuantConnect.AlgorithmFactory;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace Algoloop.ViewSupport
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             var model = context.Instance as StrategyModel;
-            string assemblyPath = model?.AlgorithmLocation;
+            string assemblyPath = MainService.FullExePath(model?.AlgorithmLocation);
             if (string.IsNullOrEmpty(assemblyPath)) return null;
 
             try

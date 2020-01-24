@@ -289,9 +289,9 @@ namespace Algoloop.ViewModel
             AccountModel account = _accounts.FindAccount(Model.Account);
 
             // Set search path if not base directory
-            string folder = Path.GetDirectoryName(Model.AlgorithmLocation);
+            string folder = Path.GetDirectoryName(MainService.FullExePath(Model.AlgorithmLocation));
             string exeFolder = MainService.GetProgramFolder();
-            if (!exeFolder.Equals(folder, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(folder) && !exeFolder.Equals(folder, StringComparison.OrdinalIgnoreCase))
             {
                 StrategyViewModel.AddPath(folder);
             }

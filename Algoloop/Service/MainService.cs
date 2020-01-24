@@ -16,6 +16,7 @@
 using Algoloop.Model;
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Algoloop.Service
 {
@@ -31,7 +32,10 @@ namespace Algoloop.Service
 
         public static string GetProgramFolder()
         {
-            return AppDomain.CurrentDomain.BaseDirectory;
+            string unc = Assembly.GetExecutingAssembly().Location;
+            string folder = Path.GetDirectoryName(unc);
+            return folder;
+
         }
 
         public static string GetAppDataFolder()
@@ -79,6 +83,14 @@ namespace Algoloop.Service
                     File.Copy(source, dest, true);
                 }
             }
+        }
+
+        internal static string FullExePath(string file)
+        {
+            if (File.Exists(file)) return file;
+            string path = Path.Combine(GetProgramFolder(), file);
+            if (File.Exists(path)) return path;
+            return null;
         }
     }
 }

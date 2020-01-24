@@ -462,25 +462,16 @@ namespace Algoloop.ViewModel
 
         private void AlgorithmNameChanged(string algorithmName)
         {
-            CloneAlgorithmCommand.RaiseCanExecuteChanged();
-
-            StrategyNameChanged();
-
+            string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
             if (string.IsNullOrEmpty(algorithmName)) return;
-            if (string.IsNullOrEmpty(Model.AlgorithmLocation)) return;
+            if (string.IsNullOrEmpty(assemblyPath)) return;
 
-            // Try to find algorithm file
-            if (!File.Exists(Model.AlgorithmLocation))
-            {
-                string location = Path.Combine(MainService.GetProgramFolder(), Model.AlgorithmLocation);
-                if (!File.Exists(location)) return;
-                Model.AlgorithmLocation = location;
-            }
-
+            CloneAlgorithmCommand.RaiseCanExecuteChanged();
+            StrategyNameChanged();
             Parameters.Clear();
             try
             {
-                Assembly assembly = Assembly.LoadFrom(Model.AlgorithmLocation);
+                Assembly assembly = Assembly.LoadFrom(assemblyPath);
                 if (assembly == null) return;
 
                 IEnumerable<Type> type = assembly
@@ -607,8 +598,7 @@ namespace Algoloop.ViewModel
                 DataToModel();
 
                 // Load assemblies of algorithms
-                string assemblyPath = Model.AlgorithmLocation;
-                Debug.Assert(!string.IsNullOrEmpty(assemblyPath));
+                string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
                 Assembly assembly = Assembly.LoadFrom(assemblyPath);
 
                 //Get the list of extention classes in the library: 
