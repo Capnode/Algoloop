@@ -150,7 +150,7 @@ namespace Algoloop.Lean
             Config.Set("cache-location", settings.DataFolder);
             string fullPath = Path.GetFullPath(model.AlgorithmLocation);
             Config.Set("algorithm-location", fullPath);
-            string fullFolder = AppDomain.CurrentDomain.BaseDirectory;
+            string fullFolder = MainService.GetProgramFolder();
             Config.Set("plugin-directory", fullFolder);
             Config.Set("composer-dll-directory", fullFolder);
             Config.Set("algorithm-type-name", model.AlgorithmName);

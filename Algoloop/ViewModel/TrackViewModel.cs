@@ -290,7 +290,8 @@ namespace Algoloop.ViewModel
 
             // Set search path if not base directory
             string folder = Path.GetDirectoryName(Model.AlgorithmLocation);
-            if (!AppDomain.CurrentDomain.BaseDirectory.Equals(folder, StringComparison.OrdinalIgnoreCase))
+            string exeFolder = MainService.GetProgramFolder();
+            if (!exeFolder.Equals(folder, StringComparison.OrdinalIgnoreCase))
             {
                 StrategyViewModel.AddPath(folder);
             }

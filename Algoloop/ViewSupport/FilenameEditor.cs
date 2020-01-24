@@ -12,6 +12,7 @@
  * limitations under the License.
 */
 
+using Algoloop.Service;
 using System;
 using System.IO;
 using System.Windows;
@@ -78,7 +79,7 @@ namespace Algoloop.ViewSupport
             string folder;
             if (path == null)
             {
-                folder = AppDomain.CurrentDomain.BaseDirectory;
+                folder = MainService.GetProgramFolder();
             }
             else
             {

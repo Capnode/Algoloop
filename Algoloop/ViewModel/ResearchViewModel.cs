@@ -94,11 +94,11 @@ namespace Algoloop.ViewModel
             string pythonpath = _process.StartInfo.EnvironmentVariables["PYTHONPATH"];
             if (string.IsNullOrEmpty(pythonpath))
             {
-                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = AppDomain.CurrentDomain.BaseDirectory;
+                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = MainService.GetProgramFolder();
             }
             else
             {
-                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = AppDomain.CurrentDomain.BaseDirectory + ";" + pythonpath;
+                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = MainService.GetProgramFolder() + ";" + pythonpath;
             }
 
             _process.OutputDataReceived += (sender, args) => Log.Trace(args.Data);
@@ -133,10 +133,11 @@ namespace Algoloop.ViewModel
 
         private void CreateConfigFile(string workFolder)
         {
+            string exeFolder = MainService.GetProgramFolder();
             var config = new Dictionary<string, string>
             {
                 { "algorithm-language", Language.Python.ToString() },
-                { "composer-dll-directory", AppDomain.CurrentDomain.BaseDirectory.Replace("\\", "/") },
+                { "composer-dll-directory", exeFolder.Replace("\\", "/") },
                 { "data-folder", _settings.DataFolder.Replace("\\", "/" ) },
                 { "api-handler", "QuantConnect.Api.Api" },
                 { "job-queue-handler", "QuantConnect.Queues.JobQueue" },

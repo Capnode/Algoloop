@@ -21,17 +21,17 @@ namespace Algoloop.Service
 {
     public class MainService
     {
-        public static string GetProgramFolder()
-        {
-            return AppDomain.CurrentDomain.BaseDirectory;
-        }
-
         public static void InitializeFolders()
         {
             string program = GetProgramFolder();
             CopyDirectory(Path.Combine(program, "Data/AppData"), GetAppDataFolder(), false);
             CopyDirectory(Path.Combine(program, "Data/ProgramData"), GetProgramDataFolder(), false);
             CopyDirectory(Path.Combine(program, "Data/UserData"), GetUserDataFolder(), false);
+        }
+
+        public static string GetProgramFolder()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory;
         }
 
         public static string GetAppDataFolder()

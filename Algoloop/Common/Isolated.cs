@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Service;
 using System;
 
 namespace Algoloop.Common
@@ -29,7 +30,7 @@ namespace Algoloop.Common
             AppDomainSetup appSetup = new AppDomainSetup()
             {
                 ApplicationName = type.Name,
-                ApplicationBase = AppDomain.CurrentDomain.BaseDirectory,
+                ApplicationBase = MainService.GetProgramFolder(),
                 PrivateBinPath = @".",
                 ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile
             };
