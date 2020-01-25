@@ -1,6 +1,0 @@
-MainPackage=C:\Source\Algoloop\Algoloop.Package\bin\x64\Release\Upload\Algoloop.Package_1.0.0.0_x64.appx
-SymbolPackage=C:\Source\Algoloop\Algoloop.Package\bin\x64\Release\Upload\Algoloop.Package_1.0.0.0\Algoloop.Package_1.0.0.0_x64.appxsym
-ResourcePack=C:\Source\Algoloop\Algoloop.Package\bin\x64\Release\Upload\Algoloop.Package_1.0.0.0_scale-100.appx
-ResourcePack=C:\Source\Algoloop\Algoloop.Package\bin\x64\Release\Upload\Algoloop.Package_1.0.0.0_scale-125.appx
-ResourcePack=C:\Source\Algoloop\Algoloop.Package\bin\x64\Release\Upload\Algoloop.Package_1.0.0.0_scale-150.appx
-ResourcePack=C:\Source\Algoloop\Algoloop.Package\bin\x64\Release\Upload\Algoloop.Package_1.0.0.0_scale-400.appx

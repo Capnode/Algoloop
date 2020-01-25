@@ -1,2 +1,0 @@
-MainPackage=C:\Source\Algoloop\Algoloop.Package\bin\x86\Release\Upload\Algoloop.Package_1.0.0.0_x86.appx
-SymbolPackage=C:\Source\Algoloop\Algoloop.Package\bin\x86\Release\Upload\Algoloop.Package_1.0.0.0\Algoloop.Package_1.0.0.0_x86.appxsym
