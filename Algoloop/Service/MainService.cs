@@ -41,7 +41,7 @@ namespace Algoloop.Service
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyTitle.Split('.')[0];
+            string product = AboutModel.AssemblyProduct;
             string path = Path.Combine(appData, company, product);
             Directory.CreateDirectory(path);
             return path;
@@ -51,7 +51,7 @@ namespace Algoloop.Service
         {
             string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyTitle.Split('.')[0];
+            string product = AboutModel.AssemblyProduct;
             string path = Path.Combine(programData, company, product);
             Directory.CreateDirectory(path);
             return path;
@@ -61,7 +61,7 @@ namespace Algoloop.Service
         {
             string userData = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyTitle.Split('.')[0];
+            string product = AboutModel.AssemblyProduct;
             string path = Path.Combine(userData, company, product);
             Directory.CreateDirectory(path);
             return path;
