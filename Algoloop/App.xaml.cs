@@ -16,6 +16,8 @@ using Algoloop.ViewModel;
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -34,6 +36,14 @@ namespace Algoloop
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint SetThreadExecutionState([In] uint esFlags);
+
+        public App()
+        {
+            // Set working directory to exe directory
+            string unc = Assembly.GetExecutingAssembly().Location;
+            string folder = Path.GetDirectoryName(unc);
+            Directory.SetCurrentDirectory(folder);
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
