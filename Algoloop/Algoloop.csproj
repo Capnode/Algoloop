@@ -74,7 +74,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\AlgoloopColor.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\AlgoloopBlack.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -549,10 +549,9 @@
       <Link>Data\UserData\Notebook\BasicQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\AlgoloopColor.ico" />
+    <None Include="Resources\AlgoloopBlack1080.png" />
     <Resource Include="Resources\AlgoloopBlack.png" />
     <None Include="Resources\AlgoloopBlack.ico" />
-    <None Include="Resources\AlgoloopColor.png" />
     <Resource Include="Resources\AlgoloopWhite.png" />
     <Resource Include="Doc\Chart.png" />
     <Content Include="Extern\AmCharts.Windows.Stock.dll" />
@@ -693,9 +692,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Stop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Algoloop.ico" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.VersionCheckAnalyzer.2.9.3\analyzers\dotnet\Microsoft.CodeAnalysis.VersionCheckAnalyzer.dll" />

@@ -113,20 +113,10 @@ namespace Algoloop.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap AlgoloopColor {
+        internal static System.Drawing.Bitmap AlgoloopBlack1080 {
             get {
-                object obj = ResourceManager.GetObject("AlgoloopColor", resourceCulture);
+                object obj = ResourceManager.GetObject("AlgoloopBlack1080", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
-        /// </summary>
-        internal static System.Drawing.Icon AlgoloopColor1 {
-            get {
-                object obj = ResourceManager.GetObject("AlgoloopColor1", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
             }
         }
         

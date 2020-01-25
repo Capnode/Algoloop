@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Capnode AB")]
 [assembly: AssemblyProduct("Algoloop")]
-[assembly: AssemblyCopyright("Copyright ©  2018 Capnode AB")]
+[assembly: AssemblyCopyright("Copyright ©  2020 Capnode AB")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
