@@ -309,7 +309,9 @@
     <Compile Include="Brokerages\Alpaca\AlpacaBrokerageTests.cs" />
     <Compile Include="Common\Data\Auxiliary\FactorFileTests.cs" />
     <Compile Include="Common\Data\Auxiliary\MapFileTests.cs" />
+    <Compile Include="Common\Data\Custom\TradingEconomicsTests.cs" />
     <Compile Include="Common\Data\Fundamental\FineFundamentalTests.cs" />
+    <Compile Include="Common\Securities\TestDefaultMarginCallModel.cs" />
     <Compile Include="Common\Statistics\StatisticsBuilderTests.cs" />
     <Compile Include="Common\Storage\LocalObjectStoreTests.cs" />
     <Compile Include="Common\Data\BaseDataTests.cs" />
@@ -556,7 +558,6 @@
     <Compile Include="Engine\DataFeeds\Enumerators\FrontierAwareEnumeratorTests.cs" />
     <Compile Include="Engine\DataFeeds\Enumerators\LiveEquityDataSynchronizingEnumeratorTests.cs" />
     <Compile Include="Engine\DataFeeds\Enumerators\LiveFillForwardEnumeratorTests.cs" />
-    <Compile Include="Engine\DataFeeds\Enumerators\OptionChainUniverseDataCollectionAggregatorEnumeratorTests.cs" />
     <Compile Include="Engine\DataFeeds\Enumerators\QuoteBarFillForwardEnumeratorTests.cs" />
     <Compile Include="Engine\DataFeeds\Enumerators\RateLimitEnumeratorTests.cs" />
     <Compile Include="Engine\DataFeeds\Enumerators\RefreshEnumeratorTests.cs" />
@@ -646,7 +647,6 @@
     <Compile Include="Symbols.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Indicators\LinearWeightedMovingAverageTests.cs" />
-    <Compile Include="ToolBox\TradingEconomicsCalendarTests.cs" />
     <Compile Include="ToolBox\PsychSignalDataTests.cs" />
     <Compile Include="ToolBox\CoinApiSymbolMapperTests.cs" />
     <Compile Include="ToolBox\ForexVolume\FxcmVolumeDownloaderTest.cs" />
