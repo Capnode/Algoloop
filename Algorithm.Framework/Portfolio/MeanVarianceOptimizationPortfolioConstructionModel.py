@@ -35,12 +35,18 @@ import pandas as pd
 ### </summary>
 class MeanVarianceOptimizationPortfolioConstructionModel(PortfolioConstructionModel):
     def __init__(self,
+                 rebalancingParam = None,
                  lookback = 1,
                  period = 63,
                  resolution = Resolution.Daily,
                  optimizer = None):
         """Initialize the model
         Args:
+            rebalancingParam: Rebalancing parameter. If it is a timedelta, date rules or Resolution, it will be converted into a function.
+                              If None will be ignored.
+                              The function returns the next expected rebalance time for a given algorithm UTC DateTime.
+                              The function returns null if unknown, in which case the function will be called again in the
+                              next loop. Returning current time will trigger rebalance.
             lookback(int): Historical return lookback period
             period(int): The time interval of history price to calculate the weight
             resolution: The resolution of the history price
@@ -53,6 +59,16 @@ class MeanVarianceOptimizationPortfolioConstructionModel(PortfolioConstructionMo
         self.symbolDataBySymbol = {}
         self.pendingRemoval = []
 
+        # If the argument is an instance of Resolution or Timedelta
+        # Redefine rebalancingFunc
+        rebalancingFunc = rebalancingParam
+        if isinstance(rebalancingParam, int):
+            rebalancingParam = Extensions.ToTimeSpan(rebalancingParam)
+        if isinstance(rebalancingParam, timedelta):
+            rebalancingFunc = lambda dt: dt + rebalancingParam
+        if rebalancingFunc:
+            self.SetRebalancingFunc(rebalancingFunc)
+
     def CreateTargets(self, algorithm, insights):
         """
         Create portfolio targets from the specified insights
@@ -62,23 +78,26 @@ class MeanVarianceOptimizationPortfolioConstructionModel(PortfolioConstructionMo
         Returns:
             An enumerable of portfolio targets to be sent to the execution model
         """
-        targets = []
 
-        for symbol in self.pendingRemoval:
-            targets.append(PortfolioTarget.Percent(algorithm, symbol, 0))
-        self.pendingRemoval.clear()
-
+        # Always add new insights
         insights = PortfolioConstructionModel.FilterInvalidInsightMagnitude(algorithm, insights)
-
-        symbols = [insight.Symbol for insight in insights]
-        if len(symbols) == 0 or all([insight.Magnitude == 0 for insight in insights]):
-            return targets
-
         for insight in insights:
             symbolData = self.symbolDataBySymbol.get(insight.Symbol)
             if insight.Magnitude is None:
                 algorithm.SetRunTimeError(ArgumentNullException('MeanVarianceOptimizationPortfolioConstructionModel does not accept \'None\' as Insight.Magnitude. Please checkout the selected Alpha Model specifications.'))
             symbolData.Add(algorithm.Time, insight.Magnitude)
+
+        targets = []
+        if not self.IsRebalanceDue(insights, algorithm.UtcTime):
+            return targets
+
+        for symbol in self.pendingRemoval:
+            targets.append(PortfolioTarget.Percent(algorithm, symbol, 0))
+        self.pendingRemoval.clear()
+
+        symbols = [insight.Symbol for insight in insights]
+        if len(symbols) == 0:
+            return targets
 
         # Create a dictionary keyed by the symbols in the insights with an pandas.Series as value to create a data frame
         returns = { str(symbol) : data.Return for symbol, data in self.symbolDataBySymbol.items() if symbol in symbols }
@@ -104,6 +123,7 @@ class MeanVarianceOptimizationPortfolioConstructionModel(PortfolioConstructionMo
             changes: The security additions and removals from the algorithm'''
 
         # clean up data for removed securities
+        super().OnSecuritiesChanged(algorithm, changes)
         for removed in changes.RemovedSecurities:
             self.pendingRemoval.append(removed.Symbol)
             symbolData = self.symbolDataBySymbol.pop(removed.Symbol, None)
