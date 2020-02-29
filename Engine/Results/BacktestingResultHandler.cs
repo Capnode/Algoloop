@@ -15,7 +15,6 @@
 */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -60,31 +59,9 @@ namespace QuantConnect.Lean.Engine.Results
         private int _projectId;
 
         /// <summary>
-        /// Packeting message queue to temporarily store packets and then pull for processing.
-        /// </summary>
-        public ConcurrentQueue<Packet> Messages { get; set; }
-
-        /// <summary>
-        /// Charts collection for storing the master copy of user charting data.
-        /// </summary>
-        public ConcurrentDictionary<string, Chart> Charts { get; set; }
-
-        /// <summary>
         /// Boolean flag indicating the result handler thread is completely finished and ready to dispose.
         /// </summary>
         public bool IsActive { get; private set; }
-
-        /// <summary>
-        /// Sampling period for timespans between resamples of the charting equity.
-        /// </summary>
-        /// <remarks>Specifically critical for backtesting since with such long timeframes the sampled data can get extreme.</remarks>
-        public TimeSpan ResamplePeriod { get; private set; }
-
-        /// <summary>
-        /// How frequently the backtests push messages to the browser.
-        /// </summary>
-        /// <remarks>Update frequency of notification packets</remarks>
-        public TimeSpan NotificationPeriod { get; }
 
         /// <summary>
         /// A dictionary containing summary statistics
@@ -96,8 +73,6 @@ namespace QuantConnect.Lean.Engine.Results
         /// </summary>
         public BacktestingResultHandler()
         {
-            Messages = new ConcurrentQueue<Packet>();
-            Charts = new ConcurrentDictionary<string, Chart>();
             IsActive = true;
             ResamplePeriod = TimeSpan.FromMinutes(4);
             NotificationPeriod = TimeSpan.FromSeconds(2);
@@ -192,20 +167,9 @@ namespace QuantConnect.Lean.Engine.Results
 
                 if (DateTime.UtcNow <= _nextUpdate || _daysProcessed < _daysProcessedFrontier) return;
 
-                //Extract the orders since last update
-                var deltaOrders = new Dictionary<int, Order>();
-                try
-                {
-                    deltaOrders = (from order in TransactionHandler.Orders
-                        where (order.Value.Time.Date >= _lastUpdate
-                              || (order.Value.LastFillTime.HasValue && order.Value.LastFillTime.Value.Date >= _lastUpdate)
-                              || (order.Value.LastUpdateTime.HasValue && order.Value.LastUpdateTime.Value.Date >= _lastUpdate))
-                        select order).Take(50).ToDictionary(t => t.Key, t => t.Value);
-                }
-                catch (Exception err)
-                {
-                    Log.Error(err);
-                }
+                var deltaOrders = GetDeltaOrders(LastDeltaOrderPosition, shouldStop: orderCount => orderCount >= 50);
+                // Deliberately skip to the end of order event collection to prevent overloading backtesting UX
+                LastDeltaOrderPosition = TransactionHandler.OrderEvents.Count();
 
                 //Reset loop variables:
                 try
@@ -266,13 +230,13 @@ namespace QuantConnect.Lean.Engine.Results
                     const int maxOrders = 100;
                     var orderCount = TransactionHandler.Orders.Count;
 
-                    var completeResult = new BacktestResult(
+                    var completeResult = new BacktestResult(new BacktestResultParameters(
                         Charts,
                         orderCount > maxOrders ? TransactionHandler.Orders.Skip(orderCount - maxOrders).ToDictionary() : TransactionHandler.Orders.ToDictionary(),
                         Algorithm.Transactions.TransactionRecord,
                         new Dictionary<string, string>(),
                         runtimeStatistics,
-                        new Dictionary<string, AlgorithmPerformance>());
+                        new Dictionary<string, AlgorithmPerformance>()));
 
                     StoreResult(new BacktestResultPacket(_job, completeResult, Algorithm.EndDate, Algorithm.StartDate, progress));
 
@@ -327,9 +291,7 @@ namespace QuantConnect.Lean.Engine.Results
         /// Save the snapshot of the total results to storage.
         /// </summary>
         /// <param name="packet">Packet to store.</param>
-        /// <param name="async">Store the packet asyncronously to speed up the thread.</param>
-        /// <remarks>Async creates crashes in Mono 3.10 if the thread disappears before the upload is complete so it is disabled for now.</remarks>
-        public void StoreResult(Packet packet, bool async = false)
+        protected override void StoreResult(Packet packet)
         {
             try
             {
@@ -347,17 +309,15 @@ namespace QuantConnect.Lean.Engine.Results
                     BacktestResult results;
                     lock (ChartLock)
                     {
-                        results = new BacktestResult(
+                        results = new BacktestResult(new BacktestResultParameters(
                             result.Results.Charts.ToDictionary(x => x.Key, x => x.Value.Clone()),
                             result.Results.Orders,
                             result.Results.ProfitLoss,
                             result.Results.Statistics,
                             result.Results.RuntimeStatistics,
                             result.Results.RollingWindow,
-                            result.Results.TotalPerformance
-                        )
-                        // Set Alpha Runtime Statistics
-                        { AlphaRuntimeStatistics = result.Results.AlphaRuntimeStatistics };
+                            result.Results.TotalPerformance,
+                            result.Results.AlphaRuntimeStatistics));
                     }
                     // Save results
                     SaveResults(key, results);
@@ -399,8 +359,8 @@ namespace QuantConnect.Lean.Engine.Results
 
                 //Create a result packet to send to the browser.
                 var result = new BacktestResultPacket(_job,
-                    new BacktestResult(charts, orders, profitLoss, statisticsResults.Summary, runtime, statisticsResults.RollingPerformances, statisticsResults.TotalPerformance)
-                    { AlphaRuntimeStatistics = AlphaRuntimeStatistics }, Algorithm.EndDate, Algorithm.StartDate)
+                    new BacktestResult(new BacktestResultParameters(charts, orders, profitLoss, statisticsResults.Summary, runtime, statisticsResults.RollingPerformances, statisticsResults.TotalPerformance, AlphaRuntimeStatistics)),
+                    Algorithm.EndDate, Algorithm.StartDate)
                 {
                     ProcessingTime = (DateTime.UtcNow - StartTime).TotalSeconds,
                     DateFinished = DateTime.Now,
@@ -686,16 +646,6 @@ namespace QuantConnect.Lean.Engine.Results
         }
 
         /// <summary>
-        /// Send a new order event to the browser.
-        /// </summary>
-        /// <remarks>In backtesting the order events are not sent because it would generate a high load of messaging.</remarks>
-        /// <param name="newEvent">New order event details</param>
-        public virtual void OrderEvent(OrderEvent newEvent)
-        {
-            // NOP. Don't do any order event processing for results in backtest mode.
-        }
-
-        /// <summary>
         /// Send an algorithm status update to the browser.
         /// </summary>
         /// <param name="status">Status enum value.</param>
@@ -704,14 +654,6 @@ namespace QuantConnect.Lean.Engine.Results
         {
             var statusPacket = new AlgorithmStatusPacket(_algorithmId, _projectId, status, message);
             MessagingHandler.Send(statusPacket);
-        }
-
-        /// <summary>
-        /// Purge/clear any outstanding messages in message queue.
-        /// </summary>
-        public void PurgeQueue()
-        {
-            Messages.Clear();
         }
 
         /// <summary>

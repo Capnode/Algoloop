@@ -15,6 +15,7 @@
 */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Lean.Engine.TransactionHandlers;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
+using QuantConnect.Packets;
 using QuantConnect.Statistics;
 
 namespace QuantConnect.Lean.Engine.Results
@@ -33,6 +35,21 @@ namespace QuantConnect.Lean.Engine.Results
     /// </summary>
     public abstract class BaseResultsHandler
     {
+        /// <summary>
+        /// The last position consumed from the <see cref="ITransactionHandler.OrderEvents"/> by <see cref="GetDeltaOrders"/>
+        /// </summary>
+        protected int LastDeltaOrderPosition;
+
+        /// <summary>
+        /// Live packet messaging queue. Queue the messages here and send when the result queue is ready.
+        /// </summary>
+        public ConcurrentQueue<Packet> Messages { get; set; }
+
+        /// <summary>
+        /// Storage for the price and equity charts of the live results.
+        /// </summary>
+        public ConcurrentDictionary<string, Chart> Charts { get; set; }
+
         /// <summary>
         /// True if the exit has been triggered
         /// </summary>
@@ -117,16 +134,76 @@ namespace QuantConnect.Lean.Engine.Results
         protected DateTime PreviousUtcSampleTime;
 
         /// <summary>
+        /// Sampling period for timespans between resamples of the charting equity.
+        /// </summary>
+        /// <remarks>Specifically critical for backtesting since with such long timeframes the sampled data can get extreme.</remarks>
+        protected TimeSpan ResamplePeriod { get; set; }
+
+        /// <summary>
+        /// How frequently the backtests push messages to the browser.
+        /// </summary>
+        /// <remarks>Update frequency of notification packets</remarks>
+        protected TimeSpan NotificationPeriod { get; set; }
+
+        /// <summary>
         /// Creates a new instance
         /// </summary>
         protected BaseResultsHandler()
         {
+            Charts = new ConcurrentDictionary<string, Chart>();
+            Messages = new ConcurrentQueue<Packet>();
             RuntimeStatistics = new Dictionary<string, string>();
             StartTime = DateTime.UtcNow;
             CompileId = "";
             JobId = "";
             ChartLock = new object();
             LogStore = new List<LogEntry>();
+        }
+
+        /// <summary>
+        /// New order event for the algorithm
+        /// </summary>
+        /// <param name="newEvent">New event details</param>
+        public virtual void OrderEvent(OrderEvent newEvent)
+        {
+        }
+
+        /// <summary>
+        /// Gets the orders generated starting from the provided <see cref="ITransactionHandler.OrderEvents"/> position
+        /// </summary>
+        /// <returns>The delta orders</returns>
+        protected virtual Dictionary<int, Order> GetDeltaOrders(int orderEventsStartPosition, Func<int, bool> shouldStop)
+        {
+            var deltaOrders = new Dictionary<int, Order>();
+
+            foreach (var orderId in TransactionHandler.OrderEvents.Skip(orderEventsStartPosition).Select(orderEvent => orderEvent.OrderId))
+            {
+                LastDeltaOrderPosition++;
+                if (deltaOrders.ContainsKey(orderId))
+                {
+                    // we can have more than 1 order event per order id
+                    continue;
+                }
+
+                var order = Algorithm.Transactions.GetOrderById(orderId);
+                if (order == null)
+                {
+                    // this shouldn't happen but just in case
+                    continue;
+                }
+
+                // for charting
+                order.Price = order.Price.SmartRounding();
+
+                deltaOrders[orderId] = order;
+
+                if (shouldStop(deltaOrders.Count))
+                {
+                    break;
+                }
+            }
+
+            return deltaOrders;
         }
 
         /// <summary>
@@ -170,6 +247,14 @@ namespace QuantConnect.Lean.Engine.Results
         }
 
         /// <summary>
+        /// Purge/clear any outstanding messages in message queue.
+        /// </summary>
+        protected void PurgeQueue()
+        {
+            Messages.Clear();
+        }
+
+        /// <summary>
         /// Gets the algorithm net return
         /// </summary>
         protected decimal GetNetReturn()
@@ -179,6 +264,12 @@ namespace QuantConnect.Lean.Engine.Results
                 (Algorithm.Portfolio.TotalPortfolioValue - StartingPortfolioValue) / StartingPortfolioValue
                 : 0;
         }
+
+        /// <summary>
+        /// Save the snapshot of the total results to storage.
+        /// </summary>
+        /// <param name="packet">Packet to store.</param>
+        protected abstract void StoreResult(Packet packet);
 
         /// <summary>
         /// Samples portfolio equity, benchmark, and daily performance
