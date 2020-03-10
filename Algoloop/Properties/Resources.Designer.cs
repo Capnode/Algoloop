@@ -93,9 +93,29 @@ namespace Algoloop.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap AlgoloopBlack {
+        internal static System.Drawing.Bitmap Algoloop {
             get {
-                object obj = ResourceManager.GetObject("AlgoloopBlack", resourceCulture);
+                object obj = ResourceManager.GetObject("Algoloop", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Algoloop1080 {
+            get {
+                object obj = ResourceManager.GetObject("Algoloop1080", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap AlgoloopColor {
+            get {
+                object obj = ResourceManager.GetObject("AlgoloopColor", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,30 +123,10 @@ namespace Algoloop.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon AlgoloopBlack1 {
+        internal static System.Drawing.Icon AlgoloopIcon {
             get {
-                object obj = ResourceManager.GetObject("AlgoloopBlack1", resourceCulture);
+                object obj = ResourceManager.GetObject("AlgoloopIcon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap AlgoloopBlack1080 {
-            get {
-                object obj = ResourceManager.GetObject("AlgoloopBlack1080", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap AlgoloopWhite {
-            get {
-                object obj = ResourceManager.GetObject("AlgoloopWhite", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
