@@ -219,7 +219,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
-    <None Include="secret.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop\Algoloop.csproj">
