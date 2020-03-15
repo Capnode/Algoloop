@@ -55,7 +55,7 @@ namespace Algoloop.Model
             get => _provider;
             set
             {
-                _provider = value;
+                _provider = value.ToLowerInvariant();
                 Refresh();
             }
         }
@@ -127,22 +127,21 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
-            switch (Provider)
+            if (Provider.Equals(nameof(Algoloop.Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
             {
-                case nameof(Algoloop.Provider.Fxcm):
-                    SetBrowsable("Access", true);
-                    SetBrowsable("Login", true);
-                    SetBrowsable("Password", true);
-                    SetBrowsable("ApiKey", false);
-                    SetReadonly("Resolution", false);
-                    break;
-                default:
-                    SetBrowsable("Access", false);
-                    SetBrowsable("Login", false);
-                    SetBrowsable("Password", false);
-                    SetBrowsable("ApiKey", false);
-                    SetReadonly("Resolution", false);
-                    break;
+                SetBrowsable("Access", true);
+                SetBrowsable("Login", true);
+                SetBrowsable("Password", true);
+                SetBrowsable("ApiKey", false);
+                SetReadonly("Resolution", false);
+            }
+            else
+            {
+                SetBrowsable("Access", false);
+                SetBrowsable("Login", false);
+                SetBrowsable("Password", false);
+                SetBrowsable("ApiKey", false);
+                SetReadonly("Resolution", false);
             }
         }
 

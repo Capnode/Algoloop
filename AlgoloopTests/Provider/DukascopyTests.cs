@@ -49,7 +49,7 @@ namespace Algoloop.Provider.Tests
             var market = new MarketModel
             {
                 Name = "Dukascopy",
-                Provider = "Dukascopy",
+                Provider = "dukascopy",
                 LastDate = date,
                 Resolution = Resolution.Daily,
                 ApiKey = key
@@ -69,7 +69,7 @@ namespace Algoloop.Provider.Tests
             var market = new MarketModel
             {
                 Name = "Dukascopy",
-                Provider = "Dukascopy",
+                Provider = "dukascopy",
                 LastDate = date,
                 Resolution = Resolution.Daily,
                 ApiKey = key

@@ -12,11 +12,9 @@
  * limitations under the License.
 */
 
-using Algoloop.Provider;
-using System;
+using QuantConnect;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 
 namespace Algoloop.ViewSupport
 {
@@ -36,14 +34,15 @@ namespace Algoloop.ViewSupport
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            // Request list of providers
-            List<string> names = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
-                .Select(m => m.Name)
-                .ToList();
-            names.Sort();
+            int code = 1;
+            string name;
+            List<string> names = new List<string>();
+            while ((name = Market.Decode(code++)) != null)
+            {
+                names.Add(name);
+            }
 
+            names.Sort();
             return new StandardValuesCollection(names);
         }
     }

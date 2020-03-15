@@ -135,12 +135,11 @@ namespace Algoloop.Provider
                 return null;
             }
 
-            RegisterProvider(type);
-
+            if (!RegisterProvider(type)) return null;
             return provider;
         }
 
-        private static void RegisterProvider(Type provider)
+        private static bool RegisterProvider(Type provider)
         {
             string name = provider.Name.ToLowerInvariant();
             if (Market.Encode(name) == null)
@@ -154,6 +153,8 @@ namespace Algoloop.Provider
 
                 Market.Add(name, code);
             }
+
+            return true;
         }
     }
 }

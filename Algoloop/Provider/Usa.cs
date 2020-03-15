@@ -42,7 +42,7 @@ namespace Algoloop.Provider
             string directory = Path.Combine(
                 settings.DataFolder,
                 SecurityType.Equity.ToString().ToLowerInvariant(),
-                market.Provider.ToLowerInvariant());
+                market.Provider);
             string dailyFolder = Path.Combine(directory, "daily");
 
             DirectoryInfo d = new DirectoryInfo(dailyFolder);

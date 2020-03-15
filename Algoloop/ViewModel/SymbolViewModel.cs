@@ -225,7 +225,7 @@ namespace Algoloop.ViewModel
             string folder = Path.Combine(
                 market.DataFolder,
                 SecurityType.Equity.ToString(),
-                market.Model.Provider.ToLowerInvariant(),
+                market.Model.Provider,
                 "fundamental",
                 "fine",
                 Model.Name.ToLowerInvariant());
