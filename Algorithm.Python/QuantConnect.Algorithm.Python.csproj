@@ -82,6 +82,7 @@
     <Content Include="BasicTemplateOptionsConsolidationAlgorithm.py" />
     <Content Include="Benchmarks\SECReportBenchmarkAlgorithm.py" />
     <Content Include="Benchmarks\SmartInsiderEventBenchmarkAlgorithm.py" />
+    <Content Include="ConsolidateRegressionAlgorithm.py" />
     <Content Include="CustomDataAddDataOnSecuritiesChangedRegressionAlgorithm.py" />
     <Content Include="CustomDataAddDataCoarseSelectionRegressionAlgorithm.py" />
     <Content Include="DynamicSecurityDataAlgorithm.py" />
@@ -93,6 +94,7 @@
     <Content Include="LiveFeaturesAlgorithm.py" />
     <Content Include="PortfolioRebalanceOnCustomFuncRegressionAlgorithm.py" />
     <Content Include="PortfolioRebalanceOnDateRulesRegressionAlgorithm.py" />
+    <Content Include="RegisterIndicatorRegressionAlgorithm.py" />
     <Content Include="SectorWeightingFrameworkAlgorithm.py" />
     <Content Include="SetHoldingsMultipleTargetsRegressionAlgorithm.py" />
     <Content Include="TradingEconomicsCalendarIndicatorAlgorithm.py" />

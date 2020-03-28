@@ -283,7 +283,7 @@
     <Compile Include="Algorithm\Framework\FrameworkModelsPythonInheritanceTests.cs" />
     <Compile Include="Algorithm\Framework\InsightTests.cs" />
     <Compile Include="Algorithm\Framework\NotifiedSecurityChangesTests.cs" />
-    <Compile Include="Algorithm\Framework\Portfolio\DuplicateKeyPortfolioConstructionModelTests.cs" />
+    <Compile Include="Algorithm\Framework\Portfolio\ReturnsSymbolDataTests.cs" />
     <Compile Include="Algorithm\Framework\Portfolio\BlackLittermanOptimizationPortfolioConstructionModelTests.cs" />
     <Compile Include="Algorithm\Framework\Portfolio\AccumulativeInsightPortfolioConstructionModelTests.cs" />
     <Compile Include="Algorithm\Framework\Portfolio\ConfidenceWeightedPortfolioConstructionModelTests.cs" />
@@ -321,7 +321,9 @@
     <Compile Include="Common\Data\Fundamental\FineFundamentalTests.cs" />
     <Compile Include="Common\Orders\OrderSizingTests.cs" />
     <Compile Include="Common\Securities\TestDefaultMarginCallModel.cs" />
+    <Compile Include="Common\Statistics\AnnualPerformanceTests.cs" />
     <Compile Include="Common\Statistics\StatisticsBuilderTests.cs" />
+    <Compile Include="Common\Statistics\TrackingErrorTests.cs" />
     <Compile Include="Common\Storage\LocalObjectStoreTests.cs" />
     <Compile Include="Common\Data\BaseDataTests.cs" />
     <Compile Include="Common\Data\CalendarConsolidatorsTests.cs" />
@@ -656,9 +658,13 @@
     <Compile Include="Python\PandasConverterTests.cs" />
     <Compile Include="RegressionTests.cs" />
     <Compile Include="Report\CalculationTests.cs" />
+    <Compile Include="Report\PortfolioLooperTests.cs" />
+    <Compile Include="Report\ResultDeserializationTests.cs" />
+    <Compile Include="Report\PortfolioLooperAlgorithmTests.cs" />
     <Compile Include="Symbols.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Indicators\LinearWeightedMovingAverageTests.cs" />
+    <Compile Include="ToolBox\EstimizeTests.cs" />
     <Compile Include="ToolBox\PsychSignalDataTests.cs" />
     <Compile Include="ToolBox\CoinApiSymbolMapperTests.cs" />
     <Compile Include="ToolBox\ForexVolume\FxcmVolumeDownloaderTest.cs" />

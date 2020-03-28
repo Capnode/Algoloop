@@ -159,7 +159,10 @@
     <Compile Include="AltData\PsychSignalSentimentAlgorithm.cs" />
     <Compile Include="AltData\TradingEconomicsAlgorithm.cs" />
     <Compile Include="AltData\TiingoNewsAlgorithm.cs" />
+    <Compile Include="AutomaticIndicatorWarmupDataTypeRegressionAlgorithm.cs" />
+    <Compile Include="AutomaticIndicatorWarmupRegressionAlgorithm.cs" />
     <Compile Include="BasicTemplateConstituentUniverseAlgorithm.cs" />
+    <Compile Include="ConsolidateRegressionAlgorithm.cs" />
     <Compile Include="DefaultResolutionRegressionAlgorithm.cs" />
     <Compile Include="BasicPythonIntegrationTemplateAlgorithm.cs" />
     <Compile Include="BasicSetAccountCurrencyAlgorithm.cs" />
@@ -181,6 +184,7 @@
     <Compile Include="MarginRemainingRegressionAlgorithm.cs" />
     <Compile Include="NoMarginCallExpectedRegressionAlgorithm.cs" />
     <Compile Include="ObjectStoreExampleAlgorithm.cs" />
+    <Compile Include="RegisterIndicatorRegressionAlgorithm.cs" />
     <Compile Include="ScheduledEventsOrderRegressionAlgorithm.cs" />
     <Compile Include="SectorWeightingFrameworkAlgorithm.cs" />
     <Compile Include="OnEndOfDayAddDataRegressionAlgorithm.cs" />

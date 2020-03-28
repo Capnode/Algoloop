@@ -41,6 +41,11 @@ namespace QuantConnect.ToolBox.EstimizeDataDownloader
         /// </summary>
         public RateGate IndexGate { get; }
 
+        protected readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        {
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc
+        };
+
         protected EstimizeDataDownloader()
         {
             _clientKey = Config.Get("estimize-economics-auth-token");
@@ -152,6 +157,21 @@ namespace QuantConnect.ToolBox.EstimizeDataDownloader
                 .ToList();
 
             File.WriteAllLines(finalPath, finalLines);
+        }
+
+        /// <summary>
+        /// Normalizes Estimize tickers to a format usable by the <see cref="Data.Auxiliary.MapFileResolver"/>
+        /// </summary>
+        /// <param name="ticker">Ticker to normalize</param>
+        /// <returns>Normalized ticker</returns>
+        public static string NormalizeTicker(string ticker)
+        {
+            return ticker.ToLowerInvariant()
+                .Replace("- defunct", string.Empty)
+                .Replace("-defunct", string.Empty)
+                .Replace(" ", string.Empty)
+                .Replace("|", string.Empty)
+                .Replace("-", ".");
         }
 
         public class Company
