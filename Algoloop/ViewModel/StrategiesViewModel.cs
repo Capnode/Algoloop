@@ -116,7 +116,7 @@ namespace Algoloop.ViewModel
                         using JsonReader reader = new JsonTextReader(r);
                         JsonSerializer serializer = new JsonSerializer();
                         Model = serializer.Deserialize<StrategyService>(reader);
-                    }).ConfigureAwait(false);
+                    }).ConfigureAwait(true); // Must continue on UI thread
 
                 }
                 catch (Exception ex)
