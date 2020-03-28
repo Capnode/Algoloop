@@ -462,12 +462,13 @@ namespace Algoloop.ViewModel
 
         private void AlgorithmNameChanged(string algorithmName)
         {
+            StrategyNameChanged();
+
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
             if (string.IsNullOrEmpty(algorithmName)) return;
             if (string.IsNullOrEmpty(assemblyPath)) return;
 
             CloneAlgorithmCommand.RaiseCanExecuteChanged();
-            StrategyNameChanged();
             Parameters.Clear();
             try
             {
