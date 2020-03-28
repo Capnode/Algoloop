@@ -12,13 +12,16 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using Algoloop.ViewModel;
 using Microsoft.Win32;
+using QuantConnect.Logging;
 using System;
-using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Algoloop
@@ -48,6 +51,13 @@ namespace Algoloop
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            Log.Debug($"Startup \"{AboutModel.AssemblyProduct}\"");
+
+            // Exception Handling Wiring
+            AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
+            TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionHandler;
+
             Algoloop.Properties.Settings.Default.Reload();
             EnsureBrowserEmulationEnabled("Algoloop.exe");
 
@@ -65,14 +75,64 @@ namespace Algoloop
             base.OnExit(e);
         }
 
-        private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs ex)
+        private void UnobservedTaskExceptionHandler(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            Debug.WriteLine("Exception {0} - {1} - {2}", ex.GetType(), ex.Exception.Message, ex.Exception.ToString());
-            Exception iex = ex.Exception.InnerException;
-            if (iex != null)
-                Debug.WriteLine("Exception inner {0} - {1}", iex.GetType(), iex.Message);
+            try
+            {
+                var message = nameof(UnobservedTaskExceptionHandler);
+                e?.SetObserved(); // Prevents the Program from terminating.
 
-            ex.Handled = true; // Continue processing
+                if (e.Exception != null && e.Exception is Exception tuex)
+                {
+                    message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, tuex.Message);
+                    Log.Error(tuex, message);
+                }
+                else if (sender is Exception ex)
+                {
+                    message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, ex.Message);
+                    Log.Error(ex, message);
+                }
+            }
+            catch { } // Swallow exception
+        }
+
+        private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                var message = nameof(UnhandledExceptionHandler);
+                if (e.ExceptionObject != null && e.ExceptionObject is Exception uex)
+                {
+                    message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, uex.Message);
+                    Log.Error(uex, message);
+                }
+                else if (sender is Exception ex)
+                {
+                    message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, ex.Message);
+                    Log.Error(ex, message);
+                }
+            }
+            catch { } // Swallow exception
+        }
+
+        private void DispatcherUnhandledExceptionHandler(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                var message = nameof(DispatcherUnhandledExceptionHandler);
+                if (e.Exception != null && e.Exception is Exception uex)
+                {
+                    message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, uex.Message);
+                    Log.Error(uex, message);
+                }
+                else if (sender is Exception ex)
+                {
+                    message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, ex.Message);
+                    Log.Error(ex, message);
+                }
+            }
+            catch { } // Swallow exception
+            e.Handled = true; // Continue processing
         }
 
         /// <summary>
@@ -82,15 +142,18 @@ namespace Algoloop
         {
             try
             {
-                using var rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
-                if (!uninstall)
+                RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
+                if (rk == null) return;
+                if (uninstall)
+                {
+                    rk.DeleteValue(exename);
+                }
+                else
                 {
                     dynamic value = rk.GetValue(exename);
                     if (value == null)
                         rk.SetValue(exename, (uint)11001, RegistryValueKind.DWord);
                 }
-                else
-                    rk.DeleteValue(exename);
             }
             finally
             {
