@@ -144,6 +144,7 @@ namespace Algoloop.ViewModel
                 { "messaging-handler", "QuantConnect.Messaging.Messaging" }
             };
 
+            Directory.CreateDirectory(workFolder);
             using StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile));
             JsonSerializer serializer = new JsonSerializer
             {
