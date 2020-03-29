@@ -16,20 +16,14 @@ using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
-using QuantConnect.Configuration;
 using QuantConnect.Logging;
 
 namespace Algoloop.ViewModel
 {
     public class LogViewModel : ViewModelBase
     {
-        public LogViewModel(ILogHandler logHandler)
+        public LogViewModel()
         {
-            Log.LogHandler = logHandler;
-
-            Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
-            Log.DebuggingLevel = Config.GetInt("debug-level", 1);
-
             if (Log.LogHandler is ILogItemHandler logService)
             {
                 logService.Connect((item) => Logs.Add(item));

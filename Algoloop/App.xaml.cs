@@ -15,7 +15,9 @@
 using Algoloop.Model;
 using Algoloop.ViewModel;
 using Microsoft.Win32;
+using QuantConnect.Configuration;
 using QuantConnect.Logging;
+using QuantConnect.Util;
 using System;
 using System.Globalization;
 using System.IO;
@@ -52,7 +54,11 @@ namespace Algoloop
         {
             base.OnStartup(e);
 
-            Log.Debug($"Startup \"{AboutModel.AssemblyProduct}\"");
+            // Set Log handler
+            Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
+            Log.DebuggingLevel = Config.GetInt("debug-level", 1);
+            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Lean.LogItemHandler")); ;
+            Log.Trace($"Startup \"{AboutModel.AssemblyProduct}\"");
 
             // Exception Handling Wiring
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
@@ -72,6 +78,8 @@ namespace Algoloop
 
             ViewModelLocator.MainViewModel.SaveAll();
             Algoloop.Properties.Settings.Default.Save();
+
+            Log.Trace($"Exit \"{AboutModel.AssemblyProduct}\"");
             base.OnExit(e);
         }
 

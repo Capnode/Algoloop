@@ -24,6 +24,7 @@ namespace Algoloop.Lean
     public class LogItemHandler : ILogItemHandler
     {
         private bool _isDisposed = false; // To detect redundant calls
+        private ILogHandler _nlogger = new NLogHandler();
         private Action<LogItem> _logger;
 
         // we need to control synchronization to our stream writer since it's not inherently thread-safe
@@ -48,6 +49,7 @@ namespace Algoloop.Lean
         public void Error(string text)
         {
             WriteMessage(LogType.Error, text);
+            _nlogger.Error(text);
         }
 
         /// <summary>
@@ -57,6 +59,7 @@ namespace Algoloop.Lean
         public void Debug(string text)
         {
             WriteMessage(LogType.Debug, text);
+            _nlogger.Debug(text);
         }
 
         /// <summary>
@@ -66,6 +69,7 @@ namespace Algoloop.Lean
         public void Trace(string text)
         {
             WriteMessage(LogType.Trace, text);
+            _nlogger.Trace(text);
         }
 
         /// <summary>

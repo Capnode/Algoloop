@@ -28,9 +28,6 @@
 
 using Algoloop.Service;
 using GalaSoft.MvvmLight.Ioc;
-using QuantConnect.Configuration;
-using QuantConnect.Logging;
-using QuantConnect.Util;
 
 namespace Algoloop.ViewModel
 {
@@ -58,10 +55,6 @@ namespace Algoloop.ViewModel
             SimpleIoc.Default.Register<LogViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<AboutViewModel>();
-
-            // Register QuantConnect types
-            SimpleIoc.Default.Register(
-                () => Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Lean.LogItemHandler")));
         }
 
         public static MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
