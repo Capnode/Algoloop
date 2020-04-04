@@ -127,6 +127,8 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
+            if (string.IsNullOrEmpty(Provider)) return;
+
             if (Provider.Equals(nameof(Algoloop.Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable("Access", true);
