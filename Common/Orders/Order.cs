@@ -15,7 +15,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using Newtonsoft.Json;
 using QuantConnect.Interfaces;
 using QuantConnect.Securities;
@@ -28,6 +30,7 @@ namespace QuantConnect.Orders
     /// </summary>
     public abstract class Order
     {
+        private volatile int _incrementalId;
         private decimal _quantity;
         private decimal _price;
 
@@ -115,11 +118,13 @@ namespace QuantConnect.Orders
         /// <summary>
         /// Order Time In Force
         /// </summary>
+        [JsonIgnore]
         public TimeInForce TimeInForce => Properties.TimeInForce;
 
         /// <summary>
         /// Tag the order with some custom data
         /// </summary>
+        [DefaultValue(""), JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string Tag { get; internal set; }
 
         /// <summary>
@@ -154,6 +159,7 @@ namespace QuantConnect.Orders
         /// <summary>
         /// Get the absolute quantity for this order
         /// </summary>
+        [JsonIgnore]
         public decimal AbsoluteQuantity => Math.Abs(Quantity);
 
         /// <summary>
@@ -245,6 +251,15 @@ namespace QuantConnect.Orders
         /// </summary>
         /// <param name="security">The security matching this order's symbol</param>
         protected abstract decimal GetValueImpl(Security security);
+
+        /// <summary>
+        /// Gets a new unique incremental id for this order
+        /// </summary>
+        /// <returns>Returns a new id for this order</returns>
+        internal int GetNewId()
+        {
+            return Interlocked.Increment(ref _incrementalId);
+        }
 
         /// <summary>
         /// Modifies the state of this order to match the update request

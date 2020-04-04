@@ -30,12 +30,14 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NodaTime;
 using Python.Runtime;
+using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Portfolio;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
+using QuantConnect.Packets;
 using QuantConnect.Python;
 using QuantConnect.Scheduling;
 using QuantConnect.Securities;
@@ -52,6 +54,66 @@ namespace QuantConnect
     {
         private static readonly Dictionary<IntPtr, PythonActivator> PythonActivators
             = new Dictionary<IntPtr, PythonActivator>();
+
+        /// <summary>
+        /// Helper method to batch a collection of <see cref="AlphaResultPacket"/> into 1 single instance.
+        /// Will return null if the provided list is empty. Will keep the last Order instance per order id,
+        /// which is the latest. Implementations trusts the provided 'resultPackets' list to batch is in order
+        /// </summary>
+        public static AlphaResultPacket Batch(this List<AlphaResultPacket> resultPackets)
+        {
+            AlphaResultPacket resultPacket = null;
+
+            // batch result packets into a single packet
+            if (resultPackets.Count > 0)
+            {
+                // we will batch results into the first packet
+                resultPacket = resultPackets[0];
+                for (var i = 1; i < resultPackets.Count; i++)
+                {
+                    var newerPacket = resultPackets[i];
+
+                    // only batch current packet if there actually is data
+                    if (newerPacket.Insights != null)
+                    {
+                        if (resultPacket.Insights == null)
+                        {
+                            // initialize the collection if it isn't there
+                            resultPacket.Insights = new List<Insight>();
+                        }
+                        resultPacket.Insights.AddRange(newerPacket.Insights);
+                    }
+
+                    // only batch current packet if there actually is data
+                    if (newerPacket.OrderEvents != null)
+                    {
+                        if (resultPacket.OrderEvents == null)
+                        {
+                            // initialize the collection if it isn't there
+                            resultPacket.OrderEvents = new List<OrderEvent>();
+                        }
+                        resultPacket.OrderEvents.AddRange(newerPacket.OrderEvents);
+                    }
+
+                    // only batch current packet if there actually is data
+                    if (newerPacket.Orders != null)
+                    {
+                        if (resultPacket.Orders == null)
+                        {
+                            // initialize the collection if it isn't there
+                            resultPacket.Orders = new List<Order>();
+                        }
+                        resultPacket.Orders.AddRange(newerPacket.Orders);
+
+                        // GroupBy guarantees to respect original order, so we want to get the last order instance per order id
+                        // this way we only keep the most updated version
+                        resultPacket.Orders = resultPacket.Orders.GroupBy(order => order.Id)
+                            .Select(ordersGroup => ordersGroup.Last()).ToList();
+                    }
+                }
+            }
+            return resultPacket;
+        }
 
         /// <summary>
         /// Helper method to safely stop a running thread
@@ -1690,6 +1752,28 @@ namespace QuantConnect
                         yield return symbol;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Converts an IEnumerable to a PyList
+        /// </summary>
+        /// <param name="enumerable">IEnumerable object to convert</param>
+        /// <returns>PyList</returns>
+        public static PyList ToPyList(this IEnumerable enumerable)
+        {
+            using (Py.GIL())
+            {
+                var pyList = new PyList();
+                foreach (var item in enumerable)
+                {
+                    using (var pyObject = item.ToPython())
+                    {
+                        pyList.Append(pyObject);
+                    }
+                }
+
+                return pyList;
             }
         }
 

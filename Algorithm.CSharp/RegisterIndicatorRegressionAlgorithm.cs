@@ -188,10 +188,10 @@ namespace QuantConnect.Algorithm.CSharp
             {"Sortino Ratio", "-1.727"},
             {"Return Over Maximum Drawdown", "-12.061"},
             {"Portfolio Turnover", "4.916"},
-            {"Total Insights Generated", "1"},
+            {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},
             {"Total Insights Analysis Completed", "0"},
-            {"Long Insight Count", "1"},
+            {"Long Insight Count", "0"},
             {"Short Insight Count", "0"},
             {"Long/Short Ratio", "100%"},
             {"Estimated Monthly Alpha Value", "$0"},
@@ -201,7 +201,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "-998933209"}
+            {"OrderListHash", "1088232772"}
         };
     }
 }
