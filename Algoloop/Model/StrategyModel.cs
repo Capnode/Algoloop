@@ -26,6 +26,7 @@ namespace Algoloop.Model
     public class StrategyModel : ModelBase
     {
         private string _name;
+        private string _algorithmLocation;
         private string _algorithmName;
         private string _account = AccountModel.AccountType.Backtest.ToString();
         private string _market;
@@ -212,7 +213,15 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string AlgorithmLocation { get; set; }
+        public string AlgorithmLocation
+        {
+            get { return _algorithmLocation; }
+            set
+            {
+                _algorithmLocation = value;
+                AlgorithmNameChanged?.Invoke(_algorithmName);
+            }
+        }
 
         [Category("Algorithm")]
         [DisplayName("Algorithm name")]
