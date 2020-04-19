@@ -443,6 +443,11 @@ namespace QuantConnect.Data
             var allData = new DataDictionary<SymbolData>();
             foreach (var datum in data)
             {
+                // we only will cache the default data type to preserve determinism and backwards compatibility
+                if (!SubscriptionManager.IsDefaultDataType(datum))
+                {
+                    continue;
+                }
                 SymbolData symbolData;
                 if (!allData.TryGetValue(datum.Symbol, out symbolData))
                 {

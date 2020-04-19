@@ -9,6 +9,7 @@ using QuantConnect.Notifications;
 using QuantConnect.Packets;
 using NetMQ;
 using NetMQ.Sockets;
+using QuantConnect.Orders.Serialization;
 
 namespace QuantConnect.Messaging
 {
@@ -20,6 +21,7 @@ namespace QuantConnect.Messaging
         private string _port;
         private PushSocket _server;
         private AlgorithmNodePacket _job;
+        private OrderEventJsonConverter _orderEventJsonConverter;
 
         /// <summary>
         /// Gets or sets whether this messaging handler has any current subscribers.
@@ -44,6 +46,7 @@ namespace QuantConnect.Messaging
         public void SetAuthentication(AlgorithmNodePacket job)
         {
             _job = job;
+            _orderEventJsonConverter = new OrderEventJsonConverter(job.AlgorithmId);
             Transmit(_job);
         }
 
@@ -71,7 +74,7 @@ namespace QuantConnect.Messaging
 
             if (StreamingApi.IsEnabled)
             {
-                StreamingApi.Transmit(_job.UserId, _job.Channel, packet);
+                StreamingApi.Transmit(_job.UserId, _job.Channel, packet, _orderEventJsonConverter);
             }
         }
 
@@ -81,7 +84,7 @@ namespace QuantConnect.Messaging
         /// <param name="packet">Packet to transmit</param>
         public void Transmit(Packet packet)
         {
-            var payload = JsonConvert.SerializeObject(packet);
+            var payload = JsonConvert.SerializeObject(packet, _orderEventJsonConverter);
 
             var message = new NetMQMessage();
 

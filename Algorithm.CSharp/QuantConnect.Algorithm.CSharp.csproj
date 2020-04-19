@@ -161,6 +161,8 @@
     <Compile Include="AltData\TiingoNewsAlgorithm.cs" />
     <Compile Include="AutomaticIndicatorWarmupDataTypeRegressionAlgorithm.cs" />
     <Compile Include="AutomaticIndicatorWarmupRegressionAlgorithm.cs" />
+    <Compile Include="CustomPartialFillModelAlgorithm.cs" />
+    <Compile Include="EquityTradeAndQuotesRegressionAlgorithm.cs" />
     <Compile Include="BasicTemplateConstituentUniverseAlgorithm.cs" />
     <Compile Include="ConsolidateRegressionAlgorithm.cs" />
     <Compile Include="DefaultResolutionRegressionAlgorithm.cs" />
@@ -175,7 +177,7 @@
     <Compile Include="CustomDataAddDataRegressionAlgorithm.cs" />
     <Compile Include="DynamicSecurityDataAlgorithm.cs" />
     <Compile Include="ConfidenceWeightedFrameworkAlgorithm.cs" />
-    <Compile Include="AccumulativeInsightFrameworkAlgorithm.cs" />
+    <Compile Include="AccumulativeInsightPortfolioRegressionAlgorithm.cs" />
     <Compile Include="EqualWeightingPortfolioConstructionModelFutureRegressionAlgorithm.cs" />
     <Compile Include="FreePortfolioValueRegressionAlgorithm.cs" />
     <Compile Include="LeveragePrecedenceRegressionAlgorithm.cs" />
@@ -184,6 +186,7 @@
     <Compile Include="MarginRemainingRegressionAlgorithm.cs" />
     <Compile Include="NoMarginCallExpectedRegressionAlgorithm.cs" />
     <Compile Include="ObjectStoreExampleAlgorithm.cs" />
+    <Compile Include="OrderSubmissionDataRegressionAlgorithm.cs" />
     <Compile Include="RegisterIndicatorRegressionAlgorithm.cs" />
     <Compile Include="ScheduledEventsOrderRegressionAlgorithm.cs" />
     <Compile Include="SectorWeightingFrameworkAlgorithm.cs" />
