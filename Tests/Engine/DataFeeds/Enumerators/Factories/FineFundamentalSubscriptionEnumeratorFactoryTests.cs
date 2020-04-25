@@ -77,12 +77,12 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators.Factories
             Assert.IsTrue(row.SecurityReference.SecuritySymbol == parameters.Symbol.Value || row.SecurityReference.SecuritySymbol == null);
             Assert.AreEqual(parameters.Ebitda3M, row.FinancialStatements.IncomeStatement.EBITDA.ThreeMonths);
             Assert.AreEqual(parameters.Ebitda12M, row.FinancialStatements.IncomeStatement.EBITDA.TwelveMonths);
-            Assert.AreEqual(parameters.Ebitda12M, row.FinancialStatements.IncomeStatement.EBITDA);
+            Assert.AreEqual(parameters.Ebitda12M, (decimal)row.FinancialStatements.IncomeStatement.EBITDA);
             Assert.AreEqual(parameters.CostOfRevenue3M, row.FinancialStatements.IncomeStatement.CostOfRevenue.ThreeMonths);
             Assert.AreEqual(parameters.CostOfRevenue12M, row.FinancialStatements.IncomeStatement.CostOfRevenue.TwelveMonths);
-            Assert.AreEqual(parameters.CostOfRevenue12M, row.FinancialStatements.IncomeStatement.CostOfRevenue);
+            Assert.AreEqual(parameters.CostOfRevenue12M, (decimal)row.FinancialStatements.IncomeStatement.CostOfRevenue);
             Assert.AreEqual(parameters.EquityPerShareGrowth1Y, row.EarningRatios.EquityPerShareGrowth.OneYear);
-            Assert.AreEqual(parameters.EquityPerShareGrowth1Y, row.EarningRatios.EquityPerShareGrowth);
+            Assert.AreEqual(parameters.EquityPerShareGrowth1Y, (decimal)row.EarningRatios.EquityPerShareGrowth);
             Assert.AreEqual(parameters.PeRatio, row.ValuationRatios.PERatio);
             if (!parameters.FinancialHealthGrade.IsNullOrEmpty())
             {
@@ -184,9 +184,10 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators.Factories
                 new FineFundamentalTestParameters("AAPL-OneYear")
                 {
                     Symbol = Symbols.AAPL,
-                    StartDate = new DateTime(2014, 1, 1),
+                    StartDate = new DateTime(2014, 2, 28),
                     EndDate = new DateTime(2014, 12, 31),
-                    RowCount = 365,
+                    // 2014-2-28 is the first fine data point we have in the OS data folder
+                    RowCount = (new DateTime(2014, 12, 31) - new DateTime(2014, 2, 28)).Days,
                     LiveMode = liveMode
                 },
                 new FineFundamentalTestParameters("AAPL-BeforeFirstDate")
@@ -194,7 +195,8 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators.Factories
                     Symbol = Symbols.AAPL,
                     StartDate = new DateTime(2014, 2, 20),
                     EndDate = new DateTime(2014, 2, 20),
-                    RowCount = 1,
+                    // FineFundamentalSubscriptionEnumeratorFactory will not emit null data points
+                    RowCount = 0,
                     LiveMode = liveMode
                 },
                 new FineFundamentalTestParameters("AAPL-FirstDate")
@@ -296,7 +298,8 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators.Factories
                     Symbol = Symbols.EURUSD,
                     StartDate = new DateTime(2014, 5, 10),
                     EndDate = new DateTime(2014, 5, 10),
-                    RowCount = 1,
+                    // FineFundamentalSubscriptionEnumeratorFactory will not emit null data points
+                    RowCount = 0,
                     LiveMode = liveMode
                 }
             }.Select(x => new TestCaseData(x).SetName(x.Name)).ToArray();

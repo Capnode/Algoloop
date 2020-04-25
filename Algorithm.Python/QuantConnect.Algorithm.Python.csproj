@@ -81,6 +81,7 @@
     <None Include="CustomPartialFillModelAlgorithm.py" />
     <Content Include="BasicTemplateConstituentUniverseAlgorithm.py" />
     <Content Include="BasicTemplateOptionsConsolidationAlgorithm.py" />
+    <None Include="BasicTemplateOptionsPriceModel.py" />
     <Content Include="Benchmarks\SECReportBenchmarkAlgorithm.py" />
     <Content Include="Benchmarks\SmartInsiderEventBenchmarkAlgorithm.py" />
     <Content Include="ConsolidateRegressionAlgorithm.py" />
@@ -88,10 +89,12 @@
     <Content Include="CustomDataAddDataCoarseSelectionRegressionAlgorithm.py" />
     <Content Include="DynamicSecurityDataAlgorithm.py" />
     <Content Include="ConfidenceWeightedFrameworkAlgorithm.py" />
+    <Content Include="FineFundamentalFilteredUniverseRegressionAlgorithm.py" />
     <Content Include="KerasNeuralNetworkAlgorithm.py" />
     <None Include="PsychSignalSentimentRegressionAlgorithm.py" />
     <Content Include="CustomDataUsingMapFileRegressionAlgorithm.py" />
     <Content Include="LiquidETFUniverseFrameworkAlgorithm.py" />
+    <Content Include="ObjectStoreExampleAlgorithm.py" />
     <Content Include="LiveFeaturesAlgorithm.py" />
     <Content Include="PortfolioRebalanceOnCustomFuncRegressionAlgorithm.py" />
     <Content Include="PortfolioRebalanceOnDateRulesRegressionAlgorithm.py" />
@@ -99,6 +102,7 @@
     <Content Include="RegisterIndicatorRegressionAlgorithm.py" />
     <Content Include="SectorWeightingFrameworkAlgorithm.py" />
     <Content Include="SetHoldingsMultipleTargetsRegressionAlgorithm.py" />
+    <Content Include="StringToSymbolImplicitConversionRegressionAlgorithm.py" />
     <Content Include="TradingEconomicsCalendarIndicatorAlgorithm.py" />
     <Content Include="OnEndOfDayRegressionAlgorithm.py" />
     <Content Include="SECReportDataAlgorithm.py" />

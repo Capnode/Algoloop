@@ -21,6 +21,7 @@ using QuantConnect.Configuration;
 using QuantConnect.Lean.Engine.Storage;
 using QuantConnect.Packets;
 using QuantConnect.Storage;
+using QuantConnect.Util;
 
 namespace QuantConnect.Tests.Common.Storage
 {
@@ -32,7 +33,7 @@ namespace QuantConnect.Tests.Common.Storage
 
         private ObjectStore _store;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
             Config.Set("object-store-root", TestStorageRoot);
@@ -41,9 +42,10 @@ namespace QuantConnect.Tests.Common.Storage
             _store.Initialize("CSharp-TestAlgorithm", 0, 0, "", new Controls());
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void Cleanup()
         {
+            _store.DisposeSafely();
             Config.Set("object-store-root", StorageRootConfigurationValue);
             try
             {
