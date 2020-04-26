@@ -61,7 +61,7 @@ namespace Algoloop.ViewModel
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            ProviderFactory.RegisterProviders();
+            ProviderFactory.RegisterProviders(settingsViewModel.Model);
 
             // Initialize data folders
             MainService.InitializeFolders();
@@ -152,7 +152,7 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = true;
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfiguration));
-                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
+                await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);

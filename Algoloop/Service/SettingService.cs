@@ -14,6 +14,7 @@
 
 using Algoloop.ViewSupport;
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
@@ -81,6 +82,9 @@ namespace Algoloop.Service
         [DataMember]
         public int MaxBacktests { get; set; } = Math.Min(Environment.ProcessorCount, 8);
 
+        [Browsable(false)]
+        public Collection<string> AddOns { get; private set; } = new Collection<string>();
+
         internal void Copy(SettingService oldSettings)
         {
             if (oldSettings == null)
@@ -95,6 +99,12 @@ namespace Algoloop.Service
             DataFolder = oldSettings.DataFolder;
             MaxBacktests = oldSettings.MaxBacktests;
             Notebook = oldSettings.Notebook;
+            AddOns = oldSettings.AddOns;
+        }
+
+        internal bool HasAddon(string addon)
+        {
+            return AddOns.Contains(addon);
         }
     }
 }

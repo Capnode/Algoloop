@@ -13,10 +13,8 @@
  */
 
 using Algoloop.Common;
-using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Service;
-using Algoloop.ViewModel;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -50,7 +48,7 @@ namespace Algoloop.Provider
                     return market;
                 }
 
-                IProvider provider = CreateProvider(market.Provider);
+                IProvider provider = CreateProvider(settings, market.Provider);
                 if (provider == null)
                 {
                     market.Active = false;
@@ -85,21 +83,21 @@ namespace Algoloop.Provider
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
 
-            IProvider provider = CreateProvider(market.Provider);
+            IProvider provider = CreateProvider(settings, market.Provider);
             if (provider == null)
                 return null;
 
             return provider.GetAllSymbols(market, settings);
         }
 
-        public static void RegisterProviders()
+        public static void RegisterProviders(SettingService settings)
         {
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface);
             foreach (Type provider in providers)
             {
-                RegisterProvider(provider);
+                RegisterProvider(settings, provider);
             }
         }
 
@@ -115,7 +113,7 @@ namespace Algoloop.Provider
             MainService.CopyDirectory(Path.Combine(sourceDir, "symbol-properties"), Path.Combine(dataFolder, "symbol-properties"), true);
         }
 
-        private static IProvider CreateProvider(string name)
+        private static IProvider CreateProvider(SettingService settings, string name)
         {
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
@@ -135,11 +133,11 @@ namespace Algoloop.Provider
                 return null;
             }
 
-            if (!RegisterProvider(type)) return null;
+            if (!RegisterProvider(settings, type)) return null;
             return provider;
         }
 
-        private static bool RegisterProvider(Type provider)
+        private static bool RegisterProvider(SettingService settings, Type provider)
         {
             string name = provider.Name.ToLowerInvariant();
             if (Market.Encode(name) == null)

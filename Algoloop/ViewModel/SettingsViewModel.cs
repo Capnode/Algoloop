@@ -17,7 +17,9 @@ using Algoloop.Service;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Algoloop.ViewModel
@@ -34,7 +36,7 @@ namespace Algoloop.ViewModel
 
         public SettingService Model { get; }
 
-        public bool Read(string fileName)
+        public async Task<bool> ReadAsync(string fileName)
         {
             if (File.Exists(fileName))
             {
@@ -52,7 +54,7 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            DataFromModel();
+            await DataFromModel();
             return true;
         }
 
@@ -84,9 +86,10 @@ namespace Algoloop.ViewModel
         {
         }
 
-        private void DataFromModel()
+        private async Task DataFromModel()
         {
             ProviderFactory.PrepareDataFolder(Model.DataFolder);
+            await Task.CompletedTask;
         }
     }
 }
