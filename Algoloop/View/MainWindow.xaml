@@ -84,7 +84,9 @@
             <TabItem Header="{Binding StrategiesViewModel.Strategies.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Strategies ({0}), FallbackValue=Strategies}">
                 <view:StrategiesView />
             </TabItem>
-            <TabItem Header="Research">
+            <TabItem
+                Header="Research"
+                Visibility="{Binding ResearchViewModel.Initialized, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <view:HtmlView
                     HtmlText="{Binding ResearchViewModel.HtmlText}"
                     Source="{Binding ResearchViewModel.Source}"/>

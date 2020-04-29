@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -60,9 +61,6 @@ namespace Algoloop.ViewModel
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
-            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            ProviderFactory.RegisterProviders(settingsViewModel.Model);
-
             // Initialize data folders
             MainService.InitializeFolders();
 
@@ -72,6 +70,12 @@ namespace Algoloop.ViewModel
 
             // Read configuration
             _ = ReadConfigAsync(appData);
+
+            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+            ProviderFactory.RegisterProviders(settingsViewModel.Model);
+
+            // Initialize Research page
+            ResearchViewModel.Initialize();
         }
 
         public RelayCommand SaveCommand { get; }
@@ -138,7 +142,7 @@ namespace Algoloop.ViewModel
             if ((bool)settings.ShowDialog())
             {
                 SaveAll();
-                ResearchViewModel.StartJupyter();
+                ResearchViewModel?.Initialize();
             }
             else
             {
@@ -156,7 +160,7 @@ namespace Algoloop.ViewModel
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
-                ResearchViewModel.StartJupyter();
+                Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfigurationCompleted));
             }
             finally
             {

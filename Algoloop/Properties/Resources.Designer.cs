@@ -259,6 +259,15 @@ namespace Algoloop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading configuration completed.
+        /// </summary>
+        internal static string LoadingConfigurationCompleted {
+            get {
+                return ResourceManager.GetString("LoadingConfigurationCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap MoveDown {

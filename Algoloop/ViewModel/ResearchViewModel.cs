@@ -46,6 +46,7 @@ namespace Algoloop.ViewModel
         private string _htmlText;
         private string _source;
         private Process _process;
+        private bool _initialized;
 
         public ResearchViewModel(SettingService settings)
         {
@@ -69,7 +70,27 @@ namespace Algoloop.ViewModel
             set => Set(ref _source, value);
         }
 
-        public void StartJupyter()
+        public bool Initialized
+        {
+            get => _initialized;
+            set => Set(ref _initialized, value);
+        }
+
+        public void Initialize()
+        {
+            try
+            {
+                StartJupyter();
+                Initialized = true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize Research Page. Optional Python package must be installed.\n");
+                Initialized = false;
+            }
+        }
+
+        private void StartJupyter()
         {
             StopJupyter();
             SetNotebookFolder();
