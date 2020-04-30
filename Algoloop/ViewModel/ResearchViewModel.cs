@@ -85,7 +85,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Failed to initialize Research Page. Optional Python package must be installed.\n");
+                Log.Error(ex, "Python must also be installed to use Research page.\nSee: https://github.com/QuantConnect/Lean/tree/master/Algorithm.Python#quantconnect-python-algorithm-project \n");
                 Initialized = false;
             }
         }
