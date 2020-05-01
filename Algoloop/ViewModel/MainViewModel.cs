@@ -142,7 +142,7 @@ namespace Algoloop.ViewModel
             if ((bool)settings.ShowDialog())
             {
                 SaveAll();
-                ResearchViewModel?.Initialize();
+                ResearchViewModel.Initialize();
             }
             else
             {

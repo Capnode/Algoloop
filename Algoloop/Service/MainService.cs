@@ -14,6 +14,7 @@
 
 
 using Algoloop.Model;
+using QuantConnect.Logging;
 using System;
 using System.IO;
 using System.Reflection;
@@ -25,9 +26,16 @@ namespace Algoloop.Service
         public static void InitializeFolders()
         {
             string program = GetProgramFolder();
-            CopyDirectory(Path.Combine(program, "Data/AppData"), GetAppDataFolder(), false);
-            CopyDirectory(Path.Combine(program, "Data/ProgramData"), GetProgramDataFolder(), false);
-            CopyDirectory(Path.Combine(program, "Data/UserData"), GetUserDataFolder(), false);
+            string appDataFolder = GetAppDataFolder();
+            string programDataFolder = GetProgramDataFolder();
+            string userDataFolder = GetUserDataFolder();
+            Log.Trace($"Program folder: {program}");
+            Log.Trace($"AppData folder: {appDataFolder}");
+            Log.Trace($"ProgramData folder: {programDataFolder}");
+            Log.Trace($"UserData folder: {userDataFolder}");
+            CopyDirectory(Path.Combine(program, "Data/AppData"), appDataFolder, false);
+            CopyDirectory(Path.Combine(program, "Data/ProgramData"), programDataFolder, false);
+            CopyDirectory(Path.Combine(program, "Data/UserData"), userDataFolder, false);
         }
 
         public static string GetProgramFolder()

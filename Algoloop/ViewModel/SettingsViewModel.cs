@@ -16,6 +16,7 @@ using Algoloop.Provider;
 using Algoloop.Service;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
+using QuantConnect.Logging;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -38,6 +39,7 @@ namespace Algoloop.ViewModel
 
         public async Task<bool> ReadAsync(string fileName)
         {
+            Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
             {
                 try

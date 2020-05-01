@@ -26,6 +26,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using QuantConnect.Logging;
 
 namespace Algoloop.ViewModel
 {
@@ -106,6 +107,7 @@ namespace Algoloop.ViewModel
 
         internal async Task<bool> ReadAsync(string fileName)
         {
+            Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
             {
                 try

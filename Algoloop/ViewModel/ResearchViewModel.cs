@@ -176,7 +176,7 @@ namespace Algoloop.ViewModel
 
         public void StopJupyter()
         {
-            if (_process == null) return;
+            if (!Initialized) return;
 
             // Send Ctrl-C to Jupyter console
             if (AttachConsole((uint)_process.Id))
@@ -195,7 +195,6 @@ namespace Algoloop.ViewModel
             }
 
             Log.Trace($"Jupyter process exit: {_process.HasExited}");
-            _process = null;
         }
     }
 }
