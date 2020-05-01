@@ -47,12 +47,12 @@ namespace Algoloop.ViewModel
             _market = market ?? throw new ArgumentNullException(nameof(market));
             Model = model;
 
-            DeleteCommand = new RelayCommand(() => _market?.DeleteFolder(this), () => !_market.Active);
+            DeleteCommand = new RelayCommand(() => _market?.DeleteFolder(this), () => !IsBusy && !_market.Active);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => DoAddSymbol(m), m => !_market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
-            RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !_market.Active && SelectedSymbol != null);
-            ExportFolderCommand = new RelayCommand(() => DoExportFolder(), () => !_market.Active);
+            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => DoAddSymbol(m), m => !IsBusy && !_market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
+            RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !IsBusy && !_market.Active && SelectedSymbol != null);
+            ExportFolderCommand = new RelayCommand(() => DoExportFolder(), () => !IsBusy && !_market.Active);
 
             DataFromModel();
 
@@ -65,6 +65,12 @@ namespace Algoloop.ViewModel
             };
 
             MarketSymbols.Source = _market.Symbols;
+        }
+
+        public bool IsBusy
+        {
+            get => _market.IsBusy;
+            set => _market.IsBusy = value;
         }
 
         public RelayCommand DeleteCommand { get; }
@@ -149,7 +155,15 @@ namespace Algoloop.ViewModel
             if (symbol == null)
                 return;
 
-            AddSymbols(new List<SymbolViewModel> { symbol });
+            try
+            {
+                IsBusy = true;
+                AddSymbols(new List<SymbolViewModel> { symbol });
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         internal void DataToModel()
@@ -187,49 +201,65 @@ namespace Algoloop.ViewModel
             if (Symbols.Count == 0 || symbols.Count == 0)
                 return;
 
-            // Create a copy of the list before remove
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            int pos = Symbols.IndexOf(list.First());
-            foreach (SymbolViewModel symbol in list)
+            try
             {
-                Symbols.Remove(symbol);
-            }
+                IsBusy = true;
+                // Create a copy of the list before remove
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+                Debug.Assert(list != null);
 
-            DataToModel();
-            if (Symbols.Count > 0)
+                int pos = Symbols.IndexOf(list.First());
+                foreach (SymbolViewModel symbol in list)
+                {
+                    Symbols.Remove(symbol);
+                }
+
+                DataToModel();
+                if (Symbols.Count > 0)
+                {
+                    SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+                }
+
+                MarketSymbols.View.Refresh();
+                AddSymbolCommand.RaiseCanExecuteChanged();
+            }
+            finally
             {
-                SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+                IsBusy = false;
             }
-
-            MarketSymbols.View.Refresh();
-            AddSymbolCommand.RaiseCanExecuteChanged();
         }
 
         private void DoExportFolder()
         {
-            DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                InitialDirectory = Directory.GetCurrentDirectory(),
-                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
-            };
-            if (saveFileDialog.ShowDialog() == false)
-                return;
-
             try
             {
-                string fileName = saveFileDialog.FileName;
-                using StreamWriter file = File.CreateText(fileName);
-                foreach (SymbolViewModel symbol in Symbols)
+                IsBusy = true;
+                DataToModel();
+                SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
-                    file.WriteLine(symbol.Model.Name);
+                    InitialDirectory = Directory.GetCurrentDirectory(),
+                    Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+                };
+                if (saveFileDialog.ShowDialog() == false)
+                    return;
+
+                try
+                {
+                    string fileName = saveFileDialog.FileName;
+                    using StreamWriter file = File.CreateText(fileName);
+                    foreach (SymbolViewModel symbol in Symbols)
+                    {
+                        file.WriteLine(symbol.Model.Name);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, ex.GetType().ToString());
                 }
             }
-            catch (Exception ex)
+            finally
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                IsBusy = false;
             }
         }
     }

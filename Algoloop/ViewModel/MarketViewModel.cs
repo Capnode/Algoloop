@@ -60,24 +60,30 @@ namespace Algoloop.ViewModel
             Model = marketModel;
             _settings = settings;
 
-            CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !_parent.IsBusy);
-            DownloadSymbolListCommand = new RelayCommand(() => DoDownloadSymbolList(), !_parent.IsBusy);
-            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), !_parent.IsBusy);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            AddToSymbolListCommand = new RelayCommand<IList>(m => DoAddToSymbolList(m), m => !_parent.IsBusy && !Active && SelectedSymbol != null);
-            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteMarket(this), () => !_parent.IsBusy && !Active);
-            NewFolderCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !_parent.IsBusy && !Active);
-            ImportFolderCommand = new RelayCommand(() => DoImportFolder(), () => !_parent.IsBusy && !Active);
-            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !_parent.IsBusy);
-            StartCommand = new RelayCommand(() => DoStartCommand(), () => !_parent.IsBusy && !Active);
-            StopCommand = new RelayCommand(() => DoStopCommand(), () => !_parent.IsBusy && Active);
+            CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !IsBusy && !Active && SelectedSymbol != null);
+            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
+            DownloadSymbolListCommand = new RelayCommand(() => DoDownloadSymbolList(), !IsBusy);
+            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
+            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), !IsBusy);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
+            AddToSymbolListCommand = new RelayCommand<IList>(m => DoAddToSymbolList(m), m => !IsBusy && !Active && SelectedSymbol != null);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteMarket(this), () => !IsBusy && !Active);
+            NewFolderCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !IsBusy && !Active);
+            ImportFolderCommand = new RelayCommand(() => DoImportFolder(), () => !IsBusy && !Active);
+            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
+            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
 
             Model.ModelChanged += DataFromModel;
 
             DataFromModel();
             DoActiveCommand(Active);
+        }
+
+        public bool IsBusy
+        {
+            get => _parent.IsBusy;
+            set => _parent.IsBusy = value;
         }
 
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
@@ -283,13 +289,21 @@ namespace Algoloop.ViewModel
 
         private async void DoActiveCommand(bool value)
         {
-            if (value)
+            try
             {
-                await StartTaskAsync().ConfigureAwait(true);
+                IsBusy = true;
+                if (value)
+                {
+                    await StartTaskAsync().ConfigureAwait(true);
+                }
+                else
+                {
+                    StopTask();
+                }
             }
-            else
+            finally
             {
-                StopTask();
+                IsBusy = false;
             }
         }
 
@@ -297,13 +311,13 @@ namespace Algoloop.ViewModel
         {
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 Active = true;
                 await StartTaskAsync().ConfigureAwait(true);
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -311,13 +325,13 @@ namespace Algoloop.ViewModel
         {
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 StopTask();
                 Active = false;
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -325,7 +339,7 @@ namespace Algoloop.ViewModel
         {
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 var symbol = new SymbolViewModel(this, new SymbolModel());
                 Symbols.Add(symbol);
                 DataToModel();
@@ -333,7 +347,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -341,7 +355,7 @@ namespace Algoloop.ViewModel
         {
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 List<SymbolModel> oldSymbols = Model.Symbols.ToList();
 
                 IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model, _settings);
@@ -371,7 +385,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -385,7 +399,7 @@ namespace Algoloop.ViewModel
 
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 list.ForEach(m => m.Active = CheckAll);
 
                 // Update folders
@@ -396,7 +410,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -408,7 +422,7 @@ namespace Algoloop.ViewModel
 
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 // Create a copy of the list before remove
                 List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
                 Debug.Assert(list != null);
@@ -427,7 +441,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -444,7 +458,7 @@ namespace Algoloop.ViewModel
 
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
                     using StreamReader r = new StreamReader(fileName);
@@ -476,7 +490,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -496,7 +510,7 @@ namespace Algoloop.ViewModel
 
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 string fileName = saveFileDialog.FileName;
                 using StreamWriter file = File.CreateText(fileName);
                 foreach (SymbolViewModel symbol in symbols)
@@ -510,7 +524,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -523,7 +537,7 @@ namespace Algoloop.ViewModel
 
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 var folder = new FolderViewModel(this, new FolderModel());
                 folder.AddSymbols(list.Where(m => m.Active));
                 Folders.Add(folder);
@@ -531,7 +545,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -551,7 +565,7 @@ namespace Algoloop.ViewModel
 
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
                     var model = new FolderModel { Name = Path.GetFileNameWithoutExtension(fileName) };
@@ -578,7 +592,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 

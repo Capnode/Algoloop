@@ -49,12 +49,18 @@ namespace Algoloop.ViewModel
             _parent = accountsViewModel;
             Model = accountModel;
 
-            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), true);
-            StartCommand = new RelayCommand(async () => await DoConnectAsync().ConfigureAwait(true), () => !Active);
-            StopCommand = new RelayCommand(async () => await DoDisconnectAsync().ConfigureAwait(true), () => Active);
-            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteAccount(this), () => !Active);
+            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), () => !IsBusy);
+            StartCommand = new RelayCommand(async () => await DoConnectAsync().ConfigureAwait(true), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(async () => await DoDisconnectAsync().ConfigureAwait(true), () => !IsBusy && Active);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteAccount(this), () => !IsBusy && !Active);
 
             DataFromModel();
+        }
+
+        public bool IsBusy
+        {
+            get => _parent.IsBusy;
+            set => _parent.IsBusy = value;
         }
 
         public RelayCommand ActiveCommand { get; }
@@ -109,26 +115,34 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            Active = true;
-            Log.Trace($"Connect Account {Model.Name}");
             try
             {
-                _brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
-                _brokerage.Message += OnMessage;
-                _brokerage.AccountChanged += OnAccountChanged;
-                _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
-                _brokerage.OrderStatusChanged += OnOrderStatusChanged;
-                _cancel = new CancellationTokenSource();
-                _task = Task.Run(() => MainLoop(), _cancel.Token);
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
-            }
+                IsBusy = true;
+                Active = true;
+                Log.Trace($"Connect Account {Model.Name}");
+                try
+                {
+                    _brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
+                    _brokerage.Message += OnMessage;
+                    _brokerage.AccountChanged += OnAccountChanged;
+                    _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
+                    _brokerage.OrderStatusChanged += OnOrderStatusChanged;
+                    _cancel = new CancellationTokenSource();
+                    _task = Task.Run(() => MainLoop(), _cancel.Token);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
+                }
 
-            if (!Active)
+                if (!Active)
+                {
+                    await DoDisconnectAsync().ConfigureAwait(true);
+                }
+            }
+            finally
             {
-                await DoDisconnectAsync().ConfigureAwait(true);
+                IsBusy = false;
             }
         }
 
@@ -139,34 +153,58 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            Active = false;
-            _cancel.Cancel();
-            await _task.ConfigureAwait(true);
-            _cancel = null;
-            _task = null;
-
-            if (Active)
+            try
             {
-                await DoConnectAsync().ConfigureAwait(true);
+                IsBusy = true;
+                Active = false;
+                _cancel.Cancel();
+                await _task.ConfigureAwait(true);
+                _cancel = null;
+                _task = null;
+
+                if (Active)
+                {
+                    await DoConnectAsync().ConfigureAwait(true);
+                }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
         internal void DataToModel()
         {
-            Model.Orders.Clear();
-            foreach (OrderViewModel vm in Orders)
+            try
             {
-                Model.Orders.Add(vm.Model);
+                IsBusy = true;
+                Model.Orders.Clear();
+                foreach (OrderViewModel vm in Orders)
+                {
+                    Model.Orders.Add(vm.Model);
+                }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
         internal void DataFromModel()
         {
-            Orders.Clear();
-            foreach (OrderModel order in Model.Orders)
+            try
             {
-                var vm = new OrderViewModel(order);
-                Orders.Add(vm);
+                IsBusy = true;
+                Orders.Clear();
+                foreach (OrderModel order in Model.Orders)
+                {
+                    var vm = new OrderViewModel(order);
+                    Orders.Add(vm);
+                }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

@@ -83,18 +83,24 @@ namespace Algoloop.ViewModel
             _accounts = accounts;
             _settings = settings;
 
-            StartCommand = new RelayCommand(() => DoStartTaskCommand(), () => !Active);
-            StopCommand = new RelayCommand(() => DoStopTaskCommand(), () => Active);
-            DeleteCommand = new RelayCommand(() => DoDeleteTrack(), () => !Active);
-            UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !Active);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => true);
-            CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => true);
-            CreateFolderCommand = new RelayCommand<IList>(m => DoCreateFolder(m), m => true);
+            StartCommand = new RelayCommand(() => DoStartTaskCommand(), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopTaskCommand(), () => !IsBusy && Active);
+            DeleteCommand = new RelayCommand(() => DoDeleteTrack(), () => !IsBusy && !Active);
+            UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !IsBusy && !Active);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy);
+            CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => !IsBusy);
+            CreateFolderCommand = new RelayCommand<IList>(m => DoCreateFolder(m), m => !IsBusy);
             ExportCommand = new RelayCommand(() => { }, () => false);
-            CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => true);
+            CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
 
             DataFromModel();
+        }
+
+        public bool IsBusy
+        {
+            get => _parent.IsBusy;
+            set => _parent.IsBusy = value;
         }
 
         public RelayCommand StartCommand { get; }
@@ -809,19 +815,43 @@ namespace Algoloop.ViewModel
 
         private void DoUseParameters()
         {
-            _parent?.UseParameters(this);
+            try
+            {
+                IsBusy = true;
+                _parent?.UseParameters(this);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private async void DoStartTaskCommand()
         {
-            Active = true;
-            await StartTaskAsync().ConfigureAwait(true);
+            try
+            {
+                IsBusy = true;
+                Active = true;
+                await StartTaskAsync().ConfigureAwait(true);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoStopTaskCommand()
         {
-            StopTask();
-            Active = false;
+            try
+            {
+                IsBusy = true;
+                StopTask();
+                Active = false;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoExportSymbols(IList symbols)
@@ -840,6 +870,7 @@ namespace Algoloop.ViewModel
 
             try
             {
+                IsBusy = true;
                 string fileName = saveFileDialog.FileName;
                 using StreamWriter file = File.CreateText(fileName);
                 foreach (TrackSymbolViewModel symbol in symbols)
@@ -851,22 +882,34 @@ namespace Algoloop.ViewModel
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoCloneStrategy(IList symbols)
         {
-            var strategyModel = new StrategyModel(Model);
-            if (symbols != null)
+            try
             {
-                strategyModel.Symbols.Clear();
-                IEnumerable<SymbolModel> symbolModels = symbols.Cast<TrackSymbolViewModel>().Select(m => new SymbolModel(m.Symbol));
-                foreach (SymbolModel symbol in symbolModels)
+                IsBusy = true;
+                var strategyModel = new StrategyModel(Model);
+                if (symbols != null)
                 {
-                    strategyModel.Symbols.Add(symbol);
+                    strategyModel.Symbols.Clear();
+                    IEnumerable<SymbolModel> symbolModels = symbols.Cast<TrackSymbolViewModel>().Select(m => new SymbolModel(m.Symbol));
+                    foreach (SymbolModel symbol in symbolModels)
+                    {
+                        strategyModel.Symbols.Add(symbol);
+                    }
                 }
-            }
 
-            _parent.CloneStrategy(strategyModel);
+                _parent.CloneStrategy(strategyModel);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoCreateFolder(IList list)
@@ -874,16 +917,32 @@ namespace Algoloop.ViewModel
             if (list == null)
                 return;
 
-            IEnumerable<string> symbols = list.Cast<TrackSymbolViewModel>().Select(m => m.Symbol);
-            _parent.CreateFolder(symbols);
+            try
+            {
+                IsBusy = true;
+                IEnumerable<string> symbols = list.Cast<TrackSymbolViewModel>().Select(m => m.Symbol);
+                _parent.CreateFolder(symbols);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void StopTask()
         {
-            if (_cancel != null)
+            try
             {
-                _cancel.Cancel();
-                _cancel = null;
+                IsBusy = true;
+                if (_cancel != null)
+                {
+                    _cancel.Cancel();
+                    _cancel = null;
+                }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

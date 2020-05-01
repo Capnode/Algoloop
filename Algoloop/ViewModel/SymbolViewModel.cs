@@ -71,7 +71,13 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            UpdateCommand = new RelayCommand(() => DoLoadData(_parent as MarketViewModel), () => _parent is MarketViewModel);
+            UpdateCommand = new RelayCommand(() => DoLoadData(_parent as MarketViewModel), () => !IsBusy && _parent is MarketViewModel);
+        }
+
+        public bool IsBusy
+        {
+            get => _parent.IsBusy;
+            set => _parent.IsBusy = value;
         }
 
         public RelayCommand DeleteCommand { get; }
@@ -151,25 +157,42 @@ namespace Algoloop.ViewModel
 
         private void DoLoadData(MarketViewModel market)
         {
-            DoLoadChart(market);
-            DoLoadFundamentals(market);
+            try
+            {
+                IsBusy = true;
+                DoLoadChart(market);
+                DoLoadFundamentals(market);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoLoadChart(MarketViewModel market)
         {
             Debug.Assert(market != null);
-            Charts.Clear();
-            string filename = PriceFilePath(market, Model.Name, SelectedResolution, Date);
-            if (filename != null)
+
+            try
             {
-                var leanDataReader = new LeanDataReader(filename);
-                IEnumerable<BaseData> data = leanDataReader.Parse();
-                if (data.Any())
+                IsBusy = true;
+                Charts.Clear();
+                string filename = PriceFilePath(market, Model.Name, SelectedResolution, Date);
+                if (filename != null)
                 {
-                    var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
-                    var viewModel = new ChartViewModel(series, data);
-                    Charts.Add(viewModel);
+                    var leanDataReader = new LeanDataReader(filename);
+                    IEnumerable<BaseData> data = leanDataReader.Parse();
+                    if (data.Any())
+                    {
+                        var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
+                        var viewModel = new ChartViewModel(series, data);
+                        Charts.Add(viewModel);
+                    }
                 }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

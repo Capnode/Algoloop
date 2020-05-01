@@ -71,23 +71,23 @@ namespace Algoloop.ViewModel
             _accounts = accounts;
             _settings = settings;
 
-            StartCommand = new RelayCommand(() => DoRunStrategy(), () => true);
+            StartCommand = new RelayCommand(() => DoRunStrategy(), () => !IsBusy);
             StopCommand = new RelayCommand(() => { }, () => false);
-            CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => true);
+            CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !string.IsNullOrEmpty(Model.AlgorithmName));
-            ExportCommand = new RelayCommand(() => DoExportStrategy(), () => true);
-            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => true);
-            DeleteAllTracksCommand = new RelayCommand(() => DoDeleteTracks(null), () => true);
-            DeleteSelectedTracksCommand = new RelayCommand<IList>(m => DoDeleteTracks(m), m => true);
-            UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => true);
-            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => true);
-            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => true);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => SelectedSymbol != null);
+            ExportCommand = new RelayCommand(() => DoExportStrategy(), () => !IsBusy);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => !IsBusy);
+            DeleteAllTracksCommand = new RelayCommand(() => DoDeleteTracks(null), () => !IsBusy);
+            DeleteSelectedTracksCommand = new RelayCommand<IList>(m => DoDeleteTracks(m), m => !IsBusy);
+            UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => !IsBusy);
+            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
+            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && SelectedSymbol != null);
+            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => !IsBusy);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => !IsBusy &&  SelectedSymbol != null);
             TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(m => DoSelectItem(m));
-            MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => SelectedSymbol != null);
-            MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => SelectedSymbol != null);
-            SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => true);
+            MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => !IsBusy && SelectedSymbol != null);
+            MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => !IsBusy && SelectedSymbol != null);
+            SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => !IsBusy);
 
             Model.NameChanged += StrategyNameChanged;
             Model.MarketChanged += MarketChanged;
@@ -95,6 +95,12 @@ namespace Algoloop.ViewModel
             DataFromModel();
 
             Model.EndDate = DateTime.Now;
+        }
+
+        public bool IsBusy
+        {
+            get => _parent.IsBusy;
+            set => _parent.IsBusy = value;
         }
 
         public RelayCommand StartCommand { get; }
@@ -274,16 +280,24 @@ namespace Algoloop.ViewModel
 
         private void DoDeleteTracks(IList tracks)
         {
-            List<TrackViewModel> list = tracks == null
-                ? Tracks.ToList()
-                : tracks.Cast<TrackViewModel>().ToList();
-
-            foreach (TrackViewModel track in list)
+            try
             {
-               Tracks.Remove(track);
-            }
+                IsBusy = true;
+                List<TrackViewModel> list = tracks == null
+                    ? Tracks.ToList()
+                    : tracks.Cast<TrackViewModel>().ToList();
 
-            DataToModel();
+                foreach (TrackViewModel track in list)
+                {
+                    Tracks.Remove(track);
+                }
+
+                DataToModel();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoSelectItem(TrackViewModel track)
@@ -291,28 +305,44 @@ namespace Algoloop.ViewModel
             if (track == null)
                 return;
 
-            track.IsSelected = true;
-            _parent.SelectedItem = track;
-            IsExpanded = true;
+            try
+            {
+                IsBusy = true;
+                track.IsSelected = true;
+                _parent.SelectedItem = track;
+                IsExpanded = true;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoAddSymbol()
         {
-            if (string.IsNullOrEmpty(SelectedFolder?.Name))
+            try
             {
-                var symbol = new SymbolViewModel(this, new SymbolModel());
-                Symbols.Add(symbol);
-            }
-            else
-            {
-                IEnumerable<SymbolViewModel> symbols = _markets
-                    .GetActiveSymbols(Model.Market, SelectedFolder)
-                    .Where(s => !Symbols.Any(p => p.Model.Name.Equals(s)))
-                    .Select(m => new SymbolViewModel(this, m));
-                Symbols.AddRange(symbols);
-            }
+                IsBusy = true;
+                if (string.IsNullOrEmpty(SelectedFolder?.Name))
+                {
+                    var symbol = new SymbolViewModel(this, new SymbolModel());
+                    Symbols.Add(symbol);
+                }
+                else
+                {
+                    IEnumerable<SymbolViewModel> symbols = _markets
+                        .GetActiveSymbols(Model.Market, SelectedFolder)
+                        .Where(s => !Symbols.Any(p => p.Model.Name.Equals(s)))
+                        .Select(m => new SymbolViewModel(this, m));
+                    Symbols.AddRange(symbols);
+                }
 
-            DataToModel();
+                DataToModel();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoUseParameters(IList selected)
@@ -320,10 +350,18 @@ namespace Algoloop.ViewModel
             if (selected == null)
                 return;
 
-            foreach (TrackViewModel track in selected)
+            try
             {
-                UseParameters(track);
-                break; // skip rest
+                IsBusy = true;
+                foreach (TrackViewModel track in selected)
+                {
+                    UseParameters(track);
+                    break; // skip rest
+                }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
@@ -512,20 +550,28 @@ namespace Algoloop.ViewModel
             if (Symbols.Count == 0 || symbols.Count == 0)
                 return;
 
-            // Create a copy of the list before remove
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            int pos = Symbols.IndexOf(list.First());
-            foreach (SymbolViewModel symbol in list)
+            try
             {
-                Symbols.Remove(symbol);
+                IsBusy = true;
+                // Create a copy of the list before remove
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+                Debug.Assert(list != null);
+
+                int pos = Symbols.IndexOf(list.First());
+                foreach (SymbolViewModel symbol in list)
+                {
+                    Symbols.Remove(symbol);
+                }
+
+                DataToModel();
+                if (Symbols.Count > 0)
+                {
+                    SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+                }
             }
-
-            DataToModel();
-            if (Symbols.Count > 0)
+            finally
             {
-                SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
+                IsBusy = false;
             }
         }
 
@@ -542,6 +588,7 @@ namespace Algoloop.ViewModel
 
             try
             {
+                IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
                     using StreamReader r = new StreamReader(fileName);
@@ -565,6 +612,10 @@ namespace Algoloop.ViewModel
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         internal void CreateFolder(IEnumerable<string> symbols)
@@ -580,14 +631,14 @@ namespace Algoloop.ViewModel
         {
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 DataToModel();
                 var strategyModel = new StrategyModel(Model);
                 CloneStrategy(strategyModel);
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -595,7 +646,7 @@ namespace Algoloop.ViewModel
         {
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 DataToModel();
 
                 // Load assemblies of algorithms
@@ -627,7 +678,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -645,7 +696,7 @@ namespace Algoloop.ViewModel
 
             try
             {
-                _parent.IsBusy = true;
+                IsBusy = true;
                 string fileName = saveFileDialog.FileName;
                 using StreamWriter file = File.CreateText(fileName);
                 JsonSerializer serializer = new JsonSerializer();
@@ -659,7 +710,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _parent.IsBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -680,6 +731,7 @@ namespace Algoloop.ViewModel
 
             try
             {
+                IsBusy = true;
                 string fileName = saveFileDialog.FileName;
                 using StreamWriter file = File.CreateText(fileName);
                 foreach (SymbolViewModel symbol in symbols)
@@ -691,6 +743,10 @@ namespace Algoloop.ViewModel
             {
                 MessageBox.Show(ex.Message, ex.GetType().ToString());
             }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void OnMoveUpSymbols(IList symbols)
@@ -698,16 +754,25 @@ namespace Algoloop.ViewModel
             if (Symbols.Count <= 1)
                 return;
 
-            // Create a copy of the list before move
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            for (int i = 1; i < Symbols.Count; i++)
+            try
             {
-                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i - 1]))
+                IsBusy = true;
+
+                // Create a copy of the list before move
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+                Debug.Assert(list != null);
+
+                for (int i = 1; i < Symbols.Count; i++)
                 {
-                    Symbols.Move(i, i - 1);
+                    if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i - 1]))
+                    {
+                        Symbols.Move(i, i - 1);
+                    }
                 }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 
@@ -716,16 +781,25 @@ namespace Algoloop.ViewModel
             if (Symbols.Count <= 1)
                 return;
 
-            // Create a copy of the list before move
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-
-            for (int i = Symbols.Count - 2; i >= 0; i--)
+            try
             {
-                if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i + 1]))
+                IsBusy = true;
+
+                // Create a copy of the list before move
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
+                Debug.Assert(list != null);
+
+                for (int i = Symbols.Count - 2; i >= 0; i--)
                 {
-                    Symbols.Move(i, i + 1);
+                    if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i + 1]))
+                    {
+                        Symbols.Move(i, i + 1);
+                    }
                 }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
     }
