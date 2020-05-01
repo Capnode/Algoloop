@@ -524,7 +524,8 @@
       <Link>Data\UserData\Notebook\BasicQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <SplashScreen Include="Resources\AlgoloopIcon.ico" />
+    <SplashScreen Include="Resources\AlgoloopSplash.png" />
+    <None Include="Resources\AlgoloopIcon.ico" />
     <None Include="Resources\Algoloop.png" />
     <None Include="Resources\AlgoloopColor.png" />
     <None Include="Resources\Algoloop1080.png" />
