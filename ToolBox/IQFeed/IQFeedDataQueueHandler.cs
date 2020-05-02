@@ -25,6 +25,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HistoryRequest = QuantConnect.Data.HistoryRequest;
 using Timer = System.Timers.Timer;
 
@@ -208,10 +209,7 @@ namespace QuantConnect.ToolBox.IQFeed
         /// <summary>
         /// Indicates the connection is live.
         /// </summary>
-        private bool IsConnected
-        {
-            get { return _isConnected; }
-        }
+        public bool IsConnected => _isConnected;
 
         /// <summary>
         /// Connect to the IQ Feed using supplied username and password information.
@@ -331,6 +329,13 @@ namespace QuantConnect.ToolBox.IQFeed
         public bool CanAdvanceTime(SecurityType securityType)
         {
             return _symbolUniverse.CanAdvanceTime(securityType);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
         }
     }
 
@@ -584,7 +589,7 @@ namespace QuantConnect.ToolBox.IQFeed
                 (securityType == SecurityType.Equity && market == Market.USA) ||
                 (securityType == SecurityType.Forex && market == Market.FXCM) ||
                 (securityType == SecurityType.Option && market == Market.USA) ||
-                (securityType == SecurityType.Future);
+                (securityType == SecurityType.Future && IQFeedDataQueueUniverseProvider.FuturesExchanges.Values.Contains(market));
         }
 
         /// <summary>

@@ -19,7 +19,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using QuantConnect.Configuration;
@@ -31,7 +30,6 @@ using QuantConnect.Orders;
 using QuantConnect.Orders.Serialization;
 using QuantConnect.Packets;
 using QuantConnect.Statistics;
-using QuantConnect.Util;
 
 namespace QuantConnect.Lean.Engine.Results
 {
@@ -95,6 +93,11 @@ namespace QuantConnect.Lean.Engine.Results
         /// The algorithm project id
         /// </summary>
         protected int ProjectId { get; set; }
+
+        /// <summary>
+        /// The maximum amount of RAM (in MB) this algorithm is allowed to utilize
+        /// </summary>
+        protected string RamAllocation { get; set; }
 
         /// <summary>
         /// The algorithm unique compilation id
@@ -205,6 +208,18 @@ namespace QuantConnect.Lean.Engine.Results
         }
 
         /// <summary>
+        /// Gets the current Server statistics
+        /// </summary>
+        protected virtual Dictionary<string, string> GetServerStatistics(DateTime utcNow)
+        {
+            var serverStatistics = OS.GetServerStatistics();
+            var upTime = utcNow - StartTime;
+            serverStatistics["Up Time"] = $"{upTime.Days}d {upTime:hh\\:mm\\:ss}";
+            serverStatistics["Total RAM (MB)"] = RamAllocation;
+            return serverStatistics;
+        }
+
+        /// <summary>
         /// Stores the order events
         /// </summary>
         /// <param name="utcTime">The utc date associated with these order events</param>
@@ -274,6 +289,7 @@ namespace QuantConnect.Lean.Engine.Results
             CompileId = job.CompileId;
             AlgorithmId = job.AlgorithmId;
             ProjectId = job.ProjectId;
+            RamAllocation = job.RamAllocation.ToStringInvariant();
             OrderEventJsonConverter = new OrderEventJsonConverter(AlgorithmId);
             _updateRunner = new Thread(Run, 0) { IsBackground = true, Name = "Result Thread" };
             _updateRunner.Start();
@@ -563,15 +579,26 @@ namespace QuantConnect.Lean.Engine.Results
             var result = new List<string>();
             var endTime = DateTime.UtcNow.AddMilliseconds(250).Ticks;
             string message;
+            var currentMessageCount = -1;
             while (DateTime.UtcNow.Ticks < endTime && concurrentQueue.TryDequeue(out message))
             {
-                if (messageQueueLimit.HasValue && Messages.Count > messageQueueLimit)
+                if (messageQueueLimit.HasValue)
                 {
-                    //if too many in the queue already skip the logging and drop the messages
-                    continue;
+                    if (currentMessageCount == -1)
+                    {
+                        // this is expensive, so let's get it once
+                        currentMessageCount = Messages.Count;
+                    }
+                    if (currentMessageCount > messageQueueLimit)
+                    {
+                        //if too many in the queue already skip the logging and drop the messages
+                        continue;
+                    }
                 }
                 AddToLogStore(message);
                 result.Add(message);
+                // increase count after we add
+                currentMessageCount++;
             }
 
             if (result.Count > 0)

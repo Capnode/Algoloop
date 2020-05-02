@@ -115,8 +115,11 @@ namespace QuantConnect.Messaging
                     {
                         // inject alpha statistics into backtesting result statistics
                         // this is primarily so we can easily regression test these values
-                        var alphaStatistics = result.Results.AlphaRuntimeStatistics?.ToDictionary().ToList() ?? new List<KeyValuePair<string, string>>();
-                        alphaStatistics.ForEach(kvp => result.Results.Statistics.Add(kvp));
+                        var alphaStatistics = result.Results.AlphaRuntimeStatistics?.ToDictionary() ?? Enumerable.Empty<KeyValuePair<string, string>>();
+                        foreach (var kvp in alphaStatistics)
+                        {
+                            result.Results.Statistics.Add(kvp);
+                        }
 
                         var orderHash = result.Results.Orders.GetHash();
                         result.Results.Statistics.Add("OrderListHash", orderHash.ToString(CultureInfo.InvariantCulture));
@@ -131,12 +134,6 @@ namespace QuantConnect.Messaging
                         Log.Trace(statisticsStr);
                     }
                     break;
-            }
-
-
-            if (StreamingApi.IsEnabled)
-            {
-                StreamingApi.Transmit(_job.UserId, _job.Channel, packet, _orderEventJsonConverter);
             }
         }
 

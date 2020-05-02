@@ -29,7 +29,7 @@ using QuantConnect.Data.Consolidators;
 
 namespace QuantConnect.Tests.ToolBox
 {
-    [TestFixture]
+    [TestFixture, Parallelizable(ParallelScope.Fixtures)]
     public class LeanDataReaderTests
     {
         string _dataDirectory = "../../../Data/";
@@ -43,9 +43,9 @@ namespace QuantConnect.Tests.ToolBox
         {
             var canonicalFutures = new Dictionary<Symbol, string>()
             {
-                { Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.USA),
+                { Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.CME),
                     "ES20Z13|ES21H14|ES20M14|ES19U14|ES19Z14" },
-                {Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.USA),
+                {Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.COMEX),
                     "GC29V13|GC26X13|GC27Z13|GC26G14|GC28J14|GC26M14|GC27Q14|GC29V14|GC29Z14|GC25G15|GC28J15|GC26M15|GC27Q15|GC29Z15|GC28M16|GC28Z16|GC28M17|GC27Z17|GC27M18|GC27Z18|GC26M19"},
             };
 
@@ -105,8 +105,7 @@ namespace QuantConnect.Tests.ToolBox
             {
                 var leanDataReader = new LeanDataReader(config, future, res, date, _dataDirectory);
 
-                var data = leanDataReader.Parse().ToList();
-                foreach (var bar in data)
+                foreach (var bar in leanDataReader.Parse())
                 {
                     //write base data type back to string
                     sb.AppendLine(LeanData.GenerateLine(bar, SecurityType.Future, res));
@@ -123,8 +122,8 @@ namespace QuantConnect.Tests.ToolBox
 
             var tickTypes = new[] { TickType.Trade, TickType.Quote, TickType.OpenInterest };
 
-            var futures = new[] { Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.USA),
-                Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.USA)};
+            var futures = new[] { Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.CME),
+                Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.COMEX)};
             var resolutions = new[] { Resolution.Hour, Resolution.Daily };
 
             foreach (var future in futures)
@@ -185,10 +184,9 @@ namespace QuantConnect.Tests.ToolBox
 
                     var leanDataReader = new LeanDataReader(configs[future.Value], future, inputResolution, date, _dataDirectory);
 
-                    var data = leanDataReader.Parse().ToList();
                     var consolidator = consolidators[future.Value];
 
-                    foreach (var bar in data)
+                    foreach (var bar in leanDataReader.Parse())
                     {
                         consolidator.Update(bar);
                     }
@@ -227,10 +225,10 @@ namespace QuantConnect.Tests.ToolBox
         {
             // Act
             var ldr = new LeanDataReader(composedFilePath);
-            var data = ldr.Parse().ToArray();
+            var data = ldr.Parse().ToList();
             // Assert
             Assert.True(symbol.Equals(data.First().Symbol));
-            Assert.AreEqual(rowsInfile, data.Length);
+            Assert.AreEqual(rowsInfile, data.Count);
             Assert.AreEqual(sumValue, data.Sum(c => c.Value));
         }
 
@@ -239,9 +237,9 @@ namespace QuantConnect.Tests.ToolBox
         {
             new object[]
             {
-                "../../../Data/future/usa/minute/es/20131008_quote.zip#20131008_es_minute_quote_201312_20131220.csv",
+                "../../../Data/future/cme/minute/es/20131008_quote.zip#20131008_es_minute_quote_201312_20131220.csv",
                 LeanData
-                    .ReadSymbolFromZipEntry(Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.USA),
+                    .ReadSymbolFromZipEntry(Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.CME),
                                             Resolution.Minute, "20131008_es_minute_quote_201312_20131220.csv"),
                 1411,
                 2346061.875
@@ -249,8 +247,8 @@ namespace QuantConnect.Tests.ToolBox
 
             new object[]
             {
-                "../../../Data/future/usa/minute/gc/20131010_trade.zip#20131010_gc_minute_trade_201312_20131227.csv",
-                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.USA),
+                "../../../Data/future/comex/minute/gc/20131010_trade.zip#20131010_gc_minute_trade_201312_20131227.csv",
+                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.COMEX),
                                                 Resolution.Minute, "20131010_gc_minute_trade_201312_20131227.csv"),
                 1379,
                 1791800.9
@@ -258,8 +256,8 @@ namespace QuantConnect.Tests.ToolBox
 
             new object[]
             {
-                "../../../Data/future/usa/tick/gc/20131009_quote.zip#20131009_gc_tick_quote_201406_20140626.csv",
-                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.USA),
+                "../../../Data/future/comex/tick/gc/20131009_quote.zip#20131009_gc_tick_quote_201406_20140626.csv",
+                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.COMEX),
                                                 Resolution.Tick, "20131009_gc_tick_quote_201406_20140626.csv"),
                 197839,
                 259245064.8
@@ -267,8 +265,8 @@ namespace QuantConnect.Tests.ToolBox
 
             new object[]
             {
-                "../../../Data/future/usa/tick/gc/20131009_trade.zip#20131009_gc_tick_trade_201312_20131227.csv",
-                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.USA),
+                "../../../Data/future/comex/tick/gc/20131009_trade.zip#20131009_gc_tick_trade_201312_20131227.csv",
+                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.COMEX),
                                                 Resolution.Tick, "20131009_gc_tick_trade_201312_20131227.csv"),
                 64712,
                 84596673.8
@@ -276,9 +274,9 @@ namespace QuantConnect.Tests.ToolBox
 
             new object[]
             {
-                "../../../Data/future/usa/minute/es/20131010_openinterest.zip#20131010_es_minute_openinterest_201312_20131220.csv",
+                "../../../Data/future/cme/minute/es/20131010_openinterest.zip#20131010_es_minute_openinterest_201312_20131220.csv",
                 LeanData
-                    .ReadSymbolFromZipEntry(Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.USA),
+                    .ReadSymbolFromZipEntry(Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.CME),
                                             Resolution.Minute, "20131010_es_minute_openinterest_201312.csv"),
                 3,
                 8119169
@@ -286,8 +284,8 @@ namespace QuantConnect.Tests.ToolBox
 
             new object[]
             {
-                "../../../Data/future/usa/tick/gc/20131009_openinterest.zip#20131009_gc_tick_openinterest_201310_20131029.csv",
-                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.USA),
+                "../../../Data/future/comex/tick/gc/20131009_openinterest.zip#20131009_gc_tick_openinterest_201310_20131029.csv",
+                LeanData.ReadSymbolFromZipEntry(Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.COMEX),
                                                 Resolution.Tick, "20131009_gc_tick_openinterest_201310_20131029.csv"),
                 4,
                 1312
@@ -337,10 +335,10 @@ namespace QuantConnect.Tests.ToolBox
 
             // Act
             var ldr = new LeanDataReader(filepath);
-            var data = ldr.Parse().ToArray();
+            var data = ldr.Parse().ToList();
             // Assert
             Assert.True(symbol.Equals(data.First().Symbol));
-            Assert.AreEqual(rowsInfile, data.Length);
+            Assert.AreEqual(rowsInfile, data.Count);
             Assert.AreEqual(sumValue, data.Sum(c => c.Value));
         }
 
