@@ -38,7 +38,7 @@ namespace Algoloop.ViewModel
             _settings = settings;
 
             AddCommand = new RelayCommand(() => DoAddMarket(), () => !IsBusy);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => vm != null);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy && vm != null);
 
             DataFromModel();
         }
@@ -117,14 +117,23 @@ namespace Algoloop.ViewModel
 
         private void DoSelectedChanged(ITreeViewModel vm)
         {
+            // No IsBusy here
             vm.Refresh();
             SelectedItem = vm;
         }
 
         private void DoAddMarket()
         {
-            var loginViewModel = new MarketViewModel(this, new MarketModel(), _settings);
-            Markets.Add(loginViewModel);
+            try
+            {
+                IsBusy = true;
+                var loginViewModel = new MarketViewModel(this, new MarketModel(), _settings);
+                Markets.Add(loginViewModel);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DataToModel()

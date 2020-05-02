@@ -74,7 +74,7 @@ namespace Algoloop.ViewModel
             StartCommand = new RelayCommand(() => DoRunStrategy(), () => !IsBusy);
             StopCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => !IsBusy);
-            CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !string.IsNullOrEmpty(Model.AlgorithmName));
+            CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmName));
             ExportCommand = new RelayCommand(() => DoExportStrategy(), () => !IsBusy);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => !IsBusy);
             DeleteAllTracksCommand = new RelayCommand(() => DoDeleteTracks(null), () => !IsBusy);
@@ -84,7 +84,7 @@ namespace Algoloop.ViewModel
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => !IsBusy);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => !IsBusy &&  SelectedSymbol != null);
-            TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(m => DoSelectItem(m));
+            TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(m => DoSelectItem(m), m => !IsBusy);
             MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => !IsBusy && SelectedSymbol != null);
             MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => !IsBusy && SelectedSymbol != null);
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => !IsBusy);
@@ -367,6 +367,7 @@ namespace Algoloop.ViewModel
 
         private async void DoRunStrategy()
         {
+            // No IsBusy here
             DataToModel();
 
             int count = 0;

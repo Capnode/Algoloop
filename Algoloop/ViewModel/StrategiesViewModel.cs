@@ -49,7 +49,7 @@ namespace Algoloop.ViewModel
             AddCommand = new RelayCommand(() => DoAddStrategy(), () => !IsBusy);
             ImportCommand = new RelayCommand(() => DoImportStrategies(), () => !IsBusy);
             ExportCommand = new RelayCommand(() => DoExportStrategies(), () => !IsBusy);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), true);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy);
 
             DataFromModel();
         }
@@ -167,20 +167,9 @@ namespace Algoloop.ViewModel
 
         private void DoSelectedChanged(ITreeViewModel vm)
         {
-            try
-            {
-                IsBusy = true;
-                if (vm != null)
-                {
-                    vm.Refresh();
-                }
-
-                SelectedItem = vm;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            // No IsBusy here
+            vm?.Refresh();
+            SelectedItem = vm;
         }
 
         private void DoImportStrategies()
