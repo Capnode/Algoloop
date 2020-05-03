@@ -289,36 +289,22 @@ namespace Algoloop.ViewModel
 
         private async void DoActiveCommand(bool value)
         {
-            try
+            // No IsBusy
+            if (value)
             {
-                IsBusy = true;
-                if (value)
-                {
-                    await StartTaskAsync().ConfigureAwait(true);
-                }
-                else
-                {
-                    StopTask();
-                }
+                await StartTaskAsync().ConfigureAwait(true);
             }
-            finally
+            else
             {
-                IsBusy = false;
+                StopTask();
             }
         }
 
         private async void DoStartCommand()
         {
-            try
-            {
-                IsBusy = true;
-                Active = true;
-                await StartTaskAsync().ConfigureAwait(true);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            // No IsBusy
+            Active = true;
+            await StartTaskAsync().ConfigureAwait(true);
         }
 
         private void DoStopCommand()
