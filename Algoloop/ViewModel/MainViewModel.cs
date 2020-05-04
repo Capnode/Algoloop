@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -37,6 +36,7 @@ namespace Algoloop.ViewModel
     {
         private bool _isBusy;
         private string _statusMessage;
+        private readonly Task _initializer;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -61,21 +61,12 @@ namespace Algoloop.ViewModel
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
-            // Initialize data folders
-            MainService.InitializeFolders();
-
             // Set working directory
             string appData = MainService.GetAppDataFolder();
             Directory.SetCurrentDirectory(appData);
 
-            // Read configuration
-            _ = ReadConfigAsync(appData);
-
-            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            ProviderFactory.RegisterProviders(settingsViewModel.Model);
-
-            // Initialize Research page
-            ResearchViewModel.Initialize();
+            // Async initialize without blocking UI
+            _initializer = Initialize(appData);
         }
 
         public RelayCommand SaveCommand { get; }
@@ -150,16 +141,30 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async Task ReadConfigAsync(string appData)
+        private async Task Initialize(string appData)
         {
             try
             {
                 IsBusy = true;
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfiguration));
-                await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
+
+                // Initialize data folders
+                MainService.InitializeFolders();
+                ProviderFactory.PrepareDataFolder(SettingsViewModel.Model.DataFolder);
+
+                // Read configuration
+                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
+
+                // Register providers
+                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                ProviderFactory.RegisterProviders(SettingsViewModel.Model);
+
+                // Initialize Research page
+                ResearchViewModel.Initialize();
+
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfigurationCompleted));
             }
             finally

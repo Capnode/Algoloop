@@ -25,6 +25,8 @@ namespace Algoloop.Service
     [DataContract]
     public class SettingService
     {
+        private Collection<string> _addOns = new Collection<string>();
+
         [Category("API")]
         [DisplayName("API access token")]
         [Description("Your unique access token to the API.")]
@@ -82,9 +84,6 @@ namespace Algoloop.Service
         [DataMember]
         public int MaxBacktests { get; set; } = Math.Min(Environment.ProcessorCount, 8);
 
-        [Browsable(false)]
-        public Collection<string> AddOns { get; private set; } = new Collection<string>();
-
         internal void Copy(SettingService oldSettings)
         {
             if (oldSettings == null)
@@ -99,12 +98,27 @@ namespace Algoloop.Service
             DataFolder = oldSettings.DataFolder;
             MaxBacktests = oldSettings.MaxBacktests;
             Notebook = oldSettings.Notebook;
-            AddOns = oldSettings.AddOns;
+        }
+
+        internal void Addon(string addon)
+        {
+            if (!_addOns.Contains(addon))
+            {
+                _addOns.Add(addon);
+            }
+        }
+
+        internal void Addons(Collection<string> addons)
+        {
+            foreach (string addon in addons)
+            {
+                Addon(addon);
+            }
         }
 
         internal bool HasAddon(string addon)
         {
-            return AddOns.Contains(addon);
+            return _addOns.Contains(addon);
         }
     }
 }

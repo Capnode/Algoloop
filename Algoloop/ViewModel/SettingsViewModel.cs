@@ -12,15 +12,12 @@
  * limitations under the License.
  */
 
-using Algoloop.Provider;
 using Algoloop.Service;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Algoloop.ViewModel
@@ -37,7 +34,7 @@ namespace Algoloop.ViewModel
 
         public SettingService Model { get; }
 
-        public async Task<bool> ReadAsync(string fileName)
+        public bool Read(string fileName)
         {
             Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
@@ -56,7 +53,7 @@ namespace Algoloop.ViewModel
                 }
             }
 
-            await DataFromModel();
+            DataFromModel();
             return true;
         }
 
@@ -88,10 +85,8 @@ namespace Algoloop.ViewModel
         {
         }
 
-        private async Task DataFromModel()
+        private void DataFromModel()
         {
-            ProviderFactory.PrepareDataFolder(Model.DataFolder);
-            await Task.CompletedTask;
         }
     }
 }
