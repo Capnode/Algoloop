@@ -152,15 +152,15 @@ namespace Algoloop.ViewModel
                 MainService.InitializeFolders();
                 ProviderFactory.PrepareDataFolder(SettingsViewModel.Model.DataFolder);
 
+                // Register providers
+                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                ProviderFactory.RegisterProviders(SettingsViewModel.Model);
+
                 // Read configuration
                 SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
-
-                // Register providers
-                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-                ProviderFactory.RegisterProviders(SettingsViewModel.Model);
 
                 // Initialize Research page
                 ResearchViewModel.Initialize();
