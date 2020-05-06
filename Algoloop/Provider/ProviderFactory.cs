@@ -53,19 +53,21 @@ namespace Algoloop.Provider
                 {
                     market.Active = false;
                 }
-
-                try
+                else
                 {
-                    provider.Download(market, settings, symbols);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(string.Format(
-                        CultureInfo.InvariantCulture, 
-                        "{0}: {1}",
-                        ex.GetType(),
-                        ex.Message));
-                    market.Active = false;
+                    try
+                    {
+                        provider.Download(market, settings, symbols);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(string.Format(
+                            CultureInfo.InvariantCulture,
+                            "{0}: {1}",
+                            ex.GetType(),
+                            ex.Message));
+                        market.Active = false;
+                    }
                 }
             }
 
