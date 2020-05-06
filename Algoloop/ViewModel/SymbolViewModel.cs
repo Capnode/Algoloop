@@ -160,8 +160,8 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                DoLoadChart(market);
-                DoLoadFundamentals(market);
+                LoadCharts(market);
+                LoadFundamentals(market);
             }
             finally
             {
@@ -169,30 +169,21 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoLoadChart(MarketViewModel market)
+        private void LoadCharts(MarketViewModel market)
         {
             Debug.Assert(market != null);
-
-            try
+            Charts.Clear();
+            string filename = PriceFilePath(market, Model.Name, SelectedResolution, Date);
+            if (filename != null)
             {
-                IsBusy = true;
-                Charts.Clear();
-                string filename = PriceFilePath(market, Model.Name, SelectedResolution, Date);
-                if (filename != null)
+                var leanDataReader = new LeanDataReader(filename);
+                IEnumerable<BaseData> data = leanDataReader.Parse();
+                if (data.Any())
                 {
-                    var leanDataReader = new LeanDataReader(filename);
-                    IEnumerable<BaseData> data = leanDataReader.Parse();
-                    if (data.Any())
-                    {
-                        var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
-                        var viewModel = new ChartViewModel(series, data);
-                        Charts.Add(viewModel);
-                    }
+                    var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
+                    var viewModel = new ChartViewModel(series, data);
+                    Charts.Add(viewModel);
                 }
-            }
-            finally
-            {
-                IsBusy = false;
             }
         }
 
@@ -237,7 +228,7 @@ namespace Algoloop.ViewModel
             return null;
         }
 
-        private void DoLoadFundamentals(MarketViewModel market)
+        private void LoadFundamentals(MarketViewModel market)
         {
             // Reset Fundamentals
             FundamentalRows.Clear();

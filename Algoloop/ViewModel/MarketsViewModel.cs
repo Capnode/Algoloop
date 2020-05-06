@@ -117,9 +117,16 @@ namespace Algoloop.ViewModel
 
         private void DoSelectedChanged(ITreeViewModel vm)
         {
-            // No IsBusy here
-            vm.Refresh();
-            SelectedItem = vm;
+            try
+            {
+                IsBusy = true;
+                vm.Refresh();
+                SelectedItem = vm;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void DoAddMarket()
