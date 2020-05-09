@@ -502,9 +502,9 @@ namespace Algoloop.ViewModel
         private void AlgorithmNameChanged(string algorithmName)
         {
             StrategyNameChanged();
+            if (string.IsNullOrEmpty(algorithmName)) return;
 
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
-            if (string.IsNullOrEmpty(algorithmName)) return;
             if (string.IsNullOrEmpty(assemblyPath)) return;
 
             CloneAlgorithmCommand.RaiseCanExecuteChanged();
