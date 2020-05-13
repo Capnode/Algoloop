@@ -16,9 +16,11 @@ using Algoloop.Model;
 using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
+using QuantConnect.Securities.Forex;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Algoloop.Provider
@@ -43,20 +45,20 @@ namespace Algoloop.Provider
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
 
-        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
+        public void Download(MarketModel market, SettingService settings)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", settings.DataFolder);
 
-            string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
-            DateTime fromDate = model.LastDate.Date.AddDays(1);
+            string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
+            DateTime fromDate = market.LastDate.Date.AddDays(1);
             if (fromDate >= DateTime.Today)
             {
                 // Do not download today data
-                model.Active = false;
+                market.Active = false;
                 return;
             }
 
@@ -65,20 +67,42 @@ namespace Algoloop.Provider
                 fromDate = _firstDate;
             }
 
-            DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, fromDate.AddDays(1).AddTicks(-1));
-            model.LastDate = fromDate;
+            // Download active symbols
+            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Name).ToList();
+            if (symbols.Any())
+            {
+                DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, fromDate.AddDays(1).AddTicks(-1));
+                market.LastDate = fromDate;
+            }
+
+            // Update symbol list
+            UpdateSymbols(market);
         }
 
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
+        private void UpdateSymbols(MarketModel market)
         {
-            var list = new List<SymbolModel>();
-            list.AddRange(_majors.Select(m => new SymbolModel(m) { Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
-            list.AddRange(_crosses.Select(m => new SymbolModel(m) { Properties = new Dictionary<string, object> { { "Category", "Crosses" } } }));
-            list.AddRange(_metals.Select(m => new SymbolModel(m) { Properties = new Dictionary<string, object> { { "Category", "Metals" } } }));
-            list.AddRange(_indices.Select(m => new SymbolModel(m) { Properties = new Dictionary<string, object> { { "Category", "Indices" } } }));
+            var all = new List<SymbolModel>();
+            all.AddRange(_majors.Select(m => new SymbolModel(m, market.Name, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
+            all.AddRange(_crosses.Select(m => new SymbolModel(m, market.Name, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Crosses" } } }));
+            all.AddRange(_metals.Select(m => new SymbolModel(m, market.Name, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Metals" } } }));
+            all.AddRange(_indices.Select(m => new SymbolModel(m, market.Name, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Indices" } } }));
 
+            // Exclude unknown symbols
             var downloader = new DukascopyDataDownloader();
-            return list.Where(m => downloader.HasSymbol(m.Name));
+            foreach (SymbolModel symbol in all.Where(m => downloader.HasSymbol(m.Name)))
+            {
+                SymbolModel item = market.Symbols.FirstOrDefault(m => m.Name.Equals(symbol.Name));
+                if (item == null)
+                {
+                    // Add symbol
+                    market.Symbols.Add(symbol);
+                }
+                else
+                {
+                    // Update properties
+                    item.Properties = symbol.Properties;
+                }
+            }
         }
     }
 }

@@ -4,11 +4,11 @@
       "Name": null,
       "Desktop": false,
       "Account": "Backtest",
-      "Market": "USA",
-      "Provider": "Usa",
+      "Market": "usa",
+      "Security": 1,
       "BarsBack": 0,
       "StartDate": "2013-10-07T00:00:00+02:00",
-      "EndDate": "2020-01-23T12:11:10.2190234+01:00",
+      "EndDate": "2020-05-13T21:51:10.8084736+02:00",
       "Resolution": 4,
       "InitialCapital": 0,
       "PcntCapitalPerPosition": 0.0,
@@ -19,6 +19,8 @@
         {
           "Active": true,
           "Name": "spy",
+          "Market": null,
+          "Security": 0,
           "Properties": null
         }
       ],

@@ -123,7 +123,7 @@ namespace Algoloop.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    Log.Error(ex, $"Failed reading {fileName}\n");
                     return false;
                 }
             }
@@ -146,7 +146,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed writing {fileName}\n");
                 return false;
             }
         }
@@ -206,7 +206,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n");
             }
             finally
             {

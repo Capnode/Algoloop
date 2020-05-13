@@ -43,7 +43,7 @@ namespace Algoloop.Model
             Desktop = strategy.Desktop;
             Account = strategy.Account;
             Market = strategy.Market;
-            Provider = strategy.Provider;
+            Security = strategy.Security;
             BarsBack = strategy.BarsBack;
             StartDate = strategy.StartDate;
             EndDate = strategy.EndDate;
@@ -100,47 +100,51 @@ namespace Algoloop.Model
             }
         }
 
-        [Category("Broker")]
-        [DisplayName("Market data")]
-        [Description("Market data for backtest")]
+        [Category("Data")]
+        [DisplayName("Market")]
+        [Description("Market data for backtest. Must match market folder in data folder structure.")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
         public string Market { get; set; }
 
-        [Category("Broker")]
-        [DisplayName("Market provider")]
-        [Description("Market data provider for backtest")]
+        [Category("Data")]
+        [DisplayName("Security type")]
+        [Description("Asset security type. Must match security folder in data folder structure.")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
-        public string Provider { get; set; }
+        public SecurityType Security { get; set; }
 
-        [Category("Time")]
+        [Category("Data")]
         [DisplayName("Bars back")]
+        [Description("Number of bars to backtest")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
         public int BarsBack { get; set; }
 
-        [Category("Time")]
-        [DisplayName("From date")]
+        [Category("Data")]
+        [DisplayName("Date from")]
+        [Description("Backtest from date")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         public DateTime StartDate { get; set; } = DateTime.Today;
 
-        [Category("Time")]
-        [DisplayName("To date")]
+        [Category("Data")]
+        [DisplayName("Date to")]
+        [Description("Backtest to date")]
         [Browsable(true)]
         [ReadOnly(true)]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [DataMember]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
-        [Category("Time")]
+        [Category("Data")]
         [DisplayName("Resolution")]
+        [Description("Period resolution. Must match resolution folder in data folder structure.")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
@@ -148,6 +152,7 @@ namespace Algoloop.Model
 
         [Category("Capital")]
         [DisplayName("Initial capial")]
+        [Description("Start capital")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
@@ -155,6 +160,7 @@ namespace Algoloop.Model
 
         [Category("Capital")]
         [DisplayName("Percent capital per position")]
+        [Description("Capital used for each position")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
@@ -162,6 +168,7 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [DisplayName("File location")]
+        [Description("Algorithm file location")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
@@ -169,6 +176,7 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [DisplayName("Algorithm name")]
+        [Description("Name of algorithm")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
@@ -176,6 +184,7 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [DisplayName("Algorithm language")]
+        [Description("Programming language of algorithm")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
@@ -224,16 +233,6 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
-            if (Account == null
-             || Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase)
-             || Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
-            {
-                SetBrowsable("Provider", true);
-            }
-            else
-            {
-                SetBrowsable("Provider", false);
-            }
         }
     }
 }

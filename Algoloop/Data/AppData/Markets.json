@@ -1,24 +1,30 @@
 {
   "Markets": [
     {
-      "Name": "USA",
-      "Provider": "Usa",
+      "Name": "QuantConnect",
+      "Provider": "quantconnect",
       "Access": 0,
       "Login": "",
       "Password": "",
       "ApiKey": "",
       "LastDate": "2020-01-12T00:00:00+01:00",
+      "Market": "usa",
+      "Security": 1,
       "Resolution": 4,
       "Active": false,
       "Symbols": [
         {
           "Active": true,
           "Name": "aapl",
+          "Market": "usa",
+          "Security": 1,
           "Properties": null
         },
         {
           "Active": true,
           "Name": "spy",
+          "Market": "usa",
+          "Security": 1,
           "Properties": null
         }
       ],
@@ -26,8 +32,20 @@
         {
           "Name": "Stock",
           "Symbols": [
-            "aapl",
-            "spy"
+            {
+              "Active": true,
+              "Name": "aapl",
+              "Market": "usa",
+              "Security": 1,
+              "Properties": null
+            },
+            {
+              "Active": true,
+              "Name": "spy",
+              "Market": "usa",
+              "Security": 1,
+              "Properties": null
+            }
           ]
         }
       ]

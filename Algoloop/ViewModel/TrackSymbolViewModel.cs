@@ -36,6 +36,16 @@ namespace Algoloop.ViewModel
         public string Symbol => _symbol.Value;
 
         /// <summary>
+        /// The market of the traded instrument
+        /// </summary>
+        public string Market => _symbol.ID.Market;
+
+        /// <summary>
+        /// The security type of the traded instrument
+        /// </summary>
+        public SecurityType Security => _symbol.ID.SecurityType;
+
+        /// <summary>
         /// The type of the traded instrument
         /// </summary>
         public string Type => _symbol.SecurityType.ToString();

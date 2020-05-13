@@ -89,7 +89,6 @@ namespace Algoloop.ViewModel
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !IsBusy && !Active);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy);
             CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => !IsBusy);
-            CreateFolderCommand = new RelayCommand<IList>(m => DoCreateFolder(m), m => !IsBusy);
             ExportCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
@@ -113,7 +112,6 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<IList> CloneStrategyCommand { get; }
-        public RelayCommand<IList> CreateFolderCommand { get; }
 
         public IList SelectedItems
         {
@@ -880,7 +878,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
             }
             finally
             {
@@ -897,7 +895,7 @@ namespace Algoloop.ViewModel
                 if (symbols != null)
                 {
                     strategyModel.Symbols.Clear();
-                    IEnumerable<SymbolModel> symbolModels = symbols.Cast<TrackSymbolViewModel>().Select(m => new SymbolModel(m.Symbol));
+                    IEnumerable<SymbolModel> symbolModels = symbols.Cast<TrackSymbolViewModel>().Select(m => new SymbolModel(m.Symbol, m.Market, m.Security));
                     foreach (SymbolModel symbol in symbolModels)
                     {
                         strategyModel.Symbols.Add(symbol);
@@ -905,23 +903,6 @@ namespace Algoloop.ViewModel
                 }
 
                 _parent.CloneStrategy(strategyModel);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private void DoCreateFolder(IList list)
-        {
-            if (list == null)
-                return;
-
-            try
-            {
-                IsBusy = true;
-                IEnumerable<string> symbols = list.Cast<TrackSymbolViewModel>().Select(m => m.Symbol);
-                _parent.CreateFolder(symbols);
             }
             finally
             {

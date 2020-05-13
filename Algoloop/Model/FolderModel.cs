@@ -28,9 +28,9 @@ namespace Algoloop.Model
         {
         }
 
-        public FolderModel(IEnumerable<string> symbols)
+        public FolderModel(IEnumerable<SymbolModel> symbols)
         {
-            foreach (string symbol in symbols)
+            foreach (SymbolModel symbol in symbols)
             {
                 Symbols.Add(symbol);
             }
@@ -46,7 +46,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public Collection<string> Symbols { get; } = new Collection<string>();
+        public Collection<SymbolModel> Symbols { get; } = new Collection<SymbolModel>();
 
         public int CompareTo(object obj)
         {

@@ -90,7 +90,6 @@ namespace Algoloop.ViewModel
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => !IsBusy);
 
             Model.NameChanged += StrategyNameChanged;
-            Model.MarketChanged += MarketChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
             DataFromModel();
 
@@ -325,7 +324,7 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
                 if (string.IsNullOrEmpty(SelectedFolder?.Name))
                 {
-                    var symbol = new SymbolViewModel(this, new SymbolModel());
+                    var symbol = new SymbolViewModel(this, new SymbolModel("symbol", Model.Market, Model.Security));
                     Symbols.Add(symbol);
                 }
                 else
@@ -492,13 +491,6 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void MarketChanged()
-        {
-            MarketModel market = _markets.GetMarket(Model.Market);
-            Model.Provider = market.Provider;
-            RaisePropertyChanged(() => Folders);
-        }
-
         private void AlgorithmNameChanged(string algorithmName)
         {
             StrategyNameChanged();
@@ -600,7 +592,7 @@ namespace Algoloop.ViewModel
                         {
                             if (Model.Symbols.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == null)
                             {
-                                var symbol = new SymbolModel(name);
+                                var symbol = new SymbolModel(name, Model.Market, Model.Security);
                                 Model.Symbols.Add(symbol);
                             }
                         }
@@ -611,7 +603,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n");
             }
             finally
             {
@@ -619,7 +611,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal void CreateFolder(IEnumerable<string> symbols)
+        internal void CreateFolder(IEnumerable<SymbolModel> symbols)
         {
             MarketModel market = _markets.GetMarket(Model.Market);
             if (market == null)
@@ -707,7 +699,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
             }
             finally
             {
@@ -742,7 +734,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
             }
             finally
             {

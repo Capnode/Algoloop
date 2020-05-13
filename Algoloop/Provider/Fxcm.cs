@@ -19,12 +19,13 @@ using QuantConnect.Configuration;
 using QuantConnect.ToolBox.FxcmDownloader;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Algoloop.Provider
 {
     public class Fxcm : IProvider
     {
-        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -49,16 +50,12 @@ namespace Algoloop.Provider
             DateTime fromDate = model.LastDate.Date;
             if (fromDate < DateTime.Today)
             {
+                IList<string> symbols = model.Symbols.Select(m => m.Name).ToList();
                 FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, fromDate, fromDate);
                 model.LastDate = fromDate.AddDays(1);
             }
 
             model.Active = model.LastDate < DateTime.Today;
-        }
-
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
-        {
-            throw new NotImplementedException();
         }
     }
 }

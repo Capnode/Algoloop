@@ -17,7 +17,6 @@ using Algoloop.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Ionic.Zip;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Data;
@@ -27,7 +26,6 @@ using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -171,9 +169,8 @@ namespace Algoloop.ViewModel
 
         private void LoadCharts(MarketViewModel market)
         {
-            Debug.Assert(market != null);
             Charts.Clear();
-            string filename = PriceFilePath(market, Model.Name, SelectedResolution, Date);
+            string filename = PriceFilePath(market, Model, SelectedResolution, Date);
             if (filename != null)
             {
                 var leanDataReader = new LeanDataReader(filename);
@@ -187,42 +184,34 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private static string PriceFilePath(MarketViewModel market, string symbol, Resolution resolution, DateTime date)
+        private static string PriceFilePath(MarketViewModel market, SymbolModel symbol, Resolution resolution, DateTime date)
         {
             DirectoryInfo basedir = new DirectoryInfo(market.DataFolder);
-            DirectoryInfo[] subdirs = basedir.GetDirectories("*");
             if (resolution.Equals(Resolution.Daily) || resolution.Equals(Resolution.Hour))
             {
-                foreach (DirectoryInfo folder in subdirs)
-                {
-                    var path = Path.Combine(folder.FullName, market.Model.Provider, resolution.ToString());
-                    if (!Directory.Exists(path))
-                        continue;
-
-                    var dir = new DirectoryInfo(path);
-                    var files = dir.GetFiles(symbol + "*.zip").Select(x => x.FullName);
-                    if (files.Count() == 1)
-                    {
-                        return files.Single();
-                    }
-                }
+                string path = Path.Combine(
+                    market.DataFolder,
+                    symbol.Security.SecurityTypeToLower(),
+                    symbol.Market,
+                    resolution.ToString(),
+                    symbol.Name + ".zip");
+                if (File.Exists(path)) return path;
             }
             else
             {
-                foreach (DirectoryInfo folder in subdirs)
-                {
-                    var path = Path.Combine(folder.FullName, market.Model.Provider, resolution.ToString(), symbol);
-                    if (!Directory.Exists(path))
-                        continue;
-
-                    var dir = new DirectoryInfo(path);
-                    string date1 = date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
-                    var files = dir.GetFiles(date1 + "*.zip").Select(x => x.FullName);
-                    if (files.Count() == 1)
-                    {
-                        return files.Single();
-                    }
-                }
+                string path = Path.Combine(
+                    market.DataFolder,
+                    symbol.Security.SecurityTypeToLower(),
+                    symbol.Market, resolution.ToString(),
+                    symbol.Name);
+                if (!Directory.Exists(path)) return null;
+                DirectoryInfo dir = new DirectoryInfo(path);
+                string date1 = date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+                string file = dir
+                    .GetFiles(date1 + "*.zip")
+                    .Select(x => x.FullName)
+                    .FirstOrDefault();
+                if (File.Exists(file)) return file;
             }
 
             return null;
@@ -238,8 +227,8 @@ namespace Algoloop.ViewModel
             // Find FineFundamentals folder
             string folder = Path.Combine(
                 market.DataFolder,
-                SecurityType.Equity.ToString(),
-                market.Model.Provider,
+                Model.Security.SecurityTypeToLower(),
+                Model.Market,
                 "fundamental",
                 "fine",
                 Model.Name.ToLowerInvariant());
@@ -254,7 +243,7 @@ namespace Algoloop.ViewModel
             FileInfo[] files = d.GetFiles("*.zip");
             foreach (FileInfo file in files)
             {
-                using (StreamReader resultStream = Compression.Unzip(file.FullName, jsonFile, out ZipFile zipFile))
+                using (StreamReader resultStream = Compression.Unzip(file.FullName, jsonFile, out Ionic.Zip.ZipFile zipFile))
                 using (zipFile)
                 {
                     if (resultStream == null)

@@ -29,7 +29,7 @@ namespace Algoloop.Provider
 {
     public class ProviderFactory : MarshalByRefObject
     {
-        public MarketModel Run(MarketModel market, SettingService settings, ILogHandler logger)
+        public MarketModel Download(MarketModel market, SettingService settings, ILogHandler logger)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -40,14 +40,6 @@ namespace Algoloop.Provider
             using (var writer = new StreamLogger(logger))
             {
                 Console.SetOut(writer);
-                IList<string> symbols = market.Symbols.Select(m => m.Name).ToList();
-                if (!symbols.Any())
-                {
-                    Log.Trace($"No symbols selected");
-                    market.Active = false;
-                    return market;
-                }
-
                 IProvider provider = CreateProvider(settings, market.Provider);
                 if (provider == null)
                 {
@@ -57,7 +49,7 @@ namespace Algoloop.Provider
                 {
                     try
                     {
-                        provider.Download(market, settings, symbols);
+                        provider.Download(market, settings);
                     }
                     catch (Exception ex)
                     {
@@ -79,17 +71,6 @@ namespace Algoloop.Provider
         {
             // No lifetime timeout
             return null;
-        }
-
-        public static IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
-        {
-            if (market == null) throw new ArgumentNullException(nameof(market));
-
-            IProvider provider = CreateProvider(settings, market.Provider);
-            if (provider == null)
-                return null;
-
-            return provider.GetAllSymbols(market, settings);
         }
 
         public static void RegisterProviders(SettingService settings)

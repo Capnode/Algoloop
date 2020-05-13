@@ -19,12 +19,13 @@ using QuantConnect.Configuration;
 using QuantConnect.ToolBox.FxcmVolumeDownload;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Algoloop.Provider
 {
     public class FxcmVolume : IProvider
     {
-        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -44,13 +45,9 @@ namespace Algoloop.Provider
             Config.Set("fxcm-user-name", model.Login);
             Config.Set("fxcm-password", model.Password);
 
+            IList<string> symbols = model.Symbols.Select(m => m.Name).ToList();
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.LastDate, model.LastDate);
-        }
-
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

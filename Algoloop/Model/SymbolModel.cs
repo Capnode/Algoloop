@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -26,17 +27,31 @@ namespace Algoloop.Model
         {
         }
 
-        public SymbolModel(string name)
+
+        public SymbolModel(string name, string market, SecurityType security)
         {
             Name = name;
+            Market = market;
+            Security = security;
         }
 
         public SymbolModel(SymbolModel model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
 
-            Name = model.Name;
             Active = model.Active;
+            Name = model.Name;
+            Market = model.Market;
+            Security = model.Security;
+        }
+
+        /// <summary>
+        /// Operator to handle database upgrade
+        /// </summary>
+        /// <param name="symbol"></param>
+        public static implicit operator SymbolModel(string symbol)
+        {
+            return new SymbolModel(symbol, string.Empty, SecurityType.Base);
         }
 
         [DataMember]
@@ -44,6 +59,12 @@ namespace Algoloop.Model
 
         [DataMember]
         public string Name { get; set; } = "symbol";
+
+        [DataMember]
+        public string Market { get; set; }
+
+        [DataMember]
+        public SecurityType Security { get; set; }
 
         [DataMember]
         public IDictionary<string, object> Properties { get; set; }
@@ -55,7 +76,16 @@ namespace Algoloop.Model
         public int CompareTo(object obj)
         {
             var a = obj as SymbolModel;
-            return string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
+            int result = string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
+            if (result != 0) return result;
+            result = string.Compare(Market, a?.Market, StringComparison.OrdinalIgnoreCase);
+            if (result != 0) return result;
+            return Security.CompareTo(a?.Security);
+        }
+
+        public override string ToString()
+        {
+            return $"{Security} {Market} {Name}";
         }
     }
 }

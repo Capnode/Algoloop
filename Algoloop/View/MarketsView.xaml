@@ -184,11 +184,6 @@
                                         <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
                                     </Button>
                                     <Button
-                                        ToolTip="Download symbol list"
-                                        Command="{Binding DownloadSymbolListCommand}">
-                                        <Image Source="/Resources\Download1.png" Width="16" Height="16"/>
-                                    </Button>
-                                    <Button
                                         ToolTip="Import symbol list..."
                                         Command="{Binding ImportSymbolsCommand}">
                                         <Image Source="/Resources\Import.png" Width="16" Height="16"/>

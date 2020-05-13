@@ -19,12 +19,13 @@ using QuantConnect.Configuration;
 using QuantConnect.ToolBox.OandaDownloader;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Algoloop.Provider
 {
     public class Oanda : IProvider
     {
-        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -32,13 +33,9 @@ namespace Algoloop.Provider
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", settings.DataFolder);
 
+            IList<string> symbols = model.Symbols.Select(m => m.Name).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             OandaDownloaderProgram.OandaDownloader(symbols, resolution, model.LastDate, model.LastDate);
-        }
-
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

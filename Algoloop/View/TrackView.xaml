@@ -203,16 +203,6 @@
                                     <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
                                 </MenuItem.Icon>
                             </MenuItem>
-                            <MenuItem
-                                Header="Create market list"
-                                Command="{Binding CreateFolderCommand}"
-                                CommandParameter="{Binding
-                                    Path=PlacementTarget.SelectedItems,
-                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
-                                <MenuItem.Icon>
-                                    <Image Source="/Resources/AddList.png" Width="16" Height="16"/>
-                                </MenuItem.Icon>
-                            </MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </wpf:ExDataGrid>

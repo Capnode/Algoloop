@@ -14,19 +14,13 @@
 
 using Algoloop.Model;
 using Algoloop.Service;
-using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
     public class CryptoIq : IProvider
     {
-        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings)
         {
-        }
-
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

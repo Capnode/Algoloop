@@ -24,7 +24,9 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
+using QuantConnect;
 using QuantConnect.Logging;
+using QuantConnect.Securities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,7 +64,6 @@ namespace Algoloop.ViewModel
 
             CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
-            DownloadSymbolListCommand = new RelayCommand(() => DoDownloadSymbolList(), !IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), !IsBusy);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
@@ -198,7 +199,6 @@ namespace Algoloop.ViewModel
         internal void DataFromModel()
         {
             Active = Model.Active;
-            Symbols.Clear();
             UpdateSymbolsAndColumns();
 
             // Update Folders
@@ -223,7 +223,7 @@ namespace Algoloop.ViewModel
             DataToModel();
         }
 
-        internal async Task StartTaskAsync()
+        private async Task DownloadAsync()
         {
             DataToModel();
             MarketModel model = Model;
@@ -237,7 +237,7 @@ namespace Algoloop.ViewModel
                     _factory = new Isolated<ProviderFactory>();
                     _cancel = new CancellationTokenSource();
                     await Task
-                        .Run(() => model = _factory.Value.Run(model, _settings, logger), _cancel.Token)
+                        .Run(() => model = _factory.Value.Download(model, _settings, logger), _cancel.Token)
                         .ConfigureAwait(true);
                     _factory.Dispose();
                     _factory = null;
@@ -292,7 +292,7 @@ namespace Algoloop.ViewModel
             // No IsBusy
             if (value)
             {
-                await StartTaskAsync().ConfigureAwait(true);
+                await DownloadAsync().ConfigureAwait(true);
             }
             else
             {
@@ -304,7 +304,7 @@ namespace Algoloop.ViewModel
         {
             // No IsBusy
             Active = true;
-            await StartTaskAsync().ConfigureAwait(true);
+            await DownloadAsync().ConfigureAwait(true);
         }
 
         private void DoStopCommand()
@@ -326,7 +326,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                var symbol = new SymbolViewModel(this, new SymbolModel());
+                var symbol = new SymbolViewModel(this, new SymbolModel("symbol", Model.Market, Model.Security));
                 Symbols.Add(symbol);
                 DataToModel();
                 Folders.ToList().ForEach(m => m.Refresh());
@@ -336,45 +336,6 @@ namespace Algoloop.ViewModel
                 IsBusy = false;
             }
         }
-
-        private void DoDownloadSymbolList()
-        {
-            try
-            {
-                IsBusy = true;
-                List<SymbolModel> oldSymbols = Model.Symbols.ToList();
-
-                IEnumerable<SymbolModel> symbols = ProviderFactory.GetAllSymbols(Model, _settings);
-                foreach (SymbolModel symbol in symbols)
-                {
-                    symbol.Name = symbol.Name.Trim();
-                    SymbolModel sym = Model.Symbols.FirstOrDefault(m => m.Name.Equals(symbol.Name, StringComparison.OrdinalIgnoreCase));
-                    if (sym != null)
-                    {
-                        sym.Properties = symbol.Properties;
-                        oldSymbols.Remove(sym);
-                    }
-                    else
-                    {
-                        Model.Symbols.Add(symbol);
-                    }
-                }
-
-                // Remove symbols not updated
-                foreach (SymbolModel symbol in oldSymbols)
-                {
-                    Model.Symbols.Remove(symbol);
-                }
-
-                Folders.ToList().ForEach(m => m.Refresh());
-                DataFromModel();
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
 
         private void DoCheckAll(IList symbols)
         {
@@ -460,7 +421,7 @@ namespace Algoloop.ViewModel
                             }
                             else
                             {
-                                symbol = new SymbolModel(name);
+                                symbol = new SymbolModel(name, Model.Market, Model.Security);
                                 Model.Symbols.Add(symbol);
                             }
                         }
@@ -472,7 +433,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n");
             }
             finally
             {
@@ -506,7 +467,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
             }
             finally
             {
@@ -562,9 +523,14 @@ namespace Algoloop.ViewModel
                         string line = r.ReadLine();
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            if (Model.Symbols.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && m.Active) != null)
+                            var symbol = Model.Symbols.FirstOrDefault(m =>
+                                m.Name.Equals(name, StringComparison.OrdinalIgnoreCase) &&
+                                m.Market.Equals(Model.Market, StringComparison.OrdinalIgnoreCase) &&
+                                m.Security == Model.Security &&
+                                m.Active);
+                            if (symbol != null)
                             {
-                                model.Symbols.Add(name);
+                                model.Symbols.Add(symbol);
                             }
                         }
                     }
@@ -574,7 +540,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n");
             }
             finally
             {
@@ -598,13 +564,56 @@ namespace Algoloop.ViewModel
                 Header = "Symbol",
                 Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
+            SymbolColumns.Add(new DataGridTextColumn()
+            {
+                Header = "Market",
+                Binding = new Binding("Model.Market") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
+            });
+            SymbolColumns.Add(new DataGridTextColumn()
+            {
+                Header = "Security",
+                Binding = new Binding("Model.Security") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
+            });
 
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
+                // Handle DB upgrade
+                if (string.IsNullOrEmpty(symbolModel.Market) || symbolModel.Security == SecurityType.Base)
+                {
+                    DbUpgrade(symbolModel);
+                }
+
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
                 ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
             }
+        }
+
+        private void DbUpgrade(SymbolModel symbol)
+        {
+            DirectoryInfo basedir = new DirectoryInfo(DataFolder);
+            foreach (DirectoryInfo securityDir in basedir.GetDirectories())
+            {
+                foreach (DirectoryInfo marketDir in securityDir.GetDirectories())
+                {
+                    foreach (DirectoryInfo resolutionDir in marketDir.GetDirectories())
+                    {
+                        if (resolutionDir.GetDirectories(symbol.Name).Any()
+                            || resolutionDir.GetFiles(symbol.Name + ".zip").Any())
+                        {
+                            if (Enum.TryParse<SecurityType>(securityDir.Name, true, out SecurityType security))
+                            {
+                                symbol.Security = security;
+                                symbol.Market = marketDir.Name;
+                                Log.Trace($"DB upgrade symbol {symbol}");
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            Log.Error($"DB upgrade symbol {symbol} failed!");
         }
 
         public void Dispose()

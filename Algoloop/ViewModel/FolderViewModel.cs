@@ -20,6 +20,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
+using QuantConnect.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -171,7 +172,7 @@ namespace Algoloop.ViewModel
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
-                Model.Symbols.Add(symbol.Model.Name);
+                Model.Symbols.Add(symbol.Model);
             }
         }
 
@@ -185,7 +186,10 @@ namespace Algoloop.ViewModel
             {
                 if (marketSymbol.Active)
                 {
-                    string symbol = Model.Symbols.FirstOrDefault(m => m.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase));
+                    SymbolModel symbol = Model.Symbols.FirstOrDefault(m => 
+                        m.Name.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase) &&
+                        m.Market.Equals(marketSymbol.Model.Market, StringComparison.OrdinalIgnoreCase) &&
+                        m.Security == marketSymbol.Model.Security);
                     if (symbol != null)
                     {
                         Symbols.Add(marketSymbol);
@@ -254,7 +258,7 @@ namespace Algoloop.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, ex.GetType().ToString());
+                    Log.Error(ex, $"Failed reading {saveFileDialog.FileName}\n");
                 }
             }
             finally

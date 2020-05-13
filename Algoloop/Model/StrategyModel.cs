@@ -29,7 +29,6 @@ namespace Algoloop.Model
         private string _algorithmLocation;
         private string _algorithmName;
         private string _account = AccountModel.AccountType.Backtest.ToString();
-        private string _market;
 
         public StrategyModel()
         {
@@ -45,7 +44,7 @@ namespace Algoloop.Model
             Name = model.Name;
             Desktop = model.Desktop;
             Market = model.Market;
-            Provider = model.Provider;
+            Security = model.Security;
             Account = model.Account;
             BarsBack = model.BarsBack;
             StartDate = model.StartDate;
@@ -68,7 +67,7 @@ namespace Algoloop.Model
 
             Desktop = model.Desktop;
             Market = model.Market;
-            Provider = model.Provider;
+            Security = model.Security;
             Account = model.Account;
             BarsBack = model.BarsBack;
             StartDate = model.StartDate;
@@ -88,8 +87,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         public Action NameChanged { get; set; }
         [Browsable(false)]
-        public Action MarketChanged { get; set; }
-        [Browsable(false)]
+
         public Action<string> AlgorithmNameChanged { get; set; }
 
         [Category("Information")]
@@ -134,59 +132,53 @@ namespace Algoloop.Model
             }
         }
 
-        [Category("Broker")]
-        [DisplayName("Market data")]
-        [Description("Market data for backtest")]
+        [Category("Data")]
+        [DisplayName("Market")]
+        [Description("Market data for backtest. Must match market folder in data folder structure.")]
         [RefreshProperties(RefreshProperties.Repaint)]
-        [TypeConverter(typeof(MarketNameConverter))]
+        [TypeConverter(typeof(ProviderNameConverter))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Market
-        {
-            get => _market;
-            set
-            {
-                _market = value;
-                MarketChanged?.Invoke();
-            }
-        }
+        public string Market { get; set; }
 
-        [Category("Broker")]
-        [DisplayName("Market provider")]
-        [Description("Market data provider for backtest")]
-        [RefreshProperties(RefreshProperties.Repaint)]
-        [TypeConverter(typeof(MarketNameConverter))]
+        [Category("Data")]
+        [DisplayName("Security type")]
+        [Description("Asset security type. Must match security folder in data folder structure.")]
         [Browsable(true)]
-        [ReadOnly(true)]
+        [ReadOnly(false)]
         [DataMember]
-        public string Provider { get; set; }
+        public SecurityType Security { get; set; }
 
-        [Category("Time")]
+        [Category("Data")]
         [DisplayName("Bars back")]
+        [Description("Number of bars to backtest")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
         public int BarsBack { get; set; }
 
-        [Category("Time")]
-        [DisplayName("From date")]
+        [Category("Data")]
+        [DisplayName("Date from")]
+        [Description("Backtest from date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
         public DateTime StartDate { get; set; } = DateTime.Today;
 
-        [Category("Time")]
-        [DisplayName("To date")]
+        [Category("Data")]
+        [DisplayName("Date to")]
+        [Description("Backtest to date")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
         public DateTime EndDate { get; set; } = DateTime.Today;
 
-        [Category("Time")]
+        [Category("Data")]
         [DisplayName("Resolution")]
+        [Description("Period resolution. Must match resolution folder in data folder structure.")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
@@ -194,6 +186,7 @@ namespace Algoloop.Model
 
         [Category("Capital")]
         [DisplayName("Initial capial")]
+        [Description("Start capital")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
@@ -201,6 +194,7 @@ namespace Algoloop.Model
 
         [Category("Capital")]
         [DisplayName("Percent capital per position")]
+        [Description("Capital used for each position")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
@@ -208,6 +202,7 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [DisplayName("File location")]
+        [Description("Algorithm file location")]
         [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
@@ -225,6 +220,7 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [DisplayName("Algorithm name")]
+        [Description("Name of algorithm")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
         [Browsable(true)]
         [ReadOnly(false)]
@@ -241,6 +237,7 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [DisplayName("Algorithm language")]
+        [Description("Programming language of algorithm")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
@@ -267,14 +264,11 @@ namespace Algoloop.Model
              || Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase)
              || Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                SetBrowsable("Market", true);
-                SetBrowsable("Provider", true);
+                SetBrowsable(nameof(Market), true);
             }
             else
             {
-                Provider = null;
-                SetBrowsable("Market", false);
-                SetBrowsable("Provider", false);
+                SetBrowsable(nameof(Market), false);
             }
         }
     }

@@ -17,13 +17,12 @@ using Algoloop.Service;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.QuandlBitfinexDownloader;
 using System;
-using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
     public class QuandBitfinex : IProvider
     {
-        public void Download(MarketModel model, SettingService settings, IList<string> symbols)
+        public void Download(MarketModel model, SettingService settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -33,11 +32,6 @@ namespace Algoloop.Provider
 
             string apiKey = ""; // TODO:
             QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.LastDate, apiKey);
-        }
-
-        public IEnumerable<SymbolModel> GetAllSymbols(MarketModel market, SettingService settings)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
