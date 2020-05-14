@@ -200,7 +200,7 @@ namespace Algoloop.Lean
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             parameters.Add("market", model.Market);
-            parameters.Add("security", model.Security.SecurityTypeToLower());
+            parameters.Add("security", model.Security.ToStringInvariant());
         }
 
         private static void SetBacktestDesktop(TrackModel model, Dictionary<string, string> parameters)
@@ -217,7 +217,7 @@ namespace Algoloop.Lean
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
             parameters.Add("market", model.Market);
-            parameters.Add("security", model.Security.SecurityTypeToLower());
+            parameters.Add("security", model.Security.ToStringInvariant());
         }
 
         private static void SetPaper(TrackModel model, Dictionary<string, string> parameters)
@@ -232,7 +232,7 @@ namespace Algoloop.Lean
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             parameters.Add("market", model.Market);
-            parameters.Add("security", model.Security.SecurityTypeToLower());
+            parameters.Add("security", model.Security.ToStringInvariant());
         }
 
         private static void SetFxcm(AccountModel account, Dictionary<string, string> parameters)
@@ -251,7 +251,7 @@ namespace Algoloop.Lean
             Config.Set("fxcm-user-name", account.Login);
             Config.Set("fxcm-password", account.Password);
             Config.Set("fxcm-account-id", account.Id);
-            parameters.Add("market", Market.FXCM.ToString(CultureInfo.InvariantCulture));
+            parameters.Add("market", Market.FXCM.ToStringInvariant());
             switch (account.Access)
             {
                 case AccountModel.AccessType.Demo:

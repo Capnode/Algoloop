@@ -122,7 +122,7 @@ namespace Algoloop.Model
         public SecurityType Security { get; set; }
 
         [Category("Data")]
-        [DisplayName("Default time resolution.")]
+        [DisplayName("Default time resolution")]
         [Description("Default time period for new symbols. Must match resolution folder in data folder structure. Behaviour is dependent on actual data provider.")]
         [Browsable(true)]
         [ReadOnly(false)]
