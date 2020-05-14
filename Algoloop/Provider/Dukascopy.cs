@@ -16,11 +16,9 @@ using Algoloop.Model;
 using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
-using QuantConnect.Securities.Forex;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Algoloop.Provider
@@ -82,10 +80,10 @@ namespace Algoloop.Provider
         private void UpdateSymbols(MarketModel market)
         {
             var all = new List<SymbolModel>();
-            all.AddRange(_majors.Select(m => new SymbolModel(m, market.Name, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
-            all.AddRange(_crosses.Select(m => new SymbolModel(m, market.Name, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Crosses" } } }));
-            all.AddRange(_metals.Select(m => new SymbolModel(m, market.Name, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Metals" } } }));
-            all.AddRange(_indices.Select(m => new SymbolModel(m, market.Name, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Indices" } } }));
+            all.AddRange(_majors.Select(m => new SymbolModel(m, market.Market, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
+            all.AddRange(_crosses.Select(m => new SymbolModel(m, market.Market, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Crosses" } } }));
+            all.AddRange(_metals.Select(m => new SymbolModel(m, market.Market, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Metals" } } }));
+            all.AddRange(_indices.Select(m => new SymbolModel(m, market.Market, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Indices" } } }));
 
             // Exclude unknown symbols
             var downloader = new DukascopyDataDownloader();

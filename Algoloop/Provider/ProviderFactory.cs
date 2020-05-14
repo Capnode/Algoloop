@@ -49,6 +49,17 @@ namespace Algoloop.Provider
                 {
                     try
                     {
+                        // Check default values
+                        if (string.IsNullOrEmpty(market.Market))
+                        {
+                            market.Market = market.Provider;
+                        }
+
+                        if (market.Security.Equals(SecurityType.Base))
+                        {
+                            market.Security = SecurityType.Equity;
+                        }
+
                         provider.Download(market, settings);
                     }
                     catch (Exception ex)
