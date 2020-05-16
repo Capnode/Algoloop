@@ -13,12 +13,11 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
 
 namespace Algoloop.Provider
 {
     public interface IProvider
     {
-        void Download(MarketModel market, SettingService settings);
+        void Download(MarketModel market, SettingModel settings);
     }
 }

@@ -20,7 +20,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using Algoloop.Model;
-using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Logging;
 
@@ -33,7 +32,7 @@ namespace Algoloop.Provider
         private const string _market = "Market";
         private const string _zip = ".zip";
 
-        public void Download(MarketModel model, SettingService settings)
+        public void Download(MarketModel model, SettingModel settings)
         {
             var uri = new Uri($"https://github.com/Capnode/Algoloop/archive/Algoloop-{_version}.zip");
             string extract = $"Algoloop-Algoloop-{_version}/Data/";

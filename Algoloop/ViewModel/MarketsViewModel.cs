@@ -27,11 +27,11 @@ namespace Algoloop.ViewModel
 {
     public class MarketsViewModel : ViewModelBase
     {
-        private readonly SettingService _settings;
+        private readonly SettingModel _settings;
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
 
-        public MarketsViewModel(MarketService markets, SettingService settings)
+        public MarketsViewModel(MarketsModel markets, SettingModel settings)
         {
             Model = markets;
             _settings = settings;
@@ -45,7 +45,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
 
-        public MarketService Model { get; }
+        public MarketsModel Model { get; }
         public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace Algoloop.ViewModel
                     using StreamReader r = new StreamReader(fileName);
                     string json = r.ReadToEnd();
                     json = DbUpgrade(json);
-                    Model.Copy(JsonConvert.DeserializeObject<MarketService>(json));
+                    Model.Copy(JsonConvert.DeserializeObject<MarketsModel>(json));
                 }
                 catch (Exception ex)
                 {
@@ -149,6 +149,7 @@ namespace Algoloop.ViewModel
 
         private void DataToModel()
         {
+            Model.Version = MarketsModel.version;
             Model.Markets.Clear();
             foreach (MarketViewModel market in Markets)
             {

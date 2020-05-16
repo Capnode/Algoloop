@@ -17,7 +17,6 @@ using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Properties;
 using Algoloop.Provider;
-using Algoloop.Service;
 using Algoloop.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
@@ -46,7 +45,7 @@ namespace Algoloop.ViewModel
     {
         private bool _isDisposed = false; // To detect redundant calls
         private readonly MarketsViewModel _parent;
-        private readonly SettingService _settings;
+        private readonly SettingModel _settings;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
         private Isolated<ProviderFactory> _factory;
@@ -55,7 +54,7 @@ namespace Algoloop.ViewModel
         private bool _checkAll;
         private IList _selectedItems;
 
-        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingService settings)
+        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingModel settings)
         {
             _parent = marketsViewModel ?? throw new ArgumentNullException(nameof(marketsViewModel));
             Model = marketModel;

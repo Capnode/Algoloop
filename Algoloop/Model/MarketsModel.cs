@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,16 +19,22 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Service
+namespace Algoloop.Model
 {
     [DataContract]
-    public class MarketService
+    public class MarketsModel
     {
+        public const int version = 1;
+
+        [Browsable(false)]
+        [DataMember]
+        public int Version { get; set; }
+
         [Browsable(false)]
         [DataMember]
         public Collection<MarketModel> Markets { get; } = new Collection<MarketModel>();
 
-        internal void Copy(MarketService marketsModel)
+        internal void Copy(MarketsModel marketsModel)
         {
             Markets.Clear();
             foreach (var market in marketsModel.Markets)

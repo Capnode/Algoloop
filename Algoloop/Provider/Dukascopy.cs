@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.DukascopyDownloader;
@@ -43,7 +42,7 @@ namespace Algoloop.Provider
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
 
-        public void Download(MarketModel market, SettingService settings)
+        public void Download(MarketModel market, SettingModel settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));

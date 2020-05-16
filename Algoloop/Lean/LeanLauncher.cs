@@ -32,7 +32,7 @@ namespace Algoloop.Lean
 {
     public class LeanLauncher : MarshalByRefObject
     {
-        public TrackModel Run(TrackModel model, AccountModel account, SettingService settings, HostDomainLogger logger)
+        public TrackModel Run(TrackModel model, AccountModel account, SettingModel settings, HostDomainLogger logger)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
 
@@ -77,7 +77,7 @@ namespace Algoloop.Lean
             return null;
         }
 
-        private static bool SetConfig(TrackModel model, AccountModel account, SettingService settings)
+        private static bool SetConfig(TrackModel model, AccountModel account, SettingModel settings)
         {
             var parameters = new Dictionary<string, string>();
             SetModel(model, settings);
@@ -117,7 +117,7 @@ namespace Algoloop.Lean
             return true;
         }
 
-        private static void SetModel(TrackModel model, SettingService settings)
+        private static void SetModel(TrackModel model, SettingModel settings)
         {
             Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
             Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");

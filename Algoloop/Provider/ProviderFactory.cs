@@ -29,7 +29,7 @@ namespace Algoloop.Provider
 {
     public class ProviderFactory : MarshalByRefObject
     {
-        public MarketModel Download(MarketModel market, SettingService settings, ILogHandler logger)
+        public MarketModel Download(MarketModel market, SettingModel settings, ILogHandler logger)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -84,7 +84,7 @@ namespace Algoloop.Provider
             return null;
         }
 
-        public static void RegisterProviders(SettingService settings)
+        public static void RegisterProviders(SettingModel settings)
         {
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
@@ -107,7 +107,7 @@ namespace Algoloop.Provider
             MainService.CopyDirectory(Path.Combine(sourceDir, "symbol-properties"), Path.Combine(dataFolder, "symbol-properties"), true);
         }
 
-        private static IProvider CreateProvider(SettingService settings, string name)
+        private static IProvider CreateProvider(SettingModel settings, string name)
         {
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
@@ -131,7 +131,7 @@ namespace Algoloop.Provider
             return provider;
         }
 
-        private static bool RegisterProvider(SettingService settings, Type provider)
+        private static bool RegisterProvider(SettingModel settings, Type provider)
         {
             string name = provider.Name.ToLowerInvariant();
             if (Market.Encode(name) == null)

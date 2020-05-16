@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.KrakenDownloader;
@@ -25,7 +24,7 @@ namespace Algoloop.Provider
 {
     public class Kraken : IProvider
     {
-        public void Download(MarketModel model, SettingService settings)
+        public void Download(MarketModel model, SettingModel settings)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
             if (model == null) throw new ArgumentNullException(nameof(model));

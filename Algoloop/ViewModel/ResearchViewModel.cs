@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using Algoloop.Service;
 using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
@@ -42,13 +43,13 @@ namespace Algoloop.ViewModel
         // Delegate type to be used as the Handler Routine for SCCH
         delegate Boolean ConsoleCtrlDelegate(uint CtrlType);
 
-        private readonly SettingService _settings;
+        private readonly SettingModel _settings;
         private string _htmlText;
         private string _source;
         private Process _process;
         private bool _initialized;
 
-        public ResearchViewModel(SettingService settings)
+        public ResearchViewModel(SettingModel settings)
         {
             _settings = settings;
         }

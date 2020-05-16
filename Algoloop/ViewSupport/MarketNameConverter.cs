@@ -13,7 +13,6 @@
 */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,11 +22,11 @@ namespace Algoloop.ViewSupport
 {
     public class MarketNameConverter : TypeConverter
     {
-        private readonly MarketService _markets;
+        private readonly MarketsModel _markets;
 
         public MarketNameConverter()
         {
-            _markets = SimpleIoc.Default.GetInstance<MarketService>();
+            _markets = SimpleIoc.Default.GetInstance<MarketsModel>();
         }
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)

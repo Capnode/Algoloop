@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Service;
 using Algoloop.ViewSupport;
 using System;
 using System.Collections.ObjectModel;
@@ -19,13 +20,18 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Service
+namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class SettingService
+    public class SettingModel
     {
+        public const int version = 1;
         private Collection<string> _addOns = new Collection<string>();
+
+        [Browsable(false)]
+        [DataMember]
+        public int Version { get; set; }
 
         [Category("API")]
         [DisplayName("API access token")]
@@ -84,7 +90,7 @@ namespace Algoloop.Service
         [DataMember]
         public int MaxBacktests { get; set; } = Math.Min(Environment.ProcessorCount, 8);
 
-        internal void Copy(SettingService oldSettings)
+        internal void Copy(SettingModel oldSettings)
         {
             if (oldSettings == null)
             {

@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.IEX;
@@ -25,7 +24,7 @@ namespace Algoloop.Provider
 {
     public class Iex : IProvider
     {
-        public void Download(MarketModel model, SettingService settings)
+        public void Download(MarketModel model, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));

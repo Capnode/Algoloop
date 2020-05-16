@@ -230,10 +230,10 @@
       <DependentUpon>AmChart.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\AccountModel.cs" />
-    <Compile Include="Service\AccountService.cs" />
+    <Compile Include="Model\AccountsModel.cs" />
     <Compile Include="Model\MarketModel.cs" />
-    <Compile Include="Service\MarketService.cs" />
-    <Compile Include="Service\SettingService.cs" />
+    <Compile Include="Model\MarketsModel.cs" />
+    <Compile Include="Model\SettingModel.cs" />
     <Compile Include="Common\Isolated.cs" />
     <Compile Include="Lean\HostDomainLogger.cs" />
     <Compile Include="Common\StreamLogger.cs" />
@@ -259,7 +259,7 @@
     <Compile Include="ViewSupport\Int32FromGridLengthConverter.cs" />
     <Compile Include="ViewSupport\StringFormatConverter.cs" />
     <Compile Include="ViewSupport\FilenameEditor.cs" />
-    <Compile Include="Service\StrategyService.cs" />
+    <Compile Include="Model\StrategiesModel.cs" />
     <Compile Include="Model\StrategyModel.cs" />
     <Compile Include="Model\TrackModel.cs" />
     <Compile Include="Model\SymbolModel.cs" />

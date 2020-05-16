@@ -13,13 +13,12 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
 
 namespace Algoloop.Provider
 {
     public class CryptoIq : IProvider
     {
-        public void Download(MarketModel model, SettingService settings)
+        public void Download(MarketModel model, SettingModel settings)
         {
         }
     }

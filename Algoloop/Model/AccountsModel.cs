@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,11 +19,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Service
+namespace Algoloop.Model
 {
     [DataContract]
-    public class AccountService
+    public class AccountsModel
     {
+        public const int version = 1;
+
         private static readonly AccountModel[] _standardAccounts = new[]
         {
             new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
@@ -33,9 +34,13 @@ namespace Algoloop.Service
 
         [Browsable(false)]
         [DataMember]
+        public int Version { get; set; }
+
+        [Browsable(false)]
+        [DataMember]
         public Collection<AccountModel> Accounts { get; } = new Collection<AccountModel>();
 
-        internal void Copy(AccountService accountsModel)
+        internal void Copy(AccountsModel accountsModel)
         {
             Accounts.Clear();
             foreach (AccountModel account in accountsModel.Accounts)

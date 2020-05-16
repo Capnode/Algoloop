@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -26,13 +25,13 @@ namespace Algoloop.Provider.Tests
     [TestClass()]
     public class DukascopyTests
     {
-        private SettingService _settings;
+        private SettingModel _settings;
         private ProviderFactory _dut;
 
         [TestInitialize()]
         public void Initialize()
         {
-            _settings = new SettingService
+            _settings = new SettingModel
             {
                 DataFolder = "Data"
             };

@@ -128,7 +128,7 @@ namespace Algoloop.ViewModel
 
         private void DoSettings()
         {
-            SettingService oldSettings = SettingsViewModel.Model;
+            SettingModel oldSettings = SettingsViewModel.Model;
             var settings = new SettingsView();
             if ((bool)settings.ShowDialog())
             {

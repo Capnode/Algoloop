@@ -54,8 +54,8 @@ namespace Algoloop.ViewModel
         private const double _daysInYear = 365.24;
 
         private readonly StrategyViewModel _parent;
-        private readonly AccountService _accounts;
-        private readonly SettingService _settings;
+        private readonly AccountsModel _accounts;
+        private readonly SettingModel _settings;
         private static readonly object _mutex = new object();
 
         private CancellationTokenSource _cancel;
@@ -75,7 +75,7 @@ namespace Algoloop.ViewModel
         private bool _loaded;
         private string _logs;
 
-        public TrackViewModel(StrategyViewModel parent, TrackModel model, AccountService accounts, SettingService settings)
+        public TrackViewModel(StrategyViewModel parent, TrackModel model, AccountsModel accounts, SettingModel settings)
         {
             _parent = parent;
             Model = model;

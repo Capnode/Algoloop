@@ -46,9 +46,9 @@ namespace Algoloop.ViewModel
         public const string DefaultName = "Strategy";
 
         private readonly StrategiesViewModel _parent;
-        private readonly MarketService _markets;
-        private readonly AccountService _accounts;
-        private readonly SettingService _settings;
+        private readonly MarketsModel _markets;
+        private readonly AccountsModel _accounts;
+        private readonly SettingModel _settings;
 
         private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
         private bool _isSelected;
@@ -62,7 +62,7 @@ namespace Algoloop.ViewModel
         private ListModel _selectedList;
         private IList _selectedItems;
 
-        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
+        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingModel settings)
         {
             _parent = parent;
             Model = model ?? throw new ArgumentNullException(nameof(model));
@@ -692,7 +692,7 @@ namespace Algoloop.ViewModel
                 string fileName = saveFileDialog.FileName;
                 using StreamWriter file = File.CreateText(fileName);
                 JsonSerializer serializer = new JsonSerializer();
-                var strategies = new StrategyService();
+                var strategies = new StrategiesModel();
                 strategies.Strategies.Add(Model);
                 serializer.Serialize(file, strategies);
             }

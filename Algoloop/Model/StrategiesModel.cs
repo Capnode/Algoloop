@@ -12,22 +12,26 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Service
+namespace Algoloop.Model
 {
     [DataContract]
-    public class StrategyService
+    public class StrategiesModel
     {
+        public const int version = 1;
+
+        [Browsable(false)]
+        [DataMember]
+        public int Version { get; set; }
+
         [Browsable(false)]
         [DataMember]
         public Collection<StrategyModel> Strategies { get; } = new Collection<StrategyModel>();
 
-        internal void Copy(StrategyService strategiesModel)
+        internal void Copy(StrategiesModel strategiesModel)
         {
             Strategies.Clear();
             foreach (StrategyModel strategy in strategiesModel.Strategies)
