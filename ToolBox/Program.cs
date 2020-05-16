@@ -38,7 +38,6 @@ using QuantConnect.ToolBox.KaikoDataConverter;
 using QuantConnect.ToolBox.KrakenDownloader;
 using QuantConnect.ToolBox.NseMarketDataConverter;
 using QuantConnect.ToolBox.OandaDownloader;
-using QuantConnect.ToolBox.PsychSignalDataConverter;
 using QuantConnect.ToolBox.QuandlBitfinexDownloader;
 using QuantConnect.ToolBox.QuantQuoteConverter;
 using QuantConnect.ToolBox.RandomDataGenerator;
@@ -147,15 +146,6 @@ namespace QuantConnect.ToolBox
                         EstimizeReleaseDataDownloaderProgram.EstimizeReleaseDataDownloader();
                         break;
 
-                    case "psdl":
-                    case "psychsignaldownloader":
-                        PsychSignalDataConverterProgram.PsychSignalDataDownloader(
-                            fromDate,
-                            toDate,
-                            GetParameterOrDefault(optionsObject, "destination-dir", Path.Combine(Globals.DataFolder, "alternative", "psychsignal", "raw-psychsignal")),
-                            GetParameterOrExit(optionsObject, "api-key"),
-                            GetParameterOrDefault(optionsObject, "data-source", "twitter_enhanced_withretweets,stocktwits"));
-                        break;
                     case "ustycdl":
                     case "ustreasuryyieldcurvedownloader":
                         USTreasuryYieldCurveProgram.USTreasuryYieldCurveRateDownloader(
@@ -258,13 +248,6 @@ namespace QuantConnect.ToolBox
                             GetParameterOrDefault(optionsObject, "destination-dir", Globals.DataFolder),
                             start);
                         break;
-                    case "psdc":
-                    case "psychsignaldataconverter":
-                        PsychSignalDataConverterProgram.PsychSignalDataConverter(
-                            GetParameterOrExit(optionsObject, "date"),
-                            GetParameterOrExit(optionsObject, "source-dir"),
-                            GetParameterOrExit(optionsObject, "destination-dir"));
-                        break;
                     case "ustyccv":
                     case "ustreasuryyieldcurveconverter":
                         USTreasuryYieldCurveProgram.USTreasuryYieldCurveConverter(
@@ -281,9 +264,11 @@ namespace QuantConnect.ToolBox
                         break;
                     case "tiinc":
                     case "tiingonewsconverter":
+                        var date = GetParameterOrDefault(optionsObject, "date", null);
                         TiingoNewsConverterProgram.TiingoNewsConverter(
                             GetParameterOrExit(optionsObject, "source-dir"),
-                            GetParameterOrExit(optionsObject, "destination-dir"));
+                            GetParameterOrExit(optionsObject, "destination-dir"),
+                            date != null ? DateTime.ParseExact(date, "yyyyMMdd", CultureInfo.InvariantCulture) : (DateTime?) null);
                         break;
                     case "bzncv":
                     case "benzinganewsconverter":

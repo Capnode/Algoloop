@@ -61,12 +61,12 @@
     <Content Include="Alphas\ShareClassMeanReversionAlpha.py" />
     <Content Include="Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py" />
     <Content Include="Alphas\VIXDualThrustAlpha.py" />
+    <Content Include="AltData\RobintrackHoldingsAlgorithm.py" />
     <Content Include="AltData\CachedAlternativeDataAlgorithm.py" />
     <Content Include="AltData\BenzingaNewsAlgorithm.py" />
     <Content Include="AltData\SECReport8KAlgorithm.py" />
     <Content Include="AltData\SmartInsiderTransactionAlgorithm.py" />
     <Content Include="AltData\USTreasuryYieldCurveRateAlgorithm.py" />
-    <Content Include="AltData\PsychSignalSentimentAlgorithm.py" />
     <Content Include="AltData\TradingEconomicsAlgorithm.py" />
     <Content Include="AltData\TiingoNewsAlgorithm.py" />
     <Content Include="BasicCSharpIntegrationTemplateAlgorithm.py" />
@@ -91,7 +91,6 @@
     <Content Include="ConfidenceWeightedFrameworkAlgorithm.py" />
     <Content Include="FineFundamentalFilteredUniverseRegressionAlgorithm.py" />
     <Content Include="KerasNeuralNetworkAlgorithm.py" />
-    <None Include="PsychSignalSentimentRegressionAlgorithm.py" />
     <Content Include="CustomDataUsingMapFileRegressionAlgorithm.py" />
     <Content Include="LiquidETFUniverseFrameworkAlgorithm.py" />
     <Content Include="ObjectStoreExampleAlgorithm.py" />
