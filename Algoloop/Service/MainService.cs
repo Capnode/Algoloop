@@ -16,8 +16,10 @@
 using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Algoloop.Service
 {
@@ -98,6 +100,19 @@ namespace Algoloop.Service
             string path = Path.Combine(GetProgramFolder(), file);
             if (File.Exists(path)) return path;
             return null;
+        }
+
+        public static int DbVersion(string json)
+        {
+            int version = 0;
+            var regex = new Regex(@"^{\s*""Version"":\s*(\d+)", RegexOptions.IgnoreCase);
+            Match match = regex.Match(json);
+            if (match.Success)
+            {
+                version = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+            }
+
+            return version;
         }
     }
 }

@@ -98,7 +98,13 @@ namespace Algoloop.ViewModel
 
         private string DbUpgrade(string json)
         {
-            return json.Replace("\"Folders\": [", "\"Lists\": [");
+            int version = MainService.DbVersion(json);
+            if (version == 0 && MarketsModel.version > 0)
+            {
+                json = json.Replace("\"Folders\": [", "\"Lists\": [");
+            }
+
+            return json;
         }
 
         internal bool Save(string fileName)
