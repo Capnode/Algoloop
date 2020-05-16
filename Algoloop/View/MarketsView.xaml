@@ -75,7 +75,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding Folders}" >
+                    <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding Lists}" >
                         <StackPanel Orientation="Horizontal">
                             <CheckBox
                                 IsChecked="{Binding Active}"
@@ -84,7 +84,7 @@
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{} {0} ({1})">
                                         <Binding Path="Model.Name"/>
-                                        <Binding Path="Folders.Count"/>
+                                        <Binding Path="Lists.Count"/>
                                     </MultiBinding>
                                 </TextBlock.Text>
                                 <TextBlock.ContextMenu>
@@ -98,14 +98,14 @@
                                         </MenuItem>
                                         <MenuItem
                                             Header="New list"
-                                            Command="{Binding NewFolderCommand}" >
+                                            Command="{Binding NewListCommand}" >
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Add.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
                                             Header="Import list..."
-                                            Command="{Binding ImportFolderCommand}" >
+                                            Command="{Binding ImportListCommand}" >
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Import.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
@@ -115,7 +115,7 @@
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:FolderViewModel}" ItemsSource="{Binding Symbols}">
+                    <HierarchicalDataTemplate DataType="{x:Type vm:ListViewModel}" ItemsSource="{Binding Symbols}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>
                                 <TextBlock.Text>
@@ -135,7 +135,7 @@
                                         </MenuItem>
                                         <MenuItem
                                             Header="Export list..."
-                                            Command="{Binding ExportFolderCommand}" >
+                                            Command="{Binding ExportListCommand}" >
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Export.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
@@ -228,7 +228,7 @@
                         </TabItem>
                     </TabControl>
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:FolderViewModel}">
+                <DataTemplate DataType="{x:Type vm:ListViewModel}">
                     <TabControl>
                         <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                             <DockPanel>

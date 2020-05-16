@@ -22,13 +22,13 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class FolderModel : ModelBase, IComparable
+    public class ListModel : ModelBase, IComparable
     {
-        public FolderModel()
+        public ListModel()
         {
         }
 
-        public FolderModel(IEnumerable<SymbolModel> symbols)
+        public ListModel(IEnumerable<SymbolModel> symbols)
         {
             foreach (SymbolModel symbol in symbols)
             {
@@ -50,7 +50,7 @@ namespace Algoloop.Model
 
         public int CompareTo(object obj)
         {
-            var a = obj as FolderModel;
+            var a = obj as ListModel;
             return string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
         }
 

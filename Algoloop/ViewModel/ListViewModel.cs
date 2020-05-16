@@ -29,13 +29,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
-    public class FolderViewModel : ViewModelBase, ITreeViewModel
+    public class ListViewModel : ViewModelBase, ITreeViewModel
     {
         private readonly MarketViewModel _market;
         private SymbolViewModel _selectedSymbol;
@@ -43,17 +42,17 @@ namespace Algoloop.ViewModel
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private IList _selectedItems;
 
-        public FolderViewModel(MarketViewModel market, FolderModel model)
+        public ListViewModel(MarketViewModel market, ListModel model)
         {
             _market = market ?? throw new ArgumentNullException(nameof(market));
             Model = model;
 
-            DeleteCommand = new RelayCommand(() => _market?.DeleteFolder(this), () => !IsBusy && !_market.Active);
+            DeleteCommand = new RelayCommand(() => _market?.DeleteList(this), () => !IsBusy && !_market.Active);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
             AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => DoAddSymbol(m), m => !IsBusy && !_market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
             RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !IsBusy && !_market.Active && SelectedSymbol != null);
-            ExportFolderCommand = new RelayCommand(() => DoExportFolder(), () => !IsBusy && !_market.Active);
+            ExportListCommand = new RelayCommand(() => DoExportList(), () => !IsBusy && !_market.Active);
 
             DataFromModel();
 
@@ -79,10 +78,10 @@ namespace Algoloop.ViewModel
         public RelayCommand StopCommand { get; }
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
-        public RelayCommand ExportFolderCommand { get; }
+        public RelayCommand ExportListCommand { get; }
 
 
-        public FolderModel Model { get; }
+        public ListModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public CollectionViewSource MarketSymbols { get; } = new CollectionViewSource();
 
@@ -233,7 +232,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoExportFolder()
+        private void DoExportList()
         {
             try
             {

@@ -36,7 +36,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -56,11 +55,11 @@ namespace Algoloop.ViewModel
         private bool _isExpanded;
         private string _displayName;
         private ObservableCollection<DataGridColumn> _trackColumns = new ObservableCollection<DataGridColumn>();
-        private readonly SyncObservableCollection<FolderModel> _folders = new SyncObservableCollection<FolderModel>();
+        private readonly SyncObservableCollection<ListModel> _lists = new SyncObservableCollection<ListModel>();
 
         private SymbolViewModel _selectedSymbol;
         private TrackViewModel _selectedTrack;
-        private FolderModel _selectedFolder;
+        private ListModel _selectedList;
         private IList _selectedItems;
 
         public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketService markets, AccountService accounts, SettingService settings)
@@ -143,19 +142,19 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public SyncObservableCollection<FolderModel> Folders
+        public SyncObservableCollection<ListModel> Lists
         {
             get
             {
-                var list = new List<FolderModel> { new FolderModel { Name = string.Empty } };
+                var list = new List<ListModel> { new ListModel { Name = string.Empty } };
                 MarketModel market = _markets.GetMarket(Model.Market);
                 if (market != null)
                 {
-                    list.AddRange(market.Folders);
+                    list.AddRange(market.Lists);
                 }
 
-                _folders.ReplaceRange(list);
-                return _folders;
+                _lists.ReplaceRange(list);
+                return _lists;
             }
         }
 
@@ -208,12 +207,12 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public FolderModel SelectedFolder
+        public ListModel SelectedList
         {
-            get => _selectedFolder;
+            get => _selectedList;
             set
             {
-                Set(ref _selectedFolder, value);
+                Set(ref _selectedList, value);
             }
         }
 
@@ -322,7 +321,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                if (string.IsNullOrEmpty(SelectedFolder?.Name))
+                if (string.IsNullOrEmpty(SelectedList?.Name))
                 {
                     var symbol = new SymbolViewModel(this, new SymbolModel("symbol", Model.Market, Model.Security));
                     Symbols.Add(symbol);
@@ -330,7 +329,7 @@ namespace Algoloop.ViewModel
                 else
                 {
                     IEnumerable<SymbolViewModel> symbols = _markets
-                        .GetActiveSymbols(Model.Market, SelectedFolder)
+                        .GetActiveSymbols(Model.Market, SelectedList)
                         .Where(s => !Symbols.Any(p => p.Model.Name.Equals(s)))
                         .Select(m => new SymbolViewModel(this, m));
                     Symbols.AddRange(symbols);
@@ -611,13 +610,13 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal void CreateFolder(IEnumerable<SymbolModel> symbols)
+        internal void CreateList(IEnumerable<SymbolModel> symbols)
         {
             MarketModel market = _markets.GetMarket(Model.Market);
             if (market == null)
                 return;
 
-            market.AddFolder(new FolderModel(symbols));
+            market.AddList(new ListModel(symbols));
         }
 
         internal void DoCloneStrategy()

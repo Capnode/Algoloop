@@ -142,7 +142,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public Collection<FolderModel> Folders { get; } = new Collection<FolderModel>();
+        public Collection<ListModel> Lists { get; } = new Collection<ListModel>();
 
         public void Refresh()
         {
@@ -166,15 +166,15 @@ namespace Algoloop.Model
             }
         }
 
-        internal void AddFolder(FolderModel folder)
+        internal void AddList(ListModel list)
         {
-            Folders.Add(folder);
+            Lists.Add(list);
             ModelChanged?.Invoke();
         }
 
-        internal IEnumerable<SymbolModel> GetActiveSymbols(FolderModel folder)
+        internal IEnumerable<SymbolModel> GetActiveSymbols(ListModel list)
         {
-            return folder.Symbols.Where(m => m.Active);
+            return list.Symbols.Where(m => m.Active);
         }
     }
 }

@@ -22,7 +22,6 @@ using QuantConnect.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
 
 namespace Algoloop.ViewModel
 {
@@ -83,8 +82,8 @@ namespace Algoloop.ViewModel
                 {
                     using StreamReader r = new StreamReader(fileName);
                     string json = r.ReadToEnd();
+                    json = DbUpgrade(json);
                     Model.Copy(JsonConvert.DeserializeObject<MarketService>(json));
-
                 }
                 catch (Exception ex)
                 {
@@ -95,6 +94,11 @@ namespace Algoloop.ViewModel
 
             DataFromModel();
             return true;
+        }
+
+        private string DbUpgrade(string json)
+        {
+            return json.Replace("\"Folders\": [", "\"Lists\": [");
         }
 
         internal bool Save(string fileName)

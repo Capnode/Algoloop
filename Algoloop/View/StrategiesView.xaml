@@ -231,9 +231,9 @@
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top">
                                         <ComboBox
-                                            SelectedValue="{Binding SelectedFolder, Mode=TwoWay}"
+                                            SelectedValue="{Binding SelectedList, Mode=TwoWay}"
                                             DisplayMemberPath="Name"
-                                            ItemsSource="{Binding Folders}"
+                                            ItemsSource="{Binding Lists}"
                                             MinWidth="120"/>
                                         <Button
                                             ToolTip="Add symbol" 

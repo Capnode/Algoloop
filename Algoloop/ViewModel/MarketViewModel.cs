@@ -37,7 +37,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
@@ -69,8 +68,8 @@ namespace Algoloop.ViewModel
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
             AddToSymbolListCommand = new RelayCommand<IList>(m => DoAddToSymbolList(m), m => !IsBusy && !Active && SelectedSymbol != null);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteMarket(this), () => !IsBusy && !Active);
-            NewFolderCommand = new RelayCommand(() => Folders.Add(new FolderViewModel(this, new FolderModel())), () => !IsBusy && !Active);
-            ImportFolderCommand = new RelayCommand(() => DoImportFolder(), () => !IsBusy && !Active);
+            NewListCommand = new RelayCommand(() => Lists.Add(new ListViewModel(this, new ListModel())), () => !IsBusy && !Active);
+            ImportListCommand = new RelayCommand(() => DoImportList(), () => !IsBusy && !Active);
             ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
             StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
             StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
@@ -96,14 +95,14 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<IList> AddToSymbolListCommand { get; }
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand NewFolderCommand { get; }
-        public RelayCommand ImportFolderCommand { get; }
+        public RelayCommand NewListCommand { get; }
+        public RelayCommand ImportListCommand { get; }
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public SyncObservableCollection<FolderViewModel> Folders { get; } = new SyncObservableCollection<FolderViewModel>();
+        public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
         public string DataFolder => _settings.DataFolder;
 
         public IList SelectedItems
@@ -174,9 +173,9 @@ namespace Algoloop.ViewModel
         public void Refresh()
         {
             Model.Refresh();
-            foreach (FolderViewModel folder in Folders)
+            foreach (ListViewModel list in Lists)
             {
-                folder.Refresh();
+                list.Refresh();
             }
         }
 
@@ -188,11 +187,11 @@ namespace Algoloop.ViewModel
                 Model.Symbols.Add(symbol.Model);
             }
 
-            Model.Folders.Clear();
-            foreach (FolderViewModel folder in Folders)
+            Model.Lists.Clear();
+            foreach (ListViewModel list in Lists)
             {
-                Model.Folders.Add(folder.Model);
-                folder.DataToModel();
+                Model.Lists.Add(list.Model);
+                list.DataToModel();
             }
         }
 
@@ -201,18 +200,18 @@ namespace Algoloop.ViewModel
             Active = Model.Active;
             UpdateSymbolsAndColumns();
 
-            // Update Folders
-            Folders.Clear();
-            foreach (FolderModel folderModel in Model.Folders.OrderBy(m => m.Name))
+            // Update Lists
+            Lists.Clear();
+            foreach (ListModel listModel in Model.Lists.OrderBy(m => m.Name))
             {
-                var folderViewModel = new FolderViewModel(this, folderModel);
-                Folders.Add(folderViewModel);
+                var listViewModel = new ListViewModel(this, listModel);
+                Lists.Add(listViewModel);
             }
         }
 
-        internal void DeleteFolder(FolderViewModel symbol)
+        internal void DeleteList(ListViewModel symbol)
         {
-            Folders.Remove(symbol);
+            Lists.Remove(symbol);
             DataToModel();
         }
 
@@ -329,7 +328,7 @@ namespace Algoloop.ViewModel
                 var symbol = new SymbolViewModel(this, new SymbolModel("symbol", Model.Market, Model.Security));
                 Symbols.Add(symbol);
                 DataToModel();
-                Folders.ToList().ForEach(m => m.Refresh());
+                Lists.ToList().ForEach(m => m.Refresh());
             }
             finally
             {
@@ -337,22 +336,22 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoCheckAll(IList symbols)
+        private void DoCheckAll(IList items)
         {
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-            if (list.Count == 0)
+            List<SymbolViewModel> symbols = items.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(symbols != null);
+            if (symbols.Count == 0)
                 return;
 
             try
             {
                 IsBusy = true;
-                list.ForEach(m => m.Active = CheckAll);
+                symbols.ForEach(m => m.Active = CheckAll);
 
-                // Update folders
-                foreach (var folder in Folders)
+                // Update lists
+                foreach (ListViewModel list in Lists)
                 {
-                    folder.Refresh();
+                    list.Refresh();
                 }
             }
             finally
@@ -428,7 +427,7 @@ namespace Algoloop.ViewModel
                     }
                 }
 
-                Folders.ToList().ForEach(m => m.Refresh());
+                Lists.ToList().ForEach(m => m.Refresh());
                 DataFromModel();
             }
             catch (Exception ex)
@@ -475,19 +474,19 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoAddToSymbolList(IList symbols)
+        private void DoAddToSymbolList(IList items)
         {
-            List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(list != null);
-            if (list.Count == 0)
+            List<SymbolViewModel> symbols = items.Cast<SymbolViewModel>()?.ToList();
+            Debug.Assert(symbols != null);
+            if (symbols.Count == 0)
                 return;
 
             try
             {
                 IsBusy = true;
-                var folder = new FolderViewModel(this, new FolderModel());
-                folder.AddSymbols(list.Where(m => m.Active));
-                Folders.Add(folder);
+                var list = new ListViewModel(this, new ListModel());
+                list.AddSymbols(symbols.Where(m => m.Active));
+                Lists.Add(list);
                 DataToModel();
             }
             finally
@@ -496,7 +495,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoImportFolder()
+        private void DoImportList()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
@@ -515,8 +514,8 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
-                    var model = new FolderModel { Name = Path.GetFileNameWithoutExtension(fileName) };
-                    Model.Folders.Add(model);
+                    var model = new ListModel { Name = Path.GetFileNameWithoutExtension(fileName) };
+                    Model.Lists.Add(model);
                     using StreamReader r = new StreamReader(fileName);
                     while (!r.EndOfStream)
                     {

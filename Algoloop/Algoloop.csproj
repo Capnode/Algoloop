@@ -194,7 +194,7 @@
     <Compile Include="ViewModel\HoldingViewModel.cs" />
     <Compile Include="ViewModel\ResearchViewModel.cs" />
     <Compile Include="ViewModel\TrackSymbolViewModel.cs" />
-    <Compile Include="Model\FolderModel.cs" />
+    <Compile Include="Model\ListModel.cs" />
     <Compile Include="Model\ModelBase.cs" />
     <Compile Include="Model\OrderModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -214,7 +214,7 @@
     <Compile Include="Provider\Oanda.cs" />
     <Compile Include="Provider\QuandBitfinex.cs" />
     <Compile Include="Provider\Yahoo.cs" />
-    <Compile Include="ViewModel\FolderViewModel.cs" />
+    <Compile Include="ViewModel\ListViewModel.cs" />
     <Compile Include="ViewModel\ITreeViewModel.cs" />
     <Compile Include="ViewModel\OrderViewModel.cs" />
     <Compile Include="ViewSupport\BooleanToVisibilityConverter.cs" />
