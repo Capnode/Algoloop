@@ -26,6 +26,7 @@ namespace Algoloop.Model
     {
         public const int version = 1;
 
+        [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
         [DataMember]
         public int Version { get; set; }

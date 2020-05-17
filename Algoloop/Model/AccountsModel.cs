@@ -24,7 +24,7 @@ namespace Algoloop.Model
     [DataContract]
     public class AccountsModel
     {
-        public const int version = 1;
+        public const int version = 0;
 
         private static readonly AccountModel[] _standardAccounts = new[]
         {
@@ -32,6 +32,7 @@ namespace Algoloop.Model
             new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
         };
 
+        [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
         [DataMember]
         public int Version { get; set; }

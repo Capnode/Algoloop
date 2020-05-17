@@ -26,9 +26,10 @@ namespace Algoloop.Model
     [DataContract]
     public class SettingModel
     {
-        public const int version = 1;
+        public const int version = 0;
         private Collection<string> _addOns = new Collection<string>();
 
+        [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
         [DataMember]
         public int Version { get; set; }

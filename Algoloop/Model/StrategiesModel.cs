@@ -21,8 +21,9 @@ namespace Algoloop.Model
     [DataContract]
     public class StrategiesModel
     {
-        public const int version = 1;
+        public const int version = 0;
 
+        [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
         [DataMember]
         public int Version { get; set; }
