@@ -60,10 +60,7 @@ namespace Algoloop.ViewModel
         public ITreeViewModel SelectedItem
         {
             get => _selectedItem;
-            set
-            {
-                Set(ref _selectedItem, value);
-            }
+            set => Set(ref _selectedItem, value);
         }
 
         internal bool DoDeleteMarket(MarketViewModel market)

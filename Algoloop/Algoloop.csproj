@@ -218,6 +218,7 @@
     <Compile Include="ViewModel\ITreeViewModel.cs" />
     <Compile Include="ViewModel\OrderViewModel.cs" />
     <Compile Include="ViewSupport\BooleanToVisibilityConverter.cs" />
+    <Compile Include="ViewSupport\CompositeCollectionConverter.cs" />
     <Compile Include="ViewSupport\MarketNameConverter.cs" />
     <Compile Include="ViewSupport\ProviderNameConverter.cs" />
     <Compile Include="View\DesktopView.xaml.cs">

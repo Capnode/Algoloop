@@ -18,9 +18,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using Algoloop.Model;
-using Algoloop.Service;
 using Algoloop.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -30,7 +28,7 @@ using QuantConnect.Logging;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategiesViewModel : ViewModelBase
+    public class StrategiesViewModel : ViewModelBase, ITreeViewModel
     {
         private readonly MarketsModel _markets;
         private readonly AccountsModel _accounts;
@@ -58,6 +56,9 @@ namespace Algoloop.ViewModel
         public RelayCommand AddCommand { get; }
         public RelayCommand ImportCommand { get; }
         public RelayCommand ExportCommand { get; }
+        public RelayCommand DeleteCommand => throw new NotImplementedException();
+        public RelayCommand StartCommand => throw new NotImplementedException();
+        public RelayCommand StopCommand => throw new NotImplementedException();
 
         public StrategiesModel Model { get; set; }
 
@@ -82,22 +83,28 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal void DoDeleteStrategy(StrategyViewModel strategy)
+        internal void DeleteStrategy(StrategyViewModel strategy)
+        {
+            int pos = Strategies.IndexOf(strategy);
+            Strategies.RemoveAt(pos);
+            DataToModel();
+            if (Strategies.Count == 0)
+            {
+                SelectedItem = null;
+                return;
+            }
+
+            SelectedItem = Strategies[Math.Max(0, pos - 1)];
+        }
+
+        private void DoDeleteStrategy(StrategyViewModel strategy)
         {
             Debug.Assert(strategy != null);
             try
             {
                 IsBusy = true;
-                int pos = Strategies.IndexOf(strategy);
-                Strategies.RemoveAt(pos);
-                DataToModel();
-                if (Strategies.Count == 0)
-                {
-                    SelectedItem = null;
-                    return;
-                }
+                DeleteStrategy(strategy);
 
-                SelectedItem = Strategies[Math.Max(0, pos - 1)];
             }
             finally
             {
@@ -291,6 +298,11 @@ namespace Algoloop.ViewModel
                     }
                 }
             }
+        }
+
+        public void Refresh()
+        {
+            throw new NotImplementedException();
         }
     }
 }

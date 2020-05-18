@@ -19,6 +19,7 @@ namespace Algoloop.ViewModel
     public interface ITreeViewModel
     {
         bool IsBusy { get; set; }
+        ITreeViewModel SelectedItem { get; set; }
         RelayCommand DeleteCommand { get; }
         RelayCommand StartCommand { get; }
         RelayCommand StopCommand { get; }

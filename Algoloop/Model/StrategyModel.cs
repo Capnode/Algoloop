@@ -35,6 +35,7 @@ namespace Algoloop.Model
             Symbols = new Collection<SymbolModel>();
             Parameters = new Collection<ParameterModel>();
             Tracks = new Collection<TrackModel>();
+            Strategies = new Collection<StrategyModel>();
         }
 
         public StrategyModel(StrategyModel model)
@@ -59,6 +60,7 @@ namespace Algoloop.Model
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m)).ToList());
             Tracks = new Collection<TrackModel>();
+            Strategies = new Collection<StrategyModel>();
         }
 
         public StrategyModel(TrackModel model)
@@ -82,6 +84,7 @@ namespace Algoloop.Model
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList());
             Tracks = new Collection<TrackModel>();
+            Strategies = new Collection<StrategyModel>();
         }
 
         [Browsable(false)]
@@ -257,6 +260,11 @@ namespace Algoloop.Model
         [ReadOnly(false)]
         [DataMember]
         public Collection<TrackModel> Tracks { get; }
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public Collection<StrategyModel> Strategies { get; }
 
         public void Refresh()
         {

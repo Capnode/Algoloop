@@ -73,6 +73,12 @@ namespace Algoloop.ViewModel
             set => _market.IsBusy = value;
         }
 
+        public ITreeViewModel SelectedItem
+        {
+            get => _market.SelectedItem;
+            set => _market.SelectedItem = value;
+        }
+
         public RelayCommand DeleteCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }

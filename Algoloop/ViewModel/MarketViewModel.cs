@@ -85,6 +85,12 @@ namespace Algoloop.ViewModel
             set => _parent.IsBusy = value;
         }
 
+        public ITreeViewModel SelectedItem
+        {
+            get => _parent.SelectedItem;
+            set => _parent.SelectedItem = value;
+        }
+
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
         public RelayCommand<IList> CheckAllCommand { get; }
         public RelayCommand AddSymbolCommand { get; }

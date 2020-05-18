@@ -101,6 +101,12 @@ namespace Algoloop.ViewModel
             set => _parent.IsBusy = value;
         }
 
+        public ITreeViewModel SelectedItem
+        {
+            get => _parent.SelectedItem;
+            set => _parent.SelectedItem = value;
+        }
+
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
         public RelayCommand DeleteCommand { get; }

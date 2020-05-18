@@ -45,7 +45,7 @@ namespace Algoloop.ViewModel
     {
         public const string DefaultName = "Strategy";
 
-        private readonly StrategiesViewModel _parent;
+        private readonly ITreeViewModel _parent;
         private readonly MarketsModel _markets;
         private readonly AccountsModel _accounts;
         private readonly SettingModel _settings;
@@ -62,7 +62,7 @@ namespace Algoloop.ViewModel
         private ListModel _selectedList;
         private IList _selectedItems;
 
-        public StrategyViewModel(StrategiesViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingModel settings)
+        public StrategyViewModel(ITreeViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingModel settings)
         {
             _parent = parent;
             Model = model ?? throw new ArgumentNullException(nameof(model));
@@ -73,9 +73,9 @@ namespace Algoloop.ViewModel
             StartCommand = new RelayCommand(() => DoRunStrategy(), () => !IsBusy);
             StopCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => !IsBusy);
-            CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmName));
+            CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmLocation));
             ExportCommand = new RelayCommand(() => DoExportStrategy(), () => !IsBusy);
-            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteStrategy(this), () => !IsBusy);
+            DeleteCommand = new RelayCommand(() => DoDeleteStrategy(), () => !IsBusy);
             DeleteAllTracksCommand = new RelayCommand(() => DoDeleteTracks(null), () => !IsBusy);
             DeleteSelectedTracksCommand = new RelayCommand<IList>(m => DoDeleteTracks(m), m => !IsBusy);
             UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => !IsBusy);
@@ -99,6 +99,12 @@ namespace Algoloop.ViewModel
         {
             get => _parent.IsBusy;
             set => _parent.IsBusy = value;
+        }
+
+        public ITreeViewModel SelectedItem
+        {
+            get =>_parent.SelectedItem;
+            set => _parent.SelectedItem = value;
         }
 
         public RelayCommand StartCommand { get; }
@@ -125,6 +131,7 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<TrackViewModel> Tracks { get; } = new SyncObservableCollection<TrackViewModel>();
+        public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
 
         public IList SelectedItems
         {
@@ -263,6 +270,13 @@ namespace Algoloop.ViewModel
                 Model.Tracks.Add(track.Model);
                 track.DataToModel();
             }
+
+            Model.Strategies.Clear();
+            foreach (StrategyViewModel strategy in Strategies)
+            {
+                Model.Strategies.Add(strategy.Model);
+                strategy.DataToModel();
+            }
         }
 
         internal bool DeleteTrack(TrackViewModel track)
@@ -272,8 +286,8 @@ namespace Algoloop.ViewModel
 
         internal void CloneStrategy(StrategyModel strategyModel)
         {
-            var strategy = new StrategyViewModel(_parent, strategyModel, _markets, _accounts, _settings);
-            _parent.Strategies.Add(strategy);
+            var strategy = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+            Strategies.Add(strategy);
         }
 
         private void DoDeleteTracks(IList tracks)
@@ -296,6 +310,31 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = false;
             }
+        }
+
+        private void DoDeleteStrategy()
+        {
+            try
+            {
+                IsBusy = true;
+                if (_parent is StrategiesViewModel strategies)
+                {
+                    strategies.DeleteStrategy(this);
+                }
+                else if (_parent is StrategyViewModel strategy)
+                {
+                    strategy.DeleteStrategy(this);
+                }
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private void DeleteStrategy(StrategyViewModel strategy)
+        {
+            Strategies.Remove(strategy);
         }
 
         private void DoSelectItem(TrackViewModel track)
@@ -452,6 +491,13 @@ namespace Algoloop.ViewModel
             AlgorithmNameChanged(Model.AlgorithmName);
 
             UpdateTracksAndColumns();
+
+            Strategies.Clear();
+            foreach (StrategyModel strategyModel in Model.Strategies)
+            {
+                var strategy = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+                Strategies.Add(strategy);
+            }
         }
 
         private void UpdateTracksAndColumns()
@@ -493,12 +539,12 @@ namespace Algoloop.ViewModel
         private void AlgorithmNameChanged(string algorithmName)
         {
             StrategyNameChanged();
+            CloneAlgorithmCommand.RaiseCanExecuteChanged();
             if (string.IsNullOrEmpty(algorithmName)) return;
 
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
             if (string.IsNullOrEmpty(assemblyPath)) return;
 
-            CloneAlgorithmCommand.RaiseCanExecuteChanged();
             Parameters.Clear();
             try
             {
@@ -644,6 +690,10 @@ namespace Algoloop.ViewModel
                 // Load assemblies of algorithms
                 string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
                 Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                if (string.IsNullOrEmpty(Model.Name))
+                {
+                    Model.Name = assembly.ManifestModule.Name;
+                }
 
                 //Get the list of extention classes in the library: 
                 List<string> extended = Loader.GetExtendedTypeNames(assembly);
@@ -664,8 +714,8 @@ namespace Algoloop.ViewModel
                         AlgorithmName = algorithm,
                         Name = null
                     };
-                    var strategy = new StrategyViewModel(_parent, strategyModel, _markets, _accounts, _settings);
-                    _parent.Strategies.Add(strategy);
+                    var strategy = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+                    Strategies.Add(strategy);
                 }
             }
             finally

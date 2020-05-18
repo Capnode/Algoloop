@@ -131,13 +131,23 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}" ItemsSource="{Binding Tracks}">
+                    <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding>
+                                <MultiBinding.Converter>
+                                    <viewsupport:CompositeCollectionConverter/>
+                                </MultiBinding.Converter>
+                                <Binding Path="Tracks" />
+                                <Binding Path="Strategies" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>
                                 <TextBlock.Text>
-                                    <MultiBinding StringFormat="{} {0} ({1})">
+                                    <MultiBinding StringFormat="{} {0} ({1},{2})">
                                         <Binding Path="DisplayName"/>
-                                        <Binding Path="Tracks.Count"/>
+                                        <Binding Path="Tracks.Count" />
+                                        <Binding Path="Strategies.Count" />
                                     </MultiBinding>
                                 </TextBlock.Text>
                                 <TextBlock.ContextMenu>
@@ -175,6 +185,13 @@
                                             Command="{Binding ExportCommand}">
                                             <MenuItem.Icon>
                                                 <Image Source="/Resources/Export.png" Width="16" Height="16"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem
+                                            Header="Clone strategy by algorithm"
+                                            Command="{Binding CloneAlgorithmCommand}">
+                                            <MenuItem.Icon>
+                                                <Image Source="/Resources/AddList.png" Width="16" Height="16"/>
                                             </MenuItem.Icon>
                                         </MenuItem>
                                     </ContextMenu>
@@ -297,13 +314,13 @@
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
-                                    CanUserFilter="True"                                    
+                                    CanUserFilter="True"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ExSelectedItems="{Binding SelectedItems}"                                       
+                                    ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn IsReadOnly="True" Header="Name" Binding="{Binding Model.Name}" />
