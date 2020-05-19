@@ -85,17 +85,15 @@
             <TreeView
                 Grid.Column="0"
                 ItemsSource="{Binding Strategies}"
-                BorderThickness="0">
+                BorderThickness="0"
+                AllowDrop="True"
+                MouseMove="TreeView_MouseMove"
+                DragOver="TreeView_DragOver"
+                Drop="TreeView_Drop">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="TreeViewItem">
                         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                        <Setter Property="FontWeight" Value="Normal" />
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="FontWeight" Value="Bold" />
-                            </Trigger>
-                        </Style.Triggers>
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.ContextMenu>

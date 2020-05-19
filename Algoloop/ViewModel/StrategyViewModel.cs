@@ -44,8 +44,8 @@ namespace Algoloop.ViewModel
     public class StrategyViewModel : ViewModelBase, ITreeViewModel
     {
         public const string DefaultName = "Strategy";
+        internal ITreeViewModel _parent;
 
-        private readonly ITreeViewModel _parent;
         private readonly MarketsModel _markets;
         private readonly AccountsModel _accounts;
         private readonly SettingModel _settings;
@@ -82,11 +82,12 @@ namespace Algoloop.ViewModel
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => !IsBusy);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => !IsBusy &&  SelectedSymbol != null);
+            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => !IsBusy && SelectedSymbol != null);
             TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(m => DoSelectItem(m), m => !IsBusy);
             MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => !IsBusy && SelectedSymbol != null);
             MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => !IsBusy && SelectedSymbol != null);
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => !IsBusy);
+            MoveStrategyCommand = new RelayCommand<ITreeViewModel>(m => OnMoveStrategy(m), m => !IsBusy);
 
             Model.NameChanged += StrategyNameChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
@@ -98,13 +99,22 @@ namespace Algoloop.ViewModel
         public bool IsBusy
         {
             get => _parent.IsBusy;
-            set => _parent.IsBusy = value;
+            set
+            {
+                Debug.Assert(_parent != this);
+                _parent.IsBusy = value;
+            }
         }
 
         public ITreeViewModel SelectedItem
         {
-            get =>_parent.SelectedItem;
-            set => _parent.SelectedItem = value;
+            get => _parent.SelectedItem;
+            set
+            {
+                Debug.Assert(_parent != this);
+                Debug.Assert(!IsBusy, "Can not set Command execute if busy");
+                _parent.SelectedItem = value;
+            }
         }
 
         public RelayCommand StartCommand { get; }
@@ -125,6 +135,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> MoveUpSymbolsCommand { get; }
         public RelayCommand<IList> MoveDownSymbolsCommand { get; }
         public RelayCommand SortSymbolsCommand { get; }
+        public RelayCommand<ITreeViewModel> MoveStrategyCommand { get; }
 
         public StrategyModel Model { get; }
 
@@ -176,6 +187,7 @@ namespace Algoloop.ViewModel
             get => _isSelected;
             set
             {
+                Debug.Assert(!IsBusy, "Can not set Command execute if busy");
                 Set(ref _isSelected, value);
             }
         }
@@ -314,21 +326,19 @@ namespace Algoloop.ViewModel
 
         private void DoDeleteStrategy()
         {
-            try
+            // No IsBusy
+            DeleteStrategy();
+        }
+
+        private void DeleteStrategy()
+        {
+            if (_parent is StrategiesViewModel strategies)
             {
-                IsBusy = true;
-                if (_parent is StrategiesViewModel strategies)
-                {
-                    strategies.DeleteStrategy(this);
-                }
-                else if (_parent is StrategyViewModel strategy)
-                {
-                    strategy.DeleteStrategy(this);
-                }
+                strategies.DeleteStrategy(this);
             }
-            finally
+            else if (_parent is StrategyViewModel strategy)
             {
-                IsBusy = false;
+                strategy.DeleteStrategy(this);
             }
         }
 
@@ -342,17 +352,10 @@ namespace Algoloop.ViewModel
             if (track == null)
                 return;
 
-            try
-            {
-                IsBusy = true;
-                track.IsSelected = true;
-                _parent.SelectedItem = track;
-                IsExpanded = true;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            // No IsBusy
+            track.IsSelected = true;
+            _parent.SelectedItem = track;
+            IsExpanded = true;
         }
 
         private void DoAddSymbol()
@@ -659,13 +662,18 @@ namespace Algoloop.ViewModel
         internal void CreateList(IEnumerable<SymbolModel> symbols)
         {
             MarketModel market = _markets.GetMarket(Model.Market);
-            if (market == null)
-                return;
-
+            if (market == null) return;
             market.AddList(new ListModel(symbols));
         }
 
-        internal void DoCloneStrategy()
+        internal void AddStrategy(StrategyViewModel strategy)
+        {
+            Debug.Assert(strategy != this);
+            strategy._parent = this;
+            Strategies.Add(strategy);
+        }
+
+        private void DoCloneStrategy()
         {
             try
             {
@@ -842,6 +850,23 @@ namespace Algoloop.ViewModel
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private void OnMoveStrategy(ITreeViewModel item)
+        {
+            if (item == this) throw new ArgumentException(nameof(item));
+
+            // No IsBusy
+            if (item is StrategiesViewModel strategies)
+            {
+                DeleteStrategy();
+                strategies.AddStrategy(this);
+            }
+            else if (item is StrategyViewModel strategy)
+            {
+                DeleteStrategy();
+                strategy.AddStrategy(this);
             }
         }
     }

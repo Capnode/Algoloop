@@ -12,7 +12,11 @@
  * limitations under the License.
  */
 
+using Algoloop.ViewModel;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace Algoloop.View
 {
@@ -24,6 +28,60 @@ namespace Algoloop.View
         public StrategiesView()
         {
             InitializeComponent();
+        }
+
+        private void TreeView_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (sender is TreeView tree
+                && tree.SelectedItem != null
+                && e.LeftButton.Equals(MouseButtonState.Pressed))
+            {
+                DragDrop.DoDragDrop(tree, tree.SelectedItem, DragDropEffects.Move);
+            }
+        }
+
+        private void TreeView_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(typeof(StrategyViewModel))
+                && FindAnchestor<TreeViewItem>((DependencyObject)e.OriginalSource) is TreeViewItem treeViewItem)
+            {
+                treeViewItem.IsSelected = true;
+                e.Effects = DragDropEffects.Move;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
+
+        private void TreeView_Drop(object sender, DragEventArgs e)
+        {
+            if (sender is TreeView tree
+                && e.Data.GetDataPresent(typeof(StrategyViewModel)))
+            {
+                var dragSource = e.Data.GetData(typeof(StrategyViewModel)) as StrategyViewModel;
+                TreeViewItem treeViewItem = FindAnchestor<TreeViewItem>((DependencyObject)e.OriginalSource);
+                object dropTarget = treeViewItem == null ? DataContext : treeViewItem.Header;
+                if (dropTarget == null || dragSource == null || dropTarget == dragSource) return;
+                if (dragSource.MoveStrategyCommand.CanExecute(dropTarget))
+                {
+                    dragSource.MoveStrategyCommand.Execute(dropTarget);
+                }
+            }
+        }
+
+        private static T FindAnchestor<T>(DependencyObject current) where T : DependencyObject
+        {
+            do
+            {
+                if (current is T)
+                {
+                    return (T)current;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
         }
     }
 }

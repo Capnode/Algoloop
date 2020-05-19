@@ -79,37 +79,20 @@ namespace Algoloop.ViewModel
             get => _selectedItem;
             set
             {
+                Debug.Assert(!IsBusy, "Can not set Command execute if busy");
                 Set(ref _selectedItem, value);
-            }
+           }
         }
 
         internal void DeleteStrategy(StrategyViewModel strategy)
         {
+            strategy.IsSelected = false;
             int pos = Strategies.IndexOf(strategy);
+            Debug.Assert(pos >= 0);
             Strategies.RemoveAt(pos);
-            DataToModel();
-            if (Strategies.Count == 0)
-            {
-                SelectedItem = null;
-                return;
-            }
-
-            SelectedItem = Strategies[Math.Max(0, pos - 1)];
-        }
-
-        private void DoDeleteStrategy(StrategyViewModel strategy)
-        {
-            Debug.Assert(strategy != null);
-            try
-            {
-                IsBusy = true;
-                DeleteStrategy(strategy);
-
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            if (Strategies.Count == 0) return;
+            strategy = Strategies[Math.Max(0, pos - 1)];
+            strategy.IsSelected = true;
         }
 
         internal async Task<bool> ReadAsync(string fileName)
@@ -158,13 +141,19 @@ namespace Algoloop.ViewModel
             }
         }
 
+        internal void AddStrategy(StrategyViewModel strategy)
+        {
+            strategy._parent = this;
+            Strategies.Add(strategy);
+        }
+
         private void DoAddStrategy()
         {
             try
             {
                 IsBusy = true;
                 var strategy = new StrategyViewModel(this, new StrategyModel(), _markets, _accounts, _settings);
-                Strategies.Add(strategy);
+                AddStrategy(strategy);
             }
             finally
             {
@@ -282,7 +271,7 @@ namespace Algoloop.ViewModel
             foreach (StrategyModel strategyModel in Model.Strategies)
             {
                 var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
-                Strategies.Add(strategyViewModel);
+                AddStrategy(strategyViewModel);
             }
         }
 

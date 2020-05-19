@@ -96,6 +96,7 @@ namespace Algoloop.Service
 
         internal static string FullExePath(string file)
         {
+            if (string.IsNullOrEmpty(file)) return null;
             if (File.Exists(file)) return file;
             string path = Path.Combine(GetProgramFolder(), file);
             if (File.Exists(path)) return path;
