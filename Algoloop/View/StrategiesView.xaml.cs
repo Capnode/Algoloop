@@ -33,25 +33,38 @@ namespace Algoloop.View
         private void TreeView_MouseMove(object sender, MouseEventArgs e)
         {
             if (sender is TreeView tree
-                && tree.SelectedItem != null
-                && e.LeftButton.Equals(MouseButtonState.Pressed))
+                && FindAnchestor<TreeViewItem>((DependencyObject)e.OriginalSource) is TreeViewItem treeViewItem
+                && treeViewItem.DataContext is StrategyViewModel
+                && e.LeftButton.Equals(MouseButtonState.Pressed)
+                && tree.SelectedItem != null)
             {
-                DragDrop.DoDragDrop(tree, tree.SelectedItem, DragDropEffects.Move);
+                DragDrop.DoDragDrop(treeViewItem, tree.SelectedItem, DragDropEffects.Move);
             }
         }
 
         private void TreeView_DragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(StrategyViewModel))
-                && FindAnchestor<TreeViewItem>((DependencyObject)e.OriginalSource) is TreeViewItem treeViewItem)
+            if (e.Data.GetDataPresent(typeof(StrategyViewModel)))
             {
-                treeViewItem.IsSelected = true;
-                e.Effects = DragDropEffects.Move;
+                if (FindAnchestor<TreeViewItem>((DependencyObject)e.OriginalSource) is TreeViewItem treeViewItem)
+                {
+                    if (treeViewItem.DataContext is StrategyViewModel)
+                    {
+                        treeViewItem.IsSelected = true;
+                        e.Effects = DragDropEffects.Move;
+                        e.Handled = true;
+                        return;
+                    }
+                }
+                else
+                {
+                    e.Effects = DragDropEffects.Move;
+                    e.Handled = true;
+                    return;
+                }
             }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
+            e.Effects = DragDropEffects.None;
+            e.Handled = true;
         }
 
         private void TreeView_Drop(object sender, DragEventArgs e)
