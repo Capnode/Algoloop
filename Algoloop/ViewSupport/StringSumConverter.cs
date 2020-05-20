@@ -13,35 +13,37 @@
 */
 
 using System;
-using System.Collections;
+using System.Globalization;
 using System.Windows.Data;
 
 namespace Algoloop.ViewSupport
 {
-    public class CompositeCollectionConverter : IMultiValueConverter
+    public class StringSumConverter : BaseConverter, IMultiValueConverter
     {
-
-        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var collection = new CompositeCollection();
-            foreach (object item in values)
+            string name = null;
+            decimal sum = 0M;
+            foreach (object value in values)
             {
-                if (item is IEnumerable ienum)
+                if (value is string str)
                 {
-                    collection.Add(new CollectionContainer() { Collection = ienum });
+                    name = str;
                 }
-                else
+                else if (value is int num)
                 {
-                    collection.Add(item);
+                    sum += num;
                 }
             }
 
-            return collection;
+            var format = string.Format(CultureInfo.InvariantCulture, (string)parameter, name, sum);
+            return format;
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            string[] splitValues = ((string)value).Split(' ');
+            return splitValues;
         }
     }
 }

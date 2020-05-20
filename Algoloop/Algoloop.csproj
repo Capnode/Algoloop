@@ -221,6 +221,7 @@
     <Compile Include="ViewSupport\CompositeCollectionConverter.cs" />
     <Compile Include="ViewSupport\MarketNameConverter.cs" />
     <Compile Include="ViewSupport\ProviderNameConverter.cs" />
+    <Compile Include="ViewSupport\StringSumConverter.cs" />
     <Compile Include="View\DesktopView.xaml.cs">
       <DependentUpon>DesktopView.xaml</DependentUpon>
     </Compile>

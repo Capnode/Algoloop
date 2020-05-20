@@ -56,9 +56,9 @@ namespace Algoloop.ViewModel
         public RelayCommand AddCommand { get; }
         public RelayCommand ImportCommand { get; }
         public RelayCommand ExportCommand { get; }
-        public RelayCommand DeleteCommand => throw new NotImplementedException();
-        public RelayCommand StartCommand => throw new NotImplementedException();
-        public RelayCommand StopCommand => throw new NotImplementedException();
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
 
         public StrategiesModel Model { get; set; }
 

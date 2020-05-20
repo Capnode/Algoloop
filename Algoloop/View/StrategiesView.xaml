@@ -142,7 +142,9 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock>
                                 <TextBlock.Text>
-                                    <MultiBinding StringFormat="{} {0} ({1},{2})">
+                                    <MultiBinding
+                                        Converter="{viewsupport:StringSumConverter}"
+                                        ConverterParameter="{}{0} ({1})">
                                         <Binding Path="DisplayName"/>
                                         <Binding Path="Tracks.Count" />
                                         <Binding Path="Strategies.Count" />
