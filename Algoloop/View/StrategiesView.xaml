@@ -249,9 +249,15 @@
                                     <ToolBar DockPanel.Dock="Top">
                                         <ComboBox
                                             SelectedValue="{Binding SelectedList, Mode=TwoWay}"
-                                            DisplayMemberPath="Name"
+                                            DisplayMemberPath="DisplayName"
                                             ItemsSource="{Binding Lists}"
-                                            MinWidth="120"/>
+                                            MinWidth="120">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="DropDownOpened">
+                                                    <i:InvokeCommandAction Command="{Binding DropDownOpenedCommand}"/>
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
                                         <Button
                                             ToolTip="Add symbol" 
                                             Command="{Binding AddSymbolCommand}">

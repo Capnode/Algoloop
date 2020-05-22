@@ -85,12 +85,11 @@ namespace Algoloop.ViewModel
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand ExportListCommand { get; }
-
+        public string DisplayName => Model != null ? $"{_market.Model.Name}: {Model.Name} ({Symbols.Count})" : string.Empty;
 
         public ListModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public CollectionViewSource MarketSymbols { get; } = new CollectionViewSource();
-
 
         public SymbolViewModel MarketSymbol
         {
@@ -130,7 +129,6 @@ namespace Algoloop.ViewModel
             set => Set(ref _symbolColumns, value);
         }
 
-
         public void Refresh()
         {
             Model.Refresh();
@@ -165,6 +163,7 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = true;
                 AddSymbols(new List<SymbolViewModel> { symbol });
+                DataToModel();
             }
             finally
             {

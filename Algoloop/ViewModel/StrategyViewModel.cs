@@ -55,11 +55,11 @@ namespace Algoloop.ViewModel
         private bool _isExpanded;
         private string _displayName;
         private ObservableCollection<DataGridColumn> _trackColumns = new ObservableCollection<DataGridColumn>();
-        private readonly SyncObservableCollection<ListModel> _lists = new SyncObservableCollection<ListModel>();
+        private SyncObservableCollection<ListViewModel> _lists = new SyncObservableCollection<ListViewModel>();
 
         private SymbolViewModel _selectedSymbol;
         private TrackViewModel _selectedTrack;
-        private ListModel _selectedList;
+        private ListViewModel _selectedList;
         private IList _selectedItems;
 
         public StrategyViewModel(ITreeViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingModel settings)
@@ -88,6 +88,7 @@ namespace Algoloop.ViewModel
             MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => !IsBusy && SelectedSymbol != null);
             SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => !IsBusy);
             MoveStrategyCommand = new RelayCommand<ITreeViewModel>(m => OnMoveStrategy(m), m => !IsBusy);
+            DropDownOpenedCommand = new RelayCommand(() => DoDropDownOpenedCommand(), () => !IsBusy);
 
             Model.NameChanged += StrategyNameChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
@@ -136,7 +137,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> MoveDownSymbolsCommand { get; }
         public RelayCommand SortSymbolsCommand { get; }
         public RelayCommand<ITreeViewModel> MoveStrategyCommand { get; }
-
+        public RelayCommand DropDownOpenedCommand { get; }
         public StrategyModel Model { get; }
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -160,20 +161,10 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public SyncObservableCollection<ListModel> Lists
+        public SyncObservableCollection<ListViewModel> Lists
         {
-            get
-            {
-                var list = new List<ListModel> { new ListModel { Name = string.Empty } };
-                MarketModel market = _markets.GetMarket(Model.Market);
-                if (market != null)
-                {
-                    list.AddRange(market.Lists);
-                }
-
-                _lists.ReplaceRange(list);
-                return _lists;
-            }
+            get => _lists;
+            set => Set(ref _lists, value);
         }
 
         public string DisplayName
@@ -226,7 +217,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public ListModel SelectedList
+        public ListViewModel SelectedList
         {
             get => _selectedList;
             set
@@ -363,18 +354,14 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                if (string.IsNullOrEmpty(SelectedList?.Name))
+                if (SelectedList?.Model == null)
                 {
                     var symbol = new SymbolViewModel(this, new SymbolModel("symbol", Model.Market, Model.Security));
                     Symbols.Add(symbol);
                 }
                 else
                 {
-                    IEnumerable<SymbolViewModel> symbols = _markets
-                        .GetActiveSymbols(Model.Market, SelectedList)
-                        .Where(s => !Symbols.Any(p => p.Model.Name.Equals(s)))
-                        .Select(m => new SymbolViewModel(this, m));
-                    Symbols.AddRange(symbols);
+                    Symbols.AddRange(SelectedList.Symbols);
                 }
 
                 DataToModel();
@@ -659,13 +646,6 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal void CreateList(IEnumerable<SymbolModel> symbols)
-        {
-            MarketModel market = _markets.GetMarket(Model.Market);
-            if (market == null) return;
-            market.AddList(new ListModel(symbols));
-        }
-
         internal void AddStrategy(StrategyViewModel strategy)
         {
             Debug.Assert(strategy != this);
@@ -867,6 +847,23 @@ namespace Algoloop.ViewModel
             {
                 DeleteStrategy();
                 strategy.AddStrategy(this);
+            }
+        }
+
+        private void DoDropDownOpenedCommand()
+        {
+            var marketsVm = new MarketsViewModel(_markets, _settings);
+            Lists.Clear();
+            var listVm = new ListViewModel(new MarketViewModel(marketsVm, new MarketModel(), _settings), null);
+            Lists.Add(listVm);
+            foreach (MarketModel market in _markets.Markets)
+            {
+                var marketVm = new MarketViewModel(marketsVm, market, _settings);
+                foreach (ListModel list in market.Lists)
+                {
+                    listVm = new ListViewModel(marketVm, list);
+                    Lists.Add(listVm);
+                }
             }
         }
     }
