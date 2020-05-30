@@ -22,10 +22,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ICSharpCode.SharpZipLib.BZip2;
 using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using QuantConnect.Util;
-using Ionic.BZip2;
 
 namespace QuantConnect.ToolBox.AlgoSeekOptionsConverter
 {
@@ -353,12 +353,11 @@ namespace QuantConnect.ToolBox.AlgoSeekOptionsConverter
         {
             var outcome = false;
             using (FileStream fileToDecompressAsStream = compressedRawDatafile.OpenRead())
-            using (var bz2InputStream = new BZip2InputStream(fileToDecompressAsStream))
             using (FileStream decompressedStream = File.Create(rawDatafile.FullName))
             {
                 try
                 {
-                    bz2InputStream.CopyTo(decompressedStream);
+                    BZip2.Decompress(fileToDecompressAsStream, decompressedStream, false);
                     outcome = true;
                 }
                 catch (Exception ex)

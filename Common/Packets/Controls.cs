@@ -16,7 +16,6 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using QuantConnect.Configuration;
 using QuantConnect.Interfaces;
 
 namespace QuantConnect.Packets
@@ -45,10 +44,16 @@ namespace QuantConnect.Packets
         public int TickLimit;
 
         /// <summary>
-        /// Ram allocation for this backtest in MB
+        /// Ram allocation for this algorithm in MB
         /// </summary>
-        [JsonProperty(PropertyName = "iRamAllocation")]
+        [JsonProperty(PropertyName = "iMaxRamAllocation")]
         public int RamAllocation;
+
+        /// <summary>
+        /// CPU allocation for this algorithm
+        /// </summary>
+        [JsonProperty(PropertyName = "dMaxCpuAllocation")]
+        public decimal CpuAllocation;
 
         /// <summary>
         /// The user backtesting log limit
@@ -140,9 +145,9 @@ namespace QuantConnect.Packets
             BacktestingMaxInsights = 10000;
             MaximumDataPointsPerChartSeries = 4000;
             SecondTimeOut = 300;
-            StorageLimitMB = Config.GetInt("storage-limit-mb", 5);
-            StorageFileCount = Config.GetInt("storage-file-count", 100);
-            PersistenceIntervalSeconds = Config.GetInt("persistence-interval-seconds", 5);
+            StorageLimitMB = 5;
+            StorageFileCount = 100;
+            PersistenceIntervalSeconds = 5;
 
             // initialize to default leaky bucket values in case they're not specified
             TrainingLimits = new LeakyBucketControlParameters();

@@ -12,9 +12,9 @@
     <ProjectGuid>{9561D14A-467E-40AD-928E-EE9F758D7D98}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>QuantConnect.Jupyter</RootNamespace>
-    <AssemblyName>QuantConnect.Jupyter</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>QuantConnect.Research</RootNamespace>
+    <AssemblyName>QuantConnect.Research</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <LangVersion>6</LangVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -48,9 +48,6 @@
     <Reference Include="NodaTime, Version=1.3.0.0, Culture=neutral, PublicKeyToken=4226afe0d9b296d1, processorArchitecture=MSIL">
       <HintPath>..\packages\NodaTime.1.3.4\lib\net35-Client\NodaTime.dll</HintPath>
     </Reference>
-    <Reference Include="StringInterpolationBridge, Version=0.9.1.0, Culture=neutral, PublicKeyToken=761dcf67ba0bf74d, processorArchitecture=MSIL">
-      <HintPath>..\packages\StringInterpolationBridgeStrong.0.9.1\lib\net40\StringInterpolationBridge.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
@@ -58,7 +55,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <PropertyGroup>
@@ -163,16 +159,16 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="BasicCSharpQuantBookTemplate.ipynb">
+    <Content Include="BasicCSharpQuantBookTemplate.ipynb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="BasicQuantBookTemplate.ipynb">
+    </Content>
+    <Content Include="BasicQuantBookTemplate.ipynb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="packages.config" />
-    <None Include="QuantConnect.csx">
+    <Content Include="QuantConnect.csx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="readme.md" />
   </ItemGroup>
   <ItemGroup>

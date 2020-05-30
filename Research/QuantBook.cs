@@ -36,7 +36,7 @@ using System.Linq;
 using QuantConnect.Logging;
 using QuantConnect.Packets;
 
-namespace QuantConnect.Jupyter
+namespace QuantConnect.Research
 {
     /// <summary>
     /// Provides access to data for quantitative analysis
@@ -90,7 +90,9 @@ namespace QuantConnect.Jupyter
                     new Controls
                     {
                         // if <= 0 we disable periodic persistence and make it synchronous
-                        PersistenceIntervalSeconds = -1
+                        PersistenceIntervalSeconds = -1,
+                        StorageLimitMB = Config.GetInt("storage-limit-mb", 5),
+                        StorageFileCount = Config.GetInt("storage-file-count", 100)
                     });
                 SetObjectStore(algorithmHandlers.ObjectStore);
 
