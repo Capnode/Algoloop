@@ -240,6 +240,7 @@ namespace Algoloop.ViewModel
             var inUse = new List<string>();
             foreach (StrategyViewModel strategy in Strategies)
             {
+                inUse.AddRange(TracksInUse(strategy, folder));
                 Model.Strategies.Add(strategy.Model);
                 strategy.DataToModel();
 
@@ -263,6 +264,24 @@ namespace Algoloop.ViewModel
                     File.Delete(file.FullName);
                 }
             }
+        }
+
+        private IEnumerable<string> TracksInUse(StrategyViewModel parent, string folder)
+        {
+            var inUse = new List<string>();
+            foreach (StrategyViewModel strategy in parent.Strategies)
+            {
+                strategy.DataToModel();
+
+                // Collect files in use
+                inUse.AddRange(strategy.Model.Tracks
+                    .Where(m => !string.IsNullOrEmpty(m.ZipFile))
+                    .Select(p => Path.Combine(folder, p.ZipFile)));
+
+                inUse.AddRange(TracksInUse(strategy, folder));
+            }
+
+            return inUse;
         }
 
         private void DataFromModel()
