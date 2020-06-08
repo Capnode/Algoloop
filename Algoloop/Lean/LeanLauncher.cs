@@ -22,6 +22,7 @@ using QuantConnect.Configuration;
 using QuantConnect.Lean.Engine;
 using QuantConnect.Logging;
 using QuantConnect.Packets;
+using QuantConnect.Securities;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,13 @@ namespace Algoloop.Lean
                 var algorithmManager = new AlgorithmManager(liveMode);
                 AlgorithmNodePacket job = systemHandlers.JobQueue.NextJob(out string assemblyPath);
                 job.UserPlan = UserPlan.Professional;
+                job.Language = model.AlgorithmLanguage;
+                if (job is BacktestNodePacket backtest)
+                {
+                    backtest.PeriodStart = model.StartDate;
+                    backtest.PeriodFinish = model.EndDate;
+                    backtest.CashAmount = new CashAmount(model.InitialCapital, Currencies.USD);
+                }
                 systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
                 engine.Run(job, algorithmManager, assemblyPath, WorkerThread.Instance);
                 BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
@@ -163,9 +171,6 @@ namespace Algoloop.Lean
 
         private static void SetParameters(TrackModel model, Dictionary<string, string> parameters)
         {
-            parameters.Add("startdate", model.StartDate.ToString(CultureInfo.InvariantCulture));
-            parameters.Add("enddate", model.EndDate.ToString(CultureInfo.InvariantCulture));
-            parameters.Add("cash", model.InitialCapital.ToString(CultureInfo.InvariantCulture));
             parameters.Add("resolution", model.Resolution.ToString());
             if (!model.Symbols.IsNullOrEmpty())
             {
