@@ -412,9 +412,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <SplashScreen Include="Resources\AlgoloopSplash.png" />
-    <None Include="..\Research\BasicCSharpQuantBookTemplate.ipynb">
+    <Content Include="..\Research\BasicCSharpQuantBookTemplate.ipynb">
       <Link>Data\UserData\Notebook\BasicCSharpQuantBookTemplate.ipynb</Link>
-    </None>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Resources\AlgoloopIcon.ico" />
     <None Include="Resources\Algoloop.png" />

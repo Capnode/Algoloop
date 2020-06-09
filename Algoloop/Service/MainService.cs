@@ -79,6 +79,12 @@ namespace Algoloop.Service
 
         public static void CopyDirectory(string sourceDir, string destDir, bool overwiteFiles)
         {
+            if (!Directory.Exists(sourceDir))
+            {
+                Log.Error($"Source directory {sourceDir} does not exist");
+                return;
+            }
+
             // Create all of the directories
             foreach (string dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
                 Directory.CreateDirectory(dirPath.Replace(sourceDir, destDir));
