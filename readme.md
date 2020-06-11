@@ -5,7 +5,7 @@ Algoloop trading application
 Algoloop is an open-source algorithmic trading application with a Windows desktop frontend to QuantConnect Lean trading engine. 
 - Local live execution with multiple brokerages
 - Local algorithm backtest execution
-- Algorithms in C#
+- Algorithms in C# and Python
 - Algorithm optimization
 - Market data from multiple providers
 - Windows WPF user interface
@@ -25,7 +25,9 @@ Contributions are welcome:
 
 ## Screenshot ##
 ![alt tag](Algoloop/Doc/Chart.png)
-
+![alt tag](Algoloop/Doc/Fundamentals.png)
+![alt tag](Algoloop/Doc/Strategy.png)
+![alt tag](Algoloop/Doc/Trades.png)
 
 ## Contact ##
 info@capnode.com
