@@ -293,6 +293,7 @@
     <Compile Include="Algorithm\AlgorithmPlottingTests.cs" />
     <Compile Include="Algorithm\AlgorithmRegisterIndicatorTests.cs" />
     <Compile Include="Algorithm\AlgorithmResolveConsolidatorTests.cs" />
+    <Compile Include="Algorithm\AlgorithmAddSecurityTests.cs" />
     <Compile Include="Algorithm\AlgorithmSetBrokerageTests.cs" />
     <Compile Include="Algorithm\AlgorithmSetHoldingsTests.cs" />
     <Compile Include="Algorithm\AlgorithmSettingsTest.cs" />
@@ -360,6 +361,7 @@
     <Compile Include="Common\Orders\OrderSizingTests.cs" />
     <Compile Include="Common\ExpiryTests.cs" />
     <Compile Include="Common\Orders\Serialization\SerializedOrderJsonConverterTests.cs" />
+    <Compile Include="Common\Packets\ControlsTests.cs" />
     <Compile Include="Common\Securities\TestDefaultMarginCallModel.cs" />
     <Compile Include="Common\Statistics\AnnualPerformanceTests.cs" />
     <Compile Include="Common\Statistics\StatisticsBuilderTests.cs" />

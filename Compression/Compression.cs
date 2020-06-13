@@ -628,9 +628,11 @@ namespace QuantConnect
         {
             using (var entryReader = new StreamReader(entry.OpenReader()))
             {
-                while (!entryReader.EndOfStream)
+                var line = entryReader.ReadLine();
+                while (line != null)
                 {
-                    yield return entryReader.ReadLine();
+                    yield return line;
+                    line = entryReader.ReadLine();
                 }
             }
         }
