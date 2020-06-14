@@ -154,7 +154,6 @@ namespace Algoloop.Model
                 SetBrowsable("Login", true);
                 SetBrowsable("Password", true);
                 SetBrowsable("ApiKey", false);
-                SetReadonly("Resolution", false);
             }
             else
             {
@@ -162,7 +161,6 @@ namespace Algoloop.Model
                 SetBrowsable("Login", false);
                 SetBrowsable("Password", false);
                 SetBrowsable("ApiKey", false);
-                SetReadonly("Resolution", false);
             }
         }
 
