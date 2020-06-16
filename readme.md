@@ -1,6 +1,8 @@
 Algoloop trading application
 =========
 
+<a href='//www.microsoft.com/store/apps/9PGZD6RCG6LC?cid=storebadge&ocid=badge'><img src='https://developer.microsoft.com/en-us/store/badges/images/English_get-it-from-MS.png' alt='Install from Microsoft Store' width="284" height="104"/></a>
+
 ## Introduction ##
 Algoloop is an open-source algorithmic trading application with a Windows desktop frontend to QuantConnect Lean trading engine. 
 - Local live execution with multiple brokerages
