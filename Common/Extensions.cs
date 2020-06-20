@@ -710,6 +710,16 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Extension method for string to decimal conversion where string can represent a number with exponent xe-y
+        /// </summary>
+        /// <param name="str">String to be converted to decimal value</param>
+        /// <returns>Decimal value of the string</returns>
+        public static decimal ToDecimalAllowExponent(this string str)
+        {
+            return decimal.Parse(str, NumberStyles.AllowExponent | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Extension method for faster string to Int32 conversion.
         /// </summary>
         /// <param name="str">String to be converted to positive Int32 value</param>
@@ -1595,8 +1605,9 @@ namespace QuantConnect
         /// <typeparam name="T">Target type of the resulting managed object</typeparam>
         /// <param name="pyObject">PyObject to be converted</param>
         /// <param name="result">Managed object </param>
+        /// <param name="allowPythonDerivative">True will convert python subclasses of T</param>
         /// <returns>True if successful conversion</returns>
-        public static bool TryConvert<T>(this PyObject pyObject, out T result)
+        public static bool TryConvert<T>(this PyObject pyObject, out T result, bool allowPythonDerivative = false)
         {
             result = default(T);
             var type = typeof(T);
@@ -1637,10 +1648,10 @@ namespace QuantConnect
 
                     // If the PyObject type and the managed object names are the same,
                     // pyObject is a C# object wrapped in PyObject, in this case return true
-                    // Otherwise, pyObject is a python object that subclass a C# class.
+                    // Otherwise, pyObject is a python object that subclass a C# class, only return true if 'allowPythonDerivative'
                     var name = (((dynamic) pythonType).__name__ as PyObject).GetAndDispose<string>();
                     pythonType.Dispose();
-                    return name == result.GetType().Name;
+                    return allowPythonDerivative || name == result.GetType().Name;
                 }
                 catch
                 {

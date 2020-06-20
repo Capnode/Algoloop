@@ -40,6 +40,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         private readonly ITimeKeeper _timeKeeper;
         private readonly bool _liveMode;
         private readonly IRegisteredSecurityDataTypesProvider _registeredTypesProvider;
+        private readonly IDataPermissionManager _dataPermissionManager;
 
         /// There is no ConcurrentHashSet collection in .NET,
         /// so we use ConcurrentDictionary with byte value to minimize memory usage
@@ -66,7 +67,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             ITimeKeeper timeKeeper,
             MarketHoursDatabase marketHoursDatabase,
             bool liveMode,
-            IRegisteredSecurityDataTypesProvider registeredTypesProvider)
+            IRegisteredSecurityDataTypesProvider registeredTypesProvider,
+            IDataPermissionManager dataPermissionManager)
         {
             _dataFeed = dataFeed;
             UniverseSelection = universeSelection;
@@ -77,6 +79,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             _marketHoursDatabase = marketHoursDatabase;
             _liveMode = liveMode;
             _registeredTypesProvider = registeredTypesProvider;
+            _dataPermissionManager = dataPermissionManager;
 
             // wire ourselves up to receive notifications when universes are added/removed
             algorithm.UniverseManager.CollectionChanged += (sender, args) =>
@@ -178,6 +181,9 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 // duplicate subscription request
                 return subscription.AddSubscriptionRequest(request);
             }
+
+            // before adding the configuration to the data feed let's assert it's valid
+            _dataPermissionManager.AssertConfiguration(request.Configuration);
 
             subscription = _dataFeed.CreateSubscription(request);
 
@@ -442,7 +448,19 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 }
             }
 
-            var marketHoursDbEntry = _marketHoursDatabase.GetEntry(symbol.ID.Market, symbol, symbol.ID.SecurityType);
+            MarketHoursDatabase.Entry marketHoursDbEntry;
+            if (!_marketHoursDatabase.TryGetEntry(symbol.ID.Market, symbol, symbol.ID.SecurityType, out marketHoursDbEntry))
+            {
+                if (symbol.SecurityType == SecurityType.Base)
+                {
+                    var baseInstance = dataTypes.Single().Item1.GetBaseDataInstance();
+                    baseInstance.Symbol = symbol;
+                    _marketHoursDatabase.SetEntryAlwaysOpen(Market.USA, null, SecurityType.Base, baseInstance.DataTimeZone());
+                }
+
+                marketHoursDbEntry = _marketHoursDatabase.GetEntry(symbol.ID.Market, symbol, symbol.ID.SecurityType);
+            }
+
             var exchangeHours = marketHoursDbEntry.ExchangeHours;
             if (symbol.ID.SecurityType == SecurityType.Option || symbol.ID.SecurityType == SecurityType.Future)
             {
