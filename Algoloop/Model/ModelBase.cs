@@ -36,5 +36,33 @@ namespace Algoloop.Model
             FieldInfo fieldToChange = attribute.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
             fieldToChange.SetValue(attribute, value);
         }
+
+        protected void SetTitle(string property, string value)
+        {
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
+            DisplayNameAttribute attribute = (DisplayNameAttribute)descriptor.Attributes[typeof(DisplayNameAttribute)];
+            FieldInfo fieldToChange = attribute.GetType().GetField("_displayName", BindingFlags.NonPublic | BindingFlags.Instance);
+            fieldToChange.SetValue(attribute, value);
+        }
+
+        protected void SetDescription(string property, string value)
+        {
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
+            DescriptionAttribute attribute = (DescriptionAttribute)descriptor.Attributes[typeof(DescriptionAttribute)];
+            FieldInfo fieldToChange = attribute.GetType().GetField("description", BindingFlags.NonPublic | BindingFlags.Instance);
+            fieldToChange.SetValue(attribute, value);
+        }
+
+        protected void SetValue(string property, bool value)
+        {
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
+            descriptor.SetValue(this, value);
+        }
+
+        protected bool GetValue(string property)
+        {
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
+            return (bool) descriptor.GetValue(this);
+        }
     }
 }

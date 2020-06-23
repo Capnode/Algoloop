@@ -17,7 +17,11 @@ using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Algoloop.ViewModel
@@ -34,7 +38,7 @@ namespace Algoloop.ViewModel
 
         public SettingModel Model { get; }
 
-        public bool Read(string fileName)
+        public async Task<bool> ReadAsync(string fileName)
         {
             Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
@@ -54,7 +58,7 @@ namespace Algoloop.ViewModel
             }
 
             DataFromModel();
-            return true;
+            return await Task.FromResult(true);
         }
 
         internal bool Save(string fileName)

@@ -76,7 +76,7 @@ namespace Algoloop
             // Enable sleep mode
             _ = SetThreadExecutionState(_esContinous);
 
-            ViewModelLocator.MainViewModel.SaveAll();
+            ViewModelLocator.MainViewModel.SaveConfig();
             Algoloop.Properties.Settings.Default.Save();
 
             Log.Trace($"Exit \"{AboutModel.AssemblyProduct}\"");

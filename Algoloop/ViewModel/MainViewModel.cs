@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -56,8 +57,8 @@ namespace Algoloop.ViewModel
             ResearchViewModel = researchViewModel;
             LogViewModel = logViewModel;
 
-            SaveCommand = new RelayCommand(() => SaveAll(), () => !IsBusy);
-            SettingsCommand = new RelayCommand(() => DoSettings(), () => !IsBusy);
+            SaveCommand = new RelayCommand(() => SaveConfig(), () => !IsBusy);
+            SettingsCommand = new RelayCommand(async () => await DoSettings(), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
@@ -66,7 +67,7 @@ namespace Algoloop.ViewModel
             Directory.SetCurrentDirectory(appData);
 
             // Async initialize without blocking UI
-            _initializer = Initialize(appData);
+            _initializer = Initialize();
         }
 
         public RelayCommand SaveCommand { get; }
@@ -97,10 +98,29 @@ namespace Algoloop.ViewModel
             set => Set(ref _statusMessage, value);
         }
 
-        public void SaveAll()
+        public void SaveConfig()
         {
-            string appData =MainService.GetAppDataFolder();
-            SaveConfig(appData);
+            try
+            {
+                IsBusy = true;
+                Messenger.Default.Send(new NotificationMessage(Resources.SavingConfiguration));
+
+                string appData = MainService.GetAppDataFolder();
+                if (!Directory.Exists(appData))
+                {
+                    Directory.CreateDirectory(appData);
+                }
+
+                SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
+                MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
+                AccountsViewModel.Save(Path.Combine(appData, "Accounts.json"));
+                StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));
+            }
+            finally
+            {
+                Messenger.Default.Send(new NotificationMessage(string.Empty));
+                IsBusy = false;
+            }
         }
 
         private void OnStatusMessage(NotificationMessage message)
@@ -126,13 +146,15 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoSettings()
+        private async Task DoSettings()
         {
+            await _initializer;
             SettingModel oldSettings = SettingsViewModel.Model;
             var settings = new SettingsView();
             if ((bool)settings.ShowDialog())
             {
-                SaveAll();
+                string appData = MainService.GetAppDataFolder();
+                SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
                 ResearchViewModel.Initialize();
             }
             else
@@ -141,7 +163,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async Task Initialize(string appData)
+        private async Task Initialize()
         {
             try
             {
@@ -157,7 +179,8 @@ namespace Algoloop.ViewModel
                 ProviderFactory.RegisterProviders(SettingsViewModel.Model);
 
                 // Read configuration
-                SettingsViewModel.Read(Path.Combine(appData, "Settings.json"));
+                string appData = MainService.GetAppDataFolder();
+                await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json"));
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
@@ -166,30 +189,6 @@ namespace Algoloop.ViewModel
                 ResearchViewModel.Initialize();
 
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfigurationCompleted));
-            }
-            finally
-            {
-                Messenger.Default.Send(new NotificationMessage(string.Empty));
-                IsBusy = false;
-            }
-        }
-
-        private void SaveConfig(string appData)
-        {
-            try
-            {
-                IsBusy = true;
-                Messenger.Default.Send(new NotificationMessage(Resources.SavingConfiguration));
-
-                if (!Directory.Exists(appData))
-                {
-                    Directory.CreateDirectory(appData);
-                }
-
-                SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
-                MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
-                AccountsViewModel.Save(Path.Combine(appData, "Accounts.json"));
-                StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));
             }
             finally
             {

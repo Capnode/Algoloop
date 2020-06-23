@@ -15,7 +15,6 @@
 using Algoloop.Service;
 using Algoloop.ViewSupport;
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.Serialization;
@@ -24,10 +23,9 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class SettingModel
+    public class SettingModel : ModelBase
     {
         public const int version = 0;
-        private Collection<string> _addOns = new Collection<string>();
 
         [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
@@ -105,27 +103,6 @@ namespace Algoloop.Model
             DataFolder = oldSettings.DataFolder;
             MaxBacktests = oldSettings.MaxBacktests;
             Notebook = oldSettings.Notebook;
-        }
-
-        internal void Addon(string addon)
-        {
-            if (!_addOns.Contains(addon))
-            {
-                _addOns.Add(addon);
-            }
-        }
-
-        internal void Addons(Collection<string> addons)
-        {
-            foreach (string addon in addons)
-            {
-                Addon(addon);
-            }
-        }
-
-        internal bool HasAddon(string addon)
-        {
-            return _addOns.Contains(addon);
         }
     }
 }
