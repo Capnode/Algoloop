@@ -174,10 +174,6 @@ namespace Algoloop.ViewModel
                 MainService.InitializeFolders();
                 ProviderFactory.PrepareDataFolder(SettingsViewModel.Model.DataFolder);
 
-                // Register providers
-                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-                ProviderFactory.RegisterProviders(SettingsViewModel.Model);
-
                 // Read configuration
                 string appData = MainService.GetAppDataFolder();
                 await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json"));
@@ -185,9 +181,12 @@ namespace Algoloop.ViewModel
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
 
+                // Register providers
+                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                ProviderFactory.RegisterProviders(SettingsViewModel.Model);
+
                 // Initialize Research page
                 ResearchViewModel.Initialize();
-
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfigurationCompleted));
             }
             finally
