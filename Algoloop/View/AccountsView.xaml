@@ -123,13 +123,15 @@
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
                                     CanUserFilter="True"
+                                    CanUserReorderColumns="True"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ExSelectedItems="{Binding SelectedItems}"                                   
-                                    ExItemsSource="{Binding Balances}">
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding Balances}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountBalanceColumnsInfo}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
                                         <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
@@ -141,14 +143,16 @@
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
-                                    CanUserFilter="True"                                   
+                                    CanUserFilter="True"
+                                    CanUserReorderColumns="True"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ExSelectedItems="{Binding SelectedItems}"                                    
-                                    ExItemsSource="{Binding Orders}">
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding Orders}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountOrdersColumnsInfo}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
@@ -188,13 +192,15 @@
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
                                     CanUserFilter="True"
+                                    CanUserReorderColumns="True"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
-                                    ExSelectedItems="{Binding SelectedItems}"                                    
-                                    ExItemsSource="{Binding Positions}">
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding Positions}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountPositionsColumnsInfo}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
                                         <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
@@ -232,11 +238,13 @@
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
                                     CanUserFilter="True"
+                                    CanUserReorderColumns="True"
                                     IsReadOnly="True"
                                     GridLinesVisibility="None"
                                     AutoGenerateColumns="False"
                                     ExSelectedItems="{Binding SelectedItems}"
-                                    ExItemsSource="{Binding ClosedTrades}">
+                                    ExItemsSource="{Binding ClosedTrades}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountClosedTradesColumnsInfo}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
                                         <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>

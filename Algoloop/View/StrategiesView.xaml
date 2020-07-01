@@ -10,7 +10,7 @@
     xmlns:vm="clr-namespace:Algoloop.ViewModel"
     xmlns:view="clr-namespace:Algoloop.View"
     xmlns:properties="clr-namespace:Algoloop.Properties"
-    xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"                                 
+    xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
     DataContext="{Binding Source={StaticResource Locator}, Path=StrategiesViewModel}" 
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
@@ -321,6 +321,7 @@
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
                                     CanUserFilter="True"
+                                    CanUserReorderColumns="False"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -371,13 +372,15 @@
                                     CanUserFreeze="False"
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
-                                    CanUserFilter="True"                                        
+                                    CanUserFilter="True"
+                                    CanUserReorderColumns="True"
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedTrack, Mode=TwoWay}"
-                                    ExSelectedItems="{Binding SelectedItems}"                                       
+                                    ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Tracks}"
-                                    ExColumns="{Binding TrackColumns}">
+                                    ExColumns="{Binding TrackColumns}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TracksColumnsInfo}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="MouseDoubleClick">
                                             <i:InvokeCommandAction

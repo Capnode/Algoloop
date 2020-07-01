@@ -207,12 +207,14 @@
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
                                     CanUserFilter="True"
+                                    CanUserReorderColumns="True"
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Symbols}"
-                                    ExColumns="{Binding SymbolColumns}">
+                                    ExColumns="{Binding SymbolColumns}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=MarketSymbolsColumnsInfo}">
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
@@ -258,12 +260,14 @@
                                     CanUserSelectDistinct="True"
                                     CanUserGroup="False"
                                     CanUserFilter="True"
+                                    CanUserReorderColumns="True"
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
-                                    ExSelectedItems="{Binding SelectedItems}"                                       
+                                    ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Symbols}"
-                                    ExColumns="{Binding SymbolColumns}">
+                                    ExColumns="{Binding SymbolColumns}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=MarketSymbolListsColumnsInfo}">
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
@@ -335,6 +339,7 @@
                                     CanUserSelectDistinct="False"
                                     CanUserGroup="False"
                                     CanUserFilter="False"
+                                    CanUserReorderColumns="False"
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     ExItemsSource="{Binding FundamentalRows}"

@@ -52,6 +52,12 @@ namespace Capnode.Wpf.DataGrid
             typeof(ExDataGrid),
             new PropertyMetadata(OnDataGridColumnsPropertyChanged));
 
+        public static readonly DependencyProperty ExColumnsInfoProperty = DependencyProperty.Register(
+            "ExColumnsInfo",
+            typeof(string),
+            typeof(ExDataGrid),
+            new FrameworkPropertyMetadata { BindsTwoWayByDefault = true, DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
+
         public static readonly DependencyProperty ExSelectedItemsProperty = DependencyProperty.Register(
             "ExSelectedItems",
             typeof(IList),
@@ -64,7 +70,16 @@ namespace Capnode.Wpf.DataGrid
             _filterHandler = new PropertyChangedEventHandler(Filter_PropertyChanged);
             InitializeComponent();
 
-            SelectionChanged += (object sender, SelectionChangedEventArgs e) => { ExSelectedItems = base.SelectedItems; };
+            Loaded += (object sender, RoutedEventArgs e) =>
+            {
+                ExDataGrid grid = sender as ExDataGrid;
+                grid?.UpdateColumnsInfo();
+            };
+
+            SelectionChanged += (object sender, SelectionChangedEventArgs e) =>
+            {
+                ExSelectedItems = base.SelectedItems;
+            };
         }
 
         public IEnumerable ExItemsSource
@@ -79,10 +94,27 @@ namespace Capnode.Wpf.DataGrid
             set { base.SetValue(ExColumnsProperty, value); }
         }
 
+        public string ExColumnsInfo
+        {
+            get { return (string)base.GetValue(ExColumnsInfoProperty); }
+            set { base.SetValue(ExColumnsInfoProperty, value); }
+        }
+
         public IList ExSelectedItems
         {
             get { return (IList)GetValue(ExSelectedItemsProperty); }
             set { SetValue(ExSelectedItemsProperty, value); }
+        }
+
+        protected bool IsResetting { get; set; }
+
+        public List<ColumnFilterControl> Filters { get; set; }
+
+        public Type FilterType { get; set; }
+
+        protected ICollectionView CollectionView
+        {
+            get { return this.ItemsSource as ICollectionView; }
         }
 
         public static void OnItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -108,19 +140,7 @@ namespace Capnode.Wpf.DataGrid
                         filter.ResetControl();
                     }
                 }
-
             }
-        }
-
-        protected bool IsResetting { get; set; }
-
-        public List<ColumnFilterControl> Filters { get; set; }
-
-        public Type FilterType { get; set; }
-
-        protected ICollectionView CollectionView
-        {
-            get { return this.ItemsSource as ICollectionView; }
         }
 
         private static void OnDataGridColumnsPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
@@ -129,19 +149,54 @@ namespace Capnode.Wpf.DataGrid
 
             if (e.OldValue is ObservableCollection<DataGridColumn> oldItems)
             {
-                foreach (var one in oldItems)
+                foreach (DataGridColumn one in oldItems)
+                {
                     context.Columns.Remove(one);
+                }
 
                 oldItems.CollectionChanged -= context.CollectionChanged;
             }
 
             if (e.NewValue is ObservableCollection<DataGridColumn> newItems)
             {
-                foreach (var one in newItems)
+                foreach (DataGridColumn one in newItems)
+                {
                     context.Columns.Add(one);
+                }
 
+                // Update column order
+                context.UpdateColumnsInfo();
                 newItems.CollectionChanged += context.CollectionChanged;
             }
+        }
+
+        private void UpdateColumnsInfo()
+        {
+            if (string.IsNullOrEmpty(ExColumnsInfo)) return;
+            string[] infos = ExColumnsInfo.Split(';');
+            if (infos.Length != Columns.Count) return;
+            foreach (DataGridColumn column in Columns)
+            {
+                for (int i = 0; i < infos.Count(); i++)
+                {
+                    string header = infos[i];
+                    if (column.Header.Equals(header))
+                    {
+                        if (column.DisplayIndex != i)
+                        {
+                            column.DisplayIndex = i;
+                        }
+                    }
+                }
+            }
+        }
+
+        protected override void OnColumnReordered(DataGridColumnEventArgs e)
+        {
+            base.OnColumnReordered(e);
+            ExColumnsInfo = string.Join(";", Columns
+                .OrderBy(x => x.DisplayIndex)
+                .Select(m => m.Header));
         }
 
         private void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

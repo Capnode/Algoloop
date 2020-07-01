@@ -70,5 +70,137 @@ namespace Algoloop.Properties {
                 this["MarketViewSplitter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TracksColumnsInfo {
+            get {
+                return ((string)(this["TracksColumnsInfo"]));
+            }
+            set {
+                this["TracksColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AccountBalanceColumnsInfo {
+            get {
+                return ((string)(this["AccountBalanceColumnsInfo"]));
+            }
+            set {
+                this["AccountBalanceColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AccountOrdersColumnsInfo {
+            get {
+                return ((string)(this["AccountOrdersColumnsInfo"]));
+            }
+            set {
+                this["AccountOrdersColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AccountPositionsColumnsInfo {
+            get {
+                return ((string)(this["AccountPositionsColumnsInfo"]));
+            }
+            set {
+                this["AccountPositionsColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AccountClosedTradesColumnsInfo {
+            get {
+                return ((string)(this["AccountClosedTradesColumnsInfo"]));
+            }
+            set {
+                this["AccountClosedTradesColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MarketSymbolsColumnsInfo {
+            get {
+                return ((string)(this["MarketSymbolsColumnsInfo"]));
+            }
+            set {
+                this["MarketSymbolsColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MarketSymbolListsColumnsInfo {
+            get {
+                return ((string)(this["MarketSymbolListsColumnsInfo"]));
+            }
+            set {
+                this["MarketSymbolListsColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TrackHoldingsColumnsInfo {
+            get {
+                return ((string)(this["TrackHoldingsColumnsInfo"]));
+            }
+            set {
+                this["TrackHoldingsColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TrackTradesColumnsInfo {
+            get {
+                return ((string)(this["TrackTradesColumnsInfo"]));
+            }
+            set {
+                this["TrackTradesColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TrackOrdersColumnsInfo {
+            get {
+                return ((string)(this["TrackOrdersColumnsInfo"]));
+            }
+            set {
+                this["TrackOrdersColumnsInfo"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TrackDetailsColumnsInfo {
+            get {
+                return ((string)(this["TrackDetailsColumnsInfo"]));
+            }
+            set {
+                this["TrackDetailsColumnsInfo"] = value;
+            }
+        }
     }
 }

@@ -13,6 +13,9 @@
     mc:Ignorable="d" 
     d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <ObjectDataProvider
+            x:Key="settings"
+            ObjectInstance="{x:Static properties:Settings.Default}"/>
         <Style TargetType="{x:Type TextBlock}" x:Key="RightCell">
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
@@ -54,12 +57,13 @@
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
+                    CanUserReorderColumns="False"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
                     IsReadOnly="True"
-                    ExSelectedItems="{Binding SelectedItems}"                                       
+                    ExSelectedItems="{Binding SelectedItems}"
                     ExItemsSource="{Binding Parameters}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
@@ -76,11 +80,13 @@
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
+                    CanUserReorderColumns="True"
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    ExSelectedItems="{Binding SelectedItems}"                                       
-                    ExItemsSource="{Binding Holdings}">
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Holdings}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackHoldingsColumnsInfo}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
                         <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
@@ -97,11 +103,13 @@
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
+                    CanUserReorderColumns="True"
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    ExSelectedItems="{Binding SelectedItems}"                                       
-                    ExItemsSource="{Binding Trades}">
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Trades}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackTradesColumnsInfo}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
                         <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>
@@ -124,12 +132,14 @@
                     CanUserFreeze="False"
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
-                    CanUserFilter="True"                  
+                    CanUserFilter="True"
+                    CanUserReorderColumns="True"
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
-                    ExSelectedItems="{Binding SelectedItems}"                                       
-                    ExItemsSource="{Binding Orders}">
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Orders}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackOrdersColumnsInfo}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
                         <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
@@ -150,13 +160,14 @@
                     CanUserFreeze="False"
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
-                    CanUserFilter="True"                   
+                    CanUserFilter="True"
+                    CanUserReorderColumns="False"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
                     IsReadOnly="True"
-                    ExSelectedItems="{Binding SelectedItems}"                                       
+                    ExSelectedItems="{Binding SelectedItems}"
                     ExItemsSource="{Binding Statistics}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
@@ -179,8 +190,10 @@
                     CanUserSelectDistinct="True"
                     CanUserGroup="False"
                     CanUserFilter="True"
+                    CanUserReorderColumns="True"
                     ExSelectedItems="{Binding SelectedItems}"
-                    ExItemsSource="{Binding TrackSymbols}">
+                    ExItemsSource="{Binding TrackSymbols}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackDetailsColumnsInfo}">
                     <DataGrid.ContextMenu>
                         <ContextMenu>
                             <MenuItem
