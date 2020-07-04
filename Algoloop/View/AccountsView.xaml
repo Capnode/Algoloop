@@ -129,6 +129,7 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Balances}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountBalanceColumnsInfo}">
@@ -150,6 +151,7 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Orders}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountOrdersColumnsInfo}">
@@ -198,6 +200,7 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Positions}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountPositionsColumnsInfo}">
@@ -242,6 +245,7 @@
                                     IsReadOnly="True"
                                     GridLinesVisibility="None"
                                     AutoGenerateColumns="False"
+                                    FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding ClosedTrades}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountClosedTradesColumnsInfo}">

@@ -63,6 +63,7 @@
                     AutoGenerateColumns="False"
                     GridLinesVisibility="None"
                     IsReadOnly="True"
+                    FrozenColumnCount="1"
                     ExSelectedItems="{Binding SelectedItems}"
                     ExItemsSource="{Binding Parameters}">
                     <DataGrid.Columns>
@@ -84,6 +85,7 @@
                     IsReadOnly="True"
                     GridLinesVisibility="None"
                     AutoGenerateColumns="False"
+                    FrozenColumnCount="1"
                     ExSelectedItems="{Binding SelectedItems}"
                     ExItemsSource="{Binding Holdings}"
                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackHoldingsColumnsInfo}">
@@ -191,6 +193,7 @@
                     CanUserGroup="False"
                     CanUserFilter="True"
                     CanUserReorderColumns="True"
+                    FrozenColumnCount="1"
                     ExSelectedItems="{Binding SelectedItems}"
                     ExItemsSource="{Binding TrackSymbols}"
                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackDetailsColumnsInfo}">

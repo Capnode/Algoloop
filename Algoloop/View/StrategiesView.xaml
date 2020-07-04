@@ -327,6 +327,7 @@
                                     AutoGenerateColumns="False"
                                     IsReadOnly="False"
                                     GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Parameters}">
                                     <DataGrid.Columns>
@@ -377,6 +378,7 @@
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedTrack, Mode=TwoWay}"
+                                    FrozenColumnCount="2"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Tracks}"
                                     ExColumns="{Binding TrackColumns}"

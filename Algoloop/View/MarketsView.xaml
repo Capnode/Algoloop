@@ -211,6 +211,7 @@
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                    FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Symbols}"
                                     ExColumns="{Binding SymbolColumns}"
@@ -264,6 +265,7 @@
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                    FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     ExItemsSource="{Binding Symbols}"
                                     ExColumns="{Binding SymbolColumns}"
@@ -342,6 +344,7 @@
                                     CanUserReorderColumns="False"
                                     AutoGenerateColumns="False"
                                     GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
                                     ExItemsSource="{Binding FundamentalRows}"
                                     ExColumns="{Binding PeriodColumns}">
                                 </wpf:ExDataGrid>
