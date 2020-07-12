@@ -14,7 +14,6 @@
 
 using Algoloop.Common;
 using Algoloop.Model;
-using Algoloop.Service;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -22,7 +21,6 @@ using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 
 namespace Algoloop.Provider
@@ -35,7 +33,9 @@ namespace Algoloop.Provider
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
             Log.LogHandler = logger;
-            PrepareDataFolder(settings.DataFolder);
+            Config.Set("data-directory", settings.DataFolder);
+            Config.Set("data-folder", settings.DataFolder);
+            Config.Set("cache-location", settings.DataFolder);
 
             using (var writer = new StreamLogger(logger))
             {
@@ -89,22 +89,12 @@ namespace Algoloop.Provider
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface);
-            foreach (Type provider in providers)
+            foreach (Type type in providers)
             {
+                IProvider provider = (IProvider)Activator.CreateInstance(type) ??
+                    throw new ApplicationException($"Can not create provider {type.Name}");
                 RegisterProvider(settings, provider);
             }
-        }
-
-        public static void PrepareDataFolder(string dataFolder)
-        {
-            Config.Set("data-directory", dataFolder);
-            Config.Set("data-folder", dataFolder);
-            Config.Set("cache-location", dataFolder);
-
-            // Update data
-            string sourceDir = Path.Combine(MainService.GetProgramFolder(), "Data/ProgramData");
-            MainService.CopyDirectory(Path.Combine(sourceDir, "market-hours"), Path.Combine(dataFolder, "market-hours"), true);
-            MainService.CopyDirectory(Path.Combine(sourceDir, "symbol-properties"), Path.Combine(dataFolder, "symbol-properties"), true);
         }
 
         private static IProvider CreateProvider(SettingModel settings, string name)
@@ -112,28 +102,19 @@ namespace Algoloop.Provider
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
-                .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ??
+                throw new ApplicationException($"Provider {name} not found");
 
-            if (type == null)
-            {
-                Log.Trace($"Provider {name} not found");
-                return null;
-            }
+            IProvider provider = (IProvider)Activator.CreateInstance(type) ??
+                throw new ApplicationException($"Can not create provider {name}");
 
-            IProvider provider = (IProvider)Activator.CreateInstance(type);
-            if (provider == null)
-            {
-                Log.Trace($"Can not create provider {name}");
-                return null;
-            }
-
-            if (!RegisterProvider(settings, type)) return null;
+            if (!RegisterProvider(settings, provider)) return null;
             return provider;
         }
 
-        private static bool RegisterProvider(SettingModel settings, Type provider)
+        private static bool RegisterProvider(SettingModel settings, IProvider provider)
         {
-            string name = provider.Name.ToLowerInvariant();
+            string name = provider.GetType().Name.ToLowerInvariant();
             if (Market.Encode(name) == null)
             {
                 // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
@@ -146,6 +127,7 @@ namespace Algoloop.Provider
                 Market.Add(name, code);
             }
 
+            provider.Register(settings);
             return true;
         }
     }

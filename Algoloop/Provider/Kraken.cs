@@ -24,6 +24,10 @@ namespace Algoloop.Provider
 {
     public class Kraken : IProvider
     {
+        public void Register(SettingModel settings)
+        {
+        }
+
         public void Download(MarketModel model, SettingModel settings)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));

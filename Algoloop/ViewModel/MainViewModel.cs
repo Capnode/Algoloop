@@ -172,7 +172,10 @@ namespace Algoloop.ViewModel
 
                 // Initialize data folders
                 MainService.InitializeFolders();
-                ProviderFactory.PrepareDataFolder(SettingsViewModel.Model.DataFolder);
+                Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
+                Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
+                Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
+                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
 
                 // Read configuration
                 string appData = MainService.GetAppDataFolder();
@@ -182,7 +185,6 @@ namespace Algoloop.ViewModel
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
 
                 // Register providers
-                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
                 ProviderFactory.RegisterProviders(SettingsViewModel.Model);
 
                 // Initialize Research page

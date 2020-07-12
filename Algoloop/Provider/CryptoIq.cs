@@ -18,6 +18,10 @@ namespace Algoloop.Provider
 {
     public class CryptoIq : IProvider
     {
+        public void Register(SettingModel settings)
+        {
+        }
+
         public void Download(MarketModel model, SettingModel settings)
         {
         }

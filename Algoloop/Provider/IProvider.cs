@@ -18,6 +18,7 @@ namespace Algoloop.Provider
 {
     public interface IProvider
     {
+        void Register(SettingModel settings);
         void Download(MarketModel market, SettingModel settings);
     }
 }

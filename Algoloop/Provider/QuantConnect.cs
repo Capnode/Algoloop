@@ -33,6 +33,10 @@ namespace Algoloop.Provider
         private const string _security = "Security";
         private const string _zip = ".zip";
 
+        public void Register(SettingModel settings)
+        {
+        }
+
         public void Download(MarketModel model, SettingModel settings)
         {
             var uri = new Uri($"https://github.com/QuantConnect/Lean/archive/{_version}.zip");

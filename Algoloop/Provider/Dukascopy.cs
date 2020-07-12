@@ -42,6 +42,10 @@ namespace Algoloop.Provider
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
 
+        public void Register(SettingModel settings)
+        {
+        }
+
         public void Download(MarketModel market, SettingModel settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));

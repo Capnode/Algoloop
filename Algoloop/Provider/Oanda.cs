@@ -24,6 +24,10 @@ namespace Algoloop.Provider
 {
     public class Oanda : IProvider
     {
+        public void Register(SettingModel settings)
+        {
+        }
+
         public void Download(MarketModel model, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
