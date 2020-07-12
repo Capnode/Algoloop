@@ -28,7 +28,7 @@ namespace Algoloop.Provider
     public class QuantConnect : IProvider
     {
         // Update _version with latest release: https://github.com/QuantConnect/Lean/releases
-        private const string _version = "8588";
+        private const string _version = "8772";
 
         private const string _security = "Security";
         private const string _zip = ".zip";
