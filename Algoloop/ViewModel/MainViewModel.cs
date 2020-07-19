@@ -170,12 +170,26 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfiguration));
 
-                // Initialize data folders
-                MainService.InitializeFolders();
+                // Set config
                 Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
                 Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
                 Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+
+                // Initialize data folders
+                string program = MainService.GetProgramFolder();
+                string appDataFolder = MainService.GetAppDataFolder();
+                string programDataFolder = MainService.GetProgramDataFolder();
+                string userDataFolder = MainService.GetUserDataFolder();
+                Log.Trace($"Program folder: {program}");
+                Log.Trace($"AppData folder: {appDataFolder}");
+                Log.Trace($"ProgramData folder: {programDataFolder}");
+                Log.Trace($"UserData folder: {userDataFolder}");
+                MainService.Delete(Path.Combine(programDataFolder, "market-hours"));
+                MainService.Delete(Path.Combine(programDataFolder, "symbol-properties"));
+                MainService.CopyDirectory(Path.Combine(program, "Data/AppData"), appDataFolder, false);
+                MainService.CopyDirectory(Path.Combine(program, "Data/ProgramData"), programDataFolder, false);
+                MainService.CopyDirectory(Path.Combine(program, "Data/UserData"), userDataFolder, false);
 
                 // Read configuration
                 string appData = MainService.GetAppDataFolder();
@@ -190,6 +204,10 @@ namespace Algoloop.ViewModel
                 // Initialize Research page
                 ResearchViewModel.Initialize();
                 Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfigurationCompleted));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
             }
             finally
             {
