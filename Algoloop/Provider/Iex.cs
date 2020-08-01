@@ -38,7 +38,7 @@ namespace Algoloop.Provider
 
             IList<string> symbols = model.Symbols.Select(m => m.Name).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.LastDate, model.LastDate, model.ApiKey);
+            IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.LastDate, model.LastDate);
         }
     }
 }
