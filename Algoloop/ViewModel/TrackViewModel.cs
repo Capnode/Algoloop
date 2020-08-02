@@ -542,10 +542,10 @@ namespace Algoloop.ViewModel
         private void AddCustomStatistics(BacktestResult result, IDictionary<string, decimal?> statistics)
         {
             KeyValuePair<string, Chart> chart = result.Charts.FirstOrDefault(m => m.Key.Equals("Strategy Equity"));
-            if (chart.Equals(default)) return;
+            if (chart.Value.Equals(default)) return;
 
             KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(m => m.Key.Equals("Equity"));
-            if (equity.Equals(default)) return;
+            if (equity.Value.Equals(default)) return;
             List<ChartPoint> series = equity.Value.Values;
 
             double score = CalculateScore(series);
