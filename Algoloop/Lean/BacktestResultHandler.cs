@@ -17,6 +17,8 @@ using QuantConnect;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using QuantConnect.Logging;
+using System;
+using QuantConnect.Orders;
 
 namespace Algoloop.Lean
 {
@@ -45,6 +47,10 @@ namespace Algoloop.Lean
         public override void SaveResults(string name, Result result)
         {
             JsonResult = JsonConvert.SerializeObject(result);
+        }
+
+        protected override void StoreOrderEvents(DateTime utcTime, List<OrderEvent> orderEvents)
+        {
         }
     }
 }
