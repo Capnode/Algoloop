@@ -27,7 +27,7 @@
   // engine
   "data-folder": "../../../Data/",
 
-  // debugging configuration
+  // debugging configuration - options for debugging-method LocalCmdLine, VisualStudio, PTVSD, PyCharm
   "debugging": false,
   "debugging-method": "LocalCmdline",
 
@@ -76,6 +76,7 @@
   "ib-tws-dir": "C:\\Jts",
   "ib-trading-mode": "paper",
   "ib-enable-delayed-streaming-data": false,
+  "ib-version": "974",
 
   // tradier configuration
   "tradier-account-id": "",
