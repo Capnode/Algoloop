@@ -171,7 +171,9 @@ namespace Algoloop.Lean
 
         private static void SetParameters(TrackModel model, Dictionary<string, string> parameters)
         {
-            parameters.Add("resolution", model.Resolution.ToString());
+            parameters.Add("market", model.Market);
+            parameters.Add("security", model.Security.ToStringInvariant());
+            parameters.Add("resolution", model.Resolution.ToStringInvariant());
             if (!model.Symbols.IsNullOrEmpty())
             {
                 parameters.Add("symbols", string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Name)));
@@ -204,8 +206,6 @@ namespace Algoloop.Lean
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
-            parameters.Add("market", model.Market);
-            parameters.Add("security", model.Security.ToStringInvariant());
         }
 
         private static void SetBacktestDesktop(TrackModel model, Dictionary<string, string> parameters)
@@ -221,8 +221,6 @@ namespace Algoloop.Lean
             Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
             Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
-            parameters.Add("market", model.Market);
-            parameters.Add("security", model.Security.ToStringInvariant());
         }
 
         private static void SetPaper(TrackModel model, Dictionary<string, string> parameters)
@@ -236,8 +234,6 @@ namespace Algoloop.Lean
             Config.Set("data-queue-handler", "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue");
             Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
-            parameters.Add("market", model.Market);
-            parameters.Add("security", model.Security.ToStringInvariant());
         }
 
         private static void SetFxcm(AccountModel account, Dictionary<string, string> parameters)
@@ -256,7 +252,6 @@ namespace Algoloop.Lean
             Config.Set("fxcm-user-name", account.Login);
             Config.Set("fxcm-password", account.Password);
             Config.Set("fxcm-account-id", account.Id);
-            parameters.Add("market", Market.FXCM.ToStringInvariant());
             switch (account.Access)
             {
                 case AccountModel.AccessType.Demo:
@@ -288,7 +283,6 @@ namespace Algoloop.Lean
             Config.Set("fxcm-account-id", account.Id);
             Config.Set("log-handler", "QuantConnect.Logging.QueueLogHandler");
             Config.Set("desktop-exe", @"../../../UserInterface/bin/Release/QuantConnect.Views.exe");
-            parameters.Add("market", Market.FXCM.ToString(CultureInfo.InvariantCulture));
             switch (account.Access)
             {
                 case AccountModel.AccessType.Demo:

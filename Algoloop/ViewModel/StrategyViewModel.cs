@@ -50,7 +50,7 @@ namespace Algoloop.ViewModel
         private readonly AccountsModel _accounts;
         private readonly SettingModel _settings;
 
-        private readonly string[] _exclude = new[] { "symbols", "resolution", "market", "startdate", "enddate", "cash" };
+        private readonly string[] _exclude = new[] { "symbols", "market", "resolution", "security", "startdate", "enddate", "cash" };
         private bool _isSelected;
         private bool _isExpanded;
         private string _displayName;
