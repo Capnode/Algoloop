@@ -542,14 +542,12 @@ namespace Algoloop.ViewModel
         private void AddCustomStatistics(BacktestResult result, IDictionary<string, decimal?> statistics)
         {
             KeyValuePair<string, Chart> chart = result.Charts.FirstOrDefault(m => m.Key.Equals("Strategy Equity"));
-            if (chart.Equals(default)) return;
-            if (chart.Value.Equals(default)) return;
+            if (chart.Equals(default(KeyValuePair<string, Chart>))) return;
 
             KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(m => m.Key.Equals("Equity"));
-            if (equity.Equals(default)) return;
-            if (equity.Value.Equals(default)) return;
-            List<ChartPoint> series = equity.Value.Values;
+            if (equity.Equals(default(KeyValuePair<string, Series>))) return;
 
+            List<ChartPoint> series = equity.Value.Values;
             double score = CalculateScore(series);
             statistics.Add("Score", (decimal)score.RoundToSignificantDigits(4));
         }
@@ -741,6 +739,8 @@ namespace Algoloop.ViewModel
 
             // Process results
             BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(model.Result, new[] { new OrderJsonConverter() });
+            Debug.Assert(result != default);
+            Debug.Assert(result.Charts.Any());
             if (result != null)
             {
                 // Load trades
