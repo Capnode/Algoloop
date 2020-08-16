@@ -27,8 +27,8 @@ namespace Algoloop.Provider
 {
     public class QuantConnect : IProvider
     {
-        // Update _version with latest release: https://github.com/QuantConnect/Lean/releases
-        private const string _version = "8772";
+        // Update _version with latest release on github
+        private const string _version = "Algoloop-1.1.1";
 
         private const string _security = "Security";
         private const string _zip = ".zip";
@@ -39,8 +39,8 @@ namespace Algoloop.Provider
 
         public void Download(MarketModel model, SettingModel settings)
         {
-            var uri = new Uri($"https://github.com/QuantConnect/Lean/archive/{_version}.zip");
-            string extract = $"Lean-{_version}/Data/";
+            var uri = new Uri($"https://github.com/Capnode/Algoloop/archive/{_version}.zip");
+            string extract = $"Algoloop-{_version}/Data/";
             string filename = "github.zip";
             Log.Trace($"Download {uri}");
             using (var client = new WebClient())
