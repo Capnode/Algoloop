@@ -27,10 +27,13 @@ using GalaSoft.MvvmLight.Messaging;
 using QuantConnect;
 using QuantConnect.Brokerages;
 using QuantConnect.Brokerages.Fxcm;
+using QuantConnect.Configuration;
+using QuantConnect.Data;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
 using QuantConnect.Statistics;
+using QuantConnect.Util;
 
 namespace Algoloop.ViewModel
 {
@@ -128,7 +131,15 @@ namespace Algoloop.ViewModel
                 Log.Trace($"Connect Account {Model.Name}");
                 try
                 {
-                    _brokerage = new FxcmBrokerage(null, null, FxcmServer, Model.Access.ToString(), Model.Login, Model.Password, Model.Id);
+                    _brokerage = new FxcmBrokerage(
+                        null, 
+                        null, 
+                        Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager")),
+                        FxcmServer,
+                        Model.Access.ToString(),
+                        Model.Login,
+                        Model.Password,
+                        Model.Id);
                     _brokerage.Message += OnMessage;
                     _brokerage.AccountChanged += OnAccountChanged;
                     _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
