@@ -721,11 +721,13 @@
     <Compile Include="Indicators\WilliamsPercentRTests.cs" />
     <Compile Include="Indicators\RateOfChangePercentTests.cs" />
     <Compile Include="Indicators\RateOfChangeTests.cs" />
+    <Compile Include="Indicators\EaseOfMovementValueTests.cs" />
     <Compile Include="Indicators\StochasticTests.cs" />
     <Compile Include="Research\QuantBookIndicatorsTests.cs" />
     <Compile Include="Research\QuantBookHistoryTests.cs" />
     <Compile Include="Messaging\StreamingMessageHandlerTests.cs" />
     <Compile Include="Python\AlgorithmPythonWrapperTests.cs" />
+    <Compile Include="Python\DataConsolidatorPythonWrapperTests.cs" />
     <Compile Include="Python\MethodOverloadTests.cs" />
     <Compile Include="Python\PandasConverterTests.BackwardsCompatibility.cs" />
     <Compile Include="Python\PortfolioCustomModelTests.cs" />
@@ -1112,6 +1114,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\spy_rocr.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\spy_emv.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\spy_tr.txt">
