@@ -151,7 +151,8 @@ namespace QuantConnect.Lean.Engine
                         new UniverseSelection(
                             algorithm,
                             securityService,
-                            AlgorithmHandlers.DataPermissionsManager),
+                            AlgorithmHandlers.DataPermissionsManager,
+                            AlgorithmHandlers.DataProvider),
                         algorithm,
                         algorithm.TimeKeeper,
                         marketHoursDatabase,
@@ -159,7 +160,6 @@ namespace QuantConnect.Lean.Engine
                         registeredTypesProvider,
                         AlgorithmHandlers.DataPermissionsManager);
 
-                    AlgorithmHandlers.Results.SetDataManager(dataManager);
                     algorithm.SubscriptionManager.SetDataManager(dataManager);
 
                     synchronizer.Initialize(algorithm, dataManager);
