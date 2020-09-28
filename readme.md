@@ -1,7 +1,8 @@
 Algoloop trading application
 =========
 
-<a href='//www.microsoft.com/store/apps/9PGZD6RCG6LC?cid=storebadge&ocid=badge'><img src='https://developer.microsoft.com/en-us/store/badges/images/English_get-it-from-MS.png' alt='Install from Microsoft Store' width="284" height="104"/></a>
+<a href='//www.microsoft.com/store/apps/9PGZD6RCG6LC?cid=storebadge&ocid=badge'><img src='https://developer.microsoft.com/en-us/store/badges/images/English_get-it-from-MS.png' alt='Install from Microsoft Store' width="284" height="104"/></a><br>
+Install prebuilt software and [get started](https://github.com/Capnode/Algoloop/wiki/Getting-started).
 
 ## Introduction ##
 Algoloop is an open-source algorithmic trading application with a Windows desktop frontend to QuantConnect Lean trading engine. 
@@ -12,24 +13,20 @@ Algoloop is an open-source algorithmic trading application with a Windows deskto
 - Market data from multiple providers
 - Windows WPF user interface
 
-For full documentation of QuantConnect Lean trading engine, please see https://www.quantconnect.com/lean
+![](Algoloop/Doc/Strategy.png)
 
+## Documentation ##
+- [Getting started](https://github.com/Capnode/Algoloop/wiki/Getting-started)
+
+For full documentation of QuantConnect Lean trading engine, please see https://www.quantconnect.com/lean
 
 ## Contribution ##
 Contributions are welcome:
 - Finding bugs
 - Fixing bugs
 - Improved charting package that can replace amCharts
-- Python support
 - Full integration with QuantConnect web services
 - ...
-
-
-## Screenshot ##
-![alt tag](Algoloop/Doc/Chart.png)
-![alt tag](Algoloop/Doc/Fundamentals.png)
-![alt tag](Algoloop/Doc/Strategy.png)
-![alt tag](Algoloop/Doc/Trades.png)
 
 ## Contact ##
 info@capnode.com
