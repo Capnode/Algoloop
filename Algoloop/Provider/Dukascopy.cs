@@ -54,26 +54,30 @@ namespace Algoloop.Provider
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", settings.DataFolder);
 
-            string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
-            DateTime fromDate = market.LastDate.Date.AddDays(1);
-            if (fromDate >= DateTime.Today)
-            {
-                // Do not download today data
-                market.Active = false;
-                return;
-            }
-
-            if (fromDate < _firstDate )
-            {
-                fromDate = _firstDate;
-            }
-
-            // Download active symbols
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Name).ToList();
             if (symbols.Any())
             {
+                string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
+                DateTime fromDate = market.LastDate.Date.AddDays(1);
+                if (fromDate >= DateTime.Today)
+                {
+                    // Do not download today data
+                    market.Active = false;
+                    return;
+                }
+
+                if (fromDate < _firstDate)
+                {
+                    fromDate = _firstDate;
+                }
+
+                // Download active symbols
                 DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, fromDate.AddDays(1).AddTicks(-1));
                 market.LastDate = fromDate;
+            }
+            else
+            {
+                market.Active = false;
             }
 
             // Update symbol list

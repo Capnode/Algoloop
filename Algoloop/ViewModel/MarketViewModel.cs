@@ -116,13 +116,11 @@ namespace Algoloop.ViewModel
             set
             {
                 _selectedItems = value;
-                string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
+                    string message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
+                    Messenger.Default.Send(new NotificationMessage(message));
                 }
-
-                Messenger.Default.Send(new NotificationMessage(message));
             }
         }
 
@@ -230,34 +228,34 @@ namespace Algoloop.ViewModel
         private async Task DownloadAsync()
         {
             DataToModel();
-            MarketModel model = Model;
+            MarketModel market = Model;
             _cancel = new CancellationTokenSource();
-            while (!_cancel.Token.IsCancellationRequested && model.Active)
+            while (!_cancel.Token.IsCancellationRequested && market.Active)
             {
-                Log.Trace($"{model.Provider} download {model.Resolution} {model.LastDate:d}");
+                Log.Trace($"{market.Provider} download {market.Resolution} {market.LastDate:d}");
                 using var logger = new HostDomainLogger();
                 try
                 {
                     _factory = new Isolated<ProviderFactory>();
                     _cancel = new CancellationTokenSource();
                     await Task
-                        .Run(() => model = _factory.Value.Download(model, _settings, logger), _cancel.Token)
+                        .Run(() => market = _factory.Value.Download(market, _settings, logger), _cancel.Token)
                         .ConfigureAwait(true);
                     _factory.Dispose();
                     _factory = null;
                 }
                 catch (AppDomainUnloadedException)
                 {
-                    Log.Trace($"Market {model.Name} canceled by user");
+                    Log.Trace($"Market {market.Name} canceled by user");
                     _factory = null;
-                    model.Active = false;
+                    market.Active = false;
                 }
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
                     _factory.Dispose();
                     _factory = null;
-                    model.Active = false;
+                    market.Active = false;
                 }
 
                 if (logger.IsError)
@@ -267,15 +265,14 @@ namespace Algoloop.ViewModel
 
                 // Update view
                 Model = null;
-                Model = model;
+                Model = market;
                 DataFromModel();
             }
 
             _cancel = null;
-            if (model.Active)
-            {
-                Log.Trace($"{Model.Provider} download complete");
-            }
+            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Name).ToList();
+            Messenger.Default.Send(new NotificationMessage(
+                symbols.Any() ? Resources.DownloadComplete : Resources.NoSymbolSelected));
         }
 
         private void StopTask()

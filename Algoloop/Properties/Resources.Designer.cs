@@ -220,6 +220,15 @@ namespace Algoloop.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download complete.
+        /// </summary>
+        internal static string DownloadComplete {
+            get {
+                return ResourceManager.GetString("DownloadComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Exit {
@@ -304,6 +313,15 @@ namespace Algoloop.Properties {
             get {
                 object obj = ResourceManager.GetObject("New", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No symbol selected!.
+        /// </summary>
+        internal static string NoSymbolSelected {
+            get {
+                return ResourceManager.GetString("NoSymbolSelected", resourceCulture);
             }
         }
         
