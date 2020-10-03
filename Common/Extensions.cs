@@ -518,7 +518,7 @@ namespace QuantConnect
         /// <summary>
         /// Lazy string to upper implementation.
         /// Will first verify the string is not already upper and avoid
-        /// the call to <see cref="string.ToUpper()"/> if possible.
+        /// the call to <see cref="string.ToUpperInvariant()"/> if possible.
         /// </summary>
         /// <param name="data">The string to upper</param>
         /// <returns>The upper string</returns>
@@ -2055,6 +2055,16 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Convert dictionary to query string
+        /// </summary>
+        /// <param name="pairs"></param>
+        /// <returns></returns>
+        public static string ToQueryString(this IDictionary<string, object> pairs)
+        {
+            return string.Join("&", pairs.Select(pair => $"{pair.Key}={pair.Value}"));
+        }
+
+        /// <summary>
         /// Returns a new string in which specified ending in the current instance is removed.
         /// </summary>
         /// <param name="s">original string value</param>
@@ -2115,43 +2125,40 @@ namespace QuantConnect
                     break;
                 case MarketDataType.Tick:
                     var securityType = data.Symbol.SecurityType;
-                    var tick = data as Tick;
-                    if (tick != null)
+                    if (securityType != SecurityType.Equity &&
+                        securityType != SecurityType.Option &&
+                        securityType != SecurityType.Future)
                     {
-                        if (securityType == SecurityType.Equity)
-                        {
-                            tick.Value = factor(tick.Value);
-                        }
-                        if (securityType == SecurityType.Option
-                            || securityType == SecurityType.Future)
-                        {
-                            if (tick.TickType == TickType.Trade)
-                            {
-                                tick.Value = factor(tick.Value);
-                            }
-                            else if (tick.TickType != TickType.OpenInterest)
-                            {
-                                tick.BidPrice = tick.BidPrice != 0 ? factor(tick.BidPrice) : 0;
-                                tick.AskPrice = tick.AskPrice != 0 ? factor(tick.AskPrice) : 0;
-
-                                if (tick.BidPrice != 0)
-                                {
-                                    if (tick.AskPrice != 0)
-                                    {
-                                        tick.Value = (tick.BidPrice + tick.AskPrice) / 2m;
-                                    }
-                                    else
-                                    {
-                                        tick.Value = tick.BidPrice;
-                                    }
-                                }
-                                else
-                                {
-                                    tick.Value = tick.AskPrice;
-                                }
-                            }
-                        }
+                        break;
                     }
+
+                    var tick = data as Tick;
+                    if (tick == null || tick.TickType == TickType.OpenInterest)
+                    {
+                        break;
+                    }
+
+                    if (tick.TickType == TickType.Trade)
+                    {
+                        tick.Value = factor(tick.Value);
+                        break;
+                    }
+
+                    tick.BidPrice = tick.BidPrice != 0 ? factor(tick.BidPrice) : 0;
+                    tick.AskPrice = tick.AskPrice != 0 ? factor(tick.AskPrice) : 0;
+
+                    if (tick.BidPrice == 0)
+                    {
+                        tick.Value = tick.AskPrice;
+                        break;
+                    }
+                    if (tick.AskPrice == 0)
+                    {
+                        tick.Value = tick.BidPrice;
+                        break;
+                    }
+
+                    tick.Value = (tick.BidPrice + tick.AskPrice) / 2m;
                     break;
                 case MarketDataType.QuoteBar:
                     var quoteBar = data as QuoteBar;
@@ -2205,6 +2212,46 @@ namespace QuantConnect
         public static BaseData Adjust(this BaseData data, decimal scale)
         {
             return data?.Scale(p => p * scale);
+        }
+
+        /// <summary>
+        /// Returns a hex string of the byte array.
+        /// </summary>
+        /// <param name="source">the byte array to be represented as string</param>
+        /// <returns>A new string containing the items in the enumerable</returns>
+        public static string ToHexString(this byte[] source)
+        {
+            if (source == null || source.Length == 0)
+            {
+                throw new ArgumentException($"Source cannot be null or empty.");
+            }
+
+            var hex = new StringBuilder(source.Length * 2);
+            foreach (var b in source)
+            {
+                hex.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
+            }
+
+            return hex.ToString();
+        }
+
+        /// <summary>
+        /// Gets the option exercise order direction resulting from the specified <paramref name="right"/> and
+        /// whether or not we wrote the option (<paramref name="isShort"/> is <code>true</code>) or bought to
+        /// option (<paramref name="isShort"/> is <code>false</code>)
+        /// </summary>
+        /// <param name="right">The option right</param>
+        /// <param name="isShort">True if we wrote the option, false if we purchased the option</param>
+        /// <returns>The order direction resulting from an exercised option</returns>
+        public static OrderDirection GetExerciseDirection(this OptionRight right, bool isShort)
+        {
+            switch (right)
+            {
+                case OptionRight.Call:
+                    return isShort ? OrderDirection.Sell : OrderDirection.Buy;
+                default:
+                    return isShort ? OrderDirection.Buy : OrderDirection.Sell;
+            }
         }
     }
 }
