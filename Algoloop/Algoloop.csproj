@@ -417,6 +417,7 @@
       <Link>Data\ProgramData\equity\usa\minute\spy\20131011_trade.zip</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\Help.png" />
     <SplashScreen Include="Resources\AlgoloopSplash.png" />
     <Content Include="..\Research\BasicCSharpQuantBookTemplate.ipynb">
       <Link>Data\UserData\Notebook\BasicCSharpQuantBookTemplate.ipynb</Link>

@@ -51,12 +51,25 @@
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem
+                    Header="Documentation"
+                    Click="HelpDocumentation">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Help.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem
                     Header="Technical support"
                     Click="HelpTechnicalSupport">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Help.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem
                     Header="Privacy policy"
                     Click="HelpPrivacyPolicy">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Info.png" Width="16" Height="16"/>
+                    </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem
                     Header="_About"

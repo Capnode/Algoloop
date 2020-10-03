@@ -52,9 +52,14 @@ namespace Algoloop.View
             about.ShowDialog();
         }
 
+        private void HelpDocumentation(object sender, RoutedEventArgs e)
+        {
+            OpenUrl("https://github.com/Capnode/Algoloop/wiki/Documentation");
+        }
+
         private void HelpTechnicalSupport(object sender, RoutedEventArgs e)
         {
-            OpenUrl("https://github.com/Capnode/Algoloop");
+            OpenUrl("https://github.com/Capnode/Algoloop/issues");
         }
 
         private void HelpPrivacyPolicy(object sender, RoutedEventArgs e)
