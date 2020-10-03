@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.ViewModel;
 using Microsoft.Win32;
 using QuantConnect.Configuration;
@@ -53,12 +54,20 @@ namespace Algoloop
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            string folder = MainService.GetProgramDataFolder();
+            string path = Path.Combine(folder, "init.log");
+            File.WriteAllText(path, $"{DateTime.Now}:>OnStartup\n");
+            File.AppendAllText(path, $"{DateTime.Now}:ProgramFolder={MainService.GetProgramFolder()}\n");
+            File.AppendAllText(path, $"{DateTime.Now}:AppDataFolder={MainService.GetAppDataFolder()}\n");
+            File.AppendAllText(path, $"{DateTime.Now}:ProgramDataFolder={MainService.GetProgramDataFolder()}\n");
+            File.AppendAllText(path, $"{DateTime.Now}:UserDataFolder={MainService.GetUserDataFolder()}\n");
 
             // Set Log handler
             Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
             Log.DebuggingLevel = Config.GetInt("debug-level", 1);
-            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Lean.LogItemHandler")); ;
-            Log.Trace($"Startup \"{AboutModel.AssemblyProduct}\"");
+            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Lean.LogItemHandler"));
+            string message = $"Startup \"{AboutModel.AssemblyProduct}\"";
+            Log.Trace(message);
 
             // Exception Handling Wiring
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
@@ -69,6 +78,7 @@ namespace Algoloop
 
             // Prevent going to sleep mode
             _ = SetThreadExecutionState(_esContinous | _esSystemRequired);
+            File.AppendAllText(path, $"{DateTime.Now}:<OnStartup\n");
         }
 
         protected override void OnExit(ExitEventArgs e)
