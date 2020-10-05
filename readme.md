@@ -15,10 +15,8 @@ Algoloop is an open-source algorithmic trading application with a Windows deskto
 
 ![](Algoloop/Doc/Strategy.png)
 
-## Documentation ##
-- [Getting started](https://github.com/Capnode/Algoloop/wiki/Getting-started)
-
-For full documentation of QuantConnect Lean trading engine, please see https://www.quantconnect.com/lean
+## Information ##
+More information and user documentation can be found [here](https://github.com/Capnode/Algoloop/wiki).
 
 ## Contribution ##
 Contributions are welcome:
