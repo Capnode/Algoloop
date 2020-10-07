@@ -327,7 +327,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                var symbol = new SymbolViewModel(this, new SymbolModel("symbol", Model.Market, Model.Security));
+                var symbol = new SymbolViewModel(this, new SymbolModel("symbol", string.Empty, SecurityType.Base));
                 Symbols.Add(symbol);
                 DataToModel();
                 Lists.ToList().ForEach(m => m.Refresh());
@@ -428,7 +428,7 @@ namespace Algoloop.ViewModel
                             }
                             else
                             {
-                                symbol = new SymbolModel(name, Model.Market, Model.Security);
+                                symbol = new SymbolModel(name, string.Empty, SecurityType.Base);
                                 Model.Symbols.Add(symbol);
                             }
                         }
@@ -532,8 +532,6 @@ namespace Algoloop.ViewModel
                         {
                             var symbol = Model.Symbols.FirstOrDefault(m =>
                                 m.Name.Equals(name, StringComparison.OrdinalIgnoreCase) &&
-                                m.Market.Equals(Model.Market, StringComparison.OrdinalIgnoreCase) &&
-                                m.Security == Model.Security &&
                                 m.Active);
                             if (symbol != null)
                             {

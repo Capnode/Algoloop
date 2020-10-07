@@ -103,27 +103,9 @@ namespace Algoloop.Model
         [DataMember]
         public DateTime LastDate { get; set; } = DateTime.Today;
 
-        [Category("Data")]
-        [DisplayName("Default market")]
-        [TypeConverter(typeof(ProviderNameConverter))]
-        [RefreshProperties(RefreshProperties.All)]
-        [Description("Default market for new symbols. Must match market folder in data folder structure. Behaviour is dependent on actual data provider.")]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        [DataMember]
-        public string Market { get; set; }
-
-        [Category("Data")]
-        [DisplayName("Default security type")]
-        [Description("Default security type for new symbols. Must match security folder in data folder structure. Behaviour is dependent on actual data provider.")]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        [DataMember]
-        public SecurityType Security { get; set; }
-
-        [Category("Data")]
-        [DisplayName("Default time resolution")]
-        [Description("Default time period for new symbols. Must match resolution folder in data folder structure. Behaviour is dependent on actual data provider.")]
+        [Category("Time")]
+        [DisplayName("Timeframe")]
+        [Description("Download data timeframe period. Behaviour is dependent on actual data provider.")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
