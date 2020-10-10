@@ -53,7 +53,7 @@ namespace Algoloop.Provider.Tests
             MarketModel result = _dut.Download(market, _settings, Log.LogHandler);
             Assert.IsFalse(result.Active);
             Assert.IsTrue(result.LastDate == date);
-            Assert.AreEqual(42, market.Symbols.Count);
+            Assert.IsTrue(market.Symbols.Count > 42);
             Assert.AreEqual(market.Symbols.Count, market.Symbols.Where(m => m.Active).Count());
         }
 
@@ -76,7 +76,7 @@ namespace Algoloop.Provider.Tests
             MarketModel result = _dut.Download(market, _settings, Log.LogHandler);
             Assert.IsFalse(result.Active);
             Assert.IsTrue(result.LastDate > date);
-            Assert.AreEqual(42, market.Symbols.Count);
+            Assert.IsTrue(market.Symbols.Count > 42);
             Assert.AreEqual(market.Symbols.Count - 1, market.Symbols.Where(m => m.Active).Count());
         }
     }
