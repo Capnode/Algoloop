@@ -171,7 +171,6 @@
     <Compile Include="ViewModel\HoldingViewModel.cs" />
     <Compile Include="ViewModel\ResearchViewModel.cs" />
     <Compile Include="ViewModel\TrackSymbolViewModel.cs" />
-    <Compile Include="Model\ListModel.cs" />
     <Compile Include="Model\OrderModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

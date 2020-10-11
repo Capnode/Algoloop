@@ -54,7 +54,7 @@ namespace Algoloop.Model
             return string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
         }
 
-        internal void Refresh()
+        public void Refresh()
         {
         }
     }
