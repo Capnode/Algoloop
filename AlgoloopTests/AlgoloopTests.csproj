@@ -118,6 +118,10 @@
       <Project>{f65da573-db1b-4524-a254-2034954cae66}</Project>
       <Name>Algoloop.Wpf</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Algoloop\Algoloop.csproj">
+      <Project>{23d560bd-cbef-4c6b-a07e-65b5d31c3a6c}</Project>
+      <Name>Algoloop</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\QuantConnect.csproj">
       <Project>{2545c0b4-fabb-49c9-8dd1-9ad7ee23f86b}</Project>
       <Name>QuantConnect</Name>

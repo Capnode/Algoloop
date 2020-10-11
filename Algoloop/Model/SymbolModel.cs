@@ -69,7 +69,7 @@ namespace Algoloop.Model
         [DataMember]
         public IDictionary<string, object> Properties { get; set; }
 
-        internal void Refresh()
+        public void Refresh()
         {
         }
 
