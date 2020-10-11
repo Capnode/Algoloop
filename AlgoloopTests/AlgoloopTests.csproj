@@ -114,9 +114,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Algoloop\Algoloop.csproj">
-      <Project>{F65DA573-DB1B-4524-A254-2034954CAE66}</Project>
-      <Name>Algoloop</Name>
+    <ProjectReference Include="..\Algoloop.Wpf\Algoloop.Wpf.csproj">
+      <Project>{f65da573-db1b-4524-a254-2034954cae66}</Project>
+      <Name>Algoloop.Wpf</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common\QuantConnect.csproj">
       <Project>{2545c0b4-fabb-49c9-8dd1-9ad7ee23f86b}</Project>
