@@ -29,7 +29,7 @@
 using Algoloop.Model;
 using GalaSoft.MvvmLight.Ioc;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     /// <summary>
     /// This class contains static references to all the view models in the

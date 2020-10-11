@@ -14,7 +14,7 @@
 
 using Algoloop.Model;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class ParameterViewModel
     {

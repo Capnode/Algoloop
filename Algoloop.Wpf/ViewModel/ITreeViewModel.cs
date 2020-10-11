@@ -14,7 +14,7 @@
 
 using GalaSoft.MvvmLight.Command;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public interface ITreeViewModel
     {

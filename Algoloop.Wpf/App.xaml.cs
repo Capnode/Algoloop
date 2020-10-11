@@ -14,7 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.Service;
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModel;
 using Microsoft.Win32;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -73,7 +73,7 @@ namespace Algoloop
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
             TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionHandler;
 
-            Algoloop.Properties.Settings.Default.Reload();
+            Algoloop.Wpf.Properties.Settings.Default.Reload();
             EnsureBrowserEmulationEnabled("Algoloop.exe");
 
             // Prevent going to sleep mode
@@ -87,7 +87,7 @@ namespace Algoloop
             _ = SetThreadExecutionState(_esContinous);
 
             ViewModelLocator.MainViewModel.SaveConfig();
-            Algoloop.Properties.Settings.Default.Save();
+            Algoloop.Wpf.Properties.Settings.Default.Save();
 
             Log.Trace($"Exit \"{AboutModel.AssemblyProduct}\"");
             base.OnExit(e);

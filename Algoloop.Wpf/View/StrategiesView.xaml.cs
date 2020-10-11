@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace Algoloop.View
+namespace Algoloop.Wpf.View
 {
     /// <summary>
     /// Interaction logic for StrategiesView.xaml

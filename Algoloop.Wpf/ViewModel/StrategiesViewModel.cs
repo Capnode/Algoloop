@@ -19,14 +19,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Algoloop.Model;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class StrategiesViewModel : ViewModelBase, ITreeViewModel
     {

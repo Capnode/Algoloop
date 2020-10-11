@@ -13,12 +13,14 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Wpf.ViewModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Algoloop.ViewModel.Tests
 {
     [TestClass()]
     public class StrategyViewModelTests
+
     {
         private StrategyViewModel _strategy;
         private StrategiesViewModel _strategies;

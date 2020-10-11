@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Service;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using System;
 using System.ComponentModel;
 using System.IO;

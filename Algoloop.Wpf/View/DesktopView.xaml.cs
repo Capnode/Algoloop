@@ -28,7 +28,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Algoloop.View
+namespace Algoloop.Wpf.View
 {
     /// <summary>
     /// Interaction logic for DesktopView.xaml

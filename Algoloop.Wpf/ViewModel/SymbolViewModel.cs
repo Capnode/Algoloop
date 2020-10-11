@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -32,7 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Controls;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class SymbolViewModel : ViewModelBase, ITreeViewModel, IComparable
     {

@@ -15,9 +15,9 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
-using Algoloop.Properties;
+using Algoloop.Wpf.Properties;
 using Algoloop.Service;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -42,7 +42,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {

@@ -16,7 +16,7 @@ using GalaSoft.MvvmLight;
 using QuantConnect;
 using System;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class PositionViewModel : ViewModelBase
     {

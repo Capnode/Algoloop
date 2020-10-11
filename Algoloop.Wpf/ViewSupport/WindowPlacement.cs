@@ -21,7 +21,7 @@ using System.Windows.Interop;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     // RECT structure required by WINDOWPLACEMENT structure
     [Serializable]

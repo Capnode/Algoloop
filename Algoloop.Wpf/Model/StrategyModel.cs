@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using QuantConnect;
 using System;
 using System.Collections.ObjectModel;

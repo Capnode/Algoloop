@@ -14,7 +14,7 @@
 
 using System.Windows.Controls;
 
-namespace Algoloop.View
+namespace Algoloop.Wpf.View
 {
     /// <summary>
     /// Interaction logic for TrackView.xaml

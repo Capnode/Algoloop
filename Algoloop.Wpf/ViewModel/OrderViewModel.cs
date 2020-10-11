@@ -19,7 +19,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class OrderViewModel : ViewModelBase
     {

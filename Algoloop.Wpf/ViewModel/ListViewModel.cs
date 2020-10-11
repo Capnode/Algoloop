@@ -13,8 +13,8 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Properties;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.Properties;
+using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -32,7 +32,7 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class ListViewModel : ViewModelBase, ITreeViewModel
     {

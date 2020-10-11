@@ -18,17 +18,17 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Algoloop.Model;
-using Algoloop.Properties;
+using Algoloop.Wpf.Properties;
 using Algoloop.Provider;
 using Algoloop.Service;
-using Algoloop.View;
+using Algoloop.Wpf.View;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     /// <summary>
     /// This class contains properties that the main View can data bind to.

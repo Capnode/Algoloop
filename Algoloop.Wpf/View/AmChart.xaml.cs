@@ -25,7 +25,7 @@ using AmCharts.Windows.Stock.Data;
 using QuantConnect;
 using QuantConnect.Data.Market;
 
-namespace Algoloop.View
+namespace Algoloop.Wpf.View
 {
     public partial class AmChart : UserControl
     {

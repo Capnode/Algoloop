@@ -16,7 +16,7 @@ using QuantConnect;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     public class ProviderNameConverter : TypeConverter
     {

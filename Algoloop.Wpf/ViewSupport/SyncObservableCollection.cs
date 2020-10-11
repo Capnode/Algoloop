@@ -18,7 +18,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     /// <summary>
     /// SyncObservableCollection class

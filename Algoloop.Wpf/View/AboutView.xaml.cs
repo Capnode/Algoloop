@@ -14,7 +14,7 @@
 
 using System.Windows;
 
-namespace Algoloop.View
+namespace Algoloop.Wpf.View
 {
     public partial class AboutView : Window
     {

@@ -24,7 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class SettingsViewModel
     {

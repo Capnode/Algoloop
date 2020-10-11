@@ -15,9 +15,9 @@
 using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
-using Algoloop.Properties;
+using Algoloop.Wpf.Properties;
 using Algoloop.Provider;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -39,7 +39,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class MarketViewModel : ViewModelBase, ITreeViewModel, IDisposable
     {

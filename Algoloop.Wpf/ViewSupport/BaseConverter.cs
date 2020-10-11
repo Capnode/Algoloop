@@ -15,7 +15,7 @@
 using System;
 using System.Windows.Markup;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     public abstract class BaseConverter : MarkupExtension
     {

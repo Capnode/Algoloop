@@ -24,7 +24,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class ResearchViewModel : ViewModelBase
     {

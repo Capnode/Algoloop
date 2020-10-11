@@ -15,7 +15,7 @@
 using System;
 using System.Windows.Data;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     [ValueConversion(typeof(object), typeof(string))]
     public class StringFormatConverter : BaseConverter, IValueConverter

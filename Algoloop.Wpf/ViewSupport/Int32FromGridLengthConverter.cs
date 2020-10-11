@@ -17,7 +17,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     [ValueConversion(typeof(int), typeof(GridLength))]
     public class Int32FromGridLengthConverter : BaseConverter, IValueConverter

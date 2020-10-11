@@ -14,11 +14,11 @@
 
 using Algoloop.Lean;
 using Algoloop.Model;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight;
 using QuantConnect.Logging;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class LogViewModel : ViewModelBase
     {

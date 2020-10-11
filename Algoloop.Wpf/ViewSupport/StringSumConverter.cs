@@ -16,7 +16,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     public class StringSumConverter : BaseConverter, IMultiValueConverter
     {

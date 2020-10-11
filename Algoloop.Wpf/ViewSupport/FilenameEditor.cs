@@ -21,7 +21,7 @@ using System.Windows.Data;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     public class FilenameEditor : ITypeEditor
     {

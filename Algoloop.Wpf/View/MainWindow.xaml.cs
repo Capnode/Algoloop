@@ -12,14 +12,14 @@
  * limitations under the License.
  */
 
-using Algoloop.Properties;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.Properties;
+using Algoloop.Wpf.ViewSupport;
 using QuantConnect.Configuration;
 using System;
 using System.Diagnostics;
 using System.Windows;
 
-namespace Algoloop.View
+namespace Algoloop.Wpf.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

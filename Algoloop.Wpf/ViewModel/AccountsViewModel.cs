@@ -16,13 +16,13 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Algoloop.Model;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class AccountsViewModel : ViewModelBase
     {

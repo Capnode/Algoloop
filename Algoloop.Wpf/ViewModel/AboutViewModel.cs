@@ -17,7 +17,7 @@ using GalaSoft.MvvmLight;
 using System;
 using System.Globalization;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class AboutViewModel : ViewModelBase
     {

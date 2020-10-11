@@ -14,7 +14,7 @@
 
 using System.Windows;
 
-namespace Algoloop.View
+namespace Algoloop.Wpf.View
 {
     /// <summary>
     /// Interaction logic for SettingsView.xaml

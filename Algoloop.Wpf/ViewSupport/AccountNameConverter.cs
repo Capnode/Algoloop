@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     public class AccountNameConverter : TypeConverter
     {

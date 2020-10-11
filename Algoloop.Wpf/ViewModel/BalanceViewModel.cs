@@ -16,7 +16,7 @@ using GalaSoft.MvvmLight;
 using QuantConnect.Securities;
 using System;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class BalanceViewModel : ViewModelBase
     {

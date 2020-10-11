@@ -19,8 +19,8 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
-using Algoloop.Properties;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.Properties;
+using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -35,7 +35,7 @@ using QuantConnect.Securities;
 using QuantConnect.Statistics;
 using QuantConnect.Util;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class AccountViewModel : ViewModelBase, ITreeViewModel, IDisposable
     {

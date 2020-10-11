@@ -14,7 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.Service;
-using Algoloop.ViewSupport;
+using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
@@ -23,7 +23,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class MarketsViewModel : ViewModelBase
     {

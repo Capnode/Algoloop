@@ -16,7 +16,7 @@ using System;
 using System.Windows.Data;
 using System.Windows.Input;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     /// <summary>
     /// Sets the cursor state of the mouse.

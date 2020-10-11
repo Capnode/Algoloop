@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
 	public class WpDataGrid : DataGrid
 	{

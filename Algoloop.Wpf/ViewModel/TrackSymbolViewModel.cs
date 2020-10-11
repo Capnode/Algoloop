@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Algoloop.ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
     public class TrackSymbolViewModel
     {

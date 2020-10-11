@@ -22,7 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Algoloop.ViewSupport
+namespace Algoloop.Wpf.ViewSupport
 {
     public class AlgorithmNameConverter : TypeConverter
     {
