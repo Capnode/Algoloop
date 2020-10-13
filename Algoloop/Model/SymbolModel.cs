@@ -55,6 +55,9 @@ namespace Algoloop.Model
         }
 
         [DataMember]
+        public string Id { get; set; }
+
+        [DataMember]
         public bool Active { get; set; } = true;
 
         [DataMember]

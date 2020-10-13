@@ -36,6 +36,13 @@ namespace Algoloop.Model
             }
         }
 
+        [DisplayName("List id")]
+        [Description("Id of the list")]
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string Id { get; set; }
+
         [DisplayName("List name")]
         [Description("Name of the list")]
         [Browsable(true)]
