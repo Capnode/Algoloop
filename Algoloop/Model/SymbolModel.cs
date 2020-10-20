@@ -28,9 +28,10 @@ namespace Algoloop.Model
         }
 
 
-        public SymbolModel(string name, string market, SecurityType security)
+        public SymbolModel(string id, string market, SecurityType security)
         {
-            Name = name;
+            Id = id;
+            Name = id;
             Market = market;
             Security = security;
         }
@@ -40,6 +41,7 @@ namespace Algoloop.Model
             if (model == null) throw new ArgumentNullException(nameof(model));
 
             Active = model.Active;
+            Id = model.Id;
             Name = model.Name;
             Market = model.Market;
             Security = model.Security;
@@ -55,13 +57,13 @@ namespace Algoloop.Model
         }
 
         [DataMember]
-        public string Id { get; set; }
+        public string Id { get; set; } = "id";
 
         [DataMember]
         public bool Active { get; set; } = true;
 
         [DataMember]
-        public string Name { get; set; } = "symbol";
+        public string Name { get; set; } = "name";
 
         [DataMember]
         public string Market { get; set; }
@@ -79,7 +81,9 @@ namespace Algoloop.Model
         public int CompareTo(object obj)
         {
             var a = obj as SymbolModel;
-            int result = string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
+            int result = string.Compare(Id, a?.Id, StringComparison.OrdinalIgnoreCase);
+            if (result != 0) return result;
+            result = string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
             if (result != 0) return result;
             result = string.Compare(Market, a?.Market, StringComparison.OrdinalIgnoreCase);
             if (result != 0) return result;
