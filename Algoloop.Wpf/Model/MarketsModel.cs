@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -38,9 +39,19 @@ namespace Algoloop.Model
         internal void Copy(MarketsModel marketsModel)
         {
             Markets.Clear();
-            foreach (var market in marketsModel.Markets)
+            foreach (MarketModel market in marketsModel.Markets)
             {
                 Markets.Add(market);
+
+                // Make sure all symbols has an id
+                foreach (SymbolModel symbol in market.Symbols)
+                {
+                    if (string.IsNullOrEmpty(symbol.Id))
+                    {
+                        symbol.Id = symbol.Name;
+                        Debug.Assert(!string.IsNullOrEmpty(symbol.Id));
+                    }
+                }
             }
         }
 

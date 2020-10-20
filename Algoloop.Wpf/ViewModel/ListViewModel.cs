@@ -183,7 +183,7 @@ namespace Algoloop.Wpf.ViewModel
         internal void DataFromModel()
         {
             SymbolColumns.Clear();
-            ExDataGridColumns.AddTextColumn(SymbolColumns, "Symbol", "Model.Name", false, true);
+            ExDataGridColumns.AddTextColumn(SymbolColumns, "Name", "Model.Name", false, true);
 
             Symbols.Clear();
             foreach (SymbolViewModel marketSymbol in _market.Symbols)

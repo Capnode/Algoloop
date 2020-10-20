@@ -566,7 +566,7 @@ namespace Algoloop.Wpf.ViewModel
             });
             SymbolColumns.Add(new DataGridTextColumn()
             {
-                Header = "Symbol",
+                Header = "Name",
                 Binding = new Binding("Model.Name") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
             SymbolColumns.Add(new DataGridTextColumn()
@@ -590,6 +590,7 @@ namespace Algoloop.Wpf.ViewModel
 
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
+                Symbols.Sort();
                 ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
             }
         }

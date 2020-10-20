@@ -200,7 +200,7 @@ namespace Algoloop.Wpf.ViewModel
                     symbol.Security.SecurityTypeToLower(),
                     symbol.Market,
                     resolution.ToString(),
-                    symbol.Name + ".zip");
+                    symbol.Id + ".zip");
                 if (File.Exists(path)) return path;
             }
             else
@@ -209,7 +209,7 @@ namespace Algoloop.Wpf.ViewModel
                     market.DataFolder,
                     symbol.Security.SecurityTypeToLower(),
                     symbol.Market, resolution.ToString(),
-                    symbol.Name);
+                    symbol.Id);
                 if (!Directory.Exists(path)) return null;
                 DirectoryInfo dir = new DirectoryInfo(path);
                 string date1 = date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
@@ -237,7 +237,7 @@ namespace Algoloop.Wpf.ViewModel
                 Model.Market,
                 "fundamental",
                 "fine",
-                Model.Name.ToLowerInvariant());
+                Model.Id.ToLowerInvariant());
 
             DirectoryInfo d = new DirectoryInfo(folder);
             if (!d.Exists)
@@ -245,7 +245,7 @@ namespace Algoloop.Wpf.ViewModel
                 return;
             }
 
-            string jsonFile = $"{Model.Name.ToLowerInvariant()}.json";
+            string jsonFile = $"{Model.Id.ToLowerInvariant()}.json";
             FileInfo[] files = d.GetFiles("*.zip");
             foreach (FileInfo file in files)
             {
