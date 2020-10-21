@@ -13,13 +13,14 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Provider;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Linq;
 
-namespace Algoloop.Provider.Tests
+namespace Algoloop.Tests.Provider
 {
     [TestClass()]
     public class QuantconnectTests

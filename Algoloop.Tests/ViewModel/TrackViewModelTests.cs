@@ -19,13 +19,13 @@ using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
 
-namespace Algoloop.ViewModel.Tests
+namespace Algoloop.Tests.ViewModel
 {
     [TestClass()]
     public class TrackViewModelTests
     {
         [TestMethod()]
-        public void CalculateScoreTest_idealProfit()
+        public void CalculateScore_idealProfit()
         {
             var trades = new List<Trade>
             {
@@ -40,7 +40,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_idealLoss()
+        public void CalculateScore_idealLoss()
         {
             var trades = new List<Trade>
             {
@@ -55,7 +55,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_breakeven()
+        public void CalculateScore_breakeven()
         {
             var trades = new List<Trade>
             {
@@ -70,7 +70,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_profit()
+        public void CalculateScore_profit()
         {
             var trades = new List<Trade>
             {
@@ -85,7 +85,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_loss()
+        public void CalculateScore_loss()
         {
             var trades = new List<Trade>
             {
@@ -100,7 +100,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_chartpoint_idealProfit()
+        public void CalculateScore_chartpoint_idealProfit()
         {
             List<ChartPoint> trades = new List<ChartPoint>
             {
@@ -115,7 +115,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_chartpoint_idealLoss()
+        public void CalculateScore_chartpoint_idealLoss()
         {
             List<ChartPoint> trades = new List<ChartPoint>
             {
@@ -130,7 +130,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_chartpoint_breakeven()
+        public void CalculateScore_chartpoint_breakeven()
         {
             List<ChartPoint> trades = new List<ChartPoint>
             {
@@ -145,7 +145,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void CalculateScoreTest_chartpoint_profit()
+        public void CalculateScore_chartpoint_profit()
         {
             List<ChartPoint> trades = new List<ChartPoint>
             {

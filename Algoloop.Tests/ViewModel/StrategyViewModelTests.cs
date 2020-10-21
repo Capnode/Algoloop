@@ -16,7 +16,7 @@ using Algoloop.Model;
 using Algoloop.Wpf.ViewModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Algoloop.ViewModel.Tests
+namespace Algoloop.Tests.ViewModel
 {
     [TestClass()]
     public class StrategyViewModelTests
@@ -34,7 +34,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void AddSymbolCommandTest()
+        public void AddSymbolCommand()
         {
             Assert.IsTrue(_strategy.AddSymbolCommand.CanExecute(null));
             Assert.AreEqual(0, _strategy.Symbols.Count);
@@ -43,7 +43,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void MoveStrategyCommandTest_child_to_track_failed()
+        public void MoveStrategyCommand_child_to_track_failed()
         {
             var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null, null);
             _strategy.AddStrategy(drag);
@@ -63,7 +63,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void MoveStrategyCommandTest_top_to_child()
+        public void MoveStrategyCommand_top_to_child()
         {
             StrategyViewModel drag = _strategy;
             var drop = new StrategyViewModel(_strategies, new StrategyModel { Name = "drop" }, null, null, null);
@@ -81,7 +81,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void MoveStrategyCommandTest_child_to_child()
+        public void MoveStrategyCommand_child_to_child()
         {
             var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null, null);
             _strategy.AddStrategy(drag);
@@ -102,7 +102,7 @@ namespace Algoloop.ViewModel.Tests
         }
 
         [TestMethod()]
-        public void MoveStrategyCommandTest_child_to_top()
+        public void MoveStrategyCommand_child_to_top()
         {
             StrategiesViewModel drop = _strategies;
             var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null, null);
