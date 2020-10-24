@@ -475,7 +475,7 @@ namespace QuantConnect.ToolBox
             if (File.Exists(filePath) && !_appendToZips)
             {
                 File.Delete(filePath);
-                Log.Trace("LeanDataWriter.Write(): Existing deleted: " + filePath);
+//                Log.Trace("LeanDataWriter.Write(): Existing deleted: " + filePath);
             }
 
             // Create the directory if it doesnt exist
@@ -485,7 +485,7 @@ namespace QuantConnect.ToolBox
             {
                 var entryName = LeanData.GenerateZipEntryName(_symbol, date, _resolution, _tickType);
                 Compression.ZipCreateAppendData(filePath, entryName, data, true);
-                Log.Trace("LeanDataWriter.Write(): Appended: " + filePath);
+//                Log.Trace("LeanDataWriter.Write(): Appended: " + filePath);
             }
             else
             {
@@ -494,7 +494,7 @@ namespace QuantConnect.ToolBox
 
                 // Move temp file to the final destination with the appropriate name
                 File.Move(tempFilePath, filePath);
-                Log.Trace("LeanDataWriter.Write(): Created: " + filePath);
+//                Log.Trace("LeanDataWriter.Write(): Created: " + filePath);
             }
         }
 
