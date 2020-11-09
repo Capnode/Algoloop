@@ -13,20 +13,23 @@
  */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight;
 using QuantConnect.Orders;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class OrderViewModel : ViewModelBase
+    public class OrderViewModel : ViewModel
     {
         public OrderViewModel(Order order)
         {
+            Contract.Requires(order != null);
             Model = new OrderModel();
             Update(order);
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public OrderViewModel(OrderModel orderModel)

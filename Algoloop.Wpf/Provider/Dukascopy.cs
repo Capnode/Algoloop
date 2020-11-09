@@ -97,7 +97,8 @@ namespace Algoloop.Provider
             var downloader = new DukascopyDataDownloader();
             foreach (SymbolModel symbol in all.Where(m => downloader.HasSymbol(m.Name)))
             {
-                SymbolModel item = market.Symbols.FirstOrDefault(m => m.Name.Equals(symbol.Name));
+                SymbolModel item = market.Symbols.FirstOrDefault(
+                    m => m.Name.Equals(symbol.Name, StringComparison.OrdinalIgnoreCase));
                 if (item == null)
                 {
                     // Add symbol

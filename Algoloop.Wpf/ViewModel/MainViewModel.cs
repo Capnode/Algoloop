@@ -22,7 +22,6 @@ using Algoloop.Wpf.Properties;
 using Algoloop.Provider;
 using Algoloop.Service;
 using Algoloop.Wpf.View;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using QuantConnect.Configuration;
@@ -33,7 +32,7 @@ namespace Algoloop.Wpf.ViewModel
     /// <summary>
     /// This class contains properties that the main View can data bind to.
     /// </summary>
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : ViewModel
     {
         private bool _isBusy;
         private string _statusMessage;
@@ -58,7 +57,7 @@ namespace Algoloop.Wpf.ViewModel
             LogViewModel = logViewModel;
 
             SaveCommand = new RelayCommand(() => SaveConfig(), () => !IsBusy);
-            SettingsCommand = new RelayCommand(async () => await DoSettings(), () => !IsBusy);
+            SettingsCommand = new RelayCommand(async () => await DoSettings().ConfigureAwait(false), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
@@ -68,6 +67,8 @@ namespace Algoloop.Wpf.ViewModel
 
             // Async initialize without blocking UI
             _initializer = Initialize();
+
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public RelayCommand SaveCommand { get; }
@@ -148,7 +149,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private async Task DoSettings()
         {
-            await _initializer;
+            await _initializer.ConfigureAwait(true);
             SettingModel oldSettings = SettingsViewModel.Model;
             var settings = new SettingsView();
             if ((bool)settings.ShowDialog())
@@ -193,7 +194,7 @@ namespace Algoloop.Wpf.ViewModel
 
                 // Read configuration
                 string appData = MainService.GetAppDataFolder();
-                await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json"));
+                await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
                 AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
@@ -207,11 +208,12 @@ namespace Algoloop.Wpf.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex);
+                string message = $"{ex.Message} ({ex.GetType()})";
+                Messenger.Default.Send(new NotificationMessage(message));
+                Log.Error(ex, message);
             }
             finally
             {
-                Messenger.Default.Send(new NotificationMessage(string.Empty));
                 IsBusy = false;
             }
         }

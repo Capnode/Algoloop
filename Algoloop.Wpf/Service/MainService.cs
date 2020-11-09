@@ -23,7 +23,7 @@ using System.Text.RegularExpressions;
 
 namespace Algoloop.Service
 {
-    public class MainService
+    public static class MainService
     {
         public static string GetProgramFolder()
         {

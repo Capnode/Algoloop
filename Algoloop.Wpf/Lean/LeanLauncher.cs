@@ -33,6 +33,7 @@ namespace Algoloop.Lean
 {
     public class LeanLauncher : MarshalByRefObject
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
         public TrackModel Run(TrackModel model, AccountModel account, SettingModel settings, HostDomainLogger logger)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
@@ -93,26 +94,26 @@ namespace Algoloop.Lean
             {
                 if (model.Desktop)
                 {
-                    SetBacktestDesktop(model, parameters);
+                    SetBacktestDesktop();
                 }
                 else
                 {
-                    SetBacktest(model, parameters);
+                    SetBacktest();
                 }
             }
             else if (model.Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                SetPaper(model, parameters);
+                SetPaper();
             }
-            else if (account.Brokerage.Equals(AccountModel.BrokerageType.Fxcm))
+            else if (account != null && account.Brokerage.Equals(AccountModel.BrokerageType.Fxcm))
             {
                 if (model.Desktop)
                 {
-                    SetFxcmDesktop(account, parameters);
+                    SetFxcmDesktop(account);
                 }
                 else
                 {
-                    SetFxcm(account, parameters);
+                    SetFxcm(account);
                 }
             }
             else
@@ -194,7 +195,7 @@ namespace Algoloop.Lean
             Config.Set("parameters", parametersConfigString);
         }
 
-        private static void SetBacktest(TrackModel model, Dictionary<string, string> parameters)
+        private static void SetBacktest()
         {
             Config.Set("environment", "backtesting");
             Config.Set("live-mode", "false");
@@ -208,7 +209,7 @@ namespace Algoloop.Lean
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
         }
 
-        private static void SetBacktestDesktop(TrackModel model, Dictionary<string, string> parameters)
+        private static void SetBacktestDesktop()
         {
             Config.Set("environment", "backtesting-desktop");
             Config.Set("live-mode", "false");
@@ -223,7 +224,7 @@ namespace Algoloop.Lean
             Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
         }
 
-        private static void SetPaper(TrackModel model, Dictionary<string, string> parameters)
+        private static void SetPaper()
         {
             Config.Set("environment", "live-paper");
             Config.Set("live-mode", "true");
@@ -236,7 +237,7 @@ namespace Algoloop.Lean
             Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
         }
 
-        private static void SetFxcm(AccountModel account, Dictionary<string, string> parameters)
+        private static void SetFxcm(AccountModel account)
         {
             Config.Set("environment", "live-fxcm");
             Config.Set("live-mode", "true");
@@ -264,7 +265,7 @@ namespace Algoloop.Lean
             }
         }
 
-        private static void SetFxcmDesktop(AccountModel account, Dictionary<string, string> parameters)
+        private static void SetFxcmDesktop(AccountModel account)
         {
             Config.Set("environment", "live-desktop");
             Config.Set("live-mode", "true");

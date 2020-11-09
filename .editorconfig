@@ -1,0 +1,36 @@
+﻿[*.cs]
+
+# CA1031: Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = none
+
+# CA1051: Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = none
+
+# CA1308: Normalize strings to uppercase
+dotnet_diagnostic.CA1308.severity = none
+
+dotnet_diagnostic.CA1724.severity = none
+
+# CA1036: Override methods on comparable types
+dotnet_diagnostic.CA1036.severity = none
+
+# CA2227: Collection properties should be read only
+dotnet_diagnostic.CA2227.severity = none
+
+# CA1303: Do not pass literals as localized parameters
+dotnet_diagnostic.CA1303.severity = none
+
+# CA2208: Instantiate argument exceptions correctly
+dotnet_diagnostic.CA2208.severity = none
+
+# CA1815: Override equals and operator equals on value types
+dotnet_diagnostic.CA1815.severity = none
+
+# CA3075: Insecure DTD processing in XML
+dotnet_diagnostic.CA3075.severity = none
+
+# CA5369: Use XmlReader For Deserialize
+dotnet_diagnostic.CA5369.severity = none
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none

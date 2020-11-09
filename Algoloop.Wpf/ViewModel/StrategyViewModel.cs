@@ -17,7 +17,6 @@ using Algoloop.Wpf.Properties;
 using Algoloop.Service;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
@@ -38,10 +37,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Diagnostics.Contracts;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class StrategyViewModel : ViewModelBase, ITreeViewModel
+    public class StrategyViewModel : ViewModel, ITreeViewModel
     {
         public const string DefaultName = "Strategy";
         internal ITreeViewModel _parent;
@@ -95,6 +95,7 @@ namespace Algoloop.Wpf.ViewModel
             DataFromModel();
 
             Model.EndDate = DateTime.Now;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public bool IsBusy
@@ -150,6 +151,7 @@ namespace Algoloop.Wpf.ViewModel
             get { return _selectedItems; }
             set
             {
+                Contract.Requires(value != null);
                 _selectedItems = value;
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
@@ -271,7 +273,6 @@ namespace Algoloop.Wpf.ViewModel
             foreach (TrackViewModel track in Tracks)
             {
                 Model.Tracks.Add(track.Model);
-                track.DataToModel();
             }
 
             Model.Strategies.Clear();
@@ -408,7 +409,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 foreach (StrategyModel model in models)
                 {
-                    await throttler.WaitAsync().ConfigureAwait(true);
+                    await throttler.WaitAsync().ConfigureAwait(false);
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
@@ -425,7 +426,7 @@ namespace Algoloop.Wpf.ViewModel
                     tasks.Add(task);
                 }
 
-                await Task.WhenAll(tasks).ConfigureAwait(true);
+                await Task.WhenAll(tasks).ConfigureAwait(false);
             }
 
             Messenger.Default.Send(new NotificationMessage(Resources.CompletedStrategy));
@@ -471,6 +472,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DataFromModel()
         {
+            Debug.Assert(IsUiThread(), "Not UI thread!");
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
@@ -858,7 +860,7 @@ namespace Algoloop.Wpf.ViewModel
             Lists.Add(listVm);
             foreach (MarketModel market in _markets.Markets)
             {
-                var marketVm = new MarketViewModel(marketsVm, market, _settings);
+                using var marketVm = new MarketViewModel(marketsVm, market, _settings);
                 foreach (ListModel list in market.Lists)
                 {
                     listVm = new ListViewModel(marketVm, list);

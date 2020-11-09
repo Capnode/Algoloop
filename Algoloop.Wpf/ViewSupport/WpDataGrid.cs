@@ -12,73 +12,73 @@ using System.Collections;
 
 namespace Algoloop.Wpf.ViewSupport
 {
-	public class WpDataGrid : DataGrid
-	{
-		private bool inWidthChange = false;
-		private bool updatingColumnInfo = false;
-		public static readonly DependencyProperty ColumnInformationProperty = DependencyProperty.Register("ColumnInformation", typeof(string), typeof(WpDataGrid),
-			new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, ColumnInfoChangedCallback)
-			);
+    public class WpDataGrid : DataGrid
+    {
+        private bool inWidthChange = false;
+        private bool updatingColumnInfo = false;
+        public static readonly DependencyProperty ColumnInformationProperty = DependencyProperty.Register("ColumnInformation", typeof(string), typeof(WpDataGrid),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, ColumnInfoChangedCallback)
+            );
 
-		private static void ColumnInfoChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
-		{
-			var grid = (WpDataGrid)dependencyObject;
-			if (!grid.updatingColumnInfo)
-			{
-				grid.ColumnInfoChanged();
-			}
-		}
+        private static void ColumnInfoChangedCallback(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        {
+            var grid = (WpDataGrid)dependencyObject;
+            if (!grid.updatingColumnInfo)
+            {
+                grid.ColumnInfoChanged();
+            }
+        }
 
-		public static readonly DependencyProperty SelectedItemsListProperty = DependencyProperty.Register("SelectedItemsList", typeof(IList), typeof(WpDataGrid),
-			new PropertyMetadata(null));
+        public static readonly DependencyProperty SelectedItemsListProperty = DependencyProperty.Register("SelectedItemsList", typeof(IList), typeof(WpDataGrid),
+            new PropertyMetadata(null));
 
-		void CustomDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			this.SelectedItemsList = this.SelectedItems;
-		}
+        void CustomDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.SelectedItemsList = this.SelectedItems;
+        }
 
-		public WpDataGrid()
-		{
-			this.SelectionChanged += CustomDataGrid_SelectionChanged;
-		}
+        public WpDataGrid()
+        {
+            this.SelectionChanged += CustomDataGrid_SelectionChanged;
+        }
 
-		protected override void OnInitialized(EventArgs e)
-		{
+        protected override void OnInitialized(EventArgs e)
+        {
             void sortDirectionChangedHandler(object sender, EventArgs x) => UpdateColumnInfo();
             void widthPropertyChangedHandler(object sender, EventArgs x) => inWidthChange = true;
             var sortDirectionPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.SortDirectionProperty, typeof(DataGridColumn));
-			var widthPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.WidthProperty, typeof(DataGridColumn));
+            var widthPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(DataGridColumn.WidthProperty, typeof(DataGridColumn));
 
-			Loaded += (sender, x) =>
-			{
-				ColumnInfoChanged();
-				foreach (var column in Columns)
-				{
-					sortDirectionPropertyDescriptor.AddValueChanged(column, sortDirectionChangedHandler);
-					widthPropertyDescriptor.AddValueChanged(column, widthPropertyChangedHandler);
-				}
-			};
-			Unloaded += (sender, x) =>
-			{
-				foreach (var column in Columns)
-				{
-					sortDirectionPropertyDescriptor.RemoveValueChanged(column, sortDirectionChangedHandler);
-					widthPropertyDescriptor.RemoveValueChanged(column, widthPropertyChangedHandler);
-				}
-			};
+            Loaded += (sender, x) =>
+            {
+                ColumnInfoChanged();
+                foreach (var column in Columns)
+                {
+                    sortDirectionPropertyDescriptor.AddValueChanged(column, sortDirectionChangedHandler);
+                    widthPropertyDescriptor.AddValueChanged(column, widthPropertyChangedHandler);
+                }
+            };
+            Unloaded += (sender, x) =>
+            {
+                foreach (var column in Columns)
+                {
+                    sortDirectionPropertyDescriptor.RemoveValueChanged(column, sortDirectionChangedHandler);
+                    widthPropertyDescriptor.RemoveValueChanged(column, widthPropertyChangedHandler);
+                }
+            };
 
-			// Set columns chooser
-			base.ContextMenu = new ContextMenu();
-			base.ContextMenuOpening += ContextMenuOpening;
+            // Set columns chooser
+            base.ContextMenu = new ContextMenu();
+            base.ContextMenuOpening += ContextMenuOpening;
 
-			base.OnInitialized(e);
-		}
+            base.OnInitialized(e);
+        }
 
-		private new void ContextMenuOpening(object sender, ContextMenuEventArgs e)
-		{
-			base.ContextMenu.Items.Clear();
-			foreach (var column in base.Columns)
-			{
+        private new void ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            base.ContextMenu.Items.Clear();
+            foreach (var column in base.Columns)
+            {
                 MenuItem item = new MenuItem
                 {
                     Header = column.Header,
@@ -87,155 +87,154 @@ namespace Algoloop.Wpf.ViewSupport
                 };
 
                 item.Checked += new RoutedEventHandler(MenuItem_CheckedChanged);
-				item.Unchecked += new RoutedEventHandler(MenuItem_CheckedChanged);
-				base.ContextMenu.Items.Add(item);
-			}
-		}
+                item.Unchecked += new RoutedEventHandler(MenuItem_CheckedChanged);
+                base.ContextMenu.Items.Add(item);
+            }
+        }
 
-		public string ColumnInformation
-		{
-			get { return (string)GetValue(ColumnInformationProperty); }
-			set { SetValue(ColumnInformationProperty, value); }
-		}
+        public string ColumnInformation
+        {
+            get { return (string)GetValue(ColumnInformationProperty); }
+            set { SetValue(ColumnInformationProperty, value); }
+        }
 
-		public IList SelectedItemsList
-		{
-			get { return (IList)GetValue(SelectedItemsListProperty); }
-			set { SetValue(SelectedItemsListProperty, value); }
-		}
+        public IList SelectedItemsList
+        {
+            get { return (IList)GetValue(SelectedItemsListProperty); }
+            set { SetValue(SelectedItemsListProperty, value); }
+        }
 
-		private void MenuItem_CheckedChanged(object sender, RoutedEventArgs e)
-		{
-			MenuItem item = sender as MenuItem;
-			Debug.Assert(item != null);
-			foreach (DataGridColumn column in base.Columns)
-			{
-				if (column.Header.Equals(item.Header))
-					if (e.RoutedEvent.Equals(MenuItem.CheckedEvent))
-						column.Visibility = Visibility.Visible;
-					else if (e.RoutedEvent.Equals(MenuItem.UncheckedEvent))
-						column.Visibility = Visibility.Collapsed;
-			}
+        private void MenuItem_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            Debug.Assert(item != null);
+            foreach (DataGridColumn column in base.Columns)
+            {
+                if (column.Header.Equals(item.Header))
+                    if (e.RoutedEvent.Equals(MenuItem.CheckedEvent))
+                        column.Visibility = Visibility.Visible;
+                    else if (e.RoutedEvent.Equals(MenuItem.UncheckedEvent))
+                        column.Visibility = Visibility.Collapsed;
+            }
 
-			UpdateColumnInfo();
-		}
+            UpdateColumnInfo();
+        }
 
-		private void UpdateColumnInfo()
-		{
-			updatingColumnInfo = true;
-			ColumnInformation = SerializeObjectToXML(new ObservableCollection<ColumnInfo>(Columns.Select((x) => new ColumnInfo(x))));
-			updatingColumnInfo = false;
-		}
+        private void UpdateColumnInfo()
+        {
+            updatingColumnInfo = true;
+            ColumnInformation = SerializeObjectToXML(new ObservableCollection<ColumnInfo>(Columns.Select((x) => new ColumnInfo(x))));
+            updatingColumnInfo = false;
+        }
 
-		protected override void OnColumnReordered(DataGridColumnEventArgs e)
-		{
-			UpdateColumnInfo();
-			base.OnColumnReordered(e);
-		}
+        protected override void OnColumnReordered(DataGridColumnEventArgs e)
+        {
+            UpdateColumnInfo();
+            base.OnColumnReordered(e);
+        }
 
-		protected override void OnPreviewMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
-		{
-			if (inWidthChange)
-			{
-				inWidthChange = false;
-				UpdateColumnInfo();
-			}
-			base.OnPreviewMouseLeftButtonUp(e);
-		}
+        protected override void OnPreviewMouseLeftButtonUp(System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (inWidthChange)
+            {
+                inWidthChange = false;
+                UpdateColumnInfo();
+            }
+            base.OnPreviewMouseLeftButtonUp(e);
+        }
 
-		private void ColumnInfoChanged()
-		{
-			Items.SortDescriptions.Clear();
-			if (string.IsNullOrEmpty(ColumnInformation))
-				return;
+        private void ColumnInfoChanged()
+        {
+            Items.SortDescriptions.Clear();
+            if (string.IsNullOrEmpty(ColumnInformation))
+                return;
 
-			var columnInfo = DeserializeFromXml<ObservableCollection<ColumnInfo>>(ColumnInformation);
-			foreach (var column in columnInfo)
-			{
-				var realColumn = Columns.Where((x) => column.Header.Equals(x.Header)).FirstOrDefault();
-				if (realColumn == null) { continue; }
-				column.Apply(realColumn, Columns.Count, Items.SortDescriptions);
-			}
-		}
+            var columnInfo = DeserializeFromXml<ObservableCollection<ColumnInfo>>(ColumnInformation);
+            foreach (var column in columnInfo)
+            {
+                var realColumn = Columns.Where((x) => column.Header.Equals(x.Header)).FirstOrDefault();
+                if (realColumn == null) { continue; }
+                column.Apply(realColumn, Columns.Count, Items.SortDescriptions);
+            }
+        }
 
-		internal void FillLastColumn()
-		{
-			DataGridColumn lastColumn = null;
-			foreach (DataGridColumn column in base.Columns)
-			{
-				if (column.Visibility.Equals(Visibility.Visible)
-					&& (lastColumn == null || column.DisplayIndex > lastColumn.DisplayIndex))
-					lastColumn = column;
-			}
-			if (lastColumn != null)
-				lastColumn.Width = new DataGridLength(1.0, DataGridLengthUnitType.Star);
-		}
+        internal void FillLastColumn()
+        {
+            DataGridColumn lastColumn = null;
+            foreach (DataGridColumn column in base.Columns)
+            {
+                if (column.Visibility.Equals(Visibility.Visible)
+                    && (lastColumn == null || column.DisplayIndex > lastColumn.DisplayIndex))
+                    lastColumn = column;
+            }
+            if (lastColumn != null)
+                lastColumn.Width = new DataGridLength(1.0, DataGridLengthUnitType.Star);
+        }
 
-		private string SerializeObjectToXML<T>(T item)
-		{
-			var xs = new XmlSerializer(typeof(T));
+        private string SerializeObjectToXML<T>(T item)
+        {
+            var xs = new XmlSerializer(typeof(T));
             using var stringWriter = new StringWriter();
             xs.Serialize(stringWriter, item);
             return stringWriter.ToString();
         }
 
-		private T DeserializeFromXml<T>(string xml)
-		{
-			T result;
-			XmlSerializer ser = new XmlSerializer(typeof(T));
-			using (TextReader tr = new StringReader(xml))
-			{
-				result = (T)ser.Deserialize(tr);
-			}
-			return result;
-		}
-	}
+        private T DeserializeFromXml<T>(string xml)
+        {
+            T result;
+            XmlSerializer ser = new XmlSerializer(typeof(T));
+            using (TextReader tr = new StringReader(xml))
+            {
+                result = (T)ser.Deserialize(tr);
+            }
+            return result;
+        }
+    }
 
-	public struct ColumnInfo
-	{
-		public ColumnInfo(DataGridColumn column)
-		{
+    public struct ColumnInfo
+    {
+        public ColumnInfo(DataGridColumn column)
+        {
             if (column == null) throw new ArgumentNullException(nameof(column));
 
             Header = column.Header;
-			if (!(column is DataGridComboBoxColumn))
-				PropertyPath = ((Binding)((DataGridBoundColumn)column).Binding).Path.Path;
-			else
-				PropertyPath = ((Binding)((DataGridComboBoxColumn)column).SelectedItemBinding).Path.Path;
-			WidthValue = column.Width.DisplayValue;
-			WidthType = column.Width.UnitType;
-			SortDirection = column.SortDirection;
-			DisplayIndex = column.DisplayIndex;
-			Visibility = column.Visibility;
-		}
+            PropertyPath = !(column is DataGridComboBoxColumn column1)
+                ? ((Binding)((DataGridBoundColumn)column).Binding).Path.Path
+                : ((Binding)column1.SelectedItemBinding).Path.Path;
+            WidthValue = column.Width.DisplayValue;
+            WidthType = column.Width.UnitType;
+            SortDirection = column.SortDirection;
+            DisplayIndex = column.DisplayIndex;
+            Visibility = column.Visibility;
+        }
 
-		public void Apply(DataGridColumn column, int gridColumnCount, SortDescriptionCollection sortDescriptions)
-		{
+        public void Apply(DataGridColumn column, int gridColumnCount, SortDescriptionCollection sortDescriptions)
+        {
             if (column == null) throw new ArgumentNullException(nameof(column));
             if (sortDescriptions == null) throw new ArgumentNullException(nameof(sortDescriptions));
 
             column.Visibility = Visibility;
-			column.Width = new DataGridLength(WidthValue, WidthType);
-			column.SortDirection = SortDirection;
-			if (SortDirection != null)
-			{
-				sortDescriptions.Add(new SortDescription(PropertyPath, SortDirection.Value));
-			}
-			if (column.DisplayIndex != DisplayIndex)
-			{
-				var maxIndex = (gridColumnCount == 0) ? 0 : gridColumnCount - 1;
-				column.DisplayIndex = (DisplayIndex <= maxIndex) ? DisplayIndex : maxIndex;
-			}
-		}
+            column.Width = new DataGridLength(WidthValue, WidthType);
+            column.SortDirection = SortDirection;
+            if (SortDirection != null)
+            {
+                sortDescriptions.Add(new SortDescription(PropertyPath, SortDirection.Value));
+            }
+            if (column.DisplayIndex != DisplayIndex)
+            {
+                var maxIndex = (gridColumnCount == 0) ? 0 : gridColumnCount - 1;
+                column.DisplayIndex = (DisplayIndex <= maxIndex) ? DisplayIndex : maxIndex;
+            }
+        }
 
-		public object Header;
-		public string PropertyPath;
-		public ListSortDirection? SortDirection;
-		public int DisplayIndex;
-		public double WidthValue;
-		public DataGridLengthUnitType WidthType;
-		public Visibility Visibility;
-	}
+        public object Header;
+        public string PropertyPath;
+        public ListSortDirection? SortDirection;
+        public int DisplayIndex;
+        public double WidthValue;
+        public DataGridLengthUnitType WidthType;
+        public Visibility Visibility;
+    }
 }
 
 /*

@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-using GalaSoft.MvvmLight;
 using QuantConnect.Securities;
 using System;
+using System.Diagnostics;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class BalanceViewModel : ViewModelBase
+    public class BalanceViewModel : ViewModel
     {
         private string _currency;
         private decimal _amount;
@@ -26,11 +26,13 @@ namespace Algoloop.Wpf.ViewModel
         public BalanceViewModel(CashAmount cash)
         {
             Update(cash);
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public BalanceViewModel(AccountEvent message)
         {
             Update(message);
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         // Gets the symbol of the security required to provide conversion rates. If this

@@ -28,6 +28,7 @@
 
 using Algoloop.Model;
 using GalaSoft.MvvmLight.Ioc;
+using System.Diagnostics;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -35,6 +36,7 @@ namespace Algoloop.Wpf.ViewModel
     /// This class contains static references to all the view models in the
     /// application and provides an entry point for the bindings.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "<Pending>")]
     public class ViewModelLocator
     {
         /// <summary>
@@ -42,6 +44,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public ViewModelLocator()
         {
+            Debug.Assert(ViewModel.IsUiThread(), "Not UI thread!");
+
             // Register Algoloop types
             SimpleIoc.Default.Register<SettingModel>();
             SimpleIoc.Default.Register<MarketsModel>();

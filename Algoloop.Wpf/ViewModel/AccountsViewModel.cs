@@ -12,19 +12,18 @@
  * limitations under the License.
  */
 
-using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Algoloop.Model;
 using Algoloop.Wpf.ViewSupport;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class AccountsViewModel : ViewModelBase
+    public class AccountsViewModel : ViewModel
     {
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
@@ -35,6 +34,7 @@ namespace Algoloop.Wpf.ViewModel
             AddCommand = new RelayCommand(() => AddAccount(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => DoSelectedChanged(market), (market) => !IsBusy && market != null);
             DataFromModel();
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
@@ -76,46 +76,30 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        public bool Read(string fileName)
+        public void Read(string fileName)
         {
             Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
             {
-                try
-                {
-                    using StreamReader r = new StreamReader(fileName);
-                    string json = r.ReadToEnd();
-                    Model.Copy(JsonConvert.DeserializeObject<AccountsModel>(json));
-
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Failed reading {fileName}\n");
-                    return false;
-                }
+                using StreamReader r = new StreamReader(fileName);
+                string json = r.ReadToEnd();
+                Model.Copy(JsonConvert.DeserializeObject<AccountsModel>(json));
             }
 
             DataFromModel();
             StartTasks();
-            return true;
         }
 
-        internal bool Save(string fileName)
+        internal void Save(string fileName)
         {
-            try
-            {
-                DataToModel();
+            DataToModel();
 
-                using StreamWriter file = File.CreateText(fileName);
-                JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
-                serializer.Serialize(file, Model);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed reading {fileName}\n");
-                return false;
-            }
+            // Do not overwrite if file read error
+            if (!Model.Accounts.Any()) return;
+
+            using StreamWriter file = File.CreateText(fileName);
+            JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
+            serializer.Serialize(file, Model);
         }
 
         private void DoSelectedChanged(ITreeViewModel vm)

@@ -14,6 +14,7 @@
  */
 
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Algoloop.Common
 {
@@ -27,6 +28,11 @@ namespace Algoloop.Common
 
         public SafeDictionary(IDictionary<TKey, TValue> dict)
             : base(dict)
+        {
+        }
+
+        protected SafeDictionary(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
 

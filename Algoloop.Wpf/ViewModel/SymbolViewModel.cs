@@ -15,7 +15,6 @@
 using Algoloop.Model;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -26,6 +25,7 @@ using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -34,7 +34,7 @@ using System.Windows.Controls;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class SymbolViewModel : ViewModelBase, ITreeViewModel, IComparable
+    public class SymbolViewModel : ViewModel, ITreeViewModel, IComparable
     {
         public enum ReportPeriod { Year, R12, Quarter};
 
@@ -70,6 +70,7 @@ namespace Algoloop.Wpf.ViewModel
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
             UpdateCommand = new RelayCommand(() => DoLoadData(_parent as MarketViewModel), () => !IsBusy && _parent is MarketViewModel);
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public bool IsBusy
@@ -375,7 +376,7 @@ namespace Algoloop.Wpf.ViewModel
             SetFundamentals(_sharesOutstanding, period, sharesOutstanding);
         }
 
-        private decimal Round(decimal value, decimal multiplier, int decimals)
+        private static decimal Round(decimal value, decimal multiplier, int decimals)
         {
             if (value.Equals(decimal.MinValue)) return decimal.MinValue;
             return decimal.Round(value * multiplier, decimals);

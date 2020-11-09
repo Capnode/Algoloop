@@ -13,13 +13,13 @@
  */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class AboutViewModel : ViewModelBase
+    public class AboutViewModel : ViewModel
     {
         public string Title { get; private set; }
         public string ProductName { get; private set; }
@@ -34,6 +34,7 @@ namespace Algoloop.Wpf.ViewModel
             Version = String.Format(CultureInfo.InvariantCulture, "Version: {0}", AboutModel.AssemblyVersion);
             Copyright = AboutModel.AssemblyCopyright;
             Description = AboutModel.AssemblyDescription;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
     }
 }

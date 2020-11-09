@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\QuantConnect.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <NoWarn>
     </NoWarn>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

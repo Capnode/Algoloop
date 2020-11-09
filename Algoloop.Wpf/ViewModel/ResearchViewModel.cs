@@ -14,7 +14,6 @@
 
 using Algoloop.Model;
 using Algoloop.Service;
-using GalaSoft.MvvmLight;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -26,7 +25,7 @@ using System.Runtime.InteropServices;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class ResearchViewModel : ViewModelBase
+    public class ResearchViewModel : ViewModel, IDisposable
     {
         internal const int CTRL_C_EVENT = 0;
         private const string _configfile = "config.json";
@@ -48,15 +47,17 @@ namespace Algoloop.Wpf.ViewModel
         private string _source;
         private Process _process;
         private bool _initialized;
+        private bool _disposed;
 
         public ResearchViewModel(SettingModel settings)
         {
             _settings = settings;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         ~ResearchViewModel()
         {
-            StopJupyter();
+            Dispose(false);
         }
 
         public string HtmlText
@@ -75,6 +76,32 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _initialized;
             set => Set(ref _initialized, value);
+        }
+
+        public void Dispose()
+        {
+            // Dispose of unmanaged resources.
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                // Dispose managed state (managed objects).
+                _process.Dispose();
+            }
+
+            StopJupyter();
+            _disposed = true;
         }
 
         public void Initialize()
@@ -129,7 +156,7 @@ namespace Algoloop.Wpf.ViewModel
                 string line = args.Data;
                 if (string.IsNullOrEmpty(line)) return;
 
-                int pos = line.IndexOf("http");
+                int pos = line.IndexOf("http", StringComparison.OrdinalIgnoreCase);
                 if (string.IsNullOrEmpty(Source) && pos > 0)
                 {
                     Source = line.Substring(pos);

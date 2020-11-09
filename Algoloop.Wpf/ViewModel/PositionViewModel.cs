@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-using GalaSoft.MvvmLight;
 using QuantConnect;
 using System;
+using System.Diagnostics;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class PositionViewModel : ViewModelBase
+    public class PositionViewModel : ViewModel
     {
         private string _symbol;
         private string _securityType;
@@ -33,6 +33,7 @@ namespace Algoloop.Wpf.ViewModel
         public PositionViewModel(Holding holding)
         {
             Update(holding);
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public string Symbol

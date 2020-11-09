@@ -17,21 +17,20 @@ using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class SettingsViewModel
+    public class SettingsViewModel : ViewModel
     {
         public SettingsViewModel(SettingModel settings)
         {
             Model = settings;
             OkCommand = new RelayCommand<Window>(window => DoOk(window));
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public RelayCommand<Window> OkCommand { get; private set; }
@@ -58,7 +57,7 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             DataFromModel();
-            return await Task.FromResult(true);
+            return await Task.FromResult(true).ConfigureAwait(false);
         }
 
         internal bool Save(string fileName)
@@ -90,6 +89,7 @@ namespace Algoloop.Wpf.ViewModel
             Model.Version = SettingModel.version;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
         private void DataFromModel()
         {
         }

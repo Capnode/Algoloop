@@ -64,10 +64,5 @@ namespace Algoloop.Model
         {
             return Markets.FirstOrDefault(m => m.Name.Equals(market, StringComparison.OrdinalIgnoreCase));
         }
-
-        internal IEnumerable<SymbolModel> GetActiveSymbols(string market, ListModel folder)
-        {
-            return GetMarket(market)?.GetActiveSymbols(folder);
-        }
     }
 }

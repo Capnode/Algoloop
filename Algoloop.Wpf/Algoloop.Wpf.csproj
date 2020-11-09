@@ -50,7 +50,7 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisRuleSet>..\QuantConnect.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
     <NoWarn>
     </NoWarn>
@@ -192,6 +192,7 @@
     <Compile Include="ViewModel\ListViewModel.cs" />
     <Compile Include="ViewModel\ITreeViewModel.cs" />
     <Compile Include="ViewModel\OrderViewModel.cs" />
+    <Compile Include="ViewModel\ViewModel.cs" />
     <Compile Include="ViewSupport\BooleanToVisibilityConverter.cs" />
     <Compile Include="ViewSupport\CompositeCollectionConverter.cs" />
     <Compile Include="ViewSupport\MarketNameConverter.cs" />

@@ -20,7 +20,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Algoloop.Model;
 using Algoloop.Wpf.ViewSupport;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -28,7 +27,7 @@ using QuantConnect.Logging;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class StrategiesViewModel : ViewModelBase, ITreeViewModel
+    public class StrategiesViewModel : ViewModel, ITreeViewModel
     {
         private readonly MarketsModel _markets;
         private readonly AccountsModel _accounts;
@@ -50,6 +49,7 @@ namespace Algoloop.Wpf.ViewModel
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy);
 
             DataFromModel();
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
@@ -100,22 +100,13 @@ namespace Algoloop.Wpf.ViewModel
             Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
             {
-                try
+                await Task.Run(() =>
                 {
-                    await Task.Run(() =>
-                    {
-                        using StreamReader r = new StreamReader(fileName);
-                        using JsonReader reader = new JsonTextReader(r);
-                        JsonSerializer serializer = new JsonSerializer();
-                        Model = serializer.Deserialize<StrategiesModel>(reader);
-                    }).ConfigureAwait(true); // Must continue on UI thread
-
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Failed reading {fileName}\n");
-                    return false;
-                }
+                    using StreamReader r = new StreamReader(fileName);
+                    using JsonReader reader = new JsonTextReader(r);
+                    JsonSerializer serializer = new JsonSerializer();
+                    Model = serializer.Deserialize<StrategiesModel>(reader);
+                }).ConfigureAwait(false); // Must continue on UI thread
             }
 
             DataFromModel();
@@ -123,22 +114,16 @@ namespace Algoloop.Wpf.ViewModel
             return true;
         }
 
-        internal bool Save(string fileName)
+        internal void Save(string fileName)
         {
-            try
-            {
-                DataToModel();
+            DataToModel();
 
-                using StreamWriter file = File.CreateText(fileName);
-                JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
-                serializer.Serialize(file, Model);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed writing {fileName}\n");
-                return false;
-            }
+            // Do not overwrite if file read error
+            if (!Model.Strategies.Any()) return;
+
+            using StreamWriter file = File.CreateText(fileName);
+            JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
+            serializer.Serialize(file, Model);
         }
 
         internal void AddStrategy(StrategyViewModel strategy)
@@ -286,12 +271,16 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DataFromModel()
         {
-            Strategies.Clear();
-            foreach (StrategyModel strategyModel in Model.Strategies)
+            // Run in UI thread
+            UiThread(() =>
             {
-                var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
-                AddStrategy(strategyViewModel);
-            }
+                Strategies.Clear();
+                foreach (StrategyModel strategyModel in Model.Strategies)
+                {
+                    var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+                    AddStrategy(strategyViewModel);
+                }
+            });
         }
 
         private void StartTasks()

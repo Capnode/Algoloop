@@ -231,6 +231,7 @@ namespace Algoloop.Model
         [DataMember]
         public IDictionary<string, decimal?> Statistics { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
         public void Refresh()
         {
         }

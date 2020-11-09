@@ -16,7 +16,6 @@ using Algoloop.Model;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
@@ -26,6 +25,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -34,7 +34,7 @@ using System.Windows.Data;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class ListViewModel : ViewModelBase, ITreeViewModel
+    public class ListViewModel : ViewModel, ITreeViewModel
     {
         private readonly MarketViewModel _market;
         private SymbolViewModel _selectedSymbol;
@@ -65,6 +65,7 @@ namespace Algoloop.Wpf.ViewModel
             };
 
             MarketSymbols.Source = _market.Symbols;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public bool IsBusy
@@ -102,6 +103,7 @@ namespace Algoloop.Wpf.ViewModel
             get { return _selectedItems; }
             set
             {
+                Contract.Requires(value != null);
                 _selectedItems = value;
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)

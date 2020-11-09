@@ -15,17 +15,17 @@
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.Wpf.ViewSupport;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class MarketsViewModel : ViewModelBase
+    public class MarketsViewModel : ViewModel
     {
         private readonly SettingModel _settings;
         private ITreeViewModel _selectedItem;
@@ -40,6 +40,7 @@ namespace Algoloop.Wpf.ViewModel
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy && vm != null);
 
             DataFromModel();
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
@@ -70,30 +71,21 @@ namespace Algoloop.Wpf.ViewModel
             return Markets.Remove(market);
         }
 
-        public bool Read(string fileName)
+        public void Read(string fileName)
         {
             Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
             {
-                try
-                {
-                    using StreamReader r = new StreamReader(fileName);
-                    string json = r.ReadToEnd();
-                    json = DbUpgrade(json);
-                    Model.Copy(JsonConvert.DeserializeObject<MarketsModel>(json));
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Failed reading {fileName}\n");
-                    return false;
-                }
+                using StreamReader r = new StreamReader(fileName);
+                string json = r.ReadToEnd();
+                json = DbUpgrade(json);
+                Model.Copy(JsonConvert.DeserializeObject<MarketsModel>(json));
             }
 
             DataFromModel();
-            return true;
         }
 
-        private string DbUpgrade(string json)
+        private static string DbUpgrade(string json)
         {
             int version = MainService.DbVersion(json);
             if (version == 0 && MarketsModel.version > 0)
@@ -104,22 +96,16 @@ namespace Algoloop.Wpf.ViewModel
             return json;
         }
 
-        internal bool Save(string fileName)
+        internal void Save(string fileName)
         {
-            try
-            {
-                DataToModel();
+            DataToModel();
 
-                using StreamWriter file = File.CreateText(fileName);
-                JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
-                serializer.Serialize(file, Model);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Failed reading {fileName}\n");
-                return false;
-            }
+            // Do not overwrite if file read error
+            if (!Model.Markets.Any()) return;
+
+            using StreamWriter file = File.CreateText(fileName);
+            JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
+            serializer.Serialize(file, Model);
         }
 
         private void DoSelectedChanged(ITreeViewModel vm)

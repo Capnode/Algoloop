@@ -19,7 +19,6 @@ using Algoloop.Wpf.Properties;
 using Algoloop.Provider;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
@@ -38,10 +37,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Diagnostics.Contracts;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class MarketViewModel : ViewModelBase, ITreeViewModel, IDisposable
+    public class MarketViewModel : ViewModel, ITreeViewModel, IDisposable
     {
         private bool _isDisposed = false; // To detect redundant calls
         private readonly MarketsViewModel _parent;
@@ -77,6 +77,7 @@ namespace Algoloop.Wpf.ViewModel
 
             DataFromModel();
             DoActiveCommand(Active);
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public bool IsBusy
@@ -115,6 +116,7 @@ namespace Algoloop.Wpf.ViewModel
             get { return _selectedItems; }
             set
             {
+                Contract.Requires(value != null);
                 _selectedItems = value;
                 if (_selectedItems?.Count > 0)
                 {
@@ -240,7 +242,7 @@ namespace Algoloop.Wpf.ViewModel
                     _cancel = new CancellationTokenSource();
                     await Task
                         .Run(() => market = _factory.Value.Download(market, _settings, logger), _cancel.Token)
-                        .ConfigureAwait(true);
+                        .ConfigureAwait(false);
                     _factory.Dispose();
                     _factory = null;
                 }
@@ -266,7 +268,7 @@ namespace Algoloop.Wpf.ViewModel
                 // Update view
                 Model = null;
                 Model = market;
-                DataFromModel();
+                UiThread(() => DataFromModel());
             }
 
             _cancel = null;
@@ -293,7 +295,7 @@ namespace Algoloop.Wpf.ViewModel
             // No IsBusy
             if (value)
             {
-                await DownloadAsync().ConfigureAwait(true);
+                await DownloadAsync().ConfigureAwait(false);
             }
             else
             {
@@ -305,7 +307,7 @@ namespace Algoloop.Wpf.ViewModel
         {
             // No IsBusy
             Active = true;
-            await DownloadAsync().ConfigureAwait(true);
+            await DownloadAsync().ConfigureAwait(false);
         }
 
         private void DoStopCommand()

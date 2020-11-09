@@ -12,13 +12,14 @@
  * limitations under the License.
  */
 
-using GalaSoft.MvvmLight;
+using Algoloop.Wpf.ViewModel;
 using QuantConnect;
 using QuantConnect.Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
-public class ChartViewModel : ViewModelBase
+public class ChartViewModel : ViewModel
 {
     public ChartViewModel(Series series)
     {
@@ -27,6 +28,7 @@ public class ChartViewModel : ViewModelBase
         Title = series.Name;
         Series = series;
         Data = null;
+        Debug.Assert(IsUiThread(), "Not UI thread!");
     }
 
     public ChartViewModel(Series series, IEnumerable<BaseData> data)
@@ -36,6 +38,7 @@ public class ChartViewModel : ViewModelBase
         Title = series.Name;
         Series = series;
         Data = data;
+        Debug.Assert(IsUiThread(), "Not UI thread!");
     }
 
     public string Title { get; }

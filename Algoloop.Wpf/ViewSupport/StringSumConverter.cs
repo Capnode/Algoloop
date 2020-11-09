@@ -13,6 +13,7 @@
 */
 
 using System;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -22,6 +23,8 @@ namespace Algoloop.Wpf.ViewSupport
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
+            Contract.Requires(values != null);
+
             string name = null;
             decimal sum = 0M;
             foreach (object value in values)
@@ -42,6 +45,7 @@ namespace Algoloop.Wpf.ViewSupport
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
+            Contract.Requires(value != null);
             string[] splitValues = ((string)value).Split(' ');
             return splitValues;
         }

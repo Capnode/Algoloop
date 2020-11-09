@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -36,6 +37,8 @@ namespace Algoloop.Provider
 
         public void Download(MarketModel model, SettingModel settings)
         {
+            Contract.Requires(model != null);
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
             string version = AboutModel.AssemblyVersion;
             var uri = new Uri($"https://github.com/Capnode/Algoloop/archive/Algoloop-{version}.zip");
             string extract = $"Algoloop-Algoloop-{version}/Data/";
@@ -55,7 +58,7 @@ namespace Algoloop.Provider
                 {
                     // skip directories
                     if (string.IsNullOrEmpty(file.Name)) continue;
-                    if (!file.FullName.StartsWith(extract)) continue;
+                    if (!file.FullName.StartsWith(extract, StringComparison.OrdinalIgnoreCase)) continue;
                     string path = file.FullName.Substring(extract.Length);
                     AddSymbol(symbols, path);
                     string destPath = Path.Combine(dest, path);
@@ -109,7 +112,7 @@ namespace Algoloop.Provider
 
             if (ticker.Contains("."))
             {
-                if (!ticker.EndsWith(_zip)) return;
+                if (!ticker.EndsWith(_zip, StringComparison.OrdinalIgnoreCase)) return;
                 ticker = ticker.Substring(0, ticker.Length - _zip.Length);
             }
 

@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -55,6 +56,7 @@ namespace Algoloop.Model
             get => _provider;
             set
             {
+                Contract.Requires(value != null);
                 _provider = value.ToLowerInvariant();
                 Refresh();
             }
@@ -152,7 +154,7 @@ namespace Algoloop.Model
             ModelChanged?.Invoke();
         }
 
-        internal IEnumerable<SymbolModel> GetActiveSymbols(ListModel list)
+        internal static IEnumerable<SymbolModel> GetActiveSymbols(ListModel list)
         {
             return list.Symbols.Where(m => m.Active);
         }

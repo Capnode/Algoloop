@@ -19,7 +19,6 @@ using System.Runtime.Serialization;
 
 namespace Algoloop.Model
 {
-    [Serializable]
     public class OrderModel
     {
         public OrderModel()

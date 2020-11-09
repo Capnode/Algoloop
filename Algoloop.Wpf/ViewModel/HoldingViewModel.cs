@@ -12,13 +12,13 @@
  * limitations under the License.
  */
 
-using GalaSoft.MvvmLight;
 using QuantConnect;
 using System;
+using System.Diagnostics;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class HoldingViewModel : ViewModelBase
+    public class HoldingViewModel : ViewModel
     {
         private decimal _price;
         private decimal _quantity;
@@ -28,6 +28,7 @@ namespace Algoloop.Wpf.ViewModel
         public HoldingViewModel(Symbol symbol)
         {
             Symbol = symbol;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public Symbol Symbol { get;}

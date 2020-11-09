@@ -18,7 +18,6 @@ using Algoloop.Model;
 using Algoloop.Wpf.Properties;
 using Algoloop.Service;
 using Algoloop.Wpf.ViewSupport;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Ionic.Zip;
@@ -41,10 +40,11 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
+    public class TrackViewModel: ViewModel, ITreeViewModel, IComparable, IDisposable
     {
         private bool _isDisposed = false; // To detect redundant calls
         public const string Folder = "Tracks";
@@ -93,6 +93,7 @@ namespace Algoloop.Wpf.ViewModel
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
 
             DataFromModel();
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public bool IsBusy
@@ -123,6 +124,7 @@ namespace Algoloop.Wpf.ViewModel
             get { return _selectedItems; }
             set
             {
+                Contract.Requires(value != null);
                 _selectedItems = value;
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
@@ -284,7 +286,6 @@ namespace Algoloop.Wpf.ViewModel
         internal async Task StartTaskAsync()
         {
             ClearRunData();
-            DataToModel();
 
             // Account must not be null
             if (Model.Account == null)
@@ -312,13 +313,13 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     Port = _settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
                     model = await RunTrack(account, model)
-                        .ConfigureAwait(true);
+                        .ConfigureAwait(false);
                     Port = null;
                 }
                 else
                 {
                     model = await RunTrack(account, model)
-                        .ConfigureAwait(true);
+                        .ConfigureAwait(false);
                 }
 
                 model.Completed = true;
@@ -340,11 +341,7 @@ namespace Algoloop.Wpf.ViewModel
             Model = model;
 
             Active = false;
-            DataFromModel();
-        }
-
-        internal void DataToModel()
-        {
+            UiThread(() => DataFromModel());
         }
 
         internal void DataFromModel()
@@ -539,12 +536,14 @@ namespace Algoloop.Wpf.ViewModel
             return Math.Sqrt(variance);
         }
 
-        private void AddCustomStatistics(BacktestResult result, IDictionary<string, decimal?> statistics)
+        private static void AddCustomStatistics(BacktestResult result, IDictionary<string, decimal?> statistics)
         {
-            KeyValuePair<string, Chart> chart = result.Charts.FirstOrDefault(m => m.Key.Equals("Strategy Equity"));
+            KeyValuePair<string, Chart> chart = result.Charts.FirstOrDefault(
+                m => m.Key.Equals("Strategy Equity", StringComparison.OrdinalIgnoreCase));
             if (chart.Equals(default(KeyValuePair<string, Chart>))) return;
 
-            KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(m => m.Key.Equals("Equity"));
+            KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(
+                m => m.Key.Equals("Equity", StringComparison.OrdinalIgnoreCase));
             if (equity.Equals(default(KeyValuePair<string, Series>))) return;
 
             List<ChartPoint> series = equity.Value.Values;
@@ -566,7 +565,7 @@ namespace Algoloop.Wpf.ViewModel
                 using Isolated<LeanLauncher> leanEngine = new Isolated<LeanLauncher>();
                 _cancel = new CancellationTokenSource();
                 await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token)
-                    .ConfigureAwait(true);
+                    .ConfigureAwait(false);
             }
             finally
             {
@@ -758,7 +757,7 @@ namespace Algoloop.Wpf.ViewModel
             model.Logs = string.Empty;
         }
 
-        private IDictionary<string, decimal?> ReadStatistics(BacktestResult result)
+        private static IDictionary<string, decimal?> ReadStatistics(BacktestResult result)
         {
             IDictionary<string, decimal?> statistics = new SafeDictionary<string, decimal?>();
             AddCustomStatistics(result, statistics);
@@ -837,7 +836,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 IsBusy = true;
                 Active = true;
-                await StartTaskAsync().ConfigureAwait(true);
+                await StartTaskAsync().ConfigureAwait(false);
             }
             finally
             {

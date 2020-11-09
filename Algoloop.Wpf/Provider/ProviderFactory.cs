@@ -27,6 +27,7 @@ namespace Algoloop.Provider
 {
     public class ProviderFactory : MarshalByRefObject
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
         public MarketModel Download(MarketModel market, SettingModel settings, ILogHandler logger)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));

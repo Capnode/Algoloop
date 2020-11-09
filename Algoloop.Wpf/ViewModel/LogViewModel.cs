@@ -15,12 +15,12 @@
 using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Wpf.ViewSupport;
-using GalaSoft.MvvmLight;
 using QuantConnect.Logging;
+using System.Diagnostics;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class LogViewModel : ViewModelBase
+    public class LogViewModel : ViewModel
     {
         public LogViewModel()
         {
@@ -28,6 +28,8 @@ namespace Algoloop.Wpf.ViewModel
             {
                 logService.Connect((item) => Logs.Add(item));
             }
+
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public SyncObservableCollection<LogItem> Logs { get; } = new SyncObservableCollection<LogItem>();

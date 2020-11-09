@@ -15,13 +15,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using QuantConnect;
@@ -37,7 +38,7 @@ using QuantConnect.Util;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class AccountViewModel : ViewModelBase, ITreeViewModel, IDisposable
+    public class AccountViewModel : ViewModel, ITreeViewModel, IDisposable
     {
         private bool _isDisposed = false; // To detect redundant calls
         private readonly AccountsViewModel _parent;
@@ -53,11 +54,12 @@ namespace Algoloop.Wpf.ViewModel
             Model = accountModel;
 
             ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), () => !IsBusy);
-            StartCommand = new RelayCommand(async () => await DoConnectAsync().ConfigureAwait(true), () => !IsBusy && !Active);
-            StopCommand = new RelayCommand(async () => await DoDisconnectAsync().ConfigureAwait(true), () => !IsBusy && Active);
+            StartCommand = new RelayCommand(async () => await DoConnectAsync().ConfigureAwait(false), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(async () => await DoDisconnectAsync().ConfigureAwait(false), () => !IsBusy && Active);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteAccount(this), () => !IsBusy && !Active);
 
             DataFromModel();
+            Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public bool IsBusy
@@ -88,6 +90,7 @@ namespace Algoloop.Wpf.ViewModel
             get { return _selectedItems; }
             set
             {
+                Contract.Requires(value != null);
                 _selectedItems = value;
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
@@ -154,7 +157,7 @@ namespace Algoloop.Wpf.ViewModel
 
                 if (!Active)
                 {
-                    await DoDisconnectAsync().ConfigureAwait(true);
+                    await DoDisconnectAsync().ConfigureAwait(false);
                 }
             }
             finally
@@ -175,13 +178,13 @@ namespace Algoloop.Wpf.ViewModel
                 IsBusy = true;
                 Active = false;
                 _cancel.Cancel();
-                await _task.ConfigureAwait(true);
+                await _task.ConfigureAwait(false);
                 _cancel = null;
                 _task = null;
 
                 if (Active)
                 {
-                    await DoConnectAsync().ConfigureAwait(true);
+                    await DoConnectAsync().ConfigureAwait(false);
                 }
             }
             finally
@@ -348,11 +351,11 @@ namespace Algoloop.Wpf.ViewModel
         {
             if (value)
             {
-                await DoConnectAsync().ConfigureAwait(true);
+                await DoConnectAsync().ConfigureAwait(false);
             }
             else
             {
-                await DoDisconnectAsync().ConfigureAwait(true);
+                await DoDisconnectAsync().ConfigureAwait(false);
             }
         }
 

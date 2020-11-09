@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics.Contracts;
 using System.Windows.Data;
 
 namespace Algoloop.Wpf.ViewSupport
@@ -23,6 +24,7 @@ namespace Algoloop.Wpf.ViewSupport
 
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
+            Contract.Requires(values != null);
             var collection = new CompositeCollection();
             foreach (object item in values)
             {
