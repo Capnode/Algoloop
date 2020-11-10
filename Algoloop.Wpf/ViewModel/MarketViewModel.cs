@@ -592,9 +592,10 @@ namespace Algoloop.Wpf.ViewModel
 
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
-                Symbols.Sort();
                 ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
             }
+
+            Symbols.Sort();
         }
 
         private void DbUpgrade(SymbolModel symbol)

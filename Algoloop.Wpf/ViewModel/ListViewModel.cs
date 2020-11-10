@@ -87,7 +87,7 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand ExportListCommand { get; }
-        public string DisplayName => Model != null ? $"{_market.Model.Name}: {Model.Name} ({Symbols.Count})" : "Empty";
+        public string DisplayName => Model != null ? $"{_market.Model.Name}: {Model.Name} ({Symbols.Count})" : string.Empty;
 
         public ListModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
