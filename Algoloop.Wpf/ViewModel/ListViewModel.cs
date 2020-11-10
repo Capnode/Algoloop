@@ -60,7 +60,8 @@ namespace Algoloop.Wpf.ViewModel
             {
                 if (e.Item is SymbolViewModel marketSymbol)
                 {
-                    e.Accepted = marketSymbol.Active && !Symbols.Any(m => m.Model.Name.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase));
+                    e.Accepted = marketSymbol.Active
+                    && !Symbols.Any(m => m.Model.Id.Equals(marketSymbol.Model.Id, StringComparison.OrdinalIgnoreCase));
                 }
             };
 
@@ -86,7 +87,7 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand ExportListCommand { get; }
-        public string DisplayName => Model != null ? $"{_market.Model.Name}: {Model.Name} ({Symbols.Count})" : string.Empty;
+        public string DisplayName => Model != null ? $"{_market.Model.Name}: {Model.Name} ({Symbols.Count})" : "Empty";
 
         public ListModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
@@ -193,7 +194,7 @@ namespace Algoloop.Wpf.ViewModel
                 if (marketSymbol.Active)
                 {
                     SymbolModel symbol = Model.Symbols.FirstOrDefault(m => 
-                        m.Name.Equals(marketSymbol.Model.Name, StringComparison.OrdinalIgnoreCase) &&
+                        m.Id.Equals(marketSymbol.Model.Id, StringComparison.OrdinalIgnoreCase) &&
                         m.Market.Equals(marketSymbol.Model.Market, StringComparison.OrdinalIgnoreCase) &&
                         m.Security == marketSymbol.Model.Security);
                     if (symbol != null)
@@ -259,7 +260,7 @@ namespace Algoloop.Wpf.ViewModel
                     using StreamWriter file = File.CreateText(fileName);
                     foreach (SymbolViewModel symbol in Symbols)
                     {
-                        file.WriteLine(symbol.Model.Name);
+                        file.WriteLine(symbol.Model.Id);
                     }
                 }
                 catch (Exception ex)

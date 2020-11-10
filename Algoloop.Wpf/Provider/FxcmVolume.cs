@@ -48,7 +48,7 @@ namespace Algoloop.Provider
             Config.Set("fxcm-user-name", model.Login);
             Config.Set("fxcm-password", model.Password);
 
-            IList<string> symbols = model.Symbols.Select(m => m.Name).ToList();
+            IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.LastDate, model.LastDate);
         }

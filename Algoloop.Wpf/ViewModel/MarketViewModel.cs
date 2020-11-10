@@ -272,7 +272,7 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             _cancel = null;
-            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Name).ToList();
+            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             Messenger.Default.Send(new NotificationMessage(
                 symbols.Any() ? Resources.DownloadComplete : Resources.NoSymbolSelected));
         }
@@ -423,7 +423,7 @@ namespace Algoloop.Wpf.ViewModel
                         string line = r.ReadLine();
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            SymbolModel symbol = Model.Symbols.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+                            SymbolModel symbol = Model.Symbols.FirstOrDefault(m => m.Id.Equals(name, StringComparison.OrdinalIgnoreCase));
                             if (symbol != null)
                             {
                                 symbol.Active = true;
@@ -471,7 +471,7 @@ namespace Algoloop.Wpf.ViewModel
                 using StreamWriter file = File.CreateText(fileName);
                 foreach (SymbolViewModel symbol in symbols)
                 {
-                    file.WriteLine(symbol.Model.Name);
+                    file.WriteLine(symbol.Model.Id);
                 }
             }
             catch (Exception ex)
@@ -533,7 +533,7 @@ namespace Algoloop.Wpf.ViewModel
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
                             var symbol = Model.Symbols.FirstOrDefault(m =>
-                                m.Name.Equals(name, StringComparison.OrdinalIgnoreCase) &&
+                                m.Id.Equals(name, StringComparison.OrdinalIgnoreCase) &&
                                 m.Active);
                             if (symbol != null)
                             {
@@ -606,8 +606,8 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     foreach (DirectoryInfo resolutionDir in marketDir.GetDirectories())
                     {
-                        if (resolutionDir.GetDirectories(symbol.Name).Any()
-                            || resolutionDir.GetFiles(symbol.Name + ".zip").Any())
+                        if (resolutionDir.GetDirectories(symbol.Id).Any()
+                            || resolutionDir.GetFiles(symbol.Id + ".zip").Any())
                         {
                             if (Enum.TryParse<SecurityType>(securityDir.Name, true, out SecurityType security))
                             {
@@ -636,8 +636,8 @@ namespace Algoloop.Wpf.ViewModel
             {
                 if (disposing)
                 {
-                    _cancel.Dispose();
-                    _factory.Dispose();
+                    _cancel?.Dispose();
+                    _factory?.Dispose();
                 }
 
                 _isDisposed = true;

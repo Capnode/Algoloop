@@ -177,7 +177,7 @@ namespace Algoloop.Lean
             parameters.Add("resolution", model.Resolution.ToStringInvariant());
             if (!model.Symbols.IsNullOrEmpty())
             {
-                parameters.Add("symbols", string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Name)));
+                parameters.Add("symbols", string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Id)));
             }
 
             foreach (ParameterModel parameter in model.Parameters)

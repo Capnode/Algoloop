@@ -55,7 +55,7 @@ namespace Algoloop.Provider
             Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
             Config.Set("data-directory", settings.DataFolder);
 
-            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Name).ToList();
+            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             if (symbols.Any())
             {
                 string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
@@ -95,10 +95,10 @@ namespace Algoloop.Provider
 
             // Exclude unknown symbols
             var downloader = new DukascopyDataDownloader();
-            foreach (SymbolModel symbol in all.Where(m => downloader.HasSymbol(m.Name)))
+            foreach (SymbolModel symbol in all.Where(m => downloader.HasSymbol(m.Id)))
             {
                 SymbolModel item = market.Symbols.FirstOrDefault(
-                    m => m.Name.Equals(symbol.Name, StringComparison.OrdinalIgnoreCase));
+                    m => m.Id.Equals(symbol.Id, StringComparison.OrdinalIgnoreCase));
                 if (item == null)
                 {
                     // Add symbol

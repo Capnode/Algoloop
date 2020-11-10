@@ -53,7 +53,7 @@ namespace Algoloop.Provider
             DateTime fromDate = model.LastDate.Date;
             if (fromDate < DateTime.Today)
             {
-                IList<string> symbols = model.Symbols.Select(m => m.Name).ToList();
+                IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
                 FxcmDownloaderProgram.FxcmDownloader(symbols, resolution, fromDate, fromDate);
                 model.LastDate = fromDate.AddDays(1);
             }

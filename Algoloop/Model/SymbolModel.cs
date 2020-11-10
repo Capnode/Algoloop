@@ -92,7 +92,7 @@ namespace Algoloop.Model
 
         public override string ToString()
         {
-            return $"{Security} {Market} {Name}";
+            return $"{Security} {Market} {Id} {Name}";
         }
     }
 }

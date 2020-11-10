@@ -117,7 +117,7 @@ namespace Algoloop.Provider
             }
 
             if (symbols
-                .Where(x => x.Name.Equals(ticker, StringComparison.OrdinalIgnoreCase)
+                .Where(x => x.Id.Equals(ticker, StringComparison.OrdinalIgnoreCase)
                     && x.Market.Equals(marketName, StringComparison.OrdinalIgnoreCase)
                     && x.Security.Equals(security))
                 .Any())
@@ -140,7 +140,7 @@ namespace Algoloop.Provider
 
             foreach (SymbolModel item in all)
             {
-                var symbol = symbols.FirstOrDefault(x => x.Name.Equals(item.Name, StringComparison.OrdinalIgnoreCase)
+                var symbol = symbols.FirstOrDefault(x => x.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase)
                     && x.Market.Equals(item.Market, StringComparison.OrdinalIgnoreCase)
                     && x.Security.Equals(item.Security));
                 if (symbol == null)

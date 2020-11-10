@@ -36,7 +36,7 @@ namespace Algoloop.Provider
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", settings.DataFolder);
 
-            IList<string> symbols = model.Symbols.Select(m => m.Name).ToList();
+            IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, model.LastDate, model.LastDate);
         }

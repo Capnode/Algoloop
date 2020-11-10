@@ -54,8 +54,6 @@ namespace Algoloop.Wpf.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private string _displayName;
-        private ObservableCollection<DataGridColumn> _trackColumns = new ObservableCollection<DataGridColumn>();
-        private SyncObservableCollection<ListViewModel> _lists = new SyncObservableCollection<ListViewModel>();
 
         private SymbolViewModel _selectedSymbol;
         private TrackViewModel _selectedTrack;
@@ -145,6 +143,8 @@ namespace Algoloop.Wpf.ViewModel
         public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
         public SyncObservableCollection<TrackViewModel> Tracks { get; } = new SyncObservableCollection<TrackViewModel>();
         public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
+        public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
+        public ObservableCollection<DataGridColumn> TrackColumns { get; } = new ObservableCollection<DataGridColumn>();
 
         public IList SelectedItems
         {
@@ -161,12 +161,6 @@ namespace Algoloop.Wpf.ViewModel
 
                 Messenger.Default.Send(new NotificationMessage(message));
             }
-        }
-
-        public SyncObservableCollection<ListViewModel> Lists
-        {
-            get => _lists;
-            set => Set(ref _lists, value);
         }
 
         public string DisplayName
@@ -189,12 +183,6 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _isExpanded;
             set => Set(ref _isExpanded, value);
-        }
-
-        public ObservableCollection<DataGridColumn> TrackColumns
-        {
-            get => _trackColumns;
-            set => Set(ref _trackColumns, value);
         }
 
         public SymbolViewModel SelectedSymbol
@@ -627,7 +615,7 @@ namespace Algoloop.Wpf.ViewModel
                         string line = r.ReadLine();
                         foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
-                            if (Model.Symbols.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) == null)
+                            if (Model.Symbols.FirstOrDefault(m => m.Id.Equals(name, StringComparison.OrdinalIgnoreCase)) == null)
                             {
                                 var symbol = new SymbolModel(name, Model.Market, Model.Security);
                                 Model.Symbols.Add(symbol);
@@ -768,7 +756,7 @@ namespace Algoloop.Wpf.ViewModel
                 using StreamWriter file = File.CreateText(fileName);
                 foreach (SymbolViewModel symbol in symbols)
                 {
-                    file.WriteLine(symbol.Model.Name);
+                    file.WriteLine(symbol.Model.Id);
                 }
             }
             catch (Exception ex)
