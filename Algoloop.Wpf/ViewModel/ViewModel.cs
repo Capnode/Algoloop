@@ -29,8 +29,12 @@ namespace Algoloop.Wpf.ViewModel
 
         public static bool IsUiThread()
         {
+            Application app = Application.Current;
+
+            // Application do not exist in test environment
+            if (app == null) return true;
+            return app.Dispatcher.CheckAccess();
 //            return Thread.CurrentThread == Application.Current.Dispatcher.Thread;
-            return Application.Current.Dispatcher.CheckAccess();
         }
 
         public static void UiThread(Action action)
