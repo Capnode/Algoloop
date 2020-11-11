@@ -132,7 +132,7 @@ namespace QuantConnect.Lean.Engine.Results
         /// <summary>
         /// Customizable dynamic statistics <see cref="IAlgorithm.RuntimeStatistics"/>
         /// </summary>
-        public Dictionary<string, string> RuntimeStatistics { get; }
+        protected Dictionary<string, string> RuntimeStatistics { get; }
 
         /// <summary>
         /// The handler responsible for communicating messages to listeners
