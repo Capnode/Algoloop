@@ -20,6 +20,7 @@ using QuantConnect.Logging;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -76,6 +77,8 @@ namespace Algoloop.Provider
 
         public static void RegisterProviders(SettingModel settings)
         {
+            Contract.Requires(settings != null);
+
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface);
