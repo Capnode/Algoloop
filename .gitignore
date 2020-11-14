@@ -276,3 +276,6 @@ secret.config
 /Jupyter/config.json
 .ipynb_checkpoints
 log.txt
+
+#Docker result files
+Results/
