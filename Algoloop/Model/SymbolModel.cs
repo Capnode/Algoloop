@@ -15,6 +15,7 @@
 using QuantConnect;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -73,6 +74,18 @@ namespace Algoloop.Model
 
         [DataMember]
         public IDictionary<string, object> Properties { get; set; }
+
+        /// <summary>
+        /// Make sure property Id is valid
+        /// </summary>
+        public void Validate()
+        {
+            if (string.IsNullOrEmpty(Id))
+            {
+                Id = Name;
+                Debug.Assert(!string.IsNullOrEmpty(Id));
+            }
+        }
 
         public void Refresh()
         {
