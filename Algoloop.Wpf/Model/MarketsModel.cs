@@ -46,11 +46,7 @@ namespace Algoloop.Model
                 // Make sure all symbols has an id
                 foreach (SymbolModel symbol in market.Symbols)
                 {
-                    if (string.IsNullOrEmpty(symbol.Id))
-                    {
-                        symbol.Id = symbol.Name;
-                        Debug.Assert(!string.IsNullOrEmpty(symbol.Id));
-                    }
+                    symbol.Validate();
                 }
             }
         }

@@ -464,6 +464,7 @@ namespace Algoloop.Wpf.ViewModel
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
+                symbolModel.Validate();
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
             }
