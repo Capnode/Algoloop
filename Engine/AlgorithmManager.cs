@@ -334,7 +334,7 @@ namespace QuantConnect.Lean.Engine
                 {
                     _algorithm.Status = AlgorithmStatus.RuntimeError;
                     Log.Trace($"AlgorithmManager.Run(): Algorithm encountered a runtime error at {timeSlice.Time.ToStringInvariant()}. Error: {algorithm.RunTimeError}");
-                    break;
+                    return;
                 }
 
                 // perform margin calls, in live mode we can also use realtime to emit these
@@ -1055,7 +1055,7 @@ namespace QuantConnect.Lean.Engine
 
                 var orderType = OrderType.Market;
                 var tag = "Liquidate from delisting";
-                if (security.Type == SecurityType.Option)
+                if (security.Type == SecurityType.Option || security.Type == SecurityType.FutureOption)
                 {
                     // tx handler will determine auto exercise/assignment
                     tag = "Option Expired";
@@ -1144,7 +1144,7 @@ namespace QuantConnect.Lean.Engine
 
                 // fetch all option derivatives of the underlying with holdings (excluding the canonical security)
                 var derivatives = algorithm.Securities.Where(kvp => kvp.Key.HasUnderlying &&
-                    kvp.Key.SecurityType == SecurityType.Option &&
+                    (kvp.Key.SecurityType == SecurityType.Option || kvp.Key.SecurityType == SecurityType.FutureOption) &&
                     kvp.Key.Underlying == security.Symbol &&
                     !kvp.Key.Underlying.IsCanonical() &&
                     kvp.Value.HoldStock
@@ -1169,7 +1169,7 @@ namespace QuantConnect.Lean.Engine
                     // mark option contract as not tradable
                     optionContractSecurity.IsTradable = false;
 
-                    algorithm.Debug($"MarktetOnClose order submitted for option contract '{optionContractSymbol}' due to impending {split.Symbol.Value} split event. "
+                    algorithm.Debug($"MarketOnClose order submitted for option contract '{optionContractSymbol}' due to impending {split.Symbol.Value} split event. "
                         + "Option splits are not currently supported.");
                 }
 
