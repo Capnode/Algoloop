@@ -163,6 +163,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Common\ConfigProcess.cs" />
     <Compile Include="Common\SafeDictionary.cs" />
     <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="Model\AboutModel.cs" />
@@ -419,6 +420,18 @@
     <SplashScreen Include="Resources\AlgoloopSplash.png" />
     <Content Include="..\Research\BasicCSharpQuantBookTemplate.ipynb">
       <Link>Data\UserData\Notebook\BasicCSharpQuantBookTemplate.ipynb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Research\BasicQuantBookTemplate.ipynb">
+      <Link>Data\UserData\Notebook\BasicQuantBookTemplate.ipynb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Research\KitchenSinkCSharpQuantBookTemplate.ipynb">
+      <Link>Data\UserData\Notebook\KitchenSinkCSharpQuantBookTemplate.ipynb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Research\KitchenSinkQuantBookTemplate.ipynb">
+      <Link>Data\UserData\Notebook\KitchenSinkQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

@@ -14,38 +14,25 @@
 
 using Algoloop.Model;
 using Algoloop.Service;
-using Newtonsoft.Json;
+using Algoloop.Wpf.Common;
 using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Algoloop.Wpf.ViewModel
 {
     public class ResearchViewModel : ViewModel, IDisposable
     {
-        internal const int CTRL_C_EVENT = 0;
-        private const string _configfile = "config.json";
         private const string _notebook = "Notebook";
-
-        [DllImport("kernel32.dll")]
-        internal static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
-        [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern bool AttachConsole(uint dwProcessId);
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        internal static extern bool FreeConsole();
-        [DllImport("kernel32.dll")]
-        static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
-        // Delegate type to be used as the Handler Routine for SCCH
-        delegate Boolean ConsoleCtrlDelegate(uint CtrlType);
 
         private readonly SettingModel _settings;
         private string _htmlText;
         private string _source;
-        private Process _process;
+        private ConfigProcess _process;
         private bool _initialized;
         private bool _disposed;
 
@@ -122,52 +109,56 @@ namespace Algoloop.Wpf.ViewModel
         {
             StopJupyter();
             SetNotebookFolder();
-            CreateConfigFile(_settings.Notebook);
+            _process = new ConfigProcess(
+                "jupyter.exe",
+                $"notebook --no-browser",
+                _settings.Notebook,
+                (line) => Log.Trace(line),
+                (line) =>
+                    {
+                        if (string.IsNullOrEmpty(line)) return;
 
-            _process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "jupyter.exe",
-                    Arguments = $"notebook --no-browser",
-                    WorkingDirectory = _settings.Notebook,
-                    UseShellExecute = false,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                }
-            };
+                        int pos = line.IndexOf("http", StringComparison.OrdinalIgnoreCase);
+                        if (string.IsNullOrEmpty(Source) && pos > 0)
+                        {
+                            Source = line.Substring(pos);
+                        }
+
+                        Log.Trace(line);
+                    });
 
             // Set PYTHONPATH
-            string pythonpath = _process.StartInfo.EnvironmentVariables["PYTHONPATH"];
+            StringDictionary environment = _process.Environment;
+            string pythonpath = environment["PYTHONPATH"];
             if (string.IsNullOrEmpty(pythonpath))
             {
-                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = MainService.GetProgramFolder();
+                environment["PYTHONPATH"] = MainService.GetProgramFolder();
             }
             else
             {
-                _process.StartInfo.EnvironmentVariables["PYTHONPATH"] = MainService.GetProgramFolder() + ";" + pythonpath;
+                environment["PYTHONPATH"] = MainService.GetProgramFolder() + ";" + pythonpath;
             }
 
-            _process.OutputDataReceived += (sender, args) => Log.Trace(args.Data);
-            _process.ErrorDataReceived += (sender, args) =>
-            {
-                string line = args.Data;
-                if (string.IsNullOrEmpty(line)) return;
+            // Set config file
+            IDictionary<string, string> config = _process.Config;
+            string exeFolder = MainService.GetProgramFolder();
+            config["algorithm-language"] = Language.Python.ToString();
+            config["composer-dll-directory"] = exeFolder.Replace("\\", "/");
+            config["data-folder"] = _settings.DataFolder.Replace("\\", "/");
+            config["api-handler"] = "QuantConnect.Api.Api";
+            config["job-queue-handler"] = "QuantConnect.Queues.JobQueue";
+            config["messaging-handler"] = "QuantConnect.Messaging.Messaging";
 
-                int pos = line.IndexOf("http", StringComparison.OrdinalIgnoreCase);
-                if (string.IsNullOrEmpty(Source) && pos > 0)
-                {
-                    Source = line.Substring(pos);
-                }
-
-                Log.Trace(line);
-            };
-
+            // Start process
             _process.Start();
-            _process.BeginOutputReadLine();
-            _process.BeginErrorReadLine();
+        }
+
+        public void StopJupyter()
+        {
+            if (!Initialized) return;
+
+            bool stopped = _process.Stop();
+            Log.Trace($"Jupyter process exit: {stopped}");
         }
 
         private void SetNotebookFolder()
@@ -178,51 +169,6 @@ namespace Algoloop.Wpf.ViewModel
                 _settings.Notebook = Path.Combine(userDataFolder, _notebook);
                 Directory.CreateDirectory(_settings.Notebook);
             }
-        }
-
-        private void CreateConfigFile(string workFolder)
-        {
-            string exeFolder = MainService.GetProgramFolder();
-            var config = new Dictionary<string, string>
-            {
-                { "algorithm-language", Language.Python.ToString() },
-                { "composer-dll-directory", exeFolder.Replace("\\", "/") },
-                { "data-folder", _settings.DataFolder.Replace("\\", "/" ) },
-                { "api-handler", "QuantConnect.Api.Api" },
-                { "job-queue-handler", "QuantConnect.Queues.JobQueue" },
-                { "messaging-handler", "QuantConnect.Messaging.Messaging" }
-            };
-
-            Directory.CreateDirectory(workFolder);
-            using StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile));
-            JsonSerializer serializer = new JsonSerializer
-            {
-                Formatting = Formatting.Indented
-            };
-            serializer.Serialize(file, config);
-        }
-
-        public void StopJupyter()
-        {
-            if (!Initialized) return;
-
-            // Send Ctrl-C to Jupyter console
-            if (AttachConsole((uint)_process.Id))
-            {
-                SetConsoleCtrlHandler(null, true);
-                try
-                {
-                    if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return;
-                    _process.WaitForExit();
-                }
-                finally
-                {
-                    FreeConsole();
-                    SetConsoleCtrlHandler(null, false);
-                }
-            }
-
-            Log.Trace($"Jupyter process exit: {_process.HasExited}");
         }
     }
 }
