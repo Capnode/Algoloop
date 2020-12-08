@@ -80,6 +80,13 @@ namespace QuantConnect.Util
                     _compositionContainer = new CompositionContainer(aggregate);
                     return _compositionContainer.Catalog.Parts.ToList();
                 }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    foreach (var item in ex.LoaderExceptions)
+                    {
+                        Log.Error($"{item.Message}");
+                    }
+                }
                 catch (Exception exception)
                 {
                     // ThreadAbortException is triggered when we shutdown ignore the error log
