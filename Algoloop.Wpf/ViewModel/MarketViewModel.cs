@@ -48,7 +48,7 @@ namespace Algoloop.Wpf.ViewModel
         private readonly SettingModel _settings;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
-        private Isolated<ProviderFactory> _factory;
+        private ProviderFactory _factory;
         private SymbolViewModel _selectedSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private bool _checkAll;
@@ -238,12 +238,11 @@ namespace Algoloop.Wpf.ViewModel
                 using var logger = new HostDomainLogger();
                 try
                 {
-                    _factory = new Isolated<ProviderFactory>();
+                    _factory = new ProviderFactory();
                     _cancel = new CancellationTokenSource();
                     await Task
-                        .Run(() => market = _factory.Value.Download(market, _settings, logger), _cancel.Token)
+                        .Run(() => market = _factory.Download(market, _settings, logger), _cancel.Token)
                         .ConfigureAwait(false);
-                    _factory.Dispose();
                     _factory = null;
                 }
                 catch (AppDomainUnloadedException)
@@ -255,7 +254,6 @@ namespace Algoloop.Wpf.ViewModel
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
-                    _factory.Dispose();
                     _factory = null;
                     market.Active = false;
                 }
@@ -282,11 +280,6 @@ namespace Algoloop.Wpf.ViewModel
             if (_cancel != null)
             {
                 _cancel.Cancel();
-            }
-
-            if (_factory != null)
-            {
-                _factory.Dispose();
             }
         }
 
@@ -638,7 +631,6 @@ namespace Algoloop.Wpf.ViewModel
                 if (disposing)
                 {
                     _cancel?.Dispose();
-                    _factory?.Dispose();
                 }
 
                 _isDisposed = true;

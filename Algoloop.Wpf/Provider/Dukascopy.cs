@@ -13,11 +13,15 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
+using Algoloop.Wpf.Common;
 using QuantConnect;
-using QuantConnect.Configuration;
+using QuantConnect.Logging;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 
 namespace Algoloop.Provider
@@ -52,9 +56,6 @@ namespace Algoloop.Provider
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            Config.Set("data-directory", settings.DataFolder);
-
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             if (symbols.Any())
             {
@@ -72,8 +73,43 @@ namespace Algoloop.Provider
                     fromDate = _firstDate;
                 }
 
+                DateTime toDate = fromDate.AddDays(1).AddTicks(-1);
+                string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+                string to = toDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+                string[] args = 
+                {
+                    "--app=DukascopyDownloader",
+                    $"--from-date={from}",
+                    $"--to-date={to}",
+                    $"--resolution={resolution}",
+                    $"--tickers={string.Join(",", symbols)}"
+                };
+
                 // Download active symbols
-                DukascopyDownloaderProgram.DukascopyDownloader(symbols, resolution, fromDate, fromDate.AddDays(1).AddTicks(-1));
+                using var process = new ConfigProcess(
+                    "QuantConnect.ToolBox.exe",
+                    string.Join(" ", args),
+                    settings.DataFolder,
+                    true,
+                    (line) => Log.Trace(line),
+                    (line) => Log.Error(line));
+
+                StringDictionary a = process.Environment;
+                // Set config file
+                IDictionary<string, string> config = process.Config;
+                string exeFolder = MainService.GetProgramFolder();
+                config["debug-mode"] = "true";
+                config["composer-dll-directory"] = exeFolder;
+                config["data-directory"] = settings.DataFolder;
+                config["data-folder"] = settings.DataFolder;
+                config["results-destination-folder"] = ".";
+                config["plugin-directory"] = ".";
+                config["log-handler"] = "CompositeLogHandler";
+                config["map-file-provider"] = "LocalDiskMapFileProvider";
+
+                // Start process
+                process.Start();
+                process.WaitForExit(10000);
                 market.LastDate = fromDate;
             }
             else

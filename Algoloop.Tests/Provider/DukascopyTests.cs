@@ -19,6 +19,7 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 
 namespace Algoloop.Tests.Provider
@@ -34,7 +35,7 @@ namespace Algoloop.Tests.Provider
         {
             _settings = new SettingModel
             {
-                DataFolder = "Data"
+                DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data")
             };
 
             _dut = new ProviderFactory();
@@ -83,6 +84,30 @@ namespace Algoloop.Tests.Provider
             Assert.IsTrue(result.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
+        }
+
+        [TestMethod()]
+        public void Download_two_symbols()
+        {
+            var key = ConfigurationManager.AppSettings["dukascopy"];
+            DateTime date = new DateTime(2019, 05, 01);
+            var market = new MarketModel
+            {
+                Name = "Dukascopy",
+                Provider = "dukascopy",
+                LastDate = date,
+                Resolution = Resolution.Daily,
+                ApiKey = key
+            };
+            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
+
+            // Dwonload symbol and update list
+            MarketModel result = _dut.Download(market, _settings, Log.LogHandler);
+            Assert.IsFalse(result.Active);
+            Assert.IsTrue(result.LastDate > date);
+            Assert.AreEqual(78, market.Symbols.Count);
+            Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
         }
     }
 }

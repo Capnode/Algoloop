@@ -35,9 +35,7 @@ namespace Algoloop.Provider
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
             Log.LogHandler = logger;
-            Config.Set("data-directory", settings.DataFolder);
-            Config.Set("data-folder", settings.DataFolder);
-            Config.Set("cache-location", settings.DataFolder);
+            Config.Set("map-file-provider", "LocalDiskMapFileProvider");
 
             using (var writer = new StreamLogger(logger))
             {

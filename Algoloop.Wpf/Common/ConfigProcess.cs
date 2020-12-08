@@ -25,11 +25,14 @@ namespace Algoloop.Wpf.Common
     public class ConfigProcess: IDisposable
     {
         private const int CTRL_C_EVENT = 0;
+        private const int _maxIndex = 65536;
         private const string _configfile = "config.json";
         private readonly string _workFolder;
+        private readonly bool _cleanup;
         private readonly Process _process;
         private readonly IDictionary<string, string> _config = new Dictionary<string, string>();
         private bool _isDisposed;
+        private static object _lock = new object();
 
         [DllImport("kernel32.dll")]
         internal static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
@@ -42,23 +45,29 @@ namespace Algoloop.Wpf.Common
         // Delegate type to be used as the Handler Routine for SCCH
         delegate Boolean ConsoleCtrlDelegate(uint CtrlType);
 
-        public ConfigProcess(string filename, string arguments, string workFolder, Action<string> output, Action<string> error)
+        public ConfigProcess(
+            string filename,
+            string arguments,
+            string workFolder,
+            bool cleanup,
+            Action<string> output,
+            Action<string> error)
         {
-            _workFolder = workFolder;
             _process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = filename,
                     Arguments = arguments,
-                    WorkingDirectory = workFolder,
                     UseShellExecute = false,
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
                 }
             };
+            _workFolder = workFolder;
+            _cleanup = cleanup;
             _process.OutputDataReceived += (sender, args) => output(args.Data);
             _process.ErrorDataReceived += (sender, args) => error(args.Data);
         }
@@ -68,18 +77,43 @@ namespace Algoloop.Wpf.Common
 
         public void Start()
         {
+            // Set working folder
+            string workFolder = CreateWorkFolder();
+            _process.StartInfo.WorkingDirectory = workFolder;
+
             // Save config file
-            Directory.CreateDirectory(_workFolder);
-            using StreamWriter file = File.CreateText(Path.Combine(_workFolder, _configfile));
-            JsonSerializer serializer = new JsonSerializer
-            {
-                Formatting = Formatting.Indented
-            };
+            using StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile));
+            JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Serialize(file, Config);
 
             _process.Start();
+            _process.PriorityClass = ProcessPriorityClass.BelowNormal;
             _process.BeginOutputReadLine();
             _process.BeginErrorReadLine();
+        }
+
+        private string CreateWorkFolder()
+        {
+            if (_cleanup)
+            {
+                lock (_lock)
+                {
+                    for (int index = 0; index < _maxIndex; index++)
+                    {
+                        string folder = Path.Combine(_workFolder, $"tmp{index}");
+                        if (Directory.Exists(folder)) continue;
+                        Directory.CreateDirectory(folder);
+                        return folder;
+                    }
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(_workFolder);
+                return _workFolder;
+            }
+
+            throw new IOException("Can not create more temporary folders");
         }
 
         public bool Stop()
@@ -122,6 +156,17 @@ namespace Algoloop.Wpf.Common
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public bool WaitForExit(int timeout = int.MaxValue)
+        {
+            if (!_process.WaitForExit(timeout)) return false;
+            if (_cleanup)
+            {
+                string path = _process.StartInfo.WorkingDirectory;
+                Directory.Delete(path, true);
+            }
+            return true;
         }
     }
 }

@@ -113,6 +113,7 @@ namespace Algoloop.Wpf.ViewModel
                 "jupyter.exe",
                 $"notebook --no-browser",
                 _settings.Notebook,
+                false,
                 (line) => Log.Trace(line),
                 (line) =>
                     {
