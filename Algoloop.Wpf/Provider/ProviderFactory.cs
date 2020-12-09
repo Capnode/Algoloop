@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Common;
 using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Configuration;
@@ -28,41 +27,35 @@ namespace Algoloop.Provider
 {
     public static class ProviderFactory
     {
-        public static MarketModel Download(MarketModel market, SettingModel settings, ILogHandler logger)
+        public static MarketModel Download(MarketModel market, SettingModel settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            Log.LogHandler = logger;
             Config.Set("map-file-provider", "LocalDiskMapFileProvider");
 
-            using (var writer = new StreamLogger(logger))
+            IProvider provider = CreateProvider(settings, market.Provider);
+            if (provider == null)
             {
-                Console.SetOut(writer);
-                IProvider provider = CreateProvider(settings, market.Provider);
-                if (provider == null)
+                market.Active = false;
+            }
+            else
+            {
+                try
                 {
-                    market.Active = false;
+                    provider.Download(market, settings);
                 }
-                else
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        provider.Download(market, settings);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(string.Format(
-                            CultureInfo.InvariantCulture,
-                            "{0}: {1}",
-                            ex.GetType(),
-                            ex.Message));
-                        market.Active = false;
-                    }
+                    Log.Error(string.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}: {1}",
+                        ex.GetType(),
+                        ex.Message));
+                    market.Active = false;
                 }
             }
 
-            Log.LogHandler.Dispose();
             return market;
         }
 

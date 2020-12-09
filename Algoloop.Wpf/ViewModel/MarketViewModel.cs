@@ -233,12 +233,11 @@ namespace Algoloop.Wpf.ViewModel
             while (!_cancel.Token.IsCancellationRequested && market.Active)
             {
                 Log.Trace($"{market.Provider} download {market.Resolution} {market.LastDate:d}");
-                using var logger = new HostDomainLogger();
                 try
                 {
                     _cancel = new CancellationTokenSource();
                     await Task
-                        .Run(() => market = ProviderFactory.Download(market, _settings, logger), _cancel.Token)
+                        .Run(() => market = ProviderFactory.Download(market, _settings), _cancel.Token)
                         .ConfigureAwait(false);
                 }
                 catch (AppDomainUnloadedException)
@@ -250,11 +249,6 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
                     market.Active = false;
-                }
-
-                if (logger.IsError)
-                {
-                    Log.Trace($"{Model.Provider} download failed");
                 }
 
                 // Update view
