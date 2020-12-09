@@ -252,9 +252,12 @@ namespace Algoloop.Wpf.ViewModel
                 }
 
                 // Update view
-                Model = null;
-                Model = market;
-                UiThread(() => DataFromModel());
+                UiThread(() => 
+                {
+                    Model = null;
+                    Model = market;
+                    DataFromModel();
+                });
             }
 
             _cancel = null;
