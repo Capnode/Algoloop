@@ -28,7 +28,6 @@ namespace Algoloop.Tests.Provider
     public class DukascopyTests
     {
         private SettingModel _settings;
-        private ProviderFactory _dut;
 
         [TestInitialize()]
         public void Initialize()
@@ -37,8 +36,6 @@ namespace Algoloop.Tests.Provider
             {
                 DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data")
             };
-
-            _dut = new ProviderFactory();
         }
 
         [TestMethod()]
@@ -56,7 +53,7 @@ namespace Algoloop.Tests.Provider
             };
 
             // Just update symbol list
-            MarketModel result = _dut.Download(market, _settings, Log.LogHandler);
+            MarketModel result = ProviderFactory.Download(market, _settings, Log.LogHandler);
             Assert.IsFalse(result.Active);
             Assert.IsTrue(result.LastDate == date);
             Assert.AreEqual(78, market.Symbols.Count);
@@ -79,7 +76,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            MarketModel result = _dut.Download(market, _settings, Log.LogHandler);
+            MarketModel result = ProviderFactory.Download(market, _settings, Log.LogHandler);
             Assert.IsFalse(result.Active);
             Assert.IsTrue(result.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
@@ -103,7 +100,31 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            MarketModel result = _dut.Download(market, _settings, Log.LogHandler);
+            MarketModel result = ProviderFactory.Download(market, _settings, Log.LogHandler);
+            Assert.IsFalse(result.Active);
+            Assert.IsTrue(result.LastDate > date);
+            Assert.AreEqual(78, market.Symbols.Count);
+            Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
+        }
+
+        [TestMethod()]
+        public void Download_two_symbols_tick()
+        {
+            var key = ConfigurationManager.AppSettings["dukascopy"];
+            DateTime date = new DateTime(2019, 05, 01);
+            var market = new MarketModel
+            {
+                Name = "Dukascopy",
+                Provider = "dukascopy",
+                LastDate = date,
+                Resolution = Resolution.Tick,
+                ApiKey = key
+            };
+            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
+
+            // Dwonload symbol and update list
+            MarketModel result = ProviderFactory.Download(market, _settings, Log.LogHandler);
             Assert.IsFalse(result.Active);
             Assert.IsTrue(result.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);

@@ -26,10 +26,9 @@ using System.Linq;
 
 namespace Algoloop.Provider
 {
-    public class ProviderFactory : MarshalByRefObject
+    public static class ProviderFactory
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
-        public MarketModel Download(MarketModel market, SettingModel settings, ILogHandler logger)
+        public static MarketModel Download(MarketModel market, SettingModel settings, ILogHandler logger)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -65,12 +64,6 @@ namespace Algoloop.Provider
 
             Log.LogHandler.Dispose();
             return market;
-        }
-
-        public override object InitializeLifetimeService()
-        {
-            // No lifetime timeout
-            return null;
         }
 
         public static void RegisterProviders(SettingModel settings)

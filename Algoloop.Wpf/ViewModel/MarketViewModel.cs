@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Common;
 using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Wpf.Properties;
@@ -48,7 +47,6 @@ namespace Algoloop.Wpf.ViewModel
         private readonly SettingModel _settings;
         private CancellationTokenSource _cancel;
         private MarketModel _model;
-        private ProviderFactory _factory;
         private SymbolViewModel _selectedSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private bool _checkAll;
@@ -238,23 +236,19 @@ namespace Algoloop.Wpf.ViewModel
                 using var logger = new HostDomainLogger();
                 try
                 {
-                    _factory = new ProviderFactory();
                     _cancel = new CancellationTokenSource();
                     await Task
-                        .Run(() => market = _factory.Download(market, _settings, logger), _cancel.Token)
+                        .Run(() => market = ProviderFactory.Download(market, _settings, logger), _cancel.Token)
                         .ConfigureAwait(false);
-                    _factory = null;
                 }
                 catch (AppDomainUnloadedException)
                 {
                     Log.Trace($"Market {market.Name} canceled by user");
-                    _factory = null;
                     market.Active = false;
                 }
                 catch (Exception ex)
                 {
                     Log.Trace($"{ex.GetType()}: {ex.Message}");
-                    _factory = null;
                     market.Active = false;
                 }
 
