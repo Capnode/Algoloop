@@ -45,6 +45,7 @@ namespace Algoloop.Tests.Provider
             DateTime date = new DateTime(2019, 05, 01);
             var market = new MarketModel
             {
+                Active = true,
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
@@ -67,6 +68,7 @@ namespace Algoloop.Tests.Provider
             DateTime date = new DateTime(2019, 05, 01);
             var market = new MarketModel
             {
+                Active = true,
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
@@ -77,7 +79,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsFalse(result.Active);
+            Assert.IsTrue(result.Active);
             Assert.IsTrue(result.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
@@ -90,6 +92,7 @@ namespace Algoloop.Tests.Provider
             DateTime date = new DateTime(2019, 05, 01);
             var market = new MarketModel
             {
+                Active = true,
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
@@ -101,7 +104,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsFalse(result.Active);
+            Assert.IsTrue(result.Active);
             Assert.IsTrue(result.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
@@ -114,6 +117,7 @@ namespace Algoloop.Tests.Provider
             DateTime date = new DateTime(2019, 05, 01);
             var market = new MarketModel
             {
+                Active = true,
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
@@ -125,10 +129,34 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsFalse(result.Active);
+            Assert.IsTrue(result.Active);
             Assert.IsTrue(result.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
+        }
+
+        [TestMethod()]
+        public void Download_invalid_symbol()
+        {
+            var key = ConfigurationManager.AppSettings["dukascopy"];
+            DateTime date = new DateTime(2019, 05, 01);
+            var market = new MarketModel
+            {
+                Active = true,
+                Name = "Dukascopy",
+                Provider = "dukascopy",
+                LastDate = date,
+                Resolution = Resolution.Daily,
+                ApiKey = key
+            };
+            market.Symbols.Add(new SymbolModel("noname", "Dukascopy", SecurityType.Forex));
+
+            // Dwonload symbol and update list
+            MarketModel result = ProviderFactory.Download(market, _settings);
+            Assert.IsFalse(result.Active);
+            Assert.IsTrue(result.LastDate > date);
+            Assert.AreEqual(79, market.Symbols.Count);
+            Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
     }
 }

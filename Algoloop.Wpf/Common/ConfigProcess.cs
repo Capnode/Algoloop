@@ -13,6 +13,7 @@
  */
 
 using Newtonsoft.Json;
+using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -68,8 +69,20 @@ namespace Algoloop.Wpf.Common
             };
             _workFolder = workFolder;
             _cleanup = cleanup;
-            _process.OutputDataReceived += (sender, args) => output(args.Data);
-            _process.ErrorDataReceived += (sender, args) => error(args.Data);
+            _process.OutputDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                {
+                    output(args.Data);
+                }
+            };
+            _process.ErrorDataReceived += (sender, args) =>
+            {
+                if (args.Data != null)
+                {
+                    error(args.Data);
+                }
+            };
         }
 
         public StringDictionary Environment => _process.StartInfo.EnvironmentVariables;
@@ -100,7 +113,7 @@ namespace Algoloop.Wpf.Common
                 {
                     for (int index = 0; index < _maxIndex; index++)
                     {
-                        string folder = Path.Combine(_workFolder, $"tmp{index}");
+                        string folder = Path.Combine(_workFolder, $"process{index}");
                         if (Directory.Exists(folder)) continue;
                         Directory.CreateDirectory(folder);
                         return folder;
@@ -160,13 +173,20 @@ namespace Algoloop.Wpf.Common
 
         public bool WaitForExit(int timeout = int.MaxValue)
         {
-            if (!_process.WaitForExit(timeout)) return false;
-            if (_cleanup)
+            if (_process.WaitForExit(timeout))
             {
-                string path = _process.StartInfo.WorkingDirectory;
-                Directory.Delete(path, true);
+                if (_cleanup)
+                {
+                    string path = _process.StartInfo.WorkingDirectory;
+                    Directory.Delete(path, true);
+                }
+                return true;
             }
-            return true;
+            else
+            {
+                Log.Error("Can not stop process");
+                return false;
+            }
         }
     }
 }
