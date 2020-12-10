@@ -434,6 +434,7 @@
       <Link>Data\UserData\Notebook\KitchenSinkQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Doc\appendix.md" />
     <None Include="packages.config" />
     <None Include="Resources\AlgoloopIcon.ico" />
     <None Include="Resources\Algoloop.png" />

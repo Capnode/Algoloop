@@ -116,6 +116,9 @@ namespace Algoloop.Provider
             config["plugin-directory"] = ".";
             config["log-handler"] = "CompositeLogHandler";
             config["map-file-provider"] = "LocalDiskMapFileProvider";
+            config["#command"] = "QuantConnect.ToolBox.exe";
+            config["#parameters"] = string.Join(" ", args);
+            config["#work-directory"] = Directory.GetCurrentDirectory();
 
             // Start process
             process.Start();
