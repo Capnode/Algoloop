@@ -232,7 +232,7 @@ namespace Algoloop.Wpf.ViewModel
             _cancel = new CancellationTokenSource();
             while (!_cancel.Token.IsCancellationRequested && market.Active)
             {
-                Log.Trace($"{market.Provider} download {market.Resolution} {market.LastDate:d}");
+                Log.Trace($"{market.Provider} download after {market.Resolution} {market.LastDate:d}");
                 try
                 {
                     _cancel = new CancellationTokenSource();

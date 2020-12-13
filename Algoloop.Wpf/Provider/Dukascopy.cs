@@ -125,9 +125,9 @@ namespace Algoloop.Provider
             if (!process.WaitForExit())
             {
                 market.Active = false;
-                return;
             }
 
+            if (!market.Active) return;
             market.LastDate = fromDate;
             UpdateSymbols(market);
         }
