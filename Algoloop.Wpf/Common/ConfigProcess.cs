@@ -100,7 +100,7 @@ namespace Algoloop.Wpf.Common
             serializer.Serialize(file, Config);
 
             _process.Start();
-            _process.PriorityClass = ProcessPriorityClass.Normal;
+            _process.PriorityClass = ProcessPriorityClass.BelowNormal;
             _process.BeginOutputReadLine();
             _process.BeginErrorReadLine();
         }

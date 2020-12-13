@@ -439,26 +439,33 @@ namespace QuantConnect.ToolBox
         {
             var rows = new SortedDictionary<DateTime, string>();
 
-            using (var zip = ZipFile.Read(fileName))
+            try
             {
-                using (var stream = new MemoryStream())
+                using (var zip = ZipFile.Read(fileName))
                 {
-                    zip[0].Extract(stream);
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    using (var reader = new StreamReader(stream))
+                    using (var stream = new MemoryStream())
                     {
-                        string line;
-                        while ((line = reader.ReadLine()) != null)
+                        zip[0].Extract(stream);
+                        stream.Seek(0, SeekOrigin.Begin);
+
+                        using (var reader = new StreamReader(stream))
                         {
-                            var time = Parse.DateTimeExact(line.Substring(0, DateFormat.TwelveCharacter.Length), DateFormat.TwelveCharacter);
-                            rows[time] = line;
+                            string line;
+                            while ((line = reader.ReadLine()) != null)
+                            {
+                                var time = Parse.DateTimeExact(line.Substring(0, DateFormat.TwelveCharacter.Length), DateFormat.TwelveCharacter);
+                                rows[time] = line;
+                            }
                         }
                     }
                 }
-            }
 
-            return rows;
+                return rows;
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException(fileName, ex);
+            }
         }
 
         /// <summary>

@@ -160,28 +160,37 @@ namespace QuantConnect.ToolBox.DukascopyDownloader
 
                 using (var client = new WebClient())
                 {
-                    byte[] bytes;
-                    try
+                    while (true)
                     {
-                        bytes = client.DownloadData(url);
-                    }
-                    catch (WebException exception)
-                    {
-                        Log.Trace($"{exception.Message}: {dukascopySymbol} {date:d}");
-                        yield break;
-                    }
-                    catch (Exception exception)
-                    {
-                        Log.Error(exception);
-                        yield break;
-                    }
-                    if (bytes != null && bytes.Length > 0)
-                    {
-                        var ticks = AppendTicksToList(symbol, bytes, date, timeOffset, pointValue);
-                        foreach (var tick in ticks)
+                        byte[] bytes = null;
+                        try
                         {
-                            yield return tick;
+                            bytes = client.DownloadData(url);
                         }
+                        catch (Exception exception)
+                        {
+                            var webEx = exception as WebException;
+                            if (webEx != null)
+                            {
+                                var response = (HttpWebResponse)webEx.Response;
+                                if (response.StatusCode == HttpStatusCode.ServiceUnavailable)
+                                {
+                                    Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
+                                    continue;
+                                }
+                            }
+                            Log.Error(exception, url);
+                            yield break;
+                        }
+                        if (bytes != null && bytes.Length > 0)
+                        {
+                            var ticks = AppendTicksToList(symbol, bytes, date, timeOffset, pointValue);
+                            foreach (var tick in ticks)
+                            {
+                                yield return tick;
+                            }
+                        }
+                        break;
                     }
                 }
             }

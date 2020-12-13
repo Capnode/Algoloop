@@ -92,6 +92,7 @@ namespace Algoloop.Provider
             };
 
             // Download active symbols
+            bool error = false;
             using var process = new ConfigProcess(
                 "QuantConnect.ToolBox.exe",
                 string.Join(" ", args),
@@ -100,7 +101,7 @@ namespace Algoloop.Provider
                 (line) => Log.Trace(line),
                 (line) =>
                 {
-                    market.Active = false;
+                    error = true;
                     Log.Error(line);
                 });
 
@@ -124,10 +125,16 @@ namespace Algoloop.Provider
             process.Start();
             if (!process.WaitForExit())
             {
-                market.Active = false;
+                Log.Error("Unexpected process stop");
+                error = true;
             }
 
-            if (!market.Active) return;
+            if (error)
+            {
+                market.Active = false;
+                return;
+            }
+
             market.LastDate = fromDate;
             UpdateSymbols(market);
         }

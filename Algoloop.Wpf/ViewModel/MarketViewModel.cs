@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Wpf.Properties;
 using Algoloop.Provider;
@@ -32,7 +31,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -40,12 +38,10 @@ using System.Diagnostics.Contracts;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class MarketViewModel : ViewModel, ITreeViewModel, IDisposable
+    public class MarketViewModel : ViewModel, ITreeViewModel
     {
-        private bool _isDisposed = false; // To detect redundant calls
         private readonly MarketsViewModel _parent;
         private readonly SettingModel _settings;
-        private CancellationTokenSource _cancel;
         private MarketModel _model;
         private SymbolViewModel _selectedSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
@@ -229,25 +225,17 @@ namespace Algoloop.Wpf.ViewModel
         {
             DataToModel();
             MarketModel market = Model;
-            _cancel = new CancellationTokenSource();
-            while (!_cancel.Token.IsCancellationRequested && market.Active)
+            while (market.Active)
             {
-                Log.Trace($"{market.Provider} download after {market.Resolution} {market.LastDate:d}");
+                Log.Trace($"{market.Provider} download {market.Resolution} after {market.LastDate:d}");
                 try
                 {
-                    _cancel = new CancellationTokenSource();
-                    await Task
-                        .Run(() => market = ProviderFactory.Download(market, _settings), _cancel.Token)
+                    await Task.Run(() => market = ProviderFactory.Download(market, _settings))
                         .ConfigureAwait(false);
-                }
-                catch (AppDomainUnloadedException)
-                {
-                    Log.Trace($"Market {market.Name} canceled by user");
-                    market.Active = false;
                 }
                 catch (Exception ex)
                 {
-                    Log.Trace($"{ex.GetType()}: {ex.Message}");
+                    Log.Error(ex);
                     market.Active = false;
                 }
 
@@ -260,18 +248,9 @@ namespace Algoloop.Wpf.ViewModel
                 });
             }
 
-            _cancel = null;
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             Messenger.Default.Send(new NotificationMessage(
                 symbols.Any() ? Resources.DownloadComplete : Resources.NoSymbolSelected));
-        }
-
-        private void StopTask()
-        {
-            if (_cancel != null)
-            {
-                _cancel.Cancel();
-            }
         }
 
         private async void DoActiveCommand(bool value)
@@ -280,10 +259,6 @@ namespace Algoloop.Wpf.ViewModel
             if (value)
             {
                 await DownloadAsync().ConfigureAwait(false);
-            }
-            else
-            {
-                StopTask();
             }
         }
 
@@ -299,7 +274,6 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
-                StopTask();
                 Active = false;
             }
             finally
@@ -607,25 +581,6 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             Log.Error($"DB upgrade symbol {symbol} failed!");
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    _cancel?.Dispose();
-                }
-
-                _isDisposed = true;
-            }
         }
     }
 }

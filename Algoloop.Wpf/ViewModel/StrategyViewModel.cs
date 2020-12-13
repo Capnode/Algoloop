@@ -849,7 +849,7 @@ namespace Algoloop.Wpf.ViewModel
             Lists.Add(listVm);
             foreach (MarketModel market in _markets.Markets)
             {
-                using var marketVm = new MarketViewModel(marketsVm, market, _settings);
+                var marketVm = new MarketViewModel(marketsVm, market, _settings);
                 foreach (ListModel list in market.Lists)
                 {
                     listVm = new ListViewModel(marketVm, list);
