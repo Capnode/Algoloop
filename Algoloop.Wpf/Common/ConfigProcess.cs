@@ -26,6 +26,7 @@ namespace Algoloop.Wpf.Common
     public class ConfigProcess: IDisposable
     {
         private const int CTRL_C_EVENT = 0;
+        private const int _timeout = 60000;
         private const int _maxIndex = 65536;
         private const string _configfile = "config.json";
         private readonly string _workFolder;
@@ -138,14 +139,13 @@ namespace Algoloop.Wpf.Common
                 try
                 {
                     if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return false;
-                    _process.WaitForExit();
+                    return WaitForExit(_timeout);
                 }
                 finally
                 {
                     FreeConsole();
                     SetConsoleCtrlHandler(null, false);
                 }
-                _process.WaitForExit();
             }
 
             return _process.HasExited;

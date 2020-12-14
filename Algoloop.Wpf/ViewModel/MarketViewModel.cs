@@ -260,6 +260,10 @@ namespace Algoloop.Wpf.ViewModel
             {
                 await DownloadAsync().ConfigureAwait(false);
             }
+            else
+            {
+
+            }
         }
 
         private async void DoStartCommand()

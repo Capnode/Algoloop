@@ -87,7 +87,6 @@ namespace Algoloop.Wpf.ViewModel
                 _process.Dispose();
             }
 
-            StopJupyter();
             _disposed = true;
         }
 

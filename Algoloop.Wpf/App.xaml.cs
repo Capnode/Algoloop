@@ -84,6 +84,7 @@ namespace Algoloop
             // Enable sleep mode
             _ = SetThreadExecutionState(_esContinous);
 
+            ViewModelLocator.ResearchViewModel.StopJupyter();
             ViewModelLocator.MainViewModel.SaveConfig();
             Algoloop.Wpf.Properties.Settings.Default.Save();
 
