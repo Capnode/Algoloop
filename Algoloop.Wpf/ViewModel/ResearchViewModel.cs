@@ -157,7 +157,7 @@ namespace Algoloop.Wpf.ViewModel
         {
             if (!Initialized) return;
 
-            bool stopped = _process.Stop();
+            bool stopped = _process.Abort();
             Log.Trace($"Jupyter process exit: {stopped}");
         }
 

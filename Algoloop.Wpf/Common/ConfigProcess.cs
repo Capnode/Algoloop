@@ -35,6 +35,7 @@ namespace Algoloop.Wpf.Common
         private readonly IDictionary<string, string> _config = new Dictionary<string, string>();
         private bool _isDisposed;
         private static object _lock = new object();
+        private bool _abort;
 
         [DllImport("kernel32.dll")]
         internal static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
@@ -130,16 +131,25 @@ namespace Algoloop.Wpf.Common
             throw new IOException("Can not create more temporary folders");
         }
 
-        public bool Stop()
+        public bool Abort()
         {
-            // Send Ctrl-C to Jupyter console
+            // Send Ctrl-C
             if (AttachConsole((uint)_process.Id))
             {
+                _abort = true;
                 SetConsoleCtrlHandler(null, true);
                 try
                 {
                     if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return false;
-                    return WaitForExit(_timeout);
+                    if (_process.WaitForExit(_timeout))
+                    {
+                        if (_cleanup)
+                        {
+                            string path = _process.StartInfo.WorkingDirectory;
+                            Directory.Delete(path, true);
+                        }
+                        return true;
+                    }
                 }
                 finally
                 {
@@ -149,19 +159,6 @@ namespace Algoloop.Wpf.Common
             }
 
             return _process.HasExited;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    _process.Dispose();
-                }
-
-                _isDisposed = true;
-            }
         }
 
         public void Dispose()
@@ -175,6 +172,11 @@ namespace Algoloop.Wpf.Common
         {
             if (_process.WaitForExit(timeout))
             {
+                if (_abort)
+                {
+                    return false; // Cleanup done
+                }
+
                 if (_cleanup)
                 {
                     string path = _process.StartInfo.WorkingDirectory;
@@ -186,6 +188,19 @@ namespace Algoloop.Wpf.Common
             {
                 Log.Error("Can not stop process");
                 return false;
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _process.Dispose();
+                }
+
+                _isDisposed = true;
             }
         }
     }

@@ -36,5 +36,9 @@ namespace Algoloop.Provider
             string apiKey = ""; // TODO:
             QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(model.LastDate, apiKey);
         }
+
+        public void Abort()
+        {
+        }
     }
 }

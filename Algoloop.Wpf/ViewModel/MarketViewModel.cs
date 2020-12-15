@@ -47,6 +47,7 @@ namespace Algoloop.Wpf.ViewModel
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private bool _checkAll;
         private IList _selectedItems;
+        private IProvider _provider;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingModel settings)
         {
@@ -230,7 +231,9 @@ namespace Algoloop.Wpf.ViewModel
                 Log.Trace($"{market.Provider} download {market.Resolution} after {market.LastDate:d}");
                 try
                 {
-                    await Task.Run(() => market = ProviderFactory.Download(market, _settings))
+                    _provider = ProviderFactory.CreateProvider(market, _settings);
+                    if (_provider == null) throw new ApplicationException($"Can not create provider {market.Provider}");
+                    await Task.Run(() => _provider.Download(market, _settings))
                         .ConfigureAwait(false);
                 }
                 catch (Exception ex)
@@ -238,6 +241,7 @@ namespace Algoloop.Wpf.ViewModel
                     Log.Error(ex);
                     market.Active = false;
                 }
+                _provider = null;
 
                 // Update view
                 UiThread(() => 
@@ -262,7 +266,7 @@ namespace Algoloop.Wpf.ViewModel
             }
             else
             {
-
+                _provider?.Abort();
             }
         }
 

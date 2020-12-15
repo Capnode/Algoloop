@@ -27,7 +27,7 @@ using System.Linq;
 
 namespace Algoloop.Provider
 {
-    public class Dukascopy : IProvider
+    public class Dukascopy : IProvider, IDisposable
     {
         private const string _market = "dukascopy";
         private readonly DateTime _firstDate = new DateTime(2003, 05, 05);
@@ -47,6 +47,22 @@ namespace Algoloop.Provider
             "AU200AUD", "CH20CHF", "DE30EUR", "ES35EUR", "EU50EUR", "FR40EUR", "UK100GBP", "HK33HKD", "IT40EUR", "JP225JPY",
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
+        private ConfigProcess _process;
+        private bool _isDisposed;
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~Dukascopy()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
 
         public void Register(SettingModel settings)
         {
@@ -93,7 +109,7 @@ namespace Algoloop.Provider
 
             // Download active symbols
             bool error = false;
-            using var process = new ConfigProcess(
+            _process = new ConfigProcess(
                 "QuantConnect.ToolBox.exe",
                 string.Join(" ", args),
                 Directory.GetCurrentDirectory(),
@@ -105,9 +121,9 @@ namespace Algoloop.Provider
                     Log.Error(line);
                 });
 
-            StringDictionary a = process.Environment;
+            StringDictionary a = _process.Environment;
             // Set config file
-            IDictionary<string, string> config = process.Config;
+            IDictionary<string, string> config = _process.Config;
             string exeFolder = MainService.GetProgramFolder();
             config["debug-mode"] = "true";
             config["composer-dll-directory"] = exeFolder;
@@ -122,12 +138,13 @@ namespace Algoloop.Provider
             config["#work-directory"] = Directory.GetCurrentDirectory();
 
             // Start process
-            process.Start();
-            if (!process.WaitForExit())
+            _process.Start();
+            if (!_process.WaitForExit())
             {
-                Log.Error("Unexpected process stop");
                 error = true;
             }
+            _process.Dispose();
+            _process = null;
 
             if (error)
             {
@@ -137,6 +154,27 @@ namespace Algoloop.Provider
 
             market.LastDate = fromDate;
             UpdateSymbols(market);
+        }
+
+        public void Abort()
+        {
+            _process?.Abort();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    _process?.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _isDisposed = true;
+            }
         }
 
         private void UpdateSymbols(MarketModel market)

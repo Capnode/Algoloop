@@ -14,49 +14,33 @@
 
 using Algoloop.Model;
 using QuantConnect;
-using QuantConnect.Configuration;
-using QuantConnect.Logging;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.Linq;
 
 namespace Algoloop.Provider
 {
     public static class ProviderFactory
     {
-        public static MarketModel Download(MarketModel market, SettingModel settings)
+        public static IProvider CreateProvider(MarketModel market, SettingModel settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            Config.Set("map-file-provider", "LocalDiskMapFileProvider");
+            string name = market.Provider;
+            Type type = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(s => s.GetTypes())
+                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
+                .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ??
+                throw new ApplicationException($"Provider {name} not found");
 
-            IProvider provider = CreateProvider(settings, market.Provider);
-            if (provider == null)
-            {
-                market.Active = false;
-            }
-            else
-            {
-                try
-                {
-                    provider.Download(market, settings);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(string.Format(
-                        CultureInfo.InvariantCulture,
-                        "{0}: {1}",
-                        ex.GetType(),
-                        ex.Message));
-                    market.Active = false;
-                }
-            }
+            IProvider provider = (IProvider)Activator.CreateInstance(type) ??
+                throw new ApplicationException($"Can not create provider {name}");
 
-            return market;
+            if (!RegisterProvider(settings, provider)) return null;
+            return provider;
         }
 
         public static void RegisterProviders(SettingModel settings)
@@ -72,21 +56,6 @@ namespace Algoloop.Provider
                     throw new ApplicationException($"Can not create provider {type.Name}");
                 RegisterProvider(settings, provider);
             }
-        }
-
-        private static IProvider CreateProvider(SettingModel settings, string name)
-        {
-            Type type = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
-                .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ??
-                throw new ApplicationException($"Provider {name} not found");
-
-            IProvider provider = (IProvider)Activator.CreateInstance(type) ??
-                throw new ApplicationException($"Can not create provider {name}");
-
-            if (!RegisterProvider(settings, provider)) return null;
-            return provider;
         }
 
         private static bool RegisterProvider(SettingModel settings, IProvider provider)

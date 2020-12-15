@@ -20,5 +20,7 @@ namespace Algoloop.Provider
     {
         void Register(SettingModel settings);
         void Download(MarketModel market, SettingModel settings);
+        void Abort();
+
     }
 }

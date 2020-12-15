@@ -25,5 +25,9 @@ namespace Algoloop.Provider
         public void Download(MarketModel model, SettingModel settings)
         {
         }
+
+        public void Abort()
+        {
+        }
     }
 }

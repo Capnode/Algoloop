@@ -158,5 +158,9 @@ namespace Algoloop.Provider
                 symbols.Remove(old);
             }
         }
+
+        public void Abort()
+        {
+        }
     }
 }

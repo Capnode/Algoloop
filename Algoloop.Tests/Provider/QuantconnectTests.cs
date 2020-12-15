@@ -48,9 +48,10 @@ namespace Algoloop.Tests.Provider
             };
 
             // Just update symbol list
-            MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsFalse(result.Active);
-            Assert.IsTrue(result.LastDate == date);
+            IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+            Assert.IsFalse(market.Active);
+            Assert.IsTrue(market.LastDate == date);
             Assert.IsTrue(market.Symbols.Count > 42);
             Assert.AreEqual(market.Symbols.Count, market.Symbols.Where(m => m.Active).Count());
         }
@@ -71,9 +72,10 @@ namespace Algoloop.Tests.Provider
             });
 
             // Dwonload symbol and update list
-            MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsFalse(result.Active);
-            Assert.IsTrue(result.LastDate > date);
+            IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+            Assert.IsFalse(market.Active);
+            Assert.IsTrue(market.LastDate > date);
             Assert.IsTrue(market.Symbols.Count > 42);
             Assert.AreEqual(market.Symbols.Count - 1, market.Symbols.Where(m => m.Active).Count());
         }

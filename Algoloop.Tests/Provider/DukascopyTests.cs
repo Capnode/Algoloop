@@ -54,9 +54,10 @@ namespace Algoloop.Tests.Provider
             };
 
             // Just update symbol list
-            MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsFalse(result.Active);
-            Assert.IsTrue(result.LastDate == date);
+            IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+            Assert.IsFalse(market.Active);
+            Assert.IsTrue(market.LastDate == date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(0, market.Symbols.Where(m => m.Active).Count());
         }
@@ -78,9 +79,9 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsTrue(result.Active);
-            Assert.IsTrue(result.LastDate > date);
+            IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+            Assert.IsTrue(market.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
@@ -103,9 +104,10 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsTrue(result.Active);
-            Assert.IsTrue(result.LastDate > date);
+            IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+            Assert.IsTrue(market.Active);
+            Assert.IsTrue(market.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
         }
@@ -128,9 +130,10 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsTrue(result.Active);
-            Assert.IsTrue(result.LastDate > date);
+            IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+            Assert.IsTrue(market.Active);
+            Assert.IsTrue(market.LastDate > date);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
         }
@@ -152,10 +155,11 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("noname", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            MarketModel result = ProviderFactory.Download(market, _settings);
-            Assert.IsFalse(result.Active);
-            Assert.IsTrue(result.LastDate > date);
-            Assert.AreEqual(79, market.Symbols.Count);
+            IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+            Assert.IsFalse(market.Active);
+            Assert.AreEqual(market.LastDate, date);
+            Assert.AreEqual(1, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
     }

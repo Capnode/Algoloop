@@ -60,5 +60,9 @@ namespace Algoloop.Provider
 
             model.Active = model.LastDate < DateTime.Today;
         }
+
+        public void Abort()
+        {
+        }
     }
 }

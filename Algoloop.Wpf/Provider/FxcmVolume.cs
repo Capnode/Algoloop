@@ -52,5 +52,9 @@ namespace Algoloop.Provider
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.LastDate, model.LastDate);
         }
+
+        public void Abort()
+        {
+        }
     }
 }
