@@ -27,7 +27,7 @@ using System.Linq;
 
 namespace Algoloop.Provider
 {
-    public class Dukascopy : IProvider, IDisposable
+    public class Dukascopy : IProvider
     {
         private const string _market = "dukascopy";
         private readonly DateTime _firstDate = new DateTime(2003, 05, 05);
@@ -50,18 +50,26 @@ namespace Algoloop.Provider
         private ConfigProcess _process;
         private bool _isDisposed;
 
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~Dukascopy()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+                _process?.Dispose();
+            }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            _process = null;
+            _isDisposed = true;
         }
 
         public void Register(SettingModel settings)
@@ -159,22 +167,6 @@ namespace Algoloop.Provider
         public void Abort()
         {
             _process?.Abort();
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                    _process?.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                _isDisposed = true;
-            }
         }
 
         private void UpdateSymbols(MarketModel market)

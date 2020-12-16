@@ -13,14 +13,14 @@
  */
 
 using Algoloop.Model;
+using System;
 
 namespace Algoloop.Provider
 {
-    public interface IProvider
+    public interface IProvider : IDisposable
     {
         void Register(SettingModel settings);
         void Download(MarketModel market, SettingModel settings);
         void Abort();
-
     }
 }

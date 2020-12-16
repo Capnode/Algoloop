@@ -24,6 +24,8 @@ namespace Algoloop.Provider
 {
     public class FxcmVolume : IProvider
     {
+        private bool _isDisposed;
+
         public void Register(SettingModel settings)
         {
         }
@@ -55,6 +57,28 @@ namespace Algoloop.Provider
 
         public void Abort()
         {
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _isDisposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
