@@ -173,8 +173,7 @@ namespace QuantConnect.ToolBox.DukascopyDownloader
                             if (webEx != null)
                             {
                                 var response = (HttpWebResponse)webEx.Response;
-                                if (response.StatusCode == HttpStatusCode.ServiceUnavailable
-                                    || response.StatusCode == HttpStatusCode.GatewayTimeout)
+                                if (response.StatusCode >= HttpStatusCode.InternalServerError)
                                 {
                                     Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
                                     continue;

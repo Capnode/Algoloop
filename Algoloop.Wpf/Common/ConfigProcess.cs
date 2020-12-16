@@ -143,11 +143,7 @@ namespace Algoloop.Wpf.Common
                     if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return false;
                     if (_process.WaitForExit(_timeout))
                     {
-                        if (_cleanup)
-                        {
-                            string path = _process.StartInfo.WorkingDirectory;
-                            Directory.Delete(path, true);
-                        }
+                        Cleanup();
                         return true;
                     }
                 }
@@ -172,16 +168,8 @@ namespace Algoloop.Wpf.Common
         {
             if (_process.WaitForExit(timeout))
             {
-                if (_abort)
-                {
-                    return false; // Cleanup done
-                }
-
-                if (_cleanup)
-                {
-                    string path = _process.StartInfo.WorkingDirectory;
-                    Directory.Delete(path, true);
-                }
+                if (_abort) return false; // Cleanup done
+                Cleanup();
                 return true;
             }
             else
@@ -201,6 +189,15 @@ namespace Algoloop.Wpf.Common
                 }
 
                 _isDisposed = true;
+            }
+        }
+
+        private void Cleanup()
+        {
+            if (_cleanup)
+            {
+                string path = _process.StartInfo.WorkingDirectory;
+                Directory.Delete(path, true);
             }
         }
     }
