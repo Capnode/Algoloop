@@ -16,42 +16,10 @@ using Algoloop.Model;
 
 namespace Algoloop.Provider
 {
-    public class CryptoIq : IProvider
+    public class CryptoIq : ProviderBase
     {
-        private bool _isDisposed;
-
-        public void Register(SettingModel settings)
+        public override void Download(MarketModel model, SettingModel settings)
         {
-        }
-
-        public void Download(MarketModel model, SettingModel settings)
-        {
-        }
-
-        public void Abort()
-        {
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                _isDisposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            System.GC.SuppressFinalize(this);
         }
     }
 }

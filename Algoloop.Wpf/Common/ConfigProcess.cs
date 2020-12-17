@@ -34,7 +34,7 @@ namespace Algoloop.Wpf.Common
         private readonly Process _process;
         private readonly IDictionary<string, string> _config = new Dictionary<string, string>();
         private bool _isDisposed;
-        private static object _lock = new object();
+        private static readonly object _lock = new object();
         private bool _abort;
 
         [DllImport("kernel32.dll")]

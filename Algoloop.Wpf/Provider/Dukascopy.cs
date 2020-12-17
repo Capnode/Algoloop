@@ -27,7 +27,7 @@ using System.Linq;
 
 namespace Algoloop.Provider
 {
-    public class Dukascopy : IProvider
+    public class Dukascopy : ProviderBase
     {
         private const string _market = "dukascopy";
         private readonly DateTime _firstDate = new DateTime(2003, 05, 05);
@@ -47,36 +47,8 @@ namespace Algoloop.Provider
             "AU200AUD", "CH20CHF", "DE30EUR", "ES35EUR", "EU50EUR", "FR40EUR", "UK100GBP", "HK33HKD", "IT40EUR", "JP225JPY",
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
-        private ConfigProcess _process;
-        private bool _isDisposed;
 
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_isDisposed) return;
-            if (disposing)
-            {
-                // TODO: dispose managed state (managed objects)
-                _process?.Dispose();
-            }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
-            _process = null;
-            _isDisposed = true;
-        }
-
-        public void Register(SettingModel settings)
-        {
-        }
-
-        public void Download(MarketModel market, SettingModel settings)
+        public override void Download(MarketModel market, SettingModel settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -162,11 +134,6 @@ namespace Algoloop.Provider
 
             market.LastDate = fromDate;
             UpdateSymbols(market);
-        }
-
-        public void Abort()
-        {
-            _process?.Abort();
         }
 
         private void UpdateSymbols(MarketModel market)

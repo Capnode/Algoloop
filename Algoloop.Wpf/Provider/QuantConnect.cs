@@ -26,17 +26,12 @@ using QuantConnect.Logging;
 
 namespace Algoloop.Provider
 {
-    public class QuantConnect : IProvider
+    public class QuantConnect : ProviderBase
     {
         private const string _security = "Security";
         private const string _zip = ".zip";
-        private bool _isDisposed;
 
-        public void Register(SettingModel settings)
-        {
-        }
-
-        public void Download(MarketModel model, SettingModel settings)
+        public override void Download(MarketModel model, SettingModel settings)
         {
             Contract.Requires(model != null);
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -158,32 +153,6 @@ namespace Algoloop.Provider
             {
                 symbols.Remove(old);
             }
-        }
-
-        public void Abort()
-        {
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                _isDisposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

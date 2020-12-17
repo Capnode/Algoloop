@@ -32,7 +32,7 @@ namespace Algoloop.Provider
             string name = market.Provider;
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface)
+                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract)
                 .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ??
                 throw new ApplicationException($"Provider {name} not found");
 
@@ -49,7 +49,7 @@ namespace Algoloop.Provider
 
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface);
+                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract);
             foreach (Type type in providers)
             {
                 IProvider provider = (IProvider)Activator.CreateInstance(type) ??

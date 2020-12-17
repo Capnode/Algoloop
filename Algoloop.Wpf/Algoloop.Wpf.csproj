@@ -167,6 +167,7 @@
     <Compile Include="Common\SafeDictionary.cs" />
     <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="Model\AboutModel.cs" />
+    <Compile Include="Provider\ProviderBase.cs" />
     <Compile Include="Provider\QuantConnect.cs" />
     <Compile Include="Service\MainService.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />

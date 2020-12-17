@@ -22,15 +22,9 @@ using System.Linq;
 
 namespace Algoloop.Provider
 {
-    public class Fxcm : IProvider
+    public class Fxcm : ProviderBase
     {
-        private bool _isDisposed;
-
-        public void Register(SettingModel settings)
-        {
-        }
-
-        public void Download(MarketModel model, SettingModel settings)
+        public override void Download(MarketModel model, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -61,32 +55,6 @@ namespace Algoloop.Provider
             }
 
             model.Active = model.LastDate < DateTime.Today;
-        }
-
-        public void Abort()
-        {
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                _isDisposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }
