@@ -16,7 +16,6 @@ using Algoloop.Model;
 using Algoloop.Provider;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
-using QuantConnect.Logging;
 using System;
 using System.Configuration;
 using System.IO;

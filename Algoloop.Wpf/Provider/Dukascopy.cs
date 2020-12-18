@@ -13,16 +13,11 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
-using Algoloop.Wpf.Common;
 using QuantConnect;
-using QuantConnect.Logging;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 
 namespace Algoloop.Provider
@@ -87,46 +82,13 @@ namespace Algoloop.Provider
                 $"--tickers={string.Join(",", symbols)}"
             };
 
-            // Download active symbols
-            bool error = false;
-            _process = new ConfigProcess(
-                "QuantConnect.ToolBox.exe",
-                string.Join(" ", args),
-                Directory.GetCurrentDirectory(),
-                true,
-                (line) => Log.Trace(line),
-                (line) =>
-                {
-                    error = true;
-                    Log.Error(line);
-                });
-
-            StringDictionary a = _process.Environment;
-            // Set config file
-            IDictionary<string, string> config = _process.Config;
-            string exeFolder = MainService.GetProgramFolder();
-            config["debug-mode"] = "true";
-            config["composer-dll-directory"] = exeFolder;
+            IDictionary<string, string> config = new Dictionary<string, string>();
             config["data-directory"] = settings.DataFolder;
             config["data-folder"] = settings.DataFolder;
-            config["results-destination-folder"] = ".";
-            config["plugin-directory"] = ".";
-            config["log-handler"] = "CompositeLogHandler";
-            config["map-file-provider"] = "LocalDiskMapFileProvider";
-            config["#command"] = "QuantConnect.ToolBox.exe";
-            config["#parameters"] = string.Join(" ", args);
-            config["#work-directory"] = Directory.GetCurrentDirectory();
 
-            // Start process
-            _process.Start();
-            if (!_process.WaitForExit())
-            {
-                error = true;
-            }
-            _process.Dispose();
-            _process = null;
-
-            if (error)
+            // Download active symbols
+            bool ok = base.RunProcess("QuantConnect.ToolBox.exe", args, config);
+            if (!ok)
             {
                 market.Active = false;
                 return;

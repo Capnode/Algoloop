@@ -13,23 +13,26 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Service;
 using Algoloop.Wpf.Common;
+using QuantConnect.Logging;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
 
 namespace Algoloop.Provider
 {
     abstract public class ProviderBase : IProvider
     {
         private bool _isDisposed;
-        protected ConfigProcess _process;
+        private ConfigProcess _process;
 
         public void Abort()
         {
             _process?.Abort();
         }
 
-        public virtual void Download(MarketModel market, SettingModel settings)
-        {
-        }
+        public abstract void Download(MarketModel market, SettingModel settings);
 
         public virtual void Register(SettingModel settings)
         {
@@ -57,6 +60,51 @@ namespace Algoloop.Provider
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             System.GC.SuppressFinalize(this);
+        }
+
+        internal bool RunProcess(string cmd, string[] args, IDictionary<string, string> configs)
+        {
+            bool ok = true;
+            _process = new ConfigProcess(
+                cmd,
+                string.Join(" ", args),
+                Directory.GetCurrentDirectory(),
+                true,
+                (line) => Log.Trace(line),
+                (line) =>
+                {
+                    ok = false;
+                    Log.Error(line);
+                });
+
+            StringDictionary a = _process.Environment;
+            // Set config file
+            IDictionary<string, string> config = _process.Config;
+            string exeFolder = MainService.GetProgramFolder();
+            config["debug-mode"] = "true";
+            config["composer-dll-directory"] = exeFolder;
+            config["results-destination-folder"] = ".";
+            config["plugin-directory"] = ".";
+            config["log-handler"] = "CompositeLogHandler";
+            config["map-file-provider"] = "LocalDiskMapFileProvider";
+            config["#command"] = "QuantConnect.ToolBox.exe";
+            config["#parameters"] = string.Join(" ", args);
+            config["#work-directory"] = Directory.GetCurrentDirectory();
+            foreach (KeyValuePair<string, string> item in configs)
+            {
+                config.Add(item);
+            }
+
+            // Start process
+            _process.Start();
+            if (!_process.WaitForExit())
+            {
+                ok = false;
+            }
+
+            _process.Dispose();
+            _process = null;
+            return ok;
         }
     }
 }
