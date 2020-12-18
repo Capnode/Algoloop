@@ -77,7 +77,9 @@ namespace Algoloop.Provider
                     Log.Error(line);
                 });
 
-            StringDictionary a = _process.Environment;
+            // Set Environment
+            StringDictionary environment = _process.Environment;
+
             // Set config file
             IDictionary<string, string> config = _process.Config;
             string exeFolder = MainService.GetProgramFolder();

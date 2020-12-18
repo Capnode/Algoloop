@@ -54,7 +54,7 @@ namespace Algoloop.Provider
                 fromDate = _firstDate;
             }
 
-            DateTime toDate = fromDate.AddDays(1).AddTicks(-1);
+            DateTime toDate = fromDate;
             string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string to = toDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string[] args =
@@ -66,12 +66,14 @@ namespace Algoloop.Provider
                 $"--tickers={string.Join(",", symbols)}"
             };
 
-            IDictionary<string, string> config = new Dictionary<string, string>();
-            config["data-directory"] = settings.DataFolder;
-            config["data-folder"] = settings.DataFolder;
-            config["fxcm-user-name"] = market.Login;
-            config["fxcm-password"] = market.Password;
-            config["fxcm-terminal"] = market.Access.ToStringInvariant();
+            IDictionary<string, string> config = new Dictionary<string, string>
+            {
+                ["data-directory"] = settings.DataFolder,
+                ["data-folder"] = settings.DataFolder,
+                ["fxcm-user-name"] = market.Login,
+                ["fxcm-password"] = market.Password,
+                ["fxcm-terminal"] = market.Access.ToStringInvariant()
+            };
 
             // Download active symbols
             bool ok = base.RunProcess("QuantConnect.ToolBox.exe", args, config);
@@ -81,7 +83,7 @@ namespace Algoloop.Provider
                 return;
             }
 
-            market.LastDate = fromDate;
+            market.LastDate = toDate;
             UpdateSymbols(market);
         }
 

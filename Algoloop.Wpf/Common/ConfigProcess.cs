@@ -115,7 +115,7 @@ namespace Algoloop.Wpf.Common
                 {
                     for (int index = 0; index < _maxIndex; index++)
                     {
-                        string folder = Path.Combine(_workFolder, $"process{index}");
+                        string folder = Path.Combine(_workFolder, $"temp{index}");
                         if (Directory.Exists(folder)) continue;
                         Directory.CreateDirectory(folder);
                         return folder;
@@ -197,7 +197,10 @@ namespace Algoloop.Wpf.Common
             if (_cleanup)
             {
                 string path = _process.StartInfo.WorkingDirectory;
-                Directory.Delete(path, true);
+                if (Directory.Exists(path))
+                {
+                    Directory.Delete(path, true);
+                }
             }
         }
     }

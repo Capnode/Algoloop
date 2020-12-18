@@ -82,9 +82,11 @@ namespace Algoloop.Provider
                 $"--tickers={string.Join(",", symbols)}"
             };
 
-            IDictionary<string, string> config = new Dictionary<string, string>();
-            config["data-directory"] = settings.DataFolder;
-            config["data-folder"] = settings.DataFolder;
+            IDictionary<string, string> config = new Dictionary<string, string>
+            {
+                ["data-directory"] = settings.DataFolder,
+                ["data-folder"] = settings.DataFolder
+            };
 
             // Download active symbols
             bool ok = base.RunProcess("QuantConnect.ToolBox.exe", args, config);

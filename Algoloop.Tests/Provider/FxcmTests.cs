@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.Provider;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Configuration;
 using System;
 using System.Configuration;
 using System.IO;
@@ -31,6 +32,8 @@ namespace Algoloop.Tests.Provider
         [TestInitialize()]
         public void Initialize()
         {
+            Config.Set("map-file-provider", "LocalDiskMapFileProvider");
+            
             _settings = new SettingModel
             {
                 DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data")
@@ -65,8 +68,13 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(0, market.Symbols.Where(m => m.Active).Count());
         }
 
-        [TestMethod()]
-        public void Download_one_symbol()
+        [DataRow(Resolution.Daily)]
+        [DataRow(Resolution.Hour)]
+        [DataRow(Resolution.Minute)]
+        [DataRow(Resolution.Second)]
+//        [DataRow(Resolution.Tick)]
+        [DataTestMethod]
+        public void Download_one_symbol(Resolution resolution)
         {
             string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
             string user = ConfigurationManager.AppSettings["fxcm_user"];
@@ -78,7 +86,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Fxcm",
                 Provider = "fxcm",
                 LastDate = date,
-                Resolution = Resolution.Daily,
+                Resolution = resolution,
                 Access = (MarketModel.AccessType)Enum.Parse(typeof(MarketModel.AccessType), terminal),
                 Login = user,
                 Password = pass
@@ -89,7 +97,7 @@ namespace Algoloop.Tests.Provider
             using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
             provider.Download(market, _settings);
             Assert.IsTrue(market.LastDate > date);
-            Assert.AreEqual(78, market.Symbols.Count);
+            Assert.AreEqual(75, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
 
