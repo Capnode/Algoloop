@@ -182,25 +182,40 @@ namespace QuantConnect.Util
 
                         case Resolution.Second:
                         case Resolution.Minute:
-                            var bar = data as QuoteBar;
-                            if (bar == null)
+                            var quoteBar = data as QuoteBar;
+                            if (quoteBar != null)
                             {
-                                throw new ArgumentException("Expected data of type 'QuoteBar'", nameof(data));
+                                return ToCsv(milliseconds,
+                                    ToNonScaledCsv(quoteBar.Bid), quoteBar.LastBidSize,
+                                    ToNonScaledCsv(quoteBar.Ask), quoteBar.LastAskSize);
                             }
-                            return ToCsv(milliseconds,
-                                ToNonScaledCsv(bar.Bid), bar.LastBidSize,
-                                ToNonScaledCsv(bar.Ask), bar.LastAskSize);
+                            var tradeBar = data as TradeBar;
+                            if (tradeBar != null)
+                            {
+                                return ToCsv(milliseconds, tradeBar.Open, tradeBar.High, tradeBar.Low, tradeBar.Close, tradeBar.Volume);
+                            }
+                            throw new ArgumentException("Minute/second bar could not be created", nameof(data));
 
                         case Resolution.Hour:
                         case Resolution.Daily:
-                            var bigBar = data as QuoteBar;
-                            if (bigBar == null)
+                            var bigQuoteBar = data as QuoteBar;
+                            if (bigQuoteBar != null)
                             {
-                                throw new ArgumentException("Expected data of type 'QuoteBar'", nameof(data));
+                                return ToCsv(longTime,
+                                    ToNonScaledCsv(bigQuoteBar.Bid), bigQuoteBar.LastBidSize,
+                                    ToNonScaledCsv(bigQuoteBar.Ask), bigQuoteBar.LastAskSize);
                             }
-                            return ToCsv(longTime,
-                                ToNonScaledCsv(bigBar.Bid), bigBar.LastBidSize,
-                                ToNonScaledCsv(bigBar.Ask), bigBar.LastAskSize);
+                            var bigTradeBar = data as TradeBar;
+                            if (bigTradeBar != null)
+                            {
+                                return ToCsv(longTime,
+                                             bigTradeBar.Open,
+                                             bigTradeBar.High,
+                                             bigTradeBar.Low,
+                                             bigTradeBar.Close,
+                                             bigTradeBar.Volume);
+                            }
+                            throw new ArgumentException("Hour/daily bar could not be created", nameof(data));
                     }
                     break;
 
