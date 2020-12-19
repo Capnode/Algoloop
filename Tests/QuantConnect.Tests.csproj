@@ -525,6 +525,7 @@
     <Compile Include="Engine\DataFeeds\Transport\RemoteFileSubscriptionStreamReaderTests.cs" />
     <Compile Include="Engine\DataFeeds\UniverseSelectionTests.cs" />
     <Compile Include="Engine\DataFeeds\SubscriptionTests.cs" />
+    <Compile Include="Engine\DataProviders\ApiDataProviderTests.cs" />
     <Compile Include="Engine\HistoricalData\SubscriptionDataReaderHistoryProviderTests.cs" />
     <Compile Include="Engine\RealTime\BacktestingRealTimeHandlerTests.cs" />
     <Compile Include="Engine\Results\BacktestingResultHandlerTests.cs" />
@@ -533,6 +534,7 @@
     <Compile Include="Indicators\AdvanceDeclineRatioVolumeTests.cs" />
     <Compile Include="Indicators\AdvanceDeclineRatioTests.cs" />
     <Compile Include="Indicators\ArmsIndexTests.cs" />
+    <Compile Include="Indicators\DeMarkerIndicatorTests.cs" />
     <Compile Include="Indicators\AwesomeOscillatorTests.cs" />
     <Compile Include="Indicators\ChaikinMoneyFlowTests.cs" />
     <Compile Include="Indicators\PythonIndicatorNoinheritanceTestsLegacy.cs" />
@@ -909,6 +911,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\arms_data.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\eurusd60_dem.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\FuturesExpiryFunctionsTestData.xml">
