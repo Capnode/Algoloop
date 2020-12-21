@@ -34,6 +34,10 @@ namespace Algoloop.Provider
 
         public abstract void Download(MarketModel market, SettingModel settings);
 
+        public virtual void Register(SettingModel settings)
+        {
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)
@@ -85,7 +89,7 @@ namespace Algoloop.Provider
             config["plugin-directory"] = ".";
             config["log-handler"] = "CompositeLogHandler";
             config["map-file-provider"] = "LocalDiskMapFileProvider";
-            config["#command"] = cmd;
+            config["#command"] = "QuantConnect.ToolBox.exe";
             config["#parameters"] = string.Join(" ", args);
             config["#work-directory"] = Directory.GetCurrentDirectory();
             foreach (KeyValuePair<string, string> item in configs)

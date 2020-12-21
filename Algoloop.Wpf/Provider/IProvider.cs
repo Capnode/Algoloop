@@ -19,6 +19,7 @@ namespace Algoloop.Provider
 {
     public interface IProvider : IDisposable
     {
+        void Register(SettingModel settings);
         void Download(MarketModel market, SettingModel settings);
         void Abort();
     }

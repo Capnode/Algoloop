@@ -17,6 +17,7 @@ using QuantConnect;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Algoloop.Provider
@@ -38,12 +39,14 @@ namespace Algoloop.Provider
             IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                 throw new ApplicationException($"Can not create provider {name}");
 
-            if (!RegisterProvider(provider)) return null;
+            if (!RegisterProvider(settings, provider)) return null;
             return provider;
         }
 
-        public static void RegisterProviders()
+        public static void RegisterProviders(SettingModel settings)
         {
+            Contract.Requires(settings != null);
+
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract);
@@ -51,11 +54,11 @@ namespace Algoloop.Provider
             {
                 IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                     throw new ApplicationException($"Can not create provider {type.Name}");
-                RegisterProvider(provider);
+                RegisterProvider(settings, provider);
             }
         }
 
-        private static bool RegisterProvider(IProvider provider)
+        private static bool RegisterProvider(SettingModel settings, IProvider provider)
         {
             string name = provider.GetType().Name.ToLowerInvariant();
             if (Market.Encode(name) == null)
@@ -70,6 +73,7 @@ namespace Algoloop.Provider
                 Market.Add(name, code);
             }
 
+            provider.Register(settings);
             return true;
         }
     }

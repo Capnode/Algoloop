@@ -45,7 +45,7 @@ namespace Algoloop.Lean
             }
 
             // Register all data providers
-            ProviderFactory.RegisterProviders();
+            ProviderFactory.RegisterProviders(settings);
 
             Log.Trace("LeanLanucher: Memory " + OS.ApplicationMemoryUsed + "Mb-App " + OS.TotalPhysicalMemoryUsed + "Mb-Used");
             try
