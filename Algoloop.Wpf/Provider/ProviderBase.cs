@@ -34,10 +34,6 @@ namespace Algoloop.Provider
 
         public abstract void Download(MarketModel market, SettingModel settings);
 
-        public virtual void Register(SettingModel settings)
-        {
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (!_isDisposed)

@@ -60,6 +60,9 @@ namespace Algoloop.Provider
 
         private static bool RegisterProvider(SettingModel settings, IProvider provider)
         {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (provider == null) throw new ArgumentNullException(nameof(provider));
+
             string name = provider.GetType().Name.ToLowerInvariant();
             if (Market.Encode(name) == null)
             {
@@ -73,7 +76,6 @@ namespace Algoloop.Provider
                 Market.Add(name, code);
             }
 
-            provider.Register(settings);
             return true;
         }
     }
