@@ -200,7 +200,7 @@ namespace Algoloop.Wpf.ViewModel
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
 
                 // Register providers
-                ProviderFactory.RegisterProviders(SettingsViewModel.Model);
+                ProviderFactory.RegisterProviders();
 
                 // Initialize Research page
                 ResearchViewModel.Initialize();
