@@ -110,21 +110,8 @@ namespace Algoloop.Provider
 
             // Exclude unknown symbols
             var downloader = new DukascopyDataDownloader();
-            foreach (SymbolModel symbol in all.Where(m => downloader.HasSymbol(m.Id)))
-            {
-                SymbolModel item = market.Symbols.FirstOrDefault(
-                    m => m.Id.Equals(symbol.Id, StringComparison.OrdinalIgnoreCase));
-                if (item == null)
-                {
-                    // Add symbol
-                    market.Symbols.Add(symbol);
-                }
-                else
-                {
-                    // Update properties
-                    item.Properties = symbol.Properties;
-                }
-            }
+            IEnumerable<SymbolModel> actual = all.Where(m => downloader.HasSymbol(m.Id));
+            UpdateSymbols(market, actual, false);
         }
     }
 }

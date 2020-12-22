@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.IO.Compression;
@@ -77,7 +76,7 @@ namespace Algoloop.Provider
             File.Delete(filename);
 
             // Update symbol list
-            UpdateSymbols(model.Symbols, symbols);
+            UpdateSymbols(model, symbols, true);
 
             Log.Trace($"Unpack {uri} completed");
             model.Active = false;
@@ -127,32 +126,6 @@ namespace Algoloop.Provider
             };
 
             symbols.Add(symbol);
-        }
-
-        private void UpdateSymbols(Collection<SymbolModel> symbols, IList<SymbolModel> all)
-        {
-            // Collect list of obsolete symbols
-            List<SymbolModel> discarded = symbols.ToList();
-
-            foreach (SymbolModel item in all)
-            {
-                var symbol = symbols.FirstOrDefault(x => x.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase)
-                    && x.Market.Equals(item.Market, StringComparison.OrdinalIgnoreCase)
-                    && x.Security.Equals(item.Security));
-                if (symbol == null)
-                {
-                    symbols.Add(item);
-                }
-                else
-                {
-                    discarded.Remove(symbol);
-                }
-            }
-
-            foreach (SymbolModel old in discarded)
-            {
-                symbols.Remove(old);
-            }
         }
     }
 }

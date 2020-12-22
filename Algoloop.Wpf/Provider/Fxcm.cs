@@ -15,7 +15,6 @@
 using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Brokerages.Fxcm;
-using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -90,25 +89,9 @@ namespace Algoloop.Provider
         private void UpdateSymbols(MarketModel market)
         {
             List<Symbol> symbols = FxcmSymbolMapper.KnownSymbols;
-            IEnumerable<SymbolModel> all = symbols.Select(
+            IEnumerable<SymbolModel> actual = symbols.Select(
                 m => new SymbolModel(m.ID.Symbol, m.ID.Market, m.ID.SecurityType) { Active = false } );
-
-            // Update symbol properties
-            foreach (SymbolModel symbol in all)
-            {
-                SymbolModel item = market.Symbols.FirstOrDefault(
-                    m => m.Id.Equals(symbol.Id, StringComparison.OrdinalIgnoreCase));
-                if (item == null)
-                {
-                    // Add symbol
-                    market.Symbols.Add(symbol);
-                }
-                else
-                {
-                    // Update properties
-                    item.Properties = symbol.Properties;
-                }
-            }
+            UpdateSymbols(market, actual, false);
         }
     }
 }

@@ -15,10 +15,15 @@
 using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.Wpf.Common;
+using QuantConnect;
 using QuantConnect.Logging;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics.Contracts;
 using System.IO;
+using System.Linq;
 
 namespace Algoloop.Provider
 {
@@ -107,6 +112,53 @@ namespace Algoloop.Provider
             _process.Dispose();
             _process = null;
             return ok;
+        }
+
+        protected static void UpdateSymbols(
+            MarketModel market,
+            IEnumerable<SymbolModel> actual,
+            bool defaultActive,
+            bool addNew = true)
+        {
+            Contract.Requires(market != null, nameof(market));
+            Contract.Requires(actual != null, nameof(actual));
+
+            // Collect list of obsolete symbols
+            Collection<SymbolModel> symbols = market.Symbols;
+            List<SymbolModel> discarded = symbols.ToList();
+            foreach (SymbolModel item in actual)
+            {
+                SymbolModel symbol = symbols.FirstOrDefault(x => x.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase)
+                    && (x.Market.Equals(item.Market, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(x.Market))
+                    && (x.Security.Equals(item.Security) || x.Security.Equals(SecurityType.Base)));
+                if (symbol == default)
+                {
+                    if (addNew)
+                    {
+                        var symbolModel = new SymbolModel(item.Id, item.Market, item.Security)
+                        {
+                            Active = defaultActive,
+                            Name = item.Name,
+                            Properties = item.Properties
+                        };
+                        symbols.Add(symbolModel);
+                    }
+                }
+                else
+                {
+                    // Update properties
+                    symbol.Name = item.Name;
+                    symbol.Market = item.Market;
+                    symbol.Security = item.Security;
+                    symbol.Properties = item.Properties;
+                    discarded.Remove(symbol);
+                }
+            }
+
+            foreach (SymbolModel old in discarded)
+            {
+                symbols.Remove(old);
+            }
         }
     }
 }
