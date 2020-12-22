@@ -188,9 +188,9 @@ namespace Algoloop.Wpf.ViewModel
                 Log.Trace($"UserData folder: {userDataFolder}");
                 MainService.Delete(Path.Combine(programDataFolder, "market-hours"));
                 MainService.Delete(Path.Combine(programDataFolder, "symbol-properties"));
-                MainService.CopyDirectory(Path.Combine(program, "Data/AppData"), appDataFolder, false);
-                MainService.CopyDirectory(Path.Combine(program, "Data/ProgramData"), programDataFolder, false);
-                MainService.CopyDirectory(Path.Combine(program, "Data/UserData"), userDataFolder, false);
+                MainService.CopyDirectory(Path.Combine(program, "Content/AppData"), appDataFolder, false);
+                MainService.CopyDirectory(Path.Combine(program, "Content/ProgramData"), programDataFolder, false);
+                MainService.CopyDirectory(Path.Combine(program, "Content/UserData"), userDataFolder, false);
 
                 // Read configuration
                 string appData = MainService.GetAppDataFolder();

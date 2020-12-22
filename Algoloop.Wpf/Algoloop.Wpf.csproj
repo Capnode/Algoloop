@@ -339,10 +339,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="Data\AppData\Markets.json">
+    <Content Include="Content\AppData\Markets.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\AppData\Strategies.json">
+    <Content Include="Content\AppData\Strategies.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Data\equity\usa\daily\aapl.zip">
