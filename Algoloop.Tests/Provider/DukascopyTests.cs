@@ -27,14 +27,20 @@ namespace Algoloop.Tests.Provider
     public class DukascopyTests
     {
         private SettingModel _settings;
+        private string _forexFolder;
 
         [TestInitialize()]
         public void Initialize()
         {
-            _settings = new SettingModel
+            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+            _forexFolder = Path.Combine(dataFolder, SecurityType.Forex.SecurityTypeToLower(), "dukascopy");
+
+            if (Directory.Exists(dataFolder))
             {
-                DataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data")
-            };
+                Directory.Delete(dataFolder, true);
+            }
+
+            _settings = new SettingModel { DataFolder = dataFolder };
         }
 
         [TestMethod()]
@@ -55,8 +61,9 @@ namespace Algoloop.Tests.Provider
             // Just update symbol list
             using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
             provider.Download(market, _settings);
+
             Assert.IsFalse(market.Active);
-            Assert.IsTrue(market.LastDate == date);
+            Assert.AreEqual(date, market.LastDate);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(0, market.Symbols.Where(m => m.Active).Count());
         }
@@ -80,9 +87,12 @@ namespace Algoloop.Tests.Provider
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
             provider.Download(market, _settings);
-            Assert.IsTrue(market.LastDate > date);
+
+            Assert.IsTrue(market.Active);
+            Assert.AreEqual(date.AddDays(1), market.LastDate);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "daily", "eurusd.zip")));
         }
 
         [TestMethod()]
@@ -105,10 +115,13 @@ namespace Algoloop.Tests.Provider
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
             provider.Download(market, _settings);
+
             Assert.IsTrue(market.Active);
-            Assert.IsTrue(market.LastDate > date);
+            Assert.AreEqual(date.AddDays(1), market.LastDate);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "daily", "eurusd.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "daily", "gbpusd.zip")));
         }
 
         [TestMethod()]
@@ -131,10 +144,21 @@ namespace Algoloop.Tests.Provider
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
             provider.Download(market, _settings);
+
             Assert.IsTrue(market.Active);
-            Assert.IsTrue(market.LastDate > date);
+            Assert.AreEqual(date.AddDays(1), market.LastDate);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(2, market.Symbols.Where(m => m.Active).Count());
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "daily", "eurusd.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "daily", "gbpusd.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "hour", "eurusd.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "hour", "gbpusd.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "minute", "eurusd", "20190501_quote.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "minute", "gbpusd", "20190501_quote.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "second", "eurusd", "20190501_quote.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "second", "gbpusd", "20190501_quote.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "tick", "eurusd", "20190501_quote.zip")));
+            Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, "tick", "gbpusd", "20190501_quote.zip")));
         }
 
         [TestMethod()]
@@ -156,9 +180,62 @@ namespace Algoloop.Tests.Provider
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
             provider.Download(market, _settings);
+
             Assert.IsFalse(market.Active);
             Assert.AreEqual(market.LastDate, date);
-            Assert.AreEqual(1, market.Symbols.Count);
+            Assert.AreEqual(78, market.Symbols.Count);
+            Assert.AreEqual(0, market.Symbols.Where(m => m.Active).Count());
+        }
+
+        [TestMethod()]
+        public void Download_today()
+        {
+            var key = ConfigurationManager.AppSettings["dukascopy"];
+            DateTime today = DateTime.Today;
+            var market = new MarketModel
+            {
+                Active = true,
+                Name = "Dukascopy",
+                Provider = "dukascopy",
+                LastDate = today,
+                Resolution = Resolution.Second,
+                ApiKey = key
+            };
+            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+
+            // Dwonload symbol and update list
+            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+
+            Assert.IsFalse(market.Active);
+            Assert.AreEqual(today, market.LastDate);
+            Assert.AreEqual(78, market.Symbols.Count);
+            Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
+        }
+
+        [TestMethod()]
+        public void Download_yesterday()
+        {
+            var key = ConfigurationManager.AppSettings["dukascopy"];
+            DateTime today = DateTime.Today;
+            var market = new MarketModel
+            {
+                Active = true,
+                Name = "Dukascopy",
+                Provider = "dukascopy",
+                LastDate = today.AddDays(-1),
+                Resolution = Resolution.Second,
+                ApiKey = key
+            };
+            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+
+            // Dwonload symbol and update list
+            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            provider.Download(market, _settings);
+
+            Assert.IsTrue(market.Active);
+            Assert.AreEqual(today, market.LastDate);
+            Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
     }
