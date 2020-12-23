@@ -1,0 +1,11 @@
+﻿{
+  "debug-mode": true,
+  "debug-level": 0,
+  "composer-dll-directory": ".",
+  "plugin-directory": ".",
+  "results-destination-folder": ".",
+  "data-directory": "Data",
+  "data-folder": "Data",
+  "log-handler": "LogItemHandler",
+  "map-file-provider": "LocalDiskMapFileProvider"
+}
