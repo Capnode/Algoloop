@@ -49,30 +49,11 @@ namespace Algoloop.Provider
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
-            if (!symbols.Any())
-            {
-                market.Active = false;
-                UpdateSymbols(market);
-                return;
-            }
-
             string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
-            DateTime fromDate = market.LastDate.Date.AddDays(1);
-            if (fromDate >= DateTime.Today)
-            {
-                // Do not download today data
-                market.Active = false;
-                return;
-            }
-
-            if (fromDate < _firstDate)
-            {
-                fromDate = _firstDate;
-            }
-
-            DateTime toDate = fromDate.AddDays(1).AddTicks(-1);
+            DateTime fromDate = market.LastDate < _firstDate ? _firstDate : market.LastDate.Date;
+            DateTime toDate = fromDate.AddDays(1);
             string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
-            string to = toDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string to = toDate.AddTicks(-1).ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string[] args =
             {
                 "--app=DukascopyDownloader",
@@ -88,15 +69,23 @@ namespace Algoloop.Provider
                 ["data-folder"] = settings.DataFolder
             };
 
-            // Download active symbols
-            bool ok = base.RunProcess("QuantConnect.ToolBox.exe", args, config);
-            if (!ok)
+            DateTime now = DateTime.Now;
+            if (RunProcess("QuantConnect.ToolBox.exe", args, config))
+            {
+                if (toDate > now)
+                {
+                    market.Active = false;
+                }
+                else
+                {
+                    market.LastDate = toDate;
+                }
+            }
+            else
             {
                 market.Active = false;
-                return;
             }
 
-            market.LastDate = fromDate;
             UpdateSymbols(market);
         }
 
