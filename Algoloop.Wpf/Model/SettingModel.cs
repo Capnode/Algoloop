@@ -87,7 +87,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public int MaxBacktests { get; set; } = Math.Min(Environment.ProcessorCount, 8);
+        public int MaxBacktests { get; set; } = Math.Max(Environment.ProcessorCount  / 2, 1);
 
         internal void Copy(SettingModel oldSettings)
         {
