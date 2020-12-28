@@ -13,11 +13,13 @@
  */
 
 using Algoloop.Model;
-using QuantConnect;
+using Newtonsoft.Json;
+using QuantConnect.Securities;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Linq;
 
 namespace Algoloop.Provider
@@ -39,13 +41,16 @@ namespace Algoloop.Provider
             IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                 throw new ApplicationException($"Can not create provider {name}");
 
-            if (!RegisterProvider(settings, provider)) return null;
+            if (!AcceptProvider(settings, provider)) return null;
             return provider;
         }
 
         public static void RegisterProviders(SettingModel settings)
         {
             Contract.Requires(settings != null);
+
+            MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
+            string originalJson = JsonConvert.SerializeObject(marketHours);
 
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
@@ -54,27 +59,27 @@ namespace Algoloop.Provider
             {
                 IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                     throw new ApplicationException($"Can not create provider {type.Name}");
-                RegisterProvider(settings, provider);
+                if (AcceptProvider(settings, provider))
+                {
+                    provider.Register(settings);
+                }
+            }
+
+            // Save market hours database if changed
+            string json = JsonConvert.SerializeObject(marketHours);
+            if (!json.Equals(originalJson, StringComparison.OrdinalIgnoreCase))
+            {
+                string path = Path.Combine(settings.DataFolder, "market-hours", "market-hours-database.json");
+                File.WriteAllText(path, json);
             }
         }
 
-        private static bool RegisterProvider(SettingModel settings, IProvider provider)
+        private static bool AcceptProvider(SettingModel settings, IProvider provider)
         {
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+
             string name = provider.GetType().Name.ToLowerInvariant();
-            if (Market.Encode(name) == null)
-            {
-                // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
-                int code = 0;
-                while (Market.Decode(code) != null)
-                {
-                    code++;
-                }
-
-                Market.Add(name, code);
-            }
-
-            provider.Register(settings);
-            return true;
+            return !string.IsNullOrEmpty(name);
         }
     }
 }
