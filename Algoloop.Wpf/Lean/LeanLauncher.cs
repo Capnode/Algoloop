@@ -15,105 +15,147 @@
 using Algoloop.Model;
 using Algoloop.Provider;
 using Algoloop.Service;
-using NetMQ;
+using Algoloop.Wpf.Common;
 using Newtonsoft.Json;
 using QuantConnect;
-using QuantConnect.Configuration;
-using QuantConnect.Lean.Engine;
 using QuantConnect.Logging;
-using QuantConnect.Packets;
 using QuantConnect.Securities;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace Algoloop.Lean
 {
-    public class LeanLauncher : MarshalByRefObject
+    public class LeanLauncher : IDisposable
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
-        public TrackModel Run(TrackModel model, AccountModel account, SettingModel settings, HostDomainLogger logger)
+        private ConfigProcess _process;
+        private bool _isDisposed;
+
+        public LeanLauncher()
+        {
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    _process?.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _process = null;
+                _isDisposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        public void Run(TrackModel model, AccountModel account, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-
-            Log.LogHandler = logger;
-            if (!SetConfig(model, account, settings))
-            {
-                return model;
-            }
+            Debug.Assert(!model.Completed);
+            Debug.Assert(model.Active);
 
             // Register all data providers
             ProviderFactory.RegisterProviders(settings);
 
-            Log.Trace("LeanLanucher: Memory " + OS.ApplicationMemoryUsed + "Mb-App " + OS.TotalPhysicalMemoryUsed + "Mb-Used");
-            try
-            {
-                var liveMode = Config.GetBool("live-mode");
-                using var algorithmHandlers = LeanEngineAlgorithmHandlers.FromConfiguration(Composer.Instance);
-                using var systemHandlers = LeanEngineSystemHandlers.FromConfiguration(Composer.Instance);
-                systemHandlers.Initialize();
-                var engine = new Engine(systemHandlers, algorithmHandlers, liveMode);
-                var algorithmManager = new AlgorithmManager(liveMode);
-                AlgorithmNodePacket job = systemHandlers.JobQueue.NextJob(out string assemblyPath);
-                job.UserPlan = UserPlan.Professional;
-                job.Language = model.AlgorithmLanguage;
-                if (job is BacktestNodePacket backtest)
+            bool success = true;
+            _process = new ConfigProcess(
+                "QuantConnect.Lean.Launcher.exe",
+                null,
+                Directory.GetCurrentDirectory(),
+                true,
+                (line) => Log.Trace(line),
+                (line) =>
                 {
-                    backtest.PeriodStart = model.StartDate;
-                    backtest.PeriodFinish = model.EndDate;
-                    backtest.CashAmount = new CashAmount(model.InitialCapital, Currencies.USD);
-                }
-                systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
-                engine.Run(job, algorithmManager, assemblyPath, WorkerThread.Instance);
-                BacktestResultHandler resultHandler = algorithmHandlers.Results as BacktestResultHandler;
-                model.Result = resultHandler?.JsonResult ?? string.Empty;
-                model.Logs = resultHandler?.Logs ?? string.Empty;
-            }
-            catch (Exception ex)
+                    success = false;
+                    Log.Error(line);
+                });
+
+            // Set Environment
+            StringDictionary environment = _process.Environment;
+
+            // Set config
+            IDictionary<string, string> config = _process.Config;
+            if (!SetConfig(config, model, account, settings)) return;
+
+            // Start process
+            _process.Start();
+            int exitCode = _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));
+            if (exitCode != 0)
             {
-                Log.Error("{0}: {1}", ex.GetType(), ex.Message);
+                success = false;
             }
 
-            NetMQConfig.Cleanup(false);
-            Log.LogHandler.Dispose();
-            return model;
+            _process.Dispose();
+            _process = null;
+
+            model.Completed = success;
+            model.Active = false;
         }
 
-        public override object InitializeLifetimeService()
+        private static void PostProcess(string folder, TrackModel model)
         {
-            return null;
+            string resultFile = Path.Combine(folder, $"{model.AlgorithmName}.json");
+            if (File.Exists(resultFile))
+            {
+                model.Result = File.ReadAllText(resultFile);
+            }
+
+            string logFile = Path.Combine(folder, $"{model.AlgorithmName}-log.txt");
+            if (File.Exists(logFile))
+            {
+                model.Logs = File.ReadAllText(logFile);
+            }
         }
 
-        private static bool SetConfig(TrackModel model, AccountModel account, SettingModel settings)
+        private static bool SetConfig(
+            IDictionary<string, string> config,
+            TrackModel model,
+            AccountModel account,
+            SettingModel settings)
         {
             var parameters = new Dictionary<string, string>();
-            SetModel(model, settings);
+            SetModel(config, model, settings);
             if (model.Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 if (model.Desktop)
                 {
-                    SetBacktestDesktop();
+                    SetBacktestDesktop(config);
                 }
                 else
                 {
-                    SetBacktest();
+                    SetBacktest(config);
                 }
             }
             else if (model.Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                SetPaper();
+                SetPaper(config);
             }
             else if (account != null && account.Brokerage.Equals(AccountModel.BrokerageType.Fxcm))
             {
                 if (model.Desktop)
                 {
-                    SetFxcmDesktop(account);
+                    SetFxcmDesktop(config, account);
                 }
                 else
                 {
-                    SetFxcm(account);
+                    SetFxcm(config, account);
                 }
             }
             else
@@ -122,55 +164,85 @@ namespace Algoloop.Lean
                 return false;
             }
 
-            SetParameters(model, parameters);
+            SetParameters(config, model, parameters);
             return true;
         }
 
-        private static void SetModel(TrackModel model, SettingModel settings)
+        private static void SetModel(
+            IDictionary<string, string> config,
+            TrackModel model,
+            SettingModel settings)
         {
-            Config.Set("messaging-handler", "QuantConnect.Messaging.Messaging");
-            Config.Set("job-queue-handler", "QuantConnect.Queues.JobQueue");
-            Config.Set("api-handler", "QuantConnect.Api.Api");
-            Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
-            Config.Set("factor-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider");
-            Config.Set("alpha-handler", "Algoloop.Lean.AlphaHandler");
-            Config.Set("api-access-token", settings.ApiToken ?? string.Empty);
-            Config.Set("job-user-id", settings.ApiUser ?? "0");
-            Config.Set("desktop-http-port", settings.DesktopPort.ToString(CultureInfo.InvariantCulture));
-            Config.Set("job-project-id", "0");
-            Config.Set("algorithm-path-python", ".");
-            Config.Set("regression-update-statistics", "false");
-            Config.Set("algorithm-manager-time-loop-maximum", "60");
-            Config.Set("symbol-minute-limit", "10000");
-            Config.Set("symbol-second-limit", "10000");
-            Config.Set("symbol-tick-limit", "10000");
-            Config.Set("maximum-data-points-per-chart-series", "10000");
-            Config.Set("force-exchange-always-open", "false");
-            Config.Set("version-id", "");
-            Config.Set("security-data-feeds", "");
-            Config.Set("forward-console-messages", "true");
-            Config.Set("send-via-api", "false");
-            Config.Set("lean-manager-type", "LocalLeanManager");
-            Config.Set("transaction-log", "");
-            Config.Set("algorithm-language", model.AlgorithmLanguage.ToString());
-            Config.Set("data-folder", settings.DataFolder);
-            Config.Set("data-directory", settings.DataFolder);
-            Config.Set("cache-location", settings.DataFolder);
+            config["debug-mode"] = "false";
+            config["debugging"] = "false";
+            config["messaging-handler"] = "QuantConnect.Messaging.Messaging";
+            config["job-queue-handler"] = "QuantConnect.Queues.JobQueue";
+            config["api-handler"] = "QuantConnect.Api.Api";
+            config["map-file-provider"] = "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider";
+            config["factor-file-provider"] = "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider";
+//            config["alpha-handler"] = "Algoloop.Lean.AlphaHandler";
+            config["alpha-handler"] = "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler";
+            config["api-access-token"] = settings.ApiToken ?? string.Empty;
+            config["job-user-id"] = settings.ApiUser ?? "0";
+            config["desktop-http-port"] = settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
+            config["job-project-id"] = "0";
+            config["algorithm-path-python"] = ".";
+            config["regression-update-statistics"] = "false";
+            config["algorithm-manager-time-loop-maximum"] = "60";
+            config["symbol-minute-limit"] = "10000";
+            config["symbol-second-limit"] = "10000";
+            config["symbol-tick-limit"] = "10000";
+            config["maximum-data-points-per-chart-series"] = "10000";
+            config["force-exchange-always-open"] = "false";
+            config["version-id"] = "";
+            config["security-data-feeds"] = "";
+            config["forward-console-messages"] = "true";
+            config["send-via-api"] = "false";
+            config["lean-manager-type"] = "LocalLeanManager";
+            config["transaction-log"] = "";
+            config["algorithm-language"] = model.AlgorithmLanguage.ToString();
+            config["data-folder"] = settings.DataFolder;
+            config["data-directory"] = settings.DataFolder;
+            config["cache-location"] = settings.DataFolder;
             string fullPath = MainService.FullExePath(model.AlgorithmLocation);
-            Config.Set("algorithm-location", fullPath);
+            config["algorithm-location"] = fullPath;
             string fullFolder = MainService.GetProgramFolder();
-            Config.Set("plugin-directory", fullFolder);
-            Config.Set("composer-dll-directory", fullFolder);
-            Config.Set("algorithm-type-name", model.AlgorithmName);
-            Config.Set("live-data-url", "ws://www.quantconnect.com/api/v2/live/data/");
-            Config.Set("live-data-port", "8020");
+            config["plugin-directory"] = fullFolder;
+            config["composer-dll-directory"] = fullFolder;
+            config["results-destination-folder"] = ".";
+            config["log-handler"] = "CompositeLogHandler";
+            config["scheduled-event-leaky-bucket-capacity"] = "120";
+            config["scheduled-event-leaky-bucket-time-interval-minutes"] = "1440";
+            config["scheduled-event-leaky-bucket-refill-amount"] = "18";
+            config["object-store"] = "LocalObjectStore";
+            config["object-store-root"] = "./storage";
+            config["data-permission-manager"] = "DataPermissionManager";
+            config["results-destination-folder"] = ".";
+            config["ignore-version-checks"] = "false";
+            config["data-feed-workers-count"] = Environment.ProcessorCount.ToString(CultureInfo.InvariantCulture);
+            config["data-feed-max-work-weight"] = "400";
+            config["data-feed-queue-type"] = "QuantConnect.Lean.Engine.DataFeeds.WorkScheduling.WorkQueue, QuantConnect.Lean.Engine";
+            config["show-missing-data-logs"] = "false";
+
+            config["algorithm-type-name"] = model.AlgorithmName;
+            config["algorithm-id"] = model.AlgorithmName;
+            config["period-start"] = model.StartDate.ToString(CultureInfo.InvariantCulture);
+            config["period-finish"] = model.EndDate.ToString(CultureInfo.InvariantCulture);
+            config["cash-amount"] = model.InitialCapital.ToString(CultureInfo.InvariantCulture);
+
+            config["close-automatically"] = "true";
+            config["live-data-url"] = "ws://www.quantconnect.com/api/v2/live/data/";
+            config["live-data-port"] = "8020";
             if (settings.ApiDownload)
-                Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.ApiDataProvider");
+                config["data-provider"] = "QuantConnect.Lean.Engine.DataFeeds.ApiDataProvider";
             else
-                Config.Set("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider");
+                config["data-provider"] = "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider";
         }
 
-        private static void SetParameters(TrackModel model, Dictionary<string, string> parameters)
+        private static void SetParameters(
+            IDictionary<string, string> config,
+            TrackModel model,
+            Dictionary<string, string> parameters)
         {
             parameters.Add("market", model.Market);
             parameters.Add("security", model.Security.ToStringInvariant());
@@ -192,106 +264,110 @@ namespace Algoloop.Lean
             }
 
             string parametersConfigString = JsonConvert.SerializeObject(parameters);
-            Config.Set("parameters", parametersConfigString);
+            config["parameters"] = parametersConfigString;
         }
 
-        private static void SetBacktest()
+        private static void SetBacktest(IDictionary<string, string> config)
         {
-            Config.Set("environment", "backtesting");
-            Config.Set("live-mode", "false");
-            Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler");
-//                Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
-            Config.Set("result-handler", "Algoloop.Lean.BacktestResultHandler");
-//            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.BacktestingResultHandler");
-            Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed");
-            Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
-            Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
-            Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
+            config["environment"] = "backtesting";
+            config["live-mode"] = "false";
+            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler";
+//                config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler";
+//            config["result-handler"] = "Algoloop.Lean.BacktestResultHandler";
+            config["result-handler"] = "QuantConnect.Lean.Engine.Results.BacktestingResultHandler";
+            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed";
+            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler";
+            config["history-provider"] = "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider";
+            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler";
         }
 
-        private static void SetBacktestDesktop()
+        private static void SetBacktestDesktop(IDictionary<string, string> config)
         {
-            Config.Set("environment", "backtesting-desktop");
-            Config.Set("live-mode", "false");
-            Config.Set("send-via-api", "true");
-            Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler");
-//            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.BacktestingResultHandler");
-            Config.Set("result-handler", "Algoloop.Lean.BacktestResultHandler");
-            Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed");
-            Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler");
-            Config.Set("history-provider", "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider");
-            Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
-            Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
+            config["environment"] = "backtesting-desktop";
+            config["live-mode"] = "false";
+            config["send-via-api"] = "true";
+            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler";
+            config["result-handler"] = "QuantConnect.Lean.Engine.Results.BacktestingResultHandler";
+//            config["result-handler"] = "Algoloop.Lean.BacktestResultHandler";
+            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed";
+            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler";
+            config["history-provider"] = "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider";
+            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler";
+            config["messaging-handler"] = "QuantConnect.Messaging.StreamingMessageHandler";
         }
 
-        private static void SetPaper()
+        private static void SetPaper(IDictionary<string, string> config)
         {
-            Config.Set("environment", "live-paper");
-            Config.Set("live-mode", "true");
-            Config.Set("live-mode-brokerage", "PaperBrokerage");
-            Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler");
-            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler");
-            Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed");
-            Config.Set("data-queue-handler", "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue");
-            Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
-            Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler");
+            config["environment"] = "live-paper";
+            config["live-mode"] = "true";
+            config["live-mode-brokerage"] = "PaperBrokerage";
+            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler";
+            config["result-handler"] = "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler";
+            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed";
+            config["data-queue-handler"] = "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue";
+            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler";
+            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler";
         }
 
-        private static void SetFxcm(AccountModel account)
+        private static void SetFxcm(
+            IDictionary<string, string> config,
+            AccountModel account)
         {
-            Config.Set("environment", "live-fxcm");
-            Config.Set("live-mode", "true");
-            Config.Set("fxcm-server", "http://www.fxcorporate.com/Hosts.jsp");
-            Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler");
-            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler");
-            Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed");
-            Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
-            Config.Set("history-provider", "BrokerageHistoryProvider");
-            Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler");
-            Config.Set("live-mode-brokerage", "FxcmBrokerage");
-            Config.Set("data-queue-handler", "FxcmBrokerage");
-            Config.Set("fxcm-user-name", account.Login);
-            Config.Set("fxcm-password", account.Password);
-            Config.Set("fxcm-account-id", account.Id);
+            config["environment"] = "live-fxcm";
+            config["live-mode"] = "true";
+            config["fxcm-server"] = "http://www.fxcorporate.com/Hosts.jsp";
+            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler";
+            config["result-handler"] = "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler";
+            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed";
+            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler";
+            config["history-provider"] = "BrokerageHistoryProvider";
+            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler";
+            config["live-mode-brokerage"] = "FxcmBrokerage";
+            config["data-queue-handler"] = "FxcmBrokerage";
+            config["fxcm-user-name"] = account.Login;
+            config["fxcm-password"] = account.Password;
+            config["fxcm-account-id"] = account.Id;
             switch (account.Access)
             {
                 case AccountModel.AccessType.Demo:
-                    Config.Set("fxcm-terminal", "Demo");
+                    config["fxcm-terminal"] = "Demo";
                     break;
 
                 case AccountModel.AccessType.Real:
-                    Config.Set("fxcm-terminal", "Real");
+                    config["fxcm-terminal"] = "Real";
                     break;
             }
         }
 
-        private static void SetFxcmDesktop(AccountModel account)
+        private static void SetFxcmDesktop(
+            IDictionary<string, string> config,
+            AccountModel account)
         {
-            Config.Set("environment", "live-desktop");
-            Config.Set("live-mode", "true");
-            Config.Set("send-via-api", "true");
-            Config.Set("fxcm-server", "http://www.fxcorporate.com/Hosts.jsp");
-            Config.Set("setup-handler", "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler");
-            Config.Set("result-handler", "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler");
-            Config.Set("data-feed-handler", "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed");
-            Config.Set("real-time-handler", "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler");
-            Config.Set("transaction-handler", "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler");
-            Config.Set("messaging-handler", "QuantConnect.Messaging.StreamingMessageHandler");
-            Config.Set("live-mode-brokerage", "FxcmBrokerage");
-            Config.Set("data-queue-handler", "FxcmBrokerage");
-            Config.Set("fxcm-user-name", account.Login);
-            Config.Set("fxcm-password", account.Password);
-            Config.Set("fxcm-account-id", account.Id);
-            Config.Set("log-handler", "QuantConnect.Logging.QueueLogHandler");
-            Config.Set("desktop-exe", @"../../../UserInterface/bin/Release/QuantConnect.Views.exe");
+            config["environment"] = "live-desktop";
+            config["live-mode"] = "true";
+            config["send-via-api"] = "true";
+            config["fxcm-server"] = "http://www.fxcorporate.com/Hosts.jsp";
+            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler";
+            config["result-handler"] = "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler";
+            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed";
+            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler";
+            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler";
+            config["messaging-handler"] = "QuantConnect.Messaging.StreamingMessageHandler";
+            config["live-mode-brokerage"] = "FxcmBrokerage";
+            config["data-queue-handler"] = "FxcmBrokerage";
+            config["fxcm-user-name"] = account.Login;
+            config["fxcm-password"] = account.Password;
+            config["fxcm-account-id"] = account.Id;
+            config["log-handler"] = "QuantConnect.Logging.QueueLogHandler";
+            config["desktop-exe"] = @"../../../UserInterface/bin/Release/QuantConnect.Views.exe";
             switch (account.Access)
             {
                 case AccountModel.AccessType.Demo:
-                    Config.Set("fxcm-terminal", "Demo");
+                    config["fxcm-terminal"] = "Demo";
                     break;
 
                 case AccountModel.AccessType.Real:
-                    Config.Set("fxcm-terminal", "Real");
+                    config["fxcm-terminal"] = "Real";
                     break;
             }
         }

@@ -104,7 +104,7 @@ namespace Algoloop.Provider
 
             // Start process
             _process.Start();
-            if (!_process.WaitForExit())
+            if (_process.WaitForExit() != 0)
             {
                 ok = false;
             }

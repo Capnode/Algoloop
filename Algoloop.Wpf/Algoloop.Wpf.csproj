@@ -214,7 +214,6 @@
     <Compile Include="Model\MarketModel.cs" />
     <Compile Include="Model\MarketsModel.cs" />
     <Compile Include="Model\SettingModel.cs" />
-    <Compile Include="Common\Isolated.cs" />
     <Compile Include="Lean\HostDomainLogger.cs" />
     <Compile Include="Common\StreamLogger.cs" />
     <Compile Include="Provider\ProviderFactory.cs" />
@@ -545,6 +544,10 @@
     <ProjectReference Include="..\Indicators\QuantConnect.Indicators.csproj">
       <Project>{73fb2522-c3ed-4e47-8e3d-afad48a6b888}</Project>
       <Name>QuantConnect.Indicators</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj">
+      <Project>{09e7b916-e58b-4021-bd8b-c10b4446e226}</Project>
+      <Name>QuantConnect.Lean.Launcher</Name>
     </ProjectReference>
     <ProjectReference Include="..\Research\QuantConnect.Research.csproj">
       <Project>{9561d14a-467e-40ad-928e-ee9f758d7d98}</Project>
