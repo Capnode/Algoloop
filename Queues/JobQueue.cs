@@ -23,6 +23,8 @@ using QuantConnect.Interfaces;
 using QuantConnect.Logging;
 using QuantConnect.Packets;
 using QuantConnect.Util;
+using QuantConnect.Securities;
+using System.Globalization;
 
 namespace QuantConnect.Queues
 {
@@ -155,6 +157,26 @@ namespace QuantConnect.Queues
                 Parameters = parameters,
                 Controls = controls
             };
+
+            string periodStart = Config.Get("period-start");
+            string periodFinish = Config.Get("period-finish");
+            string cashAmount = Config.Get("cash-amount");
+            if (!string.IsNullOrEmpty(periodStart))
+            {
+                backtestJob.PeriodStart = DateTime.Parse(periodStart, CultureInfo.InvariantCulture);
+            }
+            if (!string.IsNullOrEmpty(periodFinish))
+            {
+                backtestJob.PeriodFinish = DateTime.Parse(periodFinish, CultureInfo.InvariantCulture);
+            }
+            if (!string.IsNullOrEmpty(cashAmount))
+            {
+                decimal amount = Decimal.Parse(cashAmount, CultureInfo.InvariantCulture);
+                if (amount > 0)
+                {
+                    backtestJob.CashAmount = new CashAmount(amount, Currencies.USD);
+                }
+            }
 
             return backtestJob;
         }
