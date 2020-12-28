@@ -397,7 +397,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 foreach (StrategyModel model in models)
                 {
-                    await throttler.WaitAsync().ConfigureAwait(false);
+                    await throttler.WaitAsync().ConfigureAwait(true);
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");

@@ -38,7 +38,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
 
@@ -58,7 +57,6 @@ namespace Algoloop.Wpf.ViewModel
         private readonly SettingModel _settings;
         private static readonly object _mutex = new object();
 
-        private CancellationTokenSource _cancel;
         private TrackModel _model;
         private bool _isSelected;
         private bool _isExpanded;
@@ -263,7 +261,6 @@ namespace Algoloop.Wpf.ViewModel
             Charts = null;
             Charts = charts;
 
-            _cancel?.Cancel();
             _parent?.DeleteTrack(this);
         }
 
@@ -560,18 +557,9 @@ namespace Algoloop.Wpf.ViewModel
 
         private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
         {
-            try
-            {
-                using Isolated<LeanLauncher> leanEngine = new Isolated<LeanLauncher>();
-                _cancel = new CancellationTokenSource();
-                await Task.Run(() => model = leanEngine.Value.Run(Model, account, _settings, new HostDomainLogger()), _cancel.Token)
-                    .ConfigureAwait(false);
-            }
-            finally
-            {
-                _cancel = null;
-            }
-
+            using var leanEngine = new LeanLauncher();
+            await Task.Run(() => leanEngine.Run(model, account, _settings))
+                .ConfigureAwait(false);
             return model;
         }
 
@@ -921,11 +909,6 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
-                if (_cancel != null)
-                {
-                    _cancel.Cancel();
-                    _cancel = null;
-                }
             }
             finally
             {
@@ -1003,7 +986,6 @@ namespace Algoloop.Wpf.ViewModel
             {
                 if (disposing)
                 {
-                    _cancel.Dispose();
                 }
 
                 _isDisposed = true;

@@ -164,18 +164,24 @@ namespace Algoloop.Wpf.Common
             GC.SuppressFinalize(this);
         }
 
-        public bool WaitForExit(int timeout = int.MaxValue)
+        public int WaitForExit(int timeout = int.MaxValue, Action<string> postProcess = null)
         {
             if (_process.WaitForExit(timeout))
             {
-                if (_abort) return false; // Cleanup done
+                if (_abort) return _process.ExitCode; // Cleanup done
+                if (postProcess != null)
+                {
+                    string folder = _process.StartInfo.WorkingDirectory;
+                    postProcess(folder);
+                }
+
                 Cleanup();
-                return true;
+                return _process.ExitCode;
             }
             else
             {
                 Log.Error("Can not stop process");
-                return false;
+                return -1;
             }
         }
 
