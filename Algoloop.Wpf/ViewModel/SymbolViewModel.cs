@@ -181,7 +181,7 @@ namespace Algoloop.Wpf.ViewModel
             if (filename != null)
             {
                 var leanDataReader = new LeanDataReader(filename);
-                IEnumerable<BaseData> data = leanDataReader.Parse();
+                List<BaseData> data = leanDataReader.Parse().ToList();
                 if (data.Any())
                 {
                     var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
