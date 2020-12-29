@@ -154,7 +154,7 @@ namespace Algoloop.Wpf.ViewModel
         {
             if (obj is SymbolViewModel other)
             {
-                return string.Compare(Model.Id, other.Model.Id, StringComparison.OrdinalIgnoreCase);
+                return string.Compare(Model.Name, other.Model.Name, StringComparison.OrdinalIgnoreCase);
             }
 
             return 0;
