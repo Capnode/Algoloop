@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.Service;
 using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight.Command;
+using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System;
@@ -115,6 +116,11 @@ namespace Algoloop.Wpf.ViewModel
                 IsBusy = true;
                 vm.Refresh();
                 SelectedItem = vm;
+            }
+            catch (Exception ex)
+            {
+                Messenger.Default.Send(new NotificationMessage(ex.Message));
+                Log.Error(ex);
             }
             finally
             {
