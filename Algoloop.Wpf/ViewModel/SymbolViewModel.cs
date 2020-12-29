@@ -36,7 +36,7 @@ namespace Algoloop.Wpf.ViewModel
 {
     public class SymbolViewModel : ViewModel, ITreeViewModel, IComparable
     {
-        public enum ReportPeriod { Year, R12, Quarter};
+        public enum ReportPeriod { Year, R12, Quarter };
 
         private const decimal _million = 1e6m;
         private const string _annual = "Annual";
@@ -55,21 +55,19 @@ namespace Algoloop.Wpf.ViewModel
         private const string _sharesOutstanding = "Shares outstanding";
 
         private readonly ITreeViewModel _parent;
-        private Resolution _selectedResolution = Resolution.Daily;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
         private ObservableCollection<DataGridColumn> _periodColumns = new ObservableCollection<DataGridColumn>();
-        private DateTime _date = DateTime.Today;
-        private static ReportPeriod _selectedReportPeriod;
 
         public SymbolViewModel(ITreeViewModel parent, SymbolModel model)
         {
             _parent = parent;
+            Market = _parent as MarketViewModel;
             Model = model;
 
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            UpdateCommand = new RelayCommand(() => DoLoadData(_parent as MarketViewModel), () => !IsBusy && _parent is MarketViewModel);
+            UpdateCommand = new RelayCommand(() => DoLoadData(Market), () => !IsBusy && Market != null);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -90,9 +88,8 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand StopCommand { get; }
         public RelayCommand UpdateCommand { get; }
         public SymbolModel Model { get; }
+        public MarketViewModel Market { get; }
 
-        public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
-        public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
         public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; } = new SyncObservableCollection<ExDataGridRow>();
 
         public bool Active
@@ -110,18 +107,6 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        public Resolution SelectedResolution
-        {
-            get => _selectedResolution;
-            set => Set(ref _selectedResolution, value);
-        }
-
-        public DateTime Date
-        {
-            get => _date;
-            set => Set(ref _date, value);
-        }
-
         public SyncObservableCollection<ChartViewModel> Charts
         {
             get => _charts;
@@ -134,19 +119,13 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _periodColumns, value);
         }
 
-        public ReportPeriod SelectedReportPeriod
-        {
-            get => _selectedReportPeriod;
-            set => Set(ref _selectedReportPeriod, value);
-        }
-
         public void Refresh()
         {
             Model.Refresh();
 
-            if (_parent is MarketViewModel market)
+            if (Market != null)
             {
-                DoLoadData(market);
+                DoLoadData(Market);
             }
         }
 
@@ -177,7 +156,7 @@ namespace Algoloop.Wpf.ViewModel
         private void LoadCharts(MarketViewModel market)
         {
             Charts.Clear();
-            string filename = PriceFilePath(market, Model, SelectedResolution, Date);
+            string filename = PriceFilePath(market, Model, market.SelectedResolution, market.Date);
             if (filename != null)
             {
                 var leanDataReader = new LeanDataReader(filename);
@@ -275,7 +254,7 @@ namespace Algoloop.Wpf.ViewModel
                 return;
             }
 
-            switch (SelectedReportPeriod)
+            switch (Market.SelectedReportPeriod)
             {
                 case ReportPeriod.Year:
                     if (periodType != null && periodType.Equals(_annual, StringComparison.OrdinalIgnoreCase))

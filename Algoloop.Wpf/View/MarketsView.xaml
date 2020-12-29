@@ -296,8 +296,8 @@
                                         Margin="10 0 10 0"
                                         MinWidth="60"/>
                                     <ComboBox
-                                        SelectedValue="{Binding SelectedResolution, Mode=TwoWay}"
-                                        ItemsSource="{Binding ResolutionList}"
+                                        SelectedValue="{Binding Market.SelectedResolution, Mode=TwoWay}"
+                                        ItemsSource="{Binding Market.ResolutionList}"
                                         MinWidth="120">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="SelectionChanged">
@@ -308,7 +308,7 @@
                                     <xctk:DateTimePicker
                                         AutoCloseCalendar="True"
                                         BorderThickness="0"
-                                        Value="{Binding Date}"
+                                        Value="{Binding Market.Date}"
                                         Format="ShortDate"
                                         Margin="6"
                                         TimePickerVisibility="Collapsed">
@@ -326,8 +326,8 @@
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
-                                        SelectedValue="{Binding SelectedReportPeriod, Mode=TwoWay}"
-                                        ItemsSource="{Binding ReportPeriodList}"
+                                        SelectedValue="{Binding Market.SelectedReportPeriod, Mode=TwoWay}"
+                                        ItemsSource="{Binding Market.ReportPeriodList}"
                                         MinWidth="120">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="SelectionChanged">

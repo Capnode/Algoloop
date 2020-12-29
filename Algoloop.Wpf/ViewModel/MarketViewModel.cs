@@ -35,6 +35,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Diagnostics.Contracts;
+using static Algoloop.Wpf.ViewModel.SymbolViewModel;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -48,6 +49,9 @@ namespace Algoloop.Wpf.ViewModel
         private bool _checkAll;
         private IList _selectedItems;
         private IProvider _provider;
+        private DateTime _date = DateTime.Today;
+        private Resolution _selectedResolution = Resolution.Daily;
+        private static ReportPeriod _selectedReportPeriod;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingModel settings)
         {
@@ -101,6 +105,8 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
+        public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
+        public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
 
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
@@ -143,6 +149,24 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _model;
             set => Set(ref _model, value);
+        }
+
+        public Resolution SelectedResolution
+        {
+            get => _selectedResolution;
+            set => Set(ref _selectedResolution, value);
+        }
+
+        public DateTime Date
+        {
+            get => _date;
+            set => Set(ref _date, value);
+        }
+
+        public ReportPeriod SelectedReportPeriod
+        {
+            get => _selectedReportPeriod;
+            set => Set(ref _selectedReportPeriod, value);
         }
 
         public SymbolViewModel SelectedSymbol
