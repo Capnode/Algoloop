@@ -63,7 +63,7 @@ namespace Algoloop
             // Set Log handler
             Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
             Log.DebuggingLevel = Config.GetInt("debug-level", 1);
-            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>(Config.Get("log-handler", "Algoloop.Lean.LogItemHandler"));
+            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>("Algoloop.Lean.LogItemHandler");
             string message = $"Startup \"{AboutModel.AssemblyProduct}\"";
             Log.Trace(message);
 
