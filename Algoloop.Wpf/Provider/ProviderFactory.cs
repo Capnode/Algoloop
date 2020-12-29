@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using Newtonsoft.Json;
+using QuantConnect;
 using QuantConnect.Securities;
 using QuantConnect.Util;
 using System;
@@ -41,7 +42,7 @@ namespace Algoloop.Provider
             IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                 throw new ApplicationException($"Can not create provider {name}");
 
-            if (!AcceptProvider(settings, provider)) return null;
+            if (!AcceptProvider(settings, name)) return null;
             return provider;
         }
 
@@ -52,6 +53,7 @@ namespace Algoloop.Provider
             MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
             string originalJson = JsonConvert.SerializeObject(marketHours);
 
+            Market.Reset();
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract);
@@ -59,9 +61,11 @@ namespace Algoloop.Provider
             {
                 IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                     throw new ApplicationException($"Can not create provider {type.Name}");
-                if (AcceptProvider(settings, provider))
+                string name = provider.GetType().Name.ToLowerInvariant();
+
+                if (AcceptProvider(settings, name))
                 {
-                    provider.Register(settings);
+                    provider.Register(settings, name);
                 }
             }
 
@@ -74,12 +78,11 @@ namespace Algoloop.Provider
             }
         }
 
-        private static bool AcceptProvider(SettingModel settings, IProvider provider)
+        private static bool AcceptProvider(SettingModel settings, string name)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
-
-            string name = provider.GetType().Name.ToLowerInvariant();
-            return !string.IsNullOrEmpty(name);
+            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
+            return true;
         }
     }
 }

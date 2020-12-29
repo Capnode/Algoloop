@@ -39,8 +39,20 @@ namespace Algoloop.Provider
 
         public abstract void Download(MarketModel market, SettingModel settings);
 
-        public virtual void Register(SettingModel settings)
+        public virtual void Register(SettingModel settings, string name)
         {
+            // Make sure provider is registered
+            if (Market.Encode(name) == null)
+            {
+                // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
+                int code = 0;
+                while (Market.Decode(code) != null)
+                {
+                    code++;
+                }
+
+                Market.Add(name, code);
+            }
         }
 
         protected virtual void Dispose(bool disposing)

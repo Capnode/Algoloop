@@ -200,6 +200,22 @@ namespace QuantConnect
         public const string Bittrex = "bittrex";
 
         /// <summary>
+        /// Reset the map of available markets to initial values.
+        /// </summary>
+        public static void Reset()
+        {
+            Markets.Clear();
+            ReverseMarkets.Clear();
+
+            // initialize our maps
+            foreach (var market in HardcodedMarkets)
+            {
+                Markets[market.Item1] = market.Item2;
+                ReverseMarkets[market.Item2] = market.Item1;
+            }
+        }
+
+        /// <summary>
         /// Adds the specified market to the map of available markets with the specified identifier.
         /// </summary>
         /// <param name="market">The market string to add</param>
