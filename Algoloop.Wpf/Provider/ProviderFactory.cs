@@ -50,9 +50,11 @@ namespace Algoloop.Provider
         {
             Contract.Requires(settings != null);
 
+            MarketHoursDatabase.Reset();
             MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
             string originalJson = JsonConvert.SerializeObject(marketHours);
 
+            // Register providers to Market
             Market.Reset();
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())

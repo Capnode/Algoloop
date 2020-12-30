@@ -71,9 +71,6 @@ namespace Algoloop.Lean
             Debug.Assert(!model.Completed);
             Debug.Assert(model.Active);
 
-            // Register all data providers
-            ProviderFactory.RegisterProviders(settings);
-
             bool success = true;
             _process = new ConfigProcess(
                 "QuantConnect.Lean.Launcher.exe",
