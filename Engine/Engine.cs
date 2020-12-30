@@ -537,29 +537,7 @@ namespace QuantConnect.Lean.Engine
             // This is slow because it create all static timezones
             var nyTime = TimeZones.NewYork;
             // slow because if goes to disk and parses json
-            MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder();
-
-            // Add markets not already present
-            var listing = marketHours.ExchangeHoursListing;
-            int code = 0;
-            foreach (var item in listing)
-            {
-                SecurityDatabaseKey security = item.Key;
-                string market = security.Market;
-                if (Market.Encode(market) == null)
-                {
-                    while (Market.Decode(code) != null)
-                    {
-                        code++;
-                    }
-
-                    // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
-                    Market.Add(market, code);
-                    code++;
-                }
-            }
-
-            return marketHours;
+            return MarketHoursDatabase.FromDataFolder();
         }
 
     } // End Algorithm Node Core Thread

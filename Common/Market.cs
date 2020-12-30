@@ -64,12 +64,8 @@ namespace QuantConnect
 
         static Market()
         {
-            // initialize our maps
-            foreach (var market in HardcodedMarkets)
-            {
-                Markets[market.Item1] = market.Item2;
-                ReverseMarkets[market.Item2] = market.Item1;
-            }
+            // Initialize with hardcoded values
+            Reset();
         }
 
         /// <summary>
