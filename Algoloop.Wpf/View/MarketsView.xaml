@@ -319,7 +319,9 @@
                                         </i:Interaction.Triggers>
                                     </xctk:DateTimePicker>
                                 </ToolBar>
-                                <view:AmChart ItemsSource="{Binding Charts}"/>
+                                <view:AmChart
+                                    ItemsSource="{Binding Charts}"
+                                    Visibility="{Binding ShowCharts, Converter={viewsupport:BooleanToVisibilityConverter}}" />
                             </DockPanel>
                         </TabItem>
                         <TabItem Header ="Fundamentals">

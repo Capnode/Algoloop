@@ -57,6 +57,7 @@ namespace Algoloop.Wpf.ViewModel
         private readonly ITreeViewModel _parent;
         private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
         private ObservableCollection<DataGridColumn> _periodColumns = new ObservableCollection<DataGridColumn>();
+        private bool _showCharts;
 
         public SymbolViewModel(ITreeViewModel parent, SymbolModel model)
         {
@@ -105,6 +106,12 @@ namespace Algoloop.Wpf.ViewModel
 //                (_parent as MarketViewModel)?.Refresh();
                 }
             }
+        }
+
+        public bool ShowCharts
+        {
+            get => _showCharts;
+            set => Set(ref _showCharts, value);
         }
 
         public SyncObservableCollection<ChartViewModel> Charts
@@ -157,7 +164,7 @@ namespace Algoloop.Wpf.ViewModel
         {
             Charts.Clear();
             string filename = PriceFilePath(market, Model, market.SelectedResolution, market.Date);
-            if (filename != null)
+            if (File.Exists(filename))
             {
                 var leanDataReader = new LeanDataReader(filename);
                 List<BaseData> data = leanDataReader.Parse().ToList();
@@ -167,6 +174,11 @@ namespace Algoloop.Wpf.ViewModel
                     var viewModel = new ChartViewModel(series, data);
                     Charts.Add(viewModel);
                 }
+                ShowCharts = true;
+            }
+            else
+            {
+                ShowCharts = false;
             }
         }
 
@@ -181,7 +193,7 @@ namespace Algoloop.Wpf.ViewModel
                     symbol.Market,
                     resolution.ToString(),
                     symbol.Id + ".zip");
-                if (File.Exists(path)) return path;
+                return path;
             }
             else
             {
@@ -197,10 +209,8 @@ namespace Algoloop.Wpf.ViewModel
                     .GetFiles(date1 + "*.zip")
                     .Select(x => x.FullName)
                     .FirstOrDefault();
-                if (File.Exists(file)) return file;
+                return file;
             }
-
-            return null;
         }
 
         private void LoadFundamentals(MarketViewModel market)
