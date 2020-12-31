@@ -14,9 +14,12 @@
 
 using Algoloop.Model;
 using QuantConnect;
+using QuantConnect.Securities;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -42,6 +45,41 @@ namespace Algoloop.Provider
             "AU200AUD", "CH20CHF", "DE30EUR", "ES35EUR", "EU50EUR", "FR40EUR", "UK100GBP", "HK33HKD", "IT40EUR", "JP225JPY",
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
+
+        public override void Register(SettingModel settings, string name)
+        {
+            Contract.Requires(settings != null);
+
+            // Register market
+            base.Register(settings, name);
+
+            // Register Market Hours
+            MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
+            Debug.Assert(marketHours != null);
+
+            var exchangeHours = new SecurityExchangeHours(
+                TimeZones.Utc,
+                Enumerable.Empty<DateTime>(),
+                new Dictionary<DayOfWeek, LocalMarketHours>
+                {
+                    { DayOfWeek.Monday, new LocalMarketHours(DayOfWeek.Monday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
+                    { DayOfWeek.Tuesday, new LocalMarketHours(DayOfWeek.Tuesday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
+                    { DayOfWeek.Wednesday, new LocalMarketHours(DayOfWeek.Wednesday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
+                    { DayOfWeek.Thursday, new LocalMarketHours(DayOfWeek.Thursday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
+                    { DayOfWeek.Friday, new LocalMarketHours(DayOfWeek.Friday, new TimeSpan(0, 0, 0), new TimeSpan(22, 0, 0)) },
+                    { DayOfWeek.Saturday, LocalMarketHours.ClosedAllDay(DayOfWeek.Saturday) },
+                    { DayOfWeek.Sunday, new LocalMarketHours(DayOfWeek.Friday, new TimeSpan(22, 0, 0), new TimeSpan(1, 0, 0, 0)) }
+                },
+                new Dictionary<DateTime, TimeSpan>(),
+                new Dictionary<DateTime, TimeSpan>());
+
+            marketHours.SetEntry(
+                name,
+                null,
+                SecurityType.Forex,
+                exchangeHours,
+                TimeZones.Utc);
+        }
 
         public override void Download(MarketModel market, SettingModel settings)
         {
