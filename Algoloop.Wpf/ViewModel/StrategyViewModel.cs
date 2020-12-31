@@ -59,6 +59,7 @@ namespace Algoloop.Wpf.ViewModel
         private TrackViewModel _selectedTrack;
         private ListViewModel _selectedList;
         private IList _selectedItems;
+        private bool _active;
 
         public StrategyViewModel(ITreeViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingModel settings)
         {
@@ -68,8 +69,8 @@ namespace Algoloop.Wpf.ViewModel
             _accounts = accounts;
             _settings = settings;
 
-            StartCommand = new RelayCommand(() => DoRunStrategy(), () => !IsBusy);
-            StopCommand = new RelayCommand(() => { }, () => false);
+            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmLocation));
             ExportCommand = new RelayCommand(() => DoExportStrategy(), () => !IsBusy);
@@ -146,6 +147,21 @@ namespace Algoloop.Wpf.ViewModel
         public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
         public ObservableCollection<DataGridColumn> TrackColumns { get; } = new ObservableCollection<DataGridColumn>();
 
+        public bool Active 
+        {
+            get => _active;
+            set
+            {
+                Set(ref _active, value);
+
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
+                DeleteSymbolsCommand.RaiseCanExecuteChanged();
+                ExportSymbolsCommand.RaiseCanExecuteChanged();
+            }
+        }
+                
         public IList SelectedItems
         {
             get { return _selectedItems; }
@@ -381,9 +397,10 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        private async void DoRunStrategy()
+        private async void DoStartCommand()
         {
             // No IsBusy here
+            Active = true;
             DataToModel();
 
             int count = 0;
@@ -398,6 +415,7 @@ namespace Algoloop.Wpf.ViewModel
                 foreach (StrategyModel model in models)
                 {
                     await throttler.WaitAsync().ConfigureAwait(true);
+                    if (!Active) break;
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
@@ -418,6 +436,21 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             Messenger.Default.Send(new NotificationMessage(Resources.CompletedStrategy));
+        }
+
+        private void DoStopCommand()
+        {
+            // No IsBusy here
+            Active = false;
+
+            // Stop running tracks
+            foreach (TrackViewModel track in Tracks)
+            {
+                if (track.Active)
+                {
+                    track.Active = false;
+                }
+            }
         }
 
         private List<StrategyModel> GridOptimizerModels(StrategyModel rawModel, int index)

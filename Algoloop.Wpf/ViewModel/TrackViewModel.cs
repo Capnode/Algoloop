@@ -72,6 +72,7 @@ namespace Algoloop.Wpf.ViewModel
         private SyncObservableCollection<HoldingViewModel> _holdings = new SyncObservableCollection<HoldingViewModel>();
         private bool _loaded;
         private string _logs;
+        private LeanLauncher _leanLauncher = new LeanLauncher();
 
         public TrackViewModel(StrategyViewModel parent, TrackModel model, AccountsModel accounts, SettingModel settings)
         {
@@ -246,6 +247,25 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Model.Desktop = value;
                 RaisePropertyChanged();
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _leanLauncher.Dispose();
+                }
+
+                _isDisposed = true;
             }
         }
 
@@ -557,8 +577,8 @@ namespace Algoloop.Wpf.ViewModel
 
         private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
         {
-            using var leanEngine = new LeanLauncher();
-            await Task.Run(() => leanEngine.Run(model, account, _settings))
+            Debug.Assert(!_leanLauncher.IsBusy);
+            await Task.Run(() => _leanLauncher.Run(model, account, _settings))
                 .ConfigureAwait(false);
             return model;
         }
@@ -906,14 +926,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void StopTask()
         {
-            try
-            {
-                IsBusy = true;
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            _leanLauncher.Abort();
         }
 
         private void ClearRunData()
@@ -972,24 +985,6 @@ namespace Algoloop.Wpf.ViewModel
 
             Charts = null;
             Charts = workCharts;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                }
-
-                _isDisposed = true;
-            }
         }
     }
 }

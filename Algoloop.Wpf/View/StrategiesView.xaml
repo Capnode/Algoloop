@@ -160,6 +160,13 @@
                                             </MenuItem.Icon>
                                         </MenuItem>
                                         <MenuItem
+                                            Header="Stop strategy"
+                                            Command="{Binding StopCommand}">
+                                            <MenuItem.Icon>
+                                                <Image Source="/Resources/Stop.png" Width="16" Height="16"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem
                                             Header="Clone strategy"
                                             Command="{Binding CloneCommand}">
                                             <MenuItem.Icon>

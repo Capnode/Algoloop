@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Provider;
 using Algoloop.Service;
 using Algoloop.Wpf.Common;
 using Newtonsoft.Json;
@@ -36,10 +35,7 @@ namespace Algoloop.Lean
         private ConfigProcess _process;
         private bool _isDisposed;
 
-        public LeanLauncher()
-        {
-
-        }
+        public bool IsBusy { get; private set; }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -65,12 +61,19 @@ namespace Algoloop.Lean
             GC.SuppressFinalize(this);
         }
 
+        public void Abort()
+        {
+            _process?.Abort();
+        }
+
         public void Run(TrackModel model, AccountModel account, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
+            Debug.Assert(!IsBusy);
             Debug.Assert(!model.Completed);
-            Debug.Assert(model.Active);
+            if (!model.Active) return;
 
+            IsBusy = true;
             bool success = true;
             _process = new ConfigProcess(
                 "QuantConnect.Lean.Launcher.exe",
@@ -104,6 +107,7 @@ namespace Algoloop.Lean
 
             model.Completed = success;
             model.Active = false;
+            IsBusy = false;
         }
 
         private static void PostProcess(string folder, TrackModel model)
