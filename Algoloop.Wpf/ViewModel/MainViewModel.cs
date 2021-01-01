@@ -157,7 +157,6 @@ namespace Algoloop.Wpf.ViewModel
                 string appData = MainService.GetAppDataFolder();
                 SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
                 await Initialize().ConfigureAwait(false);
-                ResearchViewModel.Initialize();
             }
             else
             {

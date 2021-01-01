@@ -33,18 +33,12 @@ namespace Algoloop.Wpf.ViewModel
         private string _htmlText;
         private string _source;
         private ConfigProcess _process;
-        private bool _initialized;
         private bool _disposed;
 
         public ResearchViewModel(SettingModel settings)
         {
             _settings = settings;
             Debug.Assert(IsUiThread(), "Not UI thread!");
-        }
-
-        ~ResearchViewModel()
-        {
-            Dispose(false);
         }
 
         public string HtmlText
@@ -57,12 +51,6 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _source;
             set => Set(ref _source, value);
-        }
-
-        public bool Initialized
-        {
-            get => _initialized;
-            set => Set(ref _initialized, value);
         }
 
         public void Dispose()
@@ -84,7 +72,7 @@ namespace Algoloop.Wpf.ViewModel
             if (disposing)
             {
                 // Dispose managed state (managed objects).
-                _process.Dispose();
+                _process?.Dispose();
             }
 
             _disposed = true;
@@ -95,12 +83,10 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 StartJupyter();
-                Initialized = true;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Python must also be installed to use Research page.\nSee: https://github.com/QuantConnect/Lean/tree/master/Algorithm.Python#quantconnect-python-algorithm-project \n");
-                Initialized = false;
             }
         }
 
@@ -155,11 +141,13 @@ namespace Algoloop.Wpf.ViewModel
 
         public void StopJupyter()
         {
-            if (!Initialized) return;
+            if (_process == null) return;
 
             bool stopped = _process.Abort();
             Debug.Assert(stopped);
             Log.Trace($"Jupyter process exit: {stopped}");
+            _process.Dispose();
+            _process = null;
         }
 
         private void SetNotebookFolder()
