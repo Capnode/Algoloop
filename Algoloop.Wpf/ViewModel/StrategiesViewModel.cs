@@ -46,7 +46,7 @@ namespace Algoloop.Wpf.ViewModel
             AddCommand = new RelayCommand(() => DoAddStrategy(), () => !IsBusy);
             ImportCommand = new RelayCommand(() => DoImportStrategies(), () => !IsBusy);
             ExportCommand = new RelayCommand(() => DoExportStrategies(), () => !IsBusy);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy && vm != null);
 
             DataFromModel();
             Debug.Assert(IsUiThread(), "Not UI thread!");

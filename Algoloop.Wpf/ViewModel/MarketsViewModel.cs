@@ -113,21 +113,9 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DoSelectedChanged(ITreeViewModel vm)
         {
-            try
-            {
-                IsBusy = true;
-                vm.Refresh();
-                SelectedItem = vm;
-            }
-            catch (Exception ex)
-            {
-                Messenger.Default.Send(new NotificationMessage(ex.Message));
-                Log.Error(ex);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
+            // No IsBusy here
+            vm?.Refresh();
+            SelectedItem = vm;
         }
 
         private void DoAddMarket()
