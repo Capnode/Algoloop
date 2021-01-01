@@ -297,6 +297,7 @@ namespace Algoloop.Wpf.ViewModel
 
         internal async Task StartTrackAsync()
         {
+            Debug.Assert(Active);
             ClearRunData();
 
             // Account must not be null
@@ -351,6 +352,15 @@ namespace Algoloop.Wpf.ViewModel
 
             Active = false;
             UiThread(() => DataFromModel());
+        }
+
+        internal void StopTrack()
+        {
+            if (Active)
+            {
+                Active = false;
+                _leanLauncher.Abort();
+            }
         }
 
         internal void DataFromModel()
@@ -835,14 +845,22 @@ namespace Algoloop.Wpf.ViewModel
 
         private async void DoActiveCommand(bool value)
         {
-            // No IsBusy
             if (value)
             {
+                // No IsBusy
                 await StartTrackAsync().ConfigureAwait(false);
             }
             else
             {
-                _leanLauncher.Abort();
+                try
+                {
+                    IsBusy = true;
+                    _leanLauncher.Abort();
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
             }
         }
 
@@ -858,8 +876,7 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
-                _leanLauncher.Abort();
-                Active = false;
+                StopTrack();
             }
             finally
             {

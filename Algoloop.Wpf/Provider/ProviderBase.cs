@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
@@ -34,7 +35,11 @@ namespace Algoloop.Provider
 
         public void Abort()
         {
-            _process?.Abort();
+            if (_process != null)
+            {
+                bool stopped = _process.Abort();
+                Debug.Assert(stopped);
+            }
         }
 
         public abstract void Download(MarketModel market, SettingModel settings);

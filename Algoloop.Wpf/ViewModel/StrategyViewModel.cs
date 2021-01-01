@@ -295,6 +295,8 @@ namespace Algoloop.Wpf.ViewModel
 
         internal bool DeleteTrack(TrackViewModel track)
         {
+            track.StopTrack();
+            Debug.Assert(!track.Active);
             return Tracks.Remove(track);
         }
 
@@ -315,7 +317,7 @@ namespace Algoloop.Wpf.ViewModel
 
                 foreach (TrackViewModel track in list)
                 {
-                    Tracks.Remove(track);
+                    DeleteTrack(track);
                 }
 
                 DataToModel();
@@ -346,6 +348,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DeleteStrategy(StrategyViewModel strategy)
         {
+            Debug.Assert(!strategy.Active);
             Strategies.Remove(strategy);
         }
 
@@ -455,10 +458,7 @@ namespace Algoloop.Wpf.ViewModel
                 // Stop running tracks
                 foreach (TrackViewModel track in Tracks)
                 {
-                    if (track.Active)
-                    {
-                        track.Active = false;
-                    }
+                    track.StopTrack();
                 }
             }
             finally

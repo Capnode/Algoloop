@@ -63,7 +63,11 @@ namespace Algoloop.Lean
 
         public void Abort()
         {
-            _process?.Abort();
+            if (_process != null)
+            {
+                bool stopped = _process.Abort();
+                Debug.Assert(stopped);
+            }
         }
 
         public void Run(TrackModel model, AccountModel account, SettingModel settings)

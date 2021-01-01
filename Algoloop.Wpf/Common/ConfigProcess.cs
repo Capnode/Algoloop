@@ -26,7 +26,7 @@ namespace Algoloop.Wpf.Common
     public class ConfigProcess: IDisposable
     {
         private const int CTRL_C_EVENT = 0;
-        private const int _timeout = 60000;
+        private const int _timeout = 10000;
         private const int _maxIndex = 65536;
         private const string _configfile = "config.json";
         private readonly string _workFolder;
@@ -146,6 +146,22 @@ namespace Algoloop.Wpf.Common
                         Cleanup();
                         return true;
                     }
+                    else
+                    {
+                        Debug.Assert(!_process.HasExited);
+                        _process.Kill();
+                        if (_process.WaitForExit(_timeout))
+                        {
+                            Cleanup();
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                    return false;
                 }
                 finally
                 {

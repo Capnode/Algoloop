@@ -85,12 +85,7 @@ namespace Algoloop.Wpf.ViewModel
             set
             {
                 _parent.IsBusy = value;
-
-                StartCommand.RaiseCanExecuteChanged();
-                StopCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
-                DeleteSymbolsCommand.RaiseCanExecuteChanged();
-                ExportSymbolsCommand.RaiseCanExecuteChanged();
+                RaiseCommands();
             }
         }
 
@@ -143,14 +138,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Model.Active = value;
                 RaisePropertyChanged(() => Active);
-
-                StartCommand.RaiseCanExecuteChanged();
-                StopCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
-                DeleteSymbolsCommand.RaiseCanExecuteChanged();
-                ExportSymbolsCommand.RaiseCanExecuteChanged();
-                AddToSymbolListCommand.RaiseCanExecuteChanged();
-                CheckAllCommand.RaiseCanExecuteChanged();
+                RaiseCommands();
             }
         }
 
@@ -184,10 +172,7 @@ namespace Algoloop.Wpf.ViewModel
             set
             {
                 Set(ref _selectedSymbol, value);
-                DeleteSymbolsCommand.RaiseCanExecuteChanged();
-                ExportSymbolsCommand.RaiseCanExecuteChanged();
-                AddToSymbolListCommand.RaiseCanExecuteChanged();
-                CheckAllCommand.RaiseCanExecuteChanged();
+                RaiseCommands();
             }
         }
 
@@ -255,6 +240,31 @@ namespace Algoloop.Wpf.ViewModel
             DataToModel();
         }
 
+        internal void StopDownload()
+        {
+            if (Active)
+            {
+                Active = false;
+                _provider?.Abort();
+            }
+        }
+
+        private void RaiseCommands()
+        {
+            ActiveCommand.RaiseCanExecuteChanged();
+            StartCommand.RaiseCanExecuteChanged();
+            StopCommand.RaiseCanExecuteChanged();
+            CheckAllCommand.RaiseCanExecuteChanged();
+            AddSymbolCommand.RaiseCanExecuteChanged();
+            DeleteSymbolsCommand.RaiseCanExecuteChanged();
+            ImportSymbolsCommand.RaiseCanExecuteChanged();
+            ExportSymbolsCommand.RaiseCanExecuteChanged();
+            AddToSymbolListCommand.RaiseCanExecuteChanged();
+            DeleteCommand.RaiseCanExecuteChanged();
+            NewListCommand.RaiseCanExecuteChanged();
+            ImportListCommand.RaiseCanExecuteChanged();
+        }
+
         private async Task DownloadAsync()
         {
             DataToModel();
@@ -292,14 +302,22 @@ namespace Algoloop.Wpf.ViewModel
 
         private async void DoActiveCommand(bool value)
         {
-            // No IsBusy
             if (value)
             {
+                // No IsBusy
                 await DownloadAsync().ConfigureAwait(false);
             }
             else
             {
-                _provider?.Abort();
+                try
+                {
+                    IsBusy = true;
+                    _provider?.Abort();
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
             }
         }
 
@@ -315,8 +333,7 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
-                _provider?.Abort();
-                Active = false;
+                StopDownload();
             }
             finally
             {

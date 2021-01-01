@@ -69,6 +69,8 @@ namespace Algoloop.Wpf.ViewModel
         {
             Debug.Assert(market != null);
             SelectedItem = null;
+            market.StopDownload();
+            Debug.Assert(!market.Active);
             return Markets.Remove(market);
         }
 
