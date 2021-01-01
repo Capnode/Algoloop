@@ -104,12 +104,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Debug.Assert(_parent != this);
                 _parent.IsBusy = value;
-
-                StartCommand.RaiseCanExecuteChanged();
-                StopCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
-                DeleteSymbolsCommand.RaiseCanExecuteChanged();
-                ExportSymbolsCommand.RaiseCanExecuteChanged();
+                RaiseCommands();
             }
         }
 
@@ -159,12 +154,7 @@ namespace Algoloop.Wpf.ViewModel
             set
             {
                 Set(ref _active, value);
-
-                StartCommand.RaiseCanExecuteChanged();
-                StopCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
-                DeleteSymbolsCommand.RaiseCanExecuteChanged();
-                ExportSymbolsCommand.RaiseCanExecuteChanged();
+                RaiseCommands();
             }
         }
                 
@@ -213,10 +203,7 @@ namespace Algoloop.Wpf.ViewModel
             set
             {
                 Set(ref _selectedSymbol, value);
-                DeleteSymbolsCommand.RaiseCanExecuteChanged();
-                ExportSymbolsCommand.RaiseCanExecuteChanged();
-                MoveUpSymbolsCommand.RaiseCanExecuteChanged();
-                MoveDownSymbolsCommand.RaiseCanExecuteChanged();
+                RaiseCommands();
             }
         }
 
@@ -226,6 +213,7 @@ namespace Algoloop.Wpf.ViewModel
             set
             {
                 Set(ref _selectedTrack, value);
+                RaiseCommands();
             }
         }
 
@@ -235,6 +223,7 @@ namespace Algoloop.Wpf.ViewModel
             set
             {
                 Set(ref _selectedList, value);
+                RaiseCommands();
             }
         }
 
@@ -304,6 +293,29 @@ namespace Algoloop.Wpf.ViewModel
         {
             var strategy = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
             Strategies.Add(strategy);
+        }
+
+        private void RaiseCommands()
+        {
+            StartCommand.RaiseCanExecuteChanged();
+            StopCommand.RaiseCanExecuteChanged();
+            CloneCommand.RaiseCanExecuteChanged();
+            CloneAlgorithmCommand.RaiseCanExecuteChanged();
+            ExportCommand.RaiseCanExecuteChanged();
+            DeleteCommand.RaiseCanExecuteChanged();
+            DeleteAllTracksCommand.RaiseCanExecuteChanged();
+            DeleteSelectedTracksCommand.RaiseCanExecuteChanged();
+            UseParametersCommand.RaiseCanExecuteChanged();
+            AddSymbolCommand.RaiseCanExecuteChanged();
+            DeleteSymbolsCommand.RaiseCanExecuteChanged();
+            ImportSymbolsCommand.RaiseCanExecuteChanged();
+            ExportSymbolsCommand.RaiseCanExecuteChanged();
+            TrackDoubleClickCommand.RaiseCanExecuteChanged();
+            MoveUpSymbolsCommand.RaiseCanExecuteChanged();
+            MoveDownSymbolsCommand.RaiseCanExecuteChanged();
+            SortSymbolsCommand.RaiseCanExecuteChanged();
+            MoveStrategyCommand.RaiseCanExecuteChanged();
+            DropDownOpenedCommand.RaiseCanExecuteChanged();
         }
 
         private void DoDeleteTracks(IList tracks)
@@ -567,7 +579,7 @@ namespace Algoloop.Wpf.ViewModel
         private void AlgorithmNameChanged(string algorithmName)
         {
             StrategyNameChanged();
-            CloneAlgorithmCommand.RaiseCanExecuteChanged();
+            RaiseCommands();
             if (string.IsNullOrEmpty(algorithmName)) return;
 
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
