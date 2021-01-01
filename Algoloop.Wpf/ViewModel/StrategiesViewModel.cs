@@ -291,7 +291,7 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     if (track.Active)
                     {
-                        _ = track.StartTaskAsync();
+                        _ = track.StartTrackAsync();
                     }
                 }
             }

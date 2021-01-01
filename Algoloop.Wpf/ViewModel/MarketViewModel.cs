@@ -59,6 +59,9 @@ namespace Algoloop.Wpf.ViewModel
             Model = marketModel;
             _settings = settings;
 
+            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
+            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
             CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
@@ -68,9 +71,6 @@ namespace Algoloop.Wpf.ViewModel
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteMarket(this), () => !IsBusy && !Active);
             NewListCommand = new RelayCommand(() => DoNewList(), () => !IsBusy && !Active);
             ImportListCommand = new RelayCommand(() => DoImportList(), () => !IsBusy && !Active);
-            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
-            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
-            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
 
             Model.ModelChanged += DataFromModel;
 
@@ -82,7 +82,16 @@ namespace Algoloop.Wpf.ViewModel
         public bool IsBusy
         {
             get => _parent.IsBusy;
-            set => _parent.IsBusy = value;
+            set
+            {
+                _parent.IsBusy = value;
+
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
+                DeleteSymbolsCommand.RaiseCanExecuteChanged();
+                ExportSymbolsCommand.RaiseCanExecuteChanged();
+            }
         }
 
         public ITreeViewModel SelectedItem
@@ -278,7 +287,7 @@ namespace Algoloop.Wpf.ViewModel
 
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             Messenger.Default.Send(new NotificationMessage(
-                symbols.Any() ? Resources.DownloadComplete : Resources.NoSymbolSelected));
+                symbols.Any() ? Resources.DownloadCompleted : Resources.NoSymbolSelected));
         }
 
         private async void DoActiveCommand(bool value)
@@ -306,6 +315,7 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
+                _provider?.Abort();
                 Active = false;
             }
             finally

@@ -208,7 +208,9 @@
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type vm:TrackViewModel}">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding Active}" />
+                            <CheckBox
+                                IsChecked="{Binding Active}"
+                                Command="{Binding ActiveCommand}" />
                             <TextBlock Text="{Binding Model.Name}" />
                             <StackPanel.ContextMenu>
                                 <ContextMenu>

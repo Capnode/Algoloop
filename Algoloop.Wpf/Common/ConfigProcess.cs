@@ -168,7 +168,7 @@ namespace Algoloop.Wpf.Common
         {
             if (_process.WaitForExit(timeout))
             {
-                if (_abort) return _process.ExitCode; // Cleanup done
+                if (_abort) return -1; // Cleanup done
                 if (postProcess != null)
                 {
                     string folder = _process.StartInfo.WorkingDirectory;

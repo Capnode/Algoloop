@@ -161,15 +161,6 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Completed strategy.
-        /// </summary>
-        internal static string CompletedStrategy {
-            get {
-                return ResourceManager.GetString("CompletedStrategy", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Delete {
@@ -220,11 +211,11 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download complete.
+        ///   Looks up a localized string similar to Download completed.
         /// </summary>
-        internal static string DownloadComplete {
+        internal static string DownloadCompleted {
             get {
-                return ResourceManager.GetString("DownloadComplete", resourceCulture);
+                return ResourceManager.GetString("DownloadCompleted", resourceCulture);
             }
         }
         
@@ -409,6 +400,24 @@ namespace Algoloop.Wpf.Properties {
             get {
                 object obj = ResourceManager.GetObject("Stop", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy aborted.
+        /// </summary>
+        internal static string StrategyAborted {
+            get {
+                return ResourceManager.GetString("StrategyAborted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy completed.
+        /// </summary>
+        internal static string StrategyCompleted {
+            get {
+                return ResourceManager.GetString("StrategyCompleted", resourceCulture);
             }
         }
         

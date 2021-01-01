@@ -104,6 +104,12 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Debug.Assert(_parent != this);
                 _parent.IsBusy = value;
+
+                StartCommand.RaiseCanExecuteChanged();
+                StopCommand.RaiseCanExecuteChanged();
+                DeleteCommand.RaiseCanExecuteChanged();
+                DeleteSymbolsCommand.RaiseCanExecuteChanged();
+                ExportSymbolsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -422,7 +428,7 @@ namespace Algoloop.Wpf.ViewModel
                     var track = new TrackViewModel(this, trackModel, _accounts, _settings);
                     Tracks.Add(track);
                     Task task = track
-                        .StartTaskAsync()
+                        .StartTrackAsync()
                         .ContinueWith(m =>
                         {
                             ExDataGridColumns.AddPropertyColumns(TrackColumns, track.Statistics, "Statistics");
@@ -432,24 +438,32 @@ namespace Algoloop.Wpf.ViewModel
                     tasks.Add(task);
                 }
 
-                await Task.WhenAll(tasks).ConfigureAwait(false);
+                await Task.WhenAll(tasks).ConfigureAwait(true);
             }
 
-            Messenger.Default.Send(new NotificationMessage(Resources.CompletedStrategy));
+            Messenger.Default.Send(new NotificationMessage(Active ? Resources.StrategyCompleted : Resources.StrategyAborted));
+            Active = false;
         }
 
         private void DoStopCommand()
         {
-            // No IsBusy here
-            Active = false;
-
-            // Stop running tracks
-            foreach (TrackViewModel track in Tracks)
+            try
             {
-                if (track.Active)
+                IsBusy = true;
+                Active = false;
+
+                // Stop running tracks
+                foreach (TrackViewModel track in Tracks)
                 {
-                    track.Active = false;
+                    if (track.Active)
+                    {
+                        track.Active = false;
+                    }
                 }
+            }
+            finally
+            {
+                IsBusy = false;
             }
         }
 

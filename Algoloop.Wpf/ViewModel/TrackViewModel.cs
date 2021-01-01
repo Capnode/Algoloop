@@ -81,8 +81,9 @@ namespace Algoloop.Wpf.ViewModel
             _accounts = accounts;
             _settings = settings;
 
-            StartCommand = new RelayCommand(() => DoStartTaskCommand(), () => !IsBusy && !Active);
-            StopCommand = new RelayCommand(() => DoStopTaskCommand(), () => !IsBusy && Active);
+            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
+            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
             DeleteCommand = new RelayCommand(() => DoDeleteTrack(), () => !IsBusy && !Active);
             UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !IsBusy && !Active);
             ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy);
@@ -220,17 +221,11 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Model.Active = value;
                 RaisePropertyChanged(() => Active);
+
                 StartCommand.RaiseCanExecuteChanged();
                 StopCommand.RaiseCanExecuteChanged();
                 DeleteCommand.RaiseCanExecuteChanged();
-                if (value)
-                {
-                    Task task = StartTaskAsync();
-                }
-                else
-                {
-                    StopTask();
-                }
+                ExportSymbolsCommand.RaiseCanExecuteChanged();
             }
         }
 
@@ -300,7 +295,7 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        internal async Task StartTaskAsync()
+        internal async Task StartTrackAsync()
         {
             ClearRunData();
 
@@ -339,14 +334,11 @@ namespace Algoloop.Wpf.ViewModel
                         .ConfigureAwait(false);
                 }
 
-                model.Completed = true;
-
                 // Split result and logs to separate files
-                SplitModelToFiles(model);
-            }
-            catch (AppDomainUnloadedException)
-            {
-                Log.Trace($"Strategy {Model.Name} canceled by user");
+                if (model.Completed)
+                {
+                    SplitModelToFiles(model);
+                }
             }
             catch (Exception ex)
             {
@@ -727,6 +719,9 @@ namespace Algoloop.Wpf.ViewModel
 
         private void SplitModelToFiles(TrackModel model)
         {
+            Debug.Assert(model.Logs != null);
+            Debug.Assert(model.Result != null);
+
             // Create folder for track files
             Directory.CreateDirectory(Folder);
             string zipFileTemplate = Path.Combine(Folder, _zipFile);
@@ -838,26 +833,32 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        private async void DoStartTaskCommand()
+        private async void DoActiveCommand(bool value)
         {
-            try
+            // No IsBusy
+            if (value)
             {
-                IsBusy = true;
-                Active = true;
-                await StartTaskAsync().ConfigureAwait(false);
+                await StartTrackAsync().ConfigureAwait(false);
             }
-            finally
+            else
             {
-                IsBusy = false;
+                _leanLauncher.Abort();
             }
         }
 
-        private void DoStopTaskCommand()
+        private async void DoStartCommand()
+        {
+            // No IsBusy
+            Active = true;
+            await StartTrackAsync().ConfigureAwait(false);
+        }
+
+        private void DoStopCommand()
         {
             try
             {
                 IsBusy = true;
-                StopTask();
+                _leanLauncher.Abort();
                 Active = false;
             }
             finally
@@ -922,11 +923,6 @@ namespace Algoloop.Wpf.ViewModel
             {
                 IsBusy = false;
             }
-        }
-
-        private void StopTask()
-        {
-            _leanLauncher.Abort();
         }
 
         private void ClearRunData()
