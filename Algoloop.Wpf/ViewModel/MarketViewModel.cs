@@ -274,7 +274,7 @@ namespace Algoloop.Wpf.ViewModel
                 Log.Trace($"{market.Provider} download {market.Resolution} after {market.LastDate:d}");
                 try
                 {
-                    _provider = ProviderFactory.CreateProvider(market, _settings);
+                    _provider = ProviderFactory.CreateProvider(market.Provider, _settings);
                     if (_provider == null) throw new ApplicationException($"Can not create provider {market.Provider}");
                     await Task.Run(() => _provider.Download(market, _settings))
                         .ConfigureAwait(false);
@@ -284,6 +284,7 @@ namespace Algoloop.Wpf.ViewModel
                     Log.Error(ex);
                     market.Active = false;
                 }
+                _provider.Dispose();
                 _provider = null;
 
                 // Update view

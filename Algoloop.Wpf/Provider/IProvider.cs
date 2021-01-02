@@ -13,14 +13,25 @@
  */
 
 using Algoloop.Model;
+using QuantConnect;
+using QuantConnect.Orders;
+using QuantConnect.Securities;
+using QuantConnect.Statistics;
 using System;
+using System.Collections.Generic;
 
 namespace Algoloop.Provider
 {
     public interface IProvider : IDisposable
     {
         void Register(SettingModel settings, string name);
+        void Login(AccountModel account, SettingModel settings);
+        void Logout();
         void Download(MarketModel market, SettingModel settings);
         void Abort();
+        List<Order> GetOpenOrders();
+        List<Holding> GetAccountHoldings();
+        List<Trade> GetClosedTrades();
+        List<CashAmount> GetCashBalance();
     }
 }

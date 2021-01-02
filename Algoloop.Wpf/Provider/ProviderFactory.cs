@@ -27,12 +27,10 @@ namespace Algoloop.Provider
 {
     public static class ProviderFactory
     {
-        public static IProvider CreateProvider(MarketModel market, SettingModel settings)
+        public static IProvider CreateProvider(string name, SettingModel settings)
         {
-            if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            string name = market.Provider;
             Type type = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract)

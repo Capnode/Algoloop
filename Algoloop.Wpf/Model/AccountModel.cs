@@ -12,9 +12,11 @@
  * limitations under the License.
  */
 
+using Algoloop.Wpf.ViewSupport;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Contracts;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -23,11 +25,17 @@ namespace Algoloop.Model
     [DataContract]
     public class AccountModel : ModelBase
     {
-        private BrokerageType _brokerage;
+        private string _provider;
+
         public enum AccountType { Backtest, Paper, Live };
-        public enum BrokerageType { Fxcm };
         public enum AccessType { Demo, Real };
 
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public bool Active { get; set; }
+
+        [Category("Broker")]
         [DisplayName("Account name")]
         [Description("Name of the account.")]
         [Browsable(true)]
@@ -35,24 +43,21 @@ namespace Algoloop.Model
         [DataMember]
         public string Name { get; set; } = "Account";
 
-        [Browsable(false)]
-        [ReadOnly(false)]
-        [DataMember]
-        public bool Active { get; set; }
-
-        [Category("Account")]
-        [DisplayName("Brokerage")]
+        [Category("Broker")]
+        [DisplayName("Provider")]
         [Description("Name of the broker.")]
+        [TypeConverter(typeof(ProviderNameConverter))]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public BrokerageType Brokerage
+        public string Provider
         {
-            get => _brokerage;
+            get => _provider;
             set
             {
-                _brokerage = value;
+                Contract.Requires(value != null);
+                _provider = value.ToLowerInvariant();
                 Refresh();
             }
         }
@@ -83,6 +88,15 @@ namespace Algoloop.Model
         public string Password { get; set; } = string.Empty;
 
         [Category("Account")]
+        [DisplayName("API key")]
+        [Description("User API key.")]
+        [PasswordPropertyText(true)]
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string ApiKey { get; set; } = string.Empty;
+
+        [Category("Account")]
         [DisplayName("Account number")]
         [Description("Account number.")]
         [Browsable(false)]
@@ -102,20 +116,23 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
-            switch (Brokerage)
+            if (string.IsNullOrEmpty(Provider)) return;
+
+            if (Provider.Equals(nameof(Algoloop.Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
             {
-                case BrokerageType.Fxcm:
-                    SetBrowsable("Access", true);
-                    SetBrowsable("Login", true);
-                    SetBrowsable("Password", true);
-                    SetBrowsable("Id", true);
-                    break;
-                default:
-                    SetBrowsable("Access", false);
-                    SetBrowsable("Login", false);
-                    SetBrowsable("Password", false);
-                    SetBrowsable("Id", false);
-                    break;
+                SetBrowsable("Access", true);
+                SetBrowsable("Login", true);
+                SetBrowsable("Password", true);
+                SetBrowsable("ApiKey", false);
+                SetBrowsable("Id", true);
+            }
+            else
+            {
+                SetBrowsable("Access", false);
+                SetBrowsable("Login", false);
+                SetBrowsable("Password", false);
+                SetBrowsable("ApiKey", false);
+                SetBrowsable("Id", false);
             }
         }
     }

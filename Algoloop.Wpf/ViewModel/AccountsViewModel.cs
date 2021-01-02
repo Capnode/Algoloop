@@ -25,12 +25,15 @@ namespace Algoloop.Wpf.ViewModel
 {
     public class AccountsViewModel : ViewModel
     {
+        private readonly SettingModel _settings;
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
 
-        public AccountsViewModel(AccountsModel accounts)
+        public AccountsViewModel(AccountsModel accounts, SettingModel settings)
         {
             Model = accounts;
+            _settings = settings;
+
             AddCommand = new RelayCommand(() => AddAccount(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => DoSelectedChanged(market), (market) => !IsBusy && market != null);
             DataFromModel();
@@ -41,6 +44,7 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand AddCommand { get; }
 
         public AccountsModel Model { get; }
+
         public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
 
         /// <summary>
@@ -111,7 +115,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void AddAccount()
         {
-            var loginViewModel = new AccountViewModel(this, new AccountModel());
+            var loginViewModel = new AccountViewModel(this, new AccountModel(), _settings);
             Accounts.Add(loginViewModel);
         }
 
@@ -131,7 +135,7 @@ namespace Algoloop.Wpf.ViewModel
             Accounts.Clear();
             foreach (AccountModel account in Model.Accounts)
             {
-                var loginViewModel = new AccountViewModel(this, account);
+                var loginViewModel = new AccountViewModel(this, account, _settings);
                 Accounts.Add(loginViewModel);
             }
         }
@@ -142,7 +146,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 if (account.Active)
                 {
-                    _ = account.DoConnectAsync();
+                    _ = account.StartAccountAsync();
                 }
             }
         }

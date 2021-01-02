@@ -21,20 +21,16 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
+using Algoloop.Provider;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using QuantConnect;
-using QuantConnect.Brokerages;
-using QuantConnect.Brokerages.Fxcm;
-using QuantConnect.Configuration;
-using QuantConnect.Data;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
 using QuantConnect.Statistics;
-using QuantConnect.Util;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -42,20 +38,39 @@ namespace Algoloop.Wpf.ViewModel
     {
         private bool _isDisposed = false; // To detect redundant calls
         private readonly AccountsViewModel _parent;
+        private readonly SettingModel _settings;
         private CancellationTokenSource _cancel;
-        private FxcmBrokerage _brokerage;
-        private Task _task;
         private IList _selectedItems;
-        private const string FxcmServer = "http://www.fxcorporate.com/Hosts.jsp";
+        private AccountModel _model;
 
-        public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _cancel?.Dispose();
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        public AccountViewModel(AccountsViewModel accountsViewModel, AccountModel accountModel, SettingModel settings)
         {
             _parent = accountsViewModel;
             Model = accountModel;
+            _settings = settings;
 
             ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), () => !IsBusy);
-            StartCommand = new RelayCommand(async () => await DoConnectAsync().ConfigureAwait(false), () => !IsBusy && !Active);
-            StopCommand = new RelayCommand(async () => await DoDisconnectAsync().ConfigureAwait(false), () => !IsBusy && Active);
+            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
             DeleteCommand = new RelayCommand(() => _parent?.DoDeleteAccount(this), () => !IsBusy && !Active);
 
             DataFromModel();
@@ -65,7 +80,11 @@ namespace Algoloop.Wpf.ViewModel
         public bool IsBusy
         {
             get => _parent.IsBusy;
-            set => _parent.IsBusy = value;
+            set
+            {
+                _parent.IsBusy = value;
+                RaiseCommands();
+            }
         }
 
         public ITreeViewModel SelectedItem
@@ -79,7 +98,12 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand StopCommand { get; }
         public RelayCommand DeleteCommand { get; }
 
-        public AccountModel Model { get; }
+        public AccountModel Model
+        {
+            get => _model;
+            set => Set(ref _model, value);
+        }
+
         public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
         public SyncObservableCollection<Trade> ClosedTrades { get; } = new SyncObservableCollection<Trade>();
@@ -109,9 +133,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Model.Active = value;
                 RaisePropertyChanged(() => Active);
-                StartCommand.RaiseCanExecuteChanged();
-                StopCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
+                RaiseCommands();
             }
         }
 
@@ -120,77 +142,32 @@ namespace Algoloop.Wpf.ViewModel
             Model.Refresh();
         }
 
-        internal async Task DoConnectAsync()
+        internal async Task StartAccountAsync()
         {
-            if (_cancel != null || _task != null)
-            {
-                return;
-            }
+            Debug.Assert(Active);
 
             try
             {
-                IsBusy = true;
-                Active = true;
-                Log.Trace($"Connect Account {Model.Name}");
-                try
-                {
-                    _brokerage = new FxcmBrokerage(
-                        null, 
-                        null, 
-                        Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager")),
-                        FxcmServer,
-                        Model.Access.ToString(),
-                        Model.Login,
-                        Model.Password,
-                        Model.Id);
-                    _brokerage.Message += OnMessage;
-                    _brokerage.AccountChanged += OnAccountChanged;
-                    _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
-                    _brokerage.OrderStatusChanged += OnOrderStatusChanged;
-                    _cancel = new CancellationTokenSource();
-                    _task = Task.Run(() => MainLoop(), _cancel.Token);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"{_brokerage.Name}: {ex.GetType()}: {ex.Message}");
-                }
-
-                if (!Active)
-                {
-                    await DoDisconnectAsync().ConfigureAwait(false);
-                }
+                Debug.Assert(_cancel == null);
+                _cancel = new CancellationTokenSource();
+                await Task.Run(AccountLoop, _cancel.Token)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
             }
             finally
             {
-                IsBusy = false;
-            }
-        }
-
-        internal async Task DoDisconnectAsync()
-        {
-            if (_cancel == null || _task == null)
-            {
-                return;
-            }
-
-            try
-            {
-                IsBusy = true;
-                Active = false;
-                _cancel.Cancel();
-                await _task.ConfigureAwait(false);
+                _cancel?.Dispose();
                 _cancel = null;
-                _task = null;
+            }
 
-                if (Active)
-                {
-                    await DoConnectAsync().ConfigureAwait(false);
-                }
-            }
-            finally
+            // Update view
+            UiThread(() =>
             {
-                IsBusy = false;
-            }
+                Active = false;
+            });
         }
 
         internal void DataToModel()
@@ -228,27 +205,70 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        private void MainLoop()
+        private void RaiseCommands()
         {
-            _brokerage.Connect();
-            bool loop = true;
-            while (loop)
-            {
-                UpdateOrder();
-                UpdatePosition();
-                UpdateBalance();
-                UpdateClosedTrades();
-                loop = !_cancel.Token.WaitHandle.WaitOne(1000);
-            }
-
-            _brokerage.Disconnect();
-            Positions.Clear();
-            Balances.Clear();
+            ActiveCommand.RaiseCanExecuteChanged();
+            StartCommand.RaiseCanExecuteChanged();
+            StopCommand.RaiseCanExecuteChanged();
+            DeleteCommand.RaiseCanExecuteChanged();
         }
 
-        private void UpdateOrder()
+        private async void DoStartCommand()
         {
-            List<Order> orders = _brokerage.GetOpenOrders();
+            // No IsBusy
+            Active = true;
+            await StartAccountAsync().ConfigureAwait(false);
+        }
+
+        private void DoStopCommand()
+        {
+            try
+            {
+                IsBusy = true;
+                _cancel?.Cancel();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async void DoActiveCommand(bool value)
+        {
+            if (value)
+            {
+                await StartAccountAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                DoStopCommand();
+            }
+        }
+
+        private void AccountLoop()
+        {
+            using IProvider provider = ProviderFactory.CreateProvider(Model.Name, _settings);
+            if (provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
+            provider.Login(Model, _settings);
+            while (!_cancel.IsCancellationRequested)
+            {
+                UpdateOrder(provider);
+                UpdatePosition(provider);
+                UpdateBalance(provider);
+                UpdateClosedTrades(provider);
+                Thread.Sleep(1000);
+            }
+
+            provider.Logout();
+            Orders.Clear();
+            Positions.Clear();
+            Balances.Clear();
+            ClosedTrades.Clear();
+        }
+
+        private void UpdateOrder(IProvider provider)
+        {
+            List<Order> orders = provider.GetOpenOrders();
             foreach (Order order in orders)
             {
                 bool update = false;
@@ -269,9 +289,9 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        private void UpdatePosition()
+        private void UpdatePosition(IProvider provider)
         {
-            List<Holding> holdings = _brokerage.GetAccountHoldings();
+            List<Holding> holdings = provider.GetAccountHoldings();
             foreach (Holding holding in holdings)
             {
                 bool update = false;
@@ -303,19 +323,19 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        private void UpdateClosedTrades()
+        private void UpdateClosedTrades(IProvider provider)
         {
             ClosedTrades.Clear();
-            List<Trade> trades = _brokerage.GetClosedTrades();
+            List<Trade> trades = provider.GetClosedTrades();
             foreach (Trade trade in trades)
             {
                 ClosedTrades.Add(trade);
             }
         }
 
-        private void UpdateBalance()
+        private void UpdateBalance(IProvider provider)
         {
-            List<CashAmount> balances = _brokerage.GetCashBalance();
+            List<CashAmount> balances = provider.GetCashBalance();
             foreach (CashAmount balance in balances)
             {
                 bool update = false;
@@ -344,63 +364,6 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     Balances.Remove(vm);
                 }
-            }
-        }
-
-        private async void DoActiveCommand(bool value)
-        {
-            if (value)
-            {
-                await DoConnectAsync().ConfigureAwait(false);
-            }
-            else
-            {
-                await DoDisconnectAsync().ConfigureAwait(false);
-            }
-        }
-
-        private void OnMessage(object sender, BrokerageMessageEvent message)
-        {
-            var brokerage = sender as Brokerage;
-            Log.Trace($"{brokerage.Name}: {message.GetType()}: {message}");
-        }
-
-        private void OnAccountChanged(object sender, AccountEvent e)
-        {
-            var brokerage = sender as Brokerage;
-            Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
-        }
-
-        private void OnOrderStatusChanged(object sender, OrderEvent e)
-        {
-            var brokerage = sender as Brokerage;
-            Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
-        }
-
-        private void OnOptionPositionAssigned(object sender, OrderEvent e)
-        {
-            var brokerage = sender as Brokerage;
-            Log.Trace($"{brokerage.Name}: {e.GetType()}: {e}");
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    _brokerage.Dispose();
-                    _task.Dispose();
-                    _cancel.Dispose();
-                }
-
-                _isDisposed = true;
             }
         }
     }

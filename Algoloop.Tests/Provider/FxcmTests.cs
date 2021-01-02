@@ -63,7 +63,7 @@ namespace Algoloop.Tests.Provider
                 Password = pass
             };
 
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsFalse(market.Active);
@@ -98,7 +98,7 @@ namespace Algoloop.Tests.Provider
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsTrue(market.Active);
@@ -129,7 +129,7 @@ namespace Algoloop.Tests.Provider
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsTrue(market.Active);
@@ -158,7 +158,7 @@ namespace Algoloop.Tests.Provider
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsFalse(market.Active);

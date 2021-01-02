@@ -152,7 +152,7 @@ namespace Algoloop.Lean
             {
                 SetPaper(config);
             }
-            else if (account != null && account.Brokerage.Equals(AccountModel.BrokerageType.Fxcm))
+            else if (account != null && account.Provider.Equals(nameof(Algoloop.Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
             {
                 if (model.Desktop)
                 {

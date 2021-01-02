@@ -59,7 +59,7 @@ namespace Algoloop.Tests.Provider
             };
 
             // Just update symbol list
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsFalse(market.Active);
@@ -85,7 +85,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsTrue(market.Active);
@@ -113,7 +113,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsTrue(market.Active);
@@ -142,7 +142,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsTrue(market.Active);
@@ -178,7 +178,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("noname", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsFalse(market.Active);
@@ -204,7 +204,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsFalse(market.Active);
@@ -230,7 +230,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
             // Dwonload symbol and update list
-            using IProvider provider = ProviderFactory.CreateProvider(market, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
             provider.Download(market, _settings);
 
             Assert.IsTrue(market.Active);

@@ -17,6 +17,9 @@ using Algoloop.Service;
 using Algoloop.Wpf.Common;
 using QuantConnect;
 using QuantConnect.Logging;
+using QuantConnect.Orders;
+using QuantConnect.Securities;
+using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,19 +33,8 @@ namespace Algoloop.Provider
 {
     abstract public class ProviderBase : IProvider
     {
-        private bool _isDisposed;
+        protected bool _isDisposed;
         private ConfigProcess _process;
-
-        public void Abort()
-        {
-            if (_process != null)
-            {
-                bool stopped = _process.Abort();
-                Debug.Assert(stopped);
-            }
-        }
-
-        public abstract void Download(MarketModel market, SettingModel settings);
 
         public virtual void Register(SettingModel settings, string name)
         {
@@ -58,6 +50,51 @@ namespace Algoloop.Provider
 
                 Market.Add(name, code);
             }
+        }
+
+        public virtual void Login(AccountModel account, SettingModel settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Logout()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public virtual void Download(MarketModel market, SettingModel settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Abort()
+        {
+            if (_process != null)
+            {
+                bool stopped = _process.Abort();
+                Debug.Assert(stopped);
+            }
+        }
+
+        public virtual List<Order> GetOpenOrders()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual List<Holding> GetAccountHoldings()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual List<Trade> GetClosedTrades()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual List<CashAmount> GetCashBalance()
+        {
+            throw new NotImplementedException();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -111,7 +148,7 @@ namespace Algoloop.Provider
             config["plugin-directory"] = ".";
             config["log-handler"] = "CompositeLogHandler";
             config["map-file-provider"] = "LocalDiskMapFileProvider";
-            config["#command"] = "QuantConnect.ToolBox.exe";
+            config["#command"] = cmd;
             config["#parameters"] = string.Join(" ", args);
             config["#work-directory"] = Directory.GetCurrentDirectory();
             foreach (KeyValuePair<string, string> item in configs)
