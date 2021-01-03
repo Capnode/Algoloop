@@ -155,7 +155,9 @@ namespace Algoloop.Wpf.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex);
+                Messenger.Default.Send(new NotificationMessage($"{Model.Name}: {ex.Message}"));
+                Log.Error(ex, Model.Name);
+
             }
             finally
             {
