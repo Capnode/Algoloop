@@ -16,16 +16,21 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
 {
     [DataContract]
-    public class MarketsModel
+    public class AccountsModel
     {
-        public const int version = 1;
+        public const int version = 0;
+
+        private static readonly AccountModel[] _standardAccounts = new[]
+        {
+            new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
+            new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
+        };
 
         [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
@@ -34,31 +39,26 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public Collection<MarketModel> Markets { get; } = new Collection<MarketModel>();
+        public Collection<AccountModel> Accounts { get; } = new Collection<AccountModel>();
 
-        internal void Copy(MarketsModel marketsModel)
+        public void Copy(AccountsModel accountsModel)
         {
-            Markets.Clear();
-            foreach (MarketModel market in marketsModel.Markets)
+            Accounts.Clear();
+            foreach (AccountModel account in accountsModel.Accounts)
             {
-                Markets.Add(market);
-
-                // Make sure all symbols has an id
-                foreach (SymbolModel symbol in market.Symbols)
-                {
-                    symbol.Validate();
-                }
+                Accounts.Add(account);
             }
         }
 
-        internal IReadOnlyList<MarketModel> GetMarkets()
+        public AccountModel FindAccount(string account)
         {
-            return Markets;
+            return Accounts.FirstOrDefault(m => m.Name.Equals(account, StringComparison.OrdinalIgnoreCase));
         }
 
-        internal MarketModel GetMarket(string market)
+        internal IReadOnlyList<AccountModel> GetAccounts()
         {
-            return Markets.FirstOrDefault(m => m.Name.Equals(market, StringComparison.OrdinalIgnoreCase));
+            IEnumerable<AccountModel> accounts = Accounts.Concat(_standardAccounts);
+            return accounts.ToList();
         }
     }
 }

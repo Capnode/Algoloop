@@ -22,15 +22,9 @@ using System.Runtime.Serialization;
 namespace Algoloop.Model
 {
     [DataContract]
-    public class AccountsModel
+    public class MarketsModel
     {
-        public const int version = 0;
-
-        private static readonly AccountModel[] _standardAccounts = new[]
-        {
-            new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
-            new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
-        };
+        public const int version = 1;
 
         [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
@@ -39,26 +33,31 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public Collection<AccountModel> Accounts { get; } = new Collection<AccountModel>();
+        public Collection<MarketModel> Markets { get; } = new Collection<MarketModel>();
 
-        internal void Copy(AccountsModel accountsModel)
+        public void Copy(MarketsModel marketsModel)
         {
-            Accounts.Clear();
-            foreach (AccountModel account in accountsModel.Accounts)
+            Markets.Clear();
+            foreach (MarketModel market in marketsModel.Markets)
             {
-                Accounts.Add(account);
+                Markets.Add(market);
+
+                // Make sure all symbols has an id
+                foreach (SymbolModel symbol in market.Symbols)
+                {
+                    symbol.Validate();
+                }
             }
         }
 
-        internal AccountModel FindAccount(string account)
+        public IReadOnlyList<MarketModel> GetMarkets()
         {
-            return Accounts.FirstOrDefault(m => m.Name.Equals(account, StringComparison.OrdinalIgnoreCase));
+            return Markets;
         }
 
-        internal IReadOnlyList<AccountModel> GetAccounts()
+        internal MarketModel GetMarket(string market)
         {
-            IEnumerable<AccountModel> accounts = Accounts.Concat(_standardAccounts);
-            return accounts.ToList();
+            return Markets.FirstOrDefault(m => m.Name.Equals(market, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

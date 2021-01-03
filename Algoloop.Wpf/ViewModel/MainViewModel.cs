@@ -12,20 +12,20 @@
  * limitations under the License.
  */
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
 using Algoloop.Model;
 using Algoloop.Wpf.Properties;
 using Algoloop.Provider;
-using Algoloop.Service;
+using Algoloop.Support;
 using Algoloop.Wpf.View;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Algoloop.Wpf.ViewModel
 {

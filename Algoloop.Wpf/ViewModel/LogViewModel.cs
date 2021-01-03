@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Lean;
-using Algoloop.Model;
 using Algoloop.Wpf.ViewSupport;
 using QuantConnect.Logging;
 using System.Diagnostics;

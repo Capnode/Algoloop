@@ -166,14 +166,12 @@
     <Compile Include="Common\ConfigProcess.cs" />
     <Compile Include="Common\SafeDictionary.cs" />
     <Compile Include="Lean\AlphaHandler.cs" />
-    <Compile Include="Model\AboutModel.cs" />
+    <Compile Include="Lean\LogItem.cs" />
     <Compile Include="Provider\ProviderBase.cs" />
     <Compile Include="Provider\QuantConnect.cs" />
-    <Compile Include="Service\MainService.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />
     <Compile Include="ViewModel\ResearchViewModel.cs" />
     <Compile Include="ViewModel\TrackSymbolViewModel.cs" />
-    <Compile Include="Model\OrderModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -198,8 +196,8 @@
     <Compile Include="ViewSupport\BooleanToVisibilityConverter.cs" />
     <Compile Include="ViewSupport\CompositeCollectionConverter.cs" />
     <Compile Include="ViewSupport\MarketNameConverter.cs" />
-    <Compile Include="ViewSupport\ProviderNameConverter.cs" />
     <Compile Include="ViewSupport\StringSumConverter.cs" />
+    <Compile Include="ViewSupport\SyncObservableCollection.cs" />
     <Compile Include="View\DesktopView.xaml.cs">
       <DependentUpon>DesktopView.xaml</DependentUpon>
     </Compile>
@@ -209,11 +207,6 @@
     <Compile Include="View\AmChart.xaml.cs">
       <DependentUpon>AmChart.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\AccountModel.cs" />
-    <Compile Include="Model\AccountsModel.cs" />
-    <Compile Include="Model\MarketModel.cs" />
-    <Compile Include="Model\MarketsModel.cs" />
-    <Compile Include="Model\SettingModel.cs" />
     <Compile Include="Lean\HostDomainLogger.cs" />
     <Compile Include="Common\StreamLogger.cs" />
     <Compile Include="Provider\ProviderFactory.cs" />
@@ -225,27 +218,16 @@
     <Compile Include="ViewModel\MarketViewModel.cs" />
     <Compile Include="ViewModel\PositionViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
-    <Compile Include="ViewSupport\AccountNameConverter.cs" />
-    <Compile Include="ViewSupport\FolderEditor.cs" />
-    <Compile Include="Model\ParameterModel.cs" />
     <Compile Include="Lean\BacktestResultHandler.cs" />
     <Compile Include="Lean\LeanLauncher.cs" />
     <Compile Include="ViewModel\ParameterViewModel.cs" />
-    <Compile Include="ViewSupport\AlgorithmNameConverter.cs" />
     <Compile Include="ViewSupport\BusyMouseConverter.cs" />
     <Compile Include="ViewSupport\BaseConverter.cs" />
-    <Compile Include="ViewSupport\DateEditor.cs" />
     <Compile Include="ViewSupport\Int32FromGridLengthConverter.cs" />
     <Compile Include="ViewSupport\StringFormatConverter.cs" />
-    <Compile Include="ViewSupport\FilenameEditor.cs" />
-    <Compile Include="Model\StrategiesModel.cs" />
-    <Compile Include="Model\StrategyModel.cs" />
-    <Compile Include="Model\TrackModel.cs" />
     <Compile Include="ViewModel\TrackViewModel.cs" />
     <Compile Include="ViewModel\SymbolViewModel.cs" />
     <Compile Include="ViewModel\StrategyViewModel.cs" />
-    <Compile Include="ViewSupport\SyncObservableCollection.cs" />
-    <Compile Include="Model\LogItem.cs" />
     <Compile Include="Lean\ILogItemHandler.cs" />
     <Compile Include="Lean\LogItemHandler.cs" />
     <Compile Include="ViewModel\AboutViewModel.cs" />

@@ -13,7 +13,6 @@
 */
 
 using Algoloop.Model;
-using Algoloop.Service;
 using QuantConnect.AlgorithmFactory;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Algoloop.Wpf.ViewSupport
+namespace Algoloop.Support
 {
     public class AlgorithmNameConverter : TypeConverter
     {

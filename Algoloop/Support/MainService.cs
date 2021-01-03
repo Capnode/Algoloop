@@ -21,7 +21,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Algoloop.Service
+namespace Algoloop.Support
 {
     public static class MainService
     {
@@ -85,7 +85,7 @@ namespace Algoloop.Service
             }
         }
 
-        internal static string FullExePath(string file)
+        public static string FullExePath(string file)
         {
             if (string.IsNullOrEmpty(file)) return null;
             if (File.Exists(file)) return file;
@@ -107,7 +107,7 @@ namespace Algoloop.Service
             return version;
         }
 
-        internal static void Delete(string path)
+        public static void Delete(string path)
         {
             if (Directory.Exists(path))
             {

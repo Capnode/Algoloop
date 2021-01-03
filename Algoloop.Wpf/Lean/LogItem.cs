@@ -15,7 +15,7 @@
 using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.Model
+namespace Algoloop.Lean
 {
     public class LogItem
     {

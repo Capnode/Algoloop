@@ -13,8 +13,8 @@
  */
 
 using Algoloop.Model;
+using Algoloop.Support;
 using Algoloop.Wpf.Properties;
-using Algoloop.Service;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight.Command;

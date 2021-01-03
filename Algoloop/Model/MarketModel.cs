@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Wpf.ViewSupport;
+using Algoloop.Support;
 using QuantConnect;
 using System;
 using System.Collections.Generic;
@@ -32,6 +32,7 @@ namespace Algoloop.Model
         public Action ModelChanged;
 
         private string _provider;
+        private const string _fxcm = "fxcm";
 
         public enum AccessType { Demo, Real };
 
@@ -132,7 +133,7 @@ namespace Algoloop.Model
         {
             if (string.IsNullOrEmpty(Provider)) return;
 
-            if (Provider.Equals(nameof(Algoloop.Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
+            if (Provider.Equals(_fxcm, StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable("Access", true);
                 SetBrowsable("Login", true);

@@ -13,13 +13,11 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Service;
+using Algoloop.Support;
 using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;

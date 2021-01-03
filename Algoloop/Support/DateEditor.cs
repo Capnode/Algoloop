@@ -19,7 +19,8 @@ using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace Algoloop.Wpf.ViewSupport
+namespace Algoloop.
+    Support
 {
     public class DateEditor : ITypeEditor
     {

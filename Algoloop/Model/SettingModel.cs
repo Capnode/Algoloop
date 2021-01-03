@@ -12,8 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Service;
-using Algoloop.Wpf.ViewSupport;
+using Algoloop.Support;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -89,7 +88,7 @@ namespace Algoloop.Model
         [DataMember]
         public int MaxBacktests { get; set; } = Math.Max(Environment.ProcessorCount  / 2, 1);
 
-        internal void Copy(SettingModel oldSettings)
+        public void Copy(SettingModel oldSettings)
         {
             if (oldSettings == null)
             {

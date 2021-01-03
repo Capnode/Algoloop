@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2019 Capnode AB
+ * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -12,14 +12,23 @@
  * limitations under the License.
 */
 
-using QuantConnect;
+using Algoloop.Model;
+using GalaSoft.MvvmLight.Ioc;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
-namespace Algoloop.Wpf.ViewSupport
+namespace Algoloop.Support
 {
-    public class ProviderNameConverter : TypeConverter
+    public class AccountNameConverter : TypeConverter
     {
+        private readonly AccountsModel _accounts;
+
+        public AccountNameConverter()
+        {
+            _accounts = SimpleIoc.Default.GetInstance<AccountsModel>();
+        }
+
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
             // true means show a combobox
@@ -34,16 +43,15 @@ namespace Algoloop.Wpf.ViewSupport
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            int code = 1;
-            string name;
-            List<string> names = new List<string>();
-            while ((name = Market.Decode(code++)) != null)
-            {
-                names.Add(name);
-            }
+            // Request list of accounts
+            IReadOnlyList<AccountModel> accounts = _accounts.GetAccounts();
+            List<string> list = accounts
+                .Select(m => m.Name)
+                .ToList();
 
-            names.Sort();
-            return new StandardValuesCollection(names);
+            list.Sort();
+
+            return new StandardValuesCollection(list);
         }
     }
 }
