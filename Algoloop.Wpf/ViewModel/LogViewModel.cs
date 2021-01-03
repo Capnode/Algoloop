@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Lean;
+using Algoloop.Wpf.Lean;
 using Algoloop.Wpf.ViewSupport;
 using QuantConnect.Logging;
 using System.Diagnostics;

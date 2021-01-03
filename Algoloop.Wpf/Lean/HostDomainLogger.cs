@@ -15,7 +15,7 @@
 using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.Lean
+namespace Algoloop.Wpf.Lean
 {
     public class HostDomainLogger : MarshalByRefObject, ILogHandler
     {

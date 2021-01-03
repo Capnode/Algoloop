@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Algoloop.Wpf.ViewModel;
 using AmCharts.Windows.Stock;
 using AmCharts.Windows.Stock.Data;
 using QuantConnect;

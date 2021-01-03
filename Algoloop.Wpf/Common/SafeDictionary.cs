@@ -16,7 +16,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Algoloop.Common
+namespace Algoloop.Wpf.Common
 {
     [Serializable]
     public class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue>

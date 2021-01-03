@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Algoloop.Provider
+namespace Algoloop.Wpf.Provider
 {
     public class Kraken : ProviderBase
     {

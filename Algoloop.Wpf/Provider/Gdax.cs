@@ -14,7 +14,7 @@
 
 using Algoloop.Model;
 
-namespace Algoloop.Provider
+namespace Algoloop.Wpf.Provider
 {
     public class Gdax : ProviderBase
    {

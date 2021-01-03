@@ -17,7 +17,7 @@ using QuantConnect.Configuration;
 using QuantConnect.ToolBox.QuandlBitfinexDownloader;
 using System;
 
-namespace Algoloop.Provider
+namespace Algoloop.Wpf.Provider
 {
     public class QuandBitfinex : ProviderBase
     {

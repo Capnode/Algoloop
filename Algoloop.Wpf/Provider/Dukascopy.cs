@@ -23,7 +23,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
-namespace Algoloop.Provider
+namespace Algoloop.Wpf.Provider
 {
     public class Dukascopy : ProviderBase
     {

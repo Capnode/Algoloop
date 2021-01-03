@@ -21,7 +21,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
-using Algoloop.Provider;
+using Algoloop.Wpf.Provider;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight.Command;

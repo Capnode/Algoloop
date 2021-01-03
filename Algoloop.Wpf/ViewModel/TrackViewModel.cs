@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
-using Algoloop.Common;
-using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Support;
+using Algoloop.Wpf.Common;
+using Algoloop.Wpf.Lean;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight.Command;
@@ -72,7 +72,7 @@ namespace Algoloop.Wpf.ViewModel
         private SyncObservableCollection<HoldingViewModel> _holdings = new SyncObservableCollection<HoldingViewModel>();
         private bool _loaded;
         private string _logs;
-        private LeanLauncher _leanLauncher = new LeanLauncher();
+        private readonly LeanLauncher _leanLauncher = new LeanLauncher();
 
         public TrackViewModel(StrategyViewModel parent, TrackModel model, AccountsModel accounts, SettingModel settings)
         {

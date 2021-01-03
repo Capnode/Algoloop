@@ -12,36 +12,38 @@
  * limitations under the License.
  */
 
-using Algoloop.Wpf.ViewModel;
 using QuantConnect;
 using QuantConnect.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-public class ChartViewModel : ViewModel
+namespace Algoloop.Wpf.ViewModel
 {
-    public ChartViewModel(Series series)
+    public class ChartViewModel : ViewModel
     {
-        if (series == null) throw new ArgumentNullException(nameof(series));
+        public ChartViewModel(Series series)
+        {
+            if (series == null) throw new ArgumentNullException(nameof(series));
 
-        Title = series.Name;
-        Series = series;
-        Data = null;
-        Debug.Assert(IsUiThread(), "Not UI thread!");
+            Title = series.Name;
+            Series = series;
+            Data = null;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
+        }
+
+        public ChartViewModel(Series series, IEnumerable<BaseData> data)
+        {
+            if (series == null) throw new ArgumentNullException(nameof(series));
+
+            Title = series.Name;
+            Series = series;
+            Data = data;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
+        }
+
+        public string Title { get; }
+        public Series Series { get; }
+        public IEnumerable<BaseData> Data { get; }
     }
-
-    public ChartViewModel(Series series, IEnumerable<BaseData> data)
-    {
-        if (series == null) throw new ArgumentNullException(nameof(series));
-
-        Title = series.Name;
-        Series = series;
-        Data = data;
-        Debug.Assert(IsUiThread(), "Not UI thread!");
-    }
-
-    public string Title { get; }
-    public Series Series { get; }
-    public IEnumerable<BaseData> Data { get; }
 }

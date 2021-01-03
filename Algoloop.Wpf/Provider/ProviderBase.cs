@@ -29,7 +29,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.Provider
+namespace Algoloop.Wpf.Provider
 {
     abstract public class ProviderBase : IProvider
     {

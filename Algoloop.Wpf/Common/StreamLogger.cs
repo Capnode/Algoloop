@@ -16,7 +16,7 @@ using QuantConnect.Logging;
 using System.IO;
 using System.Text;
 
-namespace Algoloop.Common
+namespace Algoloop.Wpf.Common
 {
     public class StreamLogger : TextWriter
     {

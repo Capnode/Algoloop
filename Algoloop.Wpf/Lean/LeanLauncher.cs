@@ -28,7 +28,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.Lean
+namespace Algoloop.Wpf.Lean
 {
     public class LeanLauncher : IDisposable
     {
@@ -152,7 +152,7 @@ namespace Algoloop.Lean
             {
                 SetPaper(config);
             }
-            else if (account != null && account.Provider.Equals(nameof(Algoloop.Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
+            else if (account != null && account.Provider.Equals(nameof(Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
             {
                 if (model.Desktop)
                 {

@@ -40,9 +40,9 @@ namespace Algoloop.Wpf.ViewSupport
             object parameter,
             System.Globalization.CultureInfo culture)
         {
-            if (value is bool)
+            if (value is bool boolean)
             {
-                if ((bool)value)
+                if (boolean)
                 {
                     return Cursors.Wait;
                 }

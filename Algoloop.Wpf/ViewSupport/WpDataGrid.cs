@@ -198,7 +198,7 @@ namespace Algoloop.Wpf.ViewSupport
             if (column == null) throw new ArgumentNullException(nameof(column));
 
             Header = column.Header;
-            PropertyPath = !(column is DataGridComboBoxColumn column1)
+            PropertyPath = column is not DataGridComboBoxColumn column1
                 ? ((Binding)((DataGridBoundColumn)column).Binding).Path.Path
                 : ((Binding)column1.SelectedItemBinding).Path.Path;
             WidthValue = column.Width.DisplayValue;

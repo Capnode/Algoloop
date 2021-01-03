@@ -20,7 +20,7 @@ using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
 
-namespace Algoloop.Provider
+namespace Algoloop.Wpf.Provider
 {
     public interface IProvider : IDisposable
     {

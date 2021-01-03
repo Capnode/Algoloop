@@ -14,7 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.Wpf.Properties;
-using Algoloop.Provider;
+using Algoloop.Wpf.Provider;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight.Command;

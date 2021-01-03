@@ -16,7 +16,7 @@ using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.Lean
+namespace Algoloop.Wpf.Lean
 {
     interface ILogItemHandler : ILogHandler
     {

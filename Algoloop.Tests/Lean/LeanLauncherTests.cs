@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
-using Algoloop.Lean;
 using Algoloop.Model;
 using Algoloop.Support;
+using Algoloop.Wpf.Lean;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using System;
