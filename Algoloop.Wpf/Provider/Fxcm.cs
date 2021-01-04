@@ -53,7 +53,7 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public override void Login(AccountModel account, SettingModel settings)
+        public override IReadOnlyList<AccountModel> Login(AccountModel account, SettingModel settings)
         {
             Contract.Requires(account != null);
 
@@ -72,6 +72,7 @@ namespace Algoloop.Wpf.Provider
             _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
             _brokerage.OrderStatusChanged += OnOrderStatusChanged;
             _brokerage.Connect();
+            return null;
         }
 
         public override void Logout()

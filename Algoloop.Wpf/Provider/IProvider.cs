@@ -25,13 +25,13 @@ namespace Algoloop.Wpf.Provider
     public interface IProvider : IDisposable
     {
         void Register(SettingModel settings, string name);
-        void Login(AccountModel account, SettingModel settings);
+        IReadOnlyList<AccountModel> Login(AccountModel account, SettingModel settings);
         void Logout();
         void Download(MarketModel market, SettingModel settings);
         void Abort();
-        List<Order> GetOpenOrders();
-        List<Holding> GetAccountHoldings();
-        List<Trade> GetClosedTrades();
-        List<CashAmount> GetCashBalance();
+        IReadOnlyList<Order> GetOpenOrders();
+        IReadOnlyList<Holding> GetAccountHoldings();
+        IReadOnlyList<Trade> GetClosedTrades();
+        IReadOnlyList<CashAmount> GetCashBalance();
     }
 }

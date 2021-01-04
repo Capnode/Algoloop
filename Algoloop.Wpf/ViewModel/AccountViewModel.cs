@@ -31,6 +31,7 @@ using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
 using QuantConnect.Statistics;
+using System.Linq;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -251,7 +252,7 @@ namespace Algoloop.Wpf.ViewModel
         {
             using IProvider provider = ProviderFactory.CreateProvider(Model.Name, _settings);
             if (provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
-            provider.Login(Model, _settings);
+            IReadOnlyList<AccountModel> accounts = provider.Login(Model, _settings);
             while (!_cancel.IsCancellationRequested)
             {
                 UpdateOrder(provider);
@@ -270,7 +271,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void UpdateOrder(IProvider provider)
         {
-            List<Order> orders = provider.GetOpenOrders();
+            IReadOnlyList<Order> orders = provider.GetOpenOrders();
             foreach (Order order in orders)
             {
                 bool update = false;
@@ -293,7 +294,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void UpdatePosition(IProvider provider)
         {
-            List<Holding> holdings = provider.GetAccountHoldings();
+            IReadOnlyList<Holding> holdings = provider.GetAccountHoldings();
             foreach (Holding holding in holdings)
             {
                 bool update = false;
@@ -317,7 +318,7 @@ namespace Algoloop.Wpf.ViewModel
             Positions.CopyTo(vms, 0);
             foreach (PositionViewModel vm in vms)
             {
-                Holding holding = holdings.Find(m => m.Symbol.Value == vm.Symbol);
+                Holding holding = holdings.FirstOrDefault(m => m.Symbol.Value == vm.Symbol);
                 if (holding == null || holding.Symbol == null)
                 {
                     Positions.Remove(vm);
@@ -328,7 +329,7 @@ namespace Algoloop.Wpf.ViewModel
         private void UpdateClosedTrades(IProvider provider)
         {
             ClosedTrades.Clear();
-            List<Trade> trades = provider.GetClosedTrades();
+            IReadOnlyList<Trade> trades = provider.GetClosedTrades();
             foreach (Trade trade in trades)
             {
                 ClosedTrades.Add(trade);
@@ -337,7 +338,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void UpdateBalance(IProvider provider)
         {
-            List<CashAmount> balances = provider.GetCashBalance();
+            IReadOnlyCollection<CashAmount> balances = provider.GetCashBalance();
             foreach (CashAmount balance in balances)
             {
                 bool update = false;
@@ -361,7 +362,7 @@ namespace Algoloop.Wpf.ViewModel
             Balances.CopyTo(vms, 0);
             foreach (BalanceViewModel vm in vms)
             {
-                CashAmount balance = balances.Find(m => m.Currency == vm.Currency);
+                CashAmount balance = balances.FirstOrDefault(m => m.Currency == vm.Currency);
                 if (balance == null || balance.Currency == null)
                 {
                     Balances.Remove(vm);

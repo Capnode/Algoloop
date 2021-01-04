@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -186,9 +187,10 @@ namespace Algoloop.Tests.Provider
             };
 
             using IProvider provider = ProviderFactory.CreateProvider(account.Provider, _settings);
-            provider.Login(account, _settings);
+            IReadOnlyList<AccountModel> accounts = provider.Login(account, _settings);
 
             Assert.IsTrue(account.Active);
+            Assert.IsTrue(accounts.Count > 0);
         }
 
     }

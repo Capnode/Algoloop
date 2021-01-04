@@ -52,7 +52,7 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public virtual void Login(AccountModel account, SettingModel settings)
+        public virtual IReadOnlyList<AccountModel> Login(AccountModel account, SettingModel settings)
         {
             throw new NotImplementedException();
         }
@@ -77,22 +77,22 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public virtual List<Order> GetOpenOrders()
+        public virtual IReadOnlyList<Order> GetOpenOrders()
         {
             throw new NotImplementedException();
         }
 
-        public virtual List<Holding> GetAccountHoldings()
+        public virtual IReadOnlyList<Holding> GetAccountHoldings()
         {
             throw new NotImplementedException();
         }
 
-        public virtual List<Trade> GetClosedTrades()
+        public virtual IReadOnlyList<Trade> GetClosedTrades()
         {
             throw new NotImplementedException();
         }
 
-        public virtual List<CashAmount> GetCashBalance()
+        public virtual IReadOnlyList<CashAmount> GetCashBalance()
         {
             throw new NotImplementedException();
         }
