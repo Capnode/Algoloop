@@ -108,11 +108,6 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public string DataFolder { get; set; }
-
-        [Browsable(false)]
-        [ReadOnly(false)]
-        [DataMember]
         public Collection<OrderModel> Orders { get; } = new Collection<OrderModel>();
 
         public void Refresh()

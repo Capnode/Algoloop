@@ -24,13 +24,13 @@ using System.Linq;
 
 namespace Algoloop.Tests.Provider
 {
-    [TestClass()]
+    [TestClass]
     public class FxcmTests
     {
         private SettingModel _settings;
         private string _forexFolder;
 
-        [TestInitialize()]
+        [TestInitialize]
         public void Initialize()
         {
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
@@ -44,7 +44,7 @@ namespace Algoloop.Tests.Provider
             _settings = new SettingModel { DataFolder = dataFolder };
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void Download_no_symbols()
         {
             string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
@@ -108,7 +108,7 @@ namespace Algoloop.Tests.Provider
             Assert.IsTrue(File.Exists(Path.Combine(_forexFolder, resolution.ResolutionToLower(), filename)));
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void Download_yesterday()
         {
             string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
@@ -138,7 +138,7 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void Download_today()
         {
             string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
@@ -166,5 +166,30 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(75, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
+
+        [Ignore]
+        [TestMethod]
+        public void Login()
+        {
+            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
+            string user = ConfigurationManager.AppSettings["fxcm_user"];
+            string pass = ConfigurationManager.AppSettings["fxcm_pass"];
+            DateTime today = DateTime.Today;
+            var account = new AccountModel
+            {
+                Active = true,
+                Name = "Fxcm",
+                Provider = "fxcm",
+                Access = (AccountModel.AccessType)Enum.Parse(typeof(MarketModel.AccessType), terminal),
+                Login = user,
+                Password = pass
+            };
+
+            using IProvider provider = ProviderFactory.CreateProvider(account.Provider, _settings);
+            provider.Login(account, _settings);
+
+            Assert.IsTrue(account.Active);
+        }
+
     }
 }
