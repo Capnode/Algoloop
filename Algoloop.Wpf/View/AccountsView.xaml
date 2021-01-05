@@ -65,7 +65,7 @@
                 </Button>
             </ToolBar>
             <TreeView
-                ItemsSource="{Binding Accounts}"
+                ItemsSource="{Binding Brokers}"
                 BorderThickness="0">
                 <TreeView.ContextMenu>
                     <ContextMenu>
@@ -86,7 +86,7 @@
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
-                    <DataTemplate DataType="{x:Type vm:AccountViewModel}" >
+                    <HierarchicalDataTemplate DataType="{x:Type vm:BrokerViewModel}" ItemsSource="{Binding Accounts}" >
                         <StackPanel Orientation="Horizontal">
                             <CheckBox
                                 IsChecked="{Binding Active}"
@@ -105,6 +105,12 @@
                                 </TextBlock.ContextMenu>
                             </TextBlock>
                         </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type vm:AccountViewModel}" >
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="6, 0, 0, 0" Text="{Binding Model.Name}">
+                            </TextBlock>
+                        </StackPanel>
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
@@ -114,6 +120,22 @@
             Margin="7,0,0,0"
             Content="{Binding SelectedItem}">
             <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type vm:BrokerViewModel}">
+                    <DockPanel>
+                        <TabControl>
+                            <TabItem Header="Settings">
+                                <xctk:PropertyGrid
+                                    ShowTitle="False"
+                                    ShowSearchBox="False"
+                                    ShowSummary="True"
+                                    ShowAdvancedOptions="False"
+                                    ShowSortOptions="False"
+                                    SelectedObject="{Binding Model}">
+                                </xctk:PropertyGrid>
+                            </TabItem>
+                        </TabControl>
+                    </DockPanel>
+                </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:AccountViewModel}">
                     <DockPanel>
                         <TabControl>

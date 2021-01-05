@@ -47,13 +47,17 @@ namespace Algoloop.Tests.Lean
         [TestMethod()]
         public void RunTest()
         {
+            var broker = new BrokerModel()
+            {
+                Name = nameof(AccountModel.AccountType.Backtest)
+            };
             var account = new AccountModel()
             {
-                Name = AccountModel.AccountType.Backtest.ToString()
+                Broker = broker
             };
             var track = new TrackModel
             {
-                Account = account.Name,
+                Account = broker.Name,
                 AlgorithmLanguage = Language.CSharp,
                 AlgorithmLocation = Path.Combine(_exeFolder, "QuantConnect.Algorithm.CSharp.dll"),
                 AlgorithmName = "BasicTemplateFrameworkAlgorithm",

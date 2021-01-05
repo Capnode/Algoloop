@@ -152,7 +152,9 @@ namespace Algoloop.Wpf.Lean
             {
                 SetPaper(config);
             }
-            else if (account != null && account.Provider.Equals(nameof(Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
+            else if (account != null
+                && account.Broker != null
+                && account.Broker.Provider.Equals(nameof(Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
             {
                 if (model.Desktop)
                 {
@@ -329,16 +331,16 @@ namespace Algoloop.Wpf.Lean
             config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler";
             config["live-mode-brokerage"] = "FxcmBrokerage";
             config["data-queue-handler"] = "FxcmBrokerage";
-            config["fxcm-user-name"] = account.Login;
-            config["fxcm-password"] = account.Password;
+            config["fxcm-user-name"] = account.Broker.Login;
+            config["fxcm-password"] = account.Broker.Password;
             config["fxcm-account-id"] = account.Id;
-            switch (account.Access)
+            switch (account.Broker.Access)
             {
-                case AccountModel.AccessType.Demo:
+                case BrokerModel.AccessType.Demo:
                     config["fxcm-terminal"] = "Demo";
                     break;
 
-                case AccountModel.AccessType.Real:
+                case BrokerModel.AccessType.Real:
                     config["fxcm-terminal"] = "Real";
                     break;
             }
@@ -360,18 +362,18 @@ namespace Algoloop.Wpf.Lean
             config["messaging-handler"] = "QuantConnect.Messaging.StreamingMessageHandler";
             config["live-mode-brokerage"] = "FxcmBrokerage";
             config["data-queue-handler"] = "FxcmBrokerage";
-            config["fxcm-user-name"] = account.Login;
-            config["fxcm-password"] = account.Password;
+            config["fxcm-user-name"] = account.Broker.Login;
+            config["fxcm-password"] = account.Broker.Password;
             config["fxcm-account-id"] = account.Id;
             config["log-handler"] = "QuantConnect.Logging.QueueLogHandler";
             config["desktop-exe"] = @"../../../UserInterface/bin/Release/QuantConnect.Views.exe";
-            switch (account.Access)
+            switch (account.Broker.Access)
             {
-                case AccountModel.AccessType.Demo:
+                case BrokerModel.AccessType.Demo:
                     config["fxcm-terminal"] = "Demo";
                     break;
 
-                case AccountModel.AccessType.Real:
+                case BrokerModel.AccessType.Real:
                     config["fxcm-terminal"] = "Real";
                     break;
             }

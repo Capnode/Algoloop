@@ -34,7 +34,7 @@ namespace Algoloop.Wpf.ViewModel
             Model = accounts;
             _settings = settings;
 
-            AddCommand = new RelayCommand(() => AddAccount(), () => !IsBusy);
+            AddCommand = new RelayCommand(() => AddBroker(), () => !IsBusy);
             SelectedChangedCommand = new RelayCommand<ITreeViewModel>((market) => DoSelectedChanged(market), (market) => !IsBusy && market != null);
             DataFromModel();
             Debug.Assert(IsUiThread(), "Not UI thread!");
@@ -45,7 +45,7 @@ namespace Algoloop.Wpf.ViewModel
 
         public AccountsModel Model { get; }
 
-        public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
+        public SyncObservableCollection<BrokerViewModel> Brokers { get; } = new SyncObservableCollection<BrokerViewModel>();
 
         /// <summary>
         /// Mark ongoing operation
@@ -65,14 +65,14 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        public bool DoDeleteAccount(AccountViewModel account)
+        public bool DoDeleteBroker(BrokerViewModel broker)
         {
             try
             {
                 IsBusy = true;
-                Debug.Assert(account != null);
+                Debug.Assert(broker != null);
                 SelectedItem = null;
-                return Accounts.Remove(account);
+                return Brokers.Remove(broker);
             }
             finally
             {
@@ -87,7 +87,8 @@ namespace Algoloop.Wpf.ViewModel
             {
                 using StreamReader r = new StreamReader(fileName);
                 string json = r.ReadToEnd();
-                Model.Copy(JsonConvert.DeserializeObject<AccountsModel>(json));
+                AccountsModel accounts = JsonConvert.DeserializeObject<AccountsModel>(json);
+                Model.Copy(accounts);
             }
 
             DataFromModel();
@@ -99,7 +100,7 @@ namespace Algoloop.Wpf.ViewModel
             DataToModel();
 
             // Do not overwrite if file read error
-            if (!Model.Accounts.Any()) return;
+            if (!Model.Brokers.Any()) return;
 
             using StreamWriter file = File.CreateText(fileName);
             JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
@@ -113,40 +114,40 @@ namespace Algoloop.Wpf.ViewModel
             SelectedItem = vm;
         }
 
-        private void AddAccount()
+        private void AddBroker()
         {
-            var loginViewModel = new AccountViewModel(this, new AccountModel(), _settings);
-            Accounts.Add(loginViewModel);
+            var broker = new BrokerViewModel(this, new BrokerModel(), _settings);
+            Brokers.Add(broker);
         }
 
         private void DataToModel()
         {
             Model.Version = AccountsModel.version;
-            Model.Accounts.Clear();
-            foreach (AccountViewModel account in Accounts)
+            Model.Brokers.Clear();
+            foreach (BrokerViewModel broker in Brokers)
             {
-                Model.Accounts.Add(account.Model);
-                account.DataToModel();
+                Model.Brokers.Add(broker.Model);
+                broker.DataToModel();
             }
         }
 
         private void DataFromModel()
         {
-            Accounts.Clear();
-            foreach (AccountModel account in Model.Accounts)
+            Brokers.Clear();
+            foreach (BrokerModel broker in Model.Brokers)
             {
-                var loginViewModel = new AccountViewModel(this, account, _settings);
-                Accounts.Add(loginViewModel);
+                var vm = new BrokerViewModel(this, broker, _settings);
+                Brokers.Add(vm);
             }
         }
 
         private void StartTasks()
         {
-            foreach (AccountViewModel account in Accounts)
+            foreach (BrokerViewModel broker in Brokers)
             {
-                if (account.Active)
+                if (broker.Active)
                 {
-                    _ = account.StartAccountAsync();
+                    _ = broker.StartAccountAsync();
                 }
             }
         }

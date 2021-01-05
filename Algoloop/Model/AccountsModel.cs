@@ -28,8 +28,8 @@ namespace Algoloop.Model
 
         private static readonly AccountModel[] _standardAccounts = new[]
         {
-            new AccountModel() { Name = AccountModel.AccountType.Backtest.ToString() },
-            new AccountModel() { Name = AccountModel.AccountType.Paper.ToString() }
+            new AccountModel { Name = nameof(AccountModel.AccountType.Backtest) },
+            new AccountModel { Name = nameof(AccountModel.AccountType.Paper) }
         };
 
         [Description("Major Version - Increment at breaking change.")]
@@ -39,26 +39,42 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public Collection<AccountModel> Accounts { get; } = new Collection<AccountModel>();
+        public Collection<BrokerModel> Brokers { get; } = new Collection<BrokerModel>();
 
         public void Copy(AccountsModel accountsModel)
         {
-            Accounts.Clear();
-            foreach (AccountModel account in accountsModel.Accounts)
+            Brokers.Clear();
+            foreach (BrokerModel broker in accountsModel.Brokers)
             {
-                Accounts.Add(account);
+                Brokers.Add(broker);
             }
         }
 
-        public AccountModel FindAccount(string account)
+        public AccountModel FindAccount(string name)
         {
-            return Accounts.FirstOrDefault(m => m.Name.Equals(account, StringComparison.OrdinalIgnoreCase));
+            foreach (BrokerModel broker in Brokers)
+            {
+                Collection<AccountModel> accounts = broker.Accounts;
+                if (accounts == default) continue;
+                AccountModel account = accounts.FirstOrDefault(m => m.DisplayName.Equals(name, StringComparison.OrdinalIgnoreCase));
+                if (account != null) return account;
+            }
+
+            return null;
         }
 
         internal IReadOnlyList<AccountModel> GetAccounts()
         {
-            IEnumerable<AccountModel> accounts = Accounts.Concat(_standardAccounts);
-            return accounts.ToList();
+            var list = new List<AccountModel>();
+            list.AddRange(_standardAccounts);
+            foreach (BrokerModel broker in Brokers)
+            {
+                Collection<AccountModel> accounts = broker.Accounts;
+                if (accounts == default) continue;
+                list.AddRange(accounts);
+            }
+
+            return list;
         }
     }
 }

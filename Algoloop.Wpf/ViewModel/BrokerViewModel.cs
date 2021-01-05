@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
 using Algoloop.Model;
 using Algoloop.Wpf.Provider;
 using Algoloop.Wpf.Properties;
@@ -25,6 +27,7 @@ using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using QuantConnect;
+using QuantConnect.Logging;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
 using QuantConnect.Statistics;
@@ -32,16 +35,44 @@ using System.Linq;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class AccountViewModel : ViewModel, ITreeViewModel
+    public class BrokerViewModel : ViewModel, ITreeViewModel, IDisposable
     {
-        private readonly BrokerViewModel _parent;
+        private bool _isDisposed = false; // To detect redundant calls
+        private readonly AccountsViewModel _parent;
+        private readonly SettingModel _settings;
+        private CancellationTokenSource _cancel;
         private IList _selectedItems;
-        private AccountModel _model;
+        private BrokerModel _model;
 
-        public AccountViewModel(BrokerViewModel parent, AccountModel accountModel)
+        public void Dispose()
         {
-            _parent = parent;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _cancel?.Dispose();
+                }
+
+                _isDisposed = true;
+            }
+        }
+
+        public BrokerViewModel(AccountsViewModel accountsViewModel, BrokerModel accountModel, SettingModel settings)
+        {
+            _parent = accountsViewModel;
             Model = accountModel;
+            _settings = settings;
+
+            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), () => !IsBusy);
+            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
+            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteBroker(this), () => !IsBusy && !Active);
 
             DataFromModel();
             Debug.Assert(IsUiThread(), "Not UI thread!");
@@ -68,7 +99,7 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand StopCommand { get; }
         public RelayCommand DeleteCommand { get; }
 
-        public AccountModel Model
+        public BrokerModel Model
         {
             get => _model;
             set => Set(ref _model, value);
@@ -112,39 +143,43 @@ namespace Algoloop.Wpf.ViewModel
             Model.Refresh();
         }
 
-        internal void DataToModel()
+        internal async Task StartAccountAsync()
         {
+            Debug.Assert(Active);
+
             try
             {
-                IsBusy = true;
-                Model.Orders.Clear();
-                foreach (OrderViewModel vm in Orders)
-                {
-                    Model.Orders.Add(vm.Model);
-                }
+                Debug.Assert(_cancel == null);
+                _cancel = new CancellationTokenSource();
+                await Task.Run(AccountLoop, _cancel.Token)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Messenger.Default.Send(new NotificationMessage($"{Model.Name}: {ex.Message}"));
+                Log.Error(ex, Model.Name);
+
             }
             finally
             {
-                IsBusy = false;
+                _cancel?.Dispose();
+                _cancel = null;
             }
+
+            // Update view
+            UiThread(() =>
+            {
+                Active = false;
+            });
+        }
+
+        internal void DataToModel()
+        {
+            Contract.Requires(Model != null);
         }
 
         internal void DataFromModel()
         {
-            try
-            {
-                IsBusy = true;
-                Orders.Clear();
-                foreach (OrderModel order in Model.Orders)
-                {
-                    var vm = new OrderViewModel(order);
-                    Orders.Add(vm);
-                }
-            }
-            finally
-            {
-                IsBusy = false;
-            }
         }
 
         private void RaiseCommands()
@@ -153,6 +188,59 @@ namespace Algoloop.Wpf.ViewModel
             StartCommand.RaiseCanExecuteChanged();
             StopCommand.RaiseCanExecuteChanged();
             DeleteCommand.RaiseCanExecuteChanged();
+        }
+
+        private async void DoStartCommand()
+        {
+            // No IsBusy
+            Active = true;
+            await StartAccountAsync().ConfigureAwait(false);
+        }
+
+        private void DoStopCommand()
+        {
+            try
+            {
+                IsBusy = true;
+                _cancel?.Cancel();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async void DoActiveCommand(bool value)
+        {
+            if (value)
+            {
+                await StartAccountAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                DoStopCommand();
+            }
+        }
+
+        private void AccountLoop()
+        {
+            using IProvider provider = ProviderFactory.CreateProvider(Model.Name, _settings);
+            if (provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
+            IReadOnlyList<AccountModel> accounts = provider.Login(Model, _settings);
+            while (!_cancel.IsCancellationRequested)
+            {
+                UpdateOrder(provider);
+                UpdatePosition(provider);
+                UpdateBalance(provider);
+                UpdateClosedTrades(provider);
+                Thread.Sleep(1000);
+            }
+
+            provider.Logout();
+            Orders.Clear();
+            Positions.Clear();
+            Balances.Clear();
+            ClosedTrades.Clear();
         }
 
         private void UpdateOrder(IProvider provider)

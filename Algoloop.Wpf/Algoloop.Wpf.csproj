@@ -169,6 +169,7 @@
     <Compile Include="Lean\LogItem.cs" />
     <Compile Include="Provider\ProviderBase.cs" />
     <Compile Include="Provider\QuantConnect.cs" />
+    <Compile Include="ViewModel\BrokerViewModel.cs" />
     <Compile Include="ViewModel\HoldingViewModel.cs" />
     <Compile Include="ViewModel\ResearchViewModel.cs" />
     <Compile Include="ViewModel\TrackSymbolViewModel.cs" />

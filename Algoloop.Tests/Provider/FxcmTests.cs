@@ -175,21 +175,20 @@ namespace Algoloop.Tests.Provider
             string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
             string user = ConfigurationManager.AppSettings["fxcm_user"];
             string pass = ConfigurationManager.AppSettings["fxcm_pass"];
-            DateTime today = DateTime.Today;
-            var account = new AccountModel
+            var broker = new BrokerModel
             {
                 Active = true,
                 Name = "Fxcm",
                 Provider = "fxcm",
-                Access = (AccountModel.AccessType)Enum.Parse(typeof(MarketModel.AccessType), terminal),
+                Access = (BrokerModel.AccessType)Enum.Parse(typeof(MarketModel.AccessType), terminal),
                 Login = user,
                 Password = pass
             };
 
-            using IProvider provider = ProviderFactory.CreateProvider(account.Provider, _settings);
-            IReadOnlyList<AccountModel> accounts = provider.Login(account, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(broker.Provider, _settings);
+            IReadOnlyList<AccountModel> accounts = provider.Login(broker, _settings);
 
-            Assert.IsTrue(account.Active);
+            Assert.IsTrue(broker.Active);
             Assert.IsTrue(accounts.Count > 0);
         }
 

@@ -46,7 +46,7 @@ namespace Algoloop.Support
             // Request list of accounts
             IReadOnlyList<AccountModel> accounts = _accounts.GetAccounts();
             List<string> list = accounts
-                .Select(m => m.Name)
+                .Select(m => m.DisplayName)
                 .ToList();
 
             list.Sort();

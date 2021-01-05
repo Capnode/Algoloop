@@ -52,7 +52,7 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public virtual IReadOnlyList<AccountModel> Login(AccountModel account, SettingModel settings)
+        public virtual IReadOnlyList<AccountModel> Login(BrokerModel account, SettingModel settings)
         {
             throw new NotImplementedException();
         }

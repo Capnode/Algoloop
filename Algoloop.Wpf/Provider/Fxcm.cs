@@ -53,19 +53,19 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public override IReadOnlyList<AccountModel> Login(AccountModel account, SettingModel settings)
+        public override IReadOnlyList<AccountModel> Login(BrokerModel broker, SettingModel settings)
         {
-            Contract.Requires(account != null);
+            Contract.Requires(broker != null);
 
             _brokerage = new FxcmBrokerage(
                 null,
                 null,
                 Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager")),
                 _fxcmServer,
-                account.Access.ToString(),
-                account.Login,
-                account.Password,
-                account.Id);
+                broker.Access.ToString(),
+                broker.Login,
+                broker.Password,
+                broker.Login);
 
             _brokerage.Message += OnMessage;
             _brokerage.AccountChanged += OnAccountChanged;
