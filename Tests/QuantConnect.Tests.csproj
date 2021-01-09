@@ -756,6 +756,7 @@
     <Compile Include="Indicators\ParabolicStopAndReverseTests.cs" />
     <Compile Include="Indicators\PercentagePriceOscillatorTests.cs" />
     <Compile Include="Indicators\FisherTransformTests.cs" />
+    <Compile Include="Indicators\RelativeVigorIndexTests.cs" />
     <Compile Include="Indicators\SchaffTrendCycleTests.cs" />
     <Compile Include="Indicators\SwissArmyKnifeTests.cs" />
     <Compile Include="Indicators\VolumeWeightedAveragePriceIndicatorTests.cs" />
@@ -811,6 +812,7 @@
     <Compile Include="Symbols.cs" />
     <Compile Include="TestExtensions.cs" />
     <Compile Include="Indicators\LinearWeightedMovingAverageTests.cs" />
+    <Compile Include="ToolBox\RandomDataGenerator\RandomDataGeneratorProgramTests.cs" />
     <Compile Include="ToolBox\ToolBoxTests.cs" />
     <Compile Include="ToolBox\PolygonHistoryTests.cs" />
     <Compile Include="ToolBox\PolygonSymbolMapperTests.cs" />
@@ -1013,6 +1015,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\spy_coppock_curve.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\spy_rvi.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\spy_stc.txt">
