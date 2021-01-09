@@ -55,7 +55,6 @@ namespace Algoloop.Model
             foreach (BrokerModel broker in Brokers)
             {
                 Collection<AccountModel> accounts = broker.Accounts;
-                if (accounts == default) continue;
                 AccountModel account = accounts.FirstOrDefault(m => m.DisplayName.Equals(name, StringComparison.OrdinalIgnoreCase));
                 if (account != null) return account;
             }
@@ -70,7 +69,6 @@ namespace Algoloop.Model
             foreach (BrokerModel broker in Brokers)
             {
                 Collection<AccountModel> accounts = broker.Accounts;
-                if (accounts == default) continue;
                 list.AddRange(accounts);
             }
 

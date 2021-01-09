@@ -43,6 +43,12 @@ namespace Algoloop.Wpf.ViewModel
             _parent = parent;
             Model = accountModel;
 
+            // Inactive commands
+            ActiveCommand = new RelayCommand(() => { }, () => false);
+            StartCommand = new RelayCommand(() => { }, () => false);
+            StopCommand = new RelayCommand(() => { }, () => false);
+            DeleteCommand = new RelayCommand(() => { }, () => false);
+            
             DataFromModel();
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
@@ -135,10 +141,17 @@ namespace Algoloop.Wpf.ViewModel
             {
                 IsBusy = true;
                 Orders.Clear();
+                Positions.Clear();
                 foreach (OrderModel order in Model.Orders)
                 {
                     var vm = new OrderViewModel(order);
                     Orders.Add(vm);
+                }
+
+                foreach (PositionModel position in Model.Positions)
+                {
+                    var vm = new PositionViewModel(position);
+                    Positions.Add(vm);
                 }
             }
             finally

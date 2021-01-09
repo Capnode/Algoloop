@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using QuantConnect;
 using System;
 using System.Diagnostics;
@@ -29,6 +30,12 @@ namespace Algoloop.Wpf.ViewModel
         private decimal _conversionRate;
         private decimal _marketValue;
         private decimal _unrealizedPnL;
+
+        public PositionViewModel(PositionModel position)
+        {
+            Update(position);
+            Debug.Assert(IsUiThread(), "Not UI thread!");
+        }
 
         public PositionViewModel(Holding holding)
         {
@@ -88,6 +95,21 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _unrealizedPnL;
             set => Set(ref _unrealizedPnL, value);
+        }
+
+        private void Update(PositionModel position)
+        {
+            if (position == null) throw new ArgumentNullException(nameof(position));
+
+            Symbol = position.Symbol.Name;
+            SecurityType = Enum.GetName(typeof(SecurityType), position.Symbol.Security);
+            CurrencySymbol = position.PriceCurrency;
+            AveragePrice = position.AveragePrice;
+            Quantity = position.Quantity;
+            MarketPrice = position.MarketPrice;
+            ConversionRate = 1;
+            MarketValue = position.MarketValue;
+            UnrealizedPnL = position.MarketValue - position.EntryValue;
         }
 
         public void Update(Holding holding)

@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -29,33 +30,43 @@ namespace Algoloop.Model
         [ReadOnly(false)]
         public BrokerModel Broker { get; set; }
 
-        [Browsable(false)]
-        [ReadOnly(false)]
+        [Category("Account")]
+        [DisplayName("Number")]
+        [Description("Number or identity of the account.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
         [DataMember]
-        public bool Active { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         [Category("Account")]
-        [DisplayName("Account name")]
+        [DisplayName("Name")]
         [Description("Name of the account.")]
         [Browsable(true)]
-        [ReadOnly(false)]
+        [ReadOnly(true)]
         [DataMember]
         public string Name { get; set; } = "Account";
 
         [Category("Account")]
-        [DisplayName("Account number")]
-        [Description("Account number.")]
+        [DisplayName("Active")]
+        [Description("Account is tradable.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public bool Active { get; set; }
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        public string DisplayName => Broker == default ? Name : $"{Broker.Name}/{Name}";
+
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public string Id { get; set; } = string.Empty;
+        public Collection<PositionModel> Positions { get; } = new Collection<PositionModel>();
 
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
         public Collection<OrderModel> Orders { get; } = new Collection<OrderModel>();
-
-        public string DisplayName => Broker == default ? Name : $"{Broker.Name}/{Name}";
 
         public void Refresh()
         {

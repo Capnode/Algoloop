@@ -14,6 +14,7 @@
 
 using Algoloop.Support;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -100,7 +101,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public Collection<AccountModel> Accounts { get; set; }
+        public Collection<AccountModel> Accounts { get; set; } = new Collection<AccountModel>();
 
         public void Refresh()
         {
@@ -119,6 +120,16 @@ namespace Algoloop.Model
                 SetBrowsable("Login", false);
                 SetBrowsable("Password", false);
                 SetBrowsable("ApiKey", false);
+            }
+        }
+
+        public void UpdateAccounts(IEnumerable<AccountModel> accounts)
+        {
+            Accounts.Clear();
+            foreach (AccountModel account in accounts)
+            {
+                account.Broker = this;
+                Accounts.Add(account);
             }
         }
     }

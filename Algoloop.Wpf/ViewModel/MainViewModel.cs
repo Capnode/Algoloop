@@ -59,6 +59,7 @@ namespace Algoloop.Wpf.ViewModel
             SaveCommand = new RelayCommand(() => SaveConfig(), () => !IsBusy);
             SettingsCommand = new RelayCommand(async () => await DoSettings().ConfigureAwait(false), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
+            UpdateCommand = new RelayCommand(async () => await DoUpdate().ConfigureAwait(false), () => !IsBusy);
             Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
 
             // Set working directory
@@ -74,6 +75,7 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand SaveCommand { get; }
         public RelayCommand SettingsCommand { get; }
         public RelayCommand<Window> ExitCommand { get; }
+        public RelayCommand UpdateCommand { get; }
 
         public SettingsViewModel SettingsViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
@@ -192,15 +194,17 @@ namespace Algoloop.Wpf.ViewModel
                 MainService.CopyDirectory(Path.Combine(program, "Content/ProgramData"), programDataFolder, false);
                 MainService.CopyDirectory(Path.Combine(program, "Content/UserData"), userDataFolder, false);
 
-                // Read configuration
+                // Read settings
                 string appData = MainService.GetAppDataFolder();
                 await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
-                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
-                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
-                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
 
                 // Register providers
                 ProviderFactory.RegisterProviders(SettingsViewModel.Model);
+
+                // Read configuration
+                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
+                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
+                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
 
                 // Initialize Research page
                 ResearchViewModel.Initialize();
@@ -211,6 +215,23 @@ namespace Algoloop.Wpf.ViewModel
                 string message = $"{ex.Message} ({ex.GetType()})";
                 Messenger.Default.Send(new NotificationMessage(message));
                 Log.Error(ex, message);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task DoUpdate()
+        {
+            await _initializer.ConfigureAwait(false);
+            try
+            {
+                IsBusy = true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
             }
             finally
             {

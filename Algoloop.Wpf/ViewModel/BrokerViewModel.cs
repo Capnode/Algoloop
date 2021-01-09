@@ -105,10 +105,7 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _model, value);
         }
 
-        public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
-        public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
-        public SyncObservableCollection<Trade> ClosedTrades { get; } = new SyncObservableCollection<Trade>();
-        public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
+        public SyncObservableCollection<AccountViewModel> Accounts { get; } = new SyncObservableCollection<AccountViewModel>();
 
         public IList SelectedItems
         {
@@ -175,11 +172,22 @@ namespace Algoloop.Wpf.ViewModel
 
         internal void DataToModel()
         {
-            Contract.Requires(Model != null);
+            Model.Accounts.Clear();
+            foreach (AccountViewModel account in Accounts)
+            {
+                Model.Accounts.Add(account.Model);
+                account.DataToModel();
+            }
         }
 
         internal void DataFromModel()
         {
+            Accounts.Clear();
+            foreach (AccountModel account in Model.Accounts)
+            {
+                var viewModel = new AccountViewModel(this, account);
+                Accounts.Add(viewModel);
+            }
         }
 
         private void RaiseCommands()
@@ -227,121 +235,42 @@ namespace Algoloop.Wpf.ViewModel
             using IProvider provider = ProviderFactory.CreateProvider(Model.Name, _settings);
             if (provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
             IReadOnlyList<AccountModel> accounts = provider.Login(Model, _settings);
+            Model.UpdateAccounts(accounts);
+            UiThread(() => DataFromModel());
             while (!_cancel.IsCancellationRequested)
             {
-                UpdateOrder(provider);
-                UpdatePosition(provider);
-                UpdateBalance(provider);
-                UpdateClosedTrades(provider);
+                UpdateOrder(provider, accounts);
+                UpdatePosition(provider, accounts);
+                UpdateBalance(provider, accounts);
+                UpdateClosedTrades(provider, accounts);
                 Thread.Sleep(1000);
             }
 
             provider.Logout();
-            Orders.Clear();
-            Positions.Clear();
-            Balances.Clear();
-            ClosedTrades.Clear();
         }
 
-        private void UpdateOrder(IProvider provider)
+        private static void UpdateOrder(IProvider provider, IEnumerable<AccountModel> accounts)
         {
-            IReadOnlyList<Order> orders = provider.GetOpenOrders();
-            foreach (Order order in orders)
-            {
-                bool update = false;
-                foreach (OrderViewModel vm in Orders)
-                {
-                    if (order.Id == vm.Id)
-                    {
-                        vm.Update(order);
-                        update = true;
-                        break;
-                    }
-                }
-
-                if (!update)
-                {
-                    Orders.Add(new OrderViewModel(order));
-                }
-            }
+            Contract.Requires(provider != null);
+            Contract.Requires(accounts != null);
         }
 
-        private void UpdatePosition(IProvider provider)
+        private static void UpdatePosition(IProvider provider, IEnumerable<AccountModel> accounts)
         {
-            IReadOnlyList<Holding> holdings = provider.GetAccountHoldings();
-            foreach (Holding holding in holdings)
-            {
-                bool update = false;
-                foreach (PositionViewModel vm in Positions)
-                {
-                    if (holding.Symbol.Value == vm.Symbol)
-                    {
-                        vm.Update(holding);
-                        update = true;
-                        break;
-                    }
-                }
-
-                if (!update)
-                {
-                    Positions.Add(new PositionViewModel(holding));
-                }
-            }
-
-            PositionViewModel[] vms = new PositionViewModel[Positions.Count];
-            Positions.CopyTo(vms, 0);
-            foreach (PositionViewModel vm in vms)
-            {
-                Holding holding = holdings.FirstOrDefault(m => m.Symbol.Value == vm.Symbol);
-                if (holding == null || holding.Symbol == null)
-                {
-                    Positions.Remove(vm);
-                }
-            }
+            Contract.Requires(provider != null);
+            Contract.Requires(accounts != null);
         }
 
-        private void UpdateClosedTrades(IProvider provider)
+        private static void UpdateClosedTrades(IProvider provider, IEnumerable<AccountModel> accounts)
         {
-            ClosedTrades.Clear();
-            IReadOnlyList<Trade> trades = provider.GetClosedTrades();
-            foreach (Trade trade in trades)
-            {
-                ClosedTrades.Add(trade);
-            }
+            Contract.Requires(provider != null);
+            Contract.Requires(accounts != null);
         }
 
-        private void UpdateBalance(IProvider provider)
+        private static void UpdateBalance(IProvider provider, IEnumerable<AccountModel> accounts)
         {
-            IReadOnlyCollection<CashAmount> balances = provider.GetCashBalance();
-            foreach (CashAmount balance in balances)
-            {
-                bool update = false;
-                foreach (BalanceViewModel vm in Balances)
-                {
-                    if (vm.Currency == balance.Currency)
-                    {
-                        vm.Update(balance);
-                        update = true;
-                        break;
-                    }
-                }
-
-                if (!update)
-                {
-                    Balances.Add(new BalanceViewModel(balance));
-                }
-            }
-
-            BalanceViewModel[] vms = new BalanceViewModel[Balances.Count];
-            Balances.CopyTo(vms, 0);
-            foreach (BalanceViewModel vm in vms)
-            {
-                CashAmount balance = balances.FirstOrDefault(m => m.Currency == vm.Currency);
-                if (balance == null || balance.Currency == null)
-                {
-                    Balances.Remove(vm);
-                }
-            }
+            Contract.Requires(provider != null);
+            Contract.Requires(accounts != null);
         }
     }
 }
