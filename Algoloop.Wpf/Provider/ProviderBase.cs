@@ -52,7 +52,7 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public virtual IReadOnlyList<AccountModel> Login(BrokerModel account, SettingModel settings)
+        public virtual IReadOnlyList<AccountModel> Login(ProviderModel account, SettingModel settings)
         {
             throw new NotImplementedException();
         }
@@ -63,7 +63,7 @@ namespace Algoloop.Wpf.Provider
         }
 
 
-        public virtual void Download(MarketModel market, SettingModel settings)
+        public virtual void Download(ProviderModel market, SettingModel settings)
         {
             throw new NotImplementedException();
         }
@@ -169,7 +169,7 @@ namespace Algoloop.Wpf.Provider
         }
 
         protected static void UpdateSymbols(
-            MarketModel market,
+            ProviderModel market,
             IEnumerable<SymbolModel> actual,
             bool defaultActive,
             bool addNew = true)

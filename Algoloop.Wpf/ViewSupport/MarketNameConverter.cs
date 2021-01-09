@@ -44,7 +44,7 @@ namespace Algoloop.Wpf.ViewSupport
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
             // Get list of providers
-            IReadOnlyList<MarketModel> providers = _markets.GetMarkets();
+            IReadOnlyList<ProviderModel> providers = _markets.GetMarkets();
             List<string> names = providers
                 .Select(m => m.Name)
                 .ToList();

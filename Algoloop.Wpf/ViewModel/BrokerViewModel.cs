@@ -26,12 +26,7 @@ using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using QuantConnect;
 using QuantConnect.Logging;
-using QuantConnect.Orders;
-using QuantConnect.Securities;
-using QuantConnect.Statistics;
-using System.Linq;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -42,7 +37,7 @@ namespace Algoloop.Wpf.ViewModel
         private readonly SettingModel _settings;
         private CancellationTokenSource _cancel;
         private IList _selectedItems;
-        private BrokerModel _model;
+        private ProviderModel _model;
 
         public void Dispose()
         {
@@ -63,7 +58,7 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        public BrokerViewModel(AccountsViewModel accountsViewModel, BrokerModel accountModel, SettingModel settings)
+        public BrokerViewModel(AccountsViewModel accountsViewModel, ProviderModel accountModel, SettingModel settings)
         {
             _parent = accountsViewModel;
             Model = accountModel;
@@ -99,7 +94,7 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand StopCommand { get; }
         public RelayCommand DeleteCommand { get; }
 
-        public BrokerModel Model
+        public ProviderModel Model
         {
             get => _model;
             set => Set(ref _model, value);

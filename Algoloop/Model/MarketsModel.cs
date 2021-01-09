@@ -33,12 +33,12 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public Collection<MarketModel> Markets { get; } = new Collection<MarketModel>();
+        public Collection<ProviderModel> Markets { get; } = new Collection<ProviderModel>();
 
         public void Copy(MarketsModel marketsModel)
         {
             Markets.Clear();
-            foreach (MarketModel market in marketsModel.Markets)
+            foreach (ProviderModel market in marketsModel.Markets)
             {
                 Markets.Add(market);
 
@@ -50,12 +50,12 @@ namespace Algoloop.Model
             }
         }
 
-        public IReadOnlyList<MarketModel> GetMarkets()
+        public IReadOnlyList<ProviderModel> GetMarkets()
         {
             return Markets;
         }
 
-        internal MarketModel GetMarket(string market)
+        internal ProviderModel GetMarket(string market)
         {
             return Markets.FirstOrDefault(m => m.Name.Equals(market, StringComparison.OrdinalIgnoreCase));
         }

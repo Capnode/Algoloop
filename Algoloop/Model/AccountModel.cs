@@ -28,7 +28,7 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [ReadOnly(false)]
-        public BrokerModel Broker { get; set; }
+        public ProviderModel Broker { get; set; }
 
         [Category("Account")]
         [DisplayName("Number")]

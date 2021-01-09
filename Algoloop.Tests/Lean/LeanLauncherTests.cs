@@ -47,7 +47,7 @@ namespace Algoloop.Tests.Lean
         [TestMethod()]
         public void RunTest()
         {
-            var broker = new BrokerModel()
+            var broker = new ProviderModel()
             {
                 Name = nameof(AccountModel.AccountType.Backtest)
             };

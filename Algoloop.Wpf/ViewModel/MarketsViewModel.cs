@@ -121,7 +121,7 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
-                var loginViewModel = new MarketViewModel(this, new MarketModel(), _settings);
+                var loginViewModel = new MarketViewModel(this, new ProviderModel(), _settings);
                 Markets.Add(loginViewModel);
             }
             finally
@@ -144,7 +144,7 @@ namespace Algoloop.Wpf.ViewModel
         private void DataFromModel()
         {
             Markets.Clear();
-            foreach (MarketModel market in Model.Markets)
+            foreach (ProviderModel market in Model.Markets)
             {
                 var viewModel = new MarketViewModel(this, market, _settings);
                 Markets.Add(viewModel);

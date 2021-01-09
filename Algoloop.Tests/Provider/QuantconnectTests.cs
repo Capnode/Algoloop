@@ -43,7 +43,7 @@ namespace Algoloop.Tests.Provider
         public void Download_no_symbols()
         {
             DateTime date = new DateTime(2019, 05, 01);
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Name = "QuantConnect",
                 Provider = "quantconnect",
@@ -63,7 +63,7 @@ namespace Algoloop.Tests.Provider
         public void Download_one_symbol()
         {
             DateTime date = new DateTime(2019, 05, 01);
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Name = "QuantConnect",
                 Provider = "quantconnect",

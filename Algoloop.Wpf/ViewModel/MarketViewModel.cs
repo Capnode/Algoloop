@@ -43,7 +43,7 @@ namespace Algoloop.Wpf.ViewModel
     {
         private readonly MarketsViewModel _parent;
         private readonly SettingModel _settings;
-        private MarketModel _model;
+        private ProviderModel _model;
         private SymbolViewModel _selectedSymbol;
         private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
         private bool _checkAll;
@@ -53,7 +53,7 @@ namespace Algoloop.Wpf.ViewModel
         private Resolution _selectedResolution = Resolution.Daily;
         private static ReportPeriod _selectedReportPeriod;
 
-        public MarketViewModel(MarketsViewModel marketsViewModel, MarketModel marketModel, SettingModel settings)
+        public MarketViewModel(MarketsViewModel marketsViewModel, ProviderModel marketModel, SettingModel settings)
         {
             _parent = marketsViewModel ?? throw new ArgumentNullException(nameof(marketsViewModel));
             Model = marketModel;
@@ -142,7 +142,7 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        public MarketModel Model
+        public ProviderModel Model
         {
             get => _model;
             set => Set(ref _model, value);
@@ -268,7 +268,7 @@ namespace Algoloop.Wpf.ViewModel
         private async Task DownloadAsync()
         {
             DataToModel();
-            MarketModel market = Model;
+            ProviderModel market = Model;
             while (market.Active)
             {
                 Log.Trace($"{market.Provider} download {market.Resolution} after {market.LastDate:d}");

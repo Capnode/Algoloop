@@ -30,7 +30,7 @@ namespace Algoloop.Wpf.Provider
         private const string _security = "Security";
         private const string _zip = ".zip";
 
-        public override void Download(MarketModel model, SettingModel settings)
+        public override void Download(ProviderModel model, SettingModel settings)
         {
             Contract.Requires(model != null);
             if (settings == null) throw new ArgumentNullException(nameof(settings));

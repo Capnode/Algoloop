@@ -18,7 +18,7 @@ namespace Algoloop.Wpf.Provider
 {
     public class Gdax : ProviderBase
    {
-        public override void Download(MarketModel model, SettingModel settings)
+        public override void Download(ProviderModel model, SettingModel settings)
         {
         }
     }

@@ -24,7 +24,7 @@ namespace Algoloop.Wpf.Provider
 {
     public class FxcmVolume : ProviderBase
     {
-        public override void Download(MarketModel model, SettingModel settings)
+        public override void Download(ProviderModel model, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -32,11 +32,11 @@ namespace Algoloop.Wpf.Provider
             Config.Set("data-directory", settings.DataFolder);
             switch (model.Access)
             {
-                case MarketModel.AccessType.Demo:
+                case ProviderModel.AccessType.Demo:
                     Config.Set("fxcm-terminal", "Demo");
                     break;
 
-                case MarketModel.AccessType.Real:
+                case ProviderModel.AccessType.Real:
                     Config.Set("fxcm-terminal", "Real");
                     break;
             }

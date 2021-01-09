@@ -48,7 +48,7 @@ namespace Algoloop.Tests.Provider
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime date = new DateTime(2019, 05, 01);
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
@@ -73,7 +73,7 @@ namespace Algoloop.Tests.Provider
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime date = new DateTime(2019, 05, 01);
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
@@ -100,7 +100,7 @@ namespace Algoloop.Tests.Provider
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime date = new DateTime(2019, 05, 01);
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
@@ -129,7 +129,7 @@ namespace Algoloop.Tests.Provider
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime date = new DateTime(2019, 05, 01);
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
@@ -166,7 +166,7 @@ namespace Algoloop.Tests.Provider
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime date = new DateTime(2019, 05, 01);
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
@@ -192,7 +192,7 @@ namespace Algoloop.Tests.Provider
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime today = DateTime.Today;
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
@@ -218,7 +218,7 @@ namespace Algoloop.Tests.Provider
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime today = DateTime.Today;
-            var market = new MarketModel
+            var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",

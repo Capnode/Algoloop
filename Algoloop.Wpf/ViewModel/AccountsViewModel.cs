@@ -116,7 +116,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void AddBroker()
         {
-            var broker = new BrokerViewModel(this, new BrokerModel(), _settings);
+            var broker = new BrokerViewModel(this, new ProviderModel(), _settings);
             Brokers.Add(broker);
         }
 
@@ -134,7 +134,7 @@ namespace Algoloop.Wpf.ViewModel
         private void DataFromModel()
         {
             Brokers.Clear();
-            foreach (BrokerModel broker in Model.Brokers)
+            foreach (ProviderModel broker in Model.Brokers)
             {
                 var vm = new BrokerViewModel(this, broker, _settings);
                 Brokers.Add(vm);

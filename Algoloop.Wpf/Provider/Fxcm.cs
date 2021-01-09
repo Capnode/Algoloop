@@ -53,7 +53,7 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public override IReadOnlyList<AccountModel> Login(BrokerModel broker, SettingModel settings)
+        public override IReadOnlyList<AccountModel> Login(ProviderModel broker, SettingModel settings)
         {
             Contract.Requires(broker != null);
 
@@ -82,7 +82,7 @@ namespace Algoloop.Wpf.Provider
             _brokerage = null;
         }
 
-        public override void Download(MarketModel market, SettingModel settings)
+        public override void Download(ProviderModel market, SettingModel settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -131,7 +131,7 @@ namespace Algoloop.Wpf.Provider
             UpdateSymbols(market);
         }
 
-        private void UpdateSymbols(MarketModel market)
+        private void UpdateSymbols(ProviderModel market)
         {
             List<Symbol> symbols = FxcmSymbolMapper.KnownSymbols;
             IEnumerable<SymbolModel> actual = symbols.Select(

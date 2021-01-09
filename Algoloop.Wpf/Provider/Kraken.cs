@@ -24,7 +24,7 @@ namespace Algoloop.Wpf.Provider
 {
     public class Kraken : ProviderBase
     {
-        public override void Download(MarketModel model, SettingModel settings)
+        public override void Download(ProviderModel model, SettingModel settings)
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
             if (model == null) throw new ArgumentNullException(nameof(model));

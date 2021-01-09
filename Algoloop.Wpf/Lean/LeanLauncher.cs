@@ -336,11 +336,11 @@ namespace Algoloop.Wpf.Lean
             config["fxcm-account-id"] = account.Id;
             switch (account.Broker.Access)
             {
-                case BrokerModel.AccessType.Demo:
+                case ProviderModel.AccessType.Demo:
                     config["fxcm-terminal"] = "Demo";
                     break;
 
-                case BrokerModel.AccessType.Real:
+                case ProviderModel.AccessType.Real:
                     config["fxcm-terminal"] = "Real";
                     break;
             }
@@ -369,11 +369,11 @@ namespace Algoloop.Wpf.Lean
             config["desktop-exe"] = @"../../../UserInterface/bin/Release/QuantConnect.Views.exe";
             switch (account.Broker.Access)
             {
-                case BrokerModel.AccessType.Demo:
+                case ProviderModel.AccessType.Demo:
                     config["fxcm-terminal"] = "Demo";
                     break;
 
-                case BrokerModel.AccessType.Real:
+                case ProviderModel.AccessType.Real:
                     config["fxcm-terminal"] = "Real";
                     break;
             }

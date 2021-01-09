@@ -24,7 +24,7 @@ namespace Algoloop.Wpf.Provider
 {
     public class Oanda : ProviderBase
     {
-        public override void Download(MarketModel model, SettingModel settings)
+        public override void Download(ProviderModel model, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (settings == null) throw new ArgumentNullException(nameof(settings));

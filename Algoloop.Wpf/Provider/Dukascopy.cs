@@ -81,7 +81,7 @@ namespace Algoloop.Wpf.Provider
                 TimeZones.Utc);
         }
 
-        public override void Download(MarketModel market, SettingModel settings)
+        public override void Download(ProviderModel market, SettingModel settings)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -127,7 +127,7 @@ namespace Algoloop.Wpf.Provider
             UpdateSymbols(market);
         }
 
-        private void UpdateSymbols(MarketModel market)
+        private void UpdateSymbols(ProviderModel market)
         {
             var all = new List<SymbolModel>();
             all.AddRange(_majors.Select(m => new SymbolModel(m, _market, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));

@@ -39,12 +39,12 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [DataMember]
-        public Collection<BrokerModel> Brokers { get; } = new Collection<BrokerModel>();
+        public Collection<ProviderModel> Brokers { get; } = new Collection<ProviderModel>();
 
         public void Copy(AccountsModel accountsModel)
         {
             Brokers.Clear();
-            foreach (BrokerModel broker in accountsModel.Brokers)
+            foreach (ProviderModel broker in accountsModel.Brokers)
             {
                 Brokers.Add(broker);
             }
@@ -52,7 +52,7 @@ namespace Algoloop.Model
 
         public AccountModel FindAccount(string name)
         {
-            foreach (BrokerModel broker in Brokers)
+            foreach (ProviderModel broker in Brokers)
             {
                 Collection<AccountModel> accounts = broker.Accounts;
                 AccountModel account = accounts.FirstOrDefault(m => m.DisplayName.Equals(name, StringComparison.OrdinalIgnoreCase));
@@ -66,7 +66,7 @@ namespace Algoloop.Model
         {
             var list = new List<AccountModel>();
             list.AddRange(_standardAccounts);
-            foreach (BrokerModel broker in Brokers)
+            foreach (ProviderModel broker in Brokers)
             {
                 Collection<AccountModel> accounts = broker.Accounts;
                 list.AddRange(accounts);

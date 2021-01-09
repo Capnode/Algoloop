@@ -25,9 +25,9 @@ namespace Algoloop.Wpf.Provider
     public interface IProvider : IDisposable
     {
         void Register(SettingModel settings, string name);
-        IReadOnlyList<AccountModel> Login(BrokerModel account, SettingModel settings);
+        IReadOnlyList<AccountModel> Login(ProviderModel account, SettingModel settings);
         void Logout();
-        void Download(MarketModel market, SettingModel settings);
+        void Download(ProviderModel market, SettingModel settings);
         void Abort();
         IReadOnlyList<Order> GetOpenOrders();
         IReadOnlyList<Holding> GetAccountHoldings();

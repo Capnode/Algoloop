@@ -26,7 +26,7 @@ namespace Algoloop.Model
 {
     [Serializable]
     [DataContract]
-    public class MarketModel : ModelBase
+    public class ProviderModel : ModelBase
     {
         [NonSerialized]
         public Action ModelChanged;
@@ -36,17 +36,17 @@ namespace Algoloop.Model
 
         public enum AccessType { Demo, Real };
 
-        [Category("Data provider")]
-        [DisplayName("Market name")]
-        [Description("Name of the market.")]
+        [Category("Market provider")]
+        [DisplayName("Name")]
+        [Description("Name of the market provider.")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
         public string Name { get; set; } = "Market";
 
-        [Category("Data provider")]
+        [Category("Market provider")]
         [DisplayName("Provider")]
-        [Description("Name of the data provider.")]
+        [Description("Type name of the market provider.")]
         [TypeConverter(typeof(ProviderNameConverter))]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
@@ -99,7 +99,7 @@ namespace Algoloop.Model
 
         [Category("Time")]
         [DisplayName("Last date")]
-        [Description("Symbols are updated up to this date.")]
+        [Description("Account are updated up to this time.")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [Browsable(true)]
         [ReadOnly(false)]
@@ -129,6 +129,11 @@ namespace Algoloop.Model
         [DataMember]
         public Collection<ListModel> Lists { get; } = new Collection<ListModel>();
 
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public Collection<AccountModel> Accounts { get; set; } = new Collection<AccountModel>();
+
         public void Refresh()
         {
             if (string.IsNullOrEmpty(Provider)) return;
@@ -146,6 +151,16 @@ namespace Algoloop.Model
                 SetBrowsable("Login", false);
                 SetBrowsable("Password", false);
                 SetBrowsable("ApiKey", false);
+            }
+        }
+
+        public void UpdateAccounts(IEnumerable<AccountModel> accounts)
+        {
+            Accounts.Clear();
+            foreach (AccountModel account in accounts)
+            {
+                account.Broker = this;
+                Accounts.Add(account);
             }
         }
 
