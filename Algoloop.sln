@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Lean.Engine", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Algorithm", "Algorithm\QuantConnect.Algorithm.csproj", "{3240ACA4-BDD4-4D24-AC36-BBB651C39212}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect", "Common\QuantConnect.csproj", "{2545C0B4-FABB-49C9-8DD1-9AD7EE23F86B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect", "Common\QuantConnect.csproj", "{2545C0B4-FABB-49C9-8DD1-9AD7EE23F86B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Logging", "Logging\QuantConnect.Logging.csproj", "{01911409-86BE-4E7D-9947-DF714138610D}"
 EndProject
@@ -103,6 +103,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Optimizer", "Optimizer\QuantConnect.Optimizer.csproj", "{4ECD7DF3-A675-4E9E-ACA3-2B51C88736CE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Optimizer.Launcher", "Optimizer.Launcher\QuantConnect.Optimizer.Launcher.csproj", "{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Brokerages", "Algoloop.Brokerages\Algoloop.Brokerages.csproj", "{D3A6E48F-798D-4547-BB6B-60D37C484F67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -668,6 +670,26 @@ Global
 		{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}.Release|x64.Build.0 = Release|Any CPU
 		{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}.Release|x86.ActiveCfg = Release|Any CPU
 		{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}.Release|x86.Build.0 = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|x64.Build.0 = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|x86.Build.0 = Debug|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|ARM.Build.0 = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|ARM64.Build.0 = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|x64.ActiveCfg = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|x64.Build.0 = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|x86.ActiveCfg = Release|Any CPU
+		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
