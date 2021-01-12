@@ -68,9 +68,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FxcmRest\FxcmClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Doc\FXCM - Socket REST API Specs.pdf" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

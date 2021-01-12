@@ -103,6 +103,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Brokerages\FxcmRestTests.cs" />
     <Compile Include="Lean\LeanLauncherTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\FxcmTests.cs" />
@@ -116,6 +117,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj">
+      <Project>{d3a6e48f-798d-4547-bb6b-60d37c484f67}</Project>
+      <Name>Algoloop.Brokerages</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Algoloop.Wpf\Algoloop.Wpf.csproj">
       <Project>{f65da573-db1b-4524-a254-2034954cae66}</Project>
       <Name>Algoloop.Wpf</Name>
