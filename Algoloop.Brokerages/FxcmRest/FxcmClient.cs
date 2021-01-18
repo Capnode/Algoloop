@@ -22,10 +22,7 @@ using System.Threading.Tasks;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
 using QuantConnect.Logging;
-using Quobject.EngineIoClientDotNet.Client;
-using Quobject.SocketIoClientDotNet.Client;
 using static Algoloop.Model.ProviderModel;
-using Socket = Quobject.SocketIoClientDotNet.Client.Socket;
 
 namespace Algoloop.Brokerages.FxcmRest
 {

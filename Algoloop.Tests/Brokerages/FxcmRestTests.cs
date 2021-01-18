@@ -13,14 +13,11 @@
  */
 
 using Algoloop.Brokerages.FxcmRest;
-using Algoloop.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Brokerages
