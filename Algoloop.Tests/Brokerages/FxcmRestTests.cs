@@ -13,12 +13,15 @@
  */
 
 using Algoloop.Brokerages.FxcmRest;
+using Algoloop.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Brokerages
 {
@@ -45,8 +48,10 @@ namespace Algoloop.Tests.Brokerages
         public void Initialize()
         {
             string access = ConfigurationManager.AppSettings["fxcm_access"];
+            AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
+
             string key = ConfigurationManager.AppSettings["fxcm_key"];
-            _api = new FxcmClient(access, key);
+            _api = new FxcmClient(accessType, key);
         }
 
         [TestCleanup]
@@ -56,11 +61,29 @@ namespace Algoloop.Tests.Brokerages
         }
 
         [TestMethod]
-        public async Task LoginAsync()
+        public void LoginAsync()
         {
             // Act
-            await _api.LoginAsync().ConfigureAwait(true);
+            bool connected = _api.LoginAsync();
+            bool disconnected = _api.LogoutAsync();
+
+            Assert.IsTrue(connected);
+            Assert.IsTrue(disconnected);
         }
+
+        //[TestMethod]
+        //public async Task GetAccountsAsync()
+        //{
+        //    // Act
+        //    bool connected = await _api.LoginAsync().ConfigureAwait(false);
+        //    IReadOnlyList<AccountModel> accounts = await _api.GetAccountsAsync().ConfigureAwait(true);
+        //    bool disconnected = await _api.LogoutAsync().ConfigureAwait(true);
+
+        //    Assert.IsTrue(connected);
+        //    Assert.IsTrue(disconnected);
+        //    Assert.IsNotNull(accounts);
+        //    Assert.IsTrue(accounts.Count > 0);
+        //}
 
         protected virtual void Dispose(bool disposing)
         {

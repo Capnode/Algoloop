@@ -167,6 +167,7 @@
     <Compile Include="Common\SafeDictionary.cs" />
     <Compile Include="Lean\AlphaHandler.cs" />
     <Compile Include="Lean\LogItem.cs" />
+    <Compile Include="Provider\FxcmRest.cs" />
     <Compile Include="Provider\ProviderBase.cs" />
     <Compile Include="Provider\QuantConnect.cs" />
     <Compile Include="ViewModel\BrokerViewModel.cs" />
@@ -473,6 +474,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj">
+      <Project>{d3a6e48f-798d-4547-bb6b-60d37c484f67}</Project>
+      <Name>Algoloop.Brokerages</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Algoloop\Algoloop.csproj">
       <Project>{23d560bd-cbef-4c6b-a07e-65b5d31c3a6c}</Project>
       <Name>Algoloop</Name>

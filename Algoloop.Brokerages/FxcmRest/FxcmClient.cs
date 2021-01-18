@@ -13,12 +13,19 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Algoloop.Model;
+using Newtonsoft.Json.Linq;
 using QuantConnect.Logging;
+using Quobject.EngineIoClientDotNet.Client;
+using Quobject.SocketIoClientDotNet.Client;
 using static Algoloop.Model.ProviderModel;
+using Socket = Quobject.SocketIoClientDotNet.Client.Socket;
 
 namespace Algoloop.Brokerages.FxcmRest
 {
@@ -31,52 +38,81 @@ namespace Algoloop.Brokerages.FxcmRest
         private const string _baseUrlReal = "https://api.fxcm.com";
         private const string _baseUrlDemo = "https://api-demo.fxcm.com";
         private const string _mediatype = @"application/json";
+        private const string _getModel = @"trading/get_model/?models=OpenPosition&models=ClosedPosition" +
+            "&models=Order&models=Account&models=LeverageProfile&models=Properties";
 
         private bool _isDisposed;
         private readonly string _baseUrl;
         private readonly string _key;
-//        private readonly SocketIO _socketio;
+        private Socket _socketio;
         private readonly HttpClient _httpClient;
+        private ManualResetEvent _hold = new ManualResetEvent(false);
 
-        public FxcmClient(string access, string key)
+        public FxcmClient(ProviderModel.AccessType access, string key)
         {
-            _baseUrl = access.Equals(nameof(AccessType.Demo), StringComparison.OrdinalIgnoreCase)
-                ? _baseUrlDemo : _baseUrlReal;
+            _baseUrl = access.Equals(AccessType.Demo) ? _baseUrlDemo : _baseUrlReal;
             _key = key;
-
-            //_socketio = new SocketIO(_baseUrl + $"/?access_token={_key}");
-            //_socketio.OnConnected += OnConnected;
-            //_socketio.OnDisconnected += OnDisconnected;
-            //_socketio.OnError += OnError;
 
             _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediatype));
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "request");
         }
 
-        private void OnConnected(object sender, EventArgs e)
+        public bool LoginAsync()
         {
-//            Log.Trace($"Websocket connected:{_socketio.Id}");
+            var uri = new Uri(_baseUrl);
+            var options = new IO.Options
+            {
+//                Path = "/socket.io",
+                Port = uri.Port,
+                Host = uri.Host,
+                Secure = true,
+                IgnoreServerCertificateValidation = true,
+                Query = new Dictionary<string, string> { { "access_token", _key } },
+                AutoConnect = true
+            };
+            string url = $"{_baseUrl}/?access_token={_key}";
+            _socketio = IO.Socket(uri, options);
+            _socketio.On(Socket.EVENT_CONNECT, () =>
+            {
+                _hold.Set();
+            });
+            _socketio.On(Socket.EVENT_ERROR, (e) =>
+            {
+                Log.Error(e.ToString());
+            });
+
+            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) return false;
+            string bearer = "_socketio.Id" + _key;
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
+            return true;
         }
 
-        private void OnDisconnected(object sender, string e)
+        public bool LogoutAsync()
         {
+            _socketio.Disconnect();
+            return true;
         }
 
-        private void OnError(object sender, string e)
+        public async Task<IReadOnlyList<AccountModel>> GetAccountsAsync()
         {
-        }
+            Log.Trace("{0}: GetAccountsAsync", GetType().Name);
+            string json = await GetAsync(_getModel);
+            var accounts = new List<AccountModel>();
+            JObject jo = JObject.Parse(json);
+            JArray jAccounts = JArray.FromObject(jo["accounts"]);
+            foreach (JToken jAccount in jAccounts)
+            {
+                var account = new AccountModel
+                {
+                    Id = jAccount["accountId"].ToString(),
+                    Name = jAccount["accountName"].ToString(),
+                };
 
-        public async Task LoginAsync()
-        {
-            //            await _socketio.ConnectAsync();
-            await Task.Delay(10);
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _key);
-        }
+                accounts.Add(account);
+            }
 
-        public Task LogoutAsync()
-        {
-            return Task.CompletedTask;
+            return accounts;
         }
 
         public void Dispose()
