@@ -134,6 +134,18 @@
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers">
       <Version>2.9.3</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.VersionCheckAnalyzer">
+      <Version>2.9.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeQuality.Analyzers">
+      <Version>2.9.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NetCore.Analyzers">
+      <Version>2.9.3</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NetFramework.Analyzers">
+      <Version>2.9.3</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
