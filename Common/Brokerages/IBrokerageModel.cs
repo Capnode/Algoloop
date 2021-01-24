@@ -16,7 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using QuantConnect.Benchmarks;
 using QuantConnect.Data.Market;
+using QuantConnect.Interfaces;
 using QuantConnect.Orders;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Orders.Fills;
@@ -102,6 +104,13 @@ namespace QuantConnect.Brokerages
         decimal GetLeverage(Security security);
 
         /// <summary>
+        /// Get the benchmark for this model
+        /// </summary>
+        /// <param name="securities">SecurityService to create the security with if needed</param>
+        /// <returns>The benchmark for this brokerage</returns>
+        IBenchmark GetBenchmark(SecurityManager securities);
+
+        /// <summary>
         /// Gets a new fill model that represents this brokerage's fill behavior
         /// </summary>
         /// <param name="security">The security to get fill model for</param>
@@ -153,6 +162,12 @@ namespace QuantConnect.Brokerages
         /// <returns>The buying power model for this brokerage/security</returns>
         [Obsolete("Flagged deprecated and will remove December 1st 2018")]
         IBuyingPowerModel GetBuyingPowerModel(Security security, AccountType accountType);
+
+        /// <summary>
+        /// Gets the shortable provider
+        /// </summary>
+        /// <returns>Shortable provider</returns>
+        IShortableProvider GetShortableProvider();
     }
 
     /// <summary>

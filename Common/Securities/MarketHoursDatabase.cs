@@ -316,12 +316,10 @@ namespace QuantConnect.Securities
                     case SecurityType.FutureOption:
                         stringSymbol = symbol.HasUnderlying ? symbol.ID.Symbol : string.Empty;
                         break;
-
                     case SecurityType.Base:
                     case SecurityType.Future:
                         stringSymbol = symbol.ID.Symbol;
                         break;
-
                     default:
                         stringSymbol = symbol.Value;
                         break;
