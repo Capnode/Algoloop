@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -46,6 +46,7 @@ using QuantConnect.Algorithm.Framework.Portfolio;
 using QuantConnect.Algorithm.Framework.Risk;
 using QuantConnect.Algorithm.Framework.Selection;
 using QuantConnect.Algorithm.Selection;
+using QuantConnect.Data.Shortable;
 using QuantConnect.Storage;
 
 namespace QuantConnect.Algorithm
@@ -86,9 +87,6 @@ namespace QuantConnect.Algorithm
         // used for calling through to void OnData(Slice) if no override specified
         private bool _checkedForOnDataSlice;
         private Action<Slice> _onDataSlice;
-
-        // set by SetBenchmark helper API functions
-        private Symbol _benchmarkSymbol = QuantConnect.Symbol.Empty;
 
         // flips to true when the user
         private bool _userSetSecurityInitializer = false;
@@ -554,20 +552,10 @@ namespace QuantConnect.Algorithm
 
             FrameworkPostInitialize();
 
-            // if the benchmark hasn't been set yet, set it
+            // if the benchmark hasn't been set yet, load in the default from the brokerage model
             if (Benchmark == null)
             {
-                if (_benchmarkSymbol == null)
-                {
-                    _benchmarkSymbol = QuantConnect.Symbol.Create("SPY", SecurityType.Equity, Market.USA);
-                }
-
-                var security = Securities.CreateSecurity(_benchmarkSymbol,
-                    new List<SubscriptionDataConfig>(),
-                    leverage: 1,
-                    addToSymbolCache:false);
-
-                Benchmark = new SecurityBenchmark(security);
+                Benchmark = BrokerageModel.GetBenchmark(Securities);
             }
 
             // perform end of time step checks, such as enforcing underlying securities are in raw data mode
@@ -1055,7 +1043,8 @@ namespace QuantConnect.Algorithm
                 market = Market.USA;
             }
 
-            _benchmarkSymbol = QuantConnect.Symbol.Create(symbol, securityType, market);
+            var benchmarkSymbol = QuantConnect.Symbol.Create(symbol, securityType, market);
+            SetBenchmark(benchmarkSymbol);
         }
 
         /// <summary>
@@ -1068,31 +1057,24 @@ namespace QuantConnect.Algorithm
         /// </remarks>
         public void SetBenchmark(string ticker)
         {
-            if (_locked)
-            {
-                throw new InvalidOperationException("Algorithm.SetBenchmark(): Cannot change Benchmark after algorithm initialized.");
-            }
-
             Symbol symbol;
-            Security security;
-            // lets first check the cache and use that symbol to check the securities collection
-            // else use the first matching the given ticker in the collection
-            if (!SymbolCache.TryGetSymbol(ticker, out symbol)
-                || !Securities.TryGetValue(symbol, out security))
+
+            // Check the cache for the symbol
+            if (!SymbolCache.TryGetSymbol(ticker, out symbol))
             {
-                ticker = ticker.LazyToUpper();
-                security = Securities.FirstOrDefault(x => x.Key.Value == ticker).Value;
+                // Check our securities for a symbol matched with this ticker
+                symbol = Securities.FirstOrDefault(x => x.Key.Value == ticker).Key;
+
+                // If we didn't find a symbol matching our ticker, create one.
+                if (symbol == null)
+                {
+                    Debug($"Warning: SetBenchmark({ticker}): no existing symbol found, benchmark security will be added with {SecurityType.Equity} type.");
+                    symbol = QuantConnect.Symbol.Create(ticker, SecurityType.Equity, Market.USA);
+                }
             }
 
-            if (security == null)
-            {
-                Debug($"Warning: SetBenchmark({ticker}): no existing security found, benchmark security will be added with {SecurityType.Equity} type.");
-                _benchmarkSymbol = QuantConnect.Symbol.Create(ticker, SecurityType.Equity, Market.USA);
-            }
-            else
-            {
-                _benchmarkSymbol = security.Symbol;
-            }
+            // Send our symbol through
+            SetBenchmark(symbol);
         }
 
         /// <summary>
@@ -1105,7 +1087,9 @@ namespace QuantConnect.Algorithm
             {
                 throw new InvalidOperationException("Algorithm.SetBenchmark(): Cannot change Benchmark after algorithm initialized.");
             }
-            _benchmarkSymbol = symbol;
+
+            // Create our security benchmark
+            Benchmark = SecurityBenchmark.CreateInstance(Securities, symbol);
         }
 
         /// <summary>
@@ -1119,6 +1103,7 @@ namespace QuantConnect.Algorithm
             {
                 throw new InvalidOperationException("Algorithm.SetBenchmark(): Cannot change Benchmark after algorithm initialized.");
             }
+
             Benchmark = new FuncBenchmark(benchmark);
         }
 
@@ -1979,6 +1964,30 @@ namespace QuantConnect.Algorithm
         }
 
         /// <summary>
+        /// AddData<typeparam name="T"/> a new user defined data source including symbol properties and exchange hours,
+        /// all other vars are not required and will use defaults.
+        /// </summary>
+        /// <param name="ticker">Key/Ticker for data</param>
+        /// <param name="properties">The properties of this new custom data</param>
+        /// <param name="exchangeHours">The Exchange hours of this symbol</param>
+        /// <param name="resolution">Resolution of the Data Required</param>
+        /// <param name="fillDataForward">When no data available on a tradebar, return the last data that was generated</param>
+        /// <param name="leverage">Custom leverage per security</param>
+        /// <returns>The new <see cref="Security"/></returns>
+        public Security AddData<T>(string ticker, SymbolProperties properties, SecurityExchangeHours exchangeHours, Resolution? resolution = null, bool fillDataForward = false, decimal leverage = 1.0m)
+            where T : IBaseData, new()
+        {
+            // Get the right key for storage of base type symbols
+            var key = SecurityIdentifier.GenerateBaseSymbol(typeof(T), ticker);
+
+            // Set our database entries for this data type
+            SetDatabaseEntries(key, properties, exchangeHours);
+
+            // Then add the data
+            return AddData(typeof(T), ticker, resolution, null, fillDataForward, leverage);
+        }
+
+        /// <summary>
         /// Send a debug message to the web console:
         /// </summary>
         /// <param name="message">Message to send to debug console</param>
@@ -2323,6 +2332,77 @@ namespace QuantConnect.Algorithm
         public void SetObjectStore(IObjectStore objectStore)
         {
             ObjectStore = new ObjectStore(objectStore);
+        }
+
+        /// <summary>
+        /// Determines if the Symbol is shortable at the brokerage
+        /// </summary>
+        /// <param name="symbol">Symbol to check if shortable</param>
+        /// <returns>True if shortable</returns>
+        public bool Shortable(Symbol symbol)
+        {
+            return Shortable(symbol, 0);
+        }
+
+        /// <summary>
+        /// Determines if the Symbol is shortable at the brokerage
+        /// </summary>
+        /// <param name="symbol">Symbol to check if shortable</param>
+        /// <param name="shortQuantity">Order's quantity to check if it is currently shortable, taking into account current holdings and open orders</param>
+        /// <returns>True if shortable</returns>
+        public bool Shortable(Symbol symbol, decimal shortQuantity)
+        {
+            var shortableQuantity = BrokerageModel.GetShortableProvider().ShortableQuantity(symbol, Time);
+            if (shortableQuantity == null)
+            {
+                return true;
+            }
+
+            var openOrderQuantity = Transactions.GetOpenOrdersRemainingQuantity(symbol);
+            var portfolioQuantity = Portfolio.ContainsKey(symbol) ? Portfolio[symbol].Quantity : 0;
+            // We check portfolio and open orders beforehand to ensure that orderQuantity == 0 case does not return
+            // a true result whenever we have no more shares left to short.
+            if (portfolioQuantity + openOrderQuantity <= -shortableQuantity)
+            {
+                return false;
+            }
+
+            shortQuantity = -Math.Abs(shortQuantity);
+            return portfolioQuantity + shortQuantity + openOrderQuantity >= -shortableQuantity;
+        }
+
+        /// <summary>
+        /// Gets the quantity shortable for the given asset
+        /// </summary>
+        /// <returns>
+        /// Quantity shortable for the given asset. Zero if not
+        /// shortable, or a number greater than zero if shortable.
+        /// </returns>
+        public long ShortableQuantity(Symbol symbol)
+        {
+            var shortableSymbols = AllShortableSymbols();
+            return shortableSymbols.ContainsKey(symbol) ? shortableSymbols[symbol] : 0;
+        }
+
+        /// <summary>
+        /// Gets all Symbols that are shortable, as well as the quantity shortable for them
+        /// </summary>
+        /// <returns>All shortable Symbols, null if all Symbols are shortable</returns>
+        public Dictionary<Symbol, long> AllShortableSymbols()
+        {
+            return BrokerageModel.GetShortableProvider().AllShortableSymbols(Time);
+        }
+        
+        /// Set the properties and exchange hours for a given key into our databases
+        /// </summary>
+        /// <param name="key">Key for database storage</param>
+        /// <param name="properties">Properties to store</param>
+        /// <param name="exchangeHours">Exchange hours to store</param>
+        private void SetDatabaseEntries(string key, SymbolProperties properties, SecurityExchangeHours exchangeHours)
+        {
+            // Add entries to our Symbol Properties DB and MarketHours DB
+            SymbolPropertiesDatabase.SetEntry(Market.USA, key, SecurityType.Base, properties);
+            MarketHoursDatabase.SetEntry(Market.USA, key, SecurityType.Base, exchangeHours);
         }
     }
 }

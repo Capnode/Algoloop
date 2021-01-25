@@ -64,7 +64,7 @@ namespace QuantConnect.Tests.Common.Packets
                     { "Annual Variance", "0.074"},
                     { "Information Ratio", "0.018"},
                     { "Tracking Error", "0.422"},
-                    { "Treynor Ratio", "-1.363"},
+                    { "Treynor Ratio", "-1.362"},
                     { "Total Fees", "$6.62"} },
                 Language.CSharp,
                 AlgorithmStatus.Completed);
@@ -246,7 +246,7 @@ namespace QuantConnect.Tests.Common.Packets
             Assert.AreEqual(Currencies.USD, TestInitialCashAmountSetupHandler.TestAlgorithm.AccountCurrency);
         }
 
-        internal class TestInitialCashAmountAlgorithm : BasicTemplateDailyAlgorithm
+        public class TestInitialCashAmountAlgorithm : BasicTemplateDailyAlgorithm
         {
             public override void Initialize()
             {
@@ -256,7 +256,7 @@ namespace QuantConnect.Tests.Common.Packets
             }
         }
 
-        internal class TestInitialCashAmountSetupHandler : AlgorithmRunner.RegressionSetupHandlerWrapper
+        public class TestInitialCashAmountSetupHandler : AlgorithmRunner.RegressionSetupHandlerWrapper
         {
             public static TestInitialCashAmountAlgorithm TestAlgorithm { get; set; }
 
