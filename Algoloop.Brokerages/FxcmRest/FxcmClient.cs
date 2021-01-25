@@ -41,7 +41,7 @@ namespace Algoloop.Brokerages.FxcmRest
         private bool _isDisposed;
         private readonly string _baseUrl;
         private readonly string _key;
-        private Socket _socketio;
+//        private Socket _socketio;
         private readonly HttpClient _httpClient;
         private ManualResetEvent _hold = new ManualResetEvent(false);
 
@@ -57,37 +57,37 @@ namespace Algoloop.Brokerages.FxcmRest
 
         public bool LoginAsync()
         {
-            var uri = new Uri(_baseUrl);
-            var options = new IO.Options
-            {
-//                Path = "/socket.io",
-                Port = uri.Port,
-                Host = uri.Host,
-                Secure = true,
-                IgnoreServerCertificateValidation = true,
-                Query = new Dictionary<string, string> { { "access_token", _key } },
-                AutoConnect = true
-            };
-            string url = $"{_baseUrl}/?access_token={_key}";
-            _socketio = IO.Socket(uri, options);
-            _socketio.On(Socket.EVENT_CONNECT, () =>
-            {
-                _hold.Set();
-            });
-            _socketio.On(Socket.EVENT_ERROR, (e) =>
-            {
-                Log.Error(e.ToString());
-            });
+//            var uri = new Uri(_baseUrl);
+//            var options = new IO.Options
+//            {
+////                Path = "/socket.io",
+//                Port = uri.Port,
+//                Host = uri.Host,
+//                Secure = true,
+//                IgnoreServerCertificateValidation = true,
+//                Query = new Dictionary<string, string> { { "access_token", _key } },
+//                AutoConnect = true
+//            };
+//            string url = $"{_baseUrl}/?access_token={_key}";
+//            _socketio = IO.Socket(uri, options);
+//            _socketio.On(Socket.EVENT_CONNECT, () =>
+//            {
+//                _hold.Set();
+//            });
+//            _socketio.On(Socket.EVENT_ERROR, (e) =>
+//            {
+//                Log.Error(e.ToString());
+//            });
 
-            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) return false;
-            string bearer = "_socketio.Id" + _key;
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
+//            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) return false;
+//            string bearer = "_socketio.Id" + _key;
+//            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
             return true;
         }
 
         public bool LogoutAsync()
         {
-            _socketio.Disconnect();
+//            _socketio.Disconnect();
             return true;
         }
 
