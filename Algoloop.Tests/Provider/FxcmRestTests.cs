@@ -25,7 +25,7 @@ namespace Algoloop.Tests.Provider
     [TestClass]
     public class FxcmRestTests
     {
-        private const string _provider = "fxcm-rest";
+        private const string _provider = "fxcmrest";
         private SettingModel _settings;
         private ProviderModel _broker;
 

@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
 using QuantConnect.Logging;
+using WebSocketSharp;
 using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Brokerages.FxcmRest
@@ -41,14 +42,23 @@ namespace Algoloop.Brokerages.FxcmRest
         private bool _isDisposed;
         private readonly string _baseUrl;
         private readonly string _key;
-//        private Socket _socketio;
         private readonly HttpClient _httpClient;
+        private readonly WebSocket _webSocket;
         private ManualResetEvent _hold = new ManualResetEvent(false);
 
         public FxcmClient(ProviderModel.AccessType access, string key)
         {
             _baseUrl = access.Equals(AccessType.Demo) ? _baseUrlDemo : _baseUrlReal;
             _key = key;
+
+            var uri = new Uri(_baseUrl);
+            string url = $"wss://{uri.Host}:{uri.Port}/socket.io/?EIO=3&transport=websocket&access_token={_key}";
+            _webSocket = new WebSocket(url);
+            _webSocket.OnOpen += _webSocket_OnOpen;
+            _webSocket.OnMessage += _webSocket_OnMessage;
+            _webSocket.OnError += _webSocket_OnError;
+            _webSocket.OnClose += _webSocket_OnClose;
+            _webSocket.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
 
             _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediatype));
@@ -57,37 +67,50 @@ namespace Algoloop.Brokerages.FxcmRest
 
         public bool LoginAsync()
         {
-//            var uri = new Uri(_baseUrl);
-//            var options = new IO.Options
-//            {
-////                Path = "/socket.io",
-//                Port = uri.Port,
-//                Host = uri.Host,
-//                Secure = true,
-//                IgnoreServerCertificateValidation = true,
-//                Query = new Dictionary<string, string> { { "access_token", _key } },
-//                AutoConnect = true
-//            };
-//            string url = $"{_baseUrl}/?access_token={_key}";
-//            _socketio = IO.Socket(uri, options);
-//            _socketio.On(Socket.EVENT_CONNECT, () =>
-//            {
-//                _hold.Set();
-//            });
-//            _socketio.On(Socket.EVENT_ERROR, (e) =>
-//            {
-//                Log.Error(e.ToString());
-//            });
-
-//            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) return false;
-//            string bearer = "_socketio.Id" + _key;
-//            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
+            _webSocket.Connect();
+            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) return false;
+            if (!_webSocket.IsAlive) return false;
             return true;
+        }
+
+        private void _webSocket_OnOpen(object sender, EventArgs e)
+        {
+            Log.Trace("OnOpen");
+        }
+
+        private void _webSocket_OnClose(object sender, CloseEventArgs e)
+        {
+            Log.Trace("OnClose");
+        }
+
+        private void _webSocket_OnError(object sender, ErrorEventArgs e)
+        {
+            Log.Error(e.Exception);
+            _hold.Set();
+        }
+
+        private void _webSocket_OnMessage(object sender, MessageEventArgs e)
+        {
+            Log.Trace(e.Data);
+            if (e.IsText)
+            {
+                if (e.Data.StartsWith("0", StringComparison.OrdinalIgnoreCase))
+                {
+                    JObject jo = JObject.Parse(e.Data.TrimStart('0'));
+                    string sid = jo["sid"].ToString();
+                    string bearer = sid + _key;
+                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
+                }
+                else if (e.Data.StartsWith("40", StringComparison.OrdinalIgnoreCase))
+                {
+                    _hold.Set();
+                }
+            }
         }
 
         public bool LogoutAsync()
         {
-//            _socketio.Disconnect();
+            _webSocket.Close();
             return true;
         }
 
