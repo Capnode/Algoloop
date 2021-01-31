@@ -137,18 +137,18 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
         public override bool IsConnected => _client != null && _client.Connected && !_stateManager.Disconnected1100Fired;
 
         /// <summary>
-        /// Returns true if the connected user is a financial advisor or non-disclosed broker
+        /// Returns true if the connected user is a financial advisor
         /// </summary>
         public bool IsFinancialAdvisor => IsMasterAccount(_account);
 
         /// <summary>
-        /// Returns true if the account is a financial advisor or non-disclosed broker master account
+        /// Returns true if the account is a financial advisor master account
         /// </summary>
         /// <param name="account">The account code</param>
         /// <returns>True if the account is a master account</returns>
         public static bool IsMasterAccount(string account)
         {
-            return account.Contains("F") || account.Contains("I");
+            return account.Contains("F");
         }
 
         /// <summary>
@@ -305,13 +305,13 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
 
             _client.ConnectAck += (sender, e) =>
             {
-                Log.Trace("InteractiveBrokersBrokerage.HandleConnectAck(): API client connected.");
+                Log.Trace($"InteractiveBrokersBrokerage.HandleConnectAck(): API client connected [Server Version: {_client.ClientSocket.ServerVersion}].");
                 _connectEvent.Set();
             };
 
             _client.ConnectionClosed += (sender, e) =>
             {
-                Log.Trace("InteractiveBrokersBrokerage.HandleConnectionClosed(): API client disconnected.");
+                Log.Trace($"InteractiveBrokersBrokerage.HandleConnectionClosed(): API client disconnected [Server Version: {_client.ClientSocket.ServerVersion}].");
                 _connectEvent.Set();
             };
         }
@@ -691,6 +691,7 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
                     _connectEvent.Reset();
 
                     // we're going to try and connect several times, if successful break
+                    Log.Trace("InteractiveBrokersBrokerage.Connect(): calling _client.ClientSocket.eConnect()");
                     _client.ClientSocket.eConnect(_host, _port, ClientId);
 
                     if (!_connectEvent.WaitOne(TimeSpan.FromSeconds(15)))
@@ -1289,6 +1290,14 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
             else if (errorCode == 506)
             {
                 Log.Trace("InteractiveBrokersBrokerage.HandleError(): Server Version: " + _client.ClientSocket.ServerVersion);
+
+                if (!_client.ClientSocket.IsConnected())
+                {
+                    // ignore the 506 error if we are not yet connected, will be checked by IB API later
+                    // we have occasionally experienced this error after restarting IBGateway after the nightly reset
+                    Log.Trace($"InteractiveBrokersBrokerage.HandleError(): Not connected, ignoring error, ErrorCode: {errorCode} - {errorMsg}");
+                    return;
+                }
             }
 
             if (InvalidatingCodes.Contains(errorCode))
@@ -2938,6 +2947,16 @@ namespace QuantConnect.Brokerages.InteractiveBrokers
         /// <remarks>For IB history limitations see https://www.interactivebrokers.com/en/software/api/apiguide/tables/historical_data_limitations.htm </remarks>
         public override IEnumerable<BaseData> GetHistory(HistoryRequest request)
         {
+            if (!IsConnected)
+            {
+                OnMessage(
+                    new BrokerageMessageEvent(
+                        BrokerageMessageType.Warning,
+                        "GetHistoryWhenDisconnected",
+                        "History requests cannot be submitted when disconnected."));
+                yield break;
+            }
+
             // skipping universe and canonical symbols
             if (!CanSubscribe(request.Symbol) ||
                 (request.Symbol.ID.SecurityType == SecurityType.Option && request.Symbol.IsCanonical()) ||
