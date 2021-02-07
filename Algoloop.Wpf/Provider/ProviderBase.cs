@@ -146,7 +146,7 @@ namespace Algoloop.Wpf.Provider
             config["composer-dll-directory"] = exeFolder;
             config["results-destination-folder"] = ".";
             config["plugin-directory"] = ".";
-            config["log-handler"] = "CompositeLogHandler";
+            config["log-handler"] = "ConsoleLogHandler";
             config["map-file-provider"] = "LocalDiskMapFileProvider";
             config["#command"] = cmd;
             config["#parameters"] = string.Join(" ", args);
