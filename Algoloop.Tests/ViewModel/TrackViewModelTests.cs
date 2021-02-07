@@ -15,6 +15,7 @@
 using Algoloop.Wpf.ViewModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Logging;
 using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,12 @@ namespace Algoloop.Tests.ViewModel
     [TestClass()]
     public class TrackViewModelTests
     {
+        [TestInitialize()]
+        public void Initialize()
+        {
+            Log.LogHandler = new ConsoleLogHandler();
+        }
+
         [TestMethod()]
         public void CalculateScore_idealProfit()
         {

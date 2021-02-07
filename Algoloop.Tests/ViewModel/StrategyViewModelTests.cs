@@ -15,6 +15,7 @@
 using Algoloop.Model;
 using Algoloop.Wpf.ViewModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantConnect.Logging;
 
 namespace Algoloop.Tests.ViewModel
 {
@@ -28,6 +29,8 @@ namespace Algoloop.Tests.ViewModel
         [TestInitialize()]
         public void Initialize()
         {
+            Log.LogHandler = new ConsoleLogHandler();
+
             _strategies = new StrategiesViewModel(new StrategiesModel(), null, null, null);
             _strategy = new StrategyViewModel(_strategies, new StrategyModel { Name = "A" }, null, null, null);
             _strategies.AddStrategy(_strategy);

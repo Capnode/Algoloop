@@ -17,6 +17,7 @@ using Algoloop.Support;
 using Algoloop.Wpf.Lean;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Logging;
 using System;
 using System.IO;
 
@@ -31,6 +32,8 @@ namespace Algoloop.Tests.Lean
         [TestInitialize()]
         public void Initialize()
         {
+            Log.LogHandler = new ConsoleLogHandler();
+
             _exeFolder = AppDomain.CurrentDomain.BaseDirectory;
             string dataFolder = Path.Combine(_exeFolder, "Data");
 

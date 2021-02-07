@@ -15,6 +15,7 @@
 using Algoloop.Brokerages.FxcmRest;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Logging;
 using System;
 using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
@@ -25,7 +26,7 @@ namespace Algoloop.Tests.Brokerages
     [TestClass]
     public class FxcmRestTests : IDisposable
     {
-        const string _market = "fxcm_rest";
+        const string _market = "fxcmrest";
         private FxcmClient _api;
         private bool disposedValue;
 
@@ -44,6 +45,8 @@ namespace Algoloop.Tests.Brokerages
         [TestInitialize]
         public void Initialize()
         {
+            Log.LogHandler = new ConsoleLogHandler();
+
             string access = ConfigurationManager.AppSettings["fxcm_access"];
             AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
 

@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.Wpf.Provider;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Logging;
 using System;
 using System.IO;
 using System.Linq;
@@ -30,6 +31,8 @@ namespace Algoloop.Tests.Provider
         [TestInitialize()]
         public void Initialize()
         {
+            Log.LogHandler = new ConsoleLogHandler();
+
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             if (Directory.Exists(dataFolder))
             {

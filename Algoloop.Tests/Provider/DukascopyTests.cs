@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.Wpf.Provider;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Logging;
 using System;
 using System.Configuration;
 using System.IO;
@@ -32,6 +33,8 @@ namespace Algoloop.Tests.Provider
         [TestInitialize()]
         public void Initialize()
         {
+            Log.LogHandler = new ConsoleLogHandler();
+
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             _forexFolder = Path.Combine(dataFolder, SecurityType.Forex.SecurityTypeToLower(), "dukascopy");
 
