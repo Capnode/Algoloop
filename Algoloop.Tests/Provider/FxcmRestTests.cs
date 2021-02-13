@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Provider
 {
@@ -37,12 +38,15 @@ namespace Algoloop.Tests.Provider
 
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             _settings = new SettingModel { DataFolder = dataFolder };
+            string key = ConfigurationManager.AppSettings["fxcmrest-key"];
+            string access = ConfigurationManager.AppSettings["fxcmrest-access"];
 
             _broker = new ProviderModel
             {
                 Name = "FxcmRest",
                 Provider = _provider,
-                ApiKey = ConfigurationManager.AppSettings["fxcm_key"]
+                ApiKey = key,
+                Access = (AccessType)Enum.Parse(typeof(AccessType), access),
             };
         }
 
@@ -53,6 +57,7 @@ namespace Algoloop.Tests.Provider
             using IProvider provider = ProviderFactory.CreateProvider(_broker.Provider, _settings);
             provider.Register(_settings, _broker.Provider);
             IReadOnlyList<AccountModel> accounts = provider.Login(_broker, _settings);
+            provider.Logout();
 
             // Assert
             Assert.IsTrue(accounts.Count > 0);

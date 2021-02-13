@@ -14,10 +14,8 @@
 
 using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
-using QuantConnect.Logging;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 
 namespace Algoloop.Wpf.Provider
 {
@@ -30,21 +28,14 @@ namespace Algoloop.Wpf.Provider
             Contract.Requires(broker != null);
 
             _api = new FxcmClient(broker.Access, broker.ApiKey);
-            if (!_api.LoginAsync())
-            {
-                return (IReadOnlyList<AccountModel>)Enumerable.Empty<AccountModel>();
-            }
-
+            _api.LoginAsync();
             IReadOnlyList<AccountModel> accounts = _api.GetAccountsAsync().Result;
             return accounts;
         }
 
         public override void Logout()
         {
-            if (!_api.LoginAsync())
-            {
-                Log.Error("{0}: Logout failed", GetType().Name);
-            }
+            _api.LogoutAsync();
         }
 
         protected override void Dispose(bool disposing)

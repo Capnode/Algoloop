@@ -31,6 +31,10 @@ namespace Algoloop.Tests.Provider
     {
         private SettingModel _settings;
         private string _forexFolder;
+        private ProviderModel.AccessType _access;
+        private string _user;
+        private string _pass;
+        private string _account;
 
         [TestInitialize]
         public void Initialize()
@@ -46,14 +50,17 @@ namespace Algoloop.Tests.Provider
 
             Config.Set("map-file-provider", "LocalDiskMapFileProvider");
             _settings = new SettingModel { DataFolder = dataFolder };
+
+            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
+            _access = (ProviderModel.AccessType)Enum.Parse(typeof(ProviderModel.AccessType), terminal);
+            _user = ConfigurationManager.AppSettings["fxcm-user-name"];
+            _pass = ConfigurationManager.AppSettings["fxcm-password"];
+            _account = ConfigurationManager.AppSettings["fxcm-account-id"];
         }
 
         [TestMethod]
         public void Download_no_symbols()
         {
-            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
-            string user = ConfigurationManager.AppSettings["fxcm_user"];
-            string pass = ConfigurationManager.AppSettings["fxcm_pass"];
             DateTime date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
@@ -62,9 +69,9 @@ namespace Algoloop.Tests.Provider
                 Provider = "fxcm",
                 LastDate = date,
                 Resolution = Resolution.Daily,
-                Access = (ProviderModel.AccessType)Enum.Parse(typeof(ProviderModel.AccessType), terminal),
-                Login = user,
-                Password = pass
+                Access = _access,
+                Login = _user,
+                Password = _pass
             };
 
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
@@ -84,9 +91,6 @@ namespace Algoloop.Tests.Provider
         [DataTestMethod]
         public void Download_one_symbol(Resolution resolution, string filename)
         {
-            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
-            string user = ConfigurationManager.AppSettings["fxcm_user"];
-            string pass = ConfigurationManager.AppSettings["fxcm_pass"];
             DateTime date = new DateTime(2019, 05, 01);
             DateTime nextDay = date.AddDays(1);
             var market = new ProviderModel
@@ -96,9 +100,9 @@ namespace Algoloop.Tests.Provider
                 Provider = "fxcm",
                 LastDate = date,
                 Resolution = resolution,
-                Access = (ProviderModel.AccessType)Enum.Parse(typeof(ProviderModel.AccessType), terminal),
-                Login = user,
-                Password = pass
+                Access = _access,
+                Login = _user,
+                Password = _pass
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
@@ -115,9 +119,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod]
         public void Download_yesterday()
         {
-            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
-            string user = ConfigurationManager.AppSettings["fxcm_user"];
-            string pass = ConfigurationManager.AppSettings["fxcm_pass"];
             DateTime today = DateTime.Today;
             DateTime yesterday = today.AddDays(-1);
             var market = new ProviderModel
@@ -127,9 +128,9 @@ namespace Algoloop.Tests.Provider
                 Provider = "fxcm",
                 LastDate = yesterday,
                 Resolution = Resolution.Minute,
-                Access = (ProviderModel.AccessType)Enum.Parse(typeof(ProviderModel.AccessType), terminal),
-                Login = user,
-                Password = pass
+                Access = _access,
+                Login = _user,
+                Password = _pass
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
@@ -145,9 +146,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod]
         public void Download_today()
         {
-            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
-            string user = ConfigurationManager.AppSettings["fxcm_user"];
-            string pass = ConfigurationManager.AppSettings["fxcm_pass"];
             DateTime today = DateTime.Today;
             var market = new ProviderModel
             {
@@ -156,9 +154,9 @@ namespace Algoloop.Tests.Provider
                 Provider = "fxcm",
                 LastDate = today,
                 Resolution = Resolution.Minute,
-                Access = (ProviderModel.AccessType)Enum.Parse(typeof(ProviderModel.AccessType), terminal),
-                Login = user,
-                Password = pass
+                Access = _access,
+                Login = _user,
+                Password = _pass
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
@@ -175,17 +173,14 @@ namespace Algoloop.Tests.Provider
         [TestMethod]
         public void Login()
         {
-            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
-            string user = ConfigurationManager.AppSettings["fxcm_user"];
-            string pass = ConfigurationManager.AppSettings["fxcm_pass"];
             var broker = new ProviderModel
             {
                 Active = true,
                 Name = "Fxcm",
                 Provider = "fxcm",
-                Access = (ProviderModel.AccessType)Enum.Parse(typeof(ProviderModel.AccessType), terminal),
-                Login = user,
-                Password = pass
+                Access = _access,
+                Login = _user,
+                Password = _pass
             };
 
             using IProvider provider = ProviderFactory.CreateProvider(broker.Provider, _settings);

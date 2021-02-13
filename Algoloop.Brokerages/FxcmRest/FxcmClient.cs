@@ -64,13 +64,12 @@ namespace Algoloop.Brokerages.FxcmRest
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediatype));
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "request");
         }
-
-        public bool LoginAsync()
+            
+        public void LoginAsync()
         {
             _webSocket.Connect();
-            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) return false;
-            if (!_webSocket.IsAlive) return false;
-            return true;
+            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) throw new ApplicationException($"{GetType().Name} Failed to login");
+            if (!_webSocket.IsAlive) throw new ApplicationException($"{GetType().Name} Failed to login");
         }
 
         private void _webSocket_OnOpen(object sender, EventArgs e)
@@ -108,10 +107,10 @@ namespace Algoloop.Brokerages.FxcmRest
             }
         }
 
-        public bool LogoutAsync()
+        public void LogoutAsync()
         {
             _webSocket.Close();
-            return true;
+            if (_webSocket.IsAlive) throw new ApplicationException($"{GetType().Name}: Failed to logout");
         }
 
         public async Task<IReadOnlyList<AccountModel>> GetAccountsAsync()

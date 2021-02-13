@@ -18,7 +18,6 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Configuration;
-using System.Diagnostics.CodeAnalysis;
 using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Brokerages
@@ -31,7 +30,6 @@ namespace Algoloop.Tests.Brokerages
         private bool disposedValue;
 
         [ClassInitialize]
-        [SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "context")]
         public static void Setup(TestContext context)
         {
             Market.Add(_market, 100);
@@ -47,10 +45,9 @@ namespace Algoloop.Tests.Brokerages
         {
             Log.LogHandler = new ConsoleLogHandler();
 
-            string access = ConfigurationManager.AppSettings["fxcm_access"];
+            string access = ConfigurationManager.AppSettings["fxcmrest-access"];
             AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
-
-            string key = ConfigurationManager.AppSettings["fxcm_key"];
+            string key = ConfigurationManager.AppSettings["fxcmrest-key"];
             _api = new FxcmClient(accessType, key);
         }
 
@@ -64,11 +61,8 @@ namespace Algoloop.Tests.Brokerages
         public void LoginAsync()
         {
             // Act
-            bool connected = _api.LoginAsync();
-            bool disconnected = _api.LogoutAsync();
-
-            Assert.IsTrue(connected);
-            Assert.IsTrue(disconnected);
+            _api.LoginAsync();
+            _api.LogoutAsync();
         }
 
         //[TestMethod]
