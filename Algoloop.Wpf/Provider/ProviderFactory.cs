@@ -17,11 +17,13 @@ using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Securities;
 using QuantConnect.Util;
+using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Algoloop.Wpf.Provider
 {
@@ -31,17 +33,29 @@ namespace Algoloop.Wpf.Provider
         {
             if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            Type type = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract)
-                .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ??
-                throw new ApplicationException($"Provider {name} not found");
+            try
+            {
+                Type type = AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(s => s.GetTypes())
+                    .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract)
+                    .FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ??
+                    throw new ApplicationException($"Provider {name} not found");
 
-            IProvider provider = (IProvider)Activator.CreateInstance(type) ??
-                throw new ApplicationException($"Can not create provider {name}");
+                IProvider provider = (IProvider)Activator.CreateInstance(type) ??
+                    throw new ApplicationException($"Can not create provider {name}");
 
-            if (!AcceptProvider(settings, name)) return null;
-            return provider;
+                if (!AcceptProvider(settings, name)) return null;
+                return provider;
+            }
+            catch (ReflectionTypeLoadException err)
+            {
+                foreach (var exception in err.LoaderExceptions)
+                {
+                    Log.Error(exception);
+                }
+
+                throw;
+            }
         }
 
         public static void RegisterProviders(SettingModel settings)

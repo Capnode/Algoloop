@@ -280,3 +280,5 @@ log.txt
 
 #Docker result files
 Results/
+
+*.GeneratedMSBuildEditorConfig.editorconfig

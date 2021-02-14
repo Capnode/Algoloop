@@ -51,7 +51,7 @@ namespace Algoloop.Tests.Provider
             Config.Set("map-file-provider", "LocalDiskMapFileProvider");
             _settings = new SettingModel { DataFolder = dataFolder };
 
-            string terminal = ConfigurationManager.AppSettings["fxcm_terminal"];
+            string terminal = ConfigurationManager.AppSettings["fxcm-terminal"];
             _access = (ProviderModel.AccessType)Enum.Parse(typeof(ProviderModel.AccessType), terminal);
             _user = ConfigurationManager.AppSettings["fxcm-user-name"];
             _pass = ConfigurationManager.AppSettings["fxcm-password"];
