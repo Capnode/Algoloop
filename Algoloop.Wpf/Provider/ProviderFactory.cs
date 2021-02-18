@@ -47,11 +47,12 @@ namespace Algoloop.Wpf.Provider
                 if (!AcceptProvider(settings, name)) return null;
                 return provider;
             }
-            catch (ReflectionTypeLoadException err)
+            catch (ReflectionTypeLoadException ex)
             {
-                foreach (var exception in err.LoaderExceptions)
+                Log.Error($"{ex.GetType()} {ex.Message}: {name}");
+                foreach (Exception exception in ex.LoaderExceptions)
                 {
-                    Log.Error(exception);
+                    Log.Error($"LoaderExceptions: {exception.Message}");
                 }
 
                 throw;

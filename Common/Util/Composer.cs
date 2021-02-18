@@ -80,16 +80,15 @@ namespace QuantConnect.Util
                     _compositionContainer = new CompositionContainer(aggregate);
                     return _compositionContainer.Catalog.Parts.ToList();
                 }
-                catch (ReflectionTypeLoadException ex)
+                catch (Exception ex)
                 {
-                    foreach (var item in ex.LoaderExceptions)
+                    Log.Error($"{ex.GetType()} {ex.Message}");
+                    CheckParts(primaryDllLookupDirectory, "*.dll");
+                    CheckParts(primaryDllLookupDirectory, "*.exe");
+                    if (loadFromPluginDir)
                     {
-                        Log.Error($"{item.Message}");
+                        CheckParts(PluginDirectory, "*.dll");
                     }
-                }
-                catch (Exception exception)
-                {
-                    Log.Error(exception);
                 }
                 return new List<ComposablePartDefinition>();
             });
@@ -350,6 +349,34 @@ namespace QuantConnect.Util
             lock(_exportedValuesLockObject)
             {
                 _exportedValues.Clear();
+            }
+        }
+
+        private void CheckParts(string directory, string filter)
+        {
+            IEnumerable<string> files = Directory.EnumerateFiles(directory, filter, SearchOption.TopDirectoryOnly);
+            foreach (string file in files)
+            {
+                try
+                {
+                    var asmCat = new AssemblyCatalog(file);
+
+                    //Force MEF to load the plugin and figure out if there are any exports
+                    // good assemblies will not throw the RTLE exception and can be added to the catalog
+                    List<ComposablePartDefinition> parts = asmCat.Parts.ToList();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    Log.Error($"{ex.GetType()} {ex.Message}: {file}");
+                    foreach (var item in ex.LoaderExceptions)
+                    {
+                        Log.Error($"LoaderExceptions: {item.Message}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"{ex.GetType()} {ex.Message}: {file}");
+                }
             }
         }
     }
