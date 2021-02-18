@@ -82,25 +82,15 @@ namespace Algoloop.Wpf.ViewModel
         {
             try
             {
-                StartJupyter();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Python must also be installed to use Research page.\nSee: https://github.com/QuantConnect/Lean/tree/master/Algorithm.Python#quantconnect-python-algorithm-project \n");
-            }
-        }
-
-        private void StartJupyter()
-        {
-            StopJupyter();
-            SetNotebookFolder();
-            _process = new ConfigProcess(
-                "jupyter.exe",
-                $"notebook --no-browser",
-                _settings.Notebook,
-                false,
-                (line) => Log.Trace(line),
-                (line) =>
+                StopJupyter();
+                SetNotebookFolder();
+                _process = new ConfigProcess(
+                    "jupyter.exe",
+                    $"notebook --no-browser",
+                    _settings.Notebook,
+                    false,
+                    (line) => Log.Trace(line),
+                    (line) =>
                     {
                         if (string.IsNullOrEmpty(line)) return;
 
@@ -113,30 +103,36 @@ namespace Algoloop.Wpf.ViewModel
                         Log.Trace(line);
                     });
 
-            // Set PYTHONPATH
-            StringDictionary environment = _process.Environment;
-            string pythonpath = environment["PYTHONPATH"];
-            if (string.IsNullOrEmpty(pythonpath))
-            {
-                environment["PYTHONPATH"] = MainService.GetProgramFolder();
-            }
-            else
-            {
-                environment["PYTHONPATH"] = MainService.GetProgramFolder() + ";" + pythonpath;
-            }
+                // Set PYTHONPATH
+                StringDictionary environment = _process.Environment;
+                string pythonpath = environment["PYTHONPATH"];
+                if (string.IsNullOrEmpty(pythonpath))
+                {
+                    environment["PYTHONPATH"] = MainService.GetProgramFolder();
+                }
+                else
+                {
+                    environment["PYTHONPATH"] = MainService.GetProgramFolder() + ";" + pythonpath;
+                }
 
-            // Set config file
-            IDictionary<string, string> config = _process.Config;
-            string exeFolder = MainService.GetProgramFolder();
-            config["algorithm-language"] = Language.Python.ToString();
-            config["composer-dll-directory"] = exeFolder.Replace("\\", "/");
-            config["data-folder"] = _settings.DataFolder.Replace("\\", "/");
-            config["api-handler"] = "QuantConnect.Api.Api";
-            config["job-queue-handler"] = "QuantConnect.Queues.JobQueue";
-            config["messaging-handler"] = "QuantConnect.Messaging.Messaging";
+                // Set config file
+                IDictionary<string, string> config = _process.Config;
+                string exeFolder = MainService.GetProgramFolder();
+                config["algorithm-language"] = Language.Python.ToString();
+                config["composer-dll-directory"] = exeFolder.Replace("\\", "/");
+                config["data-folder"] = _settings.DataFolder.Replace("\\", "/");
+                config["api-handler"] = "QuantConnect.Api.Api";
+                config["job-queue-handler"] = "QuantConnect.Queues.JobQueue";
+                config["messaging-handler"] = "QuantConnect.Messaging.Messaging";
 
-            // Start process
-            _process.Start();
+                // Start process
+                _process.Start();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Python must also be installed to use Research page.\nSee: https://github.com/QuantConnect/Lean/tree/master/Algorithm.Python#quantconnect-python-algorithm-project \n");
+                _process = null;
+            }
         }
 
         public void StopJupyter()
