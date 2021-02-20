@@ -14,11 +14,11 @@
 
 using Algoloop.Model;
 using Algoloop.Support;
+using Algoloop.Wpf.Lean;
 using Algoloop.Wpf.ViewModel;
 using Microsoft.Win32;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
-using QuantConnect.Util;
 using System;
 using System.Globalization;
 using System.IO;
@@ -52,20 +52,18 @@ namespace Algoloop
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            string folder = MainService.GetProgramDataFolder();
-            string path = Path.Combine(folder, "init.log");
-            File.WriteAllText(path, $"{DateTime.Now}:>OnStartup\n");
-            File.AppendAllText(path, $"{DateTime.Now}:ProgramFolder={MainService.GetProgramFolder()}\n");
-            File.AppendAllText(path, $"{DateTime.Now}:AppDataFolder={MainService.GetAppDataFolder()}\n");
-            File.AppendAllText(path, $"{DateTime.Now}:ProgramDataFolder={MainService.GetProgramDataFolder()}\n");
-            File.AppendAllText(path, $"{DateTime.Now}:UserDataFolder={MainService.GetUserDataFolder()}\n");
 
             // Set Log handler
+            string logfile = Path.Combine(MainService.GetAppDataFolder(), AboutModel.AssemblyProduct + ".log");
+            File.Delete(logfile);
             Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
             Log.DebuggingLevel = Config.GetInt("debug-level", 1);
-            Log.LogHandler = Composer.Instance.GetExportedValueByTypeName<ILogHandler>("Algoloop.Wpf.Lean.LogItemHandler");
-            string message = $"Startup \"{AboutModel.AssemblyProduct}\"";
-            Log.Trace(message);
+            Log.LogHandler = new LogItemHandler(logfile);
+            Log.Trace($">Startup \"{AboutModel.AssemblyProduct}\"");
+            Log.Trace($"ProgramFolder={MainService.GetProgramFolder()}");
+            Log.Trace($"AppDataFolder={MainService.GetAppDataFolder()}");
+            Log.Trace($"ProgramDataFolder={MainService.GetProgramDataFolder()}");
+            Log.Trace($"UserDataFolder={MainService.GetUserDataFolder()}");
 
             // Exception Handling Wiring
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
@@ -76,7 +74,7 @@ namespace Algoloop
 
             // Prevent going to sleep mode
             _ = SetThreadExecutionState(_esContinous | _esSystemRequired);
-            File.AppendAllText(path, $"{DateTime.Now}:<OnStartup\n");
+            Log.Trace($"<OnStartup");
         }
 
         protected override void OnExit(ExitEventArgs e)

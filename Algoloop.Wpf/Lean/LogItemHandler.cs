@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
 
@@ -24,7 +23,7 @@ namespace Algoloop.Wpf.Lean
     public class LogItemHandler : ILogItemHandler
     {
         private bool _isDisposed = false; // To detect redundant calls
-        private readonly ILogHandler _nlogger = new NLogHandler();
+        private readonly ILogHandler _fileLogger;
         private Action<LogItem> _logger;
 
         // we need to control synchronization to our stream writer since it's not inherently thread-safe
@@ -33,8 +32,9 @@ namespace Algoloop.Wpf.Lean
         /// <summary>
         /// Initializes a new instance of the <see cref="LogItemHandler"/> class using 'log.txt' for the filepath.
         /// </summary>
-        public LogItemHandler()
+        public LogItemHandler(string path)
         {
+            _fileLogger = new FileLogHandler(path);
         }
 
         public void Connect(Action<LogItem> logger)
@@ -49,7 +49,7 @@ namespace Algoloop.Wpf.Lean
         public void Error(string text)
         {
             WriteMessage(LogType.Error, text);
-            _nlogger.Error(text);
+            _fileLogger.Error(text);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Algoloop.Wpf.Lean
         public void Debug(string text)
         {
             WriteMessage(LogType.Debug, text);
-            _nlogger.Debug(text);
+            _fileLogger.Debug(text);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Algoloop.Wpf.Lean
         public void Trace(string text)
         {
             WriteMessage(LogType.Trace, text);
-            _nlogger.Trace(text);
+            _fileLogger.Trace(text);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Algoloop.Wpf.Lean
             {
                 if (disposing)
                 {
-                    _nlogger.Dispose();
+                    _fileLogger.Dispose();
                  }
 
                 lock (_lock)
