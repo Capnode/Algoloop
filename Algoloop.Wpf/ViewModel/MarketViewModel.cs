@@ -269,36 +269,38 @@ namespace Algoloop.Wpf.ViewModel
         {
             DataToModel();
             ProviderModel market = Model;
-            while (market.Active)
+            try
             {
-                Log.Trace($"{market.Provider} download {market.Resolution} after {market.LastDate:d}");
-                try
+                while (market.Active)
                 {
+                    Log.Trace($"{market.Provider} download {market.Resolution} after {market.LastDate:d}");
                     _provider = ProviderFactory.CreateProvider(market.Provider, _settings);
                     if (_provider == null) throw new ApplicationException($"Can not create provider {market.Provider}");
                     await Task.Run(() => _provider.Download(market, _settings))
                         .ConfigureAwait(false);
+                    _provider.Dispose();
+                    _provider = null;
                 }
-                catch (Exception ex)
-                {
-                    Log.Error(ex);
-                    market.Active = false;
-                }
-                _provider.Dispose();
-                _provider = null;
 
-                // Update view
-                UiThread(() => 
-                {
-                    Model = null;
-                    Model = market;
-                    DataFromModel();
-                });
+                IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
+                Messenger.Default.Send(new NotificationMessage(
+                    symbols.Any() ? Resources.DownloadCompleted : Resources.NoSymbolSelected));
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                Messenger.Default.Send(new NotificationMessage($"{ex.GetType()} : {ex.Message}"));
+                market.Active = false;
             }
 
-            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
-            Messenger.Default.Send(new NotificationMessage(
-                symbols.Any() ? Resources.DownloadCompleted : Resources.NoSymbolSelected));
+            // Update view
+            UiThread(() =>
+            {
+                Model = null;
+                Model = market;
+                DataFromModel();
+            });
         }
 
         private async void DoActiveCommand(bool value)
