@@ -39,19 +39,20 @@ namespace Algoloop.Wpf.Lean
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!_isDisposed)
+            if (_isDisposed) return;
+            if (disposing)
             {
-                if (disposing)
+                // TODO: dispose managed state (managed objects)
+                if (_process != null)
                 {
-                    // TODO: dispose managed state (managed objects)
-                    _process?.Dispose();
+                    _process.Dispose();
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                _process = null;
-                _isDisposed = true;
             }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+            _process = null;
+            _isDisposed = true;
         }
 
         public void Dispose()

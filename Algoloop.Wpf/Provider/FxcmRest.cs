@@ -40,15 +40,16 @@ namespace Algoloop.Wpf.Provider
 
         protected override void Dispose(bool disposing)
         {
-            if (!_isDisposed)
+            if (_isDisposed) return;
+            if (disposing)
             {
-                if (disposing)
+                if (_api != null)
                 {
-                    _api?.Dispose();
+                    _api.Dispose();
                 }
-
-                base.Dispose(disposing);
             }
+
+            base.Dispose(disposing);
         }
     }
 }

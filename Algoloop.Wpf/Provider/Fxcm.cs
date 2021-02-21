@@ -38,19 +38,20 @@ namespace Algoloop.Wpf.Provider
 
         protected override void Dispose(bool disposing)
         {
-            if (!_isDisposed)
+            if (_isDisposed) return;
+            if (disposing)
             {
-                if (disposing)
+                // TODO: dispose managed state (managed objects)
+                if (_brokerage != null)
                 {
-                    // TODO: dispose managed state (managed objects)
-                    _brokerage?.Dispose();
+                    _brokerage.Dispose();
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-
-                base.Dispose(disposing);
             }
+
+            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+            // TODO: set large fields to null
+
+            base.Dispose(disposing);
         }
 
         public override IReadOnlyList<AccountModel> Login(ProviderModel broker, SettingModel settings)
@@ -131,7 +132,7 @@ namespace Algoloop.Wpf.Provider
             UpdateSymbols(market);
         }
 
-        private void UpdateSymbols(ProviderModel market)
+        private static void UpdateSymbols(ProviderModel market)
         {
             List<Symbol> symbols = FxcmSymbolMapper.KnownSymbols;
             IEnumerable<SymbolModel> actual = symbols.Select(
