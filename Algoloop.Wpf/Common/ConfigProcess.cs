@@ -36,6 +36,7 @@ namespace Algoloop.Wpf.Common
         private bool _isDisposed;
         private static readonly object _lock = new object();
         private bool _abort;
+        private bool _started;
 
         [DllImport("kernel32.dll")]
         internal static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
@@ -101,6 +102,7 @@ namespace Algoloop.Wpf.Common
             JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Serialize(file, Config);
 
+            _started = true;
             _process.Start();
             _process.PriorityClass = ProcessPriorityClass.BelowNormal;
             _process.BeginOutputReadLine();
@@ -133,6 +135,8 @@ namespace Algoloop.Wpf.Common
 
         public bool Abort()
         {
+            if (!_started) return true;
+
             // Send Ctrl-C
             if (AttachConsole((uint)_process.Id))
             {
@@ -167,6 +171,7 @@ namespace Algoloop.Wpf.Common
                 {
                     FreeConsole();
                     SetConsoleCtrlHandler(null, false);
+                    _started = false;
                 }
             }
 
@@ -184,6 +189,7 @@ namespace Algoloop.Wpf.Common
         {
             if (_process.WaitForExit(timeout))
             {
+                _started = false;
                 if (_abort) return -1; // Cleanup done
                 if (postProcess != null)
                 {

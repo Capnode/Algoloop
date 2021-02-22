@@ -158,15 +158,24 @@ namespace Algoloop.Wpf.Provider
             }
 
             // Start process
-            _process.Start();
-            if (_process.WaitForExit() != 0)
+            try
             {
-                ok = false;
-            }
+                _process.Start();
+                if (_process.WaitForExit() != 0)
+                {
+                    ok = false;
+                }
 
-            _process.Dispose();
-            _process = null;
-            return ok;
+                _process.Dispose();
+                _process = null;
+                return ok;
+            }
+            catch (Exception)
+            {
+                _process.Dispose();
+                _process = null;
+                throw;
+            }
         }
 
         protected static void UpdateSymbols(

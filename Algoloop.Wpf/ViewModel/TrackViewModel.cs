@@ -344,6 +344,7 @@ namespace Algoloop.Wpf.ViewModel
             catch (Exception ex)
             {
                 Log.Trace($"{ex.GetType()}: {ex.Message}");
+                throw;
             }
 
             // Update view
