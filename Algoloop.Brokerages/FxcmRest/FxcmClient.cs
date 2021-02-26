@@ -32,7 +32,7 @@ namespace Algoloop.Brokerages.FxcmRest
     /// </summary>
     public class FxcmClient : IDisposable
     {
-        private const string _market = "fxcm-rest";
+//        private const string _market = "fxcm-rest";
         private const string _baseUrlReal = "https://api.fxcm.com";
         private const string _baseUrlDemo = "https://api-demo.fxcm.com";
         private const string _mediatype = @"application/json";
@@ -44,7 +44,7 @@ namespace Algoloop.Brokerages.FxcmRest
         private readonly string _key;
         private readonly HttpClient _httpClient;
         private readonly WebSocket _webSocket;
-        private ManualResetEvent _hold = new ManualResetEvent(false);
+        private readonly ManualResetEvent _hold = new ManualResetEvent(false);
 
         public FxcmClient(ProviderModel.AccessType access, string key)
         {
@@ -54,10 +54,10 @@ namespace Algoloop.Brokerages.FxcmRest
             var uri = new Uri(_baseUrl);
             string url = $"wss://{uri.Host}:{uri.Port}/socket.io/?EIO=3&transport=websocket&access_token={_key}";
             _webSocket = new WebSocket(url);
-            _webSocket.OnOpen += _webSocket_OnOpen;
-            _webSocket.OnMessage += _webSocket_OnMessage;
-            _webSocket.OnError += _webSocket_OnError;
-            _webSocket.OnClose += _webSocket_OnClose;
+            _webSocket.OnOpen += OnOpen;
+            _webSocket.OnMessage += OnMessage;
+            _webSocket.OnError += OnError;
+            _webSocket.OnClose += OnClose;
             _webSocket.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
 
             _httpClient = new HttpClient { BaseAddress = new Uri(_baseUrl) };
@@ -72,23 +72,23 @@ namespace Algoloop.Brokerages.FxcmRest
             if (!_webSocket.IsAlive) throw new ApplicationException($"{GetType().Name} Failed to login");
         }
 
-        private void _webSocket_OnOpen(object sender, EventArgs e)
+        private void OnOpen(object sender, EventArgs e)
         {
             Log.Trace("OnOpen");
         }
 
-        private void _webSocket_OnClose(object sender, CloseEventArgs e)
+        private void OnClose(object sender, CloseEventArgs e)
         {
             Log.Trace("OnClose");
         }
 
-        private void _webSocket_OnError(object sender, ErrorEventArgs e)
+        private void OnError(object sender, ErrorEventArgs e)
         {
             Log.Error(e.Exception);
             _hold.Set();
         }
 
-        private void _webSocket_OnMessage(object sender, MessageEventArgs e)
+        private void OnMessage(object sender, MessageEventArgs e)
         {
             Log.Trace(e.Data);
             if (e.IsText)
@@ -147,7 +147,9 @@ namespace Algoloop.Brokerages.FxcmRest
             {
                 if (disposing)
                 {
-                    _httpClient?.Dispose();
+                    _httpClient.Dispose();
+                    _hold.Dispose();
+                    _webSocket.Close();
                 }
 
                 _isDisposed = true;
@@ -170,20 +172,20 @@ namespace Algoloop.Brokerages.FxcmRest
             }
         }
 
-        private async Task<string> PostAsync(string path, string body)
-        {
-            string uri = _httpClient.BaseAddress + path;
-            using (HttpResponseMessage response = await _httpClient.PostAsync(uri, new StringContent(body, Encoding.UTF8, _mediatype)))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    string message = $"PostAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
-                    Log.Error(message);
-                    throw new ApplicationException(message);
-                }
+        //private async Task<string> PostAsync(string path, string body)
+        //{
+        //    string uri = _httpClient.BaseAddress + path;
+        //    using (HttpResponseMessage response = await _httpClient.PostAsync(uri, new StringContent(body, Encoding.UTF8, _mediatype)))
+        //    {
+        //        if (!response.IsSuccessStatusCode)
+        //        {
+        //            string message = $"PostAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
+        //            Log.Error(message);
+        //            throw new ApplicationException(message);
+        //        }
 
-                return await response.Content.ReadAsStringAsync();
-            }
-        }
+        //        return await response.Content.ReadAsStringAsync();
+        //    }
+        //}
     }
 }
