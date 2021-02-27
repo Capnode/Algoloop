@@ -80,9 +80,13 @@ namespace QuantConnect.Util
                     _compositionContainer = new CompositionContainer(aggregate);
                     return _compositionContainer.Catalog.Parts.ToList();
                 }
-                catch (Exception ex)
+                catch (ThreadAbortException)
                 {
-                    Log.Error($"{ex.GetType()} {ex.Message}");
+                    // ThreadAbortException is triggered when we shutdown ignore the error log
+                }
+                catch (Exception exception)
+                {
+                    Log.Error($"{exception.GetType()} {exception.Message}");
                     CheckParts(primaryDllLookupDirectory, "*.dll");
                     CheckParts(primaryDllLookupDirectory, "*.exe");
                     if (loadFromPluginDir)
@@ -352,7 +356,7 @@ namespace QuantConnect.Util
             }
         }
 
-        private void CheckParts(string directory, string filter)
+        private static void CheckParts(string directory, string filter)
         {
             IEnumerable<string> files = Directory.EnumerateFiles(directory, filter, SearchOption.TopDirectoryOnly);
             foreach (string file in files)
