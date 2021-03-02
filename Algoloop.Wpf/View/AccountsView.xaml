@@ -156,7 +156,8 @@
                                     ExItemsSource="{Binding Balances}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountBalanceColumnsInfo}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" />
+                                        <DataGridTextColumn Header="Equity" Binding="{Binding Equity}" />
+                                        <DataGridTextColumn Header="Cash" Binding="{Binding Cash}" />
                                         <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
                                     </DataGrid.Columns>
                                 </wpf:ExDataGrid>

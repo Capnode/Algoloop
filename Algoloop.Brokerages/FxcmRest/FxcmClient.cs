@@ -14,13 +14,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
+using QuantConnect;
 using QuantConnect.Logging;
 using WebSocketSharp;
 using static Algoloop.Model.ProviderModel;
@@ -32,7 +34,7 @@ namespace Algoloop.Brokerages.FxcmRest
     /// </summary>
     public class FxcmClient : IDisposable
     {
-//        private const string _market = "fxcm-rest";
+        private const string _market = "fxcm";
         private const string _baseUrlReal = "https://api.fxcm.com";
         private const string _baseUrlDemo = "https://api-demo.fxcm.com";
         private const string _mediatype = @"application/json";
@@ -65,11 +67,137 @@ namespace Algoloop.Brokerages.FxcmRest
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "request");
         }
             
-        public void LoginAsync()
+        public void Login()
         {
             _webSocket.Connect();
             if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) throw new ApplicationException($"{GetType().Name} Failed to login");
             if (!_webSocket.IsAlive) throw new ApplicationException($"{GetType().Name} Failed to login");
+        }
+
+        public void Logout()
+        {
+            _webSocket.Close();
+            if (_webSocket.IsAlive) throw new ApplicationException($"{GetType().Name}: Failed to logout");
+        }
+
+        public async Task<IReadOnlyList<AccountModel>> GetAccountsAsync()
+        {
+            Log.Trace("{0}: GetAccountsAsync", GetType().Name);
+            string json = await GetAsync(_getModel);
+            JObject jo = JObject.Parse(json);
+
+            // Accounts
+            var accounts = new List<AccountModel>();
+            JArray jAccounts = JArray.FromObject(jo["accounts"]);
+            foreach (JToken jAccount in jAccounts)
+            {
+                // Skip summary row
+                if (jAccount["isTotal"] != null) continue;
+
+                var account = new AccountModel
+                {
+                    Id = jAccount["accountId"].ToString(),
+                    Name = jAccount["accountName"].ToString(),
+                };
+
+                accounts.Add(account);
+            }
+
+            // Orders
+            JArray jOrders = JArray.FromObject(jo["orders"]);
+            foreach (JToken jOrder in jOrders)
+            {
+                // Skip summary row
+                if (jOrder["isTotal"] != null) continue;
+
+                // Find account
+                string accountId = jOrder["accountId"].ToString();
+                AccountModel account = accounts.Find(m => m.Id.Equals(accountId));
+                if (account == default) continue;
+
+                // Add order
+                var order = new OrderModel
+                {
+                    BrokerId = new Collection<string> { jOrder["orderId"].ToString() },
+                    LimitPrice = (decimal)jOrder["limit"],
+                    Quantity = (decimal)jOrder["amountK"]
+                };
+                account.Orders.Add(order);
+            }
+
+            // Open positions
+            JArray jPositions = JArray.FromObject(jo["open_positions"]);
+            foreach (JToken jPosition in jPositions)
+            {
+                // Skip summary row
+                if (jPosition["isTotal"] != null) continue;
+
+                // Find account
+                string accountId = jPosition["accountId"].ToString();
+                AccountModel account = accounts.Find(m => m.Id.Equals(accountId));
+                if (account == default) continue;
+
+                // Add position
+                bool isBuy = (bool)jPosition["isBuy"];
+                decimal amountK = (decimal)jPosition["amountK"];
+                decimal open = (decimal)jPosition["open"];
+                decimal close = (decimal)jPosition["close"];
+                string currency = jPosition["currency"].ToString();
+                var symbol = new SymbolModel
+                {
+                    Id = currency,
+                    Name = currency,
+                    Market = _market,
+                    Security = ToSecurityType(currency),
+                };
+                string entryTime = jPosition["time"].ToString();
+                decimal grossPl = (decimal)jPosition["grossPL"];
+                decimal entryValue = amountK * open;
+                decimal marketValue = amountK * close;
+
+                var position = new PositionModel
+                {
+                    Symbol = symbol,
+                    AveragePrice = open,
+                    Quantity = isBuy ? amountK : -amountK,
+                    MarketPrice = close,
+                    EntryValue = entryValue,
+                    MarketValue = marketValue,
+                    EntryTime = ToTime(entryTime),
+                    UpdateTime = DateTime.Now
+                };
+                account.Positions.Add(position);
+            }
+
+            return accounts;
+        }
+
+        private DateTime ToTime(string time)
+        {
+            return DateTime.ParseExact(time, "MMddyyyyHHmmss", CultureInfo.InvariantCulture);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_isDisposed) return;
+
+            _isDisposed = true;
+            if (disposing)
+            {
+                _hold.Dispose();
+                _httpClient.Dispose();
+                if (_webSocket.IsAlive)
+                {
+                    _webSocket.Close();
+                }
+            }
         }
 
         private void OnOpen(object sender, EventArgs e)
@@ -84,7 +212,7 @@ namespace Algoloop.Brokerages.FxcmRest
 
         private void OnError(object sender, ErrorEventArgs e)
         {
-            Log.Error(e.Exception);
+            Log.Error(e.Message);
             _hold.Set();
         }
 
@@ -104,55 +232,6 @@ namespace Algoloop.Brokerages.FxcmRest
                 {
                     _hold.Set();
                 }
-            }
-        }
-
-        public void LogoutAsync()
-        {
-            _webSocket.Close();
-            if (_webSocket.IsAlive) throw new ApplicationException($"{GetType().Name}: Failed to logout");
-        }
-
-        public async Task<IReadOnlyList<AccountModel>> GetAccountsAsync()
-        {
-            Log.Trace("{0}: GetAccountsAsync", GetType().Name);
-            string json = await GetAsync(_getModel);
-            var accounts = new List<AccountModel>();
-            JObject jo = JObject.Parse(json);
-            JArray jAccounts = JArray.FromObject(jo["accounts"]);
-            foreach (JToken jAccount in jAccounts)
-            {
-                var account = new AccountModel
-                {
-                    Id = jAccount["accountId"].ToString(),
-                    Name = jAccount["accountName"].ToString(),
-                };
-
-                accounts.Add(account);
-            }
-
-            return accounts;
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    _httpClient.Dispose();
-                    _hold.Dispose();
-                    _webSocket.Close();
-                }
-
-                _isDisposed = true;
             }
         }
 
@@ -187,5 +266,11 @@ namespace Algoloop.Brokerages.FxcmRest
         //        return await response.Content.ReadAsStringAsync();
         //    }
         //}
+
+        private static SecurityType ToSecurityType(string symbol)
+        {
+            if (symbol == default) throw new ArgumentNullException(nameof(symbol));
+            return SecurityType.Forex;
+        }
     }
 }

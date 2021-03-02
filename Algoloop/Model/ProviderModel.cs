@@ -32,7 +32,10 @@ namespace Algoloop.Model
         public Action ModelChanged;
 
         private string _provider;
+        private const string _borsdata = "borsdata";
+        private const string _avanza = "avanza";
         private const string _fxcm = "fxcm";
+        private const string _fxcmrest = "fxcmrest";
 
         public enum AccessType { Demo, Real };
 
@@ -144,6 +147,27 @@ namespace Algoloop.Model
                 SetBrowsable("Login", true);
                 SetBrowsable("Password", true);
                 SetBrowsable("ApiKey", false);
+            }
+            else if (Provider.Equals(_fxcmrest, StringComparison.OrdinalIgnoreCase))
+            {
+                SetBrowsable("Access", true);
+                SetBrowsable("Login", false);
+                SetBrowsable("Password", false);
+                SetBrowsable("ApiKey", true);
+            }
+            else if (Provider.Equals(_borsdata, StringComparison.OrdinalIgnoreCase))
+            {
+                SetBrowsable("Access", false);
+                SetBrowsable("Login", false);
+                SetBrowsable("Password", false);
+                SetBrowsable("ApiKey", true);
+            }
+            else if (Provider.Equals(_avanza, StringComparison.OrdinalIgnoreCase))
+            {
+                SetBrowsable("Access", false);
+                SetBrowsable("Login", true);
+                SetBrowsable("Password", true);
+                SetBrowsable("ApiKey", true);
             }
             else
             {

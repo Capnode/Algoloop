@@ -13,11 +13,14 @@
  */
 
 using Algoloop.Brokerages.FxcmRest;
+using Algoloop.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Logging;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Brokerages
@@ -32,7 +35,16 @@ namespace Algoloop.Tests.Brokerages
         [ClassInitialize]
         public static void Setup(TestContext context)
         {
-            Market.Add(_market, 100);
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            // Add a reference to the unknown market
+            int code = 0;
+            while (Market.Decode(code) != null)
+            {
+                code++;
+            }
+
+            Market.Add(_market, code);
         }
 
         [ClassCleanup]
@@ -61,23 +73,21 @@ namespace Algoloop.Tests.Brokerages
         public void LoginAsync()
         {
             // Act
-            _api.LoginAsync();
-            _api.LogoutAsync();
+            _api.Login();
+            _api.Logout();
         }
 
-        //[TestMethod]
-        //public async Task GetAccountsAsync()
-        //{
-        //    // Act
-        //    bool connected = await _api.LoginAsync().ConfigureAwait(false);
-        //    IReadOnlyList<AccountModel> accounts = await _api.GetAccountsAsync().ConfigureAwait(true);
-        //    bool disconnected = await _api.LogoutAsync().ConfigureAwait(true);
+        [TestMethod]
+        public async Task GetAccountsAsync()
+        {
+            // Act
+            _api.Login();
+            IReadOnlyList<AccountModel> accounts = await _api.GetAccountsAsync().ConfigureAwait(false);
+            _api.Logout();
 
-        //    Assert.IsTrue(connected);
-        //    Assert.IsTrue(disconnected);
-        //    Assert.IsNotNull(accounts);
-        //    Assert.IsTrue(accounts.Count > 0);
-        //}
+            Assert.IsNotNull(accounts);
+            Assert.AreEqual(1, accounts.Count);
+        }
 
         protected virtual void Dispose(bool disposing)
         {

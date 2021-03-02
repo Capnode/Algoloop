@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using QuantConnect.Securities;
 using System;
 using System.Diagnostics;
@@ -20,12 +21,9 @@ namespace Algoloop.Wpf.ViewModel
 {
     public class BalanceViewModel : ViewModel
     {
-        private string _currency;
-        private decimal _amount;
-
-        public BalanceViewModel(CashAmount cash)
+        public BalanceViewModel(BalanceModel model)
         {
-            Update(cash);
+            Model = model;
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -35,33 +33,50 @@ namespace Algoloop.Wpf.ViewModel
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
-        // Gets the symbol of the security required to provide conversion rates. If this
-        // cash represents the account currency, then QuantConnect.Symbol.Empty is returned
+        public BalanceModel Model { get; set; }
+
         public string Currency
         {
-            get => _currency;
-            set => Set(ref _currency, value);
+            get => Model.Currency;
+            set
+            {
+                Model.Currency = value;
+                RaisePropertyChanged(() => Currency);
+            }
         }
 
-        //     Gets or sets the amount of cash held
-        public decimal Amount
+        public decimal Cash
         {
-            get => _amount;
-            set => Set(ref _amount, value);
+            get => Model.Cash;
+            set
+            {
+                Model.Cash = value;
+                RaisePropertyChanged(() => Cash);
+            }
+        }
+
+        public decimal Equity
+        {
+            get => Model.Equity;
+            set
+            {
+                Model.Equity = value;
+                RaisePropertyChanged(() => Equity);
+            }
         }
 
         public void Update(CashAmount cash)
         {
-            Currency = cash.Currency;
-            Amount = cash.Amount;
+            Model.Currency = cash.Currency;
+            Model.Cash = cash.Amount;
         }
 
         public void Update(AccountEvent message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            Currency = message.CurrencySymbol;
-            Amount = message.CashBalance;
+            Model.Currency = message.CurrencySymbol;
+            Model.Cash = message.CashBalance;
         }
     }
 }

@@ -54,12 +54,6 @@ namespace Algoloop.Model
         public string PriceCurrency { get; set; }
 
         /// <summary>
-        /// Gets the utc time the price was last updated.
-        /// </summary>
-        [DataMember]
-        public DateTime UpdateTime { get; set; }
-
-        /// <summary>
         /// Market value of position.
         /// </summary>
         [DataMember]
@@ -70,5 +64,17 @@ namespace Algoloop.Model
         /// </summary>
         [DataMember]
         public decimal EntryValue { get; set; }
+
+        /// <summary>
+        /// Gets the utc time the price was opened.
+        /// </summary>
+        [DataMember]
+        public DateTime EntryTime { get; set; }
+
+        /// <summary>
+        /// Gets the utc time the price was last updated.
+        /// </summary>
+        [DataMember]
+        public DateTime UpdateTime { get; set; }
     }
 }

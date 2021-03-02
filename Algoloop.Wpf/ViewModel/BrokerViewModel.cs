@@ -227,8 +227,9 @@ namespace Algoloop.Wpf.ViewModel
 
         private void AccountLoop()
         {
-            using IProvider provider = ProviderFactory.CreateProvider(Model.Name, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(Model.Provider, _settings);
             if (provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
+
             IReadOnlyList<AccountModel> accounts = provider.Login(Model, _settings);
             Model.UpdateAccounts(accounts);
             UiThread(() => DataFromModel());

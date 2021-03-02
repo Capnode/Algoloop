@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using QuantConnect;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -57,6 +56,12 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         public string DisplayName => Broker == default ? Name : $"{Broker.Name}/{Name}";
+
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public Collection<BalanceModel> Balances { get; } = new Collection<BalanceModel>();
 
         [Browsable(false)]
         [ReadOnly(false)]

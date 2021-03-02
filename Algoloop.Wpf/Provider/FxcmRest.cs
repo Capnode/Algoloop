@@ -28,14 +28,14 @@ namespace Algoloop.Wpf.Provider
             Contract.Requires(broker != null);
 
             _api = new FxcmClient(broker.Access, broker.ApiKey);
-            _api.LoginAsync();
+            _api.Login();
             IReadOnlyList<AccountModel> accounts = _api.GetAccountsAsync().Result;
             return accounts;
         }
 
         public override void Logout()
         {
-            _api.LogoutAsync();
+            _api.Logout();
         }
 
         protected override void Dispose(bool disposing)

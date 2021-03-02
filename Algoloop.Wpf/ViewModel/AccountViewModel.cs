@@ -140,14 +140,22 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
+
+                Balances.Clear();
+                foreach (BalanceModel balance in Model.Balances)
+                {
+                    var vm = new BalanceViewModel(balance);
+                    Balances.Add(vm);
+                }
+
                 Orders.Clear();
-                Positions.Clear();
                 foreach (OrderModel order in Model.Orders)
                 {
                     var vm = new OrderViewModel(order);
                     Orders.Add(vm);
                 }
 
+                Positions.Clear();
                 foreach (PositionModel position in Model.Positions)
                 {
                     var vm = new PositionViewModel(position);
@@ -237,15 +245,15 @@ namespace Algoloop.Wpf.ViewModel
 
         private void UpdateBalance(IProvider provider)
         {
-            IReadOnlyCollection<CashAmount> balances = provider.GetCashBalance();
-            foreach (CashAmount balance in balances)
+            IReadOnlyList<CashAmount> cashAmounts = provider.GetCashBalance();
+            foreach (CashAmount cashAmount in cashAmounts)
             {
                 bool update = false;
                 foreach (BalanceViewModel vm in Balances)
                 {
-                    if (vm.Currency == balance.Currency)
+                    if (cashAmount.Currency == vm.Model.Currency)
                     {
-                        vm.Update(balance);
+                        vm.Update(cashAmount);
                         update = true;
                         break;
                     }
@@ -253,6 +261,11 @@ namespace Algoloop.Wpf.ViewModel
 
                 if (!update)
                 {
+                    var balance = new BalanceModel
+                    {
+                        Currency = cashAmount.Currency,
+                        Cash = cashAmount.Amount
+                    };
                     Balances.Add(new BalanceViewModel(balance));
                 }
             }
@@ -261,8 +274,8 @@ namespace Algoloop.Wpf.ViewModel
             Balances.CopyTo(vms, 0);
             foreach (BalanceViewModel vm in vms)
             {
-                CashAmount balance = balances.FirstOrDefault(m => m.Currency == vm.Currency);
-                if (balance == null || balance.Currency == null)
+                CashAmount cashAmount = cashAmounts.FirstOrDefault(m => m.Currency == vm.Model.Currency);
+                if (cashAmount == null || cashAmount.Currency == null)
                 {
                     Balances.Remove(vm);
                 }

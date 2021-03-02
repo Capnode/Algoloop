@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using QuantConnect.Orders;
+using QuantConnect.Orders.TimeInForces;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -235,15 +236,15 @@ namespace Algoloop.Wpf.ViewModel
         }
 
         /// <summary>
-        /// Order Time In Force
+        /// Order valid until.
         /// </summary>
-        public TimeInForce TimeInForce
+        public DateTime ValidUntil
         {
-            get => Model.TimeInForce;
+            get => Model.ValidUntil;
             set
             {
-                Model.TimeInForce = value;
-                RaisePropertyChanged(() => TimeInForce);
+                Model.ValidUntil = value;
+                RaisePropertyChanged(() => ValidUntil);
             }
         }
 
@@ -356,7 +357,7 @@ namespace Algoloop.Wpf.ViewModel
             Quantity = order.Quantity;
             Type = order.Type;
             Status = order.Status;
-            TimeInForce = order.TimeInForce;
+            ValidUntil = ToValidUntil(order);
             Tag = order.Tag;
             Properties = (OrderProperties)order.Properties;
             SecurityType = order.SecurityType.ToString();
@@ -382,7 +383,7 @@ namespace Algoloop.Wpf.ViewModel
             Quantity = order.Quantity;
             Type = order.Type;
             Status = order.Status;
-            TimeInForce = order.TimeInForce;
+            ValidUntil = order.ValidUntil;
             Tag = order.Tag;
             Properties = order.Properties;
             SecurityType = order.SecurityType.ToString(CultureInfo.InvariantCulture);
@@ -404,6 +405,24 @@ namespace Algoloop.Wpf.ViewModel
             Quantity = message.FillQuantity;
             Status = message.Status;
             Direction = message.Direction.ToString();
+        }
+
+        private DateTime ToValidUntil(Order order)
+        {
+            if (order.TimeInForce is DayTimeInForce)
+            {
+                //TODO: Fix also for next day orders
+                return order.Time.Date.AddDays(1).AddTicks(-1);
+            }
+            else if (order.TimeInForce is GoodTilCanceledTimeInForce)
+            {
+                return DateTime.MaxValue;
+            }
+            else if (order.TimeInForce is GoodTilDateTimeInForce date)
+            {
+                return date.Expiry;
+            }
+            return DateTime.MinValue;
         }
     }
 }

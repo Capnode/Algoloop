@@ -53,6 +53,7 @@
     <Compile Include="Model\AboutModel.cs" />
     <Compile Include="Model\AccountModel.cs" />
     <Compile Include="Model\AccountsModel.cs" />
+    <Compile Include="Model\BalanceModel.cs" />
     <Compile Include="Model\ListModel.cs" />
     <Compile Include="Model\ProviderModel.cs" />
     <Compile Include="Model\MarketsModel.cs" />
