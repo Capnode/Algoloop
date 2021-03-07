@@ -91,9 +91,6 @@
             <TabItem Header="{Binding MarketsViewModel.Markets.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Markets ({0}), FallbackValue=Markets}">
                 <view:MarketsView />
             </TabItem>
-            <TabItem Header="{Binding AccountsViewModel.Brokers.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Accounts ({0}), FallbackValue=Accounts}">
-                <view:AccountsView />
-            </TabItem>
             <TabItem Header="{Binding StrategiesViewModel.Strategies.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Strategies ({0}), FallbackValue=Strategies}">
                 <view:StrategiesView />
             </TabItem>

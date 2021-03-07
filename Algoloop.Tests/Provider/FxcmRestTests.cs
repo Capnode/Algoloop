@@ -27,7 +27,7 @@ namespace Algoloop.Tests.Provider
     [TestClass]
     public class FxcmRestTests
     {
-        private const string _provider = "fxcmrest";
+        private const string _providerName = "fxcmrest";
         private SettingModel _settings;
         private ProviderModel _broker;
 
@@ -44,7 +44,7 @@ namespace Algoloop.Tests.Provider
             _broker = new ProviderModel
             {
                 Name = "FxcmRest",
-                Provider = _provider,
+                Provider = _providerName,
                 ApiKey = key,
                 Access = (AccessType)Enum.Parse(typeof(AccessType), access),
             };
@@ -55,12 +55,10 @@ namespace Algoloop.Tests.Provider
         {
             // Act
             using IProvider provider = ProviderFactory.CreateProvider(_broker.Provider, _settings);
-            provider.Register(_settings, _broker.Provider);
-            IReadOnlyList<AccountModel> accounts = provider.Login(_broker, _settings);
-            provider.Logout();
+            Assert.IsNotNull(provider);
 
-            // Assert
-            Assert.IsTrue(accounts.Count > 0);
+            provider.Login(_broker);
+            provider.Logout();
         }
     }
 }

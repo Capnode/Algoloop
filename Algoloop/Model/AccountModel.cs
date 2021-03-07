@@ -27,7 +27,7 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [ReadOnly(false)]
-        public ProviderModel Broker { get; set; }
+        public ProviderModel Provider { get; set; }
 
         [Category("Account")]
         [DisplayName("Number")]
@@ -55,8 +55,7 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [ReadOnly(false)]
-        public string DisplayName => Broker == default ? Name : $"{Broker.Name}/{Name}";
-
+        public string DisplayName => Provider == default ? Name : $"{Provider.Name}/{Name}";
 
         [Browsable(false)]
         [ReadOnly(false)]

@@ -125,6 +125,11 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
+        public string DefaultAccountId { get; set; }
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
         public Collection<SymbolModel> Symbols { get; } = new Collection<SymbolModel>();
 
         [Browsable(false)]
@@ -180,11 +185,22 @@ namespace Algoloop.Model
 
         public void UpdateAccounts(IEnumerable<AccountModel> accounts)
         {
+            if (accounts == null) return;
             Accounts.Clear();
             foreach (AccountModel account in accounts)
             {
-                account.Broker = this;
+                account.Provider = this;
                 Accounts.Add(account);
+            }
+        }
+
+        public void UpdateSymbols(IEnumerable<SymbolModel> symbols)
+        {
+            if (symbols == null) return;
+            Symbols.Clear();
+            foreach (SymbolModel symbol in symbols)
+            {
+                Symbols.Add(symbol);
             }
         }
 

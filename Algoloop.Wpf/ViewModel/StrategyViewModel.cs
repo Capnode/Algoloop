@@ -47,7 +47,6 @@ namespace Algoloop.Wpf.ViewModel
         internal ITreeViewModel _parent;
 
         private readonly MarketsModel _markets;
-        private readonly AccountsModel _accounts;
         private readonly SettingModel _settings;
 
         private readonly string[] _exclude = new[] { "symbols", "market", "resolution", "security", "startdate", "enddate", "cash" };
@@ -61,12 +60,11 @@ namespace Algoloop.Wpf.ViewModel
         private IList _selectedItems;
         private bool _active;
 
-        public StrategyViewModel(ITreeViewModel parent, StrategyModel model, MarketsModel markets, AccountsModel accounts, SettingModel settings)
+        public StrategyViewModel(ITreeViewModel parent, StrategyModel model, MarketsModel markets, SettingModel settings)
         {
             _parent = parent;
             Model = model ?? throw new ArgumentNullException(nameof(model));
             _markets = markets;
-            _accounts = accounts;
             _settings = settings;
 
             StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
@@ -291,7 +289,7 @@ namespace Algoloop.Wpf.ViewModel
 
         internal void CloneStrategy(StrategyModel strategyModel)
         {
-            var strategy = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+            var strategy = new StrategyViewModel(this, strategyModel, _markets, _settings);
             Strategies.Add(strategy);
         }
 
@@ -440,7 +438,7 @@ namespace Algoloop.Wpf.ViewModel
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
-                    var track = new TrackViewModel(this, trackModel, _accounts, _settings);
+                    var track = new TrackViewModel(this, trackModel, _markets, _settings);
                     Tracks.Add(track);
                     Task task = track
                         .StartTrackAsync()
@@ -560,7 +558,7 @@ namespace Algoloop.Wpf.ViewModel
             Strategies.Clear();
             foreach (StrategyModel strategyModel in Model.Strategies)
             {
-                var strategy = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+                var strategy = new StrategyViewModel(this, strategyModel, _markets,  _settings);
                 Strategies.Add(strategy);
             }
         }
@@ -579,7 +577,7 @@ namespace Algoloop.Wpf.ViewModel
             ExDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false, true);
             foreach (TrackModel TrackModel in Model.Tracks)
             {
-                var TrackViewModel = new TrackViewModel(this, TrackModel, _accounts, _settings);
+                var TrackViewModel = new TrackViewModel(this, TrackModel, _markets, _settings);
                 Tracks.Add(TrackViewModel);
                 ExDataGridColumns.AddPropertyColumns(TrackColumns, TrackViewModel.Statistics, "Statistics");
             }
@@ -680,7 +678,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DoImportSymbols()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Multiselect = false,
@@ -694,7 +692,7 @@ namespace Algoloop.Wpf.ViewModel
                 IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
-                    using StreamReader r = new StreamReader(fileName);
+                    using var r = new StreamReader(fileName);
                     while (!r.EndOfStream)
                     {
                         string line = r.ReadLine();
@@ -777,7 +775,7 @@ namespace Algoloop.Wpf.ViewModel
                         AlgorithmName = algorithm,
                         Name = null
                     };
-                    var strategy = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+                    var strategy = new StrategyViewModel(this, strategyModel, _markets, _settings);
                     Strategies.Add(strategy);
                 }
             }
@@ -790,7 +788,7 @@ namespace Algoloop.Wpf.ViewModel
         private void DoExportStrategy()
         {
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 FileName = Model.Name,
@@ -804,7 +802,7 @@ namespace Algoloop.Wpf.ViewModel
                 IsBusy = true;
                 string fileName = saveFileDialog.FileName;
                 using StreamWriter file = File.CreateText(fileName);
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 var strategies = new StrategiesModel();
                 strategies.Strategies.Add(Model);
                 serializer.Serialize(file, strategies);
@@ -826,7 +824,7 @@ namespace Algoloop.Wpf.ViewModel
                 return;
 
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"

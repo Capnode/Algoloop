@@ -35,16 +35,6 @@ namespace Algoloop.Wpf.ViewModel
 
         public BalanceModel Model { get; set; }
 
-        public string Currency
-        {
-            get => Model.Currency;
-            set
-            {
-                Model.Currency = value;
-                RaisePropertyChanged(() => Currency);
-            }
-        }
-
         public decimal Cash
         {
             get => Model.Cash;
@@ -62,6 +52,36 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Model.Equity = value;
                 RaisePropertyChanged(() => Equity);
+            }
+        }
+
+        public decimal Profit
+        {
+            get => Model.Profit;
+            set
+            {
+                Model.Profit = value;
+                RaisePropertyChanged(() => Profit);
+            }
+        }
+
+        public decimal DayProfit
+        {
+            get => Model.DayProfit;
+            set
+            {
+                Model.DayProfit = value;
+                RaisePropertyChanged(() => DayProfit);
+            }
+        }
+
+        public string Currency
+        {
+            get => Model.Currency;
+            set
+            {
+                Model.Currency = value;
+                RaisePropertyChanged(() => Currency);
             }
         }
 

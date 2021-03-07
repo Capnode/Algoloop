@@ -43,8 +43,7 @@ namespace Algoloop.Wpf.Provider
 
                 IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                     throw new ApplicationException($"Can not create provider {name}");
-
-                if (!AcceptProvider(settings, name)) return null;
+                if (!provider.Register(settings)) return null;
                 return provider;
             }
             catch (ReflectionTypeLoadException ex)
@@ -67,7 +66,7 @@ namespace Algoloop.Wpf.Provider
             MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
             string originalJson = JsonConvert.SerializeObject(marketHours);
 
-            // Register providers to Market
+            // Try to register providers to Market
             Market.Reset();
             IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
@@ -76,12 +75,7 @@ namespace Algoloop.Wpf.Provider
             {
                 IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                     throw new ApplicationException($"Can not create provider {type.Name}");
-                string name = provider.GetType().Name.ToLowerInvariant();
-
-                if (AcceptProvider(settings, name))
-                {
-                    provider.Register(settings, name);
-                }
+                provider.Register(settings);
             }
 
             // Save market hours database if changed
@@ -91,13 +85,6 @@ namespace Algoloop.Wpf.Provider
                 string path = Path.Combine(settings.DataFolder, "market-hours", "market-hours-database.json");
                 File.WriteAllText(path, json);
             }
-        }
-
-        private static bool AcceptProvider(SettingModel settings, string name)
-        {
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
-            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-            return true;
         }
     }
 }

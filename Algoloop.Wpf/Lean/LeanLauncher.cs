@@ -154,8 +154,8 @@ namespace Algoloop.Wpf.Lean
                 SetPaper(config);
             }
             else if (account != null
-                && account.Broker != null
-                && account.Broker.Provider.Equals(nameof(Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
+                && account.Provider != null
+                && account.Provider.Provider.Equals(nameof(Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
             {
                 if (model.Desktop)
                 {
@@ -332,10 +332,10 @@ namespace Algoloop.Wpf.Lean
             config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler";
             config["live-mode-brokerage"] = "FxcmBrokerage";
             config["data-queue-handler"] = "FxcmBrokerage";
-            config["fxcm-user-name"] = account.Broker.Login;
-            config["fxcm-password"] = account.Broker.Password;
+            config["fxcm-user-name"] = account.Provider.Login;
+            config["fxcm-password"] = account.Provider.Password;
             config["fxcm-account-id"] = account.Id;
-            switch (account.Broker.Access)
+            switch (account.Provider.Access)
             {
                 case ProviderModel.AccessType.Demo:
                     config["fxcm-terminal"] = "Demo";
@@ -363,12 +363,12 @@ namespace Algoloop.Wpf.Lean
             config["messaging-handler"] = "QuantConnect.Messaging.StreamingMessageHandler";
             config["live-mode-brokerage"] = "FxcmBrokerage";
             config["data-queue-handler"] = "FxcmBrokerage";
-            config["fxcm-user-name"] = account.Broker.Login;
-            config["fxcm-password"] = account.Broker.Password;
+            config["fxcm-user-name"] = account.Provider.Login;
+            config["fxcm-password"] = account.Provider.Password;
             config["fxcm-account-id"] = account.Id;
             config["log-handler"] = "QuantConnect.Logging.QueueLogHandler";
             config["desktop-exe"] = @"../../../UserInterface/bin/Release/QuantConnect.Views.exe";
-            switch (account.Broker.Access)
+            switch (account.Provider.Access)
             {
                 case ProviderModel.AccessType.Demo:
                     config["fxcm-terminal"] = "Demo";

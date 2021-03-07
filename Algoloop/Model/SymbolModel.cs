@@ -28,6 +28,13 @@ namespace Algoloop.Model
         {
         }
 
+        public SymbolModel(Symbol symbol)
+        {
+            Id = symbol.ID.Symbol;
+            Name = symbol.ID.Symbol;
+            Market = symbol.ID.Market;
+            Security = symbol.SecurityType;
+        }
 
         public SymbolModel(string id, string market, SecurityType security)
         {

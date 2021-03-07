@@ -211,15 +211,6 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Download completed.
-        /// </summary>
-        internal static string DownloadCompleted {
-            get {
-                return ResourceManager.GetString("DownloadCompleted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Exit {
@@ -288,6 +279,33 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Market {0} completed.
+        /// </summary>
+        internal static string MarketCompleted {
+            get {
+                return ResourceManager.GetString("MarketCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} has no symbol selected.
+        /// </summary>
+        internal static string MarketNoSymbol {
+            get {
+                return ResourceManager.GetString("MarketNoSymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} started.
+        /// </summary>
+        internal static string MarketStarted {
+            get {
+                return ResourceManager.GetString("MarketStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap MoveDown {
@@ -314,15 +332,6 @@ namespace Algoloop.Wpf.Properties {
             get {
                 object obj = ResourceManager.GetObject("New", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No symbol selected!.
-        /// </summary>
-        internal static string NoSymbolSelected {
-            get {
-                return ResourceManager.GetString("NoSymbolSelected", resourceCulture);
             }
         }
         

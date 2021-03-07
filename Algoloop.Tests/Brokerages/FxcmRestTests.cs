@@ -16,10 +16,12 @@ using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Threading;
 using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
 
@@ -74,6 +76,7 @@ namespace Algoloop.Tests.Brokerages
         {
             // Act
             _api.Login();
+            Thread.Sleep(1000);
             _api.Logout();
         }
 
@@ -82,11 +85,12 @@ namespace Algoloop.Tests.Brokerages
         {
             // Act
             _api.Login();
-            IReadOnlyList<AccountModel> accounts = await _api.GetAccountsAsync().ConfigureAwait(false);
+            IReadOnlyList<AccountModel> accounts = await _api.GetAccountsAsync(null).ConfigureAwait(false);
             _api.Logout();
 
             Assert.IsNotNull(accounts);
             Assert.AreEqual(1, accounts.Count);
+            Assert.AreEqual(1, accounts[0].Balances.Count);
         }
 
         protected virtual void Dispose(bool disposing)

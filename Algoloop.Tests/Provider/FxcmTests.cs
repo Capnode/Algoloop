@@ -19,7 +19,6 @@ using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -61,7 +60,7 @@ namespace Algoloop.Tests.Provider
         [TestMethod]
         public void Download_no_symbols()
         {
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Active = true,
@@ -75,7 +74,7 @@ namespace Algoloop.Tests.Provider
             };
 
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsFalse(market.Active);
             Assert.AreEqual(date, market.LastDate);
@@ -91,7 +90,7 @@ namespace Algoloop.Tests.Provider
         [DataTestMethod]
         public void Download_one_symbol(Resolution resolution, string filename)
         {
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             DateTime nextDay = date.AddDays(1);
             var market = new ProviderModel
             {
@@ -107,7 +106,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(nextDay, market.LastDate);
@@ -135,7 +134,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(today, market.LastDate);
@@ -161,7 +160,7 @@ namespace Algoloop.Tests.Provider
             market.Symbols.Add(new SymbolModel("EURUSD", "fxcm", SecurityType.Forex));
 
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsFalse(market.Active);
             Assert.AreEqual(today, market.LastDate);
@@ -184,10 +183,9 @@ namespace Algoloop.Tests.Provider
             };
 
             using IProvider provider = ProviderFactory.CreateProvider(broker.Provider, _settings);
-            IReadOnlyList<AccountModel> accounts = provider.Login(broker, _settings);
+            provider.Login(broker);
 
             Assert.IsTrue(broker.Active);
-            Assert.IsTrue(accounts.Count > 0);
         }
 
     }

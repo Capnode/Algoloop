@@ -12,14 +12,10 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 
 namespace Algoloop.Wpf.Provider
 {
     public class CryptoIq : ProviderBase
     {
-        public override void Download(ProviderModel model, SettingModel settings)
-        {
-        }
     }
 }

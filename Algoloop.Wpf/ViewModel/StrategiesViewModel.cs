@@ -30,17 +30,15 @@ namespace Algoloop.Wpf.ViewModel
     public class StrategiesViewModel : ViewModel, ITreeViewModel
     {
         private readonly MarketsModel _markets;
-        private readonly AccountsModel _accounts;
         private readonly SettingModel _settings;
 
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
 
-        public StrategiesViewModel(StrategiesModel strategies, MarketsModel markets, AccountsModel accounts, SettingModel settings)
+        public StrategiesViewModel(StrategiesModel strategies, MarketsModel markets, SettingModel settings)
         {
             Model = strategies;
             _markets = markets;
-            _accounts = accounts;
             _settings = settings;
 
             AddCommand = new RelayCommand(() => DoAddStrategy(), () => !IsBusy);
@@ -102,9 +100,9 @@ namespace Algoloop.Wpf.ViewModel
             {
                 await Task.Run(() =>
                 {
-                    using StreamReader r = new StreamReader(fileName);
-                    using JsonReader reader = new JsonTextReader(r);
-                    JsonSerializer serializer = new JsonSerializer();
+                    using var r = new StreamReader(fileName);
+                    using var reader = new JsonTextReader(r);
+                    var serializer = new JsonSerializer();
                     Model = serializer.Deserialize<StrategiesModel>(reader);
                 }).ConfigureAwait(false); // Must continue on UI thread
             }
@@ -122,7 +120,7 @@ namespace Algoloop.Wpf.ViewModel
             if (!Model.Strategies.Any()) return;
 
             using StreamWriter file = File.CreateText(fileName);
-            JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
+            var serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Serialize(file, Model);
         }
 
@@ -137,7 +135,7 @@ namespace Algoloop.Wpf.ViewModel
             try
             {
                 IsBusy = true;
-                var strategy = new StrategyViewModel(this, new StrategyModel(), _markets, _accounts, _settings);
+                var strategy = new StrategyViewModel(this, new StrategyModel(), _markets, _settings);
                 AddStrategy(strategy);
             }
             finally
@@ -155,7 +153,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DoImportStrategies()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Multiselect = true,
@@ -169,7 +167,7 @@ namespace Algoloop.Wpf.ViewModel
                 IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
-                    using StreamReader r = new StreamReader(fileName);
+                    using var r = new StreamReader(fileName);
                     string json = r.ReadToEnd();
                     StrategiesModel strategies = JsonConvert.DeserializeObject<StrategiesModel>(json);
                     foreach (StrategyModel strategy in strategies.Strategies)
@@ -198,7 +196,7 @@ namespace Algoloop.Wpf.ViewModel
         private void DoExportStrategies()
         {
             DataToModel();
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Filter = "json file (*.json)|*.json|All files (*.*)|*.*"
@@ -236,7 +234,7 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             // Remove Track files not in use
-            DirectoryInfo dir = new DirectoryInfo(TrackViewModel.Folder);
+            var dir = new DirectoryInfo(TrackViewModel.Folder);
             if (!dir.Exists)
             {
                 return;
@@ -277,7 +275,7 @@ namespace Algoloop.Wpf.ViewModel
                 Strategies.Clear();
                 foreach (StrategyModel strategyModel in Model.Strategies)
                 {
-                    var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _accounts, _settings);
+                    var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _settings);
                     AddStrategy(strategyViewModel);
                 }
             });

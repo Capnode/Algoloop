@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-
 using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -47,5 +46,21 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [DataMember]
         public decimal Equity { get; set; }
+
+        [Category("Balance")]
+        [DisplayName("Profit")]
+        [Description("Total profit or loss on account since start.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public decimal Profit { get; set; }
+
+        [Category("Balance")]
+        [DisplayName("DayProfit")]
+        [Description("Profit or loss on account today.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public decimal DayProfit { get; set; }
     }
 }

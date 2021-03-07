@@ -25,6 +25,11 @@ namespace Algoloop.Model
     public class MarketsModel
     {
         public const int version = 1;
+        private static readonly AccountModel[] _standardAccounts = new[]
+        {
+            new AccountModel { Name = nameof(AccountModel.AccountType.Backtest) },
+            new AccountModel { Name = nameof(AccountModel.AccountType.Paper) }
+        };
 
         [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
@@ -48,6 +53,31 @@ namespace Algoloop.Model
                     symbol.Validate();
                 }
             }
+        }
+
+        public AccountModel FindAccount(string name)
+        {
+            foreach (ProviderModel provider in Markets)
+            {
+                Collection<AccountModel> accounts = provider.Accounts;
+                AccountModel account = accounts.FirstOrDefault(m => m.DisplayName.Equals(name, StringComparison.OrdinalIgnoreCase));
+                if (account != null) return account;
+            }
+
+            return null;
+        }
+
+        internal IReadOnlyList<AccountModel> GetAccounts()
+        {
+            var list = new List<AccountModel>();
+            list.AddRange(_standardAccounts);
+            foreach (ProviderModel provider in Markets)
+            {
+                Collection<AccountModel> accounts = provider.Accounts;
+                list.AddRange(accounts);
+            }
+
+            return list;
         }
 
         public IReadOnlyList<ProviderModel> GetMarkets()

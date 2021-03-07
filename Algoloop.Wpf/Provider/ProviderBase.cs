@@ -15,11 +15,10 @@
 using Algoloop.Model;
 using Algoloop.Support;
 using Algoloop.Wpf.Common;
+using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
-using QuantConnect.Orders;
 using QuantConnect.Securities;
-using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,8 +35,11 @@ namespace Algoloop.Wpf.Provider
         protected bool _isDisposed;
         private ConfigProcess _process;
 
-        public virtual void Register(SettingModel settings, string name)
+        public virtual bool Register(SettingModel settings)
         {
+            // Get name of virtual class
+            string name = GetType().Name.ToLowerInvariant();
+
             // Make sure provider is registered
             if (Market.Encode(name) == null)
             {
@@ -50,25 +52,26 @@ namespace Algoloop.Wpf.Provider
 
                 Market.Add(name, code);
             }
+
+            // Make sure Market Hours Database exist
+            string folder = Path.Combine(settings.DataFolder, "market-hours");
+            Directory.CreateDirectory(folder);
+            string path = Path.Combine(folder, "market-hours-database.json");
+            if (!File.Exists(path))
+            {
+                var emptyExchangeHours = new Dictionary<SecurityDatabaseKey, MarketHoursDatabase.Entry>();
+                string jsonString = JsonConvert.SerializeObject(new MarketHoursDatabase(emptyExchangeHours));
+                File.WriteAllText(path, jsonString);
+            }
+
+            return true;
         }
 
-        public virtual IReadOnlyList<AccountModel> Login(ProviderModel account, SettingModel settings)
+        public virtual void Login(ProviderModel provider)
         {
-            throw new NotImplementedException();
         }
 
         public virtual void Logout()
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public virtual void Download(ProviderModel market, SettingModel settings)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Abort()
         {
             if (_process != null)
             {
@@ -77,24 +80,15 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public virtual IReadOnlyList<Order> GetOpenOrders()
+        public virtual IReadOnlyList<AccountModel> GetAccounts(ProviderModel market, Action<object> update)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
-        public virtual IReadOnlyList<Holding> GetAccountHoldings()
+        public virtual IReadOnlyList<SymbolModel> GetMarketData(ProviderModel market, Action<object> update)
         {
-            throw new NotImplementedException();
-        }
-
-        public virtual IReadOnlyList<Trade> GetClosedTrades()
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual IReadOnlyList<CashAmount> GetCashBalance()
-        {
-            throw new NotImplementedException();
+            market.Active = false;
+            return null;
         }
 
         protected virtual void Dispose(bool disposing)

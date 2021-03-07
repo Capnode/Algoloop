@@ -24,12 +24,19 @@ namespace Algoloop.Wpf.Provider
 {
     public class FxcmVolume : ProviderBase
     {
-        public override void Download(ProviderModel model, SettingModel settings)
+        private SettingModel _settings;
+
+        public override bool Register(SettingModel settings)
+        {
+            _settings = settings;
+            return base.Register(settings);
+        }
+
+        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel model, Action<object> update)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
 
-            Config.Set("data-directory", settings.DataFolder);
+            Config.Set("data-directory", _settings.DataFolder);
             switch (model.Access)
             {
                 case ProviderModel.AccessType.Demo:
@@ -47,6 +54,7 @@ namespace Algoloop.Wpf.Provider
             IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
             string resolution = model.Resolution.Equals(Resolution.Tick) ? "all" : model.Resolution.ToString();
             FxcmVolumeDownloadProgram.FxcmVolumeDownload(symbols, resolution, model.LastDate, model.LastDate);
+            return null;
         }
     }
 }

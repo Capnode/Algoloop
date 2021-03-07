@@ -69,13 +69,11 @@ namespace Algoloop.Wpf.View
 
         private void TreeView_Drop(object sender, DragEventArgs e)
         {
-            if (sender is TreeView tree
-                && e.Data.GetDataPresent(typeof(StrategyViewModel)))
+            if (sender is TreeView && e.Data.GetDataPresent(typeof(StrategyViewModel)))
             {
-                var dragSource = e.Data.GetData(typeof(StrategyViewModel)) as StrategyViewModel;
                 TreeViewItem treeViewItem = FindAnchestor<TreeViewItem>((DependencyObject)e.OriginalSource);
                 object dropTarget = treeViewItem == null ? DataContext : treeViewItem.Header;
-                if (dropTarget == null || dragSource == null || dropTarget == dragSource) return;
+                if (dropTarget == null || e.Data.GetData(typeof(StrategyViewModel)) is not StrategyViewModel dragSource || dropTarget == dragSource) return;
                 if (dragSource.MoveStrategyCommand.CanExecute(dropTarget))
                 {
                     dragSource.MoveStrategyCommand.Execute(dropTarget);
@@ -87,9 +85,9 @@ namespace Algoloop.Wpf.View
         {
             do
             {
-                if (current is T)
+                if (current is T t)
                 {
-                    return (T)current;
+                    return t;
                 }
                 current = VisualTreeHelper.GetParent(current);
             }

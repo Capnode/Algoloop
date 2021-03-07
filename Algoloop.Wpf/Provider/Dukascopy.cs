@@ -28,7 +28,7 @@ namespace Algoloop.Wpf.Provider
     public class Dukascopy : ProviderBase
     {
         private const string _market = "dukascopy";
-        private readonly DateTime _firstDate = new DateTime(2003, 05, 05);
+        private readonly DateTime _firstDate = new(2003, 05, 05);
 
         private readonly IEnumerable<string> _majors = new[] { "AUDUSD", "EURUSD", "GBPUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY" };
         private readonly IEnumerable<string> _crosses = new[]
@@ -46,12 +46,15 @@ namespace Algoloop.Wpf.Provider
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
 
-        public override void Register(SettingModel settings, string name)
+        private SettingModel _settings;
+
+        public override bool Register(SettingModel settings)
         {
             Contract.Requires(settings != null);
+            _settings = settings;
 
             // Register market
-            base.Register(settings, name);
+            if (!base.Register(settings)) return false;
 
             // Register Market Hours
             MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
@@ -74,17 +77,18 @@ namespace Algoloop.Wpf.Provider
                 new Dictionary<DateTime, TimeSpan>());
 
             marketHours.SetEntry(
-                name,
+                GetType().Name.ToLowerInvariant(),
                 null,
                 SecurityType.Forex,
                 exchangeHours,
                 TimeZones.Utc);
+
+            return true;
         }
 
-        public override void Download(ProviderModel market, SettingModel settings)
+        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel market, Action<object> update)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
 
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
@@ -103,8 +107,8 @@ namespace Algoloop.Wpf.Provider
 
             IDictionary<string, string> config = new Dictionary<string, string>
             {
-                ["data-directory"] = settings.DataFolder,
-                ["data-folder"] = settings.DataFolder
+                ["data-directory"] = _settings.DataFolder,
+                ["data-folder"] = _settings.DataFolder
             };
 
             DateTime now = DateTime.Now;
@@ -125,6 +129,7 @@ namespace Algoloop.Wpf.Provider
             }
 
             UpdateSymbols(market);
+            return null;
         }
 
         private void UpdateSymbols(ProviderModel market)

@@ -53,32 +53,32 @@ namespace Algoloop.Wpf.ViewModel
         private const double _daysInYear = 365.24;
 
         private readonly StrategyViewModel _parent;
-        private readonly AccountsModel _accounts;
+        private readonly MarketsModel _markets;
         private readonly SettingModel _settings;
-        private static readonly object _mutex = new object();
+        private static readonly object _mutex = new();
 
         private TrackModel _model;
         private bool _isSelected;
         private bool _isExpanded;
-        private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
+        private SyncObservableCollection<ChartViewModel> _charts = new();
         private IDictionary<string, decimal?> _statistics;
         private string _port;
         private IList _selectedItems;
-        private SyncObservableCollection<SymbolViewModel> _symbols = new SyncObservableCollection<SymbolViewModel>();
-        private SyncObservableCollection<ParameterViewModel> _parameters = new SyncObservableCollection<ParameterViewModel>();
-        private SyncObservableCollection<Trade> _trades = new SyncObservableCollection<Trade>();
-        private SyncObservableCollection<TrackSymbolViewModel> _trackSymbols = new SyncObservableCollection<TrackSymbolViewModel>();
-        private SyncObservableCollection<OrderViewModel> _orders = new SyncObservableCollection<OrderViewModel>();
-        private SyncObservableCollection<HoldingViewModel> _holdings = new SyncObservableCollection<HoldingViewModel>();
+        private SyncObservableCollection<SymbolViewModel> _symbols = new();
+        private SyncObservableCollection<ParameterViewModel> _parameters = new();
+        private SyncObservableCollection<Trade> _trades = new();
+        private SyncObservableCollection<TrackSymbolViewModel> _trackSymbols = new();
+        private SyncObservableCollection<OrderViewModel> _orders = new();
+        private SyncObservableCollection<HoldingViewModel> _holdings = new();
         private bool _loaded;
         private string _logs;
-        private readonly LeanLauncher _leanLauncher = new LeanLauncher();
+        private readonly LeanLauncher _leanLauncher = new();
 
-        public TrackViewModel(StrategyViewModel parent, TrackModel model, AccountsModel accounts, SettingModel settings)
+        public TrackViewModel(StrategyViewModel parent, TrackModel model, MarketsModel markets, SettingModel settings)
         {
             _parent = parent;
             Model = model;
-            _accounts = accounts;
+            _markets = markets;
             _settings = settings;
 
             ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
@@ -309,7 +309,7 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             // Find account
-            AccountModel account = _accounts.FindAccount(Model.Account);
+            AccountModel account = _markets.FindAccount(Model.Account);
 
             // Set search path if not base directory
             string folder = Path.GetDirectoryName(MainService.FullExePath(Model.AlgorithmLocation));
@@ -606,7 +606,7 @@ namespace Algoloop.Wpf.ViewModel
                 }
 
                 using JsonReader reader = new JsonTextReader(resultStream);
-                JsonSerializer serializer = new JsonSerializer();
+                var serializer = new JsonSerializer();
                 serializer.Converters.Add(new OrderJsonConverter());
                 result = serializer.Deserialize<BacktestResult>(reader);
                 if (result == null)
@@ -891,7 +891,7 @@ namespace Algoloop.Wpf.ViewModel
             if (symbols.Count == 0)
                 return;
 
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
