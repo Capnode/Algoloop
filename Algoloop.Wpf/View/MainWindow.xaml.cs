@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Support;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using QuantConnect.Configuration;
@@ -28,9 +29,9 @@ namespace Algoloop.Wpf.View
     {
         public MainWindow()
         {
-            // Avoid warning logs
-            Config.Set("plugin-directory", ".");
-            Config.Set("composer-dll-directory", ".");
+            string exeFolder = MainService.GetProgramFolder();
+            Config.Set("plugin-directory", exeFolder);
+            Config.Set("composer-dll-directory", exeFolder);
 
             InitializeComponent();
         }
@@ -65,6 +66,11 @@ namespace Algoloop.Wpf.View
         private void HelpPrivacyPolicy(object sender, RoutedEventArgs e)
         {
             OpenUrl("https://github.com/Capnode/Algoloop/wiki/Privacy-policy");
+        }
+
+        private void HelpSubscriptions(object sender, RoutedEventArgs e)
+        {
+            OpenUrl("https://account.microsoft.com/services");
         }
 
         private void OpenUrl(string url)
