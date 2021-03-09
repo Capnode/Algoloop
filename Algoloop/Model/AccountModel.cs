@@ -75,5 +75,15 @@ namespace Algoloop.Model
         public void Refresh()
         {
         }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is AccountModel other)) return false;
+            if (Provider != other.Provider) return false;
+            if (Id != other.Id) return false;
+            if (Name != other.Name) return false;
+            if (Active != other.Active) return false;
+            return true;
+        }
     }
 }

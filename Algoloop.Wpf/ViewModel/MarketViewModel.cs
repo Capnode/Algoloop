@@ -203,7 +203,12 @@ namespace Algoloop.Wpf.ViewModel
         public AccountModel SelectedAccount
         {
             get => _selectedAccount;
-            set => Set(ref _selectedAccount, value);
+            set
+            {
+                if (value == default) return;
+                if (value.Equals(_selectedAccount)) return;
+                Set(ref _selectedAccount, value);
+            }
         }
 
         public void Refresh()
@@ -244,7 +249,6 @@ namespace Algoloop.Wpf.ViewModel
                 Lists.Add(listViewModel);
             }
 
-            Accounts.Clear();
             Balances.Clear();
             Orders.Clear();
             Positions.Clear();
@@ -256,12 +260,9 @@ namespace Algoloop.Wpf.ViewModel
                 account = Model.Accounts.ElementAtOrDefault(0);
                 if (account == default) return;
             }
-            SelectedAccount = account;
 
-            foreach (AccountModel act in Model.Accounts)
-            {
-                Accounts.Add(act);
-            }
+            SelectedAccount = account;
+            SmartCopy(Model.Accounts, Accounts);
 
             foreach (BalanceModel balance in account.Balances)
             {
@@ -340,6 +341,30 @@ namespace Algoloop.Wpf.ViewModel
             DeleteCommand.RaiseCanExecuteChanged();
             NewListCommand.RaiseCanExecuteChanged();
             ImportListCommand.RaiseCanExecuteChanged();
+        }
+
+        private void SmartCopy<T>(Collection<T> src, ObservableCollection<T> dest)
+        {
+            int count = src.Count;
+            if (count == dest.Count)
+            {
+                bool equals = true;
+                for (int i = 0; i < count; i++)
+                {
+                    var srcItem = src[i];
+                    var destItem = dest[i];
+                    if (srcItem.Equals(destItem)) continue;
+                    equals = false;
+                    break;
+                }
+                if (equals) return;
+            }
+
+            dest.Clear();
+            foreach (T item in src)
+            {
+                dest.Add(item);
+            }
         }
 
         private async Task StartMarketAsync()
