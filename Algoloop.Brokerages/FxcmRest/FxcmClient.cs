@@ -77,6 +77,13 @@ namespace Algoloop.Brokerages.FxcmRest
             Log.Trace("{0}: GetAccountsAsync", GetType().Name);
             string json = await GetAsync(_getModel).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
+            JToken jResponse = jo["response"];
+            bool executed = (bool)jResponse["executed"];
+            if (!executed)
+            {
+                string error = jResponse["error"].ToString();
+                throw new ApplicationException(error);
+            }
 
             // Properties
             JArray jProperties = JArray.FromObject(jo["properties"]);
@@ -129,12 +136,21 @@ namespace Algoloop.Brokerages.FxcmRest
 
         public async Task<IReadOnlyList<SymbolModel>> GetSymbolsAsync(Action<object> update)
         {
+            // { "response":{ "executed":false,"error":"Unauthorized"} }
             // Skip if subscription active
             if (_fxcmSocket.SymbolUpdate != default && update != default) return null;
 
             Log.Trace("{0}: GetSymbolsAsync", GetType().Name);
             string json = await GetAsync(_getModelOffer).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
+            JToken jResponse = jo["response"];
+            bool executed = (bool)jResponse["executed"];
+            if (!executed)
+            {
+                string error = jResponse["error"].ToString();
+                throw new ApplicationException(error);
+            }
+
             var symbols = new List<SymbolModel>();
             JArray jOffers = JArray.FromObject(jo["offers"]);
             foreach (JToken jOffer in jOffers)
@@ -273,6 +289,10 @@ namespace Algoloop.Brokerages.FxcmRest
 
         private async Task<string> GetAsync(string path)
         {
+            if (!_fxcmSocket.IsAlive) throw new ApplicationException("Socket.IO closed");
+
+            Log.Trace(_httpClient.DefaultRequestHeaders.Authorization.ToString());
+
             string uri = _httpClient.BaseAddress + path;
             using (HttpResponseMessage response = await _httpClient.GetAsync(uri).ConfigureAwait(false))
             {

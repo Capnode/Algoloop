@@ -35,11 +35,13 @@ namespace Algoloop.Brokerages.FxcmRest
         internal Action<object> SymbolUpdate { get; set; }
 
         public string Sid { get; private set; }
+        public bool IsAlive => _webSocket.IsAlive;
 
         public FxcmSocket(Uri uri, string key)
         {
             string url = $"wss://{uri.Host}:{uri.Port}/socket.io/?EIO=3&transport=websocket&access_token={key}";
             _webSocket = new WebSocket(url);
+            _webSocket.EmitOnPing = true;
             _webSocket.OnOpen += OnOpen;
             _webSocket.OnMessage += OnMessage;
             _webSocket.OnError += OnError;
@@ -104,6 +106,10 @@ namespace Algoloop.Brokerages.FxcmRest
         private void OnMessage(object sender, MessageEventArgs e)
         {
             Log.Trace(e.Data);
+            if (e.IsPing)
+            {
+                Log.Trace("Ping");
+            }
             if (e.IsText)
             {
                 if (e.Data.StartsWith("0", StringComparison.OrdinalIgnoreCase))
