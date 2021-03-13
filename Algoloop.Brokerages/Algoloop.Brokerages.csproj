@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FxcmRest\FxcmSocket2.cs" />
+    <Compile Include="FxcmRest\FxcmSocket3.cs" />
     <Compile Include="FxcmRest\Support.cs" />
     <Compile Include="FxcmRest\FxcmClient.cs" />
     <Compile Include="FxcmRest\FxcmSocket.cs" />
@@ -79,6 +81,9 @@
     </PackageReference>
     <PackageReference Include="Otp.NET">
       <Version>1.2.2</Version>
+    </PackageReference>
+    <PackageReference Include="SocketIOClient">
+      <Version>2.1.6</Version>
     </PackageReference>
     <PackageReference Include="System.IO.Compression">
       <Version>4.3.0</Version>
