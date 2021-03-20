@@ -1,4 +1,4 @@
-/*
+﻿/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -13,54 +13,19 @@
  * limitations under the License.
 */
 
-using System;
 using System.Collections.Generic;
 using QuantConnect.Data;
-using QuantConnect.Data.Consolidators;
-using QuantConnect.Indicators;
 using QuantConnect.Interfaces;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// This algorithm reproduces GH issue 2404, exception: `This is a forward only indicator`
+    /// Regression Definition for Python NamedArgumentsRegression
+    /// Used to test PythonNet kwargs
     /// </summary>
-    public class WarmupIndicatorRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    /// <meta name="tag" content="using data" />
+    public class NamedArgumentsRegression : IRegressionAlgorithmDefinition
     {
-        private Symbol _spy;
-
-        /// <summary>
-        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
-        /// </summary>
-        public override void Initialize()
-        {
-            SetStartDate(2013, 11, 1);
-            SetEndDate(2013, 12, 10);    //Set End Date
-            SetWarmup(TimeSpan.FromDays(30));
-
-            _spy = AddEquity("SPY", Resolution.Daily).Symbol;
-            var renkoConsolidator = new RenkoConsolidator(2m);
-            renkoConsolidator.DataConsolidated += (sender, consolidated) =>
-            {
-                if (IsWarmingUp) return;
-                if (!Portfolio.Invested)
-                {
-                    SetHoldings(_spy, 1.0);
-                }
-                Log($"CLOSE - {consolidated.Time:o} - {consolidated.Open} {consolidated.Close}");
-            };
-            var sma = new SimpleMovingAverage("SMA", 3);
-            RegisterIndicator(_spy, sma, renkoConsolidator);
-        }
-
-        /// <summary>
-        /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
-        /// </summary>
-        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
-        public override void OnData(Slice data)
-        {
-        }
-
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
@@ -69,7 +34,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public Language[] Languages { get; } = { Language.Python };
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
@@ -79,30 +44,30 @@ namespace QuantConnect.Algorithm.CSharp
             {"Total Trades", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
-            {"Compounding Annual Return", "21.640%"},
-            {"Drawdown", "1.200%"},
+            {"Compounding Annual Return", "246.000%"},
+            {"Drawdown", "1.100%"},
             {"Expectancy", "0"},
-            {"Net Profit", "2.149%"},
-            {"Sharpe Ratio", "3.2"},
-            {"Probabilistic Sharpe Ratio", "79.148%"},
+            {"Net Profit", "3.459%"},
+            {"Sharpe Ratio", "10.11"},
+            {"Probabilistic Sharpe Ratio", "83.150%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "0.16"},
-            {"Beta", "0.057"},
-            {"Annual Standard Deviation", "0.054"},
-            {"Annual Variance", "0.003"},
-            {"Information Ratio", "-0.47"},
-            {"Tracking Error", "0.089"},
-            {"Treynor Ratio", "3.035"},
-            {"Total Fees", "$3.08"},
-            {"Estimated Strategy Capacity", "$480000000.00"},
-            {"Fitness Score", "0.028"},
+            {"Alpha", "1.935"},
+            {"Beta", "-0.119"},
+            {"Annual Standard Deviation", "0.16"},
+            {"Annual Variance", "0.026"},
+            {"Information Ratio", "-4.556"},
+            {"Tracking Error", "0.221"},
+            {"Treynor Ratio", "-13.568"},
+            {"Total Fees", "$3.26"},
+            {"Estimated Strategy Capacity", "$130000000.00"},
+            {"Fitness Score", "0.111"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
-            {"Sortino Ratio", "11.51"},
-            {"Return Over Maximum Drawdown", "18.205"},
-            {"Portfolio Turnover", "0.029"},
+            {"Sortino Ratio", "52.533"},
+            {"Return Over Maximum Drawdown", "214.75"},
+            {"Portfolio Turnover", "0.111"},
             {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},
             {"Total Insights Analysis Completed", "0"},
@@ -116,7 +81,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "d880f140093d5377a4335692898da3c3"}
+            {"OrderListHash", "82fee25cd17100c53bb173834ab5f0b2"}
         };
     }
 }
