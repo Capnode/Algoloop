@@ -100,19 +100,21 @@ namespace Algoloop.Wpf.Lean
             if (!SetConfig(config, model, account, settings)) return;
 
             // Start process
-            _process.Start();
-            int exitCode = _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));
-            if (exitCode != 0)
+            try
             {
-                success = false;
+                _process.Start();
+                _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));
+                if (!success) throw new ApplicationException("See logs for details");
+            }
+            finally
+            {
+                _process.Dispose();
+                _process = null;
+                model.Active = false;
+                IsBusy = false;
             }
 
-            _process.Dispose();
-            _process = null;
-
-            model.Completed = success;
-            model.Active = false;
-            IsBusy = false;
+            model.Completed = true;
         }
 
         private static void PostProcess(string folder, TrackModel model)

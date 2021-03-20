@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Support;
 using QuantConnect;
 using System;
 using System.Collections.Generic;
@@ -113,6 +114,19 @@ namespace Algoloop.Model
         public override string ToString()
         {
             return $"{Security} {Market} {Id} {Name}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is SymbolModel other)) return false;
+            if (Id != other.Id) return false;
+            if (Active != other.Active) return false;
+            if (Name != other.Name) return false;
+            if (Market != other.Market) return false;
+            if (Security != other.Security) return false;
+            if (!Collection.Equals(Properties, other.Properties)) return false;
+
+            return true;
         }
     }
 }

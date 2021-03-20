@@ -62,5 +62,17 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [DataMember]
         public decimal DayProfit { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is BalanceModel other)) return false;
+            if (Currency != other.Currency) return false;
+            if (Cash != other.Cash) return false;
+            if (Equity != other.Equity) return false;
+            if (Profit != other.Profit) return false;
+            if (DayProfit != other.DayProfit) return false;
+
+            return true;
+        }
     }
 }

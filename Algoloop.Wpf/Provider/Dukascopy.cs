@@ -86,18 +86,25 @@ namespace Algoloop.Wpf.Provider
             return true;
         }
 
-        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel market, Action<object> update)
+        public override void GetMarketData(ProviderModel market, Action<object> update)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
 
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
-            string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
-            DateTime fromDate = market.LastDate < _firstDate ? _firstDate : market.LastDate.Date;
-            DateTime toDate = fromDate.AddDays(1);
-            string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
-            string to = toDate.AddTicks(-1).ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
-            string[] args =
+            if (!symbols.Any())
             {
+                UpdateSymbols(market);
+                market.Active = false;
+                return;
+            }
+
+            string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
+                DateTime fromDate = market.LastDate < _firstDate ? _firstDate : market.LastDate.Date;
+                DateTime toDate = fromDate.AddDays(1);
+                string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+                string to = toDate.AddTicks(-1).ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+                string[] args =
+                {
                 "--app=DukascopyDownloader",
                 $"--from-date={from}",
                 $"--to-date={to}",
@@ -112,24 +119,17 @@ namespace Algoloop.Wpf.Provider
             };
 
             DateTime now = DateTime.Now;
-            if (RunProcess("QuantConnect.ToolBox.exe", args, config))
-            {
-                if (toDate > now)
-                {
-                    market.Active = false;
-                }
-                else
-                {
-                    market.LastDate = toDate;
-                }
-            }
-            else
+            RunProcess("QuantConnect.ToolBox.exe", args, config);
+            if (toDate > now)
             {
                 market.Active = false;
             }
+            else
+            {
+                market.LastDate = toDate;
+            }
 
             UpdateSymbols(market);
-            return null;
         }
 
         private void UpdateSymbols(ProviderModel market)

@@ -12,9 +12,11 @@
  * limitations under the License.
  */
 
+using Algoloop.Support;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -83,6 +85,10 @@ namespace Algoloop.Model
             if (Id != other.Id) return false;
             if (Name != other.Name) return false;
             if (Active != other.Active) return false;
+            if (!Collection.Equals(Balances, other.Balances)) return false;
+            if (!Collection.Equals(Positions, other.Positions)) return false;
+            if (!Collection.Equals(Orders, other.Orders)) return false;
+
             return true;
         }
     }

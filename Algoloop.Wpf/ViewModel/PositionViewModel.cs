@@ -97,7 +97,7 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _unrealizedPnL, value);
         }
 
-        private void Update(PositionModel position)
+        public void Update(PositionModel position)
         {
             if (position == null) throw new ArgumentNullException(nameof(position));
 

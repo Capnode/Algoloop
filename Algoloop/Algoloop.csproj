@@ -68,6 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\AccountNameConverter.cs" />
     <Compile Include="Support\AlgorithmNameConverter.cs" />
+    <Compile Include="Support\Collection.cs" />
     <Compile Include="Support\DateEditor.cs" />
     <Compile Include="Support\FilenameEditor.cs" />
     <Compile Include="Support\FolderEditor.cs" />

@@ -39,16 +39,14 @@ namespace Algoloop.Wpf.Provider
             _api.Logout();
         }
 
-        public override IReadOnlyList<AccountModel> GetAccounts(ProviderModel provider, Action<object> update)
+        public override void GetAccounts(ProviderModel provider, Action<object> update)
         {
             IReadOnlyList<AccountModel> accounts = _api.GetAccountsAsync(update).Result;
-            return accounts;
         }
 
-        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
             IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync(update).Result;
-            return symbols;
         }
 
         protected override void Dispose(bool disposing)

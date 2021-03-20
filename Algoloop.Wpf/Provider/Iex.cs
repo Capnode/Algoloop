@@ -32,7 +32,7 @@ namespace Algoloop.Wpf.Provider
             return base.Register(settings);
         }
 
-        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel model, Action<object> update)
+        public override void GetMarketData(ProviderModel model, Action<object> update)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             
@@ -42,7 +42,6 @@ namespace Algoloop.Wpf.Provider
             IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.LastDate, model.LastDate);
-            return null;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace Algoloop.Wpf.ViewModel
         private DateTime _date = DateTime.Today;
         private Resolution _selectedResolution = Resolution.Daily;
         private static ReportPeriod _selectedReportPeriod;
-        private AccountModel _selectedAccount;
+        private AccountViewModel _selectedAccount;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, ProviderModel marketModel, SettingModel settings)
         {
@@ -63,7 +63,6 @@ namespace Algoloop.Wpf.ViewModel
             Model = marketModel;
             _settings = settings;
 
-            AccountChangedCommand = new RelayCommand<AccountModel>((m) => DoAccountChanged(m), !IsBusy);
             ActiveCommand = new RelayCommand(async () => await DoActiveCommand(Model.Active).ConfigureAwait(false), !IsBusy);
             StartCommand = new RelayCommand(async () => await DoStartCommand().ConfigureAwait(false), () => !IsBusy && !Active);
             StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
@@ -80,7 +79,7 @@ namespace Algoloop.Wpf.ViewModel
             Model.ModelChanged += DataFromModel;
 
             DataFromModel();
-            DoActiveCommand(Active).Wait();
+//            DoActiveCommand(Active).Wait();
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -101,7 +100,6 @@ namespace Algoloop.Wpf.ViewModel
         }
 
         public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
-        public RelayCommand<AccountModel> AccountChangedCommand { get; }
         public RelayCommand<IList> CheckAllCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand DownloadSymbolListCommand { get; }
@@ -120,7 +118,7 @@ namespace Algoloop.Wpf.ViewModel
         public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
-        public ObservableCollection<AccountModel> Accounts { get; } = new ObservableCollection<AccountModel>();
+        public ObservableCollection<AccountViewModel> Accounts { get; } = new ObservableCollection<AccountViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
         public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
         public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
@@ -172,6 +170,21 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _date, value);
         }
 
+        public AccountViewModel SelectedAccount
+        {
+            get => _selectedAccount;
+            set
+            {
+                Set(ref _selectedAccount, value);
+                if (_selectedAccount == default) return;
+                if (_selectedAccount.Model.Id != Model.DefaultAccountId)
+                {
+                    Model.DefaultAccountId = _selectedAccount.Model.Id;
+                    DataFromModel();
+                }
+            }
+        }
+
         public ReportPeriod SelectedReportPeriod
         {
             get => _selectedReportPeriod;
@@ -198,17 +211,6 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _symbolColumns;
             set => Set(ref _symbolColumns, value);
-        }
-
-        public AccountModel SelectedAccount
-        {
-            get => _selectedAccount;
-            set
-            {
-                if (value == default) return;
-                if (value.Equals(_selectedAccount)) return;
-                Set(ref _selectedAccount, value);
-            }
         }
 
         public void Refresh()
@@ -249,34 +251,36 @@ namespace Algoloop.Wpf.ViewModel
                 Lists.Add(listViewModel);
             }
 
+            Accounts.Clear();
             Balances.Clear();
             Orders.Clear();
             Positions.Clear();
 
-            // Find selected account
-            AccountModel account = Model.Accounts.FirstOrDefault(m => m.Id.Equals(Model.DefaultAccountId));
-            if (account == default)
+            foreach (AccountModel account in Model.Accounts)
             {
-                account = Model.Accounts.ElementAtOrDefault(0);
-                if (account == default) return;
+                var vm = new AccountViewModel(account);
+                Accounts.Add(vm);
+                if (account.Id == Model.DefaultAccountId)
+                {
+                    SelectedAccount = vm;
+                }
             }
 
-            SelectedAccount = account;
-            SmartCopy(Model.Accounts, Accounts);
+            if (SelectedAccount == null) return;
 
-            foreach (BalanceModel balance in account.Balances)
+            foreach (BalanceModel balance in SelectedAccount.Model.Balances)
             {
                 var vm = new BalanceViewModel(balance);
                 Balances.Add(vm);
             }
 
-            foreach (OrderModel order in account.Orders)
+            foreach (OrderModel order in SelectedAccount.Model.Orders)
             {
                 var vm = new OrderViewModel(order);
                 Orders.Add(vm);
             }
 
-            foreach (PositionModel position in account.Positions)
+            foreach (PositionModel position in SelectedAccount.Model.Positions)
             {
                 var vm = new PositionViewModel(position);
                 Positions.Add(vm);
@@ -328,7 +332,6 @@ namespace Algoloop.Wpf.ViewModel
 
         private void RaiseCommands()
         {
-            AccountChangedCommand.RaiseCanExecuteChanged();
             ActiveCommand.RaiseCanExecuteChanged();
             StartCommand.RaiseCanExecuteChanged();
             StopCommand.RaiseCanExecuteChanged();
@@ -343,35 +346,11 @@ namespace Algoloop.Wpf.ViewModel
             ImportListCommand.RaiseCanExecuteChanged();
         }
 
-        private void SmartCopy<T>(Collection<T> src, ObservableCollection<T> dest)
-        {
-            int count = src.Count;
-            if (count == dest.Count)
-            {
-                bool equals = true;
-                for (int i = 0; i < count; i++)
-                {
-                    var srcItem = src[i];
-                    var destItem = dest[i];
-                    if (srcItem.Equals(destItem)) continue;
-                    equals = false;
-                    break;
-                }
-                if (equals) return;
-            }
-
-            dest.Clear();
-            foreach (T item in src)
-            {
-                dest.Add(item);
-            }
-        }
-
         private async Task StartMarketAsync()
         {
-            DataToModel();
             try
             {
+                DataToModel();
                 _provider = ProviderFactory.CreateProvider(Model.Provider, _settings);
                 if (_provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
                 Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketStarted, Model.Name)));
@@ -386,16 +365,26 @@ namespace Algoloop.Wpf.ViewModel
                     Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketNoSymbol, Model.Name)));
                 }
             }
+            catch (ApplicationException ex)
+            {
+                Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketException, Model.Name, ex.Message)));
+            }
             catch (Exception ex)
             {
                 Log.Error(ex);
-                Messenger.Default.Send(new NotificationMessage($"{ex.GetType()}: {Model.Name} {ex.Message} "));
-                UiThread(() => Active = false);
+                Messenger.Default.Send(new NotificationMessage($"{ex.GetType()}: {ex.Message}"));
             }
             finally
             {
                 _provider?.Dispose();
                 _provider = null;
+                UiThread(() =>
+                {
+                    ProviderModel model = Model;
+                    Model = null;
+                    Model = model;
+                    DataFromModel();
+                });
             }
         }
 
@@ -404,19 +393,15 @@ namespace Algoloop.Wpf.ViewModel
             _provider.Login(model);
             while (model.Active)
             {
-                IReadOnlyList<AccountModel> accounts = _provider.GetAccounts(model);
-                model.UpdateAccounts(accounts);
-                IReadOnlyList<SymbolModel> symbols = _provider.GetMarketData(model);
-                model.UpdateSymbols(symbols);
+                _provider.GetAccounts(model, OnAccountsUpdate);
+                _provider.GetMarketData(model, OnMarketUpdate);
 
-                // Update view
+                // Update settings page
                 UiThread(() =>
                 {
-                    Model = null; // Trick to update settings page
+                    Model = null;
                     Model = model;
-                    DataFromModel();
                 });
-
                 Thread.Sleep(1000);
             }
 
@@ -425,6 +410,88 @@ namespace Algoloop.Wpf.ViewModel
 
         private void OnAccountsUpdate(object data)
         {
+            UiThread(() =>
+            {
+                if (data is AccountModel account)
+                {
+                    if (account.Id != Model.DefaultAccountId) return;
+                    UpdateBalances(account.Balances);
+                    UpdatePositions(account.Positions);
+                    UpdateOrders(account.Orders);
+                }
+            });
+        }
+
+        private void UpdateBalances(Collection<BalanceModel> balances)
+        {
+            if (balances.Count == Balances.Count)
+            {
+                IEnumerator<BalanceViewModel> iBalance = Balances.GetEnumerator();
+                foreach (BalanceModel balance in balances)
+                {
+                    if (iBalance.MoveNext())
+                    {
+                        iBalance.Current.Update(balance);
+                    }
+                }
+            }
+            else
+            {
+                Balances.Clear();
+                foreach (BalanceModel balance in balances)
+                {
+                    var vm = new BalanceViewModel(balance);
+                    Balances.Add(vm);
+                }
+            }
+        }
+
+        private void UpdatePositions(Collection<PositionModel> positions)
+        {
+            if (positions.Count == Positions.Count)
+            {
+                IEnumerator<PositionViewModel> iPosition = Positions.GetEnumerator();
+                foreach (PositionModel position in positions)
+                {
+                    if (iPosition.MoveNext())
+                    {
+                        iPosition.Current.Update(position);
+                    }
+                }
+            }
+            else
+            {
+                Positions.Clear();
+                foreach (PositionModel position in positions)
+                {
+                    var vm = new PositionViewModel(position);
+                    Positions.Add(vm);
+                }
+            }
+        }
+
+        private void UpdateOrders(Collection<OrderModel> orders)
+        {
+            if (orders.Count == Balances.Count)
+            {
+                IEnumerator<OrderViewModel> iOrder = Orders.GetEnumerator();
+                foreach (OrderModel order in orders)
+                {
+                    if (iOrder.MoveNext())
+                    {
+                        iOrder.Current.Update(order);
+                    }
+                }
+            }
+            else
+            {
+                Orders.Clear();
+                foreach (OrderModel order in orders)
+                {
+                    var vm = new OrderViewModel(order);
+                    Orders.Add(vm);
+                }
+            }
         }
 
         private void OnMarketUpdate(object data)
@@ -459,119 +526,6 @@ namespace Algoloop.Wpf.ViewModel
             {
                 Log.Trace($"Trade:{trade}");
             }
-        }
-
-        //private void UpdateOrder(IProvider provider)
-        //{
-        //    IReadOnlyList<Order> orders = provider.GetOpenOrders();
-        //    foreach (Order order in orders)
-        //    {
-        //        bool update = false;
-        //        foreach (OrderViewModel vm in Orders)
-        //        {
-        //            if (order.Id == vm.Id)
-        //            {
-        //                vm.Update(order);
-        //                update = true;
-        //                break;
-        //            }
-        //        }
-
-        //        if (!update)
-        //        {
-        //            Orders.Add(new OrderViewModel(order));
-        //        }
-        //    }
-        //}
-
-        //private void UpdatePosition(IProvider provider)
-        //{
-        //    IReadOnlyList<Holding> holdings = provider.GetAccountHoldings();
-        //    foreach (Holding holding in holdings)
-        //    {
-        //        bool update = false;
-        //        foreach (PositionViewModel vm in Positions)
-        //        {
-        //            if (holding.Symbol.Value == vm.Symbol)
-        //            {
-        //                vm.Update(holding);
-        //                update = true;
-        //                break;
-        //            }
-        //        }
-
-        //        if (!update)
-        //        {
-        //            Positions.Add(new PositionViewModel(holding));
-        //        }
-        //    }
-
-        //    PositionViewModel[] vms = new PositionViewModel[Positions.Count];
-        //    Positions.CopyTo(vms, 0);
-        //    foreach (PositionViewModel vm in vms)
-        //    {
-        //        Holding holding = holdings.FirstOrDefault(m => m.Symbol.Value == vm.Symbol);
-        //        if (holding == null || holding.Symbol == null)
-        //        {
-        //            Positions.Remove(vm);
-        //        }
-        //    }
-        //}
-
-        //private void UpdateClosedTrades(IProvider provider)
-        //{
-        //    ClosedTrades.Clear();
-        //    IReadOnlyList<Trade> trades = provider.GetClosedTrades();
-        //    foreach (Trade trade in trades)
-        //    {
-        //        ClosedTrades.Add(trade);
-        //    }
-        //}
-
-        //private void UpdateBalance(IProvider provider)
-        //{
-        //    IReadOnlyList<CashAmount> cashAmounts = provider.GetCashBalance();
-        //    foreach (CashAmount cashAmount in cashAmounts)
-        //    {
-        //        bool update = false;
-        //        foreach (BalanceViewModel vm in Balances)
-        //        {
-        //            if (cashAmount.Currency == vm.Model.Currency)
-        //            {
-        //                vm.Update(cashAmount);
-        //                update = true;
-        //                break;
-        //            }
-        //        }
-
-        //        if (!update)
-        //        {
-        //            var balance = new BalanceModel
-        //            {
-        //                Currency = cashAmount.Currency,
-        //                Cash = cashAmount.Amount
-        //            };
-        //            Balances.Add(new BalanceViewModel(balance));
-        //        }
-        //    }
-
-        //    BalanceViewModel[] vms = new BalanceViewModel[Balances.Count];
-        //    Balances.CopyTo(vms, 0);
-        //    foreach (BalanceViewModel vm in vms)
-        //    {
-        //        CashAmount cashAmount = cashAmounts.FirstOrDefault(m => m.Currency == vm.Model.Currency);
-        //        if (cashAmount == null || cashAmount.Currency == null)
-        //        {
-        //            Balances.Remove(vm);
-        //        }
-        //    }
-        //}
-
-
-        private void DoAccountChanged(AccountModel account)
-        {
-            if (account == default) return;
-            Model.DefaultAccountId = account.Id;
         }
 
         internal async Task DoStartCommand()

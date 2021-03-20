@@ -21,9 +21,15 @@ namespace Algoloop.Wpf.ViewModel
 {
     public class BalanceViewModel : ViewModel
     {
+        private decimal _cash;
+        private decimal _equity;
+        private decimal _profit;
+        private decimal _dayProfit;
+        private string _currency;
+
         public BalanceViewModel(BalanceModel model)
         {
-            Model = model;
+            Update(model);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -33,70 +39,57 @@ namespace Algoloop.Wpf.ViewModel
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
-        public BalanceModel Model { get; set; }
-
         public decimal Cash
         {
-            get => Model.Cash;
-            set
-            {
-                Model.Cash = value;
-                RaisePropertyChanged(() => Cash);
-            }
+            get => _cash;
+            set => Set(ref _cash, value);
         }
 
         public decimal Equity
         {
-            get => Model.Equity;
-            set
-            {
-                Model.Equity = value;
-                RaisePropertyChanged(() => Equity);
-            }
+            get => _equity;
+            set => Set(ref _equity, value);
         }
 
         public decimal Profit
         {
-            get => Model.Profit;
-            set
-            {
-                Model.Profit = value;
-                RaisePropertyChanged(() => Profit);
-            }
+            get => _profit;
+            set => Set(ref _profit, value);
         }
 
         public decimal DayProfit
         {
-            get => Model.DayProfit;
-            set
-            {
-                Model.DayProfit = value;
-                RaisePropertyChanged(() => DayProfit);
-            }
+            get => _dayProfit;
+            set => Set(ref _dayProfit, value);
         }
 
         public string Currency
         {
-            get => Model.Currency;
-            set
-            {
-                Model.Currency = value;
-                RaisePropertyChanged(() => Currency);
-            }
+            get => _currency;
+            set => Set(ref _currency, value);
+        }
+
+        public void Update(BalanceModel balance)
+        {
+            Cash = balance.Cash;
+            Equity = balance.Equity;
+            Profit = balance.Profit;
+            DayProfit = balance.DayProfit;
+            Currency = balance.Currency;
         }
 
         public void Update(CashAmount cash)
         {
-            Model.Currency = cash.Currency;
-            Model.Cash = cash.Amount;
+            Currency = cash.Currency;
+            Cash = cash.Amount;
         }
 
         public void Update(AccountEvent message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            Model.Currency = message.CurrencySymbol;
-            Model.Cash = message.CashBalance;
+            Currency = message.CurrencySymbol;
+            Cash = message.CashBalance;
         }
     }
 }

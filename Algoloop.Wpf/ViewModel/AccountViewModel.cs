@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2019 Capnode AB
+ * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,28 @@
  */
 
 using Algoloop.Model;
-using System;
+using System.Diagnostics;
 
-namespace Algoloop.Wpf.Provider
+namespace Algoloop.Wpf.ViewModel
 {
-    public interface IProvider : IDisposable
+    public class AccountViewModel : ViewModel
     {
-        bool Register(SettingModel settings);
-        void Login(ProviderModel provider);
-        void Logout();
-        void GetMarketData(ProviderModel provider, Action<object> update = null);
-        void GetAccounts(ProviderModel provider, Action<object> update = null);
+        public AccountViewModel(AccountModel model)
+        {
+            Model = model;
+            Debug.Assert(IsUiThread(), "Not UI thread!");
+        }
+
+        public AccountModel Model { get; set; }
+
+        public string Name
+        {
+            get => Model.Name;
+            set
+            {
+                Model.Name = value;
+                RaisePropertyChanged(() => Name);
+            }
+        }
     }
 }

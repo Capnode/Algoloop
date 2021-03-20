@@ -30,7 +30,7 @@ namespace Algoloop.Wpf.Provider
             return base.Register(settings);
         }
 
-        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 
@@ -39,7 +39,6 @@ namespace Algoloop.Wpf.Provider
 
             string apiKey = ""; // TODO:
             QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(provider.LastDate, apiKey);
-            return null;
         }
     }
 }

@@ -32,7 +32,7 @@ namespace Algoloop.Wpf.Provider
             return base.Register(settings);
         }
 
-        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 
@@ -42,7 +42,6 @@ namespace Algoloop.Wpf.Provider
             IList<string> symbols = provider.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
             KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, provider.LastDate, provider.LastDate);
-            return null;
         }
     }
 }

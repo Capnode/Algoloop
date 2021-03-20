@@ -25,37 +25,52 @@ namespace Algoloop.Wpf.ViewModel
 {
     public class OrderViewModel : ViewModel
     {
+        private int _id;
+        private int _contingentId;
+        private Collection<string> _brokerId;
+        private string _symbol;
+        private decimal _price;
+        private decimal? _limitPrice;
+        private string _priceCurrency;
+        private DateTime _time;
+        private DateTime? _lastFillTime;
+        private DateTime? _lastUpdateTime;
+        private DateTime? _canceledTime;
+        private decimal _quantity;
+        private OrderType _type;
+        private OrderStatus _status;
+        private DateTime _validUntil;
+        private string _tag;
+        private OrderProperties _properties;
+        private string _securityType;
+        private string _direction;
+        private decimal _orderValue;
+        private OrderSubmissionData _orderSubmissionData;
+        private bool _isMarketable;
+
         public OrderViewModel(Order order)
         {
             Contract.Requires(order != null);
-            Model = new OrderModel();
             Update(order);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
-        public OrderViewModel(OrderModel orderModel)
+        public OrderViewModel(OrderModel order)
         {
-            Model = orderModel;
+            Update(order);
         }
 
         public OrderViewModel(OrderEvent message)
         {
             if (message == null) throw new ArgumentNullException(nameof(message));
 
-            Model = new OrderModel();
             Update(message);
         }
 
-        public OrderModel Model { get; set; }
-
         public int Id
         {
-            get => Model.Id;
-            set
-            {
-                Model.Id = value;
-                RaisePropertyChanged(() => Id);
-            }
+            get => _id;
+            set => Set(ref _id, value);
         }
 
         /// <summary>
@@ -63,12 +78,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public int ContingentId
         {
-            get => Model.ContingentId;
-            set
-            {
-                Model.ContingentId = value;
-                RaisePropertyChanged(() => ContingentId);
-            }
+            get => _contingentId;
+            set => Set(ref _contingentId, value);
         }
 
         /// <summary>
@@ -76,12 +87,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public Collection<string> BrokerId
         {
-            get => Model.BrokerId;
-            set
-            {
-                Model.BrokerId = value;
-                RaisePropertyChanged(() => BrokerId);
-            }
+            get => _brokerId;
+            set => Set(ref _brokerId, value);
         }
 
         /// <summary>
@@ -89,12 +96,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public string Symbol
         {
-            get => Model.Symbol;
-            set
-            {
-                Model.Symbol = value;
-                RaisePropertyChanged(() => Symbol);
-            }
+            get => _symbol;
+            set => Set(ref _symbol, value);
         }
 
         /// <summary>
@@ -102,12 +105,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public decimal Price
         {
-            get => Model.Price;
-            set
-            {
-                Model.Price = value;
-                RaisePropertyChanged(() => Price);
-            }
+            get => _price;
+            set => Set(ref _price, value);
         }
 
         /// <summary>
@@ -115,20 +114,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public decimal? LimitPrice
         {
-            get
-            {
-                if (Model.LimitPrice == 0)
-                {
-                    return null;
-                }
-
-                return Model.LimitPrice;
-            }
-            set
-            {
-                Model.LimitPrice = value ?? 0;
-                RaisePropertyChanged(() => LimitPrice);
-            }
+            get => _limitPrice;
+            set => Set(ref _limitPrice, value);
         }
 
         /// <summary>
@@ -136,12 +123,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public string PriceCurrency
         {
-            get => Model.PriceCurrency;
-            set
-            {
-                Model.PriceCurrency = value;
-                RaisePropertyChanged(() => PriceCurrency);
-            }
+            get => _priceCurrency;
+            set => Set(ref _priceCurrency, value);
         }
 
         /// <summary>
@@ -149,12 +132,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public DateTime Time
         {
-            get => Model.Time;
-            set
-            {
-                Model.Time = value;
-                RaisePropertyChanged(() => Time);
-            }
+            get => _time;
+            set => Set(ref _time, value);
         }
 
         /// <summary>
@@ -162,12 +141,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public DateTime? LastFillTime
         {
-            get => Model.LastFillTime;
-            set
-            {
-                Model.LastFillTime = value;
-                RaisePropertyChanged(() => LastFillTime);
-            }
+            get => _lastFillTime;
+            set => Set(ref _lastFillTime,  value);
         }
 
         /// <summary>
@@ -175,12 +150,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public DateTime? LastUpdateTime
         {
-            get => Model.LastUpdateTime;
-            set
-            {
-                Model.LastUpdateTime = value;
-                RaisePropertyChanged(() => LastUpdateTime);
-            }
+            get => _lastUpdateTime;
+            set => Set(ref _lastUpdateTime, value);
         }
 
         /// <summary>
@@ -188,12 +159,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public DateTime? CanceledTime
         {
-            get => Model.CanceledTime;
-            set
-            {
-                Model.CanceledTime = value;
-                RaisePropertyChanged(() => CanceledTime);
-            }
+            get => _canceledTime;
+            set => Set(ref _canceledTime, value);
         }
 
         /// <summary>
@@ -201,12 +168,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public decimal Quantity
         {
-            get => Model.Quantity;
-            set
-            {
-                Model.Quantity = value;
-                RaisePropertyChanged(() => Quantity);
-            }
+            get => _quantity;
+            set => Set(ref _quantity, value);
         }
 
         /// <summary>
@@ -214,12 +177,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public OrderType Type
         {
-            get => Model.Type;
-            set
-            {
-                Model.Type = value;
-                RaisePropertyChanged(() => Type);
-            }
+            get => _type;
+            set => Set(ref _type, value);
         }
 
         /// <summary>
@@ -227,12 +186,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public OrderStatus Status
         {
-            get => Model.Status;
-            set
-            {
-                Model.Status = value;
-                RaisePropertyChanged(() => Status);
-            }
+            get => _status;
+            set => Set(ref _status, value);
         }
 
         /// <summary>
@@ -240,12 +195,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public DateTime ValidUntil
         {
-            get => Model.ValidUntil;
-            set
-            {
-                Model.ValidUntil = value;
-                RaisePropertyChanged(() => ValidUntil);
-            }
+            get => _validUntil;
+            set => Set(ref _validUntil, value);
         }
 
         /// <summary>
@@ -253,12 +204,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public string Tag
         {
-            get => Model.Tag;
-            set
-            {
-                Model.Tag = value;
-                RaisePropertyChanged(() => Tag);
-            }
+            get => _tag;
+            set => Set(ref _tag, value);
         }
 
         /// <summary>
@@ -266,12 +213,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public OrderProperties Properties
         {
-            get => Model.Properties;
-            set
-            {
-                Model.Properties = value;
-                RaisePropertyChanged(() => Properties);
-            }
+            get => _properties;
+            set => Set(ref _properties, value);
         }
 
         /// <summary>
@@ -279,12 +222,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public string SecurityType
         {
-            get => Model.SecurityType;
-            set
-            {
-                Model.SecurityType = value;
-                RaisePropertyChanged(() => SecurityType);
-            }
+            get => _securityType;
+            set => Set(ref _securityType, value);
         }
 
         /// <summary>
@@ -292,12 +231,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public string Direction
         {
-            get => Model.Direction;
-            set
-            {
-                Model.Direction = value;
-                RaisePropertyChanged(() => Direction);
-            }
+            get => _direction;
+            set => Set(ref _direction, value);
         }
 
         /// <summary>
@@ -306,12 +241,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public decimal OrderValue
         {
-            get => Model.OrderValue;
-            set
-            {
-                Model.OrderValue = value;
-                RaisePropertyChanged(() => OrderValue);
-            }
+            get => _orderValue;
+            set => Set(ref _orderValue, value);
         }
 
         /// <summary>
@@ -319,12 +250,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public OrderSubmissionData OrderSubmissionData
         {
-            get => Model.OrderSubmissionData;
-            set
-            {
-                Model.OrderSubmissionData = value;
-                RaisePropertyChanged(() => OrderSubmissionData);
-            }
+            get => _orderSubmissionData;
+            set => Set(ref _orderSubmissionData, value);
         }
 
         /// <summary>
@@ -332,12 +259,8 @@ namespace Algoloop.Wpf.ViewModel
         /// </summary>
         public bool IsMarketable
         {
-            get => Model.IsMarketable;
-            set
-            {
-                Model.IsMarketable = value;
-                RaisePropertyChanged(() => IsMarketable);
-            }
+            get => _isMarketable;
+            set => Set(ref _isMarketable, value);
         }
 
         internal void Update(Order order)

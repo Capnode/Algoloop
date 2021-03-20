@@ -18,6 +18,22 @@
         <Style TargetType="{x:Type TextBlock}" x:Key="RightCell">
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
+        <Style TargetType="{x:Type DataGridCell}" x:Key="BlinkCell">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="Transparent"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                    <BeginStoryboard HandoffBehavior="Compose">
+                        <Storyboard TargetProperty="(DataGridCell.Background).(SolidColorBrush.Color)">
+                            <ColorAnimation Duration="0:0:1" To="Gray" AutoReverse="True"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
         <ObjectDataProvider
             x:Key="settings"
             ObjectInstance="{x:Static properties:Settings.Default}"/>
@@ -173,13 +189,6 @@
                                         SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
                                         ToolTip="Selected account"
                                         Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectionChanged">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding AccountChangedCommand}"
-                                                    CommandParameter="{Binding Path=SelectedValue, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
                                     </ComboBox>
                                     <Grid>
                                         <CheckBox
@@ -248,13 +257,6 @@
                                         MinWidth="120"
                                         SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
                                         ToolTip="Selected account">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectionChanged">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding AccountChangedCommand}"
-                                                    CommandParameter="{Binding Path=SelectedValue, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
                                     </ComboBox>
                                 </ToolBar>
                                 <wpf:ExDataGrid
@@ -263,6 +265,7 @@
                                     CanUserGroup="False"
                                     CanUserFilter="True"
                                     CanUserReorderColumns="True"
+                                    CellStyle="{StaticResource BlinkCell}"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -273,11 +276,11 @@
                                     ExItemsSource="{Binding Balances}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountBalanceColumnsInfo}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Equity" Binding="{Binding Equity}" />
-                                        <DataGridTextColumn Header="Cash" Binding="{Binding Cash}" />
-                                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit}" />
-                                        <DataGridTextColumn Header="Profit today" Binding="{Binding DayProfit}" />
-                                        <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" />
+                                        <DataGridTextColumn Header="Equity" Binding="{Binding Equity, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Cash" Binding="{Binding Cash, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Profit today" Binding="{Binding DayProfit, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Currency" Binding="{Binding Currency, NotifyOnTargetUpdated=True}"/>
                                     </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </DockPanel>
@@ -293,13 +296,6 @@
                                         MinWidth="120"
                                         SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
                                         ToolTip="Selected account">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectionChanged">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding AccountChangedCommand}"
-                                                    CommandParameter="{Binding Path=SelectedValue, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
                                     </ComboBox>
                                 </ToolBar>
                                 <wpf:ExDataGrid
@@ -308,6 +304,7 @@
                                     CanUserGroup="False"
                                     CanUserFilter="True"
                                     CanUserReorderColumns="True"
+                                    CellStyle="{StaticResource BlinkCell}"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -318,17 +315,17 @@
                                     ExItemsSource="{Binding Orders}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountOrdersColumnsInfo}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Id" Binding="{Binding Id}" />
-                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
-                                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" />
-                                        <DataGridTextColumn Header="PriceCurrency" Binding="{Binding PriceCurrency}" />
-                                        <DataGridTextColumn Header="Time" Binding="{Binding Time}" />
-                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" />
-                                        <DataGridTextColumn Header="Type" Binding="{Binding Type}" />
-                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
-                                        <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
-                                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction}" />
-                                        <DataGridTextColumn Header="Value" Binding="{Binding OrderValue}" />
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Price" Binding="{Binding Price, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="PriceCurrency" Binding="{Binding PriceCurrency, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Time" Binding="{Binding Time, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Type, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Status" Binding="{Binding Status, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Value" Binding="{Binding OrderValue, NotifyOnTargetUpdated=True}"/>
                                     </DataGrid.Columns>
                                     <DataGrid.Resources>
                                         <ContextMenu
@@ -362,13 +359,6 @@
                                         MinWidth="120"
                                         SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
                                         ToolTip="Selected account">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectionChanged">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding AccountChangedCommand}"
-                                                    CommandParameter="{Binding Path=SelectedValue, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
                                     </ComboBox>
                                 </ToolBar>
                                 <wpf:ExDataGrid
@@ -377,6 +367,7 @@
                                     CanUserGroup="False"
                                     CanUserFilter="True"
                                     CanUserReorderColumns="True"
+                                    CellStyle="{StaticResource BlinkCell}"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -387,15 +378,15 @@
                                     ExItemsSource="{Binding Positions}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountPositionsColumnsInfo}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" />
-                                        <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType}" />
-                                        <DataGridTextColumn Header="Currency" Binding="{Binding CurrencySymbol}" />
-                                        <DataGridTextColumn Header="AveragePrice" Binding="{Binding AveragePrice}" />
-                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" />
-                                        <DataGridTextColumn Header="MarketPrice" Binding="{Binding MarketPrice}" />
-                                        <DataGridTextColumn Header="ConversionRate" Binding="{Binding ConversionRate}" />
-                                        <DataGridTextColumn Header="MarketValue" Binding="{Binding MarketValue}" />
-                                        <DataGridTextColumn Header="UnrealizedPnL" Binding="{Binding UnrealizedPnL}" />
+                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Currency" Binding="{Binding CurrencySymbol, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="AveragePrice" Binding="{Binding AveragePrice, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="MarketPrice" Binding="{Binding MarketPrice, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="ConversionRate" Binding="{Binding ConversionRate, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="MarketValue" Binding="{Binding MarketValue, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="UnrealizedPnL" Binding="{Binding UnrealizedPnL, NotifyOnTargetUpdated=True}"/>
                                     </DataGrid.Columns>
                                     <DataGrid.Resources>
                                         <ContextMenu
@@ -429,13 +420,6 @@
                                         MinWidth="120"
                                         SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
                                         ToolTip="Selected account">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectionChanged">
-                                                <i:InvokeCommandAction
-                                                    Command="{Binding AccountChangedCommand}"
-                                                    CommandParameter="{Binding Path=SelectedValue, RelativeSource={RelativeSource AncestorType={x:Type ComboBox}}}"/>
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
                                     </ComboBox>
                                 </ToolBar>
                                 <wpf:ExDataGrid

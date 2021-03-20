@@ -90,7 +90,7 @@ namespace Algoloop.Wpf.Provider
             _brokerage = null;
         }
 
-        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 
@@ -119,24 +119,17 @@ namespace Algoloop.Wpf.Provider
             };
 
             DateTime now = DateTime.Now;
-            if (RunProcess("QuantConnect.ToolBox.exe", args, config))
-            {
-                if (toDate > now)
-                {
-                    provider.Active = false;
-                }
-                else
-                {
-                    provider.LastDate = toDate;
-                }
-            }
-            else
+            RunProcess("QuantConnect.ToolBox.exe", args, config);
+            if (toDate > now)
             {
                 provider.Active = false;
             }
+            else
+            {
+                provider.LastDate = toDate;
+            }
 
             UpdateSymbols(provider);
-            return null;
         }
 
         private static void UpdateSymbols(ProviderModel market)

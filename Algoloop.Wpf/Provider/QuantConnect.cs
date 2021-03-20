@@ -37,7 +37,7 @@ namespace Algoloop.Wpf.Provider
             return base.Register(settings);
         }
 
-        public override IReadOnlyList<SymbolModel> GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
             Contract.Requires(provider != null);
             string version = AboutModel.AssemblyVersion;
@@ -86,7 +86,6 @@ namespace Algoloop.Wpf.Provider
 
             Log.Trace($"Unpack {uri} completed");
             provider.Active = false;
-            return null;
         }
 
         private static void AddSymbol(IList<SymbolModel> symbols, string path)

@@ -80,15 +80,12 @@ namespace Algoloop.Wpf.Provider
             }
         }
 
-        public virtual IReadOnlyList<AccountModel> GetAccounts(ProviderModel market, Action<object> update)
+        public virtual void GetAccounts(ProviderModel market, Action<object> update)
         {
-            return null;
         }
 
-        public virtual IReadOnlyList<SymbolModel> GetMarketData(ProviderModel market, Action<object> update)
+        public virtual void GetMarketData(ProviderModel market, Action<object> update)
         {
-            market.Active = false;
-            return null;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -116,7 +113,7 @@ namespace Algoloop.Wpf.Provider
             System.GC.SuppressFinalize(this);
         }
 
-        internal bool RunProcess(string cmd, string[] args, IDictionary<string, string> configs)
+        internal void RunProcess(string cmd, string[] args, IDictionary<string, string> configs)
         {
             bool ok = true;
             _process = new ConfigProcess(
@@ -155,20 +152,22 @@ namespace Algoloop.Wpf.Provider
             try
             {
                 _process.Start();
-                if (_process.WaitForExit() != 0)
-                {
-                    ok = false;
-                }
-
-                _process.Dispose();
-                _process = null;
-                return ok;
+                _process.WaitForExit();
+                if (!ok) throw new ApplicationException("See logs for details");
             }
-            catch (Exception)
+            finally
             {
                 _process.Dispose();
                 _process = null;
-                throw;
+            }
+        }
+
+        internal void UpdateAccounts(ProviderModel market, IEnumerable<AccountModel> accounts, Action<object> update)
+        {
+            if (!Collection.SmartCopy(accounts, market.Accounts)) return;
+            foreach (AccountModel account in accounts)
+            {
+                update(account);
             }
         }
 
