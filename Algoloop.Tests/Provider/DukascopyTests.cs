@@ -165,6 +165,7 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod()]
+        [ExpectedException(typeof(ApplicationException), "An invalid symbol name was accepted")]
         public void Download_invalid_symbol()
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];

@@ -58,6 +58,7 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ApplicationException), "An invalid symbol name was accepted")]
         public void Download_no_symbols()
         {
             var date = new DateTime(2019, 05, 01);
