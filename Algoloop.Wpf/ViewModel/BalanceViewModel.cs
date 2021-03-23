@@ -26,6 +26,7 @@ namespace Algoloop.Wpf.ViewModel
         private decimal _profit;
         private decimal _dayProfit;
         private string _currency;
+        private decimal _equityChange;
 
         public BalanceViewModel(BalanceModel model)
         {
@@ -48,7 +49,24 @@ namespace Algoloop.Wpf.ViewModel
         public decimal Equity
         {
             get => _equity;
-            set => Set(ref _equity, value);
+            set
+            {
+                EquityChange = value - _equity;
+                Set(ref _equity, value);
+            }
+        }
+
+        public decimal EquityChange
+        {
+            get => _equityChange;
+            set
+            {
+                _equityChange = value;
+                if (value == 0) return;
+
+                // Raise only when changed
+                RaisePropertyChanged(() => EquityChange);
+            }
         }
 
         public decimal Profit

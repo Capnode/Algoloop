@@ -11,7 +11,7 @@
     xmlns:view="clr-namespace:Algoloop.Wpf.View"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     DataContext="{Binding Source={StaticResource Locator}, Path=MarketsViewModel}" 
-    mc:Ignorable="d" 
+    mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
@@ -19,16 +19,11 @@
             <Setter Property="TextAlignment" Value="Right"/>
         </Style>
         <Style TargetType="{x:Type DataGridCell}" x:Key="BlinkCell">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <SolidColorBrush Color="Transparent"/>
-                </Setter.Value>
-            </Setter>
             <Style.Triggers>
                 <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                    <BeginStoryboard HandoffBehavior="Compose">
-                        <Storyboard TargetProperty="(DataGridCell.Background).(SolidColorBrush.Color)">
-                            <ColorAnimation Duration="0:0:1" To="Gray" AutoReverse="True"/>
+                    <BeginStoryboard>
+                        <Storyboard TargetProperty="Background.Color">
+                            <ColorAnimation BeginTime="0:0:0.2" Duration="0:0:0.5" To="Transparent"/>
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
@@ -265,7 +260,6 @@
                                     CanUserGroup="False"
                                     CanUserFilter="True"
                                     CanUserReorderColumns="True"
-                                    CellStyle="{StaticResource BlinkCell}"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     AutoGenerateColumns="False"
@@ -276,7 +270,13 @@
                                     ExItemsSource="{Binding Balances}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountBalanceColumnsInfo}">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Equity" Binding="{Binding Equity, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Equity" Binding="{Binding Equity, NotifyOnTargetUpdated=True}">
+                                            <DataGridTextColumn.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource BlinkCell}">
+                                                    <Setter Property="Background" Value="{Binding EquityChange, Converter={viewsupport:ToBrushConverter}}" />
+                                                </Style>
+                                            </DataGridTextColumn.CellStyle>
+                                        </DataGridTextColumn>
                                         <DataGridTextColumn Header="Cash" Binding="{Binding Cash, NotifyOnTargetUpdated=True}"/>
                                         <DataGridTextColumn Header="Profit" Binding="{Binding Profit, NotifyOnTargetUpdated=True}"/>
                                         <DataGridTextColumn Header="Profit today" Binding="{Binding DayProfit, NotifyOnTargetUpdated=True}"/>
