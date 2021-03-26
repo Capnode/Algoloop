@@ -44,14 +44,12 @@ namespace Algoloop.Wpf.ViewModel
         public MainViewModel(
             SettingsViewModel settingsViewModel,
             MarketsViewModel marketsViewModel,
-            AccountsViewModel accountsViewModel,
             StrategiesViewModel strategiesViewModel,
             ResearchViewModel researchViewModel,
             LogViewModel logViewModel)
         {
             SettingsViewModel = settingsViewModel;
             MarketsViewModel = marketsViewModel;
-            AccountsViewModel = accountsViewModel;
             StrategiesViewModel = strategiesViewModel;
             ResearchViewModel = researchViewModel;
             LogViewModel = logViewModel;
@@ -79,7 +77,6 @@ namespace Algoloop.Wpf.ViewModel
 
         public SettingsViewModel SettingsViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
-        public AccountsViewModel AccountsViewModel { get; }
         public StrategiesViewModel StrategiesViewModel { get; }
         public ResearchViewModel ResearchViewModel { get; }
         public LogViewModel LogViewModel { get; }
@@ -116,7 +113,6 @@ namespace Algoloop.Wpf.ViewModel
 
                 SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
                 MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
-                AccountsViewModel.Save(Path.Combine(appData, "Accounts.json"));
                 StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));
             }
             finally
@@ -203,7 +199,6 @@ namespace Algoloop.Wpf.ViewModel
 
                 // Read configuration
                 MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
-                AccountsViewModel.Read(Path.Combine(appData, "Accounts.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
 
                 // Initialize Research page

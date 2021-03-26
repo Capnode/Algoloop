@@ -32,8 +32,9 @@ namespace Algoloop.Wpf.Provider
 {
     public class Fxcm : ProviderBase
     {
-        private readonly DateTime _firstDate = new DateTime(2003, 05, 05);
+        private readonly DateTime _firstDate = new(2003, 05, 05);
         private const string _fxcmServer = "http://www.fxcorporate.com/Hosts.jsp";
+        private SettingModel _settings;
         private FxcmBrokerage _brokerage;
 
         protected override void Dispose(bool disposing)
@@ -54,26 +55,32 @@ namespace Algoloop.Wpf.Provider
             base.Dispose(disposing);
         }
 
-        public override IReadOnlyList<AccountModel> Login(ProviderModel broker, SettingModel settings)
+        public override bool Register(SettingModel settings)
         {
-            Contract.Requires(broker != null);
+            Contract.Requires(settings != null);
+            _settings = settings;
+            return base.Register(settings);
+        }
+
+        public override void Login(ProviderModel provider)
+        {
+            Contract.Requires(provider != null);
 
             _brokerage = new FxcmBrokerage(
                 null,
                 null,
                 Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager")),
                 _fxcmServer,
-                broker.Access.ToString(),
-                broker.Login,
-                broker.Password,
-                broker.Login);
+                provider.Access.ToString(),
+                provider.Login,
+                provider.Password,
+                provider.Login);
 
             _brokerage.Message += OnMessage;
             _brokerage.AccountChanged += OnAccountChanged;
             _brokerage.OptionPositionAssigned += OnOptionPositionAssigned;
             _brokerage.OrderStatusChanged += OnOrderStatusChanged;
             _brokerage.Connect();
-            return null;
         }
 
         public override void Logout()
@@ -83,14 +90,13 @@ namespace Algoloop.Wpf.Provider
             _brokerage = null;
         }
 
-        public override void Download(ProviderModel market, SettingModel settings)
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
-            if (market == null) throw new ArgumentNullException(nameof(market));
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (provider == null) throw new ArgumentNullException(nameof(provider));
 
-            IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
-            string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
-            DateTime fromDate = market.LastDate < _firstDate ? _firstDate : market.LastDate.Date;
+            IList<string> symbols = provider.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
+            string resolution = provider.Resolution.Equals(Resolution.Tick) ? "all" : provider.Resolution.ToString();
+            DateTime fromDate = provider.LastDate < _firstDate ? _firstDate : provider.LastDate.Date;
             DateTime toDate = fromDate.AddDays(1);
             string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string to = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
@@ -105,31 +111,25 @@ namespace Algoloop.Wpf.Provider
 
             IDictionary<string, string> config = new Dictionary<string, string>
             {
-                ["data-directory"] = settings.DataFolder,
-                ["data-folder"] = settings.DataFolder,
-                ["fxcm-user-name"] = market.Login,
-                ["fxcm-password"] = market.Password,
-                ["fxcm-terminal"] = market.Access.ToStringInvariant()
+                ["data-directory"] = _settings.DataFolder,
+                ["data-folder"] = _settings.DataFolder,
+                ["fxcm-user-name"] = provider.Login,
+                ["fxcm-password"] = provider.Password,
+                ["fxcm-terminal"] = provider.Access.ToStringInvariant()
             };
 
             DateTime now = DateTime.Now;
-            if (RunProcess("QuantConnect.ToolBox.exe", args, config))
+            RunProcess("QuantConnect.ToolBox.exe", args, config);
+            if (toDate > now)
             {
-                if (toDate > now)
-                {
-                    market.Active = false;
-                }
-                else
-                {
-                    market.LastDate = toDate;
-                }
+                provider.Active = false;
             }
             else
             {
-                market.Active = false;
+                provider.LastDate = toDate;
             }
 
-            UpdateSymbols(market);
+            UpdateSymbols(provider);
         }
 
         private static void UpdateSymbols(ProviderModel market)

@@ -142,6 +142,12 @@
   <data name="AlgoloopSplash" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\algoloopsplash.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="AppUpdated" xml:space="preserve">
+    <value>Application update: {0}</value>
+  </data>
+  <data name="AppUpdating" xml:space="preserve">
+    <value>Application updating {0}%</value>
+  </data>
   <data name="Checklist" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Checklist.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -162,9 +168,6 @@
   </data>
   <data name="Download3" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Download3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="DownloadCompleted" xml:space="preserve">
-    <value>Download completed</value>
   </data>
   <data name="Exit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Exit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -187,6 +190,18 @@
   <data name="LoadingConfigurationCompleted" xml:space="preserve">
     <value>Loading configuration completed</value>
   </data>
+  <data name="MarketCompleted" xml:space="preserve">
+    <value>Market {0} completed</value>
+  </data>
+  <data name="MarketException" xml:space="preserve">
+    <value>Market {0} failed: {1}</value>
+  </data>
+  <data name="MarketNoSymbol" xml:space="preserve">
+    <value>Market {0} has no symbol selected</value>
+  </data>
+  <data name="MarketStarted" xml:space="preserve">
+    <value>Market {0} started</value>
+  </data>
   <data name="MoveDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MoveDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -195,6 +210,9 @@
   </data>
   <data name="New" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\New.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NoAppUpdate" xml:space="preserve">
+    <value>No update is available</value>
   </data>
   <data name="NoSymbolSelected" xml:space="preserve">
     <value>No symbol selected!</value>

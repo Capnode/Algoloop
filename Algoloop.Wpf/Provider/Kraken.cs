@@ -24,17 +24,24 @@ namespace Algoloop.Wpf.Provider
 {
     public class Kraken : ProviderBase
     {
-        public override void Download(ProviderModel model, SettingModel settings)
+        private SettingModel _settings;
+
+        public override bool Register(SettingModel settings)
         {
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            _settings = settings;
+            return base.Register(settings);
+        }
+
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
+        {
+            if (provider == null) throw new ArgumentNullException(nameof(provider));
 
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", settings.DataFolder);
+            Config.Set("data-directory", _settings.DataFolder);
 
-            IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
+            IList<string> symbols = provider.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, model.LastDate, model.LastDate);
+            KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, provider.LastDate, provider.LastDate);
         }
     }
 }

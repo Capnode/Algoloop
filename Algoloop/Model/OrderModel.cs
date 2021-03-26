@@ -107,10 +107,10 @@ namespace Algoloop.Model
         public OrderStatus Status { get; set; }
 
         /// <summary>
-        /// Order Time In Force
+        /// Order valid until.
         /// </summary>
         [DataMember]
-        public TimeInForce TimeInForce { get; set; }
+        public DateTime ValidUntil { get; set; }
 
         /// <summary>
         /// Tag the order with some custom data

@@ -45,7 +45,7 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_no_symbols()
         {
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Name = "QuantConnect",
@@ -55,7 +55,7 @@ namespace Algoloop.Tests.Provider
 
             // Just update symbol list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate == date);
             Assert.IsTrue(market.Symbols.Count > 42);
@@ -65,7 +65,7 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_one_symbol()
         {
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Name = "QuantConnect",
@@ -79,7 +79,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate > date);
             Assert.IsTrue(market.Symbols.Count > 42);

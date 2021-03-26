@@ -356,7 +356,7 @@ namespace QuantConnect.Util
             }
         }
 
-        private void CheckParts(string directory, string filter)
+        private static void CheckParts(string directory, string filter)
         {
             IEnumerable<string> files = Directory.EnumerateFiles(directory, filter, SearchOption.TopDirectoryOnly);
             foreach (string file in files)

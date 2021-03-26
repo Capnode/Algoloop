@@ -32,7 +32,10 @@ namespace Algoloop.Model
         public Action ModelChanged;
 
         private string _provider;
+        private const string _borsdata = "borsdata";
+        private const string _avanza = "avanza";
         private const string _fxcm = "fxcm";
+        private const string _fxcmrest = "fxcmrest";
 
         public enum AccessType { Demo, Real };
 
@@ -122,6 +125,11 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
+        public string DefaultAccountId { get; set; }
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
         public Collection<SymbolModel> Symbols { get; } = new Collection<SymbolModel>();
 
         [Browsable(false)]
@@ -145,6 +153,27 @@ namespace Algoloop.Model
                 SetBrowsable("Password", true);
                 SetBrowsable("ApiKey", false);
             }
+            else if (Provider.Equals(_fxcmrest, StringComparison.OrdinalIgnoreCase))
+            {
+                SetBrowsable("Access", true);
+                SetBrowsable("Login", false);
+                SetBrowsable("Password", false);
+                SetBrowsable("ApiKey", true);
+            }
+            else if (Provider.Equals(_borsdata, StringComparison.OrdinalIgnoreCase))
+            {
+                SetBrowsable("Access", false);
+                SetBrowsable("Login", false);
+                SetBrowsable("Password", false);
+                SetBrowsable("ApiKey", true);
+            }
+            else if (Provider.Equals(_avanza, StringComparison.OrdinalIgnoreCase))
+            {
+                SetBrowsable("Access", false);
+                SetBrowsable("Login", true);
+                SetBrowsable("Password", true);
+                SetBrowsable("ApiKey", true);
+            }
             else
             {
                 SetBrowsable("Access", false);
@@ -156,11 +185,22 @@ namespace Algoloop.Model
 
         public void UpdateAccounts(IEnumerable<AccountModel> accounts)
         {
+            if (accounts == null) return;
             Accounts.Clear();
             foreach (AccountModel account in accounts)
             {
-                account.Broker = this;
+                account.Provider = this;
                 Accounts.Add(account);
+            }
+        }
+
+        public void UpdateSymbols(IEnumerable<SymbolModel> symbols)
+        {
+            if (symbols == null) return;
+            Symbols.Clear();
+            foreach (SymbolModel symbol in symbols)
+            {
+                Symbols.Add(symbol);
             }
         }
 

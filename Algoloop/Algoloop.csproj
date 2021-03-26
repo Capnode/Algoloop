@@ -52,7 +52,7 @@
   <ItemGroup>
     <Compile Include="Model\AboutModel.cs" />
     <Compile Include="Model\AccountModel.cs" />
-    <Compile Include="Model\AccountsModel.cs" />
+    <Compile Include="Model\BalanceModel.cs" />
     <Compile Include="Model\ListModel.cs" />
     <Compile Include="Model\ProviderModel.cs" />
     <Compile Include="Model\MarketsModel.cs" />
@@ -68,6 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\AccountNameConverter.cs" />
     <Compile Include="Support\AlgorithmNameConverter.cs" />
+    <Compile Include="Support\Collection.cs" />
     <Compile Include="Support\DateEditor.cs" />
     <Compile Include="Support\FilenameEditor.cs" />
     <Compile Include="Support\FolderEditor.cs" />

@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using QuantConnect.Securities;
 using System;
 using System.Diagnostics;
@@ -20,12 +21,16 @@ namespace Algoloop.Wpf.ViewModel
 {
     public class BalanceViewModel : ViewModel
     {
+        private decimal _cash;
+        private decimal _equity;
+        private decimal _profit;
+        private decimal _dayProfit;
         private string _currency;
-        private decimal _amount;
+        private decimal _equityChange;
 
-        public BalanceViewModel(CashAmount cash)
+        public BalanceViewModel(BalanceModel model)
         {
-            Update(cash);
+            Update(model);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -35,25 +40,66 @@ namespace Algoloop.Wpf.ViewModel
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
-        // Gets the symbol of the security required to provide conversion rates. If this
-        // cash represents the account currency, then QuantConnect.Symbol.Empty is returned
+        public decimal Cash
+        {
+            get => _cash;
+            set => Set(ref _cash, value);
+        }
+
+        public decimal Equity
+        {
+            get => _equity;
+            set
+            {
+                EquityChange = value - _equity;
+                Set(ref _equity, value);
+            }
+        }
+
+        public decimal EquityChange
+        {
+            get => _equityChange;
+            set
+            {
+                _equityChange = value;
+                if (value == 0) return;
+
+                // Raise only when changed
+                RaisePropertyChanged(() => EquityChange);
+            }
+        }
+
+        public decimal Profit
+        {
+            get => _profit;
+            set => Set(ref _profit, value);
+        }
+
+        public decimal DayProfit
+        {
+            get => _dayProfit;
+            set => Set(ref _dayProfit, value);
+        }
+
         public string Currency
         {
             get => _currency;
             set => Set(ref _currency, value);
         }
 
-        //     Gets or sets the amount of cash held
-        public decimal Amount
+        public void Update(BalanceModel balance)
         {
-            get => _amount;
-            set => Set(ref _amount, value);
+            Cash = balance.Cash;
+            Equity = balance.Equity;
+            Profit = balance.Profit;
+            DayProfit = balance.DayProfit;
+            Currency = balance.Currency;
         }
 
         public void Update(CashAmount cash)
         {
             Currency = cash.Currency;
-            Amount = cash.Amount;
+            Cash = cash.Amount;
         }
 
         public void Update(AccountEvent message)
@@ -61,7 +107,7 @@ namespace Algoloop.Wpf.ViewModel
             if (message == null) throw new ArgumentNullException(nameof(message));
 
             Currency = message.CurrencySymbol;
-            Amount = message.CashBalance;
+            Cash = message.CashBalance;
         }
     }
 }

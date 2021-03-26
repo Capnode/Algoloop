@@ -24,8 +24,6 @@ namespace Capnode.Wpf.DataGrid
 {
     public partial class ColumnOptionControl : UserControl, INotifyPropertyChanged
     {
-        private static readonly Style _rightCellStyle = CellStyle(TextAlignment.Right);
-
         private readonly FilterOperationItem _addPin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Pin Column", "/Capnode.Wpf;component/Images/PinUp.png");
         private readonly FilterOperationItem _addGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Add Grouping", "/Capnode.Wpf;component/Images/GroupBy.png");
         private readonly FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Capnode.Wpf;component/Images/pinDown.png");
@@ -144,7 +142,8 @@ namespace Capnode.Wpf.DataGrid
             {
                 if (TypeHelper.IsNumbericType(FilterColumnInfo.PropertyType))
                 {
-                    boundColumn.ElementStyle = _rightCellStyle;
+
+                    boundColumn.ElementStyle = CellStyle(TextAlignment.Right, boundColumn.ElementStyle);
                 }
             }
 
@@ -205,9 +204,9 @@ namespace Capnode.Wpf.DataGrid
             }
         }
 
-        private static Style CellStyle(TextAlignment alignment)
+        private static Style CellStyle(TextAlignment alignment, Style basedOn)
         {
-            var style = new Style(typeof(TextBlock));
+            var style = new Style(typeof(TextBlock), basedOn);
             style.Setters.Add(new Setter(TextBlock.TextAlignmentProperty, alignment));
             return style;
         }

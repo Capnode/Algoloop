@@ -22,11 +22,11 @@ namespace Algoloop.Support
 {
     public class AccountNameConverter : TypeConverter
     {
-        private readonly AccountsModel _accounts;
+        private readonly MarketsModel _markets;
 
         public AccountNameConverter()
         {
-            _accounts = SimpleIoc.Default.GetInstance<AccountsModel>();
+            _markets = SimpleIoc.Default.GetInstance<MarketsModel>();
         }
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
@@ -44,7 +44,7 @@ namespace Algoloop.Support
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
             // Request list of accounts
-            IReadOnlyList<AccountModel> accounts = _accounts.GetAccounts();
+            IReadOnlyList<AccountModel> accounts = _markets.GetAccounts();
             List<string> list = accounts
                 .Select(m => m.DisplayName)
                 .ToList();

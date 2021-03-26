@@ -29,11 +29,17 @@ namespace Algoloop.Wpf.Provider
     {
         private const string _security = "Security";
         private const string _zip = ".zip";
+        private SettingModel _settings;
 
-        public override void Download(ProviderModel model, SettingModel settings)
+        public override bool Register(SettingModel settings)
         {
-            Contract.Requires(model != null);
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            return base.Register(settings);
+        }
+
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
+        {
+            Contract.Requires(provider != null);
             string version = AboutModel.AssemblyVersion;
             var uri = new Uri($"https://github.com/Capnode/Algoloop/archive/Algoloop-{version}.zip");
             string extract = $"Algoloop-Algoloop-{version}/Data/";
@@ -46,8 +52,8 @@ namespace Algoloop.Wpf.Provider
 
             Log.Trace($"Unpack {uri}");
             IList<SymbolModel> symbols = new List<SymbolModel>();
-            string dest = settings.DataFolder;
-            using (ZipArchive archive = new ZipArchive(File.OpenRead(filename)))
+            string dest = _settings.DataFolder;
+            using (var archive = new ZipArchive(File.OpenRead(filename)))
             {
                 foreach (ZipArchiveEntry file in archive.Entries)
                 {
@@ -57,7 +63,7 @@ namespace Algoloop.Wpf.Provider
                     string path = file.FullName.Substring(extract.Length);
                     AddSymbol(symbols, path);
                     string destPath = Path.Combine(dest, path);
-                    FileInfo outputFile = new FileInfo(destPath);
+                    var outputFile = new FileInfo(destPath);
                     if (!outputFile.Directory.Exists)
                     {
                         outputFile.Directory.Create();
@@ -68,21 +74,21 @@ namespace Algoloop.Wpf.Provider
             }
 
             // Adjust lastdate
-            if (model.Symbols.Any())
+            if (provider.Symbols.Any())
             {
-                model.LastDate = DateTime.Today;
+                provider.LastDate = DateTime.Today;
             }
 
             File.Delete(filename);
 
             // Update symbol list
-            UpdateSymbols(model, symbols, true);
+            UpdateSymbols(provider, symbols, true);
 
             Log.Trace($"Unpack {uri} completed");
-            model.Active = false;
+            provider.Active = false;
         }
 
-        private void AddSymbol(IList<SymbolModel> symbols, string path)
+        private static void AddSymbol(IList<SymbolModel> symbols, string path)
         {
             string[] split = path.Split('/');
             if (split.Length < 4) return;

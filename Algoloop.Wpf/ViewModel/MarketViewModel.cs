@@ -36,6 +36,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Diagnostics.Contracts;
 using static Algoloop.Wpf.ViewModel.SymbolViewModel;
+using System.Threading;
+using QuantConnect.Statistics;
+using QuantConnect.Data.Market;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -45,13 +48,14 @@ namespace Algoloop.Wpf.ViewModel
         private readonly SettingModel _settings;
         private ProviderModel _model;
         private SymbolViewModel _selectedSymbol;
-        private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
+        private ObservableCollection<DataGridColumn> _symbolColumns = new();
         private bool _checkAll;
         private IList _selectedItems;
         private IProvider _provider;
         private DateTime _date = DateTime.Today;
         private Resolution _selectedResolution = Resolution.Daily;
         private static ReportPeriod _selectedReportPeriod;
+        private AccountViewModel _selectedAccount;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, ProviderModel marketModel, SettingModel settings)
         {
@@ -59,8 +63,8 @@ namespace Algoloop.Wpf.ViewModel
             Model = marketModel;
             _settings = settings;
 
-            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
-            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
+            ActiveCommand = new RelayCommand(async () => await DoActiveCommand(Model.Active).ConfigureAwait(false), !IsBusy);
+            StartCommand = new RelayCommand(async () => await DoStartCommand().ConfigureAwait(false), () => !IsBusy && !Active);
             StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
             CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
@@ -75,7 +79,7 @@ namespace Algoloop.Wpf.ViewModel
             Model.ModelChanged += DataFromModel;
 
             DataFromModel();
-            DoActiveCommand(Active);
+//            DoActiveCommand(Active).Wait();
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -109,11 +113,17 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand ActiveCommand { get; }
         public RelayCommand StartCommand { get; }
         public RelayCommand StopCommand { get; }
+
         public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
-
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
+        public ObservableCollection<AccountViewModel> Accounts { get; } = new ObservableCollection<AccountViewModel>();
+        public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
+        public SyncObservableCollection<OrderViewModel> Orders { get; } = new SyncObservableCollection<OrderViewModel>();
+        public SyncObservableCollection<PositionViewModel> Positions { get; } = new SyncObservableCollection<PositionViewModel>();
+        public SyncObservableCollection<Trade> ClosedTrades { get; } = new SyncObservableCollection<Trade>();
+
         public string DataFolder => _settings.DataFolder;
 
         public IList SelectedItems
@@ -158,6 +168,21 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _date;
             set => Set(ref _date, value);
+        }
+
+        public AccountViewModel SelectedAccount
+        {
+            get => _selectedAccount;
+            set
+            {
+                Set(ref _selectedAccount, value);
+                if (_selectedAccount == default) return;
+                if (_selectedAccount.Model.Id != Model.DefaultAccountId)
+                {
+                    Model.DefaultAccountId = _selectedAccount.Model.Id;
+                    DataFromModel();
+                }
+            }
         }
 
         public ReportPeriod SelectedReportPeriod
@@ -225,6 +250,41 @@ namespace Algoloop.Wpf.ViewModel
                 var listViewModel = new ListViewModel(this, listModel);
                 Lists.Add(listViewModel);
             }
+
+            Accounts.Clear();
+            Balances.Clear();
+            Orders.Clear();
+            Positions.Clear();
+
+            foreach (AccountModel account in Model.Accounts)
+            {
+                var vm = new AccountViewModel(account);
+                Accounts.Add(vm);
+                if (account.Id == Model.DefaultAccountId)
+                {
+                    SelectedAccount = vm;
+                }
+            }
+
+            if (SelectedAccount == null) return;
+
+            foreach (BalanceModel balance in SelectedAccount.Model.Balances)
+            {
+                var vm = new BalanceViewModel(balance);
+                Balances.Add(vm);
+            }
+
+            foreach (OrderModel order in SelectedAccount.Model.Orders)
+            {
+                var vm = new OrderViewModel(order);
+                Orders.Add(vm);
+            }
+
+            foreach (PositionModel position in SelectedAccount.Model.Positions)
+            {
+                var vm = new PositionViewModel(position);
+                Positions.Add(vm);
+            }
         }
 
         internal void DeleteList(ListViewModel symbol)
@@ -240,12 +300,33 @@ namespace Algoloop.Wpf.ViewModel
             DataToModel();
         }
 
-        internal void StopDownload()
+        internal void StopMarket()
         {
             if (Active)
             {
                 Active = false;
-                _provider?.Abort();
+                _provider?.Logout();
+            }
+        }
+
+        private async Task DoActiveCommand(bool value)
+        {
+            if (value)
+            {
+                // No IsBusy
+                await StartMarketAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                try
+                {
+                    IsBusy = true;
+                    _provider?.Logout();
+                }
+                finally
+                {
+                    IsBusy = false;
+                }
             }
         }
 
@@ -265,78 +346,201 @@ namespace Algoloop.Wpf.ViewModel
             ImportListCommand.RaiseCanExecuteChanged();
         }
 
-        private async Task DownloadAsync()
+        private async Task StartMarketAsync()
         {
-            DataToModel();
-            ProviderModel market = Model;
             try
             {
-                while (market.Active)
+                DataToModel();
+                _provider = ProviderFactory.CreateProvider(Model.Provider, _settings);
+                if (_provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
+                Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketStarted, Model.Name)));
+                await Task.Run(() => MarketLoop(Model)).ConfigureAwait(false);
+                IList<string> symbols = Model.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
+                if (symbols.Any())
                 {
-                    Log.Trace($"{market.Provider} download {market.Resolution} after {market.LastDate:d}");
-                    _provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-                    if (_provider == null) throw new ApplicationException($"Can not create provider {market.Provider}");
-                    await Task.Run(() => _provider.Download(market, _settings))
-                        .ConfigureAwait(false);
-                    _provider.Dispose();
-                    _provider = null;
+                    Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketCompleted, Model.Name)));
                 }
-
-                IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
-                Messenger.Default.Send(new NotificationMessage(
-                    symbols.Any() ? Resources.DownloadCompleted : Resources.NoSymbolSelected));
-
+                else
+                {
+                    Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketNoSymbol, Model.Name)));
+                }
+            }
+            catch (ApplicationException ex)
+            {
+                Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketException, Model.Name, ex.Message)));
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
-                Messenger.Default.Send(new NotificationMessage($"{ex.GetType()} : {ex.Message}"));
-                market.Active = false;
+                Messenger.Default.Send(new NotificationMessage($"{ex.GetType()}: {ex.Message}"));
+            }
+            finally
+            {
+                _provider?.Dispose();
+                _provider = null;
+                UiThread(() =>
+                {
+                    ProviderModel model = Model;
+                    Model = null;
+                    Model = model;
+                    DataFromModel();
+                });
+            }
+        }
+
+        private void MarketLoop(ProviderModel model)
+        {
+            _provider.Login(model);
+            while (model.Active)
+            {
+                _provider.GetAccounts(model, OnAccountsUpdate);
+                _provider.GetMarketData(model, OnMarketUpdate);
+
+                // Update settings page
+                UiThread(() =>
+                {
+                    Model = null;
+                    Model = model;
+                });
+                Thread.Sleep(1000);
             }
 
-            // Update view
+            _provider.Logout();
+        }
+
+        private void OnAccountsUpdate(object data)
+        {
             UiThread(() =>
             {
-                Model = null;
-                Model = market;
-                DataFromModel();
+                if (data is AccountModel account)
+                {
+                    if (account.Id != Model.DefaultAccountId) return;
+                    UpdateBalances(account.Balances);
+                    UpdatePositions(account.Positions);
+                    UpdateOrders(account.Orders);
+                }
             });
         }
 
-        private async void DoActiveCommand(bool value)
+        private void UpdateBalances(Collection<BalanceModel> balances)
         {
-            if (value)
+            if (balances.Count == Balances.Count)
             {
-                // No IsBusy
-                await DownloadAsync().ConfigureAwait(false);
+                IEnumerator<BalanceViewModel> iBalance = Balances.GetEnumerator();
+                foreach (BalanceModel balance in balances)
+                {
+                    if (iBalance.MoveNext())
+                    {
+                        iBalance.Current.Update(balance);
+                    }
+                }
             }
             else
             {
-                try
+                Balances.Clear();
+                foreach (BalanceModel balance in balances)
                 {
-                    IsBusy = true;
-                    _provider?.Abort();
-                }
-                finally
-                {
-                    IsBusy = false;
+                    var vm = new BalanceViewModel(balance);
+                    Balances.Add(vm);
                 }
             }
         }
 
-        private async void DoStartCommand()
+        private void UpdatePositions(Collection<PositionModel> positions)
+        {
+            if (positions.Count == Positions.Count)
+            {
+                IEnumerator<PositionViewModel> iPosition = Positions.GetEnumerator();
+                foreach (PositionModel position in positions)
+                {
+                    if (iPosition.MoveNext())
+                    {
+                        iPosition.Current.Update(position);
+                    }
+                }
+            }
+            else
+            {
+                Positions.Clear();
+                foreach (PositionModel position in positions)
+                {
+                    var vm = new PositionViewModel(position);
+                    Positions.Add(vm);
+                }
+            }
+        }
+
+        private void UpdateOrders(Collection<OrderModel> orders)
+        {
+            if (orders.Count == Balances.Count)
+            {
+                IEnumerator<OrderViewModel> iOrder = Orders.GetEnumerator();
+                foreach (OrderModel order in orders)
+                {
+                    if (iOrder.MoveNext())
+                    {
+                        iOrder.Current.Update(order);
+                    }
+                }
+            }
+            else
+            {
+                Orders.Clear();
+                foreach (OrderModel order in orders)
+                {
+                    var vm = new OrderViewModel(order);
+                    Orders.Add(vm);
+                }
+            }
+        }
+
+        private void OnMarketUpdate(object data)
+        {
+            if (data is QuoteBar quote)
+            {
+                Log.Trace($"Quote:{quote}");
+                SymbolViewModel symbolVm = Symbols.FirstOrDefault(
+                    m => m.Model.Id.Equals(quote.Symbol.ID.Symbol,
+                    StringComparison.OrdinalIgnoreCase));
+                if (symbolVm == default) return;
+                SymbolModel symbol;
+                if (symbolVm != null)
+                {
+                    symbol = symbolVm.Model;
+                }
+                else
+                {
+                    symbol = new SymbolModel(quote.Symbol)
+                    {
+                        Properties = new Dictionary<string, object>
+                        {
+                            { "Ask", quote.Ask.Close },
+                            { "Bid", quote.Bid.Close }
+                        }
+                    };
+                    Model.Symbols.Add(symbol);
+                    UiThread(() => Symbols.Add(new SymbolViewModel(this, symbol)));
+                }
+            }
+            else if (data is TradeBar trade)
+            {
+                Log.Trace($"Trade:{trade}");
+            }
+        }
+
+        internal async Task DoStartCommand()
         {
             // No IsBusy
             Active = true;
-            await DownloadAsync().ConfigureAwait(false);
+            await StartMarketAsync().ConfigureAwait(false);
         }
 
-        private void DoStopCommand()
+        internal void DoStopCommand()
         {
             try
             {
                 IsBusy = true;
-                StopDownload();
+                StopMarket();
             }
             finally
             {
@@ -423,7 +627,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DoImportSymbols()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            OpenFileDialog openFileDialog = new()
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Multiselect = false,
@@ -437,7 +641,7 @@ namespace Algoloop.Wpf.ViewModel
                 IsBusy = true;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
-                    using StreamReader r = new StreamReader(fileName);
+                    using var r = new StreamReader(fileName);
                     while (!r.EndOfStream)
                     {
                         string line = r.ReadLine();
@@ -476,7 +680,7 @@ namespace Algoloop.Wpf.ViewModel
             if (symbols.Count == 0)
                 return;
 
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            var saveFileDialog = new SaveFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
@@ -527,7 +731,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DoImportList()
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            var openFileDialog = new OpenFileDialog
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Multiselect = true,
@@ -546,7 +750,7 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     var model = new ListModel { Name = Path.GetFileNameWithoutExtension(fileName) };
                     Model.Lists.Add(model);
-                    using StreamReader r = new StreamReader(fileName);
+                    using var r = new StreamReader(fileName);
                     while (!r.EndOfStream)
                     {
                         string line = r.ReadLine();
@@ -620,7 +824,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void DbUpgrade(SymbolModel symbol)
         {
-            DirectoryInfo basedir = new DirectoryInfo(DataFolder);
+            var basedir = new DirectoryInfo(DataFolder);
             foreach (DirectoryInfo securityDir in basedir.GetDirectories())
             {
                 foreach (DirectoryInfo marketDir in securityDir.GetDirectories())

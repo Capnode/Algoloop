@@ -14,6 +14,8 @@
 
 using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
+using QuantConnect.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
@@ -23,19 +25,28 @@ namespace Algoloop.Wpf.Provider
     {
         private FxcmClient _api;
 
-        public override IReadOnlyList<AccountModel> Login(ProviderModel broker, SettingModel settings)
+        public override void Login(ProviderModel provider)
         {
-            Contract.Requires(broker != null);
-
-            _api = new FxcmClient(broker.Access, broker.ApiKey);
-            _api.LoginAsync();
-            IReadOnlyList<AccountModel> accounts = _api.GetAccountsAsync().Result;
-            return accounts;
+            Log.Trace($"Login {provider.Provider}");
+            base.Login(provider);
+            Contract.Requires(provider != null);
+            _api = new FxcmClient(provider.Access, provider.ApiKey);
+            _api.Login();
         }
 
         public override void Logout()
         {
-            _api.LogoutAsync();
+            _api.Logout();
+        }
+
+        public override void GetAccounts(ProviderModel provider, Action<object> update)
+        {
+            IReadOnlyList<AccountModel> accounts = _api.GetAccountsAsync(update).Result;
+        }
+
+        public override void GetMarketData(ProviderModel provider, Action<object> update)
+        {
+            IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync(update).Result;
         }
 
         protected override void Dispose(bool disposing)

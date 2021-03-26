@@ -50,7 +50,7 @@ namespace Algoloop.Tests.Provider
         public void Download_no_symbols()
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Active = true,
@@ -63,7 +63,7 @@ namespace Algoloop.Tests.Provider
 
             // Just update symbol list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsFalse(market.Active);
             Assert.AreEqual(date, market.LastDate);
@@ -75,7 +75,7 @@ namespace Algoloop.Tests.Provider
         public void Download_one_symbol()
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Active = true,
@@ -89,7 +89,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(date.AddDays(1), market.LastDate);
@@ -102,7 +102,7 @@ namespace Algoloop.Tests.Provider
         public void Download_two_symbols()
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Active = true,
@@ -117,7 +117,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(date.AddDays(1), market.LastDate);
@@ -131,7 +131,7 @@ namespace Algoloop.Tests.Provider
         public void Download_two_symbols_tick()
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Active = true,
@@ -146,7 +146,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(date.AddDays(1), market.LastDate);
@@ -165,10 +165,11 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod()]
+        [ExpectedException(typeof(ApplicationException), "An invalid symbol name was accepted")]
         public void Download_invalid_symbol()
         {
             var key = ConfigurationManager.AppSettings["dukascopy"];
-            DateTime date = new DateTime(2019, 05, 01);
+            var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Active = true,
@@ -182,8 +183,9 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            Assert.IsNotNull(provider);
 
+            provider.GetMarketData(market);
             Assert.IsFalse(market.Active);
             Assert.AreEqual(market.LastDate, date);
             Assert.AreEqual(78, market.Symbols.Count);
@@ -208,7 +210,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsFalse(market.Active);
             Assert.AreEqual(today, market.LastDate);
@@ -234,7 +236,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.Download(market, _settings);
+            provider.GetMarketData(market);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(today, market.LastDate);

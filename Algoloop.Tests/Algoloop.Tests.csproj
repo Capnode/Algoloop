@@ -80,6 +80,7 @@
     <Compile Include="Provider\FxcmTests.cs" />
     <Compile Include="Provider\QuantconnectTests.cs" />
     <Compile Include="Provider\DukascopyTests.cs" />
+    <Compile Include="ViewModel\MarketViewModelTests.cs" />
     <Compile Include="ViewModel\StrategyViewModelTests.cs" />
     <Compile Include="ViewModel\TrackViewModelTests.cs" />
   </ItemGroup>

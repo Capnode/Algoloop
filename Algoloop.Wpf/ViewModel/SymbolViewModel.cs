@@ -55,8 +55,8 @@ namespace Algoloop.Wpf.ViewModel
         private const string _sharesOutstanding = "Shares outstanding";
 
         private readonly ITreeViewModel _parent;
-        private SyncObservableCollection<ChartViewModel> _charts = new SyncObservableCollection<ChartViewModel>();
-        private ObservableCollection<DataGridColumn> _periodColumns = new ObservableCollection<DataGridColumn>();
+        private SyncObservableCollection<ChartViewModel> _charts = new();
+        private ObservableCollection<DataGridColumn> _periodColumns = new();
         private bool _showCharts;
 
         public SymbolViewModel(ITreeViewModel parent, SymbolModel model)
@@ -184,7 +184,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private static string PriceFilePath(MarketViewModel market, SymbolModel symbol, Resolution resolution, DateTime date)
         {
-            DirectoryInfo basedir = new DirectoryInfo(market.DataFolder);
+            var basedir = new DirectoryInfo(market.DataFolder);
             if (resolution.Equals(Resolution.Daily) || resolution.Equals(Resolution.Hour))
             {
                 string path = Path.Combine(
@@ -203,7 +203,7 @@ namespace Algoloop.Wpf.ViewModel
                     symbol.Market, resolution.ToString(),
                     symbol.Id);
                 if (!Directory.Exists(path)) return null;
-                DirectoryInfo dir = new DirectoryInfo(path);
+                var dir = new DirectoryInfo(path);
                 string date1 = date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
                 string file = dir
                     .GetFiles(date1 + "*.zip")
@@ -229,7 +229,7 @@ namespace Algoloop.Wpf.ViewModel
                 "fine",
                 Model.Id.ToLowerInvariant());
 
-            DirectoryInfo d = new DirectoryInfo(folder);
+            var d = new DirectoryInfo(folder);
             if (!d.Exists)
             {
                 return;
@@ -248,7 +248,7 @@ namespace Algoloop.Wpf.ViewModel
                     }
 
                     using JsonReader reader = new JsonTextReader(resultStream);
-                    JsonSerializer serializer = new JsonSerializer();
+                    var serializer = new JsonSerializer();
                     FineFundamental fine = serializer.Deserialize<FineFundamental>(reader);
                     LoadFundamentals(fine);
                 }

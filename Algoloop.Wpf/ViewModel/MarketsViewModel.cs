@@ -67,7 +67,7 @@ namespace Algoloop.Wpf.ViewModel
         {
             Debug.Assert(market != null);
             SelectedItem = null;
-            market.StopDownload();
+            market.StopMarket();
             Debug.Assert(!market.Active);
             return Markets.Remove(market);
         }
@@ -77,7 +77,7 @@ namespace Algoloop.Wpf.ViewModel
             Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
             {
-                using StreamReader r = new StreamReader(fileName);
+                using StreamReader r = new(fileName);
                 string json = r.ReadToEnd();
                 json = DbUpgrade(json);
                 Model.Copy(JsonConvert.DeserializeObject<MarketsModel>(json));
@@ -105,7 +105,7 @@ namespace Algoloop.Wpf.ViewModel
             if (!Model.Markets.Any()) return;
 
             using StreamWriter file = File.CreateText(fileName);
-            JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
+            var serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Serialize(file, Model);
         }
 
@@ -146,6 +146,11 @@ namespace Algoloop.Wpf.ViewModel
             Markets.Clear();
             foreach (ProviderModel market in Model.Markets)
             {
+                foreach (AccountModel account in market.Accounts)
+                {
+                    account.Provider = market;
+                }
+
                 var viewModel = new MarketViewModel(this, market, _settings);
                 Markets.Add(viewModel);
             }

@@ -36,7 +36,6 @@ namespace Algoloop.Wpf.ViewModel
     /// This class contains static references to all the view models in the
     /// application and provides an entry point for the bindings.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1052:Static holder types should be Static or NotInheritable", Justification = "<Pending>")]
     public class ViewModelLocator
     {
         /// <summary>
@@ -49,11 +48,9 @@ namespace Algoloop.Wpf.ViewModel
             // Register Algoloop types
             SimpleIoc.Default.Register<SettingModel>();
             SimpleIoc.Default.Register<MarketsModel>();
-            SimpleIoc.Default.Register<AccountsModel>();
             SimpleIoc.Default.Register<StrategiesModel>();
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<MarketsViewModel>();
-            SimpleIoc.Default.Register<AccountsViewModel>();
             SimpleIoc.Default.Register<StrategiesViewModel>();
             SimpleIoc.Default.Register<ResearchViewModel>();
             SimpleIoc.Default.Register<LogViewModel>();
@@ -63,7 +60,6 @@ namespace Algoloop.Wpf.ViewModel
 
         public static MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
         public static MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
-        public static AccountsViewModel AccountsViewModel => SimpleIoc.Default.GetInstance<AccountsViewModel>();
         public static StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
         public static ResearchViewModel ResearchViewModel => SimpleIoc.Default.GetInstance<ResearchViewModel>();
         public static LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();

@@ -54,12 +54,6 @@ namespace Algoloop.Model
         public string PriceCurrency { get; set; }
 
         /// <summary>
-        /// Gets the utc time the price was last updated.
-        /// </summary>
-        [DataMember]
-        public DateTime UpdateTime { get; set; }
-
-        /// <summary>
         /// Market value of position.
         /// </summary>
         [DataMember]
@@ -70,5 +64,33 @@ namespace Algoloop.Model
         /// </summary>
         [DataMember]
         public decimal EntryValue { get; set; }
+
+        /// <summary>
+        /// Gets the utc time the price was opened.
+        /// </summary>
+        [DataMember]
+        public DateTime EntryTime { get; set; }
+
+        /// <summary>
+        /// Gets the utc time the price was last updated.
+        /// </summary>
+        [DataMember]
+        public DateTime UpdateTime { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is PositionModel other)) return false;
+            if (!Symbol.Equals(other.Symbol)) return false;
+            if (Quantity != other.Quantity) return false;
+            if (AveragePrice != other.AveragePrice) return false;
+            if (MarketPrice != other.MarketPrice) return false;
+            if (PriceCurrency != other.PriceCurrency) return false;
+            if (MarketValue != other.MarketValue) return false;
+            if (EntryValue != other.EntryValue) return false;
+            if (EntryTime != other.EntryTime) return false;
+            if (UpdateTime != other.UpdateTime) return false;
+
+            return true;
+        }
     }
 }

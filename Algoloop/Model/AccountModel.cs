@@ -12,10 +12,11 @@
  * limitations under the License.
  */
 
-using QuantConnect;
+using Algoloop.Support;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace Algoloop.Model
@@ -28,7 +29,7 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [ReadOnly(false)]
-        public ProviderModel Broker { get; set; }
+        public ProviderModel Provider { get; set; }
 
         [Category("Account")]
         [DisplayName("Number")]
@@ -56,7 +57,12 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         [ReadOnly(false)]
-        public string DisplayName => Broker == default ? Name : $"{Broker.Name}/{Name}";
+        public string DisplayName => Provider == default ? Name : $"{Provider.Name}/{Name}";
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public Collection<BalanceModel> Balances { get; } = new Collection<BalanceModel>();
 
         [Browsable(false)]
         [ReadOnly(false)]
@@ -70,6 +76,20 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is AccountModel other)) return false;
+            if (Provider != other.Provider) return false;
+            if (Id != other.Id) return false;
+            if (Name != other.Name) return false;
+            if (Active != other.Active) return false;
+            if (!Collection.Equals(Balances, other.Balances)) return false;
+            if (!Collection.Equals(Positions, other.Positions)) return false;
+            if (!Collection.Equals(Orders, other.Orders)) return false;
+
+            return true;
         }
     }
 }

@@ -31,8 +31,8 @@ namespace Algoloop.Tests.ViewModel
         {
             Log.LogHandler = new ConsoleLogHandler();
 
-            _strategies = new StrategiesViewModel(new StrategiesModel(), null, null, null);
-            _strategy = new StrategyViewModel(_strategies, new StrategyModel { Name = "A" }, null, null, null);
+            _strategies = new StrategiesViewModel(new StrategiesModel(), null, null);
+            _strategy = new StrategyViewModel(_strategies, new StrategyModel { Name = "A" }, null, null);
             _strategies.AddStrategy(_strategy);
         }
 
@@ -48,7 +48,7 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void MoveStrategyCommand_child_to_track_failed()
         {
-            var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null, null);
+            var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null);
             _strategy.AddStrategy(drag);
             var drop = new TrackViewModel(_strategy, new TrackModel { Name = "drop" }, null, null);
             _strategy.Tracks.Add(drop);
@@ -69,7 +69,7 @@ namespace Algoloop.Tests.ViewModel
         public void MoveStrategyCommand_top_to_child()
         {
             StrategyViewModel drag = _strategy;
-            var drop = new StrategyViewModel(_strategies, new StrategyModel { Name = "drop" }, null, null, null);
+            var drop = new StrategyViewModel(_strategies, new StrategyModel { Name = "drop" }, null, null);
             _strategies.AddStrategy(drop);
             Assert.AreEqual(2, _strategies.Strategies.Count);
             Assert.AreEqual(0, drag.Strategies.Count);
@@ -86,9 +86,9 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void MoveStrategyCommand_child_to_child()
         {
-            var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null, null);
+            var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null);
             _strategy.AddStrategy(drag);
-            var drop = new StrategyViewModel(_strategies, new StrategyModel { Name = "drop" }, null, null, null);
+            var drop = new StrategyViewModel(_strategies, new StrategyModel { Name = "drop" }, null, null);
             _strategies.AddStrategy(drop);
             Assert.AreEqual(2, _strategies.Strategies.Count);
             Assert.AreEqual(1, _strategy.Strategies.Count);
@@ -108,7 +108,7 @@ namespace Algoloop.Tests.ViewModel
         public void MoveStrategyCommand_child_to_top()
         {
             StrategiesViewModel drop = _strategies;
-            var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null, null);
+            var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null);
             _strategy.AddStrategy(drag);
             Assert.AreEqual(1, _strategy.Strategies.Count);
             Assert.AreEqual(0, drag.Strategies.Count);

@@ -11,10 +11,24 @@
     xmlns:view="clr-namespace:Algoloop.Wpf.View"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     DataContext="{Binding Source={StaticResource Locator}, Path=MarketsViewModel}" 
-    mc:Ignorable="d" 
+    mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}" x:Key="RightCell">
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+        <Style TargetType="{x:Type DataGridCell}" x:Key="BlinkCell">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                    <BeginStoryboard>
+                        <Storyboard TargetProperty="Background.Color">
+                            <ColorAnimation BeginTime="0:0:0.2" Duration="0:0:0.5" To="Transparent"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
         <ObjectDataProvider
             x:Key="settings"
             ObjectInstance="{x:Static properties:Settings.Default}"/>
@@ -163,6 +177,14 @@
                         <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Accounts}"
+                                        MinWidth="120"
+                                        SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
+                                        ToolTip="Selected account"
+                                        Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                                    </ComboBox>
                                     <Grid>
                                         <CheckBox
                                             ToolTip="Check all selected"
@@ -216,6 +238,216 @@
                                     ExItemsSource="{Binding Symbols}"
                                     ExColumns="{Binding SymbolColumns}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=MarketSymbolsColumnsInfo}">
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem
+                            Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}"
+                            Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Accounts}"
+                                        MinWidth="120"
+                                        SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
+                                        ToolTip="Selected account">
+                                    </ComboBox>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    CanUserReorderColumns="True"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding Balances}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountBalanceColumnsInfo}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Equity" Binding="{Binding Equity, NotifyOnTargetUpdated=True}">
+                                            <DataGridTextColumn.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource BlinkCell}">
+                                                    <Setter Property="Background" Value="{Binding EquityChange, Converter={viewsupport:ToBrushConverter}}" />
+                                                </Style>
+                                            </DataGridTextColumn.CellStyle>
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Header="Cash" Binding="{Binding Cash, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Profit today" Binding="{Binding DayProfit, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Currency" Binding="{Binding Currency, NotifyOnTargetUpdated=True}"/>
+                                    </DataGrid.Columns>
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem
+                            Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}"
+                            Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Accounts}"
+                                        MinWidth="120"
+                                        SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
+                                        ToolTip="Selected account">
+                                    </ComboBox>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    CanUserReorderColumns="True"
+                                    CellStyle="{StaticResource BlinkCell}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding Orders}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountOrdersColumnsInfo}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Id" Binding="{Binding Id, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Price" Binding="{Binding Price, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="PriceCurrency" Binding="{Binding PriceCurrency, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Time" Binding="{Binding Time, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Type, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Status" Binding="{Binding Status, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Value" Binding="{Binding OrderValue, NotifyOnTargetUpdated=True}"/>
+                                    </DataGrid.Columns>
+                                    <DataGrid.Resources>
+                                        <ContextMenu
+                                            x:Key="RowMenu"
+                                            DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem
+                                                Header="Close order"
+                                                Command="{Binding CloseOrderCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </DataGrid.Resources>
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow" >
+                                            <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem
+                            Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}"
+                            Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Accounts}"
+                                        MinWidth="120"
+                                        SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
+                                        ToolTip="Selected account">
+                                    </ComboBox>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    CanUserReorderColumns="True"
+                                    CellStyle="{StaticResource BlinkCell}"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    IsReadOnly="False"
+                                    GridLinesVisibility="None"
+                                    FrozenColumnCount="1"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding Positions}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountPositionsColumnsInfo}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="SecurityType" Binding="{Binding SecurityType, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Currency" Binding="{Binding CurrencySymbol, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="AveragePrice" Binding="{Binding AveragePrice, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="MarketPrice" Binding="{Binding MarketPrice, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="ConversionRate" Binding="{Binding ConversionRate, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="MarketValue" Binding="{Binding MarketValue, NotifyOnTargetUpdated=True}"/>
+                                        <DataGridTextColumn Header="UnrealizedPnL" Binding="{Binding UnrealizedPnL, NotifyOnTargetUpdated=True}"/>
+                                    </DataGrid.Columns>
+                                    <DataGrid.Resources>
+                                        <ContextMenu
+                                            x:Key="RowMenu"
+                                            DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem
+                                                Header="Close position"
+                                                Command="{Binding ClosePositionCommand}">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/Resources/Delete.png" Width="16" Height="16"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </DataGrid.Resources>
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow" >
+                                            <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem
+                            Header="{Binding ClosedTrades.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}"
+                            Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Accounts}"
+                                        MinWidth="120"
+                                        SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
+                                        ToolTip="Selected account">
+                                    </ComboBox>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    CanUserReorderColumns="True"
+                                    IsReadOnly="True"
+                                    GridLinesVisibility="None"
+                                    AutoGenerateColumns="False"
+                                    FrozenColumnCount="1"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding ClosedTrades}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountClosedTradesColumnsInfo}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
+                                        <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>
+                                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction}"/>
+                                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                                        <DataGridTextColumn Header="Entry price" Binding="{Binding EntryPrice}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Exit price" Binding="{Binding ExitPrice}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Profit" Binding="{Binding ProfitLoss}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Fees" Binding="{Binding TotalFees}" ElementStyle="{StaticResource RightCell}"/>
+                                        <DataGridTextColumn Header="Duration" Binding="{Binding Duration, StringFormat='{}{0:d\\.hh\\:mm\\:ss}'}" ElementStyle="{StaticResource RightCell}"/>
+                                    </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
