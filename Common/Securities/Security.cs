@@ -45,9 +45,16 @@ namespace QuantConnect.Securities
         private readonly ICurrencyConverter _currencyConverter;
 
         private LocalTimeKeeper _localTimeKeeper;
-        // using concurrent bag to avoid list enumeration threading issues
+
+        /// <summary>
+        /// Collection of SubscriptionDataConfigs for this security.
+        /// Uses concurrent bag to avoid list enumeration threading issues
+        /// </summary>
         protected readonly ConcurrentBag<SubscriptionDataConfig> SubscriptionsBag;
 
+        /// <summary>
+        /// This securities <see cref="IShortableProvider"/>
+        /// </summary>
         protected IShortableProvider ShortableProvider { get; private set; }
 
         /// <summary>
@@ -130,7 +137,7 @@ namespace QuantConnect.Securities
         /// <summary>
         /// Gets or sets whether or not this security should be considered tradable
         /// </summary>
-        public bool IsTradable
+        public virtual bool IsTradable
         {
             get; set;
         }
@@ -630,10 +637,10 @@ namespace QuantConnect.Securities
         /// <param name="leverage">Leverage for this asset</param>
         public void SetLeverage(decimal leverage)
         {
-            if (Symbol.ID.SecurityType == SecurityType.Future ||
-                Symbol.ID.SecurityType == SecurityType.Option ||
-                Symbol.ID.SecurityType == SecurityType.FutureOption)
+            if (Symbol.ID.SecurityType == SecurityType.Future || Symbol.ID.SecurityType.IsOption())
+            {
                 return;
+            }
 
             BuyingPowerModel.SetLeverage(this, leverage);
         }
@@ -773,6 +780,10 @@ namespace QuantConnect.Securities
             SetMarginModel(new BuyingPowerModelPythonWrapper(pyObject));
         }
 
+        /// <summary>
+        /// Set Shortable Provider for this <see cref="Security"/>
+        /// </summary>
+        /// <param name="shortableProvider">Provider to use</param>
         public void SetShortableProvider(IShortableProvider shortableProvider)
         {
             ShortableProvider = shortableProvider;
@@ -817,7 +828,11 @@ namespace QuantConnect.Securities
             UpdateSubscriptionProperties();
         }
 
-        private void UpdateConsumersMarketPrice(BaseData data)
+        /// <summary>
+        /// Update market price of this Security
+        /// </summary>
+        /// <param name="data">Data to pull price from</param>
+        protected virtual void UpdateConsumersMarketPrice(BaseData data)
         {
             if (data is OpenInterest || data.Price == 0m) return;
             Holdings.UpdateMarketPrice(Price);

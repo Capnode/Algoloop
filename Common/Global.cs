@@ -36,6 +36,7 @@ namespace QuantConnect
     /// </remarks>
     public enum PrimaryExchange : byte
     {
+#pragma warning disable 1591
         UNKNOWN=0,
         NASDAQ=81,
         BATS=90,
@@ -59,6 +60,7 @@ namespace QuantConnect
         MIAX,
         ISE_GEMINI,
         ISE_MERCURY,
+#pragma warning restore 1591
     }
 
     /// <summary>
@@ -90,7 +92,7 @@ namespace QuantConnect
         public const string Forex = "yyyyMMdd HH:mm:ss.ffff";
         /// Date format of FIX Protocol UTC Timestamp without milliseconds
         public const string FIX = "yyyyMMdd-HH:mm:ss";
-        /// Date format of FIX Protocol UTC Timestamp with milliseconds 
+        /// Date format of FIX Protocol UTC Timestamp with milliseconds
         public const string FIXWithMillisecond = "yyyyMMdd-HH:mm:ss.fff";
         /// YYYYMM Year and Month Character Date Representation (used for futures)
         public const string YearMonth = "yyyyMM";
@@ -158,7 +160,7 @@ namespace QuantConnect
             ConversionRate = security.QuoteCurrency.ConversionRate;
 
             var rounding = 2;
-            if (holding.Type == SecurityType.Forex || holding.Type == SecurityType.Cfd)
+            if (holding.Type == SecurityType.Forex || holding.Type == SecurityType.Cfd || holding.Type == SecurityType.Index)
             {
                 rounding = 5;
             }
@@ -367,7 +369,20 @@ namespace QuantConnect
         /// The contract multiplier for Futures Options plays a big part in determining the premium
         /// of the option, which can also differ from the underlying future's multiplier.
         /// </remarks>
-        FutureOption
+        FutureOption,
+
+        /// <summary>
+        /// Index Security Type.
+        /// </summary>
+        Index,
+
+        /// <summary>
+        /// Index Option Security Type.
+        /// </summary>
+        /// <remarks>
+        /// For index options traded on American markets, they tend to be European-style options and are Cash-settled.
+        /// </remarks>
+        IndexOption,
     }
 
     /// <summary>
@@ -733,7 +748,7 @@ namespace QuantConnect
         {
             return string.IsNullOrEmpty(exchange) ? null : ((char)exchange.GetPrimaryExchange()).ToString();
         }
-        
+
         /// <summary>
         /// Returns the main Exchange from the single character encoding.
         /// </summary>
@@ -756,7 +771,7 @@ namespace QuantConnect
             {
                 return primaryExchange;
             }
-            
+
             switch (exchange.LazyToUpper())
             {
                 case "T":

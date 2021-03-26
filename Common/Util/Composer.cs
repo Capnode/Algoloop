@@ -80,6 +80,10 @@ namespace QuantConnect.Util
                     _compositionContainer = new CompositionContainer(aggregate);
                     return _compositionContainer.Catalog.Parts.ToList();
                 }
+                catch (ThreadAbortException)
+                {
+                    // ThreadAbortException is triggered when we shutdown ignore the error log
+                }
                 catch (Exception ex)
                 {
                     Log.Error($"{ex.GetType()} {ex.Message}");

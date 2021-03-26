@@ -83,6 +83,7 @@ namespace QuantConnect.Brokerages.Tradier
     /// </summary>
     public class TradierQuote
     {
+#pragma warning disable 0414
         /// Quote Symbol
         [JsonProperty(PropertyName = "symbol")]
         public string Symbol = "";
@@ -139,7 +140,7 @@ namespace QuantConnect.Brokerages.Tradier
         [JsonProperty(PropertyName = "low")]
         public decimal? Low = 0;
 
-        /// Closng Price
+        /// Closing Price
         [JsonProperty(PropertyName = "close")]
         public decimal? Close = 0;
 
@@ -205,7 +206,7 @@ namespace QuantConnect.Brokerages.Tradier
 
         ///Option Exp Date
         [JsonProperty(PropertyName = "expiration_date")]
-        private long Options_ExpirationDate = 0;
+        private string Options_ExpirationDate;
 
         ///Option Exp Type
         [JsonProperty(PropertyName = "expiration_type")]
@@ -218,6 +219,7 @@ namespace QuantConnect.Brokerages.Tradier
         /// Empty Constructor
         public TradierQuote()
         { }
+#pragma warning restore 0414
     }
 
     /// <summary>
@@ -483,5 +485,15 @@ namespace QuantConnect.Brokerages.Tradier
         /// Trading Stream: Ask Date
         [JsonProperty(PropertyName = "askdate")]
         public long AskDateUnix;
+
+        /// <summary>
+        /// Gets the tick timestamp (UTC)
+        /// </summary>
+        public DateTime GetTickTimestamp()
+        {
+            var unix = Type == "trade" ? UnixDate.ConvertInvariant<long>() : Type == "quote" ? BidDateUnix : 0;
+
+            return Time.UnixMillisecondTimeStampToDateTime(unix);
+        }
     }
 }

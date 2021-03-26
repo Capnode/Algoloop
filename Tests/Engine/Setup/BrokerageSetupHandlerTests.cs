@@ -31,6 +31,7 @@ using QuantConnect.Lean.Engine.TransactionHandlers;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
 using QuantConnect.Securities;
+using QuantConnect.Tests.Common.Securities;
 using QuantConnect.Tests.Engine.DataFeeds;
 using QuantConnect.Util;
 
@@ -198,15 +199,16 @@ namespace QuantConnect.Tests.Engine.Setup
             }
         }
 
-        [Test]
-        public void EnforcesCashAmounts()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void EnforcesTotalPortfolioValue(bool fails)
         {
             var algorithm = new TestAlgorithm();
             algorithm.SetBrokerageModel(BrokerageName.InteractiveBrokersBrokerage);
 
-            algorithm.SetHistoryProvider(new BrokerageTransactionHandlerTests.BrokerageTransactionHandlerTests.EmptyHistoryProvider());
+            algorithm.SetHistoryProvider(new TestHistoryProvider());
             var job = GetJob();
-            job.BrokerageData["max-cash-limit"] = "[{\"amount\":20, \"currency\": \"USD\"}, {\"Amount\":1, \"Currency\": \"EUR\"}]";
+            job.BrokerageData[BrokerageSetupHandler.MaxAllocationLimitConfig] = fails ? "1" : "1000000000";
 
             var resultHandler = new Mock<IResultHandler>();
             var transactionHandler = new Mock<ITransactionHandler>();
@@ -225,25 +227,24 @@ namespace QuantConnect.Tests.Engine.Setup
             IBrokerageFactory factory;
             setupHandler.CreateBrokerage(job, algorithm, out factory);
 
-            Assert.IsTrue(setupHandler.Setup(new SetupHandlerParameters(_dataManager.UniverseSelection, algorithm, brokerage.Object, job, resultHandler.Object,
+            Assert.AreEqual(!fails, setupHandler.Setup(new SetupHandlerParameters(algorithm.DataManager.UniverseSelection, algorithm, brokerage.Object, job, resultHandler.Object,
                 transactionHandler.Object, realTimeHandler.Object, objectStore.Object)));
 
-            Assert.AreEqual(20, algorithm.Portfolio.CashBook[Currencies.USD].Amount);
-            Assert.IsFalse(algorithm.Portfolio.CashBook.ContainsKey(Currencies.GBP));
-            Assert.IsFalse(algorithm.Portfolio.CashBook.ContainsKey(Currencies.EUR));
+            Assert.AreEqual(10000, algorithm.Portfolio.CashBook[Currencies.USD].Amount);
+            Assert.AreEqual(11, algorithm.Portfolio.CashBook[Currencies.GBP].Amount);
         }
 
-        [Test]
-        public void SkipsLoadingHoldingsAndOrders()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void EnforcesAccountCurrency(bool enforceAccountCurrency)
         {
-            var symbol = Symbol.Create("AUDUSD", SecurityType.Forex, Market.Oanda);
-
             var algorithm = new TestAlgorithm();
-            algorithm.SetBrokerageModel(BrokerageName.InteractiveBrokersBrokerage);
-
             algorithm.SetHistoryProvider(new BrokerageTransactionHandlerTests.BrokerageTransactionHandlerTests.EmptyHistoryProvider());
             var job = GetJob();
-            job.BrokerageData["load-existing-holdings"] = "false";
+            if (enforceAccountCurrency)
+            {
+                job.BrokerageData[BrokerageSetupHandler.MaxAllocationLimitConfig] = "200000";
+            }
 
             var resultHandler = new Mock<IResultHandler>();
             var transactionHandler = new Mock<ITransactionHandler>();
@@ -252,28 +253,19 @@ namespace QuantConnect.Tests.Engine.Setup
             var objectStore = new Mock<IObjectStore>();
 
             brokerage.Setup(x => x.IsConnected).Returns(true);
-            brokerage.Setup(x => x.AccountBaseCurrency).Returns(Currencies.USD);
             brokerage.Setup(x => x.GetCashBalance()).Returns(new List<CashAmount>());
-            brokerage.Setup(x => x.GetAccountHoldings()).Returns(new List<Holding>
-            {
-                new Holding { Symbol = symbol, Type = symbol.SecurityType, Quantity = 100 }
-            });
-            brokerage.Setup(x => x.GetOpenOrders()).Returns(new List<Order>
-            {
-                new LimitOrder(Symbols.SPY, 1, 1, DateTime.UtcNow)
-            });
+            brokerage.Setup(x => x.GetAccountHoldings()).Returns(new List<Holding>());
+            brokerage.Setup(x => x.GetOpenOrders()).Returns(new List<Order>());
+            brokerage.Setup(x => x.AccountBaseCurrency).Returns(Currencies.EUR);
 
             var setupHandler = new BrokerageSetupHandler();
-
             IBrokerageFactory factory;
             setupHandler.CreateBrokerage(job, algorithm, out factory);
 
             Assert.IsTrue(setupHandler.Setup(new SetupHandlerParameters(_dataManager.UniverseSelection, algorithm, brokerage.Object, job, resultHandler.Object,
                 transactionHandler.Object, realTimeHandler.Object, objectStore.Object)));
 
-            Security security;
-            Assert.IsFalse(algorithm.Portfolio.Securities.TryGetValue(symbol, out security));
-            Assert.IsFalse(algorithm.Portfolio.Securities.TryGetValue(Symbols.SPY, out security));
+            Assert.AreEqual(enforceAccountCurrency ? Currencies.USD : Currencies.EUR, algorithm.AccountCurrency);
         }
 
         [Test]
@@ -592,10 +584,13 @@ namespace QuantConnect.Tests.Engine.Setup
         {
             private readonly Action _beforePostInitializeAction;
 
+            public DataManager DataManager { get; set; }
+
             public TestAlgorithm(Action beforePostInitializeAction = null)
             {
                 _beforePostInitializeAction = beforePostInitializeAction;
-                SubscriptionManager.SetDataManager(new DataManagerStub(this, new MockDataFeed(), liveMode: true));
+                DataManager = new DataManagerStub(this, new MockDataFeed(), liveMode: true);
+                SubscriptionManager.SetDataManager(DataManager);
             }
 
             public override void Initialize() { }

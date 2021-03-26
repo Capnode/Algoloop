@@ -30,6 +30,7 @@ namespace QuantConnect
     [ProtoContract(SkipConstructor = true)]
     public sealed class Symbol : IEquatable<Symbol>, IComparable
     {
+        private Symbol _canonical;
         // for performance we register how we compare with empty
         private bool? _isEmpty;
 
@@ -77,6 +78,10 @@ namespace QuantConnect
                     sid = SecurityIdentifier.GenerateCfd(ticker, market);
                     break;
 
+                case SecurityType.Index:
+                    sid = SecurityIdentifier.GenerateIndex(ticker, market);
+                    break;
+
                 case SecurityType.Option:
                     return CreateOption(ticker, market, default(OptionStyle), default(OptionRight), 0, SecurityIdentifier.DefaultDate);
 
@@ -87,6 +92,15 @@ namespace QuantConnect
                 case SecurityType.Crypto:
                     sid = SecurityIdentifier.GenerateCrypto(ticker, market);
                     break;
+
+                case SecurityType.IndexOption:
+                    return CreateOption(
+                        Create(ticker, SecurityType.Index, market),
+                        market,
+                        OptionStyle.European,
+                        default(OptionRight),
+                        0,
+                        SecurityIdentifier.DefaultDate);
 
                 case SecurityType.FutureOption:
                     throw new NotImplementedException("Cannot create future option Symbol using this method (insufficient information). Use `CreateOption(Symbol, ...)` instead.");
@@ -103,7 +117,7 @@ namespace QuantConnect
         /// Creates a new Symbol for custom data. This method allows for the creation of a new Base Symbol
         /// using the first ticker and the first traded date from the provided underlying Symbol. This avoids
         /// the issue for mappable types, where the ticker is remapped supposing the provided ticker value is from today.
-        /// See method <see cref="SecurityIdentifier.GetFirstTickerAndDate(Interfaces.IMapFileProvider, string, string)"/>
+        /// See <see cref="SecurityIdentifier"/>'s private method GetFirstTickerAndDate.
         /// The provided symbol is also set to <see cref="Symbol.Underlying"/> so that it can be accessed using the custom data Symbol.
         /// This is useful for associating custom data Symbols to other asset classes so that it is possible to filter using custom data
         /// and place trades on the underlying asset based on the filtered custom data.
@@ -117,9 +131,8 @@ namespace QuantConnect
             // The SID Date is only defined for the following security types: base, equity, future, option.
             // Default to SecurityIdentifier.DefaultDate if there's no matching SecurityType
             var firstDate = underlying.SecurityType == SecurityType.Equity ||
-                underlying.SecurityType == SecurityType.Option ||
+                underlying.SecurityType.IsOption() ||
                 underlying.SecurityType == SecurityType.Future ||
-                underlying.SecurityType == SecurityType.FutureOption ||
                 underlying.SecurityType == SecurityType.Base
                     ? underlying.ID.Date
                     : (DateTime?)null;
@@ -192,9 +205,41 @@ namespace QuantConnect
         {
             return
                 (ID.SecurityType == SecurityType.Future ||
-                (ID.SecurityType == SecurityType.Option && HasUnderlying) ||
-                (ID.SecurityType == SecurityType.FutureOption && HasUnderlying)) &&
+                (ID.SecurityType.IsOption() && HasUnderlying)) &&
                 ID.Date == SecurityIdentifier.DefaultDate;
+        }
+
+        /// <summary>
+        /// Get's the canonical representation of this symbol
+        /// </summary>
+        /// <remarks>This is useful for access and performance</remarks>
+        public Symbol Canonical
+        {
+            get
+            {
+                if (_canonical != null)
+                {
+                    return _canonical;
+                }
+
+                _canonical = this;
+                if (!IsCanonical())
+                {
+                    if (SecurityType.IsOption())
+                    {
+                        _canonical = CreateOption(Underlying, ID.Market, SecurityType.DefaultOptionStyle(), default(OptionRight), 0m, SecurityIdentifier.DefaultDate);
+                    }
+                    else if (SecurityType == SecurityType.Future)
+                    {
+                        _canonical = Create(ID.Symbol, SecurityType.Future, ID.Market);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Canonical is only defined for SecurityType.Option, SecurityType.Future, SecurityType.FutureOption");
+                    }
+                }
+                return _canonical;
+            }
         }
 
         /// <summary>
@@ -301,10 +346,10 @@ namespace QuantConnect
 
                 return new Symbol(ID, alias, underlyingSymbol);
             }
-
-            if (ID.SecurityType == SecurityType.FutureOption)
+            // Throw for the rest of our option types, we don't support mapping for them (FOPs and Index Options)
+            if (ID.SecurityType.IsOption())
             {
-                throw new ArgumentException("Future Option can not be mapped.");
+                throw new ArgumentException($"SecurityType {ID.SecurityType} can not be mapped.");
             }
 
             return new Symbol(ID, mappedSymbol, Underlying);
@@ -335,6 +380,8 @@ namespace QuantConnect
                     return SecurityType.Option;
                 case SecurityType.Future:
                     return SecurityType.FutureOption;
+                case SecurityType.Index:
+                    return SecurityType.IndexOption;
                 default:
                     throw new ArgumentException($"No option type exists for underlying SecurityType: {securityType}");
             }
@@ -574,6 +621,7 @@ namespace QuantConnect
             {
                 case SecurityType.FutureOption:
                 case SecurityType.Option:
+                case SecurityType.IndexOption:
                     if (securityIdentifier.Date == SecurityIdentifier.DefaultDate)
                     {
                         return $"?{underlying.Value.LazyToUpper()}";

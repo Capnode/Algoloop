@@ -123,16 +123,16 @@ namespace QuantConnect.Lean.Engine.DataFeeds.Enumerators
         {
             enumerator = null;
             var securityType = dataConfig.SecurityType;
-            if (securityType == SecurityType.FutureOption || securityType == SecurityType.Future
-                || securityType == SecurityType.Option || securityType == SecurityType.Equity)
+            if (securityType.IsOption() || securityType == SecurityType.Future || securityType == SecurityType.Equity)
             {
-                var mapfile = mapFileProvider.Get(dataConfig.Symbol.ID.Market).ResolveMapFile(dataConfig.Symbol, dataConfig.Type);
                 var delistingEventProvider = new DelistingEventProvider();
+                MapFile mapFile = null;
                 if (securityType == SecurityType.Equity)
                 {
                     delistingEventProvider = new LiveDataBasedDelistingEventProvider(dataConfig, dataQueueHandler);
+                    mapFile = mapFileProvider.Get(dataConfig.Symbol.ID.Market).ResolveMapFile(dataConfig.Symbol, dataConfig.Type);
                 }
-                enumerator = new LiveDelistingEventProviderEnumerator(timeProvider, dataConfig, securityCache, delistingEventProvider, mapfile);
+                enumerator = new LiveDelistingEventProviderEnumerator(timeProvider, dataConfig, securityCache, delistingEventProvider, mapFile);
                 return true;
             }
             return false;
