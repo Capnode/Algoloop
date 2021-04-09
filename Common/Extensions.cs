@@ -436,6 +436,27 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Get a python methods arg count
+        /// </summary>
+        /// <param name="method">The Python method</param>
+        /// <returns>Count of arguments</returns>
+        public static int GetPythonArgCount(this PyObject method)
+        {
+            using (Py.GIL())
+            {
+                int argCount;
+                var pyArgCount = PythonEngine.ModuleFromString(Guid.NewGuid().ToString(),
+                    "from inspect import signature\n" +
+                    "def GetArgCount(method):\n" +
+                    "   return len(signature(method).parameters)\n"
+                ).GetAttr("GetArgCount").Invoke(method);
+                pyArgCount.TryConvert(out argCount);
+
+                return argCount;
+            }
+        }
+
+        /// <summary>
         /// Returns an ordered enumerable where position reducing orders are executed first
         /// and the remaining orders are executed in decreasing order value.
         /// Will NOT return targets for securities that have no data yet.
@@ -1733,16 +1754,21 @@ namespace QuantConnect
         }
 
         /// <summary>
-        /// Return the first in the series of names, or find the one that matches the configured algirithmTypeName
+        /// Return the first in the series of names, or find the one that matches the configured algorithmTypeName
         /// </summary>
         /// <param name="names">The list of class names</param>
         /// <param name="algorithmTypeName">The configured algorithm type name from the config</param>
         /// <returns>The name of the class being run</returns>
         public static string SingleOrAlgorithmTypeName(this List<string> names, string algorithmTypeName)
         {
-            // if there's only one use that guy
-            // if there's more than one then find which one we should use using the algorithmTypeName specified
-            return names.Count == 1 ? names.Single() : names.SingleOrDefault(x => x.EndsWith("." + algorithmTypeName));
+            // If there's only one name use that guy
+            if (names.Count == 1) { return names.Single(); }
+
+            // If we have multiple names we need to search the names based on the given algorithmTypeName
+            // If the given name already contains dots (fully named) use it as it is
+            // otherwise add a dot to the beginning to avoid matching any subsets of other names
+            var searchName = algorithmTypeName.Contains(".") ? algorithmTypeName : "." + algorithmTypeName;
+            return names.SingleOrDefault(x => x.EndsWith(searchName));
         }
 
         /// <summary>

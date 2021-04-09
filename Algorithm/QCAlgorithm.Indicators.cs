@@ -27,8 +27,6 @@ namespace QuantConnect.Algorithm
 {
     public partial class QCAlgorithm
     {
-        private bool _isWarmUpIndicatorWarningSent = false;
-
         /// <summary>
         /// Gets whether or not WarmUpIndicator is allowed to warm up indicators/>
         /// </summary>
@@ -1889,6 +1887,17 @@ namespace QuantConnect.Algorithm
         /// <param name="resolution">The resolution</param>
         /// <returns>The Arms Index indicator for the requested symbol over the specified period</returns>
         public ArmsIndex TRIN(IEnumerable<Symbol> symbols, Resolution? resolution = null)
+        {
+            return TRIN(symbols.ToArray(), resolution);
+        }
+
+        /// <summary>
+        /// Creates a new Arms Index indicator
+        /// </summary>
+        /// <param name="symbols">The symbols whose Arms Index we want</param>
+        /// <param name="resolution">The resolution</param>
+        /// <returns>The Arms Index indicator for the requested symbol over the specified period</returns>
+        public ArmsIndex TRIN(Symbol[] symbols, Resolution? resolution = null)
         {
             var name = CreateIndicatorName(QuantConnect.Symbol.None, "TRIN", resolution ?? GetSubscription(symbols.First()).Resolution);
             var trin = new ArmsIndex(name);
