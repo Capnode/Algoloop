@@ -83,7 +83,7 @@
       <Version>1.2.2</Version>
     </PackageReference>
     <PackageReference Include="SocketIOClient">
-      <Version>2.1.6</Version>
+      <Version>2.1.7</Version>
     </PackageReference>
     <PackageReference Include="System.IO.Compression">
       <Version>4.3.0</Version>
