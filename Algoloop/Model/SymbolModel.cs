@@ -128,5 +128,26 @@ namespace Algoloop.Model
 
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            // credit: http://stackoverflow.com/a/263416/677735
+            unchecked // Overflow is fine, just wrap
+            {
+                int hash = 41;
+                // Suitable nullity checks etc, of course :)
+                if (Id != null)
+                    hash = hash * 59 + Id.GetHashCode();
+                hash = hash * 59 + Active.GetHashCode();
+                if (Name != null)
+                    hash = hash * 59 + Name.GetHashCode();
+                if (Market != null)
+                    hash = hash * 59 + Market.GetHashCode();
+                hash = hash * 59 + Security.GetHashCode();
+                if (Properties != null)
+                    hash = hash * 59 + Properties.GetHashCode();
+                return hash;
+            }
+        }
     }
 }
