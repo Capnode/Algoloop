@@ -79,7 +79,7 @@ namespace Algoloop.Wpf.Lean
             if (!model.Active) return;
 
             IsBusy = true;
-            bool success = true;
+            string error = null;
             _process = new ConfigProcess(
                 "QuantConnect.Lean.Launcher.exe",
                 null,
@@ -88,7 +88,10 @@ namespace Algoloop.Wpf.Lean
                 (line) => Log.Trace(line),
                 (line) =>
                 {
-                    success = false;
+                    if (string.IsNullOrEmpty(error))
+                    {
+                        error = line;
+                    }
                     Log.Error(line);
                 });
 
@@ -104,7 +107,7 @@ namespace Algoloop.Wpf.Lean
             {
                 _process.Start();
                 _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));
-                if (!success) throw new ApplicationException("See logs for details");
+                if (!string.IsNullOrEmpty(error)) throw new ApplicationException(error);
             }
             finally
             {
