@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -40,6 +40,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
+using AmCharts;
+using QuantConnect.Data;
+using QuantConnect.Data.Market;
+using System.Collections.ObjectModel;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -568,7 +572,7 @@ namespace Algoloop.Wpf.ViewModel
 
             List<ChartPoint> series = equity.Value.Values;
             double score = CalculateScore(series);
-            statistics.Add("Score", (decimal)score.RoundToSignificantDigits(4));
+            statistics.Add("Score", ((decimal)score).RoundToSignificantDigits(4));
         }
 
         private static double Scale(double x)
@@ -975,30 +979,71 @@ namespace Algoloop.Wpf.ViewModel
             SyncObservableCollection<ChartViewModel> workCharts = Charts;
             Debug.Assert(workCharts.Count == 0);
 
-            var series = new Series("Net profit", SeriesType.Line, "$", Color.Green, ScatterMarkerSymbol.Diamond);
             decimal profit = Model.InitialCapital;
-            series.AddPoint(Model.StartDate, profit);
+            var series = new List<BaseData>();
+            series.Add(new TradeBar(Model.StartDate, null, 0, 0, 0, profit, 0));
             foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
                 profit += trade.Value;
-                series.AddPoint(trade.Key, profit);
+                series.Add(new TradeBar(trade.Key, null, 0, 0, 0, profit, 0));
             }
 
-            workCharts.Add(new ChartViewModel(series));
+            var viewModel = new ChartViewModel(
+                "Net profit",
+                "Line",
+                Color.Green,
+                series,
+                "Time",
+                series.First().Time,
+                series.Last().Time,
+                "Value",
+                "Value",
+                "Value",
+                "Value",
+                "Value");
+
+            workCharts.Add(viewModel);
 
             foreach (KeyValuePair<string, Chart> chart in result.Charts)
             {
-                foreach (KeyValuePair<string, Series> serie in chart.Value.Series)
+                foreach (KeyValuePair<string, Series> kvp in chart.Value.Series)
                 {
-                    if (serie.Value.Values.Count < 2)
-                        continue;
+                    Series serie = kvp.Value;
+                    if (serie.Values.Count < 2) continue;
+                    IEnumerable<TimePoint> list = serie.Values.Select(
+                        m => new TimePoint(Time.UnixTimeStampToDateTime(m.x), m.y));
 
-                    workCharts.Add(new ChartViewModel(serie.Value));
+                    viewModel = new ChartViewModel(
+                        serie.Name,
+                        ToGraphType(serie.SeriesType),
+                        serie.Color,
+                        list,
+                        "Time",
+                        list.First().Time,
+                        list.Last().Time,
+                        "Value",
+                        "Value",
+                        "Value",
+                        "Value",
+                        "Value");
+
+                    workCharts.Add(viewModel);
                 }
             }
 
             Charts = null;
             Charts = workCharts;
+        }
+
+        private string ToGraphType(SeriesType seriesType)
+        {
+            switch (seriesType)
+            {
+                case SeriesType.Line: return "Line";
+                case SeriesType.Bar: return "Column";
+                case SeriesType.Candle: return "Candlestick";
+                default: return "None";
+            }
         }
     }
 }

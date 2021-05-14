@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.Wpf.ViewSupport;
+using AmCharts;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
@@ -170,8 +171,19 @@ namespace Algoloop.Wpf.ViewModel
                 List<BaseData> data = leanDataReader.Parse().ToList();
                 if (data.Any())
                 {
-                    var series = new Series(Model.Name, SeriesType.Candle, "$", Color.Black);
-                    var viewModel = new ChartViewModel(series, data);
+                    var viewModel = new ChartViewModel(
+                        Model.Name,
+                        "Candlestick",
+                        Color.Black,
+                        data,
+                        "Time",
+                        data.First().Time,
+                        data.Last().Time,
+                        "Value",
+                        "Value",
+                        "Value",
+                        "Value",
+                        "Value");
                     Charts.Add(viewModel);
                 }
                 ShowCharts = true;

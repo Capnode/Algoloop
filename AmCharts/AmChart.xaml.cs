@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -20,13 +20,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Algoloop.Wpf.ViewModel;
 using AmCharts.Windows.Stock;
 using AmCharts.Windows.Stock.Data;
-using QuantConnect;
-using QuantConnect.Data.Market;
 
-namespace Algoloop.Wpf.View
+namespace AmCharts
 {
     public partial class AmChart : UserControl
     {
@@ -66,7 +63,7 @@ namespace Algoloop.Wpf.View
                 coll.CollectionChanged += amChart.OnCollectionChanged;
             }
 
-            var charts = e.NewValue as IReadOnlyList<ChartViewModel>;
+            var charts = e.NewValue as IEnumerable<ChartViewModel>;
             amChart.OnItemsSourceChanged(charts);
         }
 
@@ -76,7 +73,7 @@ namespace Algoloop.Wpf.View
             OnItemsSourceChanged(charts);
         }
 
-        private void OnItemsSourceChanged(IReadOnlyList<ChartViewModel> charts)
+        private void OnItemsSourceChanged(IEnumerable<ChartViewModel> charts)
         {
             // Clear charts
             _combobox.Items.Clear();
@@ -87,7 +84,7 @@ namespace Algoloop.Wpf.View
             bool selected = true;
             foreach (ChartViewModel chart in charts)
             {
-                var model = new Model(chart, selected || IsDefaultSelected(chart.Title));
+                var model = new Model(chart, selected || IsDefaultSelected(chart.DataSet.Title));
                 _combobox.Items.Add(model);
                 selected = false;
             }
@@ -125,33 +122,15 @@ namespace Algoloop.Wpf.View
 
         private void RedrawChart(Model model)
         {
-            DataSet dataset = null;
-            QuantConnect.Data.BaseData item = model.Chart.Data?.FirstOrDefault();
-            if (item == null)
-            {
-                dataset = ChartSeries(model.Chart);
-            }
-            else if (item.GetType() == typeof(QuoteBar))
-            {
-                dataset = QuoteBarData(model.Chart);
-            }
-            else if (item.GetType() == typeof(TradeBar))
-            {
-                dataset = QuoteBarData(model.Chart);
-            }
-            else if (item.GetType() == typeof(Tick))
-            {
-                dataset = TickData(model.Chart);
-            }
-
+            DataSet dataset = model.Chart.DataSet;
             stockChart.DataSets.Add(dataset);
 
             var graph = new Graph
             {
-                GraphType = ToGraphType(model.Chart.Series.SeriesType),
-                Brush = ToMediaBrush(model.Chart.Series.Color),
+                GraphType = model.Chart.GraphType,
+                Brush = model.Chart.Color,
                 BulletType = GraphBulletType.RoundOutline,
-                CursorBrush = ToMediaBrush(model.Chart.Series.Color),
+                CursorBrush = model.Chart.Color,
                 CursorSize = 6,
                 DataField = DataItemField.Value,
                 ShowLegendKey = true,
@@ -168,99 +147,6 @@ namespace Algoloop.Wpf.View
             stockChart.Charts[0].Graphs.Add(graph);
         }
 
-        private static DataSet ChartSeries(ChartViewModel chart)
-        {
-            DataSet dataset;
-            int ix = 0;
-            int size = chart.Series.Values.Count;
-            KeyValuePair<DateTime, double>[] timeseries = new KeyValuePair<DateTime, double>[size];
-            foreach (ChartPoint point in chart.Series.Values)
-            {
-                DateTime time = Time.UnixTimeStampToDateTime(point.x);
-                timeseries[ix++] = new KeyValuePair<DateTime, double>(time, (double)point.y);
-            }
-
-            dataset = new DataSet()
-            {
-                ID = "id",
-                Title = chart.Title,
-                ShortTitle = chart.Title,
-                DateMemberPath = "Key",
-                OpenMemberPath = "Value",
-                HighMemberPath = "Value",
-                LowMemberPath = "Value",
-                CloseMemberPath = "Value",
-                ValueMemberPath = "Value",
-                IsSelectedForComparison = false,
-                ItemsSource = timeseries,
-                IsVisibleInCompareDataSetSelector = false,
-                IsVisibleInMainDataSetSelector = false,
-                StartDate = timeseries.First().Key,
-                EndDate = timeseries.Last().Key
-            };
-            return dataset;
-        }
-
-        private static DataSet QuoteBarData(ChartViewModel chart)
-        {
-            return new DataSet()
-            {
-                ID = "id",
-                Title = chart.Title,
-                ShortTitle = chart.Title,
-                DateMemberPath = "Time",
-                OpenMemberPath = "Open",
-                HighMemberPath = "High",
-                LowMemberPath = "Low",
-                CloseMemberPath = "Close",
-                ValueMemberPath = "Value",
-                IsSelectedForComparison = false,
-                ItemsSource = chart.Data,
-                IsVisibleInCompareDataSetSelector = false,
-                IsVisibleInMainDataSetSelector = false,
-                StartDate = chart.Data.First().Time,
-                EndDate = chart.Data.Last().Time,
-            };
-        }
-
-        private static DataSet TickData(ChartViewModel chart)
-        {
-            return new DataSet()
-            {
-                ID = "id",
-                Title = chart.Title,
-                ShortTitle = chart.Title,
-                DateMemberPath = "Time",
-                OpenMemberPath = "Value",
-                HighMemberPath = "Value",
-                LowMemberPath = "Value",
-                CloseMemberPath = "Value",
-                ValueMemberPath = "Value",
-                IsSelectedForComparison = false,
-                ItemsSource = chart.Data,
-                IsVisibleInCompareDataSetSelector = false,
-                IsVisibleInMainDataSetSelector = false,
-                StartDate = chart.Data.First().Time,
-                EndDate = chart.Data.Last().Time,
-            };
-        }
-
-        private static GraphType ToGraphType(SeriesType seriesType)
-        {
-            return seriesType switch
-            {
-                SeriesType.Bar => GraphType.Column,
-                SeriesType.Candle => GraphType.Candlestick,
-                SeriesType.Line => GraphType.Line,
-                _ => GraphType.Step,
-            };
-        }
-
-        public static System.Windows.Media.Brush ToMediaBrush(System.Drawing.Color color)
-        {
-            return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, color.R, color.G, color.B));
-        }
-
         private void Combobox_DropDownClosed(object sender, EventArgs e)
         {
             RedrawCharts();
@@ -272,7 +158,7 @@ namespace Algoloop.Wpf.View
         public Model(ChartViewModel chart, bool selected)
         {
             Chart = chart;
-            Title = chart.Title;
+            Title = chart.DataSet.Title;
             IsSelected = selected;
         }
 

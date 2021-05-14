@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Algoloop.Model
@@ -25,7 +26,10 @@ namespace Algoloop.Model
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
             BrowsableAttribute attribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
-            FieldInfo fieldToChange = attribute.GetType().GetField("browsable", BindingFlags.NonPublic | BindingFlags.Instance);
+            Type gtype = attribute.GetType();
+            FieldInfo[] fields = attribute.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            Debug.Assert(fields.Length == 1);
+            FieldInfo fieldToChange = fields[0];
             fieldToChange.SetValue(attribute, value);
         }
 
@@ -33,7 +37,9 @@ namespace Algoloop.Model
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
             ReadOnlyAttribute attribute = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
-            FieldInfo fieldToChange = attribute.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fields = attribute.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            Debug.Assert(fields.Length == 1);
+            FieldInfo fieldToChange = fields[0];
             fieldToChange.SetValue(attribute, value);
         }
 
@@ -41,7 +47,9 @@ namespace Algoloop.Model
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
             DisplayNameAttribute attribute = (DisplayNameAttribute)descriptor.Attributes[typeof(DisplayNameAttribute)];
-            FieldInfo fieldToChange = attribute.GetType().GetField("_displayName", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fields = attribute.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            Debug.Assert(fields.Length == 1);
+            FieldInfo fieldToChange = fields[0];
             fieldToChange.SetValue(attribute, value);
         }
 
@@ -49,7 +57,9 @@ namespace Algoloop.Model
         {
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
             DescriptionAttribute attribute = (DescriptionAttribute)descriptor.Attributes[typeof(DescriptionAttribute)];
-            FieldInfo fieldToChange = attribute.GetType().GetField("description", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fields = attribute.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            Debug.Assert(fields.Length == 1);
+            FieldInfo fieldToChange = fields[0];
             fieldToChange.SetValue(attribute, value);
         }
 

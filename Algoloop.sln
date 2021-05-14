@@ -58,20 +58,22 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Optimizer", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Optimizer.Launcher", "Optimizer.Launcher\QuantConnect.Optimizer.Launcher.csproj", "{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop", "Algoloop\Algoloop.csproj", "{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop", "Algoloop\Algoloop.csproj", "{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Brokerages", "Algoloop.Brokerages\Algoloop.Brokerages.csproj", "{D3A6E48F-798D-4547-BB6B-60D37C484F67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Brokerages", "Algoloop.Brokerages\Algoloop.Brokerages.csproj", "{D3A6E48F-798D-4547-BB6B-60D37C484F67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capnode.Wpf", "Capnode.Wpf\Capnode.Wpf.csproj", "{769D993C-2867-4212-BE80-B70E4862EBC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnode.Wpf", "Capnode.Wpf\Capnode.Wpf.csproj", "{769D993C-2867-4212-BE80-B70E4862EBC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Wpf", "Algoloop.Wpf\Algoloop.Wpf.csproj", "{F65DA573-DB1B-4524-A254-2034954CAE66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Wpf", "Algoloop.Wpf\Algoloop.Wpf.csproj", "{F65DA573-DB1B-4524-A254-2034954CAE66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Algoloop.Tests", "Algoloop.Tests\Algoloop.Tests.csproj", "{4355918B-3B14-4BBB-B1A2-D8155FED4E64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Tests", "Algoloop.Tests\Algoloop.Tests.csproj", "{4355918B-3B14-4BBB-B1A2-D8155FED4E64}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CE93C8B9-FE43-4861-BE6C-66A794865BDB}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AmCharts", "AmCharts\AmCharts.csproj", "{8F6994C3-CF11-4B41-A784-6D9DD423D42E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -279,6 +281,14 @@ Global
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|x64.ActiveCfg = Release|Any CPU
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|x64.Build.0 = Release|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Debug|x64.Build.0 = Debug|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Release|x64.ActiveCfg = Release|Any CPU
+		{8F6994C3-CF11-4B41-A784-6D9DD423D42E}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

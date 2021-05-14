@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -64,19 +64,7 @@ namespace Algoloop.Wpf.ViewSupport
             object parameter,
             System.Globalization.CultureInfo culture)
         {
-            if (value is Cursors)
-            {
-                if (value == Cursors.Wait)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -158,19 +158,6 @@ namespace Algoloop.Wpf.Lean
             {
                 SetPaper(config);
             }
-            else if (account != null
-                && account.Provider != null
-                && account.Provider.Provider.Equals(nameof(Provider.Fxcm), StringComparison.OrdinalIgnoreCase))
-            {
-                if (model.Desktop)
-                {
-                    SetFxcmDesktop(config, account);
-                }
-                else
-                {
-                    SetFxcm(config, account);
-                }
-            }
             else
             {
                 Log.Error("No broker selected");
@@ -320,69 +307,6 @@ namespace Algoloop.Wpf.Lean
             config["data-queue-handler"] = "QuantConnect.Lean.Engine.DataFeeds.Queues.LiveDataQueue";
             config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler";
             config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler";
-        }
-
-        private static void SetFxcm(
-            IDictionary<string, string> config,
-            AccountModel account)
-        {
-            config["environment"] = "live-fxcm";
-            config["live-mode"] = "true";
-            config["fxcm-server"] = "http://www.fxcorporate.com/Hosts.jsp";
-            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler";
-            config["result-handler"] = "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler";
-            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed";
-            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler";
-            config["history-provider"] = "BrokerageHistoryProvider";
-            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler";
-            config["live-mode-brokerage"] = "FxcmBrokerage";
-            config["data-queue-handler"] = "FxcmBrokerage";
-            config["fxcm-user-name"] = account.Provider.Login;
-            config["fxcm-password"] = account.Provider.Password;
-            config["fxcm-account-id"] = account.Id;
-            switch (account.Provider.Access)
-            {
-                case ProviderModel.AccessType.Demo:
-                    config["fxcm-terminal"] = "Demo";
-                    break;
-
-                case ProviderModel.AccessType.Real:
-                    config["fxcm-terminal"] = "Real";
-                    break;
-            }
-        }
-
-        private static void SetFxcmDesktop(
-            IDictionary<string, string> config,
-            AccountModel account)
-        {
-            config["environment"] = "live-desktop";
-            config["live-mode"] = "true";
-            config["send-via-api"] = "true";
-            config["fxcm-server"] = "http://www.fxcorporate.com/Hosts.jsp";
-            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler";
-            config["result-handler"] = "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler";
-            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed";
-            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler";
-            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler";
-            config["messaging-handler"] = "QuantConnect.Messaging.StreamingMessageHandler";
-            config["live-mode-brokerage"] = "FxcmBrokerage";
-            config["data-queue-handler"] = "FxcmBrokerage";
-            config["fxcm-user-name"] = account.Provider.Login;
-            config["fxcm-password"] = account.Provider.Password;
-            config["fxcm-account-id"] = account.Id;
-            config["log-handler"] = "QuantConnect.Logging.QueueLogHandler";
-            config["desktop-exe"] = @"../../../UserInterface/bin/Release/QuantConnect.Views.exe";
-            switch (account.Provider.Access)
-            {
-                case ProviderModel.AccessType.Demo:
-                    config["fxcm-terminal"] = "Demo";
-                    break;
-
-                case ProviderModel.AccessType.Real:
-                    config["fxcm-terminal"] = "Real";
-                    break;
-            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -38,11 +38,6 @@ namespace Algoloop.Wpf.Lean
         public void Trace(string text)
         {
             Log.Trace(text);
-        }
-
-        public override object InitializeLifetimeService()
-        {
-            return null;
         }
 
         public void Dispose()
