@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AmCharts
+namespace Algoloop.Charts
 {
     public class ChartViewModel
     {

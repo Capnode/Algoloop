@@ -15,7 +15,7 @@
 using System;
 using System.Globalization;
 
-namespace AmCharts
+namespace Algoloop.Charts
 {
     public class TimePoint
     {

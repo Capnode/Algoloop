@@ -9,4 +9,10 @@
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="StockSharp.Algo" Version="5.0.86" />
+    <PackageReference Include="StockSharp.Configuration" Version="5.0.84" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.86" />
+  </ItemGroup>
+
 </Project>

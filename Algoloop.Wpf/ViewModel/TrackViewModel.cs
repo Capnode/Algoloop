@@ -40,10 +40,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
-using AmCharts;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using System.Collections.ObjectModel;
+using Algoloop.Charts;
 
 namespace Algoloop.Wpf.ViewModel
 {

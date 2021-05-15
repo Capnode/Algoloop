@@ -22,7 +22,6 @@ More information and user documentation can be found [here](https://github.com/C
 Contributions are welcome:
 - Finding bugs
 - Fixing bugs
-- Improved charting package that can replace amCharts
 - Full integration with QuantConnect web services
 - ...
 

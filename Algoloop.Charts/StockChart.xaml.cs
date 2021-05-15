@@ -21,17 +21,17 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace AmCharts
+namespace Algoloop.Charts
 {
-    public partial class AmChart : UserControl
+    public partial class StockChart : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty = 
             DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
-            typeof(AmChart), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
+            typeof(StockChart), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
 
         private readonly List<Model> _models = new List<Model>();
 
-        public AmChart()
+        public StockChart()
         {
             InitializeComponent();
         }
@@ -44,25 +44,25 @@ namespace AmCharts
 
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            AmChart amChart = d as AmChart;
-            Debug.Assert(amChart != null);
+            StockChart chart = d as StockChart;
+            Debug.Assert(chart != null);
 
             if (e.OldValue != null)
             {
                 // Unsubscribe from CollectionChanged on the old collection
                 var coll = e.OldValue as INotifyCollectionChanged;
-                coll.CollectionChanged -= amChart.OnCollectionChanged;
+                coll.CollectionChanged -= chart.OnCollectionChanged;
             }
 
             if (e.NewValue != null)
             {
                 // Subscribe to CollectionChanged on the new collection
                 var coll = e.NewValue as ObservableCollection<ChartViewModel>;
-                coll.CollectionChanged += amChart.OnCollectionChanged;
+                coll.CollectionChanged += chart.OnCollectionChanged;
             }
 
             var charts = e.NewValue as IEnumerable<ChartViewModel>;
-            amChart.OnItemsSourceChanged(charts);
+            chart.OnItemsSourceChanged(charts);
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

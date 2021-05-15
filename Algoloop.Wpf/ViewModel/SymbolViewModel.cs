@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
+using Algoloop.Charts;
 using Algoloop.Model;
 using Algoloop.Wpf.ViewSupport;
-using AmCharts;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
