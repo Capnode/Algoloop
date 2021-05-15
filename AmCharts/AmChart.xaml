@@ -3,7 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ams="http://schemas.amcharts.com/stock/wpf/2009/xaml"
     mc:Ignorable="d"
     d:DesignHeight="126" d:DesignWidth="225">
     <DockPanel>
@@ -20,67 +19,5 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <ams:StockChart
-            Name="stockChart"
-            Height="Auto"
-            DockPanel.Dock="Top"
-            IsEquallySpaced="False"
-            Margin="5">
-            <ams:StockChart.Charts>
-                <ams:Chart
-                    GridHeight="2*" 
-                    PlotAreaBorderBrush="#CCCCCC" 
-                    PlotAreaBorderThickness="1">
-                    <ams:Chart.PlotAreaBackground>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                            <GradientStop Offset="0" Color="#F5F5F5" />
-                            <GradientStop Offset="1" Color="White" />
-                        </LinearGradientBrush>
-                    </ams:Chart.PlotAreaBackground>
-
-                    <ams:Chart.DateTimeAxis>
-                        <ams:DateTimeAxis
-                            ValuesEnabled="True"
-                            Stroke="Transparent"
-                            StrokeThickness="0"
-                            TickLength="0"/>
-                    </ams:Chart.DateTimeAxis>
-
-                    <ams:Chart.LeftValueAxis>
-                        <ams:ValueAxis
-                            ValuesFormatString="0"
-                            Stroke="Transparent"
-                            StrokeThickness="0"
-                            TickLength="0"/>
-                    </ams:Chart.LeftValueAxis>
-
-                    <ams:Chart.Legend>
-                        <ams:Legend
-                            IsDateVisible="True"
-                            PositiveValueForeground="Red"
-                            NegativeValueForeground="Green"
-                            Margin="0,0,0,5"/>
-                    </ams:Chart.Legend>
-                </ams:Chart>
-            </ams:StockChart.Charts>
-            
-            <ams:StockChart.PeriodSelector>
-                <ams:PeriodSelector
-                    CustomPeriodLabelText="Custom period"
-                    CustomPeriodVisibility="Visible" 
-                    Margin="5"
-                    PresetPeriodLabelText="Scale:">
-                    <ams:PeriodSelector.PresetPeriods>
-                        <ams:PresetPeriodButton Interval="Day" Quantity="10" ToolTip="10 days">10D</ams:PresetPeriodButton>
-                        <ams:PresetPeriodButton Interval="Month" Quantity="1" ToolTip="1 month">1M</ams:PresetPeriodButton>
-                        <ams:PresetPeriodButton Interval="Month" Quantity="3" ToolTip="3 months">3M</ams:PresetPeriodButton>
-                        <ams:PresetPeriodButton Interval="Year" Quantity="0" ToolTip="Year to date">YTD</ams:PresetPeriodButton>
-                        <ams:PresetPeriodButton Interval="Year" Quantity="1" ToolTip="1 year">1Y</ams:PresetPeriodButton>
-                        <ams:PresetPeriodButton Interval="Year" Quantity="3" ToolTip="3 years">3Y</ams:PresetPeriodButton>
-                        <ams:PresetPeriodButton Interval="Year" Quantity="NaN"  ToolTip="All available data">MAX</ams:PresetPeriodButton>
-                    </ams:PeriodSelector.PresetPeriods>
-                </ams:PeriodSelector>
-            </ams:StockChart.PeriodSelector>
-        </ams:StockChart>
     </DockPanel>
 </UserControl>

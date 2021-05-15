@@ -9,14 +9,4 @@
     <WarningLevel>3</WarningLevel>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="AmCharts.Windows.Stock">
-      <HintPath>AmCharts.Windows.Stock.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
 </Project>

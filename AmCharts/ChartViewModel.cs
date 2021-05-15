@@ -12,8 +12,6 @@
  * limitations under the License.
  */
 
-using AmCharts.Windows.Stock;
-using AmCharts.Windows.Stock.Data;
 using System;
 using System.Collections.Generic;
 
@@ -36,31 +34,31 @@ namespace AmCharts
             string closePath)
         {
             if (series == null) throw new ArgumentNullException(nameof(series));
-            GraphType = (GraphType)Enum.Parse(typeof(GraphType), graphType);
             Color = ToMediaBrush(color);
-            DataSet = new DataSet()
-            {
-                ID = "id",
-                Title = name,
-                ShortTitle = name,
-                DateMemberPath = datePath,
-                OpenMemberPath = openPath,
-                HighMemberPath = highPath,
-                LowMemberPath = lowPath,
-                CloseMemberPath = closePath,
-                ValueMemberPath = valuePath,
-                IsSelectedForComparison = false,
-                ItemsSource = series,
-                IsVisibleInCompareDataSetSelector = false,
-                IsVisibleInMainDataSetSelector = false,
-                StartDate = startDate,
-                EndDate = endDate
-            };
+            Title = name;
+            //DataSet = new DataSet()
+            //{
+            //    ID = "id",
+            //    Title = name,
+            //    ShortTitle = name,
+            //    DateMemberPath = datePath,
+            //    OpenMemberPath = openPath,
+            //    HighMemberPath = highPath,
+            //    LowMemberPath = lowPath,
+            //    CloseMemberPath = closePath,
+            //    ValueMemberPath = valuePath,
+            //    IsSelectedForComparison = false,
+            //    ItemsSource = series,
+            //    IsVisibleInCompareDataSetSelector = false,
+            //    IsVisibleInMainDataSetSelector = false,
+            //    StartDate = startDate,
+            //    EndDate = endDate
+            //};
         }
 
-        public GraphType GraphType { get; }
         public System.Windows.Media.Brush Color { get; }
-        public DataSet DataSet { get; }
+
+        public string Title { get; }
 
         private static System.Windows.Media.Brush ToMediaBrush(System.Drawing.Color color)
         {

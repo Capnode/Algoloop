@@ -20,8 +20,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using AmCharts.Windows.Stock;
-using AmCharts.Windows.Stock.Data;
 
 namespace AmCharts
 {
@@ -84,7 +82,7 @@ namespace AmCharts
             bool selected = true;
             foreach (ChartViewModel chart in charts)
             {
-                var model = new Model(chart, selected || IsDefaultSelected(chart.DataSet.Title));
+                var model = new Model(chart, selected || IsDefaultSelected(chart.Title));
                 _combobox.Items.Add(model);
                 selected = false;
             }
@@ -107,10 +105,6 @@ namespace AmCharts
 
         private void RedrawCharts()
         {
-            stockChart.DataSets.Clear();
-            Debug.Assert(stockChart.Charts.Count == 1);
-            stockChart.Charts[0].Graphs.Clear();
-
             foreach (var item in _combobox.Items)
             {
                 if (item is Model model && model.IsSelected)
@@ -122,29 +116,6 @@ namespace AmCharts
 
         private void RedrawChart(Model model)
         {
-            DataSet dataset = model.Chart.DataSet;
-            stockChart.DataSets.Add(dataset);
-
-            var graph = new Graph
-            {
-                GraphType = model.Chart.GraphType,
-                Brush = model.Chart.Color,
-                BulletType = GraphBulletType.RoundOutline,
-                CursorBrush = model.Chart.Color,
-                CursorSize = 6,
-                DataField = DataItemField.Value,
-                ShowLegendKey = true,
-                ShowLegendTitle = true,
-                LegendItemType = AmCharts.Windows.Stock.Primitives.LegendItemType.Value,
-                LegendValueLabelText = "",
-                LegendPeriodItemType = AmCharts.Windows.Stock.Primitives.LegendItemType.Value,
-                LegendValueFormatString = "0.0000",
-                PeriodValue = PeriodValue.Last,
-                DataSet = dataset,
-                Visibility = Visibility.Visible
-            };
-
-            stockChart.Charts[0].Graphs.Add(graph);
         }
 
         private void Combobox_DropDownClosed(object sender, EventArgs e)
@@ -158,7 +129,7 @@ namespace AmCharts
         public Model(ChartViewModel chart, bool selected)
         {
             Chart = chart;
-            Title = chart.DataSet.Title;
+            Title = chart.Title;
             IsSelected = selected;
         }
 
