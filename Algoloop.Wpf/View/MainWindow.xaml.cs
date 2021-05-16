@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -16,6 +16,7 @@ using Algoloop.Support;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using QuantConnect.Configuration;
+using StockSharp.Xaml;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -34,6 +35,8 @@ namespace Algoloop.Wpf.View
             Config.Set("composer-dll-directory", exeFolder);
 
             InitializeComponent();
+            ThemeExtensions.DefaultTheme = ThemeExtensions.DefaultLightTheme;
+            ThemeExtensions.ApplyDefaultTheme();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
