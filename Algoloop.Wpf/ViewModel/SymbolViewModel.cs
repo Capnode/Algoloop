@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Charts;
 using Algoloop.Model;
 using Algoloop.Wpf.Common;
 using Algoloop.Wpf.ViewSupport;
@@ -20,9 +19,7 @@ using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
 using QuantConnect;
-using QuantConnect.Data;
 using QuantConnect.Data.Fundamental;
-using QuantConnect.Data.Market;
 using QuantConnect.ToolBox;
 using QuantConnect.Util;
 using StockSharp.Algo.Candles;

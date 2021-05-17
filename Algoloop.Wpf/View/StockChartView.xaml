@@ -6,7 +6,11 @@
     xmlns:sx="http://schemas.stocksharp.com/xaml"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="640">
-    <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <ComboBox
             DockPanel.Dock="Top"
             DropDownClosed="Combobox_DropDownClosed"
@@ -20,6 +24,6 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <sx:ChartPanel x:Name="Chart" IsInteracted="True"/>
-    </DockPanel>
+        <sx:ChartPanel x:Name="Chart" IsInteracted="True" Grid.Row="1"/>
+    </Grid>
 </UserControl>

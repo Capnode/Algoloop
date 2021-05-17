@@ -16,6 +16,7 @@ using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using StockSharp.Algo.Candles;
 using StockSharp.BusinessEntities;
+using StockSharp.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,23 +44,41 @@ namespace Algoloop.Wpf.Common
                     Security = security,
                     TimeFrame = trade.Period,
                     OpenTime = trade.Time,
+                    HighTime = trade.Time,
+                    LowTime = trade.Time,
+                    CloseTime = trade.Time,
                     OpenPrice = trade.Open,
                     HighPrice = trade.High,
                     LowPrice = trade.Low,
-                    ClosePrice = trade.Low
+                    ClosePrice = trade.Close,
+                    OpenVolume = 0,
+                    HighVolume = 0,
+                    LowVolume = 0,
+                    CloseVolume = trade.Volume,
+                    BuildFrom = DataType.Ticks,
+                    State = CandleStates.Finished
                 };
             }
             else if (data is QuoteBar quote)
             {
                 return new TimeFrameCandle
                 {
-                    TimeFrame = quote.Period,
                     Security = security,
+                    TimeFrame = quote.Period,
                     OpenTime = quote.Time,
+                    HighTime = quote.Time,
+                    LowTime = quote.Time,
+                    CloseTime = quote.Time,
                     OpenPrice = quote.Open,
                     HighPrice = quote.High,
                     LowPrice = quote.Low,
-                    ClosePrice = quote.Low
+                    ClosePrice = quote.Close,
+                    OpenVolume = 0,
+                    HighVolume = 0,
+                    LowVolume = 0,
+                    CloseVolume = 0,
+                    BuildFrom = DataType.Ticks,
+                    State = CandleStates.Finished
                 };
             }
 

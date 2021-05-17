@@ -25,19 +25,18 @@ namespace Algoloop.Wpf
             IEnumerable<Candle> candles)
         {
             Title = name;
-            Color = ToMediaBrush(color);
+            Color = ToMediaColor(color);
             Candles = candles;
         }
 
-        public System.Windows.Media.Brush Color { get; }
-
         public string Title { get; }
+        public System.Windows.Media.Color Color { get; }
         public IEnumerable<Candle> Candles { get; }
         public bool IsSelected { get; set; }
 
-        private static System.Windows.Media.Brush ToMediaBrush(System.Drawing.Color color)
+        private static System.Windows.Media.Color ToMediaColor(System.Drawing.Color color)
         {
-            return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, color.R, color.G, color.B));
+            return System.Windows.Media.Color.FromRgb(color.R, color.G, color.B);
         }
     }
 }

@@ -40,10 +40,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
-using QuantConnect.Data;
-using QuantConnect.Data.Market;
-using System.Collections.ObjectModel;
-using Algoloop.Charts;
 using StockSharp.Algo.Candles;
 
 namespace Algoloop.Wpf.ViewModel

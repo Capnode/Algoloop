@@ -15,7 +15,7 @@
 using System;
 using System.Windows;
 
-namespace Algoloop.Charts
+namespace Algoloop.Wpf.ViewSupport
 {
     public class WpfSupport
     {

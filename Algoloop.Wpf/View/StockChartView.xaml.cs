@@ -31,19 +31,30 @@ namespace Algoloop.Wpf.View
         public static readonly DependencyProperty ItemsSourceProperty = 
             DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
             typeof(StockChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
-
-        private readonly List<ChartViewModel> _models = new List<ChartViewModel>();
+        private bool _isLoaded;
 
         public StockChartView()
         {
             InitializeComponent();
-            Chart.FillIndicators();
+            Loaded += OnLoaded;
+            Unloaded += OnUnloaded;
         }
 
         public ObservableCollection<ChartViewModel> ItemsSource
         {
             get => (ObservableCollection<ChartViewModel>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            _isLoaded = true;
+            Chart.FillIndicators();
+//            RedrawCharts();
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
         }
 
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -79,10 +90,7 @@ namespace Algoloop.Wpf.View
         {
             // Clear charts
             _combobox.Items.Clear();
-            _models.Clear();
-            if (charts == null)
-                return;
-
+            if (charts == null) return;
             bool selected = true;
             foreach (ChartViewModel chart in charts)
             {
@@ -93,8 +101,10 @@ namespace Algoloop.Wpf.View
 
             _combobox.SelectedIndex = 0;
             _combobox.Visibility = _combobox.Items.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-
-            RedrawCharts();
+            if (_isLoaded)
+            {
+                RedrawCharts();
+            }
         }
 
         private static bool IsDefaultSelected(string title)
@@ -115,22 +125,22 @@ namespace Algoloop.Wpf.View
         private void RedrawCharts()
         {
             Chart.ClearAreas();
-            var areaComb = new ChartArea();
-            var yAxis = areaComb.YAxises.First();
+            ChartArea candlesArea = new ChartArea();
+            var yAxis = candlesArea.YAxises.First();
             yAxis.AutoRange = true;
             Chart.IsAutoRange = true;
             Chart.IsAutoScroll = true;
-            Chart.AddArea(areaComb);
-            foreach (var item in _combobox.Items)
+            Chart.AddArea(candlesArea);
+            foreach (object item in _combobox.Items)
             {
-                if (item is ChartViewModel model && model.IsSelected)
+                if (item is ChartViewModel chart && chart.IsSelected)
                 {
-                    RedrawChart(areaComb, model);
+                    RedrawChart(candlesArea, chart);
                 }
             }
         }
 
-        private void RedrawChart(ChartArea areaComb, ChartViewModel model)
+        private void RedrawChart(ChartArea candlesArea, ChartViewModel model)
         {
             Candle first = model.Candles.FirstOrDefault();
             if (first == default) return;
@@ -143,15 +153,20 @@ namespace Algoloop.Wpf.View
             {
                 throw new NotImplementedException("Candle subtype not implemented");
             }
-            var candleElement = new ChartCandleElement();
-            Chart.AddElement(areaComb, candleElement, series);
+            var candleElement = new ChartCandleElement
+            {
+                UpBorderColor = model.Color,
+                DownBorderColor = model.Color
+            };
+            Chart.AddElement(candlesArea, candleElement, series);
             var chartData = new ChartDrawData();
             foreach (Candle candle in model.Candles)
             {
                 ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
                 chartGroup.Add(candleElement, candle);
+//                chartGroup.Add(candleElement, model.Color);
             }
-
+            Chart.Reset(new[] { candleElement });
             Chart.Draw(chartData);
         }
     }
