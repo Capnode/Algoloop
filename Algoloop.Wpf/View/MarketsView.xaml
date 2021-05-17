@@ -8,7 +8,7 @@
     xmlns:viewsupport="clr-namespace:Algoloop.Wpf.ViewSupport"
     xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
     xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModel"
-    xmlns:charts="clr-namespace:Algoloop.Charts;assembly=Algoloop.Charts"
+    xmlns:view="clr-namespace:Algoloop.Wpf.View"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     DataContext="{Binding Source={StaticResource Locator}, Path=MarketsViewModel}" 
     mc:Ignorable="d"
@@ -551,7 +551,7 @@
                                         </i:Interaction.Triggers>
                                     </xctk:DateTimePicker>
                                 </ToolBar>
-                                <charts:StockChart
+                                <view:StockChartView
                                     ItemsSource="{Binding Charts}"
                                     Visibility="{Binding ShowCharts, Converter={viewsupport:BooleanToVisibilityConverter}}" />
                             </DockPanel>

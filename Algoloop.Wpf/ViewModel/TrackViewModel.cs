@@ -44,6 +44,7 @@ using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using System.Collections.ObjectModel;
 using Algoloop.Charts;
+using StockSharp.Algo.Candles;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -980,27 +981,15 @@ namespace Algoloop.Wpf.ViewModel
             Debug.Assert(workCharts.Count == 0);
 
             decimal profit = Model.InitialCapital;
-            var series = new List<BaseData>();
-            series.Add(new TradeBar(Model.StartDate, null, 0, 0, 0, profit, 0));
+            var series = new List<Candle>();
+            series.Add(new TimeFrameCandle { CloseTime = Model.StartDate, ClosePrice = profit });
             foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
                 profit += trade.Value;
-                series.Add(new TradeBar(trade.Key, null, 0, 0, 0, profit, 0));
+                series.Add(new TimeFrameCandle { CloseTime = trade.Key, ClosePrice = profit });
             }
 
-            var viewModel = new ChartViewModel(
-                "Net profit",
-                "Line",
-                Color.Green,
-                series,
-                "Time",
-                series.First().Time,
-                series.Last().Time,
-                "Value",
-                "Value",
-                "Value",
-                "Value",
-                "Value");
+            var viewModel = new ChartViewModel("Net profit", Color.Green, series);
 
             workCharts.Add(viewModel);
 
@@ -1010,40 +999,15 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     Series serie = kvp.Value;
                     if (serie.Values.Count < 2) continue;
-                    IEnumerable<TimePoint> list = serie.Values.Select(
-                        m => new TimePoint(Time.UnixTimeStampToDateTime(m.x), m.y));
-
-                    viewModel = new ChartViewModel(
-                        serie.Name,
-                        ToGraphType(serie.SeriesType),
-                        serie.Color,
-                        list,
-                        "Time",
-                        list.First().Time,
-                        list.Last().Time,
-                        "Value",
-                        "Value",
-                        "Value",
-                        "Value",
-                        "Value");
-
+                    IEnumerable<Candle> candles = serie.Values.Select(
+                        m => new TimeFrameCandle { CloseTime = Time.UnixTimeStampToDateTime(m.x), ClosePrice = m.y } );
+                    viewModel = new ChartViewModel(serie.Name, serie.Color, candles);
                     workCharts.Add(viewModel);
                 }
             }
 
             Charts = null;
             Charts = workCharts;
-        }
-
-        private string ToGraphType(SeriesType seriesType)
-        {
-            switch (seriesType)
-            {
-                case SeriesType.Line: return "Line";
-                case SeriesType.Bar: return "Column";
-                case SeriesType.Candle: return "Candlestick";
-                default: return "None";
-            }
         }
     }
 }

@@ -73,8 +73,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Charts", "Algoloop.Charts\Algoloop.Charts.csproj", "{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -281,14 +279,6 @@ Global
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|x64.ActiveCfg = Release|Any CPU
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|x64.Build.0 = Release|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Debug|x64.Build.0 = Debug|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Release|x64.ActiveCfg = Release|Any CPU
-		{06F3F0E3-E153-43A7-A74E-118DA8EA5EF5}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

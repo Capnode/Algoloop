@@ -8,7 +8,6 @@
     xmlns:viewsupport="clr-namespace:Algoloop.Wpf.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModel"
     xmlns:view="clr-namespace:Algoloop.Wpf.View"
-    xmlns:charts="clr-namespace:Algoloop.Charts;assembly=Algoloop.Charts"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"             
     mc:Ignorable="d" 
@@ -179,7 +178,7 @@
                 </wpf:ExDataGrid>
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
-                <charts:StockChart ItemsSource="{Binding Charts}"/>
+                <view:StockChartView ItemsSource="{Binding Charts}"/>
             </TabItem>
             <TabItem
                 Header="Desktop"

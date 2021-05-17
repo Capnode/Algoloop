@@ -14,6 +14,7 @@
 
 using Algoloop.Charts;
 using Algoloop.Model;
+using Algoloop.Wpf.Common;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight.Command;
@@ -21,8 +22,10 @@ using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Data;
 using QuantConnect.Data.Fundamental;
+using QuantConnect.Data.Market;
 using QuantConnect.ToolBox;
 using QuantConnect.Util;
+using StockSharp.Algo.Candles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -168,22 +171,10 @@ namespace Algoloop.Wpf.ViewModel
             if (File.Exists(filename))
             {
                 var leanDataReader = new LeanDataReader(filename);
-                List<BaseData> data = leanDataReader.Parse().ToList();
-                if (data.Any())
+                IEnumerable<Candle> candles = leanDataReader.Parse().ToCandles();
+                if (candles.Any())
                 {
-                    var viewModel = new ChartViewModel(
-                        Model.Name,
-                        "Candlestick",
-                        Color.Black,
-                        data,
-                        "Time",
-                        data.First().Time,
-                        data.Last().Time,
-                        "Value",
-                        "Value",
-                        "Value",
-                        "Value",
-                        "Value");
+                    var viewModel = new ChartViewModel(Model.Name, Color.Black, candles);
                     Charts.Add(viewModel);
                 }
                 ShowCharts = true;

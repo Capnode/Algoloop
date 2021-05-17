@@ -12,20 +12,32 @@
  * limitations under the License.
  */
 
+using StockSharp.Algo.Candles;
+using System.Collections.Generic;
 
-namespace Algoloop.Charts
+namespace Algoloop.Wpf
 {
-    internal class ChartModel
+    public class ChartViewModel
     {
-        public ChartModel(ChartViewModel chart, bool selected)
+        public ChartViewModel(
+            string name,
+            System.Drawing.Color color,
+            IEnumerable<Candle> candles)
         {
-            Chart = chart;
-            Title = chart.Title;
-            IsSelected = selected;
+            Title = name;
+            Color = ToMediaBrush(color);
+            Candles = candles;
         }
 
-        public ChartViewModel Chart { get; }
+        public System.Windows.Media.Brush Color { get; }
+
         public string Title { get; }
+        public IEnumerable<Candle> Candles { get; }
         public bool IsSelected { get; set; }
+
+        private static System.Windows.Media.Brush ToMediaBrush(System.Drawing.Color color)
+        {
+            return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, color.R, color.G, color.B));
+        }
     }
 }

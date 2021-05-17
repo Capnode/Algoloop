@@ -185,7 +185,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
-    <ProjectReference Include="..\Algoloop.Charts\Algoloop.Charts.csproj" />
     <ProjectReference Include="..\Algoloop\Algoloop.csproj" />
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
     <ProjectReference Include="..\Algorithm.Framework\QuantConnect.Algorithm.Framework.csproj" />
@@ -240,6 +239,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="StockSharp.Algo" Version="5.0.86" />
+    <PackageReference Include="StockSharp.Configuration" Version="5.0.84" />
     <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.86" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
@@ -261,5 +262,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="View\StockChartView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
   </ItemGroup>
 </Project>
