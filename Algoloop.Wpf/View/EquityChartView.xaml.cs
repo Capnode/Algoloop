@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using MoreLinq;
-using StockSharp.Algo.Candles;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace Algoloop.Wpf.View
     public partial class EquityChartView : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty = 
-            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
+            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<EquityChartViewModel>),
             typeof(EquityChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
         private bool _isLoaded = false;
 
@@ -40,9 +40,9 @@ namespace Algoloop.Wpf.View
             Unloaded += OnUnloaded;
         }
 
-        public ObservableCollection<ChartViewModel> ItemsSource
+        public ObservableCollection<EquityChartViewModel> ItemsSource
         {
-            get => (ObservableCollection<ChartViewModel>)GetValue(ItemsSourceProperty);
+            get => (ObservableCollection<EquityChartViewModel>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
 
@@ -71,27 +71,27 @@ namespace Algoloop.Wpf.View
             if (e.NewValue != null)
             {
                 // Subscribe to CollectionChanged on the new collection
-                var coll = e.NewValue as ObservableCollection<ChartViewModel>;
+                var coll = e.NewValue as ObservableCollection<EquityChartViewModel>;
                 coll.CollectionChanged += chart.OnCollectionChanged;
             }
 
-            var charts = e.NewValue as IEnumerable<ChartViewModel>;
+            var charts = e.NewValue as IEnumerable<EquityChartViewModel>;
             chart.OnItemsSourceChanged(charts);
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            List<ChartViewModel> charts = e.NewItems?.Cast<ChartViewModel>().ToList();
+            List<EquityChartViewModel> charts = e.NewItems?.Cast<EquityChartViewModel>().ToList();
             OnItemsSourceChanged(charts);
         }
 
-        private void OnItemsSourceChanged(IEnumerable<ChartViewModel> charts)
+        private void OnItemsSourceChanged(IEnumerable<EquityChartViewModel> charts)
         {
             // Clear charts
             _combobox.Items.Clear();
             if (charts == null) return;
             bool selected = true;
-            foreach (ChartViewModel chart in charts)
+            foreach (EquityChartViewModel chart in charts)
             {
                 chart.IsSelected = selected || IsDefaultSelected(chart.Title);
                 _combobox.Items.Add(chart);
@@ -126,23 +126,23 @@ namespace Algoloop.Wpf.View
             _chart.Clear();
             foreach (object item in _combobox.Items)
             {
-                if (item is ChartViewModel chart && chart.IsSelected)
+                if (item is EquityChartViewModel chart && chart.IsSelected)
                 {
                     RedrawChart(chart);
                 }
             }
         }
 
-        private void RedrawChart(ChartViewModel model)
+        private void RedrawChart(EquityChartViewModel model)
         {
-            Candle first = model.Candles.FirstOrDefault();
+            TimeValueModel first = model.Series.FirstOrDefault();
             if (first == default) return;
             ChartBandElement curveElement = _chart.CreateCurve(model.Title, model.Color, ChartIndicatorDrawStyles.Line);
             var chartData = new ChartDrawData();
-            foreach (Candle candle in model.Candles)
+            foreach (TimeValueModel item in model.Series)
             {
-                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
-                chartGroup.Add(curveElement, candle.OpenPrice);
+                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(item.Time);
+                chartGroup.Add(curveElement, item.Value);
             }
 
             _chart.Draw(chartData);

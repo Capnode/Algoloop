@@ -12,20 +12,21 @@
  * limitations under the License.
  */
 
+using Algoloop.Wpf.Common;
 using StockSharp.Algo.Candles;
 using System.Collections.Generic;
 
 namespace Algoloop.Wpf
 {
-    public class ChartViewModel
+    public class StockChartViewModel
     {
-        public ChartViewModel(
+        public StockChartViewModel(
             string name,
             System.Drawing.Color color,
             IEnumerable<Candle> candles)
         {
             Title = name;
-            Color = ToMediaColor(color);
+            Color = Converters.ToMediaColor(color);
             Candles = candles;
         }
 
@@ -33,10 +34,5 @@ namespace Algoloop.Wpf
         public System.Windows.Media.Color Color { get; }
         public IEnumerable<Candle> Candles { get; }
         public bool IsSelected { get; set; }
-
-        private static System.Windows.Media.Color ToMediaColor(System.Drawing.Color color)
-        {
-            return System.Windows.Media.Color.FromRgb(color.R, color.G, color.B);
-        }
     }
 }

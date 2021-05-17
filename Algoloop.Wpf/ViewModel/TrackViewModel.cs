@@ -40,9 +40,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
-using StockSharp.Algo.Candles;
-using stocksharp = StockSharp.BusinessEntities;
-using stocksharpMessage = StockSharp.Messages;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -63,7 +60,7 @@ namespace Algoloop.Wpf.ViewModel
         private TrackModel _model;
         private bool _isSelected;
         private bool _isExpanded;
-        private SyncObservableCollection<ChartViewModel> _charts = new();
+        private SyncObservableCollection<EquityChartViewModel> _charts = new();
         private IDictionary<string, decimal?> _statistics;
         private string _port;
         private IList _selectedItems;
@@ -199,7 +196,7 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _holdings, value);
         }
 
-        public SyncObservableCollection<ChartViewModel> Charts
+        public SyncObservableCollection<EquityChartViewModel> Charts
         {
             get => _charts;
             set => Set(ref _charts, value);
@@ -975,20 +972,19 @@ namespace Algoloop.Wpf.ViewModel
 
         private void ParseCharts(Result result)
         {
-            SyncObservableCollection<ChartViewModel> workCharts = Charts;
+            SyncObservableCollection<EquityChartViewModel> workCharts = Charts;
             Debug.Assert(workCharts.Count == 0);
 
-            stocksharp.Security security = EquitySecurity("Net profit");
             decimal profit = Model.InitialCapital;
-            var series = new List<Candle>();
-            series.Add(EquityData(security, Model.StartDate, profit));
+            var series = new List<TimeValueModel>();
+            series.Add(new TimeValueModel(Model.StartDate, profit));
             foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
                 profit += trade.Value;
-                series.Add(EquityData(security, trade.Key, profit));
+                series.Add(new TimeValueModel(trade.Key, profit));
             }
 
-            var viewModel = new ChartViewModel("Net profit", Color.Green, series);
+            var viewModel = new EquityChartViewModel("Net profit", Color.Green, series);
 
             workCharts.Add(viewModel);
 
@@ -998,46 +994,15 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     Series serie = kvp.Value;
                     if (serie.Values.Count < 2) continue;
-                    IEnumerable<Candle> candles = serie.Values.Select(
-                        m => EquityData(EquitySecurity(serie.Name), Time.UnixTimeStampToDateTime(m.x), m.y));
-                    viewModel = new ChartViewModel(serie.Name, serie.Color, candles);
+                    IEnumerable<TimeValueModel> list = serie.Values.Select(
+                        m => new TimeValueModel(Time.UnixTimeStampToDateTime(m.x), m.y));
+                    viewModel = new EquityChartViewModel(serie.Name, serie.Color, list);
                     workCharts.Add(viewModel);
                 }
             }
 
             Charts = null;
             Charts = workCharts;
-        }
-
-        private Candle EquityData(stocksharp.Security security, DateTime date, decimal value)
-        {
-            return new TimeFrameCandle
-            {
-                Security = security,
-                TimeFrame = TimeSpan.FromDays(1),
-                OpenTime = date,
-                HighTime = date,
-                LowTime = date,
-                CloseTime = date,
-                OpenPrice = value,
-                HighPrice = value,
-                LowPrice = value,
-                ClosePrice = value,
-                OpenVolume = 0,
-                HighVolume = 0,
-                LowVolume = 0,
-                CloseVolume = 0,
-                BuildFrom = stocksharpMessage.DataType.Ticks,
-                State = stocksharpMessage.CandleStates.Finished
-            };
-        }
-
-        private stocksharp.Security EquitySecurity(string name)
-        {
-            return new stocksharp.Security
-            {
-                Id = name
-            };
         }
     }
 }

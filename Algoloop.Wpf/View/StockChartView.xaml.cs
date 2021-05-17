@@ -29,7 +29,7 @@ namespace Algoloop.Wpf.View
     public partial class StockChartView : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty = 
-            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
+            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<StockChartViewModel>),
             typeof(StockChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
         private bool _isLoaded = false;
 
@@ -53,9 +53,9 @@ namespace Algoloop.Wpf.View
             _chart.UnSubscribeElement += OnUnSubscribeElement;
         }
 
-        public ObservableCollection<ChartViewModel> ItemsSource
+        public ObservableCollection<StockChartViewModel> ItemsSource
         {
-            get => (ObservableCollection<ChartViewModel>)GetValue(ItemsSourceProperty);
+            get => (ObservableCollection<StockChartViewModel>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
 
@@ -93,27 +93,27 @@ namespace Algoloop.Wpf.View
             if (e.NewValue != null)
             {
                 // Subscribe to CollectionChanged on the new collection
-                var coll = e.NewValue as ObservableCollection<ChartViewModel>;
+                var coll = e.NewValue as ObservableCollection<StockChartViewModel>;
                 coll.CollectionChanged += chart.OnCollectionChanged;
             }
 
-            var charts = e.NewValue as IEnumerable<ChartViewModel>;
+            var charts = e.NewValue as IEnumerable<StockChartViewModel>;
             chart.OnItemsSourceChanged(charts);
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            List<ChartViewModel> charts = e.NewItems?.Cast<ChartViewModel>().ToList();
+            List<StockChartViewModel> charts = e.NewItems?.Cast<StockChartViewModel>().ToList();
             OnItemsSourceChanged(charts);
         }
 
-        private void OnItemsSourceChanged(IEnumerable<ChartViewModel> charts)
+        private void OnItemsSourceChanged(IEnumerable<StockChartViewModel> charts)
         {
             // Clear charts
             _combobox.Items.Clear();
             if (charts == null) return;
             bool selected = true;
-            foreach (ChartViewModel chart in charts)
+            foreach (StockChartViewModel chart in charts)
             {
                 chart.IsSelected = selected || IsDefaultSelected(chart.Title);
                 _combobox.Items.Add(chart);
@@ -151,7 +151,7 @@ namespace Algoloop.Wpf.View
             _chart.AddArea(candlesArea);
             foreach (object item in _combobox.Items)
             {
-                if (item is ChartViewModel chart && chart.IsSelected)
+                if (item is StockChartViewModel chart && chart.IsSelected)
                 {
                     RedrawChart(candlesArea, chart);
                 }
@@ -160,7 +160,7 @@ namespace Algoloop.Wpf.View
             _chart.IsAutoRange = false; // Allow user to adjust range
         }
 
-        private void RedrawChart(ChartArea candlesArea, ChartViewModel model)
+        private void RedrawChart(ChartArea candlesArea, StockChartViewModel model)
         {
             Candle first = model.Candles.FirstOrDefault();
             if (first == default) return;

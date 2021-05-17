@@ -23,7 +23,7 @@ using System.Linq;
 
 namespace Algoloop.Wpf.Common
 {
-    public static class Converter
+    public static class Converters
     {
         public static Candle ToCandle(BaseData data, Security security = default)
         {
@@ -92,6 +92,11 @@ namespace Algoloop.Wpf.Common
                 Id = first.Symbol.ID.Symbol
             };
             return data.Select(m => ToCandle(m, security));
+        }
+
+        public static System.Windows.Media.Color ToMediaColor(System.Drawing.Color color)
+        {
+            return System.Windows.Media.Color.FromRgb(color.R, color.G, color.B);
         }
     }
 }

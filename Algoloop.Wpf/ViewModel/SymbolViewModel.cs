@@ -56,7 +56,7 @@ namespace Algoloop.Wpf.ViewModel
         private const string _sharesOutstanding = "Shares outstanding";
 
         private readonly ITreeViewModel _parent;
-        private SyncObservableCollection<ChartViewModel> _charts = new();
+        private SyncObservableCollection<StockChartViewModel> _charts = new();
         private ObservableCollection<DataGridColumn> _periodColumns = new();
         private bool _showCharts;
 
@@ -115,7 +115,7 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _showCharts, value);
         }
 
-        public SyncObservableCollection<ChartViewModel> Charts
+        public SyncObservableCollection<StockChartViewModel> Charts
         {
             get => _charts;
             set => Set(ref _charts, value);
@@ -171,7 +171,7 @@ namespace Algoloop.Wpf.ViewModel
                 IEnumerable<Candle> candles = leanDataReader.Parse().ToCandles();
                 if (candles.Any())
                 {
-                    var viewModel = new ChartViewModel(Model.Name, Color.Black, candles);
+                    var viewModel = new StockChartViewModel(Model.Name, Color.Black, candles);
                     Charts.Add(viewModel);
                 }
                 ShowCharts = true;
