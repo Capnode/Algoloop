@@ -6,11 +6,7 @@
     xmlns:sx="http://schemas.stocksharp.com/xaml"
     mc:Ignorable="d"
     d:DesignHeight="300" d:DesignWidth="640">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <DockPanel>
         <ComboBox
             DockPanel.Dock="Top"
             DropDownClosed="Combobox_DropDownClosed"
@@ -18,12 +14,13 @@
             x:Name="_combobox">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox Content="{Binding Title}"
-                          IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"
-                          Tag="{RelativeSource FindAncestor, AncestorType={x:Type ComboBox}}"/>
+                    <CheckBox
+                        Content="{Binding Title}"
+                        IsChecked="{Binding Path=IsSelected, Mode=TwoWay}"
+                        Tag="{RelativeSource FindAncestor, AncestorType={x:Type ComboBox}}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <sx:ChartPanel x:Name="Chart" IsInteracted="True" Grid.Row="1"/>
-    </Grid>
+        <sx:ChartPanel x:Name="_chart"/>
+    </DockPanel>
 </UserControl>

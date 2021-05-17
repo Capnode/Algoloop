@@ -31,13 +31,26 @@ namespace Algoloop.Wpf.View
         public static readonly DependencyProperty ItemsSourceProperty = 
             DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<ChartViewModel>),
             typeof(StockChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
-        private bool _isLoaded;
+        private bool _isLoaded = false;
 
         public StockChartView()
         {
             InitializeComponent();
             Loaded += OnLoaded;
             Unloaded += OnUnloaded;
+
+            _chart.IsInteracted = true;
+            _chart.IsAutoRange = true;
+            _chart.IsAutoScroll = true;
+            _chart.ShowOverview = true;
+            _chart.AllowAddCandles = false;
+            _chart.AllowAddIndicators = true;
+            _chart.AllowAddOrders = false;
+            _chart.AllowAddOwnTrades = false;
+            _chart.AllowAddAxis = false;
+            _chart.AllowAddArea = false;
+            _chart.SubscribeIndicatorElement += OnSubscribeIndicatorElement;
+            _chart.UnSubscribeElement += OnUnSubscribeElement;
         }
 
         public ObservableCollection<ChartViewModel> ItemsSource
@@ -49,8 +62,16 @@ namespace Algoloop.Wpf.View
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             _isLoaded = true;
-            Chart.FillIndicators();
-//            RedrawCharts();
+            _chart.FillIndicators();
+            RedrawCharts();
+        }
+
+        private void OnUnSubscribeElement(IChartElement obj)
+        {
+        }
+
+        private void OnSubscribeIndicatorElement(ChartIndicatorElement arg1, CandleSeries arg2, StockSharp.Algo.Indicators.IIndicator arg3)
+        {
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -124,13 +145,10 @@ namespace Algoloop.Wpf.View
 
         private void RedrawCharts()
         {
-            Chart.ClearAreas();
+            _chart.IsAutoRange = true;
+            _chart.ClearAreas();
             ChartArea candlesArea = new ChartArea();
-            var yAxis = candlesArea.YAxises.First();
-            yAxis.AutoRange = true;
-            Chart.IsAutoRange = true;
-            Chart.IsAutoScroll = true;
-            Chart.AddArea(candlesArea);
+            _chart.AddArea(candlesArea);
             foreach (object item in _combobox.Items)
             {
                 if (item is ChartViewModel chart && chart.IsSelected)
@@ -138,6 +156,8 @@ namespace Algoloop.Wpf.View
                     RedrawChart(candlesArea, chart);
                 }
             }
+
+            _chart.IsAutoRange = false; // Allow user to adjust range
         }
 
         private void RedrawChart(ChartArea candlesArea, ChartViewModel model)
@@ -153,21 +173,20 @@ namespace Algoloop.Wpf.View
             {
                 throw new NotImplementedException("Candle subtype not implemented");
             }
+
             var candleElement = new ChartCandleElement
             {
                 UpBorderColor = model.Color,
                 DownBorderColor = model.Color
             };
-            Chart.AddElement(candlesArea, candleElement, series);
+            _chart.AddElement(candlesArea, candleElement, series);
             var chartData = new ChartDrawData();
             foreach (Candle candle in model.Candles)
             {
                 ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
                 chartGroup.Add(candleElement, candle);
-//                chartGroup.Add(candleElement, model.Color);
             }
-            Chart.Reset(new[] { candleElement });
-            Chart.Draw(chartData);
+            _chart.Draw(chartData);
         }
     }
 }
