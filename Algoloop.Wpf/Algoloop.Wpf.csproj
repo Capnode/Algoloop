@@ -264,6 +264,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="View\EquityChartView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="View\StockChartView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>

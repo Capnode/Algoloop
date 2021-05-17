@@ -31,9 +31,7 @@ namespace Algoloop.Wpf.Common
             {
                 security = new Security
                 {
-                    Id = data.Symbol.ID.Symbol,
-                    PriceStep = 0.01m,
-                    Board = ExchangeBoard.Test
+                    Id = data.Symbol.ID.Symbol
                 };
             }
 
@@ -91,9 +89,7 @@ namespace Algoloop.Wpf.Common
             if (first == default) return default;
             var security = new Security
             {
-                Id = first.Symbol.ID.Symbol,
-                PriceStep = 0.01m,
-                Board = ExchangeBoard.Test
+                Id = first.Symbol.ID.Symbol
             };
             return data.Select(m => ToCandle(m, security));
         }

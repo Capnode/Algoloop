@@ -178,7 +178,7 @@
                 </wpf:ExDataGrid>
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
-                <view:StockChartView ItemsSource="{Binding Charts}"/>
+                <view:EquityChartView ItemsSource="{Binding Charts}"/>
             </TabItem>
             <TabItem
                 Header="Desktop"
