@@ -23,6 +23,7 @@
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile></DocumentationFile>
+    <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <RunCodeAnalysis>false</RunCodeAnalysis>
@@ -31,6 +32,7 @@
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile></DocumentationFile>
+    <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero" />

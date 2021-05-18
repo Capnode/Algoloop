@@ -16,7 +16,7 @@
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <NoWarn>1701;1702;;NU1701</NoWarn>
+    <NoWarn>NU1701;CA1416</NoWarn>
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile></DocumentationFile>
   </PropertyGroup>
@@ -25,6 +25,7 @@
     <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile></DocumentationFile>
+    <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AlgorithmFactory\QuantConnect.AlgorithmFactory.csproj" />
