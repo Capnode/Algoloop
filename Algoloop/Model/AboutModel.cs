@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -34,7 +34,7 @@ namespace Algoloop.Model
                     }
                 }
 
-                return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().CodeBase);
+                return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
             }
         }
 

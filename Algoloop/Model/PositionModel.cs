@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -79,7 +79,7 @@ namespace Algoloop.Model
 
         public override bool Equals(object obj)
         {
-            if (!(obj is PositionModel other)) return false;
+            if (obj is not PositionModel other) return false;
             if (!Symbol.Equals(other.Symbol)) return false;
             if (Quantity != other.Quantity) return false;
             if (AveragePrice != other.AveragePrice) return false;
@@ -107,8 +107,7 @@ namespace Algoloop.Model
                 hash = hash * 59 + MarketPrice.GetHashCode();
                 hash = hash * 59 + MarketValue.GetHashCode();
                 hash = hash * 59 + EntryValue.GetHashCode();
-                if (UpdateTime != null)
-                    hash = hash * 59 + UpdateTime.GetHashCode();
+                hash = hash * 59 + UpdateTime.GetHashCode();
                 return hash;
             }
         }

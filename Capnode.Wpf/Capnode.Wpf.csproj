@@ -35,9 +35,6 @@
     <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationFramework.Aero" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\Contains.png" />
     <Resource Include="Images\EndsWith.png" />
     <Resource Include="Images\Equal.png" />
