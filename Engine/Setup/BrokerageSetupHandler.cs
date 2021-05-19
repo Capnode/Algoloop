@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -41,7 +41,7 @@ namespace QuantConnect.Lean.Engine.Setup
     /// </summary>
     public class BrokerageSetupHandler : ISetupHandler
     {
-        private bool _notifiedDefaultResolutionUsed;
+        private bool _notifiedUniverseSettingsUsed;
 
         /// <summary>
         /// Max allocation limit configuration variable name
@@ -240,7 +240,7 @@ namespace QuantConnect.Lean.Engine.Setup
 
                         //Set our parameters
                         algorithm.SetParameters(liveJob.Parameters);
-                        algorithm.SetAvailableDataTypes(GetConfiguredDataFeeds());
+                        algorithm.SetAvailableDataTypes(BaseSetupHandler.GetConfiguredDataFeeds());
 
                         //Algorithm is live, not backtesting:
                         algorithm.SetLiveMode(true);
@@ -461,11 +461,16 @@ namespace QuantConnect.Lean.Engine.Setup
             if (!algorithm.Portfolio.ContainsKey(symbol))
             {
                 var resolution = algorithm.UniverseSettings.Resolution;
-                if (!_notifiedDefaultResolutionUsed)
+                var fillForward = algorithm.UniverseSettings.FillForward;
+                var leverage = algorithm.UniverseSettings.Leverage;
+                var extendedHours = algorithm.UniverseSettings.ExtendedMarketHours;
+
+                if (!_notifiedUniverseSettingsUsed)
                 {
                     // let's just send the message once
-                    _notifiedDefaultResolutionUsed = true;
-                    algorithm.Debug($"Will use UniverseSettings.Resolution value '{resolution}' for automatically added securities for open orders and holdings.");
+                    _notifiedUniverseSettingsUsed = true;
+                    algorithm.Debug($"Will use UniverseSettings for automatically added securities for open orders and holdings. UniverseSettings:" +
+                        $" Resolution = {resolution}; Leverage = {leverage}; FillForward = {fillForward}; ExtendedHours = {extendedHours}");
                 }
 
                 Log.Trace("BrokerageSetupHandler.Setup(): Adding unrequested security: " + symbol.Value);
@@ -473,17 +478,17 @@ namespace QuantConnect.Lean.Engine.Setup
                 if (symbol.SecurityType.IsOption())
                 {
                     // add current option contract to the system
-                    algorithm.AddOptionContract(symbol, resolution, true, 1.0m);
+                    algorithm.AddOptionContract(symbol, resolution, fillForward, leverage);
                 }
                 else if (symbol.SecurityType == SecurityType.Future)
                 {
                     // add current future contract to the system
-                    algorithm.AddFutureContract(symbol, resolution, true, 1.0m);
+                    algorithm.AddFutureContract(symbol, resolution, fillForward, leverage);
                 }
                 else
                 {
                     // for items not directly requested set leverage to 1 and at the min resolution
-                    algorithm.AddSecurity(symbol.SecurityType, symbol.Value, resolution, symbol.ID.Market, true, 1.0m, false);
+                    algorithm.AddSecurity(symbol.SecurityType, symbol.Value, resolution, symbol.ID.Market, fillForward, leverage, extendedHours);
                 }
             }
         }
@@ -526,23 +531,6 @@ namespace QuantConnect.Lean.Engine.Setup
 
                 AddUnrequestedSecurity(algorithm, order.Symbol);
             }
-        }
-
-        /// <summary>
-        /// Get the available data feeds from config.json,
-        /// If none available, throw an error
-        /// </summary>
-        private static Dictionary<SecurityType, List<TickType>> GetConfiguredDataFeeds()
-        {
-            var dataFeedsConfigString = Config.Get("security-data-feeds");
-
-            Dictionary<SecurityType, List<TickType>> dataFeeds = new Dictionary<SecurityType, List<TickType>>();
-            if (dataFeedsConfigString != string.Empty)
-            {
-                dataFeeds = JsonConvert.DeserializeObject<Dictionary<SecurityType, List<TickType>>>(dataFeedsConfigString);
-            }
-
-            return dataFeeds;
         }
 
         /// <summary>

@@ -14,11 +14,13 @@
 */
 
 using System;
-using System.Collections.Generic;
 using QuantConnect.Data;
-using QuantConnect.Interfaces;
 using QuantConnect.Orders;
+using QuantConnect.Interfaces;
 using QuantConnect.Securities;
+using System.Collections.Generic;
+using QuantConnect.Securities.Option;
+using Futures = QuantConnect.Securities.Futures;
 
 namespace QuantConnect.Algorithm.CSharp
 {
@@ -96,7 +98,32 @@ namespace QuantConnect.Algorithm.CSharp
                 _invested = true;
 
                 MarketOrder(_esFuture, 1);
+
+                var optionContract = Securities[_esFutureOption];
+                var marginModel = optionContract.BuyingPowerModel as FuturesOptionsMarginModel;
+                if (marginModel.InitialIntradayMarginRequirement == 0
+                    || marginModel.InitialOvernightMarginRequirement == 0
+                    || marginModel.MaintenanceIntradayMarginRequirement == 0
+                    || marginModel.MaintenanceOvernightMarginRequirement == 0)
+                {
+                    throw new Exception("Unexpected margin requirements");
+                }
+
+                if (marginModel.GetInitialMarginRequirement(optionContract, 1) == 0)
+                {
+                    throw new Exception("Unexpected Initial Margin requirement");
+                }
+                if (marginModel.GetMaintenanceMargin(optionContract) != 0)
+                {
+                    throw new Exception("Unexpected Maintenance Margin requirement");
+                }
+
                 MarketOrder(_esFutureOption, 1);
+
+                if (marginModel.GetMaintenanceMargin(optionContract) == 0)
+                {
+                    throw new Exception("Unexpected Maintenance Margin requirement");
+                }
             }
         }
 
@@ -173,7 +200,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Tracking Error", "0.33"},
             {"Treynor Ratio", "-16.321"},
             {"Total Fees", "$7.40"},
-            {"Estimated Strategy Capacity", "$71000000.00"},
+            {"Estimated Strategy Capacity", "$45000000.00"},
+            {"Lowest Capacity Asset", "ES XFH59UK0MYO1"},
             {"Fitness Score", "0.005"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},

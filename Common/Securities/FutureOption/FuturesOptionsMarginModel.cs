@@ -24,7 +24,27 @@ namespace QuantConnect.Securities.Option
     /// </summary>
     public class FuturesOptionsMarginModel : FutureMarginModel
     {
-        private const decimal FixedMarginMultiplier = 1.5m;
+        public const decimal FixedMarginMultiplier = 1.5m;
+
+        /// <summary>
+        /// Initial Overnight margin requirement for the contract effective from the date of change
+        /// </summary>
+        public override decimal InitialOvernightMarginRequirement => base.InitialOvernightMarginRequirement * FixedMarginMultiplier;
+
+        /// <summary>
+        /// Maintenance Overnight margin requirement for the contract effective from the date of change
+        /// </summary>
+        public override decimal MaintenanceOvernightMarginRequirement => base.MaintenanceOvernightMarginRequirement * FixedMarginMultiplier;
+
+        /// <summary>
+        /// Initial Intraday margin for the contract effective from the date of change
+        /// </summary>
+        public override decimal InitialIntradayMarginRequirement => base.InitialIntradayMarginRequirement * FixedMarginMultiplier;
+
+        /// <summary>
+        /// Maintenance Intraday margin requirement for the contract effective from the date of change
+        /// </summary>
+        public override decimal MaintenanceIntradayMarginRequirement => base.MaintenanceIntradayMarginRequirement * FixedMarginMultiplier;
 
         /// <summary>
         /// Creates an instance of FutureOptionMarginModel
@@ -48,7 +68,7 @@ namespace QuantConnect.Securities.Option
         /// </remarks>
         public override MaintenanceMargin GetMaintenanceMargin(MaintenanceMarginParameters parameters)
         {
-            return base.GetMaintenanceMargin(parameters.ForUnderlying()) * FixedMarginMultiplier;
+            return base.GetMaintenanceMargin(parameters.ForUnderlying(parameters.Quantity)) * FixedMarginMultiplier;
         }
 
         /// <summary>
