@@ -243,10 +243,6 @@
     <PackageReference Include="StockSharp.Algo" Version="5.0.87" />
     <PackageReference Include="StockSharp.Configuration" Version="5.0.85" />
     <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.87" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
-    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
-    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
