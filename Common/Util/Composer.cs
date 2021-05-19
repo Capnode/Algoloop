@@ -67,15 +67,14 @@ namespace QuantConnect.Util
             {
                 try
                 {
-                    var catalogs = new List<ComposablePartCatalog>
-                    {
-                        new DirectoryCatalog(primaryDllLookupDirectory, "*.dll"),
-                        new DirectoryCatalog(primaryDllLookupDirectory, "*.exe")
-                    };
+                    IEnumerable<string> fileList = Directory.EnumerateFiles(primaryDllLookupDirectory, "*.dll");
+                    fileList = fileList.Concat(Directory.EnumerateFiles(primaryDllLookupDirectory, "*.exe"));
                     if (loadFromPluginDir)
                     {
-                        catalogs.Add(new DirectoryCatalog(PluginDirectory, "*.dll"));
+                        fileList = fileList.Concat(Directory.EnumerateFiles(PluginDirectory, "*.dll"));
                     }
+
+                    var catalogs = CreateCatalogs(fileList);
                     var aggregate = new AggregateCatalog(catalogs);
                     _compositionContainer = new CompositionContainer(aggregate);
                     return _compositionContainer.Catalog.Parts.ToList();
@@ -87,12 +86,6 @@ namespace QuantConnect.Util
                 catch (Exception ex)
                 {
                     Log.Error($"{ex.GetType()} {ex.Message}");
-                    CheckParts(primaryDllLookupDirectory, "*.dll");
-                    CheckParts(primaryDllLookupDirectory, "*.exe");
-                    if (loadFromPluginDir)
-                    {
-                        CheckParts(PluginDirectory, "*.dll");
-                    }
                 }
                 return new List<ComposablePartDefinition>();
             });
@@ -356,32 +349,30 @@ namespace QuantConnect.Util
             }
         }
 
-        private static void CheckParts(string directory, string filter)
+        private static IEnumerable<ComposablePartCatalog> CreateCatalogs(IEnumerable<string> files)
         {
-            IEnumerable<string> files = Directory.EnumerateFiles(directory, filter, SearchOption.TopDirectoryOnly);
-            foreach (string file in files)
+            var catalogs = new List<ComposablePartCatalog>();
+            foreach (string file in files.Distinct())
             {
                 try
                 {
-                    var asmCat = new AssemblyCatalog(file);
-
-                    //Force MEF to load the plugin and figure out if there are any exports
-                    // good assemblies will not throw the RTLE exception and can be added to the catalog
-                    List<ComposablePartDefinition> parts = asmCat.Parts.ToList();
-                }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    Log.Error($"{ex.GetType()} {ex.Message}: {file}");
-                    foreach (var item in ex.LoaderExceptions)
+                    using (AssemblyCatalog asmCat = new AssemblyCatalog(file))
                     {
-                        Log.Error($"LoaderExceptions: {item.Message}");
+                        // Force to load the plugin and figure out if there are any exports
+                        // good assemblies will not throw the RTLE exception and can be added to the catalog
+                        List<ComposablePartDefinition> parts = asmCat.Parts.ToList();
                     }
+
+                    var fileInfo = new FileInfo(file);
+                    catalogs.Add(new DirectoryCatalog(fileInfo.DirectoryName, fileInfo.Name));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    Log.Error($"{ex.GetType()} {ex.Message}: {file}");
+                    // Skip file
                 }
             }
+
+            return catalogs;
         }
     }
 }
