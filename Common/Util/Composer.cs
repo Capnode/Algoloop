@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -82,10 +82,6 @@ namespace QuantConnect.Util
                 catch (ThreadAbortException)
                 {
                     // ThreadAbortException is triggered when we shutdown ignore the error log
-                }
-                catch (Exception ex)
-                {
-                    Log.Error($"{ex.GetType()} {ex.Message}");
                 }
                 return new List<ComposablePartDefinition>();
             });
@@ -349,6 +345,9 @@ namespace QuantConnect.Util
             }
         }
 
+        /// <summary>
+        /// Create catalog of files that are loadable from a list of files.
+        /// </summary>
         private static IEnumerable<ComposablePartCatalog> CreateCatalogs(IEnumerable<string> files)
         {
             var catalogs = new List<ComposablePartCatalog>();
@@ -362,14 +361,24 @@ namespace QuantConnect.Util
                         // good assemblies will not throw the RTLE exception and can be added to the catalog
                         List<ComposablePartDefinition> parts = asmCat.Parts.ToList();
                     }
-
-                    var fileInfo = new FileInfo(file);
-                    catalogs.Add(new DirectoryCatalog(fileInfo.DirectoryName, fileInfo.Name));
+                }
+                catch (ReflectionTypeLoadException)
+                {
+                    // Skip file
+                    continue;
+                }
+                catch (FileNotFoundException )
+                {
+                    // Skip file
+                    continue;
                 }
                 catch (Exception)
                 {
-                    // Skip file
+                    // Accept file
                 }
+
+                var fileInfo = new FileInfo(file);
+                catalogs.Add(new DirectoryCatalog(fileInfo.DirectoryName, fileInfo.Name));
             }
 
             return catalogs;
