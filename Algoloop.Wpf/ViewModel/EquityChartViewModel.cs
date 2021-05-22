@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 using Algoloop.Wpf.Common;
+using StockSharp.Xaml.Charting;
 using System.Collections.Generic;
 
 namespace Algoloop.Wpf
@@ -23,7 +23,7 @@ namespace Algoloop.Wpf
         public EquityChartViewModel(
             string title,
             System.Drawing.Color color,
-            IEnumerable<TimeValueModel> series)
+            IEnumerable<EquityData> series)
         {
             Title = title;
             Color = Converters.ToMediaColor(color);
@@ -32,7 +32,7 @@ namespace Algoloop.Wpf
 
         public string Title { get; }
         public System.Windows.Media.Color Color { get; }
-        public IEnumerable<TimeValueModel> Series { get; }
+        public IEnumerable<EquityData> Series { get; }
         public bool IsSelected { get; set; }
     }
 }

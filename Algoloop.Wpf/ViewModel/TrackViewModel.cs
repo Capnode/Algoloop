@@ -40,6 +40,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
+using stocksharp = StockSharp.Xaml.Charting;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -976,12 +977,14 @@ namespace Algoloop.Wpf.ViewModel
             Debug.Assert(workCharts.Count == 0);
 
             decimal profit = Model.InitialCapital;
-            var series = new List<TimeValueModel>();
-            series.Add(new TimeValueModel(Model.StartDate, profit));
+            var series = new List<stocksharp.EquityData>
+            {
+                new stocksharp.EquityData { Time = Model.StartDate, Value = profit }
+            };
             foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
                 profit += trade.Value;
-                series.Add(new TimeValueModel(trade.Key, profit));
+                series.Add(new stocksharp.EquityData { Time = trade.Key, Value = profit });
             }
 
             var viewModel = new EquityChartViewModel("Net profit", Color.Green, series);
@@ -994,8 +997,8 @@ namespace Algoloop.Wpf.ViewModel
                 {
                     Series serie = kvp.Value;
                     if (serie.Values.Count < 2) continue;
-                    IEnumerable<TimeValueModel> list = serie.Values.Select(
-                        m => new TimeValueModel(Time.UnixTimeStampToDateTime(m.x), m.y));
+                    IEnumerable<stocksharp.EquityData> list = serie.Values.Select(
+                        m => new stocksharp.EquityData { Time = Time.UnixTimeStampToDateTime(m.x), Value = m.y });
                     viewModel = new EquityChartViewModel(serie.Name, serie.Color, list);
                     workCharts.Add(viewModel);
                 }

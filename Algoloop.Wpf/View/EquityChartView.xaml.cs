@@ -12,14 +12,12 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 using MoreLinq;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -59,7 +57,6 @@ namespace Algoloop.Wpf.View
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             EquityChartView chart = d as EquityChartView;
-            Debug.Assert(chart != null);
 
             if (e.OldValue != null)
             {
@@ -124,28 +121,57 @@ namespace Algoloop.Wpf.View
         private void RedrawCharts()
         {
             _chart.Clear();
+
+            // Collect time-value points of all curves
+            Dictionary<ChartBandElement, decimal> curves = new();
+            Dictionary<DateTimeOffset, List<Tuple<ChartBandElement, decimal>>> points = new ();
             foreach (object item in _combobox.Items)
             {
-                if (item is EquityChartViewModel chart && chart.IsSelected)
+                if (item is EquityChartViewModel model && model.IsSelected)
                 {
-                    RedrawChart(chart);
+                    ChartBandElement curveElement = _chart.CreateCurve(model.Title, model.Color, ChartIndicatorDrawStyles.Line);
+                    foreach (EquityData equityData in model.Series)
+                    {
+                        decimal value = equityData.Value;
+                        if (!curves.ContainsKey(curveElement))
+                        {
+                            curves.Add(curveElement, value);
+                        }
+
+                        DateTimeOffset time = equityData.Time.Date;
+                        if (!points.TryGetValue(time, out List<Tuple<ChartBandElement, decimal>> list))
+                        {
+                            list = new List<Tuple<ChartBandElement, decimal>>();
+                            points.Add(time, list);
+                        }
+                        list.Add(new Tuple<ChartBandElement, decimal>(curveElement, value));
+                    }
                 }
             }
-        }
 
-        private void RedrawChart(EquityChartViewModel model)
-        {
-            TimeValueModel first = model.Series.FirstOrDefault();
-            if (first == default) return;
-            ChartBandElement curveElement = _chart.CreateCurve(model.Title, model.Color, ChartIndicatorDrawStyles.Line);
-            var chartData = new ChartDrawData();
-            foreach (TimeValueModel item in model.Series)
+            // Draw all curves in time order, moment by moment
+            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartBandElement, decimal>>> moment in points.OrderBy(m => m.Key))
             {
-                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(item.Time);
-                chartGroup.Add(curveElement, item.Value);
-            }
+                DateTimeOffset time = moment.Key;
+                ChartDrawData chartData = new();
+                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(time);
+                foreach (KeyValuePair<ChartBandElement, decimal> curve in curves)
+                {
+                    ChartBandElement chart = curve.Key;
+                    decimal value = curve.Value;
 
-            _chart.Draw(chartData);
+                    // Use actual point it available
+                    Tuple<ChartBandElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
+                    if (pair != default)
+                    {
+                        value = pair.Item2;
+                        curves[chart] = value;
+                    }
+                    chartGroup.Add(chart, value);
+                }
+
+                _chart.Draw(chartData);
+            }
         }
     }
 }
