@@ -16,9 +16,9 @@ using Algoloop.Wpf.Common;
 using StockSharp.Xaml.Charting;
 using System.Collections.Generic;
 
-namespace Algoloop.Wpf
+namespace Algoloop.Wpf.ViewModel
 {
-    public class EquityChartViewModel
+    public class EquityChartViewModel : IChartViewModel
     {
         public EquityChartViewModel(
             string title,

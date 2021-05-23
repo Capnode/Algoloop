@@ -12,27 +12,14 @@
  * limitations under the License.
  */
 
-using Algoloop.Wpf.Common;
-using StockSharp.Algo.Candles;
-using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace Algoloop.Wpf.ViewModel
 {
-    public class StockChartViewModel : IChartViewModel
+    public interface IChartViewModel
     {
-        public StockChartViewModel(
-            string name,
-            System.Drawing.Color color,
-            IEnumerable<Candle> candles)
-        {
-            Title = name;
-            Color = Converters.ToMediaColor(color);
-            Candles = candles;
-        }
-
-        public string Title { get; }
-        public System.Windows.Media.Color Color { get; }
-        public IEnumerable<Candle> Candles { get; }
-        public bool IsSelected { get; set; }
+        string Title { get; }
+        Color Color { get; }
+        bool IsSelected { get; set; }
     }
 }

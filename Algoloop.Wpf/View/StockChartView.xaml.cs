@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 
+using Algoloop.Wpf.ViewModel;
 using MoreLinq;
 using StockSharp.Algo.Candles;
+using StockSharp.BusinessEntities;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
@@ -23,13 +25,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Algoloop.Wpf.View
 {
     public partial class StockChartView : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty = 
-            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<StockChartViewModel>),
+            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<IChartViewModel>),
             typeof(StockChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
         private bool _isLoaded = false;
 
@@ -43,19 +46,21 @@ namespace Algoloop.Wpf.View
             _chart.IsAutoRange = true;
             _chart.IsAutoScroll = true;
             _chart.ShowOverview = true;
+            _chart.ShowPerfStats = false;
             _chart.AllowAddCandles = false;
             _chart.AllowAddIndicators = true;
             _chart.AllowAddOrders = false;
             _chart.AllowAddOwnTrades = false;
             _chart.AllowAddAxis = false;
             _chart.AllowAddArea = false;
+
             _chart.SubscribeIndicatorElement += OnSubscribeIndicatorElement;
             _chart.UnSubscribeElement += OnUnSubscribeElement;
         }
 
-        public ObservableCollection<StockChartViewModel> ItemsSource
+        public ObservableCollection<IChartViewModel> ItemsSource
         {
-            get => (ObservableCollection<StockChartViewModel>)GetValue(ItemsSourceProperty);
+            get => (ObservableCollection<IChartViewModel>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
 
@@ -93,29 +98,29 @@ namespace Algoloop.Wpf.View
             if (e.NewValue != null)
             {
                 // Subscribe to CollectionChanged on the new collection
-                var coll = e.NewValue as ObservableCollection<StockChartViewModel>;
+                var coll = e.NewValue as ObservableCollection<IChartViewModel>;
                 coll.CollectionChanged += chart.OnCollectionChanged;
             }
 
-            var charts = e.NewValue as IEnumerable<StockChartViewModel>;
+            var charts = e.NewValue as IEnumerable<IChartViewModel>;
             chart.OnItemsSourceChanged(charts);
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            List<StockChartViewModel> charts = e.NewItems?.Cast<StockChartViewModel>().ToList();
+            List<IChartViewModel> charts = e.NewItems?.Cast<IChartViewModel>().ToList();
             OnItemsSourceChanged(charts);
         }
 
-        private void OnItemsSourceChanged(IEnumerable<StockChartViewModel> charts)
+        private void OnItemsSourceChanged(IEnumerable<IChartViewModel> charts)
         {
             // Clear charts
             _combobox.Items.Clear();
             if (charts == null) return;
             bool selected = true;
-            foreach (StockChartViewModel chart in charts)
+            foreach (IChartViewModel chart in charts)
             {
-                chart.IsSelected = selected || IsDefaultSelected(chart.Title);
+                chart.IsSelected = selected;
                 _combobox.Items.Add(chart);
                 selected = false;
             }
@@ -128,16 +133,6 @@ namespace Algoloop.Wpf.View
             }
         }
 
-        private static bool IsDefaultSelected(string title)
-        {
-            return title switch
-            {
-                "Net profit" => true,
-                "Equity" => true,
-                _ => false,
-            };
-        }
-
         private void Combobox_DropDownClosed(object sender, EventArgs e)
         {
             RedrawCharts();
@@ -147,13 +142,20 @@ namespace Algoloop.Wpf.View
         {
             _chart.IsAutoRange = true;
             _chart.ClearAreas();
-            ChartArea candlesArea = new ChartArea();
+            ChartArea candlesArea = new ();
             _chart.AddArea(candlesArea);
-            foreach (object item in _combobox.Items)
+            foreach (IChartViewModel chart in _combobox.Items)
             {
-                if (item is StockChartViewModel chart && chart.IsSelected)
+                if (!chart.IsSelected) continue;
+                if (chart is StockChartViewModel stockChart)
                 {
-                    RedrawChart(candlesArea, chart);
+                    RedrawChart(candlesArea, stockChart);
+                }
+                else if (chart is EquityChartViewModel)
+                {
+                    _chart.IsInteracted = false;
+                    RedrawEquityCharts(candlesArea);
+                    break;
                 }
             }
 
@@ -187,6 +189,89 @@ namespace Algoloop.Wpf.View
                 chartGroup.Add(candleElement, candle);
             }
             _chart.Draw(chartData);
+        }
+
+        private void RedrawEquityCharts(ChartArea candlesArea)
+        {
+            // Collect time-value points of all curves
+            Dictionary<ChartCandleElement, decimal> curves = new();
+            Dictionary<DateTimeOffset, List<Tuple<ChartCandleElement, decimal>>> points = new();
+            foreach (object item in _combobox.Items)
+            {
+                if (item is EquityChartViewModel model && model.IsSelected)
+                {
+                    Security security = new () { Id = model.Title };
+                    CandleSeries series = new (typeof(TimeFrameCandle), security, TimeSpan.FromDays(1));
+                    ChartCandleElement curveElement = new()
+                    {
+                        DrawStyle = ChartCandleDrawStyles.LineClose,
+                        LineColor = model.Color,
+                        FontColor = model.Color,
+                        AreaColor = Colors.LightGray
+                    };
+                    _chart.AddElement(candlesArea, curveElement, series);
+                    foreach (EquityData equityData in model.Series)
+                    {
+                        decimal value = equityData.Value;
+                        if (!curves.ContainsKey(curveElement))
+                        {
+                            curves.Add(curveElement, value);
+                        }
+
+                        DateTimeOffset time = equityData.Time.Date;
+                        if (!points.TryGetValue(time, out List<Tuple<ChartCandleElement, decimal>> list))
+                        {
+                            list = new List<Tuple<ChartCandleElement, decimal>>();
+                            points.Add(time, list);
+                        }
+                        list.Add(new Tuple<ChartCandleElement, decimal>(curveElement, value));
+                    }
+                }
+            }
+
+            // Draw all curves in time order, moment by moment
+            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartCandleElement, decimal>>> moment in points.OrderBy(m => m.Key))
+            {
+                DateTimeOffset time = moment.Key;
+                ChartDrawData chartData = new();
+                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(time);
+                foreach (KeyValuePair<ChartCandleElement, decimal> curve in curves)
+                {
+                    ChartCandleElement chart = curve.Key;
+                    decimal value = curve.Value;
+
+                    // Use actual point it available
+                    Tuple<ChartCandleElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
+                    if (pair != default)
+                    {
+                        value = pair.Item2;
+                        curves[chart] = value;
+                    }
+                    Security security = new() { Id = "Id" };
+                    TimeFrameCandle candle = new()
+                    {
+                        Security = security,
+                        TimeFrame = TimeSpan.FromDays(1),
+                        OpenTime = time,
+                        HighTime = time,
+                        LowTime = time,
+                        CloseTime = time,
+                        OpenPrice = value,
+                        HighPrice = value,
+                        LowPrice = value,
+                        ClosePrice = value,
+                        OpenVolume = 0,
+                        HighVolume = 0,
+                        LowVolume = 0,
+                        CloseVolume = 0,
+                        BuildFrom = StockSharp.Messages.DataType.Ticks,
+                        State = StockSharp.Messages.CandleStates.Finished
+                    };
+                    chartGroup.Add(chart, candle);
+                }
+
+                _chart.Draw(chartData);
+            }
         }
     }
 }

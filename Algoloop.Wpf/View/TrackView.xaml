@@ -3,7 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"             
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     xmlns:viewsupport="clr-namespace:Algoloop.Wpf.ViewSupport"
     xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModel"
@@ -178,7 +177,7 @@
                 </wpf:ExDataGrid>
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
-                <view:EquityChartView ItemsSource="{Binding Charts}"/>
+                <view:StockChartView ItemsSource="{Binding Charts}"/>
             </TabItem>
             <TabItem
                 Header="Desktop"

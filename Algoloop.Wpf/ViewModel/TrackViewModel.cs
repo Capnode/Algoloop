@@ -61,7 +61,7 @@ namespace Algoloop.Wpf.ViewModel
         private TrackModel _model;
         private bool _isSelected;
         private bool _isExpanded;
-        private SyncObservableCollection<EquityChartViewModel> _charts = new();
+        private SyncObservableCollection<IChartViewModel> _charts = new();
         private IDictionary<string, decimal?> _statistics;
         private string _port;
         private IList _selectedItems;
@@ -197,7 +197,7 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _holdings, value);
         }
 
-        public SyncObservableCollection<EquityChartViewModel> Charts
+        public SyncObservableCollection<IChartViewModel> Charts
         {
             get => _charts;
             set => Set(ref _charts, value);
@@ -973,7 +973,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void ParseCharts(Result result)
         {
-            SyncObservableCollection<EquityChartViewModel> workCharts = Charts;
+            SyncObservableCollection<IChartViewModel> workCharts = Charts;
             Debug.Assert(workCharts.Count == 0);
 
             decimal profit = Model.InitialCapital;
@@ -1000,7 +1000,16 @@ namespace Algoloop.Wpf.ViewModel
                     IEnumerable<stocksharp.EquityData> list = serie.Values.Select(
                         m => new stocksharp.EquityData { Time = Time.UnixTimeStampToDateTime(m.x), Value = m.y });
                     viewModel = new EquityChartViewModel(serie.Name, serie.Color, list);
-                    workCharts.Add(viewModel);
+
+                    // Add Equity chart first in list
+                    if (serie.Name.Equals("Equity"))
+                    {
+                        workCharts.Insert(0, viewModel);
+                    }
+                    else
+                    {
+                        workCharts.Add(viewModel);
+                    }
                 }
             }
 

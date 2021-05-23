@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Wpf.ViewModel;
 using MoreLinq;
 using StockSharp.Xaml.Charting;
 using System;
@@ -27,7 +28,7 @@ namespace Algoloop.Wpf.View
     public partial class EquityChartView : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty = 
-            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<EquityChartViewModel>),
+            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<IChartViewModel>),
             typeof(EquityChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
         private bool _isLoaded = false;
 
@@ -38,9 +39,9 @@ namespace Algoloop.Wpf.View
             Unloaded += OnUnloaded;
         }
 
-        public ObservableCollection<EquityChartViewModel> ItemsSource
+        public ObservableCollection<IChartViewModel> ItemsSource
         {
-            get => (ObservableCollection<EquityChartViewModel>)GetValue(ItemsSourceProperty);
+            get => (ObservableCollection<IChartViewModel>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
 
@@ -68,29 +69,29 @@ namespace Algoloop.Wpf.View
             if (e.NewValue != null)
             {
                 // Subscribe to CollectionChanged on the new collection
-                var coll = e.NewValue as ObservableCollection<EquityChartViewModel>;
+                var coll = e.NewValue as ObservableCollection<IChartViewModel>;
                 coll.CollectionChanged += chart.OnCollectionChanged;
             }
 
-            var charts = e.NewValue as IEnumerable<EquityChartViewModel>;
+            var charts = e.NewValue as IEnumerable<IChartViewModel>;
             chart.OnItemsSourceChanged(charts);
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            List<EquityChartViewModel> charts = e.NewItems?.Cast<EquityChartViewModel>().ToList();
+            List<IChartViewModel> charts = e.NewItems?.Cast<IChartViewModel>().ToList();
             OnItemsSourceChanged(charts);
         }
 
-        private void OnItemsSourceChanged(IEnumerable<EquityChartViewModel> charts)
+        private void OnItemsSourceChanged(IEnumerable<IChartViewModel> charts)
         {
             // Clear charts
             _combobox.Items.Clear();
             if (charts == null) return;
             bool selected = true;
-            foreach (EquityChartViewModel chart in charts)
+            foreach (IChartViewModel chart in charts)
             {
-                chart.IsSelected = selected || IsDefaultSelected(chart.Title);
+                chart.IsSelected = selected;
                 _combobox.Items.Add(chart);
                 selected = false;
             }
@@ -101,16 +102,6 @@ namespace Algoloop.Wpf.View
             {
                 RedrawCharts();
             }
-        }
-
-        private static bool IsDefaultSelected(string title)
-        {
-            return title switch
-            {
-                "Net profit" => true,
-                "Equity" => true,
-                _ => false,
-            };
         }
 
         private void Combobox_DropDownClosed(object sender, EventArgs e)
