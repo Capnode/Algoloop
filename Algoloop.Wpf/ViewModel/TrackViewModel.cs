@@ -984,7 +984,7 @@ namespace Algoloop.Wpf.ViewModel
             foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
                 profit += trade.Value;
-                series.Add(new stocksharp.EquityData { Time = trade.Key, Value = profit });
+                series.Add(new stocksharp.EquityData { Time = trade.Key, Value = RoundLarge(profit) });
             }
 
             var viewModel = new EquityChartViewModel("Net profit", Color.Green, series);

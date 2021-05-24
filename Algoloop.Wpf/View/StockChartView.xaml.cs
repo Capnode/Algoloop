@@ -53,6 +53,7 @@ namespace Algoloop.Wpf.View
             _chart.AllowAddOwnTrades = false;
             _chart.AllowAddAxis = false;
             _chart.AllowAddArea = false;
+            _chart.XAxisType = ChartAxisType.CategoryDateTime;
 
             _chart.SubscribeIndicatorElement += OnSubscribeIndicatorElement;
             _chart.UnSubscribeElement += OnUnSubscribeElement;
@@ -194,80 +195,62 @@ namespace Algoloop.Wpf.View
         private void RedrawEquityCharts(ChartArea candlesArea)
         {
             // Collect time-value points of all curves
-            Dictionary<ChartCandleElement, decimal> curves = new();
-            Dictionary<DateTimeOffset, List<Tuple<ChartCandleElement, decimal>>> points = new();
+            Dictionary<ChartLineElement, decimal> curves = new();
+            Dictionary<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> points = new();
             foreach (object item in _combobox.Items)
             {
                 if (item is EquityChartViewModel model && model.IsSelected)
                 {
                     Security security = new () { Id = model.Title };
                     CandleSeries series = new (typeof(TimeFrameCandle), security, TimeSpan.FromDays(1));
-                    ChartCandleElement curveElement = new()
+                    ChartLineElement lineElement = new()
                     {
-                        DrawStyle = ChartCandleDrawStyles.Area,
-                        LineColor = model.Color,
-                        FontColor = model.Color,
-                        AreaColor = Colors.LightGray
+                        FullTitle = model.Title,
+                        Style = ChartIndicatorDrawStyles.Area,
+                        Color = model.Color,
+                        AntiAliasing = false,
+                        IsLegend = true,
+                        ShowAxisMarker = true
                     };
-                    _chart.AddElement(candlesArea, curveElement, series);
+                    _chart.AddElement(candlesArea, lineElement);
                     foreach (EquityData equityData in model.Series)
                     {
                         decimal value = equityData.Value;
-                        if (!curves.ContainsKey(curveElement))
+                        if (!curves.ContainsKey(lineElement))
                         {
-                            curves.Add(curveElement, value);
+                            curves.Add(lineElement, value);
                         }
 
                         DateTimeOffset time = equityData.Time.Date;
-                        if (!points.TryGetValue(time, out List<Tuple<ChartCandleElement, decimal>> list))
+                        if (!points.TryGetValue(time, out List<Tuple<ChartLineElement, decimal>> list))
                         {
-                            list = new List<Tuple<ChartCandleElement, decimal>>();
+                            list = new List<Tuple<ChartLineElement, decimal>>();
                             points.Add(time, list);
                         }
-                        list.Add(new Tuple<ChartCandleElement, decimal>(curveElement, value));
+                        list.Add(new Tuple<ChartLineElement, decimal>(lineElement, value));
                     }
                 }
             }
 
             // Draw all curves in time order, moment by moment
-            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartCandleElement, decimal>>> moment in points.OrderBy(m => m.Key))
+            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> moment in points.OrderBy(m => m.Key))
             {
                 DateTimeOffset time = moment.Key;
                 ChartDrawData chartData = new();
                 ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(time);
-                foreach (KeyValuePair<ChartCandleElement, decimal> curve in curves)
+                foreach (KeyValuePair<ChartLineElement, decimal> curve in curves)
                 {
-                    ChartCandleElement chart = curve.Key;
+                    ChartLineElement lineElement = curve.Key;
                     decimal value = curve.Value;
 
                     // Use actual point it available
-                    Tuple<ChartCandleElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
+                    Tuple<ChartLineElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
                     if (pair != default)
                     {
                         value = pair.Item2;
-                        curves[chart] = value;
+                        curves[lineElement] = value;
                     }
-                    Security security = new() { Id = "Id" };
-                    TimeFrameCandle candle = new()
-                    {
-                        Security = security,
-                        TimeFrame = TimeSpan.FromDays(1),
-                        OpenTime = time,
-                        HighTime = time,
-                        LowTime = time,
-                        CloseTime = time,
-                        OpenPrice = value,
-                        HighPrice = value,
-                        LowPrice = value,
-                        ClosePrice = value,
-                        OpenVolume = 0,
-                        HighVolume = 0,
-                        LowVolume = 0,
-                        CloseVolume = 0,
-                        BuildFrom = StockSharp.Messages.DataType.Ticks,
-                        State = StockSharp.Messages.CandleStates.Finished
-                    };
-                    chartGroup.Add(chart, candle);
+                    chartGroup.Add(lineElement, value);
                 }
 
                 _chart.Draw(chartData);
