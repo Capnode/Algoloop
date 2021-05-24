@@ -201,8 +201,6 @@ namespace Algoloop.Wpf.View
             {
                 if (item is EquityChartViewModel model && model.IsSelected)
                 {
-                    Security security = new () { Id = model.Title };
-                    CandleSeries series = new (typeof(TimeFrameCandle), security, TimeSpan.FromDays(1));
                     ChartLineElement lineElement = new()
                     {
                         FullTitle = model.Title,
