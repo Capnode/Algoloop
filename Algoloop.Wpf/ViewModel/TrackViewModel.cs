@@ -998,7 +998,7 @@ namespace Algoloop.Wpf.ViewModel
                     Series serie = kvp.Value;
                     if (serie.Values.Count < 2) continue;
                     IEnumerable<stocksharp.EquityData> list = serie.Values.Select(
-                        m => new stocksharp.EquityData { Time = Time.UnixTimeStampToDateTime(m.x), Value = m.y });
+                        m => new stocksharp.EquityData { Time = Time.UnixTimeStampToDateTime(m.x), Value = RoundLarge(m.y) });
                     viewModel = new EquityChartViewModel(serie.Name, serie.Color, list);
 
                     // Add Equity chart first in list
@@ -1015,6 +1015,12 @@ namespace Algoloop.Wpf.ViewModel
 
             Charts = null;
             Charts = workCharts;
+        }
+
+        private decimal RoundLarge(decimal value)
+        {
+            if (value < 1000) return value;
+            return Decimal.Round(value);
         }
     }
 }

@@ -204,7 +204,7 @@ namespace Algoloop.Wpf.View
                     CandleSeries series = new (typeof(TimeFrameCandle), security, TimeSpan.FromDays(1));
                     ChartCandleElement curveElement = new()
                     {
-                        DrawStyle = ChartCandleDrawStyles.LineClose,
+                        DrawStyle = ChartCandleDrawStyles.Area,
                         LineColor = model.Color,
                         FontColor = model.Color,
                         AreaColor = Colors.LightGray
