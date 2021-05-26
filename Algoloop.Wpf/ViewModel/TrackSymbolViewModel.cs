@@ -22,7 +22,7 @@ namespace Algoloop.Wpf.ViewModel
 {
     public class TrackSymbolViewModel
     {
-        readonly List<Trade> _trades = new List<Trade>();
+        readonly List<Trade> _trades = new ();
         private readonly Symbol _symbol;
 
         public TrackSymbolViewModel(Symbol symbol)

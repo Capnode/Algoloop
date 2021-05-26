@@ -118,12 +118,9 @@ namespace Algoloop.Wpf.View
             // Clear charts
             _combobox.Items.Clear();
             if (charts == null) return;
-            bool selected = true;
             foreach (IChartViewModel chart in charts)
             {
-                chart.IsSelected = selected;
                 _combobox.Items.Add(chart);
-                selected = false;
             }
 
             _combobox.SelectedIndex = 0;
@@ -179,6 +176,7 @@ namespace Algoloop.Wpf.View
 
             var candleElement = new ChartCandleElement
             {
+                DrawStyle = model.Style,
                 UpBorderColor = model.Color,
                 DownBorderColor = model.Color
             };
@@ -197,18 +195,36 @@ namespace Algoloop.Wpf.View
             // Collect time-value points of all curves
             Dictionary<ChartLineElement, decimal> curves = new();
             Dictionary<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> points = new();
+            Dictionary<int, ChartAxis> yAxis = new();
             foreach (object item in _combobox.Items)
             {
                 if (item is EquityChartViewModel model && model.IsSelected)
                 {
+                    ChartAxis axis;
+                    if (yAxis.Any())
+                    {
+                        if (!yAxis.TryGetValue(model.SubChart, out axis))
+                        {
+                            axis = new() { AxisType = ChartAxisType.Numeric };
+                            yAxis.Add(model.SubChart, axis);
+                            candlesArea.YAxises.Add(axis);
+                        }
+                    }
+                    else
+                    {
+                        axis = candlesArea.YAxises.First();
+                        yAxis.Add(model.SubChart, axis);
+                    }
+
                     ChartLineElement lineElement = new()
                     {
                         FullTitle = model.Title,
-                        Style = ChartIndicatorDrawStyles.Area,
+                        Style = model.Style,
                         Color = model.Color,
                         AntiAliasing = false,
                         IsLegend = true,
-                        ShowAxisMarker = true
+                        ShowAxisMarker = true,
+                        YAxisId = axis.Id
                     };
                     _chart.AddElement(candlesArea, lineElement);
                     foreach (EquityData equityData in model.Series)

@@ -14,7 +14,9 @@
 
 using Algoloop.Wpf.Common;
 using StockSharp.Algo.Candles;
+using StockSharp.Xaml.Charting;
 using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -22,16 +24,19 @@ namespace Algoloop.Wpf.ViewModel
     {
         public StockChartViewModel(
             string name,
+            ChartCandleDrawStyles style,
             System.Drawing.Color color,
             IEnumerable<Candle> candles)
         {
             Title = name;
+            Style = style;
             Color = Converters.ToMediaColor(color);
             Candles = candles;
         }
 
         public string Title { get; }
-        public System.Windows.Media.Color Color { get; }
+        public ChartCandleDrawStyles Style { get; }
+        public Color Color { get; }
         public IEnumerable<Candle> Candles { get; }
         public bool IsSelected { get; set; }
     }

@@ -15,6 +15,7 @@
 using Algoloop.Wpf.Common;
 using StockSharp.Xaml.Charting;
 using System.Collections.Generic;
+using System.Windows.Media;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -22,17 +23,25 @@ namespace Algoloop.Wpf.ViewModel
     {
         public EquityChartViewModel(
             string title,
+            ChartIndicatorDrawStyles style,
             System.Drawing.Color color,
+            int subChart,
+            bool isSelected,
             IEnumerable<EquityData> series)
         {
             Title = title;
+            Style = style;
             Color = Converters.ToMediaColor(color);
+            SubChart = subChart;
+            IsSelected = isSelected;
             Series = series;
         }
 
         public string Title { get; }
-        public System.Windows.Media.Color Color { get; }
-        public IEnumerable<EquityData> Series { get; }
+        public ChartIndicatorDrawStyles Style { get; }
+        public int SubChart { get; }
+        public Color Color { get; }
         public bool IsSelected { get; set; }
+        public IEnumerable<EquityData> Series { get; }
     }
 }

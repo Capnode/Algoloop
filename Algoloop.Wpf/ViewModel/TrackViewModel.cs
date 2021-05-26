@@ -987,7 +987,7 @@ namespace Algoloop.Wpf.ViewModel
                 series.Add(new stocksharp.EquityData { Time = trade.Key, Value = RoundLarge(profit) });
             }
 
-            var viewModel = new EquityChartViewModel("Net profit", Color.Green, series);
+            var viewModel = new EquityChartViewModel("Net profit", stocksharp.ChartIndicatorDrawStyles.Area, Color.Green, 0, false, series);
 
             workCharts.Add(viewModel);
 
@@ -999,17 +999,19 @@ namespace Algoloop.Wpf.ViewModel
                     if (serie.Values.Count < 2) continue;
                     IEnumerable<stocksharp.EquityData> list = serie.Values.Select(
                         m => new stocksharp.EquityData { Time = Time.UnixTimeStampToDateTime(m.x), Value = RoundLarge(m.y) });
-                    viewModel = new EquityChartViewModel(serie.Name, serie.Color, list);
 
-                    // Add Equity chart first in list
-                    if (serie.Name.Equals("Equity"))
+                    viewModel = serie.Name switch
                     {
-                        workCharts.Insert(0, viewModel);
-                    }
-                    else
-                    {
-                        workCharts.Add(viewModel);
-                    }
+                        "Equity" => new EquityChartViewModel(
+                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Area, serie.Color, 0, true, list),
+                        "Benchmark" => new EquityChartViewModel(
+                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Area, serie.Color, 0, false, list),
+                        "Daily Performance" => new EquityChartViewModel(
+                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Histogram, serie.Color, 1, false, list),
+                        _ => new EquityChartViewModel(
+                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Line, serie.Color, 2, false, list),
+                    };
+                    workCharts.Add(viewModel);
                 }
             }
 
@@ -1017,7 +1019,7 @@ namespace Algoloop.Wpf.ViewModel
             Charts = workCharts;
         }
 
-        private decimal RoundLarge(decimal value)
+        private static decimal RoundLarge(decimal value)
         {
             if (value < 1000) return value;
             return Decimal.Round(value);

@@ -23,6 +23,7 @@ using QuantConnect.Data.Fundamental;
 using QuantConnect.ToolBox;
 using QuantConnect.Util;
 using StockSharp.Algo.Candles;
+using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -171,7 +172,7 @@ namespace Algoloop.Wpf.ViewModel
                 IEnumerable<Candle> candles = leanDataReader.Parse().ToCandles();
                 if (candles.Any())
                 {
-                    var viewModel = new StockChartViewModel(Model.Name, Color.Black, candles);
+                    var viewModel = new StockChartViewModel(Model.Name, ChartCandleDrawStyles.CandleStick, Color.Black, candles);
                     Charts.Add(viewModel);
                 }
                 ShowCharts = true;
