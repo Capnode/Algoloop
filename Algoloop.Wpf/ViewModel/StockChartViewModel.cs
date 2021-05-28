@@ -31,13 +31,14 @@ namespace Algoloop.Wpf.ViewModel
             Title = name;
             Style = style;
             Color = Converters.ToMediaColor(color);
+            IsVisible = true;
             Candles = candles;
         }
 
         public string Title { get; }
         public ChartCandleDrawStyles Style { get; }
         public Color Color { get; }
+        public bool IsVisible { get; set; }
         public IEnumerable<Candle> Candles { get; }
-        public bool IsSelected { get; set; }
     }
 }

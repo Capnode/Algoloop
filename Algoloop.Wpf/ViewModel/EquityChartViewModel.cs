@@ -26,14 +26,14 @@ namespace Algoloop.Wpf.ViewModel
             ChartIndicatorDrawStyles style,
             System.Drawing.Color color,
             int subChart,
-            bool isSelected,
+            bool isVisible,
             IEnumerable<EquityData> series)
         {
             Title = title;
             Style = style;
             Color = Converters.ToMediaColor(color);
             SubChart = subChart;
-            IsSelected = isSelected;
+            IsVisible = isVisible;
             Series = series;
         }
 
@@ -41,7 +41,7 @@ namespace Algoloop.Wpf.ViewModel
         public ChartIndicatorDrawStyles Style { get; }
         public int SubChart { get; }
         public Color Color { get; }
-        public bool IsSelected { get; set; }
+        public bool IsVisible { get; set; }
         public IEnumerable<EquityData> Series { get; }
     }
 }

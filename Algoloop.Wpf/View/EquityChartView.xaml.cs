@@ -88,12 +88,9 @@ namespace Algoloop.Wpf.View
             // Clear charts
             _combobox.Items.Clear();
             if (charts == null) return;
-            bool selected = true;
             foreach (IChartViewModel chart in charts)
             {
-                chart.IsSelected = selected;
                 _combobox.Items.Add(chart);
-                selected = false;
             }
 
             _combobox.SelectedIndex = 0;
@@ -118,7 +115,7 @@ namespace Algoloop.Wpf.View
             Dictionary<DateTimeOffset, List<Tuple<ChartBandElement, decimal>>> points = new ();
             foreach (object item in _combobox.Items)
             {
-                if (item is EquityChartViewModel model && model.IsSelected)
+                if (item is EquityChartViewModel model && model.IsVisible)
                 {
                     ChartBandElement curveElement = _chart.CreateCurve(model.Title, model.Color, ChartIndicatorDrawStyles.Line);
                     foreach (EquityData equityData in model.Series)

@@ -20,6 +20,6 @@ namespace Algoloop.Wpf.ViewModel
     {
         string Title { get; }
         Color Color { get; }
-        bool IsSelected { get; set; }
+        bool IsVisible { get; set; }
     }
 }

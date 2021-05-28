@@ -144,7 +144,7 @@ namespace Algoloop.Wpf.View
             _chart.AddArea(candlesArea);
             foreach (IChartViewModel chart in _combobox.Items)
             {
-                if (!chart.IsSelected) continue;
+                if (!chart.IsVisible) continue;
                 if (chart is StockChartViewModel stockChart)
                 {
                     RedrawChart(candlesArea, stockChart);
@@ -198,7 +198,7 @@ namespace Algoloop.Wpf.View
             Dictionary<int, ChartAxis> yAxis = new();
             foreach (object item in _combobox.Items)
             {
-                if (item is EquityChartViewModel model && model.IsSelected)
+                if (item is EquityChartViewModel model && model.IsVisible)
                 {
                     ChartAxis axis;
                     if (yAxis.Any())
