@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -444,15 +444,7 @@ namespace Algoloop.Wpf.ViewModel
                         .StartTrackAsync()
                         .ContinueWith(m =>
                         {
-                            if (m.IsFaulted || m.IsCanceled)
-                            {
-                                AbortTracks(m.Exception);
-                                Active = false;
-                            }
-                            else
-                            {
-                                ExDataGridColumns.AddPropertyColumns(TrackColumns, track.Statistics, "Statistics");
-                            }
+                            ExDataGridColumns.AddPropertyColumns(TrackColumns, track.Statistics, "Statistics");
                             throttler.Release();
                         }, TaskScheduler.FromCurrentSynchronizationContext());
                     tasks.Add(task);
@@ -463,24 +455,6 @@ namespace Algoloop.Wpf.ViewModel
 
             Messenger.Default.Send(new NotificationMessage(Active ? Resources.StrategyCompleted : Resources.StrategyAborted));
             Active = false;
-        }
-
-        private void AbortTracks(AggregateException ae)
-        {
-            // Log exceptions
-            if (ae != null)
-            {
-                foreach (Exception ie in ae.InnerExceptions)
-                {
-                    Log.Error(ie, null, true);
-                }
-            }
-
-            // Stop running tracks
-            foreach (TrackViewModel track in Tracks)
-            {
-                track.StopTrack();
-            }
         }
 
         private void DoStopCommand()
@@ -908,8 +882,6 @@ namespace Algoloop.Wpf.ViewModel
 
         private void OnMoveStrategy(ITreeViewModel item)
         {
-            if (item == this) throw new ArgumentException(nameof(item));
-
             // No IsBusy
             if (item is StrategiesViewModel strategies)
             {

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -20,6 +20,7 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.IO;
+using static Algoloop.Model.TrackModel;
 
 namespace Algoloop.Tests.Lean
 {
@@ -70,7 +71,7 @@ namespace Algoloop.Tests.Lean
             using var launcher = new LeanLauncher();
             launcher.Run(track, account, _settings);
 
-            Assert.IsTrue(track.Completed);
+            Assert.IsTrue(track.Status.Equals(CompletionStatus.Success));
             Assert.IsFalse(track.Active);
             Assert.IsNotNull(track.Logs);
             Assert.IsTrue(track.Logs.Length > 0);

@@ -41,6 +41,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
 using stocksharp = StockSharp.Xaml.Charting;
+using static Algoloop.Model.TrackModel;
 
 namespace Algoloop.Wpf.ViewModel
 {
@@ -288,8 +289,7 @@ namespace Algoloop.Wpf.ViewModel
 
         public void Refresh()
         {
-            Model.Refresh();
-            if (!_loaded && Model.Completed)
+            if (!_loaded)
             {
                 LoadTrack();
                 _loaded = true;
@@ -337,7 +337,7 @@ namespace Algoloop.Wpf.ViewModel
                 }
 
                 // Split result and logs to separate files
-                if (model.Completed)
+                if (model.Status.Equals(CompletionStatus.Success) || model.Status.Equals(CompletionStatus.Error))
                 {
                     SplitModelToFiles(model);
                 }
@@ -946,7 +946,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void ClearRunData()
         {
-            Model.Completed = false;
+            Model.Status = CompletionStatus.None;
             Model.Logs = null;
             Model.Result = null;
             Model.Statistics = null;

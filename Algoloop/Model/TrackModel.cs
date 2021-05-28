@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -27,6 +27,8 @@ namespace Algoloop.Model
     [DataContract]
     public class TrackModel : ModelBase
     {
+        public enum CompletionStatus { None, Success, Error } ;
+
         private string _account;
 
         public TrackModel()
@@ -96,7 +98,6 @@ namespace Algoloop.Model
             set
             {
                 _account = value;
-                Refresh();
             }
         }
 
@@ -209,7 +210,7 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
-        public bool Completed { get; set; }
+        public CompletionStatus Status { get; set; }
 
         [ReadOnly(true)]
         [Browsable(false)]
@@ -230,9 +231,5 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public IDictionary<string, decimal?> Statistics { get; set; }
-
-        public void Refresh()
-        {
-        }
     }
 }

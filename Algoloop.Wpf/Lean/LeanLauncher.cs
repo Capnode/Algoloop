@@ -27,6 +27,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using static Algoloop.Model.TrackModel;
 
 namespace Algoloop.Wpf.Lean
 {
@@ -75,11 +76,11 @@ namespace Algoloop.Wpf.Lean
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             Debug.Assert(!IsBusy);
-            Debug.Assert(!model.Completed);
+            Debug.Assert(model.Status == CompletionStatus.None);
             if (!model.Active) return;
 
             IsBusy = true;
-            string error = null;
+            bool error = false;
             _process = new ConfigProcess(
                 "QuantConnect.Lean.Launcher.exe",
                 null,
@@ -88,10 +89,7 @@ namespace Algoloop.Wpf.Lean
                 (line) => Log.Trace(line),
                 (line) =>
                 {
-                    if (string.IsNullOrEmpty(error))
-                    {
-                        error = line;
-                    }
+                    error = true;
                     Log.Error(line);
                 });
 
@@ -107,7 +105,6 @@ namespace Algoloop.Wpf.Lean
             {
                 _process.Start();
                 _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));
-                if (!string.IsNullOrEmpty(error)) throw new ApplicationException(error);
             }
             finally
             {
@@ -117,7 +114,7 @@ namespace Algoloop.Wpf.Lean
                 IsBusy = false;
             }
 
-            model.Completed = true;
+            model.Status = error ? CompletionStatus.Error : CompletionStatus.Success;
         }
 
         private static void PostProcess(string folder, TrackModel model)
@@ -158,7 +155,7 @@ namespace Algoloop.Wpf.Lean
             {
                 SetPaper(config);
             }
-            else
+            else if (account == default)
             {
                 Log.Error("No broker selected");
                 return false;
