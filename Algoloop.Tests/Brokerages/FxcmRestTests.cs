@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,13 +14,13 @@
 
 using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
+using AlgoloopTests.TestSupport;
+using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
-using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading;
 using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
@@ -59,9 +59,10 @@ namespace Algoloop.Tests.Brokerages
         {
             Log.LogHandler = new ConsoleLogHandler();
 
-            string access = ConfigurationManager.AppSettings["fxcmrest-access"];
+            IConfigurationRoot config = TestConfig.Create();
+            string access = config["fxcmrest-access"];
             AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
-            string key = ConfigurationManager.AppSettings["fxcmrest-key"];
+            string key = config["fxcmrest-key"];
             _api = new FxcmClient(accessType, key);
         }
 

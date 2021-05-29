@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2020 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,11 +14,10 @@
 
 using Algoloop.Model;
 using Algoloop.Wpf.Provider;
+using AlgoloopTests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect.Logging;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using static Algoloop.Model.ProviderModel;
 
@@ -38,8 +37,9 @@ namespace Algoloop.Tests.Provider
 
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             _settings = new SettingModel { DataFolder = dataFolder };
-            string key = ConfigurationManager.AppSettings["fxcmrest-key"];
-            string access = ConfigurationManager.AppSettings["fxcmrest-access"];
+            var config = TestConfig.Create();
+            string key = config["fxcmrest-key"];
+            string access = config["fxcmrest-access"];
 
             _broker = new ProviderModel
             {

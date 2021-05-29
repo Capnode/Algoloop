@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -49,7 +49,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_no_symbols()
         {
-            var key = ConfigurationManager.AppSettings["dukascopy"];
             var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
@@ -57,8 +56,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
-                Resolution = Resolution.Daily,
-                ApiKey = key
+                Resolution = Resolution.Daily
             };
 
             // Just update symbol list
@@ -74,7 +72,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_one_symbol()
         {
-            var key = ConfigurationManager.AppSettings["dukascopy"];
             var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
@@ -82,8 +79,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
-                Resolution = Resolution.Daily,
-                ApiKey = key
+                Resolution = Resolution.Daily
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
@@ -101,7 +97,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_two_symbols()
         {
-            var key = ConfigurationManager.AppSettings["dukascopy"];
             var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
@@ -109,8 +104,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
-                Resolution = Resolution.Daily,
-                ApiKey = key
+                Resolution = Resolution.Daily
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
             market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
@@ -130,7 +124,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_two_symbols_tick()
         {
-            var key = ConfigurationManager.AppSettings["dukascopy"];
             var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
@@ -138,8 +131,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
-                Resolution = Resolution.Tick,
-                ApiKey = key
+                Resolution = Resolution.Tick
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
             market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
@@ -168,7 +160,6 @@ namespace Algoloop.Tests.Provider
         [ExpectedException(typeof(ApplicationException), "An invalid symbol name was accepted")]
         public void Download_invalid_symbol()
         {
-            var key = ConfigurationManager.AppSettings["dukascopy"];
             var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
@@ -176,8 +167,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = date,
-                Resolution = Resolution.Daily,
-                ApiKey = key
+                Resolution = Resolution.Daily
             };
             market.Symbols.Add(new SymbolModel("noname", "Dukascopy", SecurityType.Forex));
 
@@ -195,7 +185,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_today()
         {
-            var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime today = DateTime.Today;
             var market = new ProviderModel
             {
@@ -203,8 +192,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = today,
-                Resolution = Resolution.Second,
-                ApiKey = key
+                Resolution = Resolution.Second
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
@@ -221,7 +209,6 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_yesterday()
         {
-            var key = ConfigurationManager.AppSettings["dukascopy"];
             DateTime today = DateTime.Today;
             var market = new ProviderModel
             {
@@ -229,8 +216,7 @@ namespace Algoloop.Tests.Provider
                 Name = "Dukascopy",
                 Provider = "dukascopy",
                 LastDate = today.AddDays(-1),
-                Resolution = Resolution.Second,
-                ApiKey = key
+                Resolution = Resolution.Second
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
 
