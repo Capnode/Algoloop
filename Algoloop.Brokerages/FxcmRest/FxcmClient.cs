@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -36,7 +36,7 @@ namespace Algoloop.Brokerages.FxcmRest
         private const string _mediatype = @"application/json";
         private const string _getModel = @"trading/get_model/?models=OpenPosition&models=ClosedPosition" +
             "&models=Order&models=Account&models=LeverageProfile&models=Properties";
-        private const string _getInstruments = @"trading/get_instruments";
+//        private const string _getInstruments = @"trading/get_instruments";
         private const string _getModelOffer = @"trading/get_model/?models=Offer";
 
         private bool _isDisposed;
@@ -248,7 +248,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 Security = Support.ToSecurityType(currency),
             };
             string entryTime = token["time"].ToString();
-            decimal grossPl = token["grossPL"].ToDecimal();
+//            decimal grossPl = token["grossPL"].ToDecimal();
             decimal entryValue = amountK * open;
             decimal marketValue = amountK * close;
             var position = new PositionModel
@@ -294,33 +294,29 @@ namespace Algoloop.Brokerages.FxcmRest
             Log.Trace(_httpClient.DefaultRequestHeaders.Authorization.ToString());
 
             string uri = _httpClient.BaseAddress + path;
-            using (HttpResponseMessage response = await _httpClient.GetAsync(uri).ConfigureAwait(false))
+            using HttpResponseMessage response = await _httpClient.GetAsync(uri).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
             {
-                if (!response.IsSuccessStatusCode)
-                {
-                    string message = $"GetAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
-                    Log.Error(message);
-                    throw new ApplicationException(message);
-                }
-
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                string message = $"GetAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
+                Log.Error(message);
+                throw new ApplicationException(message);
             }
+
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
-        private async Task<string> PostAsync(string path, string body)
-        {
-            string uri = _httpClient.BaseAddress + path;
-            using (HttpResponseMessage response = await _httpClient.PostAsync(uri, new StringContent(body, Encoding.UTF8, _mediatype)))
-            {
-                if (!response.IsSuccessStatusCode)
-                {
-                    string message = $"PostAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
-                    Log.Error(message);
-                    throw new ApplicationException(message);
-                }
+        //private async Task<string> PostAsync(string path, string body)
+        //{
+        //    string uri = _httpClient.BaseAddress + path;
+        //    using HttpResponseMessage response = await _httpClient.PostAsync(uri, new StringContent(body, Encoding.UTF8, _mediatype));
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        string message = $"PostAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
+        //        Log.Error(message);
+        //        throw new ApplicationException(message);
+        //    }
 
-                return await response.Content.ReadAsStringAsync();
-            }
-        }
+        //    return await response.Content.ReadAsStringAsync();
+        //}
     }
 }

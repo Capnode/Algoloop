@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -28,7 +28,7 @@ namespace Algoloop.Brokerages.FxcmRest
         private enum ActionType { Connect, Disconnect, Event, Ack, Error, BinaryEvent, BinaryAck };
 
         private readonly WebSocket _webSocket;
-        private readonly ManualResetEvent _hold = new ManualResetEvent(false);
+        private readonly ManualResetEvent _hold = new(false);
         private bool _isDisposed;
 
         internal Action<object> AccountsUpdate { get; set; }
@@ -40,8 +40,10 @@ namespace Algoloop.Brokerages.FxcmRest
         public FxcmSocket(Uri uri, string key)
         {
             string url = $"wss://{uri.Host}:{uri.Port}/socket.io/?EIO=3&transport=websocket&access_token={key}";
-            _webSocket = new WebSocket(url);
-            _webSocket.EmitOnPing = true;
+            _webSocket = new WebSocket(url)
+            {
+                EmitOnPing = true
+            };
             _webSocket.OnOpen += OnOpen;
             _webSocket.OnMessage += OnMessage;
             _webSocket.OnError += OnError;
@@ -115,17 +117,17 @@ namespace Algoloop.Brokerages.FxcmRest
                 if (e.Data.StartsWith("0", StringComparison.OrdinalIgnoreCase))
                 {
                     // 0{"sid":"oTlhP94ieIujcA7aAVdn","upgrades":[],"pingInterval":25000,"pingTimeout":5000}
-                    OpenConnect(e.Data.Substring(1));
+                    OpenConnect(e.Data[1..]);
                 }
                 else if (e.Data.StartsWith("40", StringComparison.OrdinalIgnoreCase))
                 {
                     // 40
-                    MessageConnect(e.Data.Substring(2));
+                    MessageConnect(e.Data[2..]);
                 }
                 else if (e.Data.StartsWith("42", StringComparison.OrdinalIgnoreCase))
                 {
                     // 42["EUR/USD","{\"Updated\":1614843030623,\"Rates\":[1.20526,1.20539,1.2068999999999999,1.20429],\"Symbol\":\"EUR/USD\"}"]
-                    MessageEvent(e.Data.Substring(2));
+                    MessageEvent(e.Data[2..]);
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -27,7 +27,7 @@ namespace Algoloop.Wpf.Lean
         private Action<LogItem> _logger;
 
         // we need to control synchronization to our stream writer since it's not inherently thread-safe
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogItemHandler"/> class using 'log.txt' for the filepath.
