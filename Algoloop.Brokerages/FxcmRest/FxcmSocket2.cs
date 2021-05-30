@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -27,9 +27,7 @@ namespace Algoloop.Brokerages.FxcmRest
     public class FxcmSocket2 : IDisposable
     {
         private readonly SocketIO _socketio;
-
-        private readonly ManualResetEvent _hold = new ManualResetEvent(false);
-        private bool _isDisposed;
+        private readonly ManualResetEvent _hold = new(false);
 
         internal Action<object> AccountsUpdate { get; set; }
         internal Action<object> SymbolUpdate { get; set; }
@@ -51,6 +49,12 @@ namespace Algoloop.Brokerages.FxcmRest
             _socketio.OnReceivedEvent += OnReceivedEvent;
         }
 
+        public void Dispose()
+        {
+            _hold.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
         private void OnReceivedEvent(object sender, ReceivedEventArgs e)
         {
             Log.Trace(e.Event);
@@ -66,7 +70,6 @@ namespace Algoloop.Brokerages.FxcmRest
 
         public void Close()
         {
-            bool connected = _socketio.Connected;
             try
             {
                 _socketio.DisconnectAsync().Wait();
@@ -75,28 +78,6 @@ namespace Algoloop.Brokerages.FxcmRest
             {
                 Log.Error(ex);
             }
-
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (_isDisposed) return;
-            _isDisposed = true;
-            if (disposing)
-            {
-                // TODO: dispose managed state (managed objects)
-                _hold.Dispose();
-            }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-            // TODO: set large fields to null
         }
 
         private void OnConnected(object sender, EventArgs e)

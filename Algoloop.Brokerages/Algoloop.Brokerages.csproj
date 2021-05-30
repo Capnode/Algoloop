@@ -44,8 +44,6 @@
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>
     </PackageReference>
-    <PackageReference Include="WebSocketSharpFork">
-      <Version>1.0.4</Version>
-    </PackageReference>
+    <PackageReference Include="WebSocket4Net" Version="0.15.2" />
   </ItemGroup>
 </Project>

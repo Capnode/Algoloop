@@ -21,7 +21,6 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
 
@@ -77,7 +76,6 @@ namespace Algoloop.Tests.Brokerages
         {
             // Act
             _api.Login();
-            Thread.Sleep(5000);
             _api.Logout();
         }
 
