@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2020 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -28,12 +28,13 @@ namespace Algoloop.Wpf.ViewModel
     public class ResearchViewModel : ViewModel, IDisposable
     {
         private const string _notebook = "Notebook";
-
+        private const string _pythonpath = "PYTHONPATH";
         private readonly SettingModel _settings;
         private string _htmlText;
         private string _source;
         private ConfigProcess _process;
         private bool _disposed;
+        private bool _initialized;
 
         public ResearchViewModel(SettingModel settings)
         {
@@ -51,6 +52,12 @@ namespace Algoloop.Wpf.ViewModel
         {
             get => _source;
             set => Set(ref _source, value);
+        }
+
+        public bool Initialized
+        {
+            get => _initialized;
+            private set => Set(ref _initialized, value);
         }
 
         public void Dispose()
@@ -96,27 +103,27 @@ namespace Algoloop.Wpf.ViewModel
                         int pos = line.IndexOf("http", StringComparison.OrdinalIgnoreCase);
                         if (string.IsNullOrEmpty(Source) && pos > 0)
                         {
-                            Source = line.Substring(pos);
+                            Source = line[pos..];
                         }
 
                         Log.Trace(line);
                     });
 
                 // Set PYTHONPATH
+                string exeFolder = MainService.GetProgramFolder();
                 StringDictionary environment = _process.Environment;
-                string pythonpath = environment["PYTHONPATH"];
-                if (string.IsNullOrEmpty(pythonpath))
+                if (environment.ContainsKey(_pythonpath))
                 {
-                    environment["PYTHONPATH"] = MainService.GetProgramFolder();
+                    string pythonpath = environment[_pythonpath];
+                    environment[_pythonpath] = exeFolder + ";" + pythonpath;
                 }
                 else
                 {
-                    environment["PYTHONPATH"] = MainService.GetProgramFolder() + ";" + pythonpath;
+                    environment[_pythonpath] = exeFolder;
                 }
 
                 // Set config file
                 IDictionary<string, string> config = _process.Config;
-                string exeFolder = MainService.GetProgramFolder();
                 config["algorithm-language"] = Language.Python.ToString();
                 config["composer-dll-directory"] = exeFolder.Replace("\\", "/");
                 config["data-folder"] = _settings.DataFolder.Replace("\\", "/");
@@ -126,6 +133,7 @@ namespace Algoloop.Wpf.ViewModel
 
                 // Start process
                 _process.Start();
+                Initialized = true;
             }
             catch (Exception ex)
             {
