@@ -122,6 +122,9 @@ namespace Algoloop.Wpf.ViewModel
                     environment[_pythonpath] = exeFolder;
                 }
 
+                // Copy python startup files
+                SetPythonStart(exeFolder);
+
                 // Set config file
                 IDictionary<string, string> config = _process.Config;
                 config["algorithm-language"] = Language.Python.ToString();
@@ -161,6 +164,18 @@ namespace Algoloop.Wpf.ViewModel
                 _settings.Notebook = Path.Combine(userDataFolder, _notebook);
                 Directory.CreateDirectory(_settings.Notebook);
             }
+        }
+
+        private static void SetPythonStart(string exeFolder)
+        {
+            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string sourceFile = Path.Combine(exeFolder, "start.py");
+            string destFile = Path.Combine(home, @".ipython\profile_default\startup\quantconnect.py");
+            File.Copy(sourceFile, destFile, true);
+
+            sourceFile = Path.Combine(exeFolder, @"QuantConnect.Lean.Launcher.runtimeconfig.json");
+            destFile = Path.Combine(home, @".ipython\profile_default\startup\QuantConnect.Lean.Launcher.runtimeconfig.json");
+            File.Copy(sourceFile, destFile, true);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2020 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -34,7 +34,7 @@ namespace Algoloop.Wpf.Common
         private readonly Process _process;
         private readonly IDictionary<string, string> _config = new Dictionary<string, string>();
         private bool _isDisposed;
-        private static readonly object _lock = new object();
+        private static readonly object _lock = new();
         private bool _abort;
         private bool _started;
 
@@ -99,7 +99,7 @@ namespace Algoloop.Wpf.Common
 
             // Save config file
             using StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile));
-            JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
+            JsonSerializer serializer = new() { Formatting = Formatting.Indented };
             serializer.Serialize(file, Config);
 
             _started = true;
