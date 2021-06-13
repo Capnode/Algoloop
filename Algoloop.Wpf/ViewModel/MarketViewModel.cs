@@ -665,7 +665,7 @@ namespace Algoloop.Wpf.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n");
+                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n", true);
             }
             finally
             {
@@ -699,7 +699,7 @@ namespace Algoloop.Wpf.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
+                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n", true);
             }
             finally
             {
@@ -770,7 +770,7 @@ namespace Algoloop.Wpf.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n");
+                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n", true);
             }
             finally
             {
@@ -845,7 +845,7 @@ namespace Algoloop.Wpf.ViewModel
                 }
             }
 
-            Log.Error($"DB upgrade symbol {symbol} failed!");
+            Log.Error($"DB upgrade symbol {symbol} failed!", true);
         }
     }
 }

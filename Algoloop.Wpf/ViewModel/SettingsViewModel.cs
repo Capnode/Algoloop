@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -44,14 +44,14 @@ namespace Algoloop.Wpf.ViewModel
             {
                 try
                 {
-                    using StreamReader r = new StreamReader(fileName);
+                    using StreamReader r = new(fileName);
                     string json = r.ReadToEnd();
                     SettingModel settings = JsonConvert.DeserializeObject<SettingModel>(json);
                     Model.Copy(settings);
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, $"Failed reading {fileName}\n");
+                    Log.Error(ex, $"Failed reading {fileName}\n", true);
                     return false;
                 }
             }
@@ -67,18 +67,18 @@ namespace Algoloop.Wpf.ViewModel
                 DataToModel();
 
                 using StreamWriter file = File.CreateText(fileName);
-                JsonSerializer serializer = new JsonSerializer { Formatting = Formatting.Indented };
+                JsonSerializer serializer = new() { Formatting = Formatting.Indented };
                 serializer.Serialize(file, Model);
                 return true;
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed writing {fileName}\n");
+                Log.Error(ex, $"Failed writing {fileName}\n", true);
                 return false;
             }
         }
 
-        private void DoOk(Window window)
+        private static void DoOk(Window window)
         {
             window.DialogResult = true;
             window.Close();

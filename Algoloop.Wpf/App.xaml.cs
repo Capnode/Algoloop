@@ -141,7 +141,6 @@ namespace Algoloop
         /// <summary>
         /// WebBrowser Internet Explorer 11 emulation
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         public static void EnsureBrowserEmulationEnabled(string exename, bool uninstall = false)
         {
             RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);

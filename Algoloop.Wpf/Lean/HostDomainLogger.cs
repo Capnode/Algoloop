@@ -32,12 +32,12 @@ namespace Algoloop.Wpf.Lean
         public void Error(string text)
         {
             _errCount++;
-            Log.Error(text);
+            Log.Error(text, true);
         }
 
         public void Trace(string text)
         {
-            Log.Trace(text);
+            Log.Trace(text, true);
         }
 
         public void Dispose()

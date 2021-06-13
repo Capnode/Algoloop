@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -39,7 +39,7 @@ namespace Algoloop.Wpf.ViewModel
         private readonly MarketViewModel _market;
         private SymbolViewModel _selectedSymbol;
         private SymbolViewModel _marketSymbol;
-        private ObservableCollection<DataGridColumn> _symbolColumns = new ObservableCollection<DataGridColumn>();
+        private ObservableCollection<DataGridColumn> _symbolColumns = new();
         private IList _selectedItems;
 
         public ListViewModel(MarketViewModel market, ListModel model)
@@ -246,7 +246,7 @@ namespace Algoloop.Wpf.ViewModel
             {
                 IsBusy = true;
                 DataToModel();
-                SaveFileDialog saveFileDialog = new SaveFileDialog
+                SaveFileDialog saveFileDialog = new()
                 {
                     InitialDirectory = Directory.GetCurrentDirectory(),
                     Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
@@ -265,7 +265,7 @@ namespace Algoloop.Wpf.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, $"Failed reading {saveFileDialog.FileName}\n");
+                    Log.Error(ex, $"Failed reading {saveFileDialog.FileName}\n", true);
                 }
             }
             finally

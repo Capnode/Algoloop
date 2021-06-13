@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -48,10 +48,10 @@ namespace Algoloop.Wpf.Provider
             }
             catch (ReflectionTypeLoadException ex)
             {
-                Log.Error($"{ex.GetType()} {ex.Message}: {name}");
+                Log.Error($"{ex.GetType()} {ex.Message}: {name}", true);
                 foreach (Exception exception in ex.LoaderExceptions)
                 {
-                    Log.Error($"LoaderExceptions: {exception.Message}");
+                    Log.Error($"LoaderExceptions: {exception.Message}", true);
                 }
 
                 throw;

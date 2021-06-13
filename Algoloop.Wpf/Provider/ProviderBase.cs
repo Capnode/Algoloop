@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -125,7 +125,7 @@ namespace Algoloop.Wpf.Provider
                 (line) =>
                 {
                     ok = false;
-                    Log.Error(line);
+                    Log.Error(line, true);
                 });
 
             // Set Environment

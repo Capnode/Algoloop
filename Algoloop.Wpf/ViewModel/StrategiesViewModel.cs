@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -185,7 +185,7 @@ namespace Algoloop.Wpf.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n");
+                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n", true);
             }
             finally
             {
