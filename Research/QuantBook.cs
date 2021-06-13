@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -110,7 +110,6 @@ namespace QuantConnect.Research
                     SetStartDate(newYorkTime - TimeSpan.FromDays(1));
                 }
 
-
                 // Sets PandasConverter
                 SetPandasConverter();
 
@@ -118,6 +117,7 @@ namespace QuantConnect.Research
                 var composer = new Composer();
                 var algorithmHandlers = LeanEngineAlgorithmHandlers.FromConfiguration(composer);
                 var systemHandlers = LeanEngineSystemHandlers.FromConfiguration(composer);
+
                 // init the API
                 systemHandlers.Initialize();
                 systemHandlers.LeanManager.Initialize(systemHandlers,
@@ -178,8 +178,8 @@ namespace QuantConnect.Research
                     )
                 );
 
-                SetOptionChainProvider(new CachingOptionChainProvider(new BacktestingOptionChainProvider()));
-                SetFutureChainProvider(new CachingFutureChainProvider(new BacktestingFutureChainProvider()));
+                SetOptionChainProvider(new CachingOptionChainProvider(new BacktestingOptionChainProvider(_dataProvider)));
+                SetFutureChainProvider(new CachingFutureChainProvider(new BacktestingFutureChainProvider(_dataProvider)));
             }
             catch (Exception exception)
             {
