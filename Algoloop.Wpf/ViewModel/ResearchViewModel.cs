@@ -19,7 +19,6 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 
@@ -28,7 +27,6 @@ namespace Algoloop.Wpf.ViewModel
     public class ResearchViewModel : ViewModel, IDisposable
     {
         private const string _notebook = "Notebook";
-        private const string _pythonpath = "PYTHONPATH";
         private readonly SettingModel _settings;
         private string _htmlText;
         private string _source;
@@ -109,21 +107,10 @@ namespace Algoloop.Wpf.ViewModel
                         Log.Trace(line);
                     });
 
-                // Set PYTHONPATH
+                // Setup Python and Jupyter environment
                 string exeFolder = MainService.GetProgramFolder();
-                StringDictionary environment = _process.Environment;
-                if (environment.ContainsKey(_pythonpath))
-                {
-                    string pythonpath = environment[_pythonpath];
-                    environment[_pythonpath] = exeFolder + ";" + pythonpath;
-                }
-                else
-                {
-                    environment[_pythonpath] = exeFolder;
-                }
-
-                // Copy python startup files
-                SetPythonStart(exeFolder);
+                PythonSupport.SetupJupyter(_process.Environment, exeFolder);
+                PythonSupport.SetupPython(_process.Environment);
 
                 // Set config file
                 IDictionary<string, string> config = _process.Config;
@@ -164,18 +151,6 @@ namespace Algoloop.Wpf.ViewModel
                 _settings.Notebook = Path.Combine(userDataFolder, _notebook);
                 Directory.CreateDirectory(_settings.Notebook);
             }
-        }
-
-        private static void SetPythonStart(string exeFolder)
-        {
-            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string sourceFile = Path.Combine(exeFolder, "start.py");
-            string destFile = Path.Combine(home, @".ipython\profile_default\startup\quantconnect.py");
-            File.Copy(sourceFile, destFile, true);
-
-            sourceFile = Path.Combine(exeFolder, @"QuantConnect.Lean.Launcher.runtimeconfig.json");
-            destFile = Path.Combine(home, @".ipython\profile_default\startup\QuantConnect.Lean.Launcher.runtimeconfig.json");
-            File.Copy(sourceFile, destFile, true);
         }
     }
 }

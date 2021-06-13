@@ -304,8 +304,11 @@ namespace Algoloop.Wpf.ViewModel
             // Account must not be null
             if (Model.Account == null)
             {
-                Active = false;
-                Log.Error($"Strategy {Model.Name}: Account is not defined!");
+                UiThread(() =>
+                {
+                    Active = false;
+                });
+                Log.Error($"Strategy {Model.Name}: Account is not defined!", true);
                 return;
             }
 
@@ -321,39 +324,34 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             TrackModel model = Model;
-            try
+            if (Desktop && _settings.DesktopPort > 0)
             {
-                if (Desktop && _settings.DesktopPort > 0)
-                {
-                    Port = _settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
-                    model = await RunTrack(account, model)
-                        .ConfigureAwait(false);
-                    Port = null;
-                }
-                else
-                {
-                    model = await RunTrack(account, model)
-                        .ConfigureAwait(false);
-                }
-
-                // Split result and logs to separate files
-                if (model.Status.Equals(CompletionStatus.Success) || model.Status.Equals(CompletionStatus.Error))
-                {
-                    SplitModelToFiles(model);
-                }
+                Port = _settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
+                model = await RunTrack(account, model)
+                    .ConfigureAwait(false);
+                Port = null;
             }
-            catch (Exception ex)
+            else
             {
-                Log.Trace($"{ex.GetType()}: {ex.Message}");
-                throw;
+                model = await RunTrack(account, model)
+                    .ConfigureAwait(false);
+            }
+
+            // Split result and logs to separate files
+            if (model.Status.Equals(CompletionStatus.Success) || model.Status.Equals(CompletionStatus.Error))
+            {
+                SplitModelToFiles(model);
             }
 
             // Update view
             Model = null;
             Model = model;
 
-            Active = false;
-            UiThread(() => DataFromModel());
+            UiThread(() =>
+            {
+                Active = false;
+                DataFromModel();
+            });
         }
 
         internal void StopTrack()
@@ -581,7 +579,6 @@ namespace Algoloop.Wpf.ViewModel
 
         private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
         {
-            Debug.Assert(!_leanLauncher.IsBusy);
             await Task.Run(() => _leanLauncher.Run(model, account, _settings))
                 .ConfigureAwait(false);
             return model;
@@ -731,8 +728,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private void SplitModelToFiles(TrackModel model)
         {
-            Debug.Assert(model.Logs != null);
-            Debug.Assert(model.Result != null);
+            if (model.Result == null) return;
 
             // Create folder for track files
             Directory.CreateDirectory(Folder);
@@ -850,7 +846,7 @@ namespace Algoloop.Wpf.ViewModel
             if (value)
             {
                 // No IsBusy
-                await StartTrackAsync().ConfigureAwait(false);
+                await StartSingleTrackAsync();
             }
             else
             {
@@ -870,7 +866,23 @@ namespace Algoloop.Wpf.ViewModel
         {
             // No IsBusy
             Active = true;
+            await StartSingleTrackAsync();
+        }
+
+        private async Task StartSingleTrackAsync()
+        {
             await StartTrackAsync().ConfigureAwait(false);
+            string message = string.Empty;
+            switch (Model.Status)
+            {
+                case CompletionStatus.Error:
+                    message = Resources.StrategyAborted;
+                    break;
+                case CompletionStatus.Success:
+                    message = Resources.StrategyCompleted;
+                    break;
+            }
+            Messenger.Default.Send(new NotificationMessage(message));
         }
 
         private void DoStopCommand()
@@ -912,7 +924,7 @@ namespace Algoloop.Wpf.ViewModel
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
+                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n", true);
             }
             finally
             {

@@ -36,8 +36,6 @@ namespace Algoloop.Wpf.Lean
         private ConfigProcess _process;
         private bool _isDisposed;
 
-        public bool IsBusy { get; private set; }
-
         protected virtual void Dispose(bool disposing)
         {
             if (_isDisposed) return;
@@ -75,11 +73,9 @@ namespace Algoloop.Wpf.Lean
         public void Run(TrackModel model, AccountModel account, SettingModel settings)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            Debug.Assert(!IsBusy);
             Debug.Assert(model.Status == CompletionStatus.None);
             if (!model.Active) return;
 
-            IsBusy = true;
             bool error = false;
             _process = new ConfigProcess(
                 "QuantConnect.Lean.Launcher.exe",
@@ -90,7 +86,7 @@ namespace Algoloop.Wpf.Lean
                 (line) =>
                 {
                     error = true;
-                    Log.Error(line);
+                    Log.Error(line, true);
                 });
 
             // Set Environment
@@ -103,18 +99,26 @@ namespace Algoloop.Wpf.Lean
             // Start process
             try
             {
+                if (model.AlgorithmLanguage.Equals(Language.Python))
+                {
+                    PythonSupport.SetupPython(_process.Environment);
+                }
                 _process.Start();
                 _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));
+                model.Status = error ? CompletionStatus.Error : CompletionStatus.Success;
+            }
+            catch (Exception ex)
+            {
+                model.Status = CompletionStatus.Error;
+                Log.Error($"{ex.GetType()}: {ex.Message}", true);
+
             }
             finally
             {
                 _process.Dispose();
                 _process = null;
                 model.Active = false;
-                IsBusy = false;
             }
-
-            model.Status = error ? CompletionStatus.Error : CompletionStatus.Success;
         }
 
         private static void PostProcess(string folder, TrackModel model)
@@ -157,7 +161,7 @@ namespace Algoloop.Wpf.Lean
             }
             else if (account == default)
             {
-                Log.Error("No broker selected");
+                Log.Error("No broker selected", true);
                 return false;
             }
 
