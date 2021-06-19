@@ -141,31 +141,8 @@ namespace Algoloop
             }
         }
 
-        /// <summary>
-        /// WebBrowser Internet Explorer 11 emulation
-        /// </summary>
-        public static void EnsureBrowserEmulationEnabled(string exename, bool uninstall = false)
-        {
-            RegistryKey rk = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION", true);
-            if (rk == null) return;
-            if (uninstall)
-            {
-                rk.DeleteValue(exename);
-            }
-            else
-            {
-                dynamic value = rk.GetValue(exename);
-                if (value == null)
-                    rk.SetValue(exename, (uint)11001, RegistryValueKind.DWord);
-            }
-        }
-
         private void InitCef()
         {
-#if ANYCPU
-            //Only required for PlatformTarget of AnyCPU
-            AppDomain.CurrentDomain.AssemblyResolve += Resolver;
-#endif
             var settings = new CefSettings()
             {
                 //By default CefSharp will use an in-memory cache, you need to specify a Cache Folder to persist data
@@ -193,24 +170,5 @@ namespace Algoloop
                 Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
             }
         }
-
-#if ANYCPU
-        private static System.Reflection.Assembly Resolver(object sender, ResolveEventArgs args)
-        {
-            if (args.Name.StartsWith("CefSharp.Core.Runtime"))
-            {
-                string assemblyName = args.Name.Split(new[] { ',' }, 2)[0] + ".dll";
-                string archSpecificPath = Path.Combine(AppDomain.CurrentDomain.SetupInformation.ApplicationBase,
-                                                       Environment.Is64BitProcess ? "x64" : "x86",
-                                                       assemblyName);
-
-                return File.Exists(archSpecificPath)
-                           ? System.Reflection.Assembly.LoadFile(archSpecificPath)
-                           : null;
-            }
-
-            return null;
-        }
-#endif
     }
 }
