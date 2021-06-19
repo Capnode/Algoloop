@@ -146,14 +146,7 @@ namespace Algoloop.Wpf.Lean
             SetModel(config, model, settings);
             if (model.Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase))
             {
-                if (model.Desktop)
-                {
-                    SetBacktestDesktop(config);
-                }
-                else
-                {
-                    SetBacktest(config);
-                }
+                SetBacktest(config);
             }
             else if (model.Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
@@ -185,7 +178,6 @@ namespace Algoloop.Wpf.Lean
             config["alpha-handler"] = "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler";
             config["api-access-token"] = settings.ApiToken ?? string.Empty;
             config["job-user-id"] = settings.ApiUser ?? "0";
-            config["desktop-http-port"] = settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
             config["job-project-id"] = "0";
             config["algorithm-path-python"] = ".";
             config["regression-update-statistics"] = "false";
@@ -280,21 +272,6 @@ namespace Algoloop.Wpf.Lean
             config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler";
             config["history-provider"] = "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider";
             config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler";
-        }
-
-        private static void SetBacktestDesktop(IDictionary<string, string> config)
-        {
-            config["environment"] = "backtesting-desktop";
-            config["live-mode"] = "false";
-            config["send-via-api"] = "true";
-            config["setup-handler"] = "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler";
-            config["result-handler"] = "QuantConnect.Lean.Engine.Results.BacktestingResultHandler";
-//            config["result-handler"] = "Algoloop.Lean.BacktestResultHandler";
-            config["data-feed-handler"] = "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed";
-            config["real-time-handler"] = "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler";
-            config["history-provider"] = "QuantConnect.Lean.Engine.HistoricalData.SubscriptionDataReaderHistoryProvider";
-            config["transaction-handler"] = "QuantConnect.Lean.Engine.TransactionHandlers.BacktestingTransactionHandler";
-            config["messaging-handler"] = "QuantConnect.Messaging.StreamingMessageHandler";
         }
 
         private static void SetPaper(IDictionary<string, string> config)

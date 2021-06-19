@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -55,14 +55,6 @@ namespace Algoloop.Model
         [DataMember]
         public bool ApiDownload { get; set; }
 
-        [Category("API")]
-        [DisplayName("Desktop port")]
-        [Description("Desktop API port number.")]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        [DataMember]
-        public int DesktopPort { get; set; } = 1234;
-
         [Category("Folders")]
         [DisplayName("Data folder")]
         [Description("Folder for market data.")]
@@ -98,7 +90,6 @@ namespace Algoloop.Model
             ApiToken = oldSettings.ApiToken;
             ApiUser = oldSettings.ApiUser;
             ApiDownload = oldSettings.ApiDownload;
-            DesktopPort = oldSettings.DesktopPort;
             DataFolder = oldSettings.DataFolder;
             MaxBacktests = oldSettings.MaxBacktests;
             Notebook = oldSettings.Notebook;

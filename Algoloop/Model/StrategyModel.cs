@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -43,7 +43,6 @@ namespace Algoloop.Model
             if (model == null) throw new ArgumentNullException(nameof(model));
 
             Name = model.Name;
-            Desktop = model.Desktop;
             Market = model.Market;
             Security = model.Security;
             Account = model.Account;
@@ -67,7 +66,6 @@ namespace Algoloop.Model
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
 
-            Desktop = model.Desktop;
             Market = model.Market;
             Security = model.Security;
             Account = model.Account;
@@ -108,14 +106,6 @@ namespace Algoloop.Model
                 NameChanged?.Invoke();
             }
         }
-
-        [Category("Information")]
-        [DisplayName("Desktop")]
-        [Description("Desktop execution.")]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        [DataMember]
-        public bool Desktop { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]

@@ -42,7 +42,6 @@ namespace Algoloop.Model
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
 
             Name = name;
-            Desktop = strategy.Desktop;
             Account = strategy.Account;
             Market = strategy.Market;
             Security = strategy.Security;
@@ -77,14 +76,6 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [DataMember]
         public string Name { get; set; } = "Track";
-
-        [Category("Information")]
-        [DisplayName("Desktop")]
-        [Description("Desktop execution.")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public bool Desktop { get; set; }
 
         [Category("Broker")]
         [DisplayName("Account")]

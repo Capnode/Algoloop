@@ -237,16 +237,6 @@ namespace Algoloop.Wpf.ViewModel
             set => Set(ref _port, value);
         }
 
-        public bool Desktop
-        {
-            get => Model.Desktop;
-            set
-            {
-                Model.Desktop = value;
-                RaisePropertyChanged();
-            }
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -324,18 +314,8 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             TrackModel model = Model;
-            if (Desktop && _settings.DesktopPort > 0)
-            {
-                Port = _settings.DesktopPort.ToString(CultureInfo.InvariantCulture);
-                model = await RunTrack(account, model)
-                    .ConfigureAwait(false);
-                Port = null;
-            }
-            else
-            {
-                model = await RunTrack(account, model)
-                    .ConfigureAwait(false);
-            }
+            await Task.Run(() => _leanLauncher.Run(model, account, _settings))
+                .ConfigureAwait(false);
 
             // Split result and logs to separate files
             if (model.Status.Equals(CompletionStatus.Success) || model.Status.Equals(CompletionStatus.Error))
@@ -575,13 +555,6 @@ namespace Algoloop.Wpf.ViewModel
             // Adjust scale that x = 1 returns 0.1
             const int c = 99;
             return x / Math.Sqrt(c + x * x);
-        }
-
-        private async Task<TrackModel> RunTrack(AccountModel account, TrackModel model)
-        {
-            await Task.Run(() => _leanLauncher.Run(model, account, _settings))
-                .ConfigureAwait(false);
-            return model;
         }
 
         private void LoadTrack()
