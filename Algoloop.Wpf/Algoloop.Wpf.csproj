@@ -232,6 +232,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="90.6.70" />
+    <PackageReference Include="chromiumembeddedframework.runtime.win-x64" Version="91.1.6" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
@@ -239,6 +241,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.87" />
     <PackageReference Include="StockSharp.Configuration" Version="5.0.85" />

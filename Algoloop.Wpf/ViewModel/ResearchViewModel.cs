@@ -90,7 +90,7 @@ namespace Algoloop.Wpf.ViewModel
                 SetNotebookFolder();
                 _process = new ConfigProcess(
                     "jupyter.exe",
-                    $"notebook --no-browser",
+                    $"lab --no-browser",
                     _settings.Notebook,
                     false,
                     (line) => Log.Trace(line),
