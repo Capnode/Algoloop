@@ -18,7 +18,6 @@ using Algoloop.Wpf.Lean;
 using Algoloop.Wpf.ViewModel;
 using CefSharp;
 using CefSharp.Wpf;
-using Microsoft.Win32;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
@@ -29,7 +28,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Algoloop
+namespace Algoloop.Wpf
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -74,7 +73,6 @@ namespace Algoloop
             TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionHandler;
 
             Algoloop.Wpf.Properties.Settings.Default.Reload();
-            EnsureBrowserEmulationEnabled("Algoloop.exe");
 
             // Prevent going to sleep mode
             _ = SetThreadExecutionState(_esContinous | _esSystemRequired);
