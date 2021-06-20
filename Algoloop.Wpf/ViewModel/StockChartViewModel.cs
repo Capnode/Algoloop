@@ -36,6 +36,7 @@ namespace Algoloop.Wpf.ViewModel
         }
 
         public string Title { get; }
+        public int SubChart { get; }
         public ChartCandleDrawStyles Style { get; }
         public Color Color { get; }
         public bool IsVisible { get; set; }

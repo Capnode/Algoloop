@@ -15,7 +15,6 @@
 using Algoloop.Wpf.ViewModel;
 using MoreLinq;
 using StockSharp.Algo.Candles;
-using StockSharp.BusinessEntities;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace Algoloop.Wpf.View
 {
@@ -138,22 +136,87 @@ namespace Algoloop.Wpf.View
 
         private void RedrawCharts()
         {
+            Dictionary<int, ChartArea> areas = new();
             _chart.IsAutoRange = true;
             _chart.ClearAreas();
-            ChartArea candlesArea = new ();
-            _chart.AddArea(candlesArea);
+
+            // Collect time-value points of all Equity curves
+            Dictionary<ChartLineElement, decimal> curves = new();
+            Dictionary<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> points = new();
             foreach (IChartViewModel chart in _combobox.Items)
             {
                 if (!chart.IsVisible) continue;
+                if (!areas.TryGetValue(chart.SubChart, out ChartArea area))
+                {
+                    area = new();
+                    areas.Add(chart.SubChart, area);
+                    _chart.AddArea(area);
+                }
+
+                if (chart is EquityChartViewModel model)
+                {
+                    ChartLineElement lineElement = new()
+                    {
+                        FullTitle = model.Title,
+                        Style = model.Style,
+                        Color = model.Color,
+                        AntiAliasing = false,
+                        IsLegend = true,
+                        ShowAxisMarker = true
+                    };
+                    _chart.AddElement(area, lineElement);
+                    foreach (EquityData equityData in model.Series)
+                    {
+                        decimal value = equityData.Value;
+                        if (!curves.ContainsKey(lineElement))
+                        {
+                            curves.Add(lineElement, value);
+                        }
+
+                        DateTimeOffset time = equityData.Time.Date;
+                        if (!points.TryGetValue(time, out List<Tuple<ChartLineElement, decimal>> list))
+                        {
+                            list = new List<Tuple<ChartLineElement, decimal>>();
+                            points.Add(time, list);
+                        }
+                        list.Add(new Tuple<ChartLineElement, decimal>(lineElement, value));
+                    }
+                }
+            }
+
+            // Draw all equity curves in time order, moment by moment
+            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> moment in points.OrderBy(m => m.Key))
+            {
+                DateTimeOffset time = moment.Key;
+                ChartDrawData chartData = new();
+                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(time);
+                foreach (KeyValuePair<ChartLineElement, decimal> curve in curves)
+                {
+                    ChartLineElement lineElement = curve.Key;
+                    decimal value = curve.Value;
+
+                    // Use actual point it available
+                    Tuple<ChartLineElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
+                    if (pair != default)
+                    {
+                        value = pair.Item2;
+                        curves[lineElement] = value;
+                    }
+                    chartGroup.Add(lineElement, value);
+                }
+
+                _chart.IsInteracted = false;
+                _chart.Draw(chartData);
+            }
+
+            // Draw Candles
+            foreach (IChartViewModel chart in _combobox.Items)
+            {
+                if (!chart.IsVisible) continue;
+                ChartArea area = areas[chart.SubChart];
                 if (chart is StockChartViewModel stockChart)
                 {
-                    RedrawChart(candlesArea, stockChart);
-                }
-                else if (chart is EquityChartViewModel)
-                {
-                    _chart.IsInteracted = false;
-                    RedrawEquityCharts(candlesArea);
-                    break;
+                    RedrawChart(area, stockChart);
                 }
             }
 
@@ -188,87 +251,6 @@ namespace Algoloop.Wpf.View
                 chartGroup.Add(candleElement, candle);
             }
             _chart.Draw(chartData);
-        }
-
-        private void RedrawEquityCharts(ChartArea candlesArea)
-        {
-            // Collect time-value points of all curves
-            Dictionary<ChartLineElement, decimal> curves = new();
-            Dictionary<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> points = new();
-            Dictionary<int, ChartAxis> yAxis = new();
-            foreach (object item in _combobox.Items)
-            {
-                if (item is EquityChartViewModel model && model.IsVisible)
-                {
-                    ChartAxis axis;
-                    if (yAxis.Any())
-                    {
-                        if (!yAxis.TryGetValue(model.SubChart, out axis))
-                        {
-                            axis = new() { AxisType = ChartAxisType.Numeric };
-                            yAxis.Add(model.SubChart, axis);
-                            candlesArea.YAxises.Add(axis);
-                        }
-                    }
-                    else
-                    {
-                        axis = candlesArea.YAxises.First();
-                        yAxis.Add(model.SubChart, axis);
-                    }
-
-                    ChartLineElement lineElement = new()
-                    {
-                        FullTitle = model.Title,
-                        Style = model.Style,
-                        Color = model.Color,
-                        AntiAliasing = false,
-                        IsLegend = true,
-                        ShowAxisMarker = true,
-                        YAxisId = axis.Id
-                    };
-                    _chart.AddElement(candlesArea, lineElement);
-                    foreach (EquityData equityData in model.Series)
-                    {
-                        decimal value = equityData.Value;
-                        if (!curves.ContainsKey(lineElement))
-                        {
-                            curves.Add(lineElement, value);
-                        }
-
-                        DateTimeOffset time = equityData.Time.Date;
-                        if (!points.TryGetValue(time, out List<Tuple<ChartLineElement, decimal>> list))
-                        {
-                            list = new List<Tuple<ChartLineElement, decimal>>();
-                            points.Add(time, list);
-                        }
-                        list.Add(new Tuple<ChartLineElement, decimal>(lineElement, value));
-                    }
-                }
-            }
-
-            // Draw all curves in time order, moment by moment
-            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> moment in points.OrderBy(m => m.Key))
-            {
-                DateTimeOffset time = moment.Key;
-                ChartDrawData chartData = new();
-                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(time);
-                foreach (KeyValuePair<ChartLineElement, decimal> curve in curves)
-                {
-                    ChartLineElement lineElement = curve.Key;
-                    decimal value = curve.Value;
-
-                    // Use actual point it available
-                    Tuple<ChartLineElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
-                    if (pair != default)
-                    {
-                        value = pair.Item2;
-                        curves[lineElement] = value;
-                    }
-                    chartGroup.Add(lineElement, value);
-                }
-
-                _chart.Draw(chartData);
-            }
         }
     }
 }

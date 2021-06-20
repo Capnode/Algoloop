@@ -19,6 +19,7 @@ namespace Algoloop.Wpf.ViewModel
     public interface IChartViewModel
     {
         string Title { get; }
+        public int SubChart { get; }
         Color Color { get; }
         bool IsVisible { get; set; }
     }

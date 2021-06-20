@@ -992,7 +992,7 @@ namespace Algoloop.Wpf.ViewModel
                         "Benchmark" => new EquityChartViewModel(
                             serie.Name, stocksharp.ChartIndicatorDrawStyles.Area, serie.Color, 0, false, list),
                         "Daily Performance" => new EquityChartViewModel(
-                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Histogram, serie.Color, 1, false, list),
+                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Histogram, serie.Color, 1, true, list),
                         _ => new EquityChartViewModel(
                             serie.Name, stocksharp.ChartIndicatorDrawStyles.Line, serie.Color, 2, false, list),
                     };
