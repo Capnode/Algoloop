@@ -15,7 +15,6 @@
 using Algoloop.Model;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
-using Capnode.Wpf.DataGrid;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
@@ -23,36 +22,32 @@ using QuantConnect.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace Algoloop.Wpf.ViewModel
 {
     public class ListViewModel : ViewModel, ITreeViewModel
     {
-        private readonly MarketViewModel _market;
         private SymbolViewModel _selectedSymbol;
         private SymbolViewModel _marketSymbol;
-        private ObservableCollection<DataGridColumn> _symbolColumns = new();
         private IList _selectedItems;
 
         public ListViewModel(MarketViewModel market, ListModel model)
         {
-            _market = market ?? throw new ArgumentNullException(nameof(market));
+            Market = market ?? throw new ArgumentNullException(nameof(market));
             Model = model;
 
-            DeleteCommand = new RelayCommand(() => _market?.DeleteList(this), () => !IsBusy && !_market.Active);
+            DeleteCommand = new RelayCommand(() => Market?.DeleteList(this), () => !IsBusy && !Market.Active);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => DoAddSymbol(m), m => !IsBusy && !_market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
-            RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !IsBusy && !_market.Active && SelectedSymbol != null);
-            ExportListCommand = new RelayCommand(() => DoExportList(), () => !IsBusy && !_market.Active);
+            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => DoAddSymbol(m), m => !IsBusy && !Market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
+            RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !IsBusy && !Market.Active && SelectedSymbol != null);
+            ExportListCommand = new RelayCommand(() => DoExportList(), () => !IsBusy && !Market.Active);
 
             DataFromModel();
 
@@ -65,20 +60,20 @@ namespace Algoloop.Wpf.ViewModel
                 }
             };
 
-            MarketSymbols.Source = _market.Symbols;
+            MarketSymbols.Source = Market.Symbols;
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public bool IsBusy
         {
-            get => _market.IsBusy;
-            set => _market.IsBusy = value;
+            get => Market.IsBusy;
+            set => Market.IsBusy = value;
         }
 
         public ITreeViewModel SelectedItem
         {
-            get => _market.SelectedItem;
-            set => _market.SelectedItem = value;
+            get => Market.SelectedItem;
+            set => Market.SelectedItem = value;
         }
 
         public RelayCommand DeleteCommand { get; }
@@ -87,8 +82,9 @@ namespace Algoloop.Wpf.ViewModel
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand ExportListCommand { get; }
-        public string DisplayName => Model != null ? $"{_market.Model.Name}: {Model.Name} ({Symbols.Count})" : string.Empty;
+        public string DisplayName => Model != null ? $"{Market.Model.Name}: {Model.Name} ({Symbols.Count})" : string.Empty;
 
+        public MarketViewModel Market { get; }
         public ListModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public CollectionViewSource MarketSymbols { get; } = new CollectionViewSource();
@@ -124,12 +120,6 @@ namespace Algoloop.Wpf.ViewModel
                 Set(ref _selectedSymbol, value);
                 RemoveSymbolsCommand.RaiseCanExecuteChanged();
             }
-        }
-
-        public ObservableCollection<DataGridColumn> SymbolColumns
-        {
-            get => _symbolColumns;
-            set => Set(ref _symbolColumns, value);
         }
 
         public void Refresh()
@@ -185,11 +175,8 @@ namespace Algoloop.Wpf.ViewModel
 
         internal void DataFromModel()
         {
-            SymbolColumns.Clear();
-            ExDataGridColumns.AddTextColumn(SymbolColumns, "Name", "Model.Name", false, true);
-
             Symbols.Clear();
-            foreach (SymbolViewModel marketSymbol in _market.Symbols)
+            foreach (SymbolViewModel marketSymbol in Market.Symbols)
             {
                 if (marketSymbol.Active)
                 {
@@ -201,8 +188,6 @@ namespace Algoloop.Wpf.ViewModel
                     {
                         Symbols.Add(marketSymbol);
                     }
-
-                    ExDataGridColumns.AddPropertyColumns(SymbolColumns, marketSymbol.Model.Properties, "Model.Properties", false, true);
                 }
             }
         }

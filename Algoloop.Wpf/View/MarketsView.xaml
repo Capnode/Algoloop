@@ -469,11 +469,20 @@
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Market.Accounts}"
+                                        MinWidth="120"
+                                        SelectedValue="{Binding Market.SelectedAccount, Mode=TwoWay}"
+                                        ToolTip="Selected account"
+                                        Visibility="{Binding Market.Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                                    </ComboBox>
+                                    <ComboBox
                                         Name="combobox"
                                         SelectedValue="{Binding MarketSymbol, Mode=TwoWay}"
                                         DisplayMemberPath="Model.Name"
                                         ItemsSource="{Binding MarketSymbols.View}"
-                                        MinWidth="120"/>
+                                        MinWidth="120">
+                                    </ComboBox>
                                     <Button
                                         ToolTip="Add symbol" 
                                         Command="{Binding AddSymbolCommand}"
@@ -499,9 +508,24 @@
                                     SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
                                     FrozenColumnCount="1"
                                     ExSelectedItems="{Binding SelectedItems}"
-                                    ExItemsSource="{Binding Symbols}"
-                                    ExColumns="{Binding SymbolColumns}"
-                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=MarketSymbolListsColumnsInfo}">
+                                    ExItemsSource="{Binding Symbols}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Model.Name}"/>
+                                        <DataGridTextColumn Header="Ask" Binding="{Binding Ask, NotifyOnTargetUpdated=True}">
+                                            <DataGridTextColumn.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource BlinkCell}">
+                                                    <Setter Property="Background" Value="{Binding AskChange, Converter={viewsupport:ToBrushConverter}}" />
+                                                </Style>
+                                            </DataGridTextColumn.CellStyle>
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Header="Bid" Binding="{Binding Bid, NotifyOnTargetUpdated=True}">
+                                            <DataGridTextColumn.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource BlinkCell}">
+                                                    <Setter Property="Background" Value="{Binding BidChange, Converter={viewsupport:ToBrushConverter}}" />
+                                                </Style>
+                                            </DataGridTextColumn.CellStyle>
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>

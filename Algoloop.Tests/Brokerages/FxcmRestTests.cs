@@ -84,7 +84,9 @@ namespace Algoloop.Tests.Brokerages
         {
             // Act
             _api.Login();
-            IReadOnlyList<AccountModel> accounts = await _api.GetAccountsAsync(null).ConfigureAwait(false);
+            IReadOnlyList<AccountModel> accounts = null;
+            await _api.GetAccountsAsync(acct => accounts = acct as IReadOnlyList<AccountModel>)
+                .ConfigureAwait(false);
             _api.Logout();
 
             Assert.IsNotNull(accounts);

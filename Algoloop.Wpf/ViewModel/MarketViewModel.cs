@@ -176,12 +176,7 @@ namespace Algoloop.Wpf.ViewModel
             set
             {
                 Set(ref _selectedAccount, value);
-                if (_selectedAccount == default) return;
-                if (_selectedAccount.Model.Id != Model.DefaultAccountId)
-                {
-                    Model.DefaultAccountId = _selectedAccount.Model.Id;
-                    DataFromModel();
-                }
+                ReloadAccount();
             }
         }
 
@@ -252,10 +247,6 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             Accounts.Clear();
-            Balances.Clear();
-            Orders.Clear();
-            Positions.Clear();
-
             foreach (AccountModel account in Model.Accounts)
             {
                 var vm = new AccountViewModel(account);
@@ -267,6 +258,16 @@ namespace Algoloop.Wpf.ViewModel
             }
 
             if (SelectedAccount == null) return;
+            ReloadAccount();
+        }
+
+        private void ReloadAccount()
+        {
+            Model.DefaultAccountId = SelectedAccount.Model.Id;
+
+            Balances.Clear();
+            Orders.Clear();
+            Positions.Clear();
 
             foreach (BalanceModel balance in SelectedAccount.Model.Balances)
             {
@@ -409,14 +410,22 @@ namespace Algoloop.Wpf.ViewModel
 
         private void OnAccountsUpdate(object data)
         {
+            if (data is not IEnumerable<AccountModel> accounts)
+            {
+                throw new NotImplementedException(data.GetType().Name);
+            }
+
+            Model.UpdateAccounts(accounts);
             UiThread(() =>
             {
-                if (data is AccountModel account)
+                foreach (AccountModel account in accounts)
                 {
-                    if (account.Id != Model.DefaultAccountId) return;
-                    UpdateBalances(account.Balances);
-                    UpdatePositions(account.Positions);
-                    UpdateOrders(account.Orders);
+                    if (account.Id == Model.DefaultAccountId || accounts.Count() == 1)
+                    {
+                        UpdateBalances(account.Balances);
+                        UpdatePositions(account.Positions);
+                        UpdateOrders(account.Orders);
+                    }
                 }
             });
         }
@@ -497,33 +506,36 @@ namespace Algoloop.Wpf.ViewModel
         {
             if (data is QuoteBar quote)
             {
-                Log.Trace($"Quote:{quote}");
                 SymbolViewModel symbolVm = Symbols.FirstOrDefault(
                     m => m.Model.Id.Equals(quote.Symbol.ID.Symbol,
                     StringComparison.OrdinalIgnoreCase));
-                if (symbolVm == default) return;
+
                 SymbolModel symbol;
                 if (symbolVm != null)
                 {
                     symbol = symbolVm.Model;
+                    symbolVm.Ask = quote.Ask.Close;
+                    symbolVm.Bid = quote.Bid.Close;
+
                 }
                 else
                 {
-                    symbol = new SymbolModel(quote.Symbol)
-                    {
-                        Properties = new Dictionary<string, object>
-                        {
-                            { "Ask", quote.Ask.Close },
-                            { "Bid", quote.Bid.Close }
-                        }
-                    };
+                    symbol = new SymbolModel(quote.Symbol);
                     Model.Symbols.Add(symbol);
-                    UiThread(() => Symbols.Add(new SymbolViewModel(this, symbol)));
+
+                    UiThread(() =>
+                    {
+                        symbolVm = new SymbolViewModel(this, symbol)
+                        {
+                            Ask = quote.Ask.Close,
+                            Bid = quote.Bid.Close
+                        };
+                        Symbols.Add(symbolVm);
+                    });
                 }
             }
             else if (data is TradeBar trade)
             {
-                Log.Trace($"Trade:{trade}");
             }
         }
 

@@ -88,7 +88,6 @@ namespace Algoloop.Brokerages.FxcmRest
 
         private void OnMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            Log.Trace(e.Message);
             if (e.Message.StartsWith("0", StringComparison.OrdinalIgnoreCase))
             {
                 // 0{"sid":"oTlhP94ieIujcA7aAVdn","upgrades":[],"pingInterval":25000,"pingTimeout":5000}

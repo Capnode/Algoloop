@@ -68,10 +68,10 @@ namespace Algoloop.Brokerages.FxcmRest
             _fxcmSocket.Close();
         }
 
-        public async Task<IReadOnlyList<AccountModel>> GetAccountsAsync(Action<object> update)
+        public async Task GetAccountsAsync(Action<object> update)
         {
             // Skip if subscription active
-            if (_fxcmSocket.AccountsUpdate != default && update != default) return null;
+            if (_fxcmSocket.AccountsUpdate != default && update != default) return;
 
             Log.Trace("{0}: GetAccountsAsync", GetType().Name);
             string json = await GetAsync(_getModel).ConfigureAwait(false);
@@ -129,8 +129,8 @@ namespace Algoloop.Brokerages.FxcmRest
                 account.Positions.Add(position);
             }
 
+            update(accounts);
             _fxcmSocket.AccountsUpdate = update;
-            return accounts;
         }
 
         public async Task<IReadOnlyList<SymbolModel>> GetSymbolsAsync(Action<object> update)
@@ -276,11 +276,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 Name = currency,
                 Market = Support.Market,
                 Security = Support.ToSecurityType(instrumentType),
-                Properties = new Dictionary<string, object>
-                {
-                    { "Ask", token["sell"].ToDecimal() },
-                    { "Bid", token["buy"].ToDecimal() }
-                }
+                Properties = new Dictionary<string, object>()
             };
 
             return symbol;

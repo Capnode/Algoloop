@@ -60,6 +60,12 @@ namespace Algoloop.Wpf.ViewModel
         private SyncObservableCollection<IChartViewModel> _charts = new();
         private ObservableCollection<DataGridColumn> _periodColumns = new();
         private bool _showCharts;
+        private decimal _ask;
+        private decimal _bid;
+        private decimal _price;
+        private decimal _askChange;
+        private decimal _bidChange;
+        private decimal _priceChange;
 
         public SymbolViewModel(ITreeViewModel parent, SymbolModel model)
         {
@@ -72,6 +78,63 @@ namespace Algoloop.Wpf.ViewModel
             StopCommand = new RelayCommand(() => { }, () => false);
             UpdateCommand = new RelayCommand(() => DoLoadData(Market), () => !IsBusy && Market != null);
             Debug.Assert(IsUiThread(), "Not UI thread!");
+        }
+
+        public decimal Ask
+        {
+            get => _ask;
+            set => Set(ref _ask, value);
+        }
+
+        public decimal AskChange
+        {
+            get => _askChange;
+            set
+            {
+                _askChange = value;
+                if (value == 0) return;
+
+                // Raise only when changed
+                RaisePropertyChanged(() => AskChange);
+            }
+        }
+
+        public decimal Bid
+        {
+            get => _bid;
+            set => Set(ref _bid, value);
+        }
+
+        public decimal BidChange
+        {
+            get => _bidChange;
+            set
+            {
+                _bidChange = value;
+                if (value == 0) return;
+
+                // Raise only when changed
+                RaisePropertyChanged(() => BidChange);
+            }
+        }
+
+        public decimal Price
+        {
+            get => _price;
+            set => Set(ref _price, value);
+        }
+
+        public decimal PriceChange
+        {
+            get => _priceChange;
+            set
+            {
+                _priceChange = value;
+                if (value == 0) return;
+
+                // Raise only when changed
+                RaisePropertyChanged(() => PriceChange);
+            }
         }
 
         public bool IsBusy

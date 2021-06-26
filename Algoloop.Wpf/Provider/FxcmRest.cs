@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -16,7 +16,6 @@ using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace Algoloop.Wpf.Provider
@@ -41,12 +40,12 @@ namespace Algoloop.Wpf.Provider
 
         public override void GetAccounts(ProviderModel provider, Action<object> update)
         {
-            IReadOnlyList<AccountModel> accounts = _api.GetAccountsAsync(update).Result;
+             _api.GetAccountsAsync(update).Wait();
         }
 
         public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
-            IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync(update).Result;
+            _api.GetSymbolsAsync(update).Wait();
         }
 
         protected override void Dispose(bool disposing)
