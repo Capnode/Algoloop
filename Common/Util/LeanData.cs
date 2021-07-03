@@ -998,6 +998,48 @@ namespace QuantConnect.Util
         /// <summary>
         /// Parses file name into a <see cref="Security"/> and DateTime
         /// </summary>
+        /// <param name="filePath">File path to be parsed</param>
+        /// <param name="symbol">The symbol as parsed from the fileName</param>
+        /// <param name="date">Date of data in the file path. Only returned if the resolution is lower than Hourly</param>
+        /// <param name="resolution">The resolution of the symbol as parsed from the filePath</param>
+        /// <param name="tickType">The tick type</param>
+        /// <param name="dataType">The data type</param>
+        public static bool TryParsePath(string filePath, out Symbol symbol, out DateTime date,
+            out Resolution resolution, out TickType tickType, out Type dataType)
+        {
+            symbol = default;
+            tickType = default;
+            dataType = default;
+            date = default;
+            resolution = default;
+
+            try
+            {
+                if (!TryParsePath(filePath, out symbol, out date, out resolution))
+                {
+                    return false;
+                }
+
+                tickType = GetCommonTickType(symbol.SecurityType);
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                if (fileName.Contains("_"))
+                {
+                    tickType = (TickType)Enum.Parse(typeof(TickType), fileName.Split('_')[1], true);
+                }
+
+                dataType = GetDataType(resolution, tickType);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Debug($"LeanData.TryParsePath(): Error encountered while parsing the path {filePath}. Error: {ex.GetBaseException()}");
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Parses file name into a <see cref="Security"/> and DateTime
+        /// </summary>
         /// <param name="fileName">File name to be parsed</param>
         /// <param name="symbol">The symbol as parsed from the fileName</param>
         /// <param name="date">Date of data in the file path. Only returned if the resolution is lower than Hourly</param>
@@ -1068,7 +1110,7 @@ namespace QuantConnect.Util
             }
             catch (Exception ex)
             {
-                Log.Error($"LeanData.TryParsePath(): Error encountered while parsing the path {fileName}. Error: {ex.GetBaseException()}");
+                Log.Debug($"LeanData.TryParsePath(): Error encountered while parsing the path {fileName}. Error: {ex.GetBaseException()}");
                 return false;
             }
 

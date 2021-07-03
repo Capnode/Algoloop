@@ -18,90 +18,108 @@ using System.Collections.Generic;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Execution;
 using QuantConnect.Algorithm.Framework.Portfolio;
+using QuantConnect.Algorithm.Framework.Risk;
 using QuantConnect.Algorithm.Framework.Selection;
+using QuantConnect.Orders;
 using QuantConnect.Interfaces;
+using QuantConnect.Data;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Test algorithm using <see cref="AccumulativeInsightPortfolioConstructionModel"/> and <see cref="ConstantAlphaModel"/>
-    /// generating a constant <see cref="Insight"/> with a 0.25 confidence
+    /// Basic template India algorithm simply initializes the date range and cash. This is a skeleton
+    /// framework you can use for designing an algorithm.
     /// </summary>
-    public class AccumulativeInsightPortfolioRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    /// <meta name="tag" content="using data" />
+    /// <meta name="tag" content="using quantconnect" />
+    /// <meta name="tag" content="trading and orders" />
+    public class BasicTemplateIndiaAlgorithm : QCAlgorithm
     {
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
         public override void Initialize()
         {
-            // Set requested data resolution
-            UniverseSettings.Resolution = Resolution.Minute;
-
-            SetStartDate(2013, 10, 07);  //Set Start Date
-            SetEndDate(2013, 10, 11);    //Set End Date
+            SetStartDate(2003, 10, 07);  //Set Start Date
+            SetEndDate(2003, 10, 11);    //Set End Date
             SetCash(100000);             //Set Strategy Cash
 
-            // set algorithm framework models
-            SetUniverseSelection(new ManualUniverseSelectionModel(QuantConnect.Symbol.Create("SPY", SecurityType.Equity, Market.USA)));
-            SetAlpha(new ConstantAlphaModel(InsightType.Price, InsightDirection.Up, TimeSpan.FromMinutes(20), 0.025, 0.25));
-            SetPortfolioConstruction(new AccumulativeInsightPortfolioConstructionModel());
-            SetExecution(new ImmediateExecutionModel());
+            // Find more symbols here: http://quantconnect.com/data
+            // Equities Resolutions: Tick, Second, Minute, Hour, Daily.
+            AddEquity("TCS", Resolution.Tick, Market.India);
+            
+            //Set Order Prperties as per the requirements for order placement
+            DefaultOrderProperties = new ZerodhaOrderProperties(exchange: "nse");
+
+            // General Debug statement for acknowledgement
+            Debug("Intialization Done");
+
         }
 
-        public override void OnEndOfAlgorithm()
+        /// <summary>
+        /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
+        /// </summary>
+        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
+        public override void OnData(Slice data)
         {
-            if (// holdings value should be 0.03 - to avoid price fluctuation issue we compare with 0.06 and 0.01
-                Portfolio.TotalHoldingsValue > Portfolio.TotalPortfolioValue * 0.06m
-                ||
-                Portfolio.TotalHoldingsValue < Portfolio.TotalPortfolioValue * 0.01m)
+            if (!Portfolio.Invested)
             {
-                throw new Exception($"Unexpected Total Holdings Value: {Portfolio.TotalHoldingsValue}");
+                var marketTicket = MarketOrder("TCS", 1);
+            }
+        }
+
+    
+        public override void OnOrderEvent(OrderEvent orderEvent)
+        {
+            if (orderEvent.Status.IsFill())
+            {
+                Debug($"Purchased Complete: {orderEvent.Symbol}");
             }
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
-        public bool CanRunLocally { get; } = true;
+        public bool CanRunLocally { get; } = false;
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public Language[] Languages { get; } = { Language.CSharp };
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "199"},
-            {"Average Win", "0.00%"},
-            {"Average Loss", "0.00%"},
-            {"Compounding Annual Return", "-12.611%"},
-            {"Drawdown", "0.200%"},
-            {"Expectancy", "-0.585"},
-            {"Net Profit", "-0.172%"},
-            {"Sharpe Ratio", "-10.169"},
-            {"Probabilistic Sharpe Ratio", "12.075%"},
-            {"Loss Rate", "78%"},
-            {"Win Rate", "22%"},
-            {"Profit-Loss Ratio", "0.87"},
-            {"Alpha", "-0.149"},
-            {"Beta", "0.035"},
-            {"Annual Standard Deviation", "0.008"},
-            {"Annual Variance", "0"},
-            {"Information Ratio", "-9.603"},
-            {"Tracking Error", "0.215"},
-            {"Treynor Ratio", "-2.264"},
-            {"Total Fees", "$199.00"},
-            {"Estimated Strategy Capacity", "$26000000.00"},
+            {"Total Trades", "3"},
+            {"Average Win", "0%"},
+            {"Average Loss", "-1.01%"},
+            {"Compounding Annual Return", "261.134%"},
+            {"Drawdown", "2.200%"},
+            {"Expectancy", "-1"},
+            {"Net Profit", "1.655%"},
+            {"Sharpe Ratio", "8.505"},
+            {"Probabilistic Sharpe Ratio", "66.840%"},
+            {"Loss Rate", "100%"},
+            {"Win Rate", "0%"},
+            {"Profit-Loss Ratio", "0"},
+            {"Alpha", "-0.091"},
+            {"Beta", "1.006"},
+            {"Annual Standard Deviation", "0.224"},
+            {"Annual Variance", "0.05"},
+            {"Information Ratio", "-33.445"},
+            {"Tracking Error", "0.002"},
+            {"Treynor Ratio", "1.893"},
+            {"Total Fees", "$10.32"},
+            {"Estimated Strategy Capacity", "$27000000.00"},
             {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
-            {"Fitness Score", "0.002"},
+            {"Fitness Score", "0.747"},
             {"Kelly Criterion Estimate", "38.796"},
             {"Kelly Criterion Probability Value", "0.228"},
-            {"Sortino Ratio", "-22.493"},
-            {"Return Over Maximum Drawdown", "-77.93"},
-            {"Portfolio Turnover", "1.211"},
+            {"Sortino Ratio", "79228162514264337593543950335"},
+            {"Return Over Maximum Drawdown", "85.095"},
+            {"Portfolio Turnover", "0.747"},
             {"Total Insights Generated", "100"},
             {"Total Insights Closed", "99"},
             {"Total Insights Analysis Completed", "99"},
@@ -115,7 +133,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "53.5354%"},
             {"Rolling Averaged Population Direction", "58.2788%"},
             {"Rolling Averaged Population Magnitude", "58.2788%"},
-            {"OrderListHash", "3c4c4085810cc5ecdb927d3647b9bbf3"}
+            {"OrderListHash", "ad2216297c759d8e5aef48ff065f8919"}
         };
     }
 }
