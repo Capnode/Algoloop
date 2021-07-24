@@ -16,6 +16,7 @@ using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace Algoloop.Wpf.Provider
@@ -45,7 +46,12 @@ namespace Algoloop.Wpf.Provider
 
         public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
-            _api.GetSymbolsAsync(update).Wait();
+            DateTime now = DateTime.Now;
+            IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
+            UpdateSymbols(provider, symbols, false, true);
+            update(provider.Symbols);
+//            _api.GetOffersAsync(update).Wait();
+            provider.LastDate = now;
         }
 
         protected override void Dispose(bool disposing)

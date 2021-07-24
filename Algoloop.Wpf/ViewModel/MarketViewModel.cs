@@ -236,7 +236,8 @@ namespace Algoloop.Wpf.ViewModel
         internal void DataFromModel()
         {
             Active = Model.Active;
-            UpdateSymbolsAndColumns();
+            UpdateColumns();
+            SymbolsFromModel();
 
             // Update Lists
             Lists.Clear();
@@ -504,6 +505,23 @@ namespace Algoloop.Wpf.ViewModel
 
         private void OnMarketUpdate(object data)
         {
+            if (data is IEnumerable<SymbolModel> symbols)
+            {
+                Symbols.Clear();
+                UiThread(() =>
+                {
+                    foreach (SymbolModel symbolModel in symbols)
+                    {
+                        var symbolViewModel = new SymbolViewModel(this, symbolModel);
+                        Symbols.Add(symbolViewModel);
+                        ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
+                    }
+                });
+
+                Symbols.Sort();
+                return;
+            }
+
             if (data is QuoteBar quote)
             {
                 SymbolViewModel symbolVm = Symbols.FirstOrDefault(
@@ -533,9 +551,12 @@ namespace Algoloop.Wpf.ViewModel
                         Symbols.Add(symbolVm);
                     });
                 }
+                return;
             }
-            else if (data is TradeBar trade)
+
+            if (data is TradeBar trade)
             {
+                return;
             }
         }
 
@@ -790,10 +811,9 @@ namespace Algoloop.Wpf.ViewModel
             }
         }
 
-        private void UpdateSymbolsAndColumns()
+        private void UpdateColumns()
         {
             Active = Model.Active;
-            Symbols.Clear();
 
             SymbolColumns.Clear();
             SymbolColumns.Add(new DataGridCheckBoxColumn()
@@ -816,7 +836,11 @@ namespace Algoloop.Wpf.ViewModel
                 Header = "Security",
                 Binding = new Binding("Model.Security") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
             });
+        }
 
+        private void SymbolsFromModel()
+        {
+            Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 // Handle DB upgrade

@@ -21,6 +21,7 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
 
@@ -92,6 +93,34 @@ namespace Algoloop.Tests.Brokerages
             Assert.IsNotNull(accounts);
             Assert.AreEqual(1, accounts.Count);
             Assert.AreEqual(1, accounts[0].Balances.Count);
+        }
+
+        [TestMethod]
+        public async Task GetSymbolsAsync()
+        {
+            // Act
+            _api.Login();
+            IReadOnlyList<SymbolModel> symbols = await _api.GetSymbolsAsync()
+                .ConfigureAwait(false);
+            _api.Logout();
+
+            Assert.IsNotNull(symbols);
+            Assert.AreNotEqual(0, symbols.Count);
+        }
+
+        [TestMethod]
+        public async Task GetOffersAsync()
+        {
+            // Act
+            _api.Login();
+            IReadOnlyList<SymbolModel> offers = null;
+            await _api.GetOffersAsync(offer => offers = offer as IReadOnlyList<SymbolModel>)
+                .ConfigureAwait(false);
+            Thread.Sleep(6000);
+            _api.Logout();
+
+            Assert.IsNotNull(offers);
+            Assert.AreNotEqual(0, offers.Count);
         }
 
         protected virtual void Dispose(bool disposing)

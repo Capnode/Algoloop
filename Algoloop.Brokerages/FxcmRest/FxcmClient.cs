@@ -37,6 +37,7 @@ namespace Algoloop.Brokerages.FxcmRest
             "&models=Order&models=Account&models=LeverageProfile&models=Properties";
 //        private const string _getInstruments = @"trading/get_instruments";
         private const string _getModelOffer = @"trading/get_model/?models=Offer";
+        private const string _getSymbols = @"trading/get_instruments";
 
         private bool _isDisposed;
         private string _baseCurrency;
@@ -66,6 +67,44 @@ namespace Algoloop.Brokerages.FxcmRest
         public void Logout()
         {
             _fxcmSocket.Close();
+        }
+
+        public async Task<IReadOnlyList<SymbolModel>> GetSymbolsAsync()
+        {
+            // {"response":{"executed":true},"data":{"instrument":[{"symbol":"EUR/USD","visible":true,"order":100},
+            Log.Trace("{0}: GetSymbolsAsync", GetType().Name);
+            string json = await GetAsync(_getSymbols).ConfigureAwait(false);
+            JObject jo = JObject.Parse(json);
+            JToken jResponse = jo["response"];
+            bool executed = (bool)jResponse["executed"];
+            if (!executed)
+            {
+                string error = jResponse["error"].ToString();
+                throw new ApplicationException(error);
+            }
+
+            var symbols = new List<SymbolModel>();
+            JToken jData = jo["data"];
+            JArray jInstruments = JArray.FromObject(jData["instrument"]);
+            foreach (JToken jInstrument in jInstruments)
+            {
+                string name = jInstrument["symbol"].ToString();
+                bool visible = (bool)jInstrument["visible"];
+                int order = (int)jInstrument["order"];
+                var symbol = new SymbolModel
+                {
+                    Active = visible,
+                    Id = order.ToString(),
+                    Name = name,
+                    Market = Support.Market,
+                    Security = Support.ToSecurityType(0),
+                    Properties = new Dictionary<string, object>()
+                };
+
+                symbols.Add(symbol);
+            }
+
+            return symbols;
         }
 
         public async Task GetAccountsAsync(Action<object> update)
@@ -133,11 +172,11 @@ namespace Algoloop.Brokerages.FxcmRest
             _fxcmSocket.AccountsUpdate = update;
         }
 
-        public async Task<IReadOnlyList<SymbolModel>> GetSymbolsAsync(Action<object> update)
+        public async Task GetOffersAsync(Action<object> update)
         {
             // { "response":{ "executed":false,"error":"Unauthorized"} }
             // Skip if subscription active
-            if (_fxcmSocket.SymbolUpdate != default && update != default) return null;
+            if (_fxcmSocket.SymbolUpdate != default && update != default) return;
 
             Log.Trace("{0}: GetSymbolsAsync", GetType().Name);
             string json = await GetAsync(_getModelOffer).ConfigureAwait(false);
@@ -159,8 +198,8 @@ namespace Algoloop.Brokerages.FxcmRest
                 symbols.Add(symbol);
             }
 
+            update(symbols);
             _fxcmSocket.SymbolUpdate = update;
-            return symbols;
         }
 
         public void Dispose()

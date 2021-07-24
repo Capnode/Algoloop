@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -61,5 +61,12 @@ namespace Algoloop.Brokerages.FxcmRest
             if (jToken.Type == JTokenType.Null) return 0;
             return (decimal)jToken;
         }
+
+        public static int ToInt(this JToken jToken)
+        {
+            if (jToken.Type == JTokenType.Null) return 0;
+            return (int)jToken;
+        }
+
     }
 }
