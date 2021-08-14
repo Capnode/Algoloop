@@ -103,6 +103,7 @@ namespace QuantConnect.Brokerages.Bitfinex
                 Subscribe,
                 Unsubscribe,
                 OnDataMessage,
+                TimeSpan.Zero,
                 _connectionRateLimiter);
 
             _symbolPropertiesDatabase = SymbolPropertiesDatabase.FromDataFolder();
@@ -188,8 +189,10 @@ namespace QuantConnect.Brokerages.Bitfinex
         /// Implementation of the OnMessage event
         /// </summary>
         /// <param name="e"></param>
-        private void OnMessageImpl(WebSocketMessage e)
+        private void OnMessageImpl(WebSocketMessage webSocketMessage)
         {
+            var e = (WebSocketClientWrapper.TextMessage)webSocketMessage.Data;
+
             try
             {
                 var token = JToken.Parse(e.Message);

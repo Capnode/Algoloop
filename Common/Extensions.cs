@@ -54,6 +54,7 @@ using Microsoft.IO;
 using NodaTime.TimeZones;
 using QuantConnect.Configuration;
 using QuantConnect.Data.Auxiliary;
+using QuantConnect.Exceptions;
 using QuantConnect.Securities.FutureOption;
 using QuantConnect.Securities.Option;
 
@@ -2973,6 +2974,17 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Helper method to set an algorithm runtime exception in a normalized fashion
+        /// </summary>
+        public static void SetRuntimeError(this IAlgorithm algorithm, Exception exception, string context)
+        {
+            Log.Error(exception, $"Extensions.SetRuntimeError(): RuntimeError at {algorithm.UtcTime} UTC. Context: {context}");
+            exception = StackExceptionInterpreter.Instance.Value.Interpret(exception);
+            algorithm.RunTimeError = exception;
+            algorithm.SetStatus(AlgorithmStatus.RuntimeError);
+        }
+
+        /// <summary>
         /// Creates a <see cref="OptionChainUniverse"/> for a given symbol
         /// </summary>
         /// <param name="algorithm">The algorithm instance to create universes for</param>
@@ -3064,6 +3076,33 @@ namespace QuantConnect
         public static bool Compare<T>(this ComparisonOperatorTypes op, T arg1, T arg2) where T : IComparable
         {
             return ComparisonOperator.Compare(op, arg1, arg2);
+        }
+
+        /// <summary>
+        /// Converts a <see cref="Data.HistoryRequest" /> instance to a <see cref="SubscriptionDataConfig"/> instance
+        /// </summary>
+        /// <param name="request">History request</param>
+        /// <param name="isInternalFeed">
+        /// Set to true if this subscription is added for the sole purpose of providing currency conversion rates,
+        /// setting this flag to true will prevent the data from being sent into the algorithm's OnData methods
+        /// </param>
+        /// <param name="isFilteredSubscription">True if this subscription should have filters applied to it (market hours/user filters from security), false otherwise</param>
+        /// <returns>Subscription data configuration</returns>
+        public static SubscriptionDataConfig ToSubscriptionDataConfig(this Data.HistoryRequest request, bool isInternalFeed = false, bool isFilteredSubscription = true)
+        {
+            return new SubscriptionDataConfig(request.DataType,
+                request.Symbol,
+                request.Resolution,
+                request.DataTimeZone,
+                request.ExchangeHours.TimeZone,
+                request.FillForwardResolution.HasValue,
+                request.IncludeExtendedMarketHours,
+                isInternalFeed,
+                request.IsCustomData,
+                request.TickType,
+                isFilteredSubscription,
+                request.DataNormalizationMode
+            );
         }
 
         /// <summary>

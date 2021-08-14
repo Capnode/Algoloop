@@ -19,6 +19,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
 using System.Threading;
+using static QuantConnect.Brokerages.WebSocketClientWrapper;
 
 namespace Algoloop.Brokerages.FxcmRest
 {
@@ -98,26 +99,30 @@ namespace Algoloop.Brokerages.FxcmRest
 
         private void OnMessage(object sender, WebSocketMessage e)
         {
-            Log.Trace($"OnMessage {e.Message}");
+            if (e.Data is TextMessage textMessage)
+            {
+                string message = textMessage.Message;
+                Log.Trace($"OnMessage {message}");
 
-            if (e.Message.StartsWith(_msgPong, StringComparison.OrdinalIgnoreCase))
-            {
-                ; // Do nothing
-            }
-            else if (e.Message.StartsWith(_msgOpen, StringComparison.OrdinalIgnoreCase))
-            {
-                // 0{"sid":"oTlhP94ieIujcA7aAVdn","upgrades":[],"pingInterval":25000,"pingTimeout":5000}
-                OpenConnect(e.Message[1..]);
-            }
-            else if (e.Message.StartsWith(_msgMessageConnect, StringComparison.OrdinalIgnoreCase))
-            {
-                // 40
-                MessageConnect(e.Message[2..]);
-            }
-            else if (e.Message.StartsWith(_msgMessageEvent, StringComparison.OrdinalIgnoreCase))
-            {
-                // 42["EUR/USD","{\"Updated\":1614843030623,\"Rates\":[1.20526,1.20539,1.2068999999999999,1.20429],\"Symbol\":\"EUR/USD\"}"]
-                MessageEvent(e.Message[2..]);
+                if (message.StartsWith(_msgPong, StringComparison.OrdinalIgnoreCase))
+                {
+                    ; // Do nothing
+                }
+                else if (message.StartsWith(_msgOpen, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 0{"sid":"oTlhP94ieIujcA7aAVdn","upgrades":[],"pingInterval":25000,"pingTimeout":5000}
+                    OpenConnect(message[1..]);
+                }
+                else if (message.StartsWith(_msgMessageConnect, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 40
+                    MessageConnect(message[2..]);
+                }
+                else if (message.StartsWith(_msgMessageEvent, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 42["EUR/USD","{\"Updated\":1614843030623,\"Rates\":[1.20526,1.20539,1.2068999999999999,1.20429],\"Symbol\":\"EUR/USD\"}"]
+                    MessageEvent(message[2..]);
+                }
             }
         }
 

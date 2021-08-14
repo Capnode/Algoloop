@@ -179,7 +179,7 @@ namespace QuantConnect.Lean.Engine
                 TimeLimit.StartNewTimeStep();
 
                 //Check this backtest is still running:
-                if (_algorithm.Status != AlgorithmStatus.Running)
+                if (_algorithm.Status != AlgorithmStatus.Running && _algorithm.RunTimeError == null)
                 {
                     Log.Error($"AlgorithmManager.Run(): Algorithm state changed to {_algorithm.Status} at {timeSlice.Time.ToStringInvariant()}");
                     break;
@@ -322,15 +322,14 @@ namespace QuantConnect.Lean.Engine
                 ProcessSplitSymbols(algorithm, splitWarnings, delistings);
 
                 //Check if the user's signalled Quit: loop over data until day changes.
-                if (algorithm.Status == AlgorithmStatus.Stopped)
+                if (_algorithm.Status != AlgorithmStatus.Running && _algorithm.RunTimeError == null)
                 {
-                    Log.Trace("AlgorithmManager.Run(): Algorithm quit requested.");
+                    Log.Error($"AlgorithmManager.Run(): Algorithm state changed to {_algorithm.Status} at {timeSlice.Time.ToStringInvariant()}");
                     break;
                 }
                 if (algorithm.RunTimeError != null)
                 {
-                    _algorithm.Status = AlgorithmStatus.RuntimeError;
-                    Log.Trace($"AlgorithmManager.Run(): Algorithm encountered a runtime error at {timeSlice.Time.ToStringInvariant()}. Error: {algorithm.RunTimeError}");
+                    Log.Error($"AlgorithmManager.Run(): Stopping, encountered a runtime error at {algorithm.UtcTime} UTC.");
                     return;
                 }
 
@@ -361,10 +360,7 @@ namespace QuantConnect.Lean.Engine
                         }
                         catch (Exception err)
                         {
-                            algorithm.RunTimeError = err;
-                            _algorithm.Status = AlgorithmStatus.RuntimeError;
-                            var locator = executingMarginCall ? "Portfolio.MarginCallModel.ExecuteMarginCall" : "OnMarginCall";
-                            Log.Error($"AlgorithmManager.Run(): RuntimeError: {locator}: {err}");
+                            algorithm.SetRuntimeError(err, executingMarginCall ? "Portfolio.MarginCallModel.ExecuteMarginCall" : "OnMarginCall");
                             return;
                         }
                     }
@@ -377,9 +373,7 @@ namespace QuantConnect.Lean.Engine
                         }
                         catch (Exception err)
                         {
-                            algorithm.RunTimeError = err;
-                            _algorithm.Status = AlgorithmStatus.RuntimeError;
-                            Log.Error("AlgorithmManager.Run(): RuntimeError: OnMarginCallWarning: " + err);
+                            algorithm.SetRuntimeError(err, "OnMarginCallWarning");
                             return;
                         }
                     }
@@ -411,9 +405,7 @@ namespace QuantConnect.Lean.Engine
                     }
                     catch (Exception err)
                     {
-                        algorithm.RunTimeError = err;
-                        _algorithm.Status = AlgorithmStatus.RuntimeError;
-                        Log.Error("AlgorithmManager.Run(): RuntimeError: OnSecuritiesChanged event: " + err);
+                        algorithm.SetRuntimeError(err, "OnSecuritiesChanged");
                         return;
                     }
                 }
@@ -487,9 +479,7 @@ namespace QuantConnect.Lean.Engine
                     }
                     catch (Exception err)
                     {
-                        algorithm.RunTimeError = err;
-                        _algorithm.Status = AlgorithmStatus.RuntimeError;
-                        Log.Error("AlgorithmManager.Run(): RuntimeError: Split event: " + err);
+                        algorithm.SetRuntimeError(err, "Split event");
                         return;
                     }
                 }
@@ -523,9 +513,7 @@ namespace QuantConnect.Lean.Engine
                 }
                 catch (Exception err)
                 {
-                    algorithm.RunTimeError = err;
-                    _algorithm.Status = AlgorithmStatus.RuntimeError;
-                    Log.Error("AlgorithmManager.Run(): RuntimeError: Consolidators update: " + err);
+                    algorithm.SetRuntimeError(err, "Consolidators update");
                     return;
                 }
 
@@ -550,9 +538,7 @@ namespace QuantConnect.Lean.Engine
                     }
                     catch (Exception err)
                     {
-                        algorithm.RunTimeError = err;
-                        _algorithm.Status = AlgorithmStatus.RuntimeError;
-                        Log.Error("AlgorithmManager.Run(): RuntimeError: Custom Data: " + err);
+                        algorithm.SetRuntimeError(err, "Custom Data");
                         return;
                     }
                 }
@@ -575,9 +561,7 @@ namespace QuantConnect.Lean.Engine
                 }
                 catch (Exception err)
                 {
-                    algorithm.RunTimeError = err;
-                    _algorithm.Status = AlgorithmStatus.RuntimeError;
-                    Log.Error("AlgorithmManager.Run(): RuntimeError: Dividends/Splits/Delistings: " + err);
+                    algorithm.SetRuntimeError(err, "Dividends/Splits/Delistings");
                     return;
                 }
 
@@ -597,9 +581,7 @@ namespace QuantConnect.Lean.Engine
                 }
                 catch (Exception err)
                 {
-                    algorithm.RunTimeError = err;
-                    _algorithm.Status = AlgorithmStatus.RuntimeError;
-                    Log.Error("AlgorithmManager.Run(): RuntimeError: New Style Mode: " + err);
+                    algorithm.SetRuntimeError(err, "methodInvokers");
                     return;
                 }
 
@@ -616,9 +598,7 @@ namespace QuantConnect.Lean.Engine
                 }
                 catch (Exception err)
                 {
-                    algorithm.RunTimeError = err;
-                    _algorithm.Status = AlgorithmStatus.RuntimeError;
-                    Log.Error("AlgorithmManager.Run(): RuntimeError: Slice: " + err);
+                    algorithm.SetRuntimeError(err, "OnData");
                     return;
                 }
 
@@ -652,9 +632,7 @@ namespace QuantConnect.Lean.Engine
             }
             catch (Exception err)
             {
-                _algorithm.Status = AlgorithmStatus.RuntimeError;
-                algorithm.RunTimeError = new Exception("Error running OnEndOfAlgorithm(): " + err.Message, err.InnerException);
-                Log.Error("AlgorithmManager.OnEndOfAlgorithm(): " + err);
+                algorithm.SetRuntimeError(err, "OnEndOfAlgorithm");
                 return;
             }
 
@@ -713,7 +691,7 @@ namespace QuantConnect.Lean.Engine
                 //Algorithm could be null after it's initialized and they call Run on us
                 if (state != AlgorithmStatus.Running && _algorithm != null)
                 {
-                    _algorithm.Status = state;
+                    _algorithm.SetStatus(state);
                 }
             }
         }
@@ -821,8 +799,7 @@ namespace QuantConnect.Lean.Engine
                     }
                     catch (Exception err)
                     {
-                        Log.Error(err);
-                        algorithm.RunTimeError = err;
+                        algorithm.SetRuntimeError(err, $"Warmup history request. Slice.Time {slice.Time}");
                         yield break;
                     }
 
