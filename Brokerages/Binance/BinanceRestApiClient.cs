@@ -36,7 +36,6 @@ namespace QuantConnect.Brokerages.Binance
     /// </summary>
     public class BinanceRestApiClient : IDisposable
     {
-        private const string RestApiUrl = "https://api.binance.com";
         private const string UserDataStreamEndpoint = "/api/v3/userDataStream";
 
         private readonly SymbolPropertiesDatabaseSymbolMapper _symbolMapper;
@@ -87,11 +86,13 @@ namespace QuantConnect.Brokerages.Binance
         /// <param name="securityProvider">The holdings provider.</param>
         /// <param name="apiKey">The Binance API key</param>
         /// <param name="apiSecret">The The Binance API secret</param>
-        public BinanceRestApiClient(SymbolPropertiesDatabaseSymbolMapper symbolMapper, ISecurityProvider securityProvider, string apiKey, string apiSecret)
+        /// <param name="restApiUrl">The Binance API rest url</param>
+        public BinanceRestApiClient(SymbolPropertiesDatabaseSymbolMapper symbolMapper, ISecurityProvider securityProvider,
+            string apiKey, string apiSecret, string restApiUrl)
         {
             _symbolMapper = symbolMapper;
             _securityProvider = securityProvider;
-            _restClient = new RestClient(RestApiUrl);
+            _restClient = new RestClient(restApiUrl);
             ApiKey = apiKey;
             ApiSecret = apiSecret;
         }
@@ -300,7 +301,8 @@ namespace QuantConnect.Brokerages.Binance
             var symbol = _symbolMapper.GetBrokerageSymbol(request.Symbol);
             var startMs = (long)Time.DateTimeToUnixTimeStamp(request.StartTimeUtc) * 1000;
             var endMs = (long)Time.DateTimeToUnixTimeStamp(request.EndTimeUtc) * 1000;
-            var endpoint = $"/api/v3/klines?symbol={symbol}&interval={resolution}&limit=1000";
+            // we always use the real endpoint for history requests
+            var endpoint = $"https://api.binance.com/api/v3/klines?symbol={symbol}&interval={resolution}&limit=1000";
 
             while (endMs - startMs >= resolutionInMs)
             {
@@ -317,9 +319,17 @@ namespace QuantConnect.Brokerages.Binance
                 var klines = JsonConvert.DeserializeObject<object[][]>(response.Content)
                     .Select(entries => new Messages.Kline(entries))
                     .ToList();
+
                 if (klines.Count > 0)
                 {
-                    startMs = klines.Last().OpenTime + resolutionInMs;
+                    var lastValue = klines[klines.Count - 1];
+                    if (Log.DebuggingEnabled)
+                    {
+                        var windowStartTime = Time.UnixMillisecondTimeStampToDateTime(klines[0].OpenTime);
+                        var windowEndTime = Time.UnixMillisecondTimeStampToDateTime(lastValue.OpenTime + resolutionInMs);
+                        Log.Debug($"BinanceRestApiClient.GetHistory(): Received [{symbol}] data for timeperiod from {windowStartTime.ToStringInvariant()} to {windowEndTime.ToStringInvariant()}..");
+                    }
+                    startMs = lastValue.OpenTime + resolutionInMs;
 
                     foreach (var kline in klines)
                     {
@@ -328,7 +338,8 @@ namespace QuantConnect.Brokerages.Binance
                 }
                 else
                 {
-                    startMs += resolutionInMs;
+                    // if there is no data just break
+                    break;
                 }
             }
         }
