@@ -27,10 +27,11 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/test \
    && apt-fast clean && apt-get remove -y apt-fast && apt-get clean && apt-get autoclean && apt-get autoremove --purge -y \
    && rm -rf /var/lib/apt/lists/*
 
-# Install IB Gateway: Installs to /usr/local/ibgateway
-RUN wget https://cdn.quantconnect.com/interactive/ibgateway-latest-standalone-linux-x64.v985.1j.sh && \
+# Install IB Gateway: Installs to /root/ibgateway
+RUN mkdir -p /root/ibgateway && \
+    wget https://cdn.quantconnect.com/interactive/ibgateway-latest-standalone-linux-x64.v985.1j.sh && \
     chmod 777 ibgateway-latest-standalone-linux-x64.v985.1j.sh && \
-    ./ibgateway-latest-standalone-linux-x64.v985.1j.sh -q && \
+    ./ibgateway-latest-standalone-linux-x64.v985.1j.sh -q -dir /root/ibgateway && \
     rm ibgateway-latest-standalone-linux-x64.v985.1j.sh
 
 # Install dotnet 5 sdk & runtime
@@ -137,7 +138,7 @@ RUN pip install --no-cache-dir      \
     gluonts==0.4.3                  \
     gplearn==0.4.1                  \
     jax==0.1.68                     \
-    jaxlib==0.1.47                  \
+    jaxlib==0.1.69                  \
     keras-rl==0.4.2                 \
     pennylane==0.9.0                \
     neural-tangents==0.2.1          \
