@@ -51,6 +51,11 @@ namespace QuantConnect.Brokerages
         public event EventHandler<OrderEvent> OptionPositionAssigned;
 
         /// <summary>
+        /// Event that fires each time an option position has changed
+        /// </summary>
+        public event EventHandler<OptionNotificationEventArgs> OptionNotification;
+
+        /// <summary>
         /// Event that fires each time a user's brokerage account is changed
         /// </summary>
         public event EventHandler<AccountEvent> AccountChanged;
@@ -127,12 +132,6 @@ namespace QuantConnect.Brokerages
             try
             {
                 OrderStatusChanged?.Invoke(this, e);
-
-                if (Log.DebuggingEnabled)
-                {
-                    // log after calling the OrderStatusChanged event, the BrokerageTransactionHandler will set the order quantity
-                    Log.Debug("Brokerage.OnOrderEvent(): " + e);
-                }
             }
             catch (Exception err)
             {
@@ -151,6 +150,24 @@ namespace QuantConnect.Brokerages
                 Log.Debug("Brokerage.OptionPositionAssigned(): " + e);
 
                 OptionPositionAssigned?.Invoke(this, e);
+            }
+            catch (Exception err)
+            {
+                Log.Error(err);
+            }
+        }
+
+        /// <summary>
+        /// Event invocator for the OptionNotification event
+        /// </summary>
+        /// <param name="e">The OptionNotification event arguments</param>
+        protected virtual void OnOptionNotification(OptionNotificationEventArgs e)
+        {
+            try
+            {
+                Log.Debug("Brokerage.OnOptionNotification(): " + e);
+
+                OptionNotification?.Invoke(this, e);
             }
             catch (Exception err)
             {
@@ -217,7 +234,10 @@ namespace QuantConnect.Brokerages
             {
                 // remove the key, we really only want to return the cached value on the first request
                 var result = JsonConvert.DeserializeObject<List<Holding>>(value);
-
+                if (result == null)
+                {
+                    return new List<Holding>();
+                }
                 Log.Trace($"Brokerage.GetAccountHoldings(): sourcing holdings from provided brokerage data, found {result.Count} entries");
                 return result;
             }
@@ -243,7 +263,10 @@ namespace QuantConnect.Brokerages
             {
                 // remove the key, we really only want to return the cached value on the first request
                 var result = JsonConvert.DeserializeObject<List<CashAmount>>(value);
-
+                if (result == null)
+                {
+                    return new List<CashAmount>();
+                }
                 Log.Trace($"Brokerage.GetCashBalance(): sourcing cash balance from provided brokerage data, found {result.Count} entries");
                 return result;
             }

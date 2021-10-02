@@ -24,7 +24,6 @@ using NodaTime;
 using NUnit.Framework;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
-using QuantConnect.Data.Auxiliary;
 using QuantConnect.Data.Custom.IconicTypes;
 using QuantConnect.Data.Fundamental;
 using QuantConnect.Data.Market;
@@ -584,11 +583,11 @@ namespace QuantConnect.Tests.Engine.DataFeeds
         }
 
         [TestCase(FileFormat.Csv, true, false)]
-        [TestCase(FileFormat.Collection, true, false)]
+        [TestCase(FileFormat.UnfoldingCollection, true, false)]
         [TestCase(FileFormat.Csv, false, false)]
-        [TestCase(FileFormat.Collection, false, false)]
+        [TestCase(FileFormat.UnfoldingCollection, false, false)]
         [TestCase(FileFormat.Csv, false, true)]
-        [TestCase(FileFormat.Collection, false, true)]
+        [TestCase(FileFormat.UnfoldingCollection, false, true)]
         public void RestCustomDataReturningNullDoesNotInfinitelyPoll(FileFormat fileFormat, bool returnsNull, bool throwsException)
         {
             TestCustomData.FileFormat = fileFormat;
@@ -739,34 +738,41 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             Assert.AreEqual(1, receivedDelisted, $"Did not receive {DelistingType.Delisted}");
         }
 
-        [Test]
-        public void CoarseFundamentalDataIsHoldUntilTimeIsRight()
+        [TestCase("20140325", typeof(CoarseFundamental))]
+        [TestCase("20201202", typeof(ETFConstituentData))]
+        public void UniverseDataIsHoldUntilTimeIsRight(string dateTime, Type universeData)
         {
-            _startDate = new DateTime(2014, 3, 25);
+            _startDate = Time.ParseDate(dateTime);
             CustomMockedFileBaseData.StartDate = _startDate;
             _manualTimeProvider.SetCurrentTimeUtc(_startDate);
 
-            Log.Trace($"StartTime {_manualTimeProvider.GetUtcNow()}");
+            Log.Debug($"StartTime {_manualTimeProvider.GetUtcNow()}");
 
-            // we just want to emit one single coarse data packet
             var feed = RunDataFeed(getNextTicksFunction: fdqh => Enumerable.Empty<BaseData>());
-
-            _algorithm.AddUniverse(coarse => coarse.Take(10).Select(x => x.Symbol));
+            if (universeData == typeof(CoarseFundamental))
+            {
+                _algorithm.AddUniverse(coarse => coarse.Take(10).Select(x => x.Symbol));
+            }
+            else
+            {
+                _algorithm.AddUniverse(_algorithm.Universe.ETF("SPY", Market.USA, _algorithm.UniverseSettings,
+                    constituentData => constituentData.Take(10).Select(x => x.Symbol)));
+            }
             // will add the universe
             _algorithm.OnEndOfTimeStep();
 
-            var receivedCoarseData = false;
+            var receivedUniverseData = false;
             ConsumeBridge(feed, TimeSpan.FromSeconds(5), ts =>
             {
                 if (ts.UniverseData.Count > 0 &&
-                    ts.UniverseData.First().Value.Data.First() is CoarseFundamental)
+                    ts.UniverseData.First().Value.Data.First().GetType() == universeData)
                 {
                     var now = _manualTimeProvider.GetUtcNow();
                     Log.Trace($"Received BaseDataCollection {now}");
 
                     // Assert data got hold until time was right
                     Assert.IsTrue(now.Hour < 23 && now.Hour > 5, $"Unexpected now value: {now}");
-                    receivedCoarseData = true;
+                    receivedUniverseData = true;
 
                     // we got what we wanted, end unit test
                     _manualTimeProvider.SetCurrentTimeUtc(DateTime.UtcNow);
@@ -776,9 +782,9 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                 secondsTimeStep: 3600,
                 endDate: _startDate.AddDays(1));
 
-            Log.Trace($"EndTime {_manualTimeProvider.GetUtcNow()}");
+            Log.Debug($"EndTime {_manualTimeProvider.GetUtcNow()}");
 
-            Assert.IsTrue(receivedCoarseData, "Did not receive Coarse data.");
+            Assert.IsTrue(receivedUniverseData, "Did not receive universe data.");
         }
 
         [Test]
@@ -833,9 +839,9 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             Assert.IsTrue(fineWasCalled);
         }
 
-
-        [Test]
-        public void FineCoarseFundamentalDataGetsPipedCorrectly()
+        [TestCase(1)]
+        [TestCase(2)]
+        public void FineCoarseFundamentalDataGetsPipedCorrectly(int numberOfUniverses)
         {
             _startDate = new DateTime(2014, 3, 25);
             CustomMockedFileBaseData.StartDate = _startDate;
@@ -843,18 +849,22 @@ namespace QuantConnect.Tests.Engine.DataFeeds
 
             var feed = RunDataFeed(getNextTicksFunction: fdqh => Enumerable.Empty<BaseData>());
 
-            var fineWasCalled = false;
-            _algorithm.AddUniverse(coarse => coarse
-                    .Where(x => x.Symbol.ID.Symbol.Contains("AAPL")).Select((fundamental, i) => fundamental.Symbol),
-                fine =>
-                {
-                    var symbol = fine.First().Symbol;
-                    if (symbol == Symbols.AAPL)
+            var fineWasCalled = new List<bool> { false, false };
+            for (var i = 0; i < numberOfUniverses; i++)
+            {
+                var index = i;
+                _algorithm.AddUniverse(coarse => coarse
+                        .Where(x => x.Symbol.ID.Symbol.Contains("AAPL")).Select((fundamental, i) => fundamental.Symbol),
+                    fine =>
                     {
-                        fineWasCalled = true;
-                    }
-                    return new[] { symbol };
-                });
+                        var symbol = fine.First().Symbol;
+                        if (symbol == Symbols.AAPL)
+                        {
+                            fineWasCalled[index] = true;
+                        }
+                        return new[] { symbol };
+                    });
+            }
 
             var receivedFundamentalsData = false;
             ConsumeBridge(feed, TimeSpan.FromSeconds(5), ts =>
@@ -869,7 +879,10 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             }, sendUniverseData: true, alwaysInvoke: true, secondsTimeStep: 3600, endDate: _startDate.AddDays(10));
 
             Assert.IsTrue(receivedFundamentalsData);
-            Assert.IsTrue(fineWasCalled);
+            for (var i = 0; i < numberOfUniverses; i++)
+            {
+                Assert.IsTrue(fineWasCalled[i]);
+            }
         }
 
         [TestCase(SecurityType.Future)]
@@ -2426,7 +2439,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                     Symbol = config.Symbol
                 };
 
-                if (FileFormat == FileFormat.Collection)
+                if (FileFormat == FileFormat.UnfoldingCollection)
                 {
                     return new BaseDataCollection
                     {
