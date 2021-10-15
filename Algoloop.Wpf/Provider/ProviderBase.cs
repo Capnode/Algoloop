@@ -174,8 +174,7 @@ namespace Algoloop.Wpf.Provider
         protected static void UpdateSymbols(
             ProviderModel market,
             IEnumerable<SymbolModel> actual,
-            bool defaultActive,
-            bool addNew = true)
+            bool addNew)
         {
             Contract.Requires(market != null, nameof(market));
             Contract.Requires(actual != null, nameof(actual));
@@ -194,7 +193,7 @@ namespace Algoloop.Wpf.Provider
                     {
                         var symbolModel = new SymbolModel(item.Id, item.Market, item.Security)
                         {
-                            Active = defaultActive,
+                            Active = item.Active,
                             Name = item.Name,
                             Properties = item.Properties
                         };

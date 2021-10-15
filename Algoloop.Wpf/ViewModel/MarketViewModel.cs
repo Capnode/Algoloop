@@ -258,12 +258,12 @@ namespace Algoloop.Wpf.ViewModel
                 }
             }
 
-            if (SelectedAccount == null) return;
             ReloadAccount();
         }
 
         private void ReloadAccount()
         {
+            if (SelectedAccount == null) return;
             Model.DefaultAccountId = SelectedAccount.Model.Id;
 
             Balances.Clear();
@@ -319,15 +319,7 @@ namespace Algoloop.Wpf.ViewModel
             }
             else
             {
-                try
-                {
-                    IsBusy = true;
-                    _provider?.Logout();
-                }
-                finally
-                {
-                    IsBusy = false;
-                }
+                Model.Active = false;
             }
         }
 

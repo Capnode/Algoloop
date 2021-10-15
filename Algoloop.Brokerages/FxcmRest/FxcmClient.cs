@@ -15,11 +15,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
+using QuantConnect;
+using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using static Algoloop.Model.ProviderModel;
 
@@ -38,6 +41,8 @@ namespace Algoloop.Brokerages.FxcmRest
 //        private const string _getInstruments = @"trading/get_instruments";
         private const string _getModelOffer = @"trading/get_model/?models=Offer";
         private const string _getSymbols = @"trading/get_instruments";
+        private const string _subscribe = @"subscribe";
+        private const string _unsubscribe = @"unsubscribe";
 
         private bool _isDisposed;
         private string _baseCurrency;
@@ -172,13 +177,10 @@ namespace Algoloop.Brokerages.FxcmRest
             _fxcmSocket.AccountsUpdate = update;
         }
 
-        public async Task GetOffersAsync(Action<object> update)
+        public async Task GetMarketDataAsync(Action<object> update)
         {
-            // { "response":{ "executed":false,"error":"Unauthorized"} }
-            // Skip if subscription active
-            if (_fxcmSocket.SymbolUpdate != default && update != default) return;
-
-            Log.Trace("{0}: GetSymbolsAsync", GetType().Name);
+// {"response":{ "executed":true},"offers":[{ "t":0,"ratePrecision":5,"offerId":1,"rollB":-0.7542,"rollS":0.3162,"fractionDigits":5,"pip":0.0001,"defaultSortOrder":100,"currency":"EUR/USD","instrumentType":1,"valueDate":"08062021","time":"2021-08-04T17:00:00.347Z","sell":1.18374,"buy":1.18385,"sellTradable":true,"buyTradable":true,"high":1.19001,"low":1.18329,"volume":1,"pipFraction":0.1,"spread":1.1,"mmr":33.3,"emr":33.3,"lmr":16.65,"minQuantity":1,"maxQuantity":50000000,"instrBaseUnitSize":1,"pipCost":0.08447}
+            Log.Trace("{0}: GetOffersAsync", GetType().Name);
             string json = await GetAsync(_getModelOffer).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
@@ -189,17 +191,86 @@ namespace Algoloop.Brokerages.FxcmRest
                 throw new ApplicationException(error);
             }
 
-            var symbols = new List<SymbolModel>();
+            var quoteBars = new List<QuoteBar>();
             JArray jOffers = JArray.FromObject(jo["offers"]);
             foreach (JToken jOffer in jOffers)
             {
-                SymbolModel symbol = ToSymbol(jOffer);
-                if (symbol == null) continue;
-                symbols.Add(symbol);
+                string ticker = jOffer["currency"].ToString();
+                if (string.IsNullOrWhiteSpace(ticker)) continue;
+                int instrumentType = (int)jOffer["instrumentType"];
+                SecurityType security = Support.ToSecurityType(instrumentType);
+                Symbol symbol = Symbol.Create(ticker, security, Support.Market);
+                DateTime utcTime = DateTime.Parse(jOffer["time"].ToString());
+                decimal bid = jOffer["sell"].ToDecimal();
+                decimal ask = jOffer["buy"].ToDecimal();
+                var bidBar = new Bar(0, 0, 0, bid);
+                var askBar = new Bar(0, 0, 0, ask);
+                var quoteBar = new QuoteBar(utcTime, symbol, bidBar, 0, askBar, 0);
+                quoteBars.Add(quoteBar);
             }
 
-            update(symbols);
+            update(quoteBars);
+        }
+
+        public async Task SubscribeMarketDataAsync(IEnumerable<SymbolModel> symbols, Action<object> update)
+        {
+            Log.Trace("{0}: SubscribeMarketDataAsync", GetType().Name);
+
+            List<KeyValuePair<string, string>> nvc = symbols
+                .Where(m => m.Active)
+                .Select(n => new KeyValuePair<string, string>("pairs", n.Name)).ToList();
+            string json = await PostAsync(_subscribe, nvc).ConfigureAwait(false);
+//  { "response":{ "executed":true,"error":""},"pairs":[{ "Updated":1628025032910,"Rates":[1.18608,1.18646,1.18706,1.18578,1.18608,1.18646],"Symbol":"EUR/USD"}]}
+            JObject jo = JObject.Parse(json);
+            JToken jResponse = jo["response"];
+            bool executed = (bool)jResponse["executed"];
+            if (!executed)
+            {
+                string error = jResponse["error"].ToString();
+                throw new ApplicationException(error);
+            }
+            var quoteBars = new List<QuoteBar>();
+            JArray jPairs = JArray.FromObject(jo["pairs"]);
+            foreach (JToken jPair in jPairs)
+            {
+                long updated = (long)jPair["Updated"];
+                DateTime utcTime = Support.ToTime(updated);
+                string ticker = jPair["Symbol"].ToString();
+                JArray jRates = JArray.FromObject(jPair["Rates"]);
+                decimal bid = jRates[0].ToDecimal();
+                decimal ask = jRates[1].ToDecimal();
+                decimal high = jRates[2].ToDecimal();
+                decimal low = jRates[3].ToDecimal();
+                var bidBar = new Bar(0, 0, 0, bid);
+                var askBar = new Bar(0, 0, 0, ask);
+                SymbolModel symbolModel = symbols.FirstOrDefault(m => m.Name.Equals(ticker));
+                if (symbolModel == default) continue;
+                Symbol symbol = Symbol.Create(ticker, symbolModel.Security, symbolModel.Market);
+                var quoteBar = new QuoteBar(utcTime, symbol, bidBar, 0, askBar, 0);
+                quoteBars.Add(quoteBar);
+            }
+
+            update(quoteBars);
             _fxcmSocket.SymbolUpdate = update;
+        }
+
+        public async Task UnsubscribeQuotesAsync(IEnumerable<SymbolModel> symbols)
+        {
+            Log.Trace("{0}: UnsubscribeMarketDataAsync", GetType().Name);
+
+            List<KeyValuePair<string, string>> nvc = symbols
+                .Where(m => m.Active)
+                .Select(n => new KeyValuePair<string, string>("pairs", n.Name)).ToList();
+            string json = await PostAsync(_unsubscribe, nvc).ConfigureAwait(false);
+            // { {"response":{"executed":true,"error":""},"pairs":["EUR/USD"]}
+            JObject jo = JObject.Parse(json);
+            JToken jResponse = jo["response"];
+            bool executed = (bool)jResponse["executed"];
+            if (!executed)
+            {
+                string error = jResponse["error"].ToString();
+                throw new ApplicationException(error);
+            }
         }
 
         public void Dispose()
@@ -304,23 +375,6 @@ namespace Algoloop.Brokerages.FxcmRest
             return position;
         }
 
-        private static SymbolModel ToSymbol(JToken token)
-        {
-            string currency = token["currency"].ToString();
-            if (string.IsNullOrWhiteSpace(currency)) return null;
-            int instrumentType = (int)token["instrumentType"];
-            var symbol = new SymbolModel
-            {
-                Id = currency,
-                Name = currency,
-                Market = Support.Market,
-                Security = Support.ToSecurityType(instrumentType),
-                Properties = new Dictionary<string, object>()
-            };
-
-            return symbol;
-        }
-
         private async Task<string> GetAsync(string path)
         {
             if (!_fxcmSocket.IsAlive) throw new ApplicationException("Socket.IO closed");
@@ -339,18 +393,18 @@ namespace Algoloop.Brokerages.FxcmRest
             return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
-        //private async Task<string> PostAsync(string path, string body)
-        //{
-        //    string uri = _httpClient.BaseAddress + path;
-        //    using HttpResponseMessage response = await _httpClient.PostAsync(uri, new StringContent(body, Encoding.UTF8, _mediatype));
-        //    if (!response.IsSuccessStatusCode)
-        //    {
-        //        string message = $"PostAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
-        //        Log.Error(message);
-        //        throw new ApplicationException(message);
-        //    }
+        private async Task<string> PostAsync(string path, IList<KeyValuePair<string, string>> nvc)
+        {
+            string uri = _httpClient.BaseAddress + path;
+            using HttpResponseMessage response = await _httpClient.PostAsync(uri, new FormUrlEncodedContent(nvc));
+            if (!response.IsSuccessStatusCode)
+            {
+                string message = $"PostAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";
+                Log.Error(message);
+                throw new ApplicationException(message);
+            }
 
-        //    return await response.Content.ReadAsStringAsync();
-        //}
+            return await response.Content.ReadAsStringAsync();
+        }
     }
 }

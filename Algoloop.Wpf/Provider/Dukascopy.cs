@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -143,7 +143,7 @@ namespace Algoloop.Wpf.Provider
             // Exclude unknown symbols
             var downloader = new DukascopyDataDownloader();
             IEnumerable<SymbolModel> actual = all.Where(m => downloader.HasSymbol(m.Id));
-            UpdateSymbols(market, actual, false);
+            UpdateSymbols(market, actual, true);
         }
     }
 }

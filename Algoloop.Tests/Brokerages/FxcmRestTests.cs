@@ -18,6 +18,7 @@ using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
@@ -109,18 +110,49 @@ namespace Algoloop.Tests.Brokerages
         }
 
         [TestMethod]
-        public async Task GetOffersAsync()
+        public async Task GetMarketData()
         {
             // Act
             _api.Login();
-            IReadOnlyList<SymbolModel> offers = null;
-            await _api.GetOffersAsync(offer => offers = offer as IReadOnlyList<SymbolModel>)
-                .ConfigureAwait(false);
+            IReadOnlyList<QuoteBar> list = null;
+            await _api.GetMarketDataAsync(m =>
+            {
+                if (m is IReadOnlyList<QuoteBar> quotes)
+                {
+                    list = quotes;
+                }
+            }).ConfigureAwait(false);
             Thread.Sleep(6000);
             _api.Logout();
 
-            Assert.IsNotNull(offers);
-            Assert.AreNotEqual(0, offers.Count);
+            Assert.IsNotNull(list);
+            Assert.AreNotEqual(0, list.Count);
+        }
+
+        [TestMethod]
+        public async Task SubscribeMarketData()
+        {
+            List<SymbolModel> symbols = new () { new SymbolModel("EUR/USD", "fxcm", SecurityType.Cfd) };
+
+            // Act
+            _api.Login();
+            IReadOnlyList<QuoteBar> list = null;
+            await _api.SubscribeMarketDataAsync(symbols, m =>
+            {
+                if (m is IReadOnlyList<QuoteBar> quotes)
+                {
+                    list = quotes;
+                }
+            }).ConfigureAwait(false);
+            Thread.Sleep(6000);
+            Assert.IsNotNull(list);
+            Assert.AreNotEqual(0, list.Count);
+
+            await _api.UnsubscribeQuotesAsync(symbols).ConfigureAwait(false);
+            list = null;
+            Thread.Sleep(6000);
+            Assert.IsNull(list);
+            _api.Logout();
         }
 
         protected virtual void Dispose(bool disposing)

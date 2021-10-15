@@ -24,6 +24,7 @@ namespace Algoloop.Wpf.Provider
     public class FxcmRest : ProviderBase
     {
         private FxcmClient _api;
+        private bool _symbolsUpdated;
 
         public override void Login(ProviderModel provider)
         {
@@ -32,6 +33,7 @@ namespace Algoloop.Wpf.Provider
             Contract.Requires(provider != null);
             _api = new FxcmClient(provider.Access, provider.ApiKey);
             _api.Login();
+            _symbolsUpdated = false;
         }
 
         public override void Logout()
@@ -47,10 +49,15 @@ namespace Algoloop.Wpf.Provider
         public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
             DateTime now = DateTime.Now;
-            IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
-            UpdateSymbols(provider, symbols, false, true);
-            update(provider.Symbols);
-//            _api.GetOffersAsync(update).Wait();
+            if (!_symbolsUpdated)
+            {
+                IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
+                UpdateSymbols(provider, symbols, true);
+                update(provider.Symbols);
+                _symbolsUpdated = true;
+                _api.SubscribeMarketDataAsync(provider.Symbols, update).Wait();
+            }
+
             provider.LastDate = now;
         }
 

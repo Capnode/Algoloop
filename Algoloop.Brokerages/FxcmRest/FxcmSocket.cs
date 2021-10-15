@@ -77,8 +77,8 @@ namespace Algoloop.Brokerages.FxcmRest
         public void Close()
         {
             Log.Trace("Close");
-            _webSocket.Close();
             _keepAliveTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            _webSocket.Close();
         }
 
         private void OnOpen(object sender, EventArgs e)
