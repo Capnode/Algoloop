@@ -234,7 +234,7 @@
   <ItemGroup>
     <PackageReference Include="CefSharp.Wpf.NETCore" Version="94.4.110" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-x64" Version="94.4.11" />
-    <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.6" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
       <Version>5.0.3</Version>
