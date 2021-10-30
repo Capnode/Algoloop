@@ -232,8 +232,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="93.1.111" />
-    <PackageReference Include="chromiumembeddedframework.runtime.win-x64" Version="94.4.5" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="94.4.110" />
+    <PackageReference Include="chromiumembeddedframework.runtime.win-x64" Version="94.4.11" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
@@ -243,9 +243,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
-    <PackageReference Include="StockSharp.Algo" Version="5.0.105" />
-    <PackageReference Include="StockSharp.Configuration" Version="5.0.104" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.105" />
+    <PackageReference Include="StockSharp.Algo" Version="5.0.106" />
+    <PackageReference Include="StockSharp.Configuration" Version="5.0.105" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.106" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
@@ -270,9 +270,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="94.4.5" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="94.4.11" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="94.4.5" />
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="94.4.11" />
   </ItemGroup>
 </Project>
