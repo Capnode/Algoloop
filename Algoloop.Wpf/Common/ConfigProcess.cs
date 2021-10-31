@@ -30,7 +30,7 @@ namespace Algoloop.Wpf.Common
         private const int _maxIndex = 65536;
         private const string _configfile = "config.json";
         private readonly string _workFolder;
-        private readonly bool _cleanup;
+        private readonly bool _useSubfolder;
         private readonly Process _process;
         private readonly IDictionary<string, string> _config = new Dictionary<string, string>();
         private bool _isDisposed;
@@ -53,7 +53,7 @@ namespace Algoloop.Wpf.Common
             string filename,
             string arguments,
             string workFolder,
-            bool cleanup,
+            bool useSubfolder,
             Action<string> output,
             Action<string> error)
         {
@@ -71,7 +71,7 @@ namespace Algoloop.Wpf.Common
                 }
             };
             _workFolder = workFolder;
-            _cleanup = cleanup;
+            _useSubfolder = useSubfolder;
             _process.OutputDataReceived += (sender, args) =>
             {
                 if (args.Data != null)
@@ -111,7 +111,7 @@ namespace Algoloop.Wpf.Common
 
         private string CreateWorkFolder()
         {
-            if (_cleanup)
+            if (_useSubfolder)
             {
                 lock (_lock)
                 {
@@ -145,22 +145,11 @@ namespace Algoloop.Wpf.Common
                 try
                 {
                     if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return false;
-                    if (_process.WaitForExit(_timeout))
-                    {
-                        Cleanup();
-                        return true;
-                    }
-                    else
-                    {
-                        Debug.Assert(!_process.HasExited);
-                        _process.Kill();
-                        if (_process.WaitForExit(_timeout))
-                        {
-                            Cleanup();
-                            return true;
-                        }
-                        return false;
-                    }
+                    if (_process.WaitForExit(_timeout)) return true;
+                    Debug.Assert(!_process.HasExited);
+                    _process.Kill();
+                    if (_process.WaitForExit(_timeout)) return true;
+                    return false;
                 }
                 catch (Exception ex)
                 {
@@ -196,8 +185,6 @@ namespace Algoloop.Wpf.Common
                     string folder = _process.StartInfo.WorkingDirectory;
                     postProcess(folder);
                 }
-
-                Cleanup();
             }
             else
             {
@@ -215,18 +202,6 @@ namespace Algoloop.Wpf.Common
                 }
 
                 _isDisposed = true;
-            }
-        }
-
-        private void Cleanup()
-        {
-            if (_cleanup)
-            {
-                string path = _process.StartInfo.WorkingDirectory;
-                if (Directory.Exists(path))
-                {
-                    Directory.Delete(path, true);
-                }
             }
         }
     }

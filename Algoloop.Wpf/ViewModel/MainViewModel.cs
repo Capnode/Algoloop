@@ -186,6 +186,7 @@ namespace Algoloop.Wpf.ViewModel
                 Log.Trace($"UserData folder: {userDataFolder}");
                 MainService.Delete(Path.Combine(programDataFolder, "market-hours"));
                 MainService.Delete(Path.Combine(programDataFolder, "symbol-properties"));
+                MainService.DeleteFolders(appDataFolder, "temp*");
                 MainService.CopyDirectory(Path.Combine(program, "Content/AppData"), appDataFolder, false);
                 MainService.CopyDirectory(Path.Combine(program, "Content/ProgramData"), programDataFolder, false);
                 MainService.CopyDirectory(Path.Combine(program, "Content/UserData"), userDataFolder, false);

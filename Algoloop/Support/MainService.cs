@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -116,6 +116,14 @@ namespace Algoloop.Support
             else if (File.Exists(path))
             {
                 File.Delete(path);
+            }
+        }
+
+        public static void DeleteFolders(string path, string pattern)
+        {
+            foreach (string folder in Directory.EnumerateDirectories(path, pattern))
+            {
+                Directory.Delete(folder, true);
             }
         }
     }
