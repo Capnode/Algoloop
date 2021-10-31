@@ -391,7 +391,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 var securityBenchmark = _algorithm.Benchmark as SecurityBenchmark;
                 if (securityBenchmark != null)
                 {
-                    var resolution = _algorithm.LiveMode ? Resolution.Minute : Resolution.Hour;
+                    var resolution = securityBenchmark.Security.Resolution;
 
                     // Check that the tradebar subscription we are using can support this resolution GH #5893
                     var subscriptionType = _algorithm.SubscriptionManager.SubscriptionDataConfigService.LookupSubscriptionConfigDataTypes(securityBenchmark.Security.Type, resolution, securityBenchmark.Security.Symbol.IsCanonical()).First();
