@@ -190,6 +190,7 @@
   "samco-trading-segment": "EQUITY", // EQUITY(NSE,BSE) or COMMODITY (MCX)
 
   // FTX configuration
+  "ftx-account-tier": "Tier1", // accept "Tier1", "Tier2", "Tier3", "Tier4", "Tier5", "Tier6", "VIP1", "VIP2", "VIP3", "MM1", "MM2", "MM3"
   "ftx-api-secret": "",
   "ftx-api-key": "",
 
@@ -212,7 +213,7 @@
     "backtesting": {
       "live-mode": false,
 
-      "setup-handler": "QuantConnect.Lean.Engine.Setup.ConsoleSetupHandler",
+      "setup-handler": "QuantConnect.Lean.Engine.Setup.BacktestingSetupHandler",
       "result-handler": "QuantConnect.Lean.Engine.Results.BacktestingResultHandler",
       "data-feed-handler": "QuantConnect.Lean.Engine.DataFeeds.FileSystemDataFeed",
       "real-time-handler": "QuantConnect.Lean.Engine.RealTime.BacktestingRealTimeHandler",
@@ -415,7 +416,7 @@
       "real-time-handler": "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler",
       "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler"
     },
-    
+
     // defines the 'live-kraken' environment
     "live-kraken": {
       "live-mode": true,
