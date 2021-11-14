@@ -243,9 +243,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.37" />
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
-    <PackageReference Include="StockSharp.Algo" Version="5.0.107" />
-    <PackageReference Include="StockSharp.Configuration" Version="5.0.106" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.107" />
+    <PackageReference Include="StockSharp.Algo" Version="5.0.110" />
+    <PackageReference Include="StockSharp.Configuration" Version="5.0.109" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.110" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
