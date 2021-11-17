@@ -353,6 +353,31 @@ namespace QuantConnect.Algorithm
         }
 
         /// <summary>
+        /// Creates a BetaIndicator for the given target symbol in relation with the reference used. 
+        /// The indicator will be automatically updated on the given resolution.
+        /// </summary>
+        /// <param name="target">The target symbol whose Beta value we want</param>
+        /// <param name="reference">The reference symbol to compare with the target symbol</param>
+        /// <param name="period">The period of the BetaIndicator</param>
+        /// <param name="resolution">The resolution</param>
+        /// <returns>The BetaIndicator for the given parameters</returns>
+        public BetaIndicator B(Symbol target, Symbol reference, int period, Resolution? resolution = null)
+        {
+            var name = CreateIndicatorName(QuantConnect.Symbol.None, "B", resolution);
+            var betaIndicator = new BetaIndicator(name, period, target, reference);
+            RegisterIndicator(target, betaIndicator, resolution);
+            RegisterIndicator(reference, betaIndicator, resolution);
+
+            if (EnableAutomaticIndicatorWarmUp)
+            {
+                WarmUpIndicator(target, betaIndicator, resolution);
+                WarmUpIndicator(reference, betaIndicator, resolution);
+            }
+
+            return betaIndicator;
+        }
+
+        /// <summary>
         /// Creates a new Balance Of Power indicator.
         /// The indicator will be automatically updated on the given resolution.
         /// </summary>
@@ -1582,6 +1607,28 @@ namespace QuantConnect.Algorithm
             }
 
             return relativeDailyVolume;
+        }
+
+        /// <summary>
+        /// Creates a new SuperTrend indicator.
+        /// </summary>
+        /// <param name="symbol">The symbol whose SuperTrend indicator we want.</param>
+        /// <param name="period">The smoothing period for average true range.</param>
+        /// <param name="multiplier">Multiplier to calculate basic upper and lower bands width.</param>
+        /// <param name="movingAverageType">Smoother type for average true range, defaults to Wilders.</param>
+        /// <param name="resolution">The resolution.</param>
+        public SuperTrend STR(Symbol symbol, int period, decimal multiplier, MovingAverageType movingAverageType = MovingAverageType.Wilders, Resolution? resolution = null)
+        {
+            var name = CreateIndicatorName(symbol, $"STR({period},{multiplier})", resolution);
+            var strend = new SuperTrend(name, period, multiplier, movingAverageType);
+            RegisterIndicator(symbol, strend, resolution);
+
+            if (EnableAutomaticIndicatorWarmUp)
+            {
+                WarmUpIndicator(symbol, strend, resolution);
+            }
+
+            return strend;
         }
 
         /// <summary>
