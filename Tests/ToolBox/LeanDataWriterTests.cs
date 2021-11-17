@@ -61,6 +61,16 @@ namespace QuantConnect.Tests.ToolBox
             };
         }
 
+        private List<Tick> GetTicks2(Symbol sym)
+        {
+            return new List<Tick>()
+            {
+                new Tick(Parse.DateTime("3/16/2017 12:00:03 PM"), sym, 11.0m, 12.0m),
+                new Tick(Parse.DateTime("3/16/2017 12:00:04 PM"), sym, 13.0m, 14.0m),
+                new Tick(Parse.DateTime("3/16/2017 12:00:05 PM"), sym, 15.0m, 16.0m),
+            };
+        }
+
         private List<QuoteBar> GetQuoteBars(Symbol sym)
         {
             return new List<QuoteBar>()
@@ -161,6 +171,33 @@ namespace QuantConnect.Tests.ToolBox
             var data = QuantConnect.Compression.Unzip(filePath);
 
             Assert.AreEqual(data.First().Value.Count(), 3);
+        }
+
+        [Test]
+        public void LeanDataWriter_CanAppendEquity()
+        {
+            var filePath = LeanData.GenerateZipFilePath(_dataDirectory, _equity, _date, Resolution.Tick, TickType.Trade);
+
+            var leanDataWriter = new LeanDataWriter(Resolution.Tick, _equity, _dataDirectory);
+            leanDataWriter.Write(GetTicks(_equity));
+
+            Assert.IsTrue(File.Exists(filePath));
+            Assert.IsFalse(File.Exists(filePath + ".tmp"));
+
+            var data = QuantConnect.Compression.Unzip(filePath);
+
+            Assert.AreEqual(data.First().Value.Count(), 3);
+
+            leanDataWriter.Write(GetTicks2(_equity));
+
+            Assert.IsTrue(File.Exists(filePath));
+            Assert.IsFalse(File.Exists(filePath + ".tmp"));
+
+            var data2 = QuantConnect.Compression.Unzip(filePath);
+
+            Assert.AreEqual(data.First().Value.Count(), 6);
+
+
         }
 
         [Test]
