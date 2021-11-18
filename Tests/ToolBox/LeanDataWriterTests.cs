@@ -174,33 +174,6 @@ namespace QuantConnect.Tests.ToolBox
         }
 
         [Test]
-        public void LeanDataWriter_CanAppendEquity()
-        {
-            var filePath = LeanData.GenerateZipFilePath(_dataDirectory, _equity, _date, Resolution.Tick, TickType.Trade);
-
-            var leanDataWriter = new LeanDataWriter(Resolution.Tick, _equity, _dataDirectory);
-            leanDataWriter.Write(GetTicks(_equity));
-
-            Assert.IsTrue(File.Exists(filePath));
-            Assert.IsFalse(File.Exists(filePath + ".tmp"));
-
-            var data = QuantConnect.Compression.Unzip(filePath);
-
-            Assert.AreEqual(data.First().Value.Count(), 3);
-
-            leanDataWriter.Write(GetTicks2(_equity));
-
-            Assert.IsTrue(File.Exists(filePath));
-            Assert.IsFalse(File.Exists(filePath + ".tmp"));
-
-            var data2 = QuantConnect.Compression.Unzip(filePath);
-
-            Assert.AreEqual(data.First().Value.Count(), 6);
-
-
-        }
-
-        [Test]
         public void LeanDataWriter_CanWriteCrypto()
         {
             var filePath = LeanData.GenerateZipFilePath(_dataDirectory, _crypto, _date, Resolution.Second, TickType.Quote);
