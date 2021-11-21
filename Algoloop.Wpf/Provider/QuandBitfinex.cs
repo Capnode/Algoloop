@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -36,6 +36,7 @@ namespace Algoloop.Wpf.Provider
 
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", _settings.DataFolder);
+            Config.Set("cache-location", _settings.DataFolder);
 
             string apiKey = ""; // TODO:
             QuandlBitfinexDownloaderProgram.QuandlBitfinexDownloader(provider.LastDate, apiKey);

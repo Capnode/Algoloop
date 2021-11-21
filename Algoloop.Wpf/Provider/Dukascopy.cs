@@ -115,6 +115,7 @@ namespace Algoloop.Wpf.Provider
             IDictionary<string, string> config = new Dictionary<string, string>
             {
                 ["data-directory"] = _settings.DataFolder,
+                ["cache-location"] = _settings.DataFolder,
                 ["data-folder"] = _settings.DataFolder
             };
 

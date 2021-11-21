@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -38,6 +38,7 @@ namespace Algoloop.Wpf.Provider
             
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", _settings.DataFolder);
+            Config.Set("cache-location", _settings.DataFolder);
 
             IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
