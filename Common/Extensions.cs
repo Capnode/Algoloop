@@ -152,6 +152,25 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Helper method to deserialize a json array into a list also handling single json values
+        /// </summary>
+        /// <param name="jsonArray">The value to deserialize</param>
+        public static List<string> DeserializeList(this string jsonArray)
+        {
+            List<string> result = new();
+            try
+            {
+                result = JsonConvert.DeserializeObject<List<string>>(jsonArray);
+            }
+            catch(JsonReaderException)
+            {
+                result.Add(jsonArray);
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Helper method to download a provided url as a string
         /// </summary>
         /// <param name="url">The url to download data from</param>
@@ -2909,6 +2928,19 @@ namespace QuantConnect
             {
                 return s;
             }
+        }
+
+        /// <summary>
+        /// Helper method to determine symbol for a live subscription
+        /// </summary>
+        /// <remarks>Useful for continuous futures where we subscribe to the underlying</remarks>
+        public static Symbol GetLiveSubscriptionSymbol(this Symbol symbol)
+        {
+            if (symbol.SecurityType == SecurityType.Future && symbol.IsCanonical() && symbol.HasUnderlying)
+            {
+                return symbol.Underlying;
+            }
+            return symbol;
         }
 
         /// <summary>

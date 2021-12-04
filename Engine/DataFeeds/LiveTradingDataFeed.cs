@@ -15,24 +15,23 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
-using QuantConnect.Configuration;
 using QuantConnect.Data;
-using QuantConnect.Data.Auxiliary;
-using QuantConnect.Data.Custom;
-using QuantConnect.Data.Custom.Tiingo;
-using QuantConnect.Data.Market;
-using QuantConnect.Data.UniverseSelection;
-using QuantConnect.Interfaces;
-using QuantConnect.Lean.Engine.DataFeeds.Enumerators;
-using QuantConnect.Lean.Engine.DataFeeds.Enumerators.Factories;
-using QuantConnect.Lean.Engine.Results;
+using QuantConnect.Util;
 using QuantConnect.Logging;
 using QuantConnect.Packets;
+using System.Threading.Tasks;
+using QuantConnect.Interfaces;
 using QuantConnect.Securities;
-using QuantConnect.Util;
+using QuantConnect.Data.Custom;
+using QuantConnect.Data.Market;
+using System.Collections.Generic;
+using QuantConnect.Configuration;
+using QuantConnect.Data.Custom.Tiingo;
+using QuantConnect.Lean.Engine.Results;
+using QuantConnect.Data.UniverseSelection;
+using QuantConnect.Lean.Engine.DataFeeds.Enumerators;
+using QuantConnect.Lean.Engine.DataFeeds.Enumerators.Factories;
 
 namespace QuantConnect.Lean.Engine.DataFeeds
 {
@@ -43,8 +42,10 @@ namespace QuantConnect.Lean.Engine.DataFeeds
     public class LiveTradingDataFeed : IDataFeed
     {
         private LiveNodePacket _job;
+
         // used to get current time
         private ITimeProvider _timeProvider;
+
         private ITimeProvider _frontierTimeProvider;
         private IDataProvider _dataProvider;
         private IMapFileProvider _mapFileProvider;
@@ -83,14 +84,14 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
             _cancellationTokenSource = new CancellationTokenSource();
 
-            _job = (LiveNodePacket) job;
+            _job = (LiveNodePacket)job;
             _timeProvider = dataFeedTimeProvider.TimeProvider;
             _dataProvider = dataProvider;
             _mapFileProvider = mapFileProvider;
             _factorFileProvider = factorFileProvider;
             _channelProvider = dataChannelProvider;
             _frontierTimeProvider = dataFeedTimeProvider.FrontierTimeProvider;
-            _customExchange = new BaseDataExchange("CustomDataExchange") {SleepInterval = 10};
+            _customExchange = new BaseDataExchange("CustomDataExchange") { SleepInterval = 10 };
             _subscriptions = subscriptionManager.DataFeedSubscriptions;
 
             _dataQueueHandler = GetDataQueueHandler();
@@ -165,14 +166,13 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         }
 
         /// <summary>
-        /// Gets the <see cref="IDataQueueHandler"/> to use. By default this will try to load
-        /// the type specified in the configuration via the 'data-queue-handler'
+        /// Gets the <see cref="IDataQueueHandler"/> to use by default <see cref="CompositeDataQueueHandler"/>
         /// </summary>
+        /// <remarks>Useful for testing</remarks>
         /// <returns>The loaded <see cref="IDataQueueHandler"/></returns>
         protected virtual IDataQueueHandler GetDataQueueHandler()
         {
-            Log.Trace($"LiveTradingDataFeed.GetDataQueueHandler(): will use {_job.DataQueueHandler}");
-            return Composer.Instance.GetExportedValueByTypeName<IDataQueueHandler>(_job.DataQueueHandler);
+            return new CompositeDataQueueHandler();
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             try
             {
                 var localEndTime = request.EndTimeUtc.ConvertFromUtc(request.Security.Exchange.TimeZone);
-                var timeZoneOffsetProvider = new TimeZoneOffsetProvider(request.Security.Exchange.TimeZone, request.StartTimeUtc, request.EndTimeUtc);
+                var timeZoneOffsetProvider = new TimeZoneOffsetProvider(request.Configuration.ExchangeTimeZone, request.StartTimeUtc, request.EndTimeUtc);
 
                 IEnumerator<BaseData> enumerator;
                 if (!_channelProvider.ShouldStreamSubscription(request.Configuration))
@@ -229,12 +229,12 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     }
 
                     EventHandler handler = (_, _) => subscription?.OnNewDataAvailable();
-                    enumerator = _dataQueueHandler.Subscribe(request.Configuration, handler);
+                    enumerator = Subscribe(request.Configuration, handler);
 
                     if (request.Configuration.EmitSplitsAndDividends())
                     {
-                        auxEnumerators.Add(_dataQueueHandler.Subscribe(new SubscriptionDataConfig(request.Configuration, typeof(Dividend)), handler));
-                        auxEnumerators.Add(_dataQueueHandler.Subscribe(new SubscriptionDataConfig(request.Configuration, typeof(Split)), handler));
+                        auxEnumerators.Add(Subscribe(new SubscriptionDataConfig(request.Configuration, typeof(Dividend)), handler));
+                        auxEnumerators.Add(Subscribe(new SubscriptionDataConfig(request.Configuration, typeof(Split)), handler));
                     }
 
                     if (auxEnumerators.Count > 0)
@@ -270,6 +270,11 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             return subscription;
         }
 
+        private IEnumerator<BaseData> Subscribe(SubscriptionDataConfig dataConfig, EventHandler newDataAvailableHandler)
+        {
+            return new LiveSubscriptionEnumerator(dataConfig, _dataQueueHandler, newDataAvailableHandler);
+        }
+
         /// <summary>
         /// Creates a new subscription for universe selection
         /// </summary>
@@ -283,7 +288,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             // grab the relevant exchange hours
             var config = request.Universe.Configuration;
             var localEndTime = request.EndTimeUtc.ConvertFromUtc(request.Security.Exchange.TimeZone);
-            var tzOffsetProvider = new TimeZoneOffsetProvider(request.Security.Exchange.TimeZone, request.StartTimeUtc, request.EndTimeUtc);
+            var tzOffsetProvider = new TimeZoneOffsetProvider(request.Configuration.ExchangeTimeZone, request.StartTimeUtc, request.EndTimeUtc);
 
             IEnumerator<BaseData> enumerator = null;
 
@@ -302,7 +307,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 _customExchange.AddEnumerator(new EnumeratorHandler(config.Symbol, enumerator, enqueueable));
                 enumerator = enqueueable;
             }
-            else if (config.Type == typeof (CoarseFundamental) || config.Type == typeof (ETFConstituentData))
+            else if (config.Type == typeof(CoarseFundamental) || config.Type == typeof(ETFConstituentData))
             {
                 Log.Trace($"LiveTradingDataFeed.CreateUniverseSubscription(): Creating {config.Type.Name} universe: {config.Symbol.ID}");
 
@@ -336,7 +341,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 Func<SubscriptionRequest, IEnumerator<BaseData>> configure = (subRequest) =>
                 {
                     var fillForwardResolution = _subscriptions.UpdateAndGetFillForwardResolution(subRequest.Configuration);
-                    var input = _dataQueueHandler.Subscribe(subRequest.Configuration, (sender, args) => subscription.OnNewDataAvailable());
+                    var input = Subscribe(subRequest.Configuration, (sender, args) => subscription.OnNewDataAvailable());
                     return new LiveFillForwardEnumerator(_frontierTimeProvider, input, subRequest.Security.Exchange, fillForwardResolution, subRequest.Configuration.ExtendedMarketHours, localEndTime, subRequest.Configuration.Increment, subRequest.Configuration.DataTimeZone);
                 };
 
@@ -372,7 +377,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
 
                 var factory = new LiveCustomDataSubscriptionEnumeratorFactory(_timeProvider);
                 var enumeratorStack = factory.CreateEnumerator(request, _dataProvider);
-                enumerator = new BaseDataCollectionAggregatorEnumerator(enumeratorStack, config.Symbol, liveMode:true);
+                enumerator = new BaseDataCollectionAggregatorEnumerator(enumeratorStack, config.Symbol, liveMode: true);
 
                 var enqueueable = new EnqueueableEnumerator<BaseData>();
                 _customExchange.AddEnumerator(new EnumeratorHandler(config.Symbol, enumerator, enqueueable));
@@ -386,7 +391,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             // send the subscription for the new symbol through to the data queuehandler
             if (_channelProvider.ShouldStreamSubscription(subscription.Configuration))
             {
-                _dataQueueHandler.Subscribe(request.Configuration, (sender, args) => subscription.OnNewDataAvailable());
+                Subscribe(request.Configuration, (sender, args) => subscription.OnNewDataAvailable());
             }
 
             return subscription;
@@ -413,22 +418,28 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// <summary>
         /// Overrides methods of the base data exchange implementation
         /// </summary>
-        class EnumeratorHandler : BaseDataExchange.EnumeratorHandler
+        private class EnumeratorHandler : BaseDataExchange.EnumeratorHandler
         {
             private readonly EnqueueableEnumerator<BaseData> _enqueueable;
+
             public EnumeratorHandler(Symbol symbol, IEnumerator<BaseData> enumerator, EnqueueableEnumerator<BaseData> enqueueable)
                 : base(symbol, enumerator, true)
             {
                 _enqueueable = enqueueable;
             }
+
             /// <summary>
             /// Returns true if this enumerator should move next
             /// </summary>
-            public override bool ShouldMoveNext() { return true; }
+            public override bool ShouldMoveNext()
+            { return true; }
+
             /// <summary>
             /// Calls stop on the internal enqueueable enumerator
             /// </summary>
-            public override void OnEnumeratorFinished() { _enqueueable.Stop(); }
+            public override void OnEnumeratorFinished()
+            { _enqueueable.Stop(); }
+
             /// <summary>
             /// Enqueues the data
             /// </summary>

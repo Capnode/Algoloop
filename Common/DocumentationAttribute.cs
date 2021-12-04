@@ -1,4 +1,4 @@
-/*
+﻿/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -14,33 +14,41 @@
 */
 
 using System;
+using Newtonsoft.Json;
 
-namespace QuantConnect.Scheduling
+namespace QuantConnect
 {
     /// <summary>
-    /// Represents a timer consumer instance
+    /// Custom attribute used for documentation
     /// </summary>
-    public class TimeConsumer
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+    public sealed class DocumentationAttribute : Attribute
     {
         /// <summary>
-        /// True if the consumer already finished it's work and no longer consumes time
+        /// The documentation tag
         /// </summary>
-        public bool Finished { get; set; }
+        [JsonProperty(PropertyName = "tag")]
+        public string Tag { get; }
 
         /// <summary>
-        /// The time provider associated with this consumer
+        ///  The associated weight of this attribute and tag
         /// </summary>
-        public ITimeProvider TimeProvider { get; set; }
+        [JsonProperty(PropertyName = "weight")]
+        public int Weight { get; }
 
         /// <summary>
-        /// The isolator limit provider to be used with this consumer
+        /// The attributes type id, we override it to ignore it when serializing
         /// </summary>
-        public IIsolatorLimitResultProvider IsolatorLimitProvider { get; set; }
+        [JsonIgnore]
+        public override object TypeId => base.TypeId;
 
         /// <summary>
-        /// The next time, base on the <see cref="TimeProvider"/>, that time should be requested
-        /// to be <see cref="IsolatorLimitProvider"/>
+        /// Creates a new instance
         /// </summary>
-        public DateTime? NextTimeRequest { get; set; }
+        public DocumentationAttribute(string tag, int weight = 0)
+        {
+            Tag = tag;
+            Weight = weight;
+        }
     }
 }

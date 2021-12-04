@@ -13,42 +13,44 @@
  * limitations under the License.
 */
 
+using System;
+using System.Linq;
 using QuantConnect.Data;
 using QuantConnect.Orders;
 using QuantConnect.Interfaces;
-using QuantConnect.Brokerages;
+using QuantConnect.Securities;
 using System.Collections.Generic;
+using QuantConnect.Securities.Future;
+using QuantConnect.Data.UniverseSelection;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Basic template algorithm for the Atreyu brokerage
+    /// Continuous Futures Regression algorithm. Asserting and showcasing the behavior of adding a continuous future
+    /// and a future contract at the same time
     /// </summary>
-    /// <meta name="tag" content="using data" />
-    /// <meta name="tag" content="using quantconnect" />
-    /// <meta name="tag" content="trading and orders" />
-    public class BasicTemplateAtreyuAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class AddFutureContractWithContinuousRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        private Symbol _currentMappedSymbol;
+        private Future _continuousContract;
+        private Future _futureContract;
+        private bool _ended;
+
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 07);
-            SetEndDate(2013, 10, 11);
-            SetCash(100000);
+            SetStartDate(2013, 10, 6);
+            SetEndDate(2013, 10, 10);
 
-            SetBrokerageModel(BrokerageName.Atreyu);
-            AddEquity("SPY", Resolution.Minute);
+            _continuousContract = AddFuture(Futures.Indices.SP500EMini,
+                dataNormalizationMode: DataNormalizationMode.BackwardsRatio,
+                dataMappingMode: DataMappingMode.LastTradingDay,
+                contractDepthOffset: 0
+            );
 
-            DefaultOrderProperties = new AtreyuOrderProperties
-            {
-                // Can specify the default exchange to execute an order on.
-                // If not specified will default to the primary exchange
-                Exchange = Exchange.BATS,
-                // Currently only support order for the day
-                TimeInForce = TimeInForce.Day
-            };
+            _futureContract = AddFutureContract(FutureChainProvider.GetFutureContractList(_continuousContract.Symbol, Time).First());
         }
 
         /// <summary>
@@ -57,15 +59,42 @@ namespace QuantConnect.Algorithm.CSharp
         /// <param name="data">Slice object keyed by symbol containing the stock data</param>
         public override void OnData(Slice data)
         {
+            if (_ended)
+            {
+                throw new Exception($"Algorithm should of ended!");
+            }
+            if (data.Keys.Count > 2)
+            {
+                throw new Exception($"Getting data for more than 2 symbols! {string.Join(",", data.Keys.Select(symbol => symbol))}");
+            }
+            if (UniverseManager.Count != 3)
+            {
+                throw new Exception($"Expecting 3 universes (chain, continuous and user defined) but have {UniverseManager.Count}");
+            }
+
             if (!Portfolio.Invested)
             {
-                // will set 25% of our buying power with a market order that will be routed to exchange set in the default order properties (BATS)
-                SetHoldings("SPY", 0.25m);
-                // will increase our SPY holdings to 50% of our buying power with a market order that will be routed to ARCA
-                SetHoldings("SPY", 0.50m, orderProperties: new AtreyuOrderProperties { Exchange = Exchange.ARCA });
+                Buy(_futureContract.Symbol, 1);
+                Buy(_continuousContract.Mapped, 1);
 
-                Debug("Purchased SPY!");
+                RemoveSecurity(_futureContract.Symbol);
+                RemoveSecurity(_continuousContract.Symbol);
+
+                _ended = true;
             }
+        }
+
+        public override void OnOrderEvent(OrderEvent orderEvent)
+        {
+            if (orderEvent.Status == OrderStatus.Filled)
+            {
+                Log($"{orderEvent}");
+            }
+        }
+
+        public override void OnSecuritiesChanged(SecurityChanges changes)
+        {
+            Debug($"{Time}-{changes}");
         }
 
         /// <summary>
@@ -76,41 +105,41 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public Language[] Languages { get; } = { Language.CSharp };
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "2"},
+            {"Total Trades", "3"},
             {"Average Win", "0%"},
-            {"Average Loss", "0%"},
-            {"Compounding Annual Return", "93.340%"},
-            {"Drawdown", "1.100%"},
-            {"Expectancy", "0"},
-            {"Net Profit", "0.846%"},
-            {"Sharpe Ratio", "6.515"},
-            {"Probabilistic Sharpe Ratio", "67.535%"},
-            {"Loss Rate", "0%"},
+            {"Average Loss", "-0.03%"},
+            {"Compounding Annual Return", "-2.503%"},
+            {"Drawdown", "0.000%"},
+            {"Expectancy", "-1"},
+            {"Net Profit", "-0.032%"},
+            {"Sharpe Ratio", "0"},
+            {"Probabilistic Sharpe Ratio", "0%"},
+            {"Loss Rate", "100%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
             {"Alpha", "0"},
             {"Beta", "0"},
-            {"Annual Standard Deviation", "0.11"},
-            {"Annual Variance", "0.012"},
-            {"Information Ratio", "6.515"},
-            {"Tracking Error", "0.11"},
+            {"Annual Standard Deviation", "0"},
+            {"Annual Variance", "0"},
+            {"Information Ratio", "-0.678"},
+            {"Tracking Error", "0.243"},
             {"Treynor Ratio", "0"},
-            {"Total Fees", "$1.20"},
-            {"Estimated Strategy Capacity", "$8600000.00"},
-            {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
-            {"Fitness Score", "0.124"},
+            {"Total Fees", "$7.40"},
+            {"Estimated Strategy Capacity", "$2100000.00"},
+            {"Lowest Capacity Asset", "ES VMKLFZIH2MTD"},
+            {"Fitness Score", "0.419"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
             {"Sortino Ratio", "79228162514264337593543950335"},
-            {"Return Over Maximum Drawdown", "78.222"},
-            {"Portfolio Turnover", "0.124"},
+            {"Return Over Maximum Drawdown", "-81.557"},
+            {"Portfolio Turnover", "0.837"},
             {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},
             {"Total Insights Analysis Completed", "0"},
@@ -124,7 +153,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "01a751a837beafd90015b2fd82edf994"}
+            {"OrderListHash", "68775c18eb40c1bde212653faec4016e"}
         };
     }
 }
