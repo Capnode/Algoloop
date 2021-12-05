@@ -34,6 +34,7 @@ namespace Algoloop.Wpf.ViewModel
 
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
+        private bool _doSelectedChangedPending;
 
         public StrategiesViewModel(StrategiesModel strategies, MarketsModel markets, SettingModel settings)
         {
@@ -147,8 +148,17 @@ namespace Algoloop.Wpf.ViewModel
         private void DoSelectedChanged(ITreeViewModel vm)
         {
             // No IsBusy here
-            vm?.Refresh();
-            SelectedItem = vm;
+            if (_doSelectedChangedPending) return;
+            try
+            {
+                _doSelectedChangedPending = true;
+                vm?.Refresh();
+                SelectedItem = vm;
+            }
+            finally
+            {
+                _doSelectedChangedPending = false;
+            }
         }
 
         private void DoImportStrategies()
