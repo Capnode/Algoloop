@@ -1355,6 +1355,26 @@ namespace QuantConnect
         }
 
         /// <summary>
+        /// Helper method to determine if a data type implements the Stream reader method
+        /// </summary>
+        public static bool ImplementsStreamReader(this Type baseDataType)
+        {
+            // we know these type implement the streamReader interface lets avoid dynamic reflection call to figure it out
+            if (baseDataType == typeof(TradeBar) || baseDataType == typeof(QuoteBar) || baseDataType == typeof(Tick))
+            {
+                return true;
+            }
+
+            var method = baseDataType.GetMethod("Reader",
+                new[] { typeof(SubscriptionDataConfig), typeof(StreamReader), typeof(DateTime), typeof(bool) });
+            if (method != null && method.DeclaringType == baseDataType)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Breaks the specified string into csv components, all commas are considered separators
         /// </summary>
         /// <param name="str">The string to be broken into csv</param>
@@ -3194,6 +3214,41 @@ namespace QuantConnect
                 case DataNormalizationMode.Raw:
                 default:
                     return data;
+            }
+        }
+
+        /// <summary>
+        /// Thread safe concurrent dictionary order by implementation by using <see cref="SafeEnumeration{TSource,TKey}"/>
+        /// </summary>
+        /// <remarks>See https://stackoverflow.com/questions/47630824/is-c-sharp-linq-orderby-threadsafe-when-used-with-concurrentdictionarytkey-tva</remarks>
+        public static IOrderedEnumerable<KeyValuePair<TSource, TKey>> OrderBySafe<TSource, TKey>(
+            this ConcurrentDictionary<TSource, TKey> source, Func<KeyValuePair<TSource, TKey>, TSource> keySelector
+            )
+        {
+            return source.SafeEnumeration().OrderBy(keySelector);
+        }
+
+        /// <summary>
+        /// Thread safe concurrent dictionary order by implementation by using <see cref="SafeEnumeration{TSource,TKey}"/>
+        /// </summary>
+        /// <remarks>See https://stackoverflow.com/questions/47630824/is-c-sharp-linq-orderby-threadsafe-when-used-with-concurrentdictionarytkey-tva</remarks>
+        public static IOrderedEnumerable<KeyValuePair<TSource, TKey>> OrderBySafe<TSource, TKey>(
+            this ConcurrentDictionary<TSource, TKey> source, Func<KeyValuePair<TSource, TKey>, TKey> keySelector
+            )
+        {
+            return source.SafeEnumeration().OrderBy(keySelector);
+        }
+
+        /// <summary>
+        /// Force concurrent dictionary enumeration using a thread safe implementation
+        /// </summary>
+        /// <remarks>See https://stackoverflow.com/questions/47630824/is-c-sharp-linq-orderby-threadsafe-when-used-with-concurrentdictionarytkey-tva</remarks>
+        public static IEnumerable<KeyValuePair<TSource, TKey>> SafeEnumeration<TSource, TKey>(
+            this ConcurrentDictionary<TSource, TKey> source)
+        {
+            foreach (var kvp in source)
+            {
+                yield return kvp;
             }
         }
 
