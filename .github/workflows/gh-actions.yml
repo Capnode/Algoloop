@@ -1,4 +1,4 @@
-name: Build & Test Lean
+name: Build & Test Algoloop
 
 on:
   push:
@@ -16,10 +16,10 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build
-        run: dotnet build /p:Configuration=Release /v:quiet /p:WarningLevel=1 QuantConnect.Lean.sln
+        run: dotnet build /p:Configuration=Release /v:quiet /p:WarningLevel=1 Algoloop.sln
 
       - name: Run Tests
-        run: dotnet test ./Tests/bin/Release/QuantConnect.Tests.dll --filter TestCategory!=TravisExclude -- TestRunParameters.Parameter\(name=\"log-handler\", value=\"ConsoleErrorLogHandler\"\)
+        run: dotnet test ./Tests/bin/Release/Algoloop.Tests.dll --filter TestCategory!=TravisExclude -- TestRunParameters.Parameter\(name=\"log-handler\", value=\"ConsoleErrorLogHandler\"\)
 
       - name: Generate & Publish python stubs
         if: startsWith(github.ref, 'refs/tags/')

@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build
-        run: dotnet build /p:Configuration=Release /v:quiet /p:WarningLevel=1 QuantConnect.Lean.sln
+        run: dotnet build /p:Configuration=Release /v:quiet /p:WarningLevel=1 Algoloop.sln
 
       - name: Run Tests
-        run: dotnet test ./Tests/bin/Release/QuantConnect.Tests.dll --filter TestCategory=RegressionTests -- TestRunParameters.Parameter\(name=\"log-handler\", value=\"ConsoleErrorLogHandler\"\) TestRunParameters.Parameter\(name=\"reduced-disk-size\", value=\"true\"\)
+        run: dotnet test ./Tests/bin/Release/Algoloop.Tests.dll --filter TestCategory=RegressionTests -- TestRunParameters.Parameter\(name=\"log-handler\", value=\"ConsoleErrorLogHandler\"\) TestRunParameters.Parameter\(name=\"reduced-disk-size\", value=\"true\"\)
