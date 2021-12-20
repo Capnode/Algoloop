@@ -99,12 +99,13 @@ namespace Algoloop.Wpf.Provider
             }
 
             string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
-                DateTime fromDate = market.LastDate < _firstDate ? _firstDate : market.LastDate.Date;
-                DateTime toDate = fromDate.AddDays(1);
-                string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
-                string to = toDate.AddTicks(-1).ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
-                string[] args =
-                {
+            DateTime lastDate = market.LastDate.ToUniversalTime();
+            DateTime fromDate = lastDate < _firstDate ? _firstDate : lastDate.Date;
+            DateTime toDate = fromDate.AddDays(1);
+            string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string to = toDate.AddTicks(-1).ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string[] args =
+            {
                 "--app=DukascopyDownloader",
                 $"--from-date={from}",
                 $"--to-date={to}",
@@ -119,7 +120,7 @@ namespace Algoloop.Wpf.Provider
                 ["data-folder"] = _settings.DataFolder
             };
 
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             RunProcess("QuantConnect.ToolBox.exe", args, config);
             if (toDate > now)
             {
@@ -127,7 +128,7 @@ namespace Algoloop.Wpf.Provider
             }
             else
             {
-                market.LastDate = toDate;
+                market.LastDate = toDate.ToLocalTime();
             }
 
             UpdateSymbols(market);
