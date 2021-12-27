@@ -18,7 +18,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Logging;
 using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 
@@ -49,7 +48,8 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_no_symbols()
         {
-            var date = new DateTime(2019, 05, 01);
+            var utcStart = new DateTime(2019, 05, 01, 0, 0, 0, DateTimeKind.Utc);
+            var date = utcStart.ToLocalTime();
             var market = new ProviderModel
             {
                 Active = true,
@@ -72,7 +72,8 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_one_symbol()
         {
-            var date = new DateTime(2019, 05, 01);
+            var utcStart = new DateTime(2019, 05, 01, 0, 0, 0, DateTimeKind.Utc);
+            var date = utcStart.ToLocalTime();
             var market = new ProviderModel
             {
                 Active = true,
@@ -97,7 +98,8 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_two_symbols()
         {
-            var date = new DateTime(2019, 05, 01);
+            var utcStart = new DateTime(2019, 05, 01, 0, 0, 0, DateTimeKind.Utc);
+            var date = utcStart.ToLocalTime();
             var market = new ProviderModel
             {
                 Active = true,
@@ -124,7 +126,8 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_two_symbols_tick()
         {
-            var date = new DateTime(2019, 05, 01);
+            var utcStart = new DateTime(2019, 05, 01, 0, 0, 0, DateTimeKind.Utc);
+            var date = utcStart.ToLocalTime();
             var market = new ProviderModel
             {
                 Active = true,
@@ -160,7 +163,8 @@ namespace Algoloop.Tests.Provider
         [ExpectedException(typeof(ApplicationException), "An invalid symbol name was accepted")]
         public void Download_invalid_symbol()
         {
-            var date = new DateTime(2019, 05, 01);
+            var utcStart = new DateTime(2019, 05, 01, 0, 0, 0, DateTimeKind.Utc);
+            var date = utcStart.ToLocalTime();
             var market = new ProviderModel
             {
                 Active = true,
@@ -185,13 +189,14 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_today()
         {
-            DateTime today = DateTime.Today;
+            DateTime utcStart = DateTime.UtcNow.Date;
+            var date = utcStart.ToLocalTime();
             var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
                 Provider = "dukascopy",
-                LastDate = today,
+                LastDate = date,
                 Resolution = Resolution.Second
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
@@ -201,7 +206,7 @@ namespace Algoloop.Tests.Provider
             provider.GetMarketData(market);
 
             Assert.IsFalse(market.Active);
-            Assert.AreEqual(today, market.LastDate);
+            Assert.AreEqual(date, market.LastDate);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }
@@ -209,13 +214,14 @@ namespace Algoloop.Tests.Provider
         [TestMethod()]
         public void Download_yesterday()
         {
-            DateTime today = DateTime.Today;
+            DateTime utcStart = DateTime.UtcNow.Date;
+            var date = utcStart.ToLocalTime();
             var market = new ProviderModel
             {
                 Active = true,
                 Name = "Dukascopy",
                 Provider = "dukascopy",
-                LastDate = today.AddDays(-1),
+                LastDate = date.AddDays(-1),
                 Resolution = Resolution.Second
             };
             market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
@@ -225,7 +231,7 @@ namespace Algoloop.Tests.Provider
             provider.GetMarketData(market);
 
             Assert.IsTrue(market.Active);
-            Assert.AreEqual(today, market.LastDate);
+            Assert.AreEqual(date, market.LastDate);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
         }

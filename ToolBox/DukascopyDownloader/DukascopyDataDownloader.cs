@@ -141,24 +141,20 @@ namespace QuantConnect.ToolBox.DukascopyDownloader
                         {
                             bytes = client.DownloadData(url);
                         }
-                        catch (Exception exception)
+                        catch (WebException webEx)
                         {
-                            var webEx = exception as WebException;
-                            if (webEx != null)
+                            var response = (HttpWebResponse)webEx.Response;
+                            if (response == default) throw;
+                            if (response.StatusCode >= HttpStatusCode.InternalServerError)
                             {
-                                var response = (HttpWebResponse)webEx.Response;
-                                if (response.StatusCode >= HttpStatusCode.InternalServerError)
-                                {
-                                    Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
-                                    continue;
-                                }
-                                else if (response.StatusCode == HttpStatusCode.NotFound)
-                                {
-                                    break;
-                                }
+                                Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
+                                continue;
                             }
-                            Log.Error(exception, url);
-                            yield break;
+                            else if (response.StatusCode == HttpStatusCode.NotFound)
+                            {
+                                break;
+                            }
+                            throw;
                         }
                         if (bytes != null && bytes.Length > 0)
                         {

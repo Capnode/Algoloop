@@ -101,7 +101,7 @@ namespace Algoloop.Wpf.Provider
             string resolution = market.Resolution.Equals(Resolution.Tick) ? "all" : market.Resolution.ToString();
             DateTime lastDate = market.LastDate.ToUniversalTime();
             DateTime fromDate = lastDate < _firstDate ? _firstDate : lastDate;
-            DateTime toDate = fromDate.AddDays(1);
+            DateTime toDate = fromDate.AddDays(1).Date;
             string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string to = toDate.AddTicks(-1).ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string[] args =
