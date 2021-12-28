@@ -290,7 +290,14 @@ namespace Algoloop.Wpf.ViewModel
         internal void CloneStrategy(StrategyModel strategyModel)
         {
             var strategy = new StrategyViewModel(this, strategyModel, _markets, _settings);
-            Strategies.Add(strategy);
+            if (_parent is StrategyViewModel strategyVm)
+            {
+                strategyVm.Strategies.Add(strategy);
+            }
+            else if (_parent is StrategiesViewModel strategiesVm)
+            {
+                strategiesVm.Strategies.Add(strategy);
+            }
         }
 
         private void RaiseCommands()
