@@ -24,7 +24,7 @@
   // engine
   "data-folder": "../../../Data/",
 
-  // debugging configuration - options for debugging-method LocalCmdLine, VisualStudio, PTVSD, PyCharm
+  // debugging configuration - options for debugging-method LocalCmdLine, VisualStudio, Debugpy, PyCharm
   "debugging": false,
   "debugging-method": "LocalCmdline",
 
@@ -152,9 +152,9 @@
   "tt-order-routing-port": "",
   "tt-log-fix-messages": false,
 
-  // Required to access data from Quandl
-  // To get your access token go to https://www.quandl.com/account/api
-  "quandl-auth-token": "",
+  // Required to access data from Nasdaq
+  // To get your access token go to https://data.nasdaq.com/account/profile
+  "nasdaq-auth-token": "",
 
   // Required to access data from Tiingo
   // To get your access token go to https://www.tiingo.com
@@ -193,6 +193,11 @@
   "ftx-account-tier": "Tier1", // accept "Tier1", "Tier2", "Tier3", "Tier4", "Tier5", "Tier6", "VIP1", "VIP2", "VIP3", "MM1", "MM2", "MM3"
   "ftx-api-secret": "",
   "ftx-api-key": "",
+
+  // FTX.US configuration
+  "ftxus-account-tier": "Tier1", // accept "Tier1", "Tier2", "Tier3", "Tier4", "Tier5", "Tier6", "Tier7", "Tier8", "Tier9", "VIP1", "VIP2", "MM1", "MM2", "MM3"
+  "ftxus-api-secret": "",
+  "ftxus-api-key": "",
 
   // parameters to set in the algorithm (the below are just samples)
   "parameters": {
@@ -431,12 +436,29 @@
       "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler",
       "history-provider": "BrokerageHistoryProvider"
     },
+
+    // defines the 'live-ftx' environment
     "live-ftx": {
       "live-mode": true,
 
       // real brokerage implementations require the BrokerageTransactionHandler
       "live-mode-brokerage": "QuantConnect.FTXBrokerage.FTXBrokerage",
       "data-queue-handler": [ "QuantConnect.FTXBrokerage.FTXBrokerage" ],
+      "setup-handler": "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler",
+      "result-handler": "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler",
+      "data-feed-handler": "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed",
+      "real-time-handler": "QuantConnect.Lean.Engine.RealTime.LiveTradingRealTimeHandler",
+      "transaction-handler": "QuantConnect.Lean.Engine.TransactionHandlers.BrokerageTransactionHandler",
+      "history-provider": "BrokerageHistoryProvider"
+    },
+
+    // defines the 'live-ftxus' environment
+    "live-ftxus": {
+      "live-mode": true,
+
+      // real brokerage implementations require the BrokerageTransactionHandler
+      "live-mode-brokerage": "QuantConnect.FTXBrokerage.FTXUSBrokerage",
+      "data-queue-handler": [ "QuantConnect.FTXBrokerage.FTXUSBrokerage" ],
       "setup-handler": "QuantConnect.Lean.Engine.Setup.BrokerageSetupHandler",
       "result-handler": "QuantConnect.Lean.Engine.Results.LiveTradingResultHandler",
       "data-feed-handler": "QuantConnect.Lean.Engine.DataFeeds.LiveTradingDataFeed",

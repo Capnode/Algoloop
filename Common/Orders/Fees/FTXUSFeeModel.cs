@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -13,33 +13,22 @@
  * limitations under the License.
 */
 
-using QuantConnect.Data;
-using QuantConnect.Data.Custom;
-using System;
-using System.Collections.Generic;
-
-namespace QuantConnect.Python
+namespace QuantConnect.Orders.Fees
 {
     /// <summary>
-    /// Dynamic data class for Python algorithms.
+    /// Provides an implementation of <see cref="FeeModel"/> that models FTX order fees
+    /// https://help.ftx.us/hc/en-us/articles/360043579273-Fees
     /// </summary>
-    public class PythonQuandl : Quandl
+    public class FTXUSFeeModel : FTXFeeModel
     {
         /// <summary>
-        /// Constructor for initialising the PythonQuandl class
+        /// Tier 1 maker fees
         /// </summary>
-        public PythonQuandl() : base("Close")
-        {
-            //Empty constructor required for fast-reflection initialization
-        }
-
+        public override decimal MakerFee => 0.001m;
+        
         /// <summary>
-        /// Constructor for creating customized quandl instance which doesn't use "Close" as its value item.
+        /// Tier 1 taker fees
         /// </summary>
-        /// <param name="valueColumnName"></param>
-        public PythonQuandl(string valueColumnName) : base(valueColumnName)
-        {
-            //
-        }
+        public override decimal TakerFee => 0.004m;
     }
 }
