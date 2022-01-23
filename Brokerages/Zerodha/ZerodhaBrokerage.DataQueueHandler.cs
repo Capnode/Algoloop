@@ -42,7 +42,7 @@ namespace QuantConnect.Brokerages.Zerodha
                 job.BrokerageData["zerodha-access-token"],
                 null,
                 null,
-                Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager"))
+                Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager"), forceTypeNameOnExisting: false)
             );
 
             if (!IsConnected)
@@ -94,7 +94,9 @@ namespace QuantConnect.Brokerages.Zerodha
             // Include future options as a special case with no matching market, otherwise
             // our subscriptions are removed without any sort of notice.
             return
-                (securityType == SecurityType.Equity) && (market == Market.India);
+                (securityType == SecurityType.Equity ||
+                securityType == SecurityType.Index) && 
+                (market == Market.India);
         }
 
         #endregion IDataQueueHandler implementation

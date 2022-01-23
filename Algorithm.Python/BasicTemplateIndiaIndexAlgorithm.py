@@ -14,27 +14,36 @@
 from AlgorithmImports import *
 
 ### <summary>
-### Basic template framework algorithm uses framework components to define the algorithm.
+### Basic Template India Index Algorithm uses framework components to define the algorithm.
 ### </summary>
 ### <meta name="tag" content="using data" />
 ### <meta name="tag" content="using quantconnect" />
 ### <meta name="tag" content="trading and orders" />
-class BasicTemplateIndiaAlgorithm(QCAlgorithm):
+class BasicTemplateIndiaIndexAlgorithm(QCAlgorithm):
     '''Basic template framework algorithm uses framework components to define the algorithm.'''
 
     def Initialize(self):
         '''Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.'''
 
-        self.SetAccountCurrency("INR")  #Set Account Currency 
-        self.SetStartDate(2019, 1, 23)  #Set Start Date
-        self.SetEndDate(2019, 10, 31)   #Set End Date
-        self.SetCash(100000)            #Set Strategy Cash
-        # Find more symbols here: http://quantconnect.com/data
-        self.AddEquity("YESBANK", Resolution.Minute, Market.India)
-        self.Debug("numpy test >>> print numpy.pi: " + str(np.pi))
+        self.SetAccountCurrency("INR") #Set Account Currency
+        self.SetStartDate(2019, 1, 1)  #Set Start Date
+        self.SetEndDate(2019, 1, 5)    #Set End Date
+        self.SetCash(1000000)          #Set Strategy Cash
 
+        # Use indicator for signal; but it cannot be traded
+        self.Nifty = self.AddIndex("NIFTY50", Resolution.Minute, Market.India).Symbol
+        # Trade Index based ETF
+        self.NiftyETF = self.AddEquity("JUNIORBEES", Resolution.Minute, Market.India).Symbol
+   
         # Set Order Prperties as per the requirements for order placement
         self.DefaultOrderProperties = IndiaOrderProperties(Exchange.NSE)
+
+        # Define indicator
+        self._emaSlow = self.EMA(self.Nifty, 80);
+        self._emaFast = self.EMA(self.Nifty, 200);
+
+        self.Debug("numpy test >>> print numpy.pi: " + str(np.pi))
+
 
     def OnData(self, data):
         '''OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
@@ -42,9 +51,21 @@ class BasicTemplateIndiaAlgorithm(QCAlgorithm):
         Arguments:
             data: Slice object keyed by symbol containing the stock data
         '''
-        if not self.Portfolio.Invested:
-            self.MarketOrder("YESBANK", 1)
 
-    def OnOrderEvent(self, orderEvent):
-        if orderEvent.Status == OrderStatus.Filled:
-            self.Debug("Purchased Stock: {0}".format(orderEvent.Symbol))
+        if not data.Bars.ContainsKey(self.Nifty) or not data.Bars.ContainsKey(self.NiftyETF):
+            return
+
+        if not self._emaSlow.IsReady:
+            return
+
+        if self._emaFast > self._emaSlow:
+            if not self.Portfolio.Invested:
+                self.marketTicket = self.MarketOrder(self.NiftyETF, 1)
+        else:
+            self.Liquidate()
+
+
+    def OnEndOfAlgorithm(self):
+        if self.Portfolio[self.Nifty].TotalSaleVolume > 0:
+            raise Exception("Index is not tradable.")
+

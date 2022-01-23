@@ -11,109 +11,133 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
 
+using System;
 using QuantConnect.Data;
 using System.Collections.Generic;
+using QuantConnect.Indicators;
 using QuantConnect.Interfaces;
 using QuantConnect.Orders;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Basic template India algorithm simply initializes the date range and cash. This is a skeleton
-    /// framework you can use for designing an algorithm.
+    /// This example demonstrates how to add index asset types.
     /// </summary>
     /// <meta name="tag" content="using data" />
-    /// <meta name="tag" content="using quantconnect" />
-    /// <meta name="tag" content="trading and orders" />
-    public class BasicTemplateIndiaAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    /// <meta name="tag" content="benchmarks" />
+    /// <meta name="tag" content="indexes" />
+    public class BasicTemplateIndiaIndexAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        protected Symbol Nifty;
+        protected Symbol NiftyETF;
+        private ExponentialMovingAverage _emaSlow;
+        private ExponentialMovingAverage _emaFast;
+
         /// <summary>
-        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
+        /// Initialize your algorithm and add desired assets.
         /// </summary>
         public override void Initialize()
         {
-            SetAccountCurrency("INR");  //Set Account Currency
-            SetStartDate(2019, 1, 23);  //Set Start Date
-            SetEndDate(2019, 10, 31);   //Set End Date
-            SetCash(100000);            //Set Strategy Cash
+            SetAccountCurrency("INR"); //Set Account Currency
+            SetStartDate(2019, 1, 1);  //Set End Date
+            SetEndDate(2019, 1, 5);    //Set End Date
+            SetCash(1000000);          //Set Strategy Cash
 
-            // Find more symbols here: http://quantconnect.com/data
-            // Equities Resolutions: Tick, Second, Minute, Hour, Daily.
-            AddEquity("YESBANK", Resolution.Minute, Market.India);
+            // Use indicator for signal; but it cannot be traded
+            Nifty = AddIndex("NIFTY50", Resolution.Minute, Market.India).Symbol;
+
+            //Trade Index based ETF
+            NiftyETF = AddEquity("JUNIORBEES", Resolution.Minute, Market.India).Symbol;
 
             //Set Order Prperties as per the requirements for order placement
             DefaultOrderProperties = new IndiaOrderProperties(exchange: Exchange.NSE);
-            //override default productType value set in config.json if needed - order specific productType value
-            //DefaultOrderProperties = new IndiaOrderProperties(exchange: Exchange.NSE, IndiaOrderProperties.IndiaProductType.CNC);
 
-            // General Debug statement for acknowledgement
-            Debug("Intialization Done");
+            _emaSlow = EMA(Nifty, 80);
+            _emaFast = EMA(Nifty, 200);
         }
 
         /// <summary>
-        /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
+        /// Index EMA Cross trading underlying.
         /// </summary>
-        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
-        public override void OnData(Slice data)
+        public override void OnData(Slice slice)
         {
-            if (!Portfolio.Invested)
+            if (!slice.Bars.ContainsKey(Nifty) || !slice.Bars.ContainsKey(NiftyETF))
             {
-                var marketTicket = MarketOrder("YESBANK", 1);
+                return;
+            }
+
+            // Warm up indicators
+            if (!_emaSlow.IsReady)
+            {
+                return;
+            }
+
+            if (_emaFast > _emaSlow)
+            {
+                if (!Portfolio.Invested)
+                {
+                    var marketTicket = MarketOrder(NiftyETF, 1);
+                }
+            }
+            else
+            {
+                Liquidate();
             }
         }
 
-        public override void OnOrderEvent(OrderEvent orderEvent)
+        public override void OnEndOfAlgorithm()
         {
-            if (orderEvent.Status.IsFill())
+            if (Portfolio[Nifty].TotalSaleVolume > 0)
             {
-                Debug($"Purchased Complete: {orderEvent.Symbol}");
+                throw new Exception("Index is not tradable.");
             }
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
-        public bool CanRunLocally { get; } = true;
+        public virtual bool CanRunLocally { get; } = true;
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public virtual Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "1"},
+            {"Total Trades", "6"},
             {"Average Win", "0%"},
-            {"Average Loss", "0%"},
-            {"Compounding Annual Return", "-0.010%"},
+            {"Average Loss", "0.00%"},
+            {"Compounding Annual Return", "-0.395%"},
             {"Drawdown", "0.000%"},
-            {"Expectancy", "0"},
-            {"Net Profit", "-0.008%"},
-            {"Sharpe Ratio", "-1.183"},
-            {"Probabilistic Sharpe Ratio", "0.001%"},
-            {"Loss Rate", "0%"},
+            {"Expectancy", "-1"},
+            {"Net Profit", "-0.004%"},
+            {"Sharpe Ratio", "-23.595"},
+            {"Probabilistic Sharpe Ratio", "0%"},
+            {"Loss Rate", "100%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
             {"Alpha", "0"},
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-1.183"},
+            {"Information Ratio", "-23.595"},
             {"Tracking Error", "0"},
             {"Treynor Ratio", "0"},
-            {"Total Fees", "$6.00"},
-            {"Estimated Strategy Capacity", "$61000000000.00"},
-            {"Lowest Capacity Asset", "YESBANK UL"},
+            {"Total Fees", "$36.00"},
+            {"Estimated Strategy Capacity", "$74000.00"},
+            {"Lowest Capacity Asset", "JUNIORBEES UL"},
             {"Fitness Score", "0"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
-            {"Sortino Ratio", "-0.247"},
-            {"Return Over Maximum Drawdown", "-1.104"},
+            {"Sortino Ratio", "-29.6"},
+            {"Return Over Maximum Drawdown", "-123.624"},
             {"Portfolio Turnover", "0"},
             {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},
@@ -128,7 +152,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "6cc69218edd7bd461678b9ee0c575db5"}
+            {"OrderListHash", "4637f26543287548b28a3c296db055d3"}
         };
     }
 }
