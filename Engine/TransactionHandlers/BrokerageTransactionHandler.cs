@@ -38,6 +38,7 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
     {
         private IAlgorithm _algorithm;
         private IBrokerage _brokerage;
+        private bool _loggedFeeAdjustmentWarning;
 
         // Counter to keep track of total amount of processed orders
         private int _totalOrderCount;
@@ -1011,6 +1012,26 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
                                 order.Tag += " - " + orderEvent.Message;
                             }
                         }
+
+                        if (_algorithm.BrokerageModel.AccountType == AccountType.Cash
+                            && order.Direction == OrderDirection.Buy
+                            && CurrencyPairUtil.TryDecomposeCurrencyPair(orderEvent.Symbol, out var baseCurrency, out _)
+                            && orderEvent.OrderFee.Value.Currency == baseCurrency)
+                        {
+                            // fees are in the base currency, so we have to subtract them from the filled quantity
+                            // else the virtual position will bigger than the real size and we might no be able to liquidate
+                            orderEvent.FillQuantity -= orderEvent.OrderFee.Value.Amount;
+                            orderEvent.OrderFee = new ModifiedFillQuantityOrderFee(orderEvent.OrderFee.Value);
+
+                            if (!_loggedFeeAdjustmentWarning)
+                            {
+                                _loggedFeeAdjustmentWarning = true;
+                                const string message = "When buying currency pairs, using Cash account types, fees in base currency" +
+                                    " will be deducted from the filled quantity so virtual positions reflect actual holdings.";
+                                Log.Trace($"BrokerageTransactionHandler.HandleOrderEvent(): {message}");
+                                _algorithm.Debug(message);
+                            }
+                        }
                         break;
 
                     case OrderStatus.UpdateSubmitted:
@@ -1207,10 +1228,14 @@ namespace QuantConnect.Lean.Engine.TransactionHandlers
                     {
                         if (e.Position == 0)
                         {
-                            Log.Trace(
-                                "BrokerageTransactionHandler.HandleOptionNotification(): clearing position for expired option holding: " +
-                                $"Symbol: {e.Symbol.Value}, " +
-                                $"Quantity: {security.Holdings.Quantity}");
+                            // only log always in live trading, in backtesting log if not 0 holdings
+                            if (_algorithm.LiveMode || security.Holdings.Quantity != 0)
+                            {
+                                Log.Trace(
+                                    "BrokerageTransactionHandler.HandleOptionNotification(): clearing position for expired option holding: " +
+                                    $"Symbol: {e.Symbol.Value}, " +
+                                    $"Holdings: {security.Holdings.Quantity}");
+                            }
 
                             var quantity = -security.Holdings.Quantity;
 
