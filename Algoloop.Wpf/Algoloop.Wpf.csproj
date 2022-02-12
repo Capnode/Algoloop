@@ -232,7 +232,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="97.1.60" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="97.1.61" />
     <PackageReference Include="chromiumembeddedframework.runtime.win-x64" Version="97.1.6" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.6" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.2" />
@@ -242,9 +242,9 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
-    <PackageReference Include="StockSharp.Algo" Version="5.0.122" />
-    <PackageReference Include="StockSharp.Configuration" Version="5.0.121" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.122" />
+    <PackageReference Include="StockSharp.Algo" Version="5.0.123" />
+    <PackageReference Include="StockSharp.Configuration" Version="5.0.122" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.123" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
