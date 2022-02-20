@@ -27,6 +27,7 @@ using System.Windows.Controls;
 
 namespace Algoloop.Wpf.View
 {
+    // StockShart doc: https://doc.stocksharp.com/topics/StockSharpAbout.html
     public partial class StockChartView : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty = 
@@ -43,6 +44,7 @@ namespace Algoloop.Wpf.View
             _chart.IsInteracted = true;
             _chart.IsAutoRange = true;
             _chart.IsAutoScroll = true;
+            _chart.MinimumRange = int.MaxValue;
             _chart.ShowOverview = true;
             _chart.ShowPerfStats = false;
             _chart.AllowAddCandles = false;

@@ -21,6 +21,6 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <sx:ChartPanel x:Name="_chart"/>
+        <sx:Chart x:Name="_chart"/>
     </DockPanel>
 </UserControl>
