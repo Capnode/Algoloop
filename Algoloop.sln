@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30717.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 15.0.0.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Lean.Launcher", "Launcher\QuantConnect.Lean.Launcher.csproj", "{09E7B916-E58B-4021-BD8B-C10B4446E226}"
 EndProject
@@ -58,8 +58,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Optimizer", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Optimizer.Launcher", "Optimizer.Launcher\QuantConnect.Optimizer.Launcher.csproj", "{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop", "Algoloop\Algoloop.csproj", "{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Brokerages", "Algoloop.Brokerages\Algoloop.Brokerages.csproj", "{D3A6E48F-798D-4547-BB6B-60D37C484F67}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Capnode.Wpf", "Capnode.Wpf\Capnode.Wpf.csproj", "{769D993C-2867-4212-BE80-B70E4862EBC5}"
@@ -72,6 +70,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Core", "Algoloop.Core\Algoloop.Core.csproj", "{7B3208BA-E460-44D2-84C1-4343A95738AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -239,14 +239,6 @@ Global
 		{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}.Release|x64.ActiveCfg = Release|Any CPU
 		{D46D2A8D-340C-4B40-8EE6-6BAA7B1198AB}.Release|x64.Build.0 = Release|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Debug|x64.Build.0 = Debug|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Release|x64.ActiveCfg = Release|Any CPU
-		{23D560BD-CBEF-4C6B-A07E-65B5D31C3A6C}.Release|x64.Build.0 = Release|Any CPU
 		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3A6E48F-798D-4547-BB6B-60D37C484F67}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -279,6 +271,14 @@ Global
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|x64.ActiveCfg = Release|Any CPU
 		{4355918B-3B14-4BBB-B1A2-D8155FED4E64}.Release|x64.Build.0 = Release|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Debug|x64.Build.0 = Debug|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Release|x64.ActiveCfg = Release|Any CPU
+		{7B3208BA-E460-44D2-84C1-4343A95738AD}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -22,7 +22,7 @@
     <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Algoloop\Algoloop.csproj" />
+    <ProjectReference Include="..\Algoloop\Algoloop.Core.csproj" />
     <ProjectReference Include="..\Brokerages\QuantConnect.Brokerages.csproj" />
     <ProjectReference Include="..\Common\QuantConnect.csproj" />
     <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj" />
