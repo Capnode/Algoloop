@@ -13,29 +13,29 @@
  * limitations under the License.
 */
 
-using Moq;
+using System;
 using NUnit.Framework;
 using QuantConnect.Brokerages;
-using QuantConnect.Tests.Brokerages;
-using QuantConnect.Orders;
 
 namespace QuantConnect.Tests.Common.Brokerages
 {
+
     [TestFixture, Parallelizable(ParallelScope.All)]
-    class KrakenBrokerageModelTests
+    public class BinanceUSBrokerageModelTests : BinanceBrokerageModelTests
     {
-        private readonly KrakenBrokerageModel _krakenBrokerageModel = new KrakenBrokerageModel();
+        protected override BinanceBrokerageModel BinanceBrokerageModel => new BinanceUSBrokerageModel();
 
-        [TestCase(0.01, true)]
-        [TestCase(0.00009, false)]
-        public void CanSubmitOrder_WhenQuantityIsLargeEnough(decimal orderQuantity, bool isValidOrderQuantity)
+        [Test]
+        public void ThrowsError_IfMarginAccount()
         {
-            BrokerageMessageEvent message;
-            var order = new Mock<Order>();
+            Assert.Throws<ArgumentException>(() => new BinanceUSBrokerageModel(AccountType.Margin));
+        }
 
-            order.Object.Quantity = orderQuantity;
-
-            Assert.AreEqual(isValidOrderQuantity, _krakenBrokerageModel.CanSubmitOrder(TestsHelpers.GetSecurity(market: Market.Kraken), order.Object, out message));
+        [Test]
+        public override void CryptoMapped()
+        {
+            var defaultMarkets = BinanceBrokerageModel.DefaultMarkets;
+            Assert.AreEqual(Market.BinanceUS, defaultMarkets[SecurityType.Crypto]);
         }
     }
 }
