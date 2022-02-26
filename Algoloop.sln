@@ -5,8 +5,6 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "Algoloop (Package)", "Algoloop (Package)\Algoloop (Package).wapproj", "{20043E84-BD72-493D-9AA5-B5FC5727242F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop", "Algoloop\Algoloop.csproj", "{2328DC1C-BB58-46B3-B389-FA31210311A9}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Brokerages", "Algoloop.Brokerages\Algoloop.Brokerages.csproj", "{3BC71AF6-C753-44EF-9F5B-408E9667A6A2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Core", "Algoloop.Core\Algoloop.Core.csproj", "{B60108B9-5190-46E3-BA32-0E248FA17F7D}"
@@ -63,6 +61,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Tests", "Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.ToolBox", "ToolBox\QuantConnect.ToolBox.csproj", "{733B4916-5395-405F-8178-32F29D8298A3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.WinUI", "Algoloop.WinUI\Algoloop.WinUI.csproj", "{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,22 +99,6 @@ Global
 		{20043E84-BD72-493D-9AA5-B5FC5727242F}.Release|x86.ActiveCfg = Release|x86
 		{20043E84-BD72-493D-9AA5-B5FC5727242F}.Release|x86.Build.0 = Release|x86
 		{20043E84-BD72-493D-9AA5-B5FC5727242F}.Release|x86.Deploy.0 = Release|x86
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|Any CPU.Build.0 = Debug|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|arm64.ActiveCfg = Debug|arm64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|arm64.Build.0 = Debug|arm64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|x64.ActiveCfg = Debug|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|x64.Build.0 = Debug|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|x86.ActiveCfg = Debug|x86
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Debug|x86.Build.0 = Debug|x86
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|Any CPU.ActiveCfg = Release|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|Any CPU.Build.0 = Release|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|arm64.ActiveCfg = Release|arm64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|arm64.Build.0 = Release|arm64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|x64.ActiveCfg = Release|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|x64.Build.0 = Release|x64
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|x86.ActiveCfg = Release|x86
-		{2328DC1C-BB58-46B3-B389-FA31210311A9}.Release|x86.Build.0 = Release|x86
 		{3BC71AF6-C753-44EF-9F5B-408E9667A6A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3BC71AF6-C753-44EF-9F5B-408E9667A6A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BC71AF6-C753-44EF-9F5B-408E9667A6A2}.Debug|arm64.ActiveCfg = Debug|Any CPU
@@ -555,6 +539,22 @@ Global
 		{733B4916-5395-405F-8178-32F29D8298A3}.Release|x64.Build.0 = Release|Any CPU
 		{733B4916-5395-405F-8178-32F29D8298A3}.Release|x86.ActiveCfg = Release|Any CPU
 		{733B4916-5395-405F-8178-32F29D8298A3}.Release|x86.Build.0 = Release|Any CPU
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|Any CPU.Build.0 = Debug|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|arm64.ActiveCfg = Debug|arm64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|arm64.Build.0 = Debug|arm64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|x64.ActiveCfg = Debug|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|x64.Build.0 = Debug|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|x86.ActiveCfg = Debug|x86
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Debug|x86.Build.0 = Debug|x86
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|Any CPU.ActiveCfg = Release|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|Any CPU.Build.0 = Release|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|arm64.ActiveCfg = Release|arm64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|arm64.Build.0 = Release|arm64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|x64.ActiveCfg = Release|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|x64.Build.0 = Release|x64
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|x86.ActiveCfg = Release|x86
+		{8A72B2CF-AFC2-41AC-85C6-DE37FA7BA66E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
