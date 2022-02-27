@@ -15,4 +15,10 @@
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22000.194" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Algoloop.Core\Algoloop.Core.csproj" />
+    <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
+    <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
+  </ItemGroup>
 </Project>
