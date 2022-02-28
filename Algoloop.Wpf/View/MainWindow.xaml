@@ -6,7 +6,7 @@
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     xmlns:view="clr-namespace:Algoloop.Wpf.View"
     xmlns:viewsupport="clr-namespace:Algoloop.Wpf.ViewSupport"
-    xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+    xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     DataContext="{Binding Source={StaticResource Locator}, Path=MainViewModel}"
     Closing="Window_Closing"
     mc:Ignorable="d"
@@ -98,10 +98,10 @@
             <TabItem
                 Header="Research"
                 Visibility="{Binding ResearchViewModel.Initialized, Converter={viewsupport:BooleanToVisibilityConverter}}">
-                <wpf:ChromiumWebBrowser
+                <wv2:WebView2
                     x:Name="Browser"
-                    Address="{Binding ResearchViewModel.Source}">
-                </wpf:ChromiumWebBrowser>
+                    Source="{Binding ResearchViewModel.Source}">
+                </wv2:WebView2>
             </TabItem>
             <TabItem Header="{Binding LogViewModel.Logs.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
                 <view:LogView />
