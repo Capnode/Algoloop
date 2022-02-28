@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
     <LangVersion>latest</LangVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -53,7 +53,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Content\AppData\Markets.json">
@@ -188,8 +187,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
     <ProjectReference Include="..\Algoloop.Core\Algoloop.Core.csproj" />
-    <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
-    <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
     <ProjectReference Include="..\Algorithm.Framework\QuantConnect.Algorithm.Framework.csproj" />
     <ProjectReference Include="..\AlgorithmFactory\QuantConnect.AlgorithmFactory.csproj" />
