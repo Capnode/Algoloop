@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -19,10 +19,9 @@ using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace Algoloop.
-    Support
+namespace Algoloop.Model.Converter
 {
-    public class DateEditor : ITypeEditor
+    internal class DateEditor : ITypeEditor
     {
         public FrameworkElement ResolveEditor(PropertyItem propertyItem)
         {

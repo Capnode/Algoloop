@@ -49,7 +49,6 @@
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
     <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
     <ProjectReference Include="..\Algoloop.Wpf\Algoloop.Wpf.csproj" />
-    <ProjectReference Include="..\Algoloop.Core\Algoloop.Model.csproj" />
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
     <ProjectReference Include="..\Common\QuantConnect.csproj" />
     <ProjectReference Include="..\Configuration\QuantConnect.Configuration.csproj" />

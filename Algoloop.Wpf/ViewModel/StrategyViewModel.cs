@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Support;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.ViewSupport;
 using Capnode.Wpf.DataGrid;

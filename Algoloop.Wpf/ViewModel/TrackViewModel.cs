@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Support;
 using Algoloop.Wpf.Common;
 using Algoloop.Wpf.Lean;
 using Algoloop.Wpf.Properties;

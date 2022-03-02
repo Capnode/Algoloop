@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,7 +12,6 @@
  * limitations under the License.
 */
 
-using Algoloop.Model;
 using QuantConnect.AlgorithmFactory;
 using System;
 using System.Collections.Generic;
@@ -21,9 +20,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Algoloop.Support
+namespace Algoloop.Model.Converter
 {
-    public class AlgorithmNameConverter : TypeConverter
+    internal class AlgorithmNameConverter : TypeConverter
     {
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {

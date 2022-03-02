@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Algoloop.Support
+namespace Algoloop.Model
 {
     public static class Collection
     {

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -20,9 +20,9 @@ using System.Windows.Data;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace Algoloop.Support
+namespace Algoloop.Model.Converter
 {
-    public class FilenameEditor : ITypeEditor
+    internal class FilenameEditor : ITypeEditor
     {
         public FrameworkElement ResolveEditor(PropertyItem propertyItem)
         {

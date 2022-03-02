@@ -15,7 +15,6 @@
 using Algoloop.Model;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.Provider;
-using Algoloop.Support;
 using Algoloop.Wpf.View;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;

@@ -13,7 +13,6 @@
  */
 
 
-using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
 using System.Globalization;
@@ -21,7 +20,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Algoloop.Support
+namespace Algoloop.Model
 {
     public static class MainService
     {
