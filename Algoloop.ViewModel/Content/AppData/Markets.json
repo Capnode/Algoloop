@@ -1,4 +1,5 @@
 {
+  "Version": 1,
   "Markets": [
     {
       "Name": "QuantConnect",
@@ -8,12 +9,12 @@
       "Password": "",
       "ApiKey": "",
       "LastDate": "2020-01-12T00:00:00+01:00",
-      "Market": "usa",
-      "Security": 1,
       "Resolution": 4,
       "Active": false,
+      "DefaultAccountId": null,
       "Symbols": [
         {
+          "Id": "aapl",
           "Active": true,
           "Name": "aapl",
           "Market": "usa",
@@ -21,6 +22,7 @@
           "Properties": null
         },
         {
+          "Id": "spy",
           "Active": true,
           "Name": "spy",
           "Market": "usa",
@@ -28,11 +30,13 @@
           "Properties": null
         }
       ],
-      "Folders": [
+      "Lists": [
         {
-          "Name": "Stock",
+          "Id": null,
+          "Name": "Stocks",
           "Symbols": [
             {
+              "Id": "aapl",
               "Active": true,
               "Name": "aapl",
               "Market": "usa",
@@ -40,6 +44,7 @@
               "Properties": null
             },
             {
+              "Id": "spy",
               "Active": true,
               "Name": "spy",
               "Market": "usa",
@@ -48,7 +53,8 @@
             }
           ]
         }
-      ]
+      ],
+      "Accounts": []
     }
   ]
 }
