@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.Wpf.ViewModel;
+using Algoloop.ViewModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect.Logging;
 

@@ -10,7 +10,6 @@
     <UseWinUI>true</UseWinUI>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="BrowserToolbar.xaml" />
     <None Remove="MainWindow.xaml" />
   </ItemGroup>
 
@@ -26,9 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="BrowserToolbar.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Update="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>

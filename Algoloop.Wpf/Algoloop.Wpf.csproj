@@ -187,6 +187,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
     <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
+    <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
     <ProjectReference Include="..\Algorithm.Framework\QuantConnect.Algorithm.Framework.csproj" />
     <ProjectReference Include="..\AlgorithmFactory\QuantConnect.AlgorithmFactory.csproj" />
@@ -259,10 +260,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="View\EquityChartView.xaml">
+    <Page Update="EquityChartView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-    <Page Update="View\StockChartView.xaml">
+    <Page Update="StockChartView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
   </ItemGroup>

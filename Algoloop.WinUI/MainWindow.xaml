@@ -12,12 +12,5 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <local:BrowserToolbar x:Name="browserToolbar" 
-                                ReloadClicked="browserToolbar_ReloadClicked"
-                                UrlEntered="browserToolbar_UrlEntered"/>
-        <WebView2 x:Name="mainWebView" 
-                    Grid.Row="1"
-                    Source="{x:Bind ViewModel.UrlSource}"/>
     </Grid>
 </Window>
