@@ -16,12 +16,12 @@
 
 using QuantConnect.Lean.Engine.Alphas;
 
-namespace Algoloop.ViewModel.Lean
+namespace Algoloop.ViewModel.Internal
 {
     /// <summary>
     /// Default alpha handler that supports sending insights to the messaging handler, analyzing insights online
     /// </summary>
-    public class AlphaHandler : DefaultAlphaHandler
+    internal class AlphaHandler : DefaultAlphaHandler
     {
         protected override void StoreInsights()
         {

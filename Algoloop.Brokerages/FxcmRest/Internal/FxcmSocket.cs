@@ -21,9 +21,9 @@ using System;
 using System.Threading;
 using static QuantConnect.Brokerages.WebSocketClientWrapper;
 
-namespace Algoloop.Brokerages.FxcmRest
+namespace Algoloop.Brokerages.FxcmRest.Internal
 {
-    public class FxcmSocket : IDisposable
+    internal class FxcmSocket : IDisposable
     {
         private static string _msgOpen = "0";
         private static string _msgClose = "1";

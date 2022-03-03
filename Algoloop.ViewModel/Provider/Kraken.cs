@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class Kraken : ProviderBase
+    internal class Kraken : ProviderBase
     {
         private SettingModel _settings;
 

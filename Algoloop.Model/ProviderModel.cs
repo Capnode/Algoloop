@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model.Converter;
+using Algoloop.Model.Internal;
 using QuantConnect;
 using System;
 using System.Collections.Generic;

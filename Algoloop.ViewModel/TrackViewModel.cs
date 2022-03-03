@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel.Lean;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Ionic.Zip;

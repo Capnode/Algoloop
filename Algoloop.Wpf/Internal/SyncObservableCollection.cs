@@ -23,7 +23,7 @@ namespace Algoloop.Wpf.Internal
     /// <summary>
     /// SyncObservableCollection class
     /// </summary>
-    public class SyncObservableCollection<T> : ObservableCollection<T>
+    internal class SyncObservableCollection<T> : ObservableCollection<T>
     {
         private readonly object _lock = new object();
 

@@ -25,7 +25,7 @@ using QuantConnect.Logging;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class QuantConnect : ProviderBase
+    internal class QuantConnect : ProviderBase
     {
         private const string _security = "Security";
         private const string _zip = ".zip";

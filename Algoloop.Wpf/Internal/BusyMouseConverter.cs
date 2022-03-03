@@ -22,7 +22,7 @@ namespace Algoloop.Wpf.Internal
     /// Sets the cursor state of the mouse.
     /// </summary>
     [ValueConversion(typeof(bool), typeof(Cursors))]
-    public class BusyMouseConverter : BaseConverter, IValueConverter
+    internal class BusyMouseConverter : BaseConverter, IValueConverter
     {
         /// <summary>
         /// BusyMouseConverter constructor

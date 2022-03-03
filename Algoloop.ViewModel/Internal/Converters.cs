@@ -23,7 +23,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Internal
 {
-    public static class Converters
+    internal static class Converters
     {
         public static Candle ToCandle(BaseData data, Security security = default)
         {

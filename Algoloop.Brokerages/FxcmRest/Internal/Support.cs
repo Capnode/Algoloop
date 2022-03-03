@@ -17,9 +17,9 @@ using QuantConnect;
 using System;
 using System.Globalization;
 
-namespace Algoloop.Brokerages.FxcmRest
+namespace Algoloop.Brokerages.FxcmRest.Internal
 {
-    public static class Support
+    internal static class Support
     {
         public const string Market = "fxcm";
 

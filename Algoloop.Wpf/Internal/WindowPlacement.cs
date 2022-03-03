@@ -70,7 +70,7 @@ namespace Algoloop.Wpf.Internal
         public RECT normalPosition;
     }
 
-    public static class WindowPlacement
+    internal static class WindowPlacement
     {
         private static readonly Encoding encoding = new UTF8Encoding();
         private static readonly XmlSerializer serializer = new XmlSerializer(typeof(WINDOWPLACEMENT));

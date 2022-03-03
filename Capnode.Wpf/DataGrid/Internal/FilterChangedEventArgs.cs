@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,15 +14,15 @@
 
 using System;
 
-namespace Capnode.Wpf.DataGrid
+namespace Capnode.Wpf.DataGrid.Internal
 {
-    public class CancelableFilterChangedEventArgs : EventArgs
+    internal class FilterChangedEventArgs : EventArgs
     {
-        public bool Cancel { get; set; }
-        public Predicate<object> NewFilter { get; set; }
-        public CancelableFilterChangedEventArgs(Predicate<object> p)
+        public Predicate<object> Filter { get; set; }
+
+        public FilterChangedEventArgs(Predicate<object> p)
         {
-            NewFilter = p;
+            Filter = p;
         }
     }
 }

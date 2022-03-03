@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-
 using QuantConnect.Logging;
 using System;
 using System.Globalization;

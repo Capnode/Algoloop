@@ -21,7 +21,7 @@ using System.Diagnostics.Contracts;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class FxcmRest : ProviderBase
+    internal class FxcmRest : ProviderBase
     {
         private FxcmClient _api;
         private bool _symbolsUpdated;

@@ -19,7 +19,7 @@ using System.Windows.Data;
 
 namespace Algoloop.Wpf.Internal
 {
-    public class CompositeCollectionConverter : IMultiValueConverter
+    internal class CompositeCollectionConverter : IMultiValueConverter
     {
 
         public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)

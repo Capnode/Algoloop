@@ -18,7 +18,7 @@ using System.Windows.Data;
 namespace Algoloop.Wpf.Internal
 {
     [ValueConversion(typeof(object), typeof(string))]
-    public class StringFormatConverter : BaseConverter, IValueConverter
+    internal class StringFormatConverter : BaseConverter, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {

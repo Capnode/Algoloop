@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Algoloop.Model.Converter
+namespace Algoloop.Model.Internal
 {
     internal class AccountNameConverter : TypeConverter
     {

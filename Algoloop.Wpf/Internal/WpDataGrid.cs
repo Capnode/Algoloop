@@ -12,7 +12,7 @@ using System.Collections;
 
 namespace Algoloop.Wpf.Internal
 {
-    public class WpDataGrid : DataGrid
+    internal class WpDataGrid : DataGrid
     {
         private bool inWidthChange = false;
         private bool updatingColumnInfo = false;

@@ -20,9 +20,9 @@ using QuantConnect.Logging;
 using System;
 using QuantConnect.Orders;
 
-namespace Algoloop.ViewModel.Lean
+namespace Algoloop.ViewModel.Internal
 {
-    public class BacktestResultHandler : BacktestingResultHandler
+    internal class BacktestResultHandler : BacktestingResultHandler
     {
         public string JsonResult { get; private set; }
         public string Logs { get; private set; }

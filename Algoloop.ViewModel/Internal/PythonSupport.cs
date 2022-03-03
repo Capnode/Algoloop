@@ -19,7 +19,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Internal
 {
-    public class PythonSupport
+    internal class PythonSupport
     {
         private const string _path = "PATH";
         private const string _pythonPath = "PYTHONPATH";

@@ -15,9 +15,9 @@
 using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.ViewModel.Lean
+namespace Algoloop.ViewModel.Internal
 {
-    public class HostDomainLogger : MarshalByRefObject, ILogHandler
+    internal class HostDomainLogger : MarshalByRefObject, ILogHandler
     {
         private bool _isDisposed = false; // To detect redundant calls
         private int _errCount = 0;

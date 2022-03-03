@@ -17,7 +17,7 @@ using System.Windows;
 
 namespace Algoloop.Wpf.Internal
 {
-    public class WpfSupport
+    internal class WpfSupport
     {
         public static bool IsUiThread()
         {

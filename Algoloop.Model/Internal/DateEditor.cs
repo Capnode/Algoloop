@@ -19,7 +19,7 @@ using Xceed.Wpf.Toolkit;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace Algoloop.Model.Converter
+namespace Algoloop.Model.Internal
 {
     internal class DateEditor : ITypeEditor
     {

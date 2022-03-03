@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,9 +14,9 @@
 
 using System;
 using System.Windows;
-namespace Capnode.Wpf.DataGrid
+namespace Capnode.Wpf.DataGrid.Internal
 {
-    public class ColumnConfiguration : DependencyObject
+    internal class ColumnConfiguration : DependencyObject
     {
      
         #region Properties for setting via xaml

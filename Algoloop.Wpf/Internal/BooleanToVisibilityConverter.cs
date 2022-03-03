@@ -19,7 +19,7 @@ using System.Windows.Data;
 
 namespace Algoloop.Wpf.Internal
 {
-    public class BooleanToVisibilityConverter : BaseConverter, IValueConverter
+    internal class BooleanToVisibilityConverter : BaseConverter, IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class Oanda : ProviderBase
+    internal class Oanda : ProviderBase
     {
         private SettingModel _settings;
 

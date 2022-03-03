@@ -16,7 +16,7 @@ using QuantConnect;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace Algoloop.Model.Converter
+namespace Algoloop.Model.Internal
 {
     internal class ProviderNameConverter : TypeConverter
     {

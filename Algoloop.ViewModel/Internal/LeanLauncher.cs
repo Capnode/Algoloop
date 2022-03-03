@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel.Internal;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -28,9 +27,9 @@ using System.IO;
 using System.Linq;
 using static Algoloop.Model.TrackModel;
 
-namespace Algoloop.ViewModel.Lean
+namespace Algoloop.ViewModel.Internal
 {
-    public class LeanLauncher : IDisposable
+    internal class LeanLauncher : IDisposable
     {
         private ConfigProcess _process;
         private bool _isDisposed;

@@ -15,19 +15,10 @@
 using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.ViewModel.Lean
+namespace Algoloop.ViewModel.Internal
 {
-    public class LogItem
+    internal interface ILogItemHandler : ILogHandler
     {
-        public DateTime Time { get; set; }
-        public LogType Level { get; set; }
-        public string Message { get; set; }
-
-        public LogItem(DateTime time, LogType level, string message)
-        {
-            Time = time;
-            Level = level;
-            Message = message;
-        }
+        void Connect(Action<LogItem> logger);
     }
 }

@@ -15,7 +15,7 @@
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class CryptoIq : ProviderBase
+    internal class CryptoIq : ProviderBase
     {
     }
 }

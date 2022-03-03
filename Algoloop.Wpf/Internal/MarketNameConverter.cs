@@ -20,7 +20,7 @@ using System.Linq;
 
 namespace Algoloop.Wpf.Internal
 {
-    public class MarketNameConverter : TypeConverter
+    internal class MarketNameConverter : TypeConverter
     {
         private readonly MarketsModel _markets;
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,9 +15,9 @@
 using System;
 using System.Linq.Expressions;
 
-namespace Capnode.Wpf.DataGrid
+namespace Capnode.Wpf.DataGrid.Internal
 {
-    public static class ExpressionHelper
+    internal static class ExpressionHelper
     {
         public static MethodCallExpression ToString(Expression prop)
         {

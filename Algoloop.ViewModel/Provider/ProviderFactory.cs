@@ -27,7 +27,7 @@ using System.Reflection;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public static class ProviderFactory
+    internal class ProviderFactory
     {
         public static IProvider CreateProvider(string name, SettingModel settings)
         {

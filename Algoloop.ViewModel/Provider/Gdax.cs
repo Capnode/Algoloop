@@ -14,7 +14,7 @@
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class Gdax : ProviderBase
+    internal class Gdax : ProviderBase
     {
     }
 }

@@ -25,7 +25,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class Dukascopy : ProviderBase
+    internal class Dukascopy : ProviderBase
     {
         private const string _market = "dukascopy";
         private readonly DateTime _firstDate = new(2003, 05, 05);

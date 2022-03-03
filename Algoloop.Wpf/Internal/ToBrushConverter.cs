@@ -20,7 +20,7 @@ using System.Windows.Media;
 namespace Algoloop.Wpf.Internal
 {
     [ValueConversion(typeof(object), typeof(Brush))]
-    public class ToBrushConverter : BaseConverter, IValueConverter
+    internal class ToBrushConverter : BaseConverter, IValueConverter
     {
         // https://spsexton.files.wordpress.com/2011/02/001-allcolors.png
 

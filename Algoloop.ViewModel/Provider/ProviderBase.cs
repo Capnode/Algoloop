@@ -29,7 +29,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Provider
 {
-    abstract public class ProviderBase : IProvider
+    abstract internal class ProviderBase : IProvider
     {
         protected bool _isDisposed;
         private ConfigProcess _process;

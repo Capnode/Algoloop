@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Capnode AB
+ * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -12,14 +12,20 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
-using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.ViewModel.Lean
+namespace Capnode.Wpf.DataGrid.Internal
 {
-    public interface ILogItemHandler : ILogHandler
+    public static class PredicateExtensions
     {
-        void Connect(Action<LogItem> logger);
+        public static Predicate<T> And<T>(this Predicate<T> original, Predicate<T> newPredicate)
+        {
+            return t => original(t) && newPredicate(t);
+        }
+
+        public static Predicate<T> Or<T>(this Predicate<T> original, Predicate<T> newPredicate)
+        {
+            return t => original(t) || newPredicate(t);
+        }
     }
 }

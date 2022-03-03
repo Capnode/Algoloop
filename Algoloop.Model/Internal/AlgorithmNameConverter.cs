@@ -20,7 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Algoloop.Model.Converter
+namespace Algoloop.Model.Internal
 {
     internal class AlgorithmNameConverter : TypeConverter
     {

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model.Converter;
+using Algoloop.Model.Internal;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 
 namespace Algoloop.ViewModel.Internal
 {
-    public class ConfigProcess: IDisposable
+    internal class ConfigProcess: IDisposable
     {
         private const int CTRL_C_EVENT = 0;
         private const int _timeout = 10000;

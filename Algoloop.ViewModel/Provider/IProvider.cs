@@ -17,7 +17,7 @@ using System;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public interface IProvider : IDisposable
+    internal interface IProvider : IDisposable
     {
         bool Register(SettingModel settings);
         void Login(ProviderModel provider);

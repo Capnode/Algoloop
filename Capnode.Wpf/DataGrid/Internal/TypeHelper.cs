@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -14,9 +14,9 @@
 
 using System;
 
-namespace Capnode.Wpf.DataGrid
+namespace Capnode.Wpf.DataGrid.Internal
 {
-    public static class TypeHelper
+    internal static class TypeHelper
     {
         public static object ValueConverter(Type type, string value)
         {

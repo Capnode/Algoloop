@@ -13,15 +13,16 @@
 */
 
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Xceed.Wpf.Toolkit.PropertyGrid;
 using Xceed.Wpf.Toolkit.PropertyGrid.Editors;
 
-namespace Algoloop.Model.Converter
+namespace Algoloop.Model.Internal
 {
-    internal class FolderEditor : ITypeEditor
+    internal class FilenameEditor : ITypeEditor
     {
         public FrameworkElement ResolveEditor(PropertyItem propertyItem)
         {
@@ -45,7 +46,7 @@ namespace Algoloop.Model.Converter
                 Source = propertyItem,
                 Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay
             };
-
+            
             //bind to the Value property of the PropertyItem
             BindingOperations.SetBinding(textBox, TextBox.TextProperty, binding);
 
@@ -72,17 +73,24 @@ namespace Algoloop.Model.Converter
                 return;
             }
 
-            using var dlg = new System.Windows.Forms.FolderBrowserDialog
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            string path = item.Value?.ToString();
+            string folder;
+            if (path == null)
             {
-                Description = "Select data folder",
-                SelectedPath = item.Value?.ToString(),
-                ShowNewFolderButton = true
-            };
+                folder = MainService.GetProgramFolder();
+            }
+            else
+            {
+                string fullPath = Path.GetFullPath(path);
+                folder = Path.GetDirectoryName(fullPath);
+            }
 
-            if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                return;
-
-            item.Value = dlg.SelectedPath;
+            openFileDialog.InitialDirectory = folder;
+            if ((bool)openFileDialog.ShowDialog())
+            {
+                item.Value = openFileDialog.FileName;
+            }
         }
     }
 }

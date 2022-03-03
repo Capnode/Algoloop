@@ -18,7 +18,7 @@ using System.Text;
 
 namespace Algoloop.ViewModel.Internal
 {
-    public class StreamLogger : TextWriter
+    internal class StreamLogger : TextWriter
     {
         private readonly StringBuilder _sb = new StringBuilder();
         private readonly ILogHandler _logger;

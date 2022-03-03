@@ -1,5 +1,5 @@
-﻿/*
- * Copyright 2019 Capnode AB
+/*
+ * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -12,20 +12,22 @@
  * limitations under the License.
  */
 
+using QuantConnect.Logging;
 using System;
 
-namespace Capnode.Wpf
+namespace Algoloop.ViewModel
 {
-    public static class PredicateExtensions
+    public class LogItem
     {
-        public static Predicate<T> And<T>(this Predicate<T> original, Predicate<T> newPredicate)
-        {
-            return t => original(t) && newPredicate(t);
-        }
+        public DateTime Time { get; set; }
+        public LogType Level { get; set; }
+        public string Message { get; set; }
 
-        public static Predicate<T> Or<T>(this Predicate<T> original, Predicate<T> newPredicate)
+        public LogItem(DateTime time, LogType level, string message)
         {
-            return t => original(t) || newPredicate(t);
+            Time = time;
+            Level = level;
+            Message = message;
         }
     }
 }

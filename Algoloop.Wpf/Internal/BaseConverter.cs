@@ -17,7 +17,7 @@ using System.Windows.Markup;
 
 namespace Algoloop.Wpf.Internal
 {
-    public abstract class BaseConverter : MarkupExtension
+    internal abstract class BaseConverter : MarkupExtension
     {
         public override object ProvideValue(IServiceProvider serviceProvider)
         {

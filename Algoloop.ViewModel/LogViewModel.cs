@@ -13,7 +13,6 @@
  */
 
 using Algoloop.ViewModel.Internal;
-using Algoloop.ViewModel.Lean;
 using QuantConnect.Logging;
 using System.Diagnostics;
 

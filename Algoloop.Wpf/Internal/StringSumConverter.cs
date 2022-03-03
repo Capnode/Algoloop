@@ -19,7 +19,7 @@ using System.Windows.Data;
 
 namespace Algoloop.Wpf.Internal
 {
-    public class StringSumConverter : BaseConverter, IMultiValueConverter
+    internal class StringSumConverter : BaseConverter, IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

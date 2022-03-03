@@ -1,4 +1,3 @@
-using System;
 /*
  * Copyright 2019 Capnode AB
  * 
@@ -13,13 +12,14 @@ using System;
  * limitations under the License.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Algoloop.ViewModel.Internal
 {
     [Serializable]
-    public class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue>
+    internal class SafeDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     {
         public SafeDictionary()
             : base()

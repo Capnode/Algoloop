@@ -22,7 +22,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Provider
 {
-    public class Yahoo : ProviderBase
+    internal class Yahoo : ProviderBase
     {
         private SettingModel _settings;
 

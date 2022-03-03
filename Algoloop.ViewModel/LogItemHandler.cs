@@ -12,10 +12,11 @@
  * limitations under the License.
  */
 
+using Algoloop.ViewModel.Internal;
 using QuantConnect.Logging;
 using System;
 
-namespace Algoloop.ViewModel.Lean
+namespace Algoloop.ViewModel
 {
     /// <summary>
     /// Provides an implementation of <see cref="ILogHandler"/> that writes all log messages to a file on disk.
