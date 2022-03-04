@@ -1,0 +1,228 @@
+<UserControl x:Class="Algoloop.Wpf.TrackView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    xmlns:viewsupport="clr-namespace:Algoloop.Wpf.Internal"
+    xmlns:vm="clr-namespace:Algoloop.ViewModel;assembly=Algoloop.ViewModel"
+    xmlns:view="clr-namespace:Algoloop.Wpf"
+    xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
+    xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"             
+    mc:Ignorable="d" 
+    d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ObjectDataProvider
+            x:Key="settings"
+            ObjectInstance="{x:Static properties:Settings.Default}"/>
+        <Style TargetType="{x:Type TextBlock}" x:Key="RightCell">
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+    </UserControl.Resources>
+    
+    <DockPanel>
+        <TabControl>
+            <TabItem Header="Configuration">
+                <ScrollViewer>
+                    <xctk:PropertyGrid
+                        ShowTitle="False"
+                        ShowSearchBox="False"
+                        ShowSummary="True"
+                        ShowAdvancedOptions="False"
+                        ShowSortOptions="False"
+                        IsReadOnly="True"
+                        SelectedObject="{Binding Model}">
+                    </xctk:PropertyGrid>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                <ListBox
+                    SelectionMode="Extended"
+                    DockPanel.Dock="Bottom"
+                    ItemsSource="{Binding Symbols}">
+                    <ListBox.Resources>
+                        <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding Model.Active}" IsEnabled="False"/>
+                                <TextBlock Text="{Binding Model.Name}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.Resources>
+                </ListBox>
+            </TabItem>
+            <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
+                <wpf:ExDataGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
+                    CanUserReorderColumns="False"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    AutoGenerateColumns="False"
+                    GridLinesVisibility="None"
+                    IsReadOnly="True"
+                    FrozenColumnCount="1"
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Parameters}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Parameter" Binding="{Binding Model.Name}" />
+                        <DataGridCheckBoxColumn Header="Use" Binding="{Binding Model.UseValue}" />
+                        <DataGridTextColumn Header="Value" Binding="{Binding Model.Value}" />
+                        <DataGridCheckBoxColumn Header="Use range" Binding="{Binding Model.UseRange}" />
+                        <DataGridTextColumn Header="Range" Binding="{Binding Model.Range}" />
+                    </DataGrid.Columns>
+                </wpf:ExDataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Holdings.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Holdings ({0}), FallbackValue=Holdings}">
+                <wpf:ExDataGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
+                    CanUserReorderColumns="True"
+                    IsReadOnly="True"
+                    GridLinesVisibility="None"
+                    AutoGenerateColumns="False"
+                    FrozenColumnCount="1"
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Holdings}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackHoldingsColumnsInfo}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Duration" Binding="{Binding Duration, StringFormat='{}{0:d\\.hh\\:mm\\:ss}'}" ElementStyle="{StaticResource RightCell}"/>
+                    </DataGrid.Columns>
+                </wpf:ExDataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Trades.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}">
+                <wpf:ExDataGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
+                    CanUserReorderColumns="True"
+                    IsReadOnly="True"
+                    GridLinesVisibility="None"
+                    AutoGenerateColumns="False"
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Trades}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackTradesColumnsInfo}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Entry time" Binding="{Binding EntryTime, StringFormat=u}"/>
+                        <DataGridTextColumn Header="Exit time" Binding="{Binding ExitTime, StringFormat=u}"/>
+                        <DataGridTextColumn Header="Direction" Binding="{Binding Direction}"/>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol.Value}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Symbol.SecurityType}"/>
+                        <DataGridTextColumn Header="Entry price" Binding="{Binding EntryPrice}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Exit price" Binding="{Binding ExitPrice}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Profit" Binding="{Binding ProfitLoss}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Fees" Binding="{Binding TotalFees}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Duration" Binding="{Binding Duration, StringFormat='{}{0:d\\.hh\\:mm\\:ss}'}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="MAE" Binding="{Binding MAE}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="MFE" Binding="{Binding MFE}" ElementStyle="{StaticResource RightCell}"/>
+                    </DataGrid.Columns>
+                </wpf:ExDataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}">
+                <wpf:ExDataGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
+                    CanUserReorderColumns="True"
+                    IsReadOnly="True"
+                    GridLinesVisibility="None"
+                    AutoGenerateColumns="False"
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Orders}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackOrdersColumnsInfo}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Date Time" Binding="{Binding Time, StringFormat=u}"/>
+                        <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}"/>
+                        <DataGridTextColumn Header="Operation" Binding="{Binding Direction}"/>
+                        <DataGridTextColumn Header="Type" Binding="{Binding Type}"/>
+                        <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Limit" Binding="{Binding LimitPrice}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Price" Binding="{Binding Price}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Currency" Binding="{Binding PriceCurrency}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Value" Binding="{Binding OrderValue}" ElementStyle="{StaticResource RightCell}"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}"/>
+                        <DataGridTextColumn Header="Tag" Binding="{Binding Tag}"/>
+                    </DataGrid.Columns>
+                </wpf:ExDataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Statistics.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Statistics ({0}), FallbackValue=Statistics}">
+                <wpf:ExDataGrid
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
+                    CanUserReorderColumns="False"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    AutoGenerateColumns="False"
+                    GridLinesVisibility="None"
+                    IsReadOnly="True"
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding Statistics}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Key}" />
+                        <DataGridTextColumn Header="Value" Binding="{Binding Value}" ElementStyle="{StaticResource RightCell}"/>
+                    </DataGrid.Columns>
+                </wpf:ExDataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
+                <view:StockChartView ItemsSource="{Binding Charts}"/>
+            </TabItem>
+            <TabItem Header="{Binding TrackSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Details ({0}), FallbackValue=Details}">
+                <wpf:ExDataGrid
+                    AutoGenerateColumns="True"
+                    CanUserFreeze="False"
+                    CanUserSelectDistinct="True"
+                    CanUserGroup="False"
+                    CanUserFilter="True"
+                    CanUserReorderColumns="True"
+                    FrozenColumnCount="1"
+                    ExSelectedItems="{Binding SelectedItems}"
+                    ExItemsSource="{Binding TrackSymbols}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackDetailsColumnsInfo}">
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem
+                                Header="Export symbols..."
+                                Command="{Binding ExportSymbolsCommand}"
+                                CommandParameter="{Binding
+                                    Path=PlacementTarget.SelectedItems,
+                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
+                                <MenuItem.Icon>
+                                    <Image Source="/Resources/Export.png" Width="16" Height="16"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                Header="Clone strategy"
+                                Command="{Binding CloneStrategyCommand}"
+                                CommandParameter="{Binding
+                                    Path=PlacementTarget.SelectedItems,
+                                    RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}">
+                                <MenuItem.Icon>
+                                    <Image Source="/Resources/Clone.png" Width="16" Height="16"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </wpf:ExDataGrid>
+            </TabItem>
+            <TabItem Header="{Binding Loglines, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">
+                <TextBox
+                    Text="{Binding Logs, Mode=OneWay}"
+                    IsReadOnly="True"
+                    VerticalScrollBarVisibility="Auto" />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

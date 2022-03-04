@@ -55,102 +55,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Content\AppData\Markets.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\AppData\Strategies.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\daily\aapl.zip">
-      <Link>Content\ProgramData\equity\usa\daily\aapl.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\daily\spy.zip">
-      <Link>Content\ProgramData\equity\usa\daily\spy.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140228.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\aapl\20140228.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140331.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\appl\20140331.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140424.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\aapl\20140424.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140429.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\aapl\20140429.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\hour\aapl.zip">
-      <Link>Content\ProgramData\equity\usa\hour\aapl.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\hour\spy.zip">
-      <Link>Content\ProgramData\equity\usa\hour\spy.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\map_files\aapl.csv">
-      <Link>Content\ProgramData\equity\usa\map_files\aapl.csv</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\aapl\20140605_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\appl\20140605_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\aapl\20140606_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\appl\20140606_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\aapl\20140609_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\appl\20140609_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\spy\20131004_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\spy\20131004_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\spy\20131007_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\spy\20131007_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\spy\20131008_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\spy\20131008_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\spy\20131009_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\spy\20131009_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\spy\20131010_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\spy\20131010_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\minute\spy\20131011_trade.zip">
-      <Link>Content\ProgramData\equity\usa\minute\spy\20131011_trade.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Resources\Help.png" />
     <SplashScreen Include="Resources\AlgoloopSplash.png" />
-    <Content Include="..\Research\BasicCSharpQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\BasicCSharpQuantBookTemplate.ipynb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Research\BasicQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\BasicQuantBookTemplate.ipynb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Research\KitchenSinkCSharpQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\KitchenSinkCSharpQuantBookTemplate.ipynb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Research\KitchenSinkQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\KitchenSinkQuantBookTemplate.ipynb</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Doc\Chart.png" />
     <Resource Include="Resources\Exit.png" />
     <Resource Include="Resources\Tools.png" />
@@ -172,21 +78,14 @@
     <Resource Include="Resources\Down.png" />
     <Resource Include="Resources\Clone.png" />
     <Resource Include="Resources\Add.png" />
-    <Content Include="..\Data\market-hours\market-hours-database.json">
-      <Link>Content\ProgramData\market-hours\market-hours-database.json</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\symbol-properties\symbol-properties-database.csv">
-      <Link>Content\ProgramData\symbol-properties\symbol-properties-database.csv</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="..\readme.md">
       <Link>Doc\readme.md</Link>
     </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
-    <ProjectReference Include="..\Algoloop\Algoloop.csproj" />
+    <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
+    <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
     <ProjectReference Include="..\Algorithm.Framework\QuantConnect.Algorithm.Framework.csproj" />
     <ProjectReference Include="..\AlgorithmFactory\QuantConnect.AlgorithmFactory.csproj" />
@@ -232,8 +131,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="98.1.210" />
-    <PackageReference Include="chromiumembeddedframework.runtime.win-x64" Version="98.1.21" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.6" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
@@ -241,7 +138,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1108.44" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.124" />
     <PackageReference Include="StockSharp.Configuration" Version="5.0.123" />
     <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.124" />
@@ -260,17 +159,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="View\EquityChartView.xaml">
+    <Page Update="EquityChartView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-    <Page Update="View\StockChartView.xaml">
+    <Page Update="StockChartView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="98.1.21" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="98.1.21" />
   </ItemGroup>
 </Project>

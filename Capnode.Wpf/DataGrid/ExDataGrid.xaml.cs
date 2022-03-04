@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -22,11 +22,12 @@ using System.Collections;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Capnode.Wpf.DataGrid.Internal;
 
 namespace Capnode.Wpf.DataGrid
 {
-    public delegate void FilterChangedEventHandler(object sender, FilterChangedEventArgs e);
-    public delegate void CancelableFilterChangedEventHandler(object sender, CancelableFilterChangedEventArgs e);
+    internal delegate void FilterChangedEventHandler(object sender, FilterChangedEventArgs e);
+    internal delegate void CancelableFilterChangedEventHandler(object sender, CancelableFilterChangedEventArgs e);
 
     /// <summary>
     /// Interaction logic for ExDataGrid.xaml
@@ -34,8 +35,8 @@ namespace Capnode.Wpf.DataGrid
     /// </summary>
     public partial class ExDataGrid : System.Windows.Controls.DataGrid, INotifyPropertyChanged
     {
-        public event CancelableFilterChangedEventHandler BeforeFilterChangedEventHandler;
-        public event FilterChangedEventHandler AfterFilterChanged;
+        internal event CancelableFilterChangedEventHandler BeforeFilterChangedEventHandler;
+        internal event FilterChangedEventHandler AfterFilterChanged;
 
         private readonly List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
         private readonly PropertyChangedEventHandler _filterHandler;

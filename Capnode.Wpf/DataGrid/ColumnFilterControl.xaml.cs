@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using linq = System.Linq.Expressions;
 using System.Globalization;
+using Capnode.Wpf.DataGrid.Internal;
 
 namespace Capnode.Wpf.DataGrid
 {
@@ -157,7 +158,7 @@ namespace Capnode.Wpf.DataGrid
 
 
         private FilterOperationItem _SelectedFilterOperation;
-        public FilterOperationItem SelectedFilterOperation
+        internal FilterOperationItem SelectedFilterOperation
         {
             get
             {

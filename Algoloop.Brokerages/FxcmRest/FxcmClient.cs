@@ -19,6 +19,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Algoloop.Brokerages.FxcmRest.Internal;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
 using QuantConnect;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Controls.Primitives;
+using Capnode.Wpf.DataGrid.Internal;
 
 namespace Capnode.Wpf.DataGrid
 {
