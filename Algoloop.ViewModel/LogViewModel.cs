@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 namespace Algoloop.ViewModel
 {
-    public class LogViewModel : ViewModel
+    public class LogViewModel : ViewModelBase
     {
         public LogViewModel()
         {

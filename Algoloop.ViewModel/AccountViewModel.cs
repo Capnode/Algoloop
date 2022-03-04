@@ -17,7 +17,7 @@ using System.Diagnostics;
 
 namespace Algoloop.ViewModel
 {
-    public class AccountViewModel : ViewModel
+    public class AccountViewModel : ViewModelBase
     {
         public AccountViewModel(AccountModel model)
         {
@@ -33,7 +33,7 @@ namespace Algoloop.ViewModel
             set
             {
                 Model.Name = value;
-                RaisePropertyChanged(() => Name);
+                OnPropertyChanged();
             }
         }
     }

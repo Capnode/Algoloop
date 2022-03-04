@@ -23,7 +23,7 @@ using System.Globalization;
 
 namespace Algoloop.ViewModel
 {
-    public class OrderViewModel : ViewModel
+    public class OrderViewModel : ViewModelBase
     {
         private int _id;
         private int _contingentId;
@@ -70,7 +70,7 @@ namespace Algoloop.ViewModel
         public int Id
         {
             get => _id;
-            set => Set(ref _id, value);
+            set => SetProperty(ref _id, value);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace Algoloop.ViewModel
         public int ContingentId
         {
             get => _contingentId;
-            set => Set(ref _contingentId, value);
+            set => SetProperty(ref _contingentId, value);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Algoloop.ViewModel
         public Collection<string> BrokerId
         {
             get => _brokerId;
-            set => Set(ref _brokerId, value);
+            set => SetProperty(ref _brokerId, value);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Algoloop.ViewModel
         public string Symbol
         {
             get => _symbol;
-            set => Set(ref _symbol, value);
+            set => SetProperty(ref _symbol, value);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@ namespace Algoloop.ViewModel
         public decimal Price
         {
             get => _price;
-            set => Set(ref _price, value);
+            set => SetProperty(ref _price, value);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace Algoloop.ViewModel
         public decimal? LimitPrice
         {
             get => _limitPrice;
-            set => Set(ref _limitPrice, value);
+            set => SetProperty(ref _limitPrice, value);
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace Algoloop.ViewModel
         public string PriceCurrency
         {
             get => _priceCurrency;
-            set => Set(ref _priceCurrency, value);
+            set => SetProperty(ref _priceCurrency, value);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Algoloop.ViewModel
         public DateTime Time
         {
             get => _time;
-            set => Set(ref _time, value);
+            set => SetProperty(ref _time, value);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Algoloop.ViewModel
         public DateTime? LastFillTime
         {
             get => _lastFillTime;
-            set => Set(ref _lastFillTime,  value);
+            set => SetProperty(ref _lastFillTime,  value);
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Algoloop.ViewModel
         public DateTime? LastUpdateTime
         {
             get => _lastUpdateTime;
-            set => Set(ref _lastUpdateTime, value);
+            set => SetProperty(ref _lastUpdateTime, value);
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Algoloop.ViewModel
         public DateTime? CanceledTime
         {
             get => _canceledTime;
-            set => Set(ref _canceledTime, value);
+            set => SetProperty(ref _canceledTime, value);
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Algoloop.ViewModel
         public decimal Quantity
         {
             get => _quantity;
-            set => Set(ref _quantity, value);
+            set => SetProperty(ref _quantity, value);
         }
 
         /// <summary>
@@ -178,7 +178,7 @@ namespace Algoloop.ViewModel
         public OrderType Type
         {
             get => _type;
-            set => Set(ref _type, value);
+            set => SetProperty(ref _type, value);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Algoloop.ViewModel
         public OrderStatus Status
         {
             get => _status;
-            set => Set(ref _status, value);
+            set => SetProperty(ref _status, value);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Algoloop.ViewModel
         public DateTime ValidUntil
         {
             get => _validUntil;
-            set => Set(ref _validUntil, value);
+            set => SetProperty(ref _validUntil, value);
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace Algoloop.ViewModel
         public string Tag
         {
             get => _tag;
-            set => Set(ref _tag, value);
+            set => SetProperty(ref _tag, value);
         }
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace Algoloop.ViewModel
         public OrderProperties Properties
         {
             get => _properties;
-            set => Set(ref _properties, value);
+            set => SetProperty(ref _properties, value);
         }
 
         /// <summary>
@@ -223,7 +223,7 @@ namespace Algoloop.ViewModel
         public string SecurityType
         {
             get => _securityType;
-            set => Set(ref _securityType, value);
+            set => SetProperty(ref _securityType, value);
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace Algoloop.ViewModel
         public string Direction
         {
             get => _direction;
-            set => Set(ref _direction, value);
+            set => SetProperty(ref _direction, value);
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace Algoloop.ViewModel
         public decimal OrderValue
         {
             get => _orderValue;
-            set => Set(ref _orderValue, value);
+            set => SetProperty(ref _orderValue, value);
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace Algoloop.ViewModel
         public OrderSubmissionData OrderSubmissionData
         {
             get => _orderSubmissionData;
-            set => Set(ref _orderSubmissionData, value);
+            set => SetProperty(ref _orderSubmissionData, value);
         }
 
         /// <summary>
@@ -260,7 +260,7 @@ namespace Algoloop.ViewModel
         public bool IsMarketable
         {
             get => _isMarketable;
-            set => Set(ref _isMarketable, value);
+            set => SetProperty(ref _isMarketable, value);
         }
 
         internal void Update(Order order)

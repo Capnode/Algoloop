@@ -15,8 +15,6 @@
 using Algoloop.Model;
 using Algoloop.ViewModel.Provider;
 using Capnode.Wpf.DataGrid;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -37,12 +35,12 @@ using static Algoloop.ViewModel.SymbolViewModel;
 using System.Threading;
 using QuantConnect.Statistics;
 using QuantConnect.Data.Market;
-using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
+using Microsoft.Toolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {
-    public class MarketViewModel : ViewModel, ITreeViewModel
+    public class MarketViewModel : ViewModelBase, ITreeViewModel
     {
         private readonly MarketsViewModel _parent;
         private readonly SettingModel _settings;
@@ -63,18 +61,34 @@ namespace Algoloop.ViewModel
             Model = marketModel;
             _settings = settings;
 
-            ActiveCommand = new RelayCommand(async () => await DoActiveCommand(Model.Active).ConfigureAwait(false), !IsBusy);
-            StartCommand = new RelayCommand(async () => await DoStartCommand().ConfigureAwait(false), () => !IsBusy && !Active);
-            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
-            CheckAllCommand = new RelayCommand<IList>(m => DoCheckAll(m), m => !IsBusy && !Active && SelectedSymbol != null);
+            ActiveCommand = new RelayCommand(
+                async () => await DoActiveCommand(Model.Active).ConfigureAwait(false),
+                () => !IsBusy);
+            StartCommand = new RelayCommand(
+                async () => await DoStartCommand().ConfigureAwait(false),
+                () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(
+                () => DoStopCommand(), () => !IsBusy && Active);
+            CheckAllCommand = new RelayCommand<IList>(
+                m => DoCheckAll(m), m => !IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
-            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), !IsBusy);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy && !Active && SelectedSymbol != null);
-            AddToSymbolListCommand = new RelayCommand<IList>(m => DoAddToSymbolList(m), m => !IsBusy && !Active && SelectedSymbol != null);
-            DeleteCommand = new RelayCommand(() => _parent?.DoDeleteMarket(this), () => !IsBusy && !Active);
-            NewListCommand = new RelayCommand(() => DoNewList(), () => !IsBusy && !Active);
-            ImportListCommand = new RelayCommand(() => DoImportList(), () => !IsBusy && !Active);
+            DeleteSymbolsCommand = new RelayCommand<IList>(
+                m => DoDeleteSymbols(m),
+                m => !IsBusy && !Active && SelectedSymbol != null);
+            ImportSymbolsCommand = new RelayCommand(
+                () => DoImportSymbols(), () => !IsBusy);
+            ExportSymbolsCommand = new RelayCommand<IList>(
+                m => DoExportSymbols(m),
+                m => !IsBusy && !Active && SelectedSymbol != null);
+            AddToSymbolListCommand = new RelayCommand<IList>(
+                m => DoAddToSymbolList(m),
+                m => !IsBusy && !Active && SelectedSymbol != null);
+            DeleteCommand = new RelayCommand(
+                () => _parent?.DoDeleteMarket(this), () => !IsBusy && !Active);
+            NewListCommand = new RelayCommand(
+                () => DoNewList(), () => !IsBusy && !Active);
+            ImportListCommand = new RelayCommand(
+                () => DoImportList(), () => !IsBusy && !Active);
 
             Model.ModelChanged += DataFromModel;
 
@@ -136,7 +150,7 @@ namespace Algoloop.ViewModel
                 if (_selectedItems?.Count > 0)
                 {
                     string message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
-                    Messenger.Default.Send(new NotificationMessage(message));
+                    Messenger.Send(new NotificationMessage(message), 0);
                 }
             }
         }
@@ -147,7 +161,7 @@ namespace Algoloop.ViewModel
             set
             {
                 Model.Active = value;
-                RaisePropertyChanged(() => Active);
+                OnPropertyChanged();
                 RaiseCommands();
             }
         }
@@ -155,19 +169,19 @@ namespace Algoloop.ViewModel
         public ProviderModel Model
         {
             get => _model;
-            set => Set(ref _model, value);
+            set => SetProperty(ref _model, value);
         }
 
         public Resolution SelectedResolution
         {
             get => _selectedResolution;
-            set => Set(ref _selectedResolution, value);
+            set => SetProperty(ref _selectedResolution, value);
         }
 
         public DateTime Date
         {
             get => _date;
-            set => Set(ref _date, value);
+            set => SetProperty(ref _date, value);
         }
 
         public AccountViewModel SelectedAccount
@@ -175,7 +189,7 @@ namespace Algoloop.ViewModel
             get => _selectedAccount;
             set
             {
-                Set(ref _selectedAccount, value);
+                SetProperty(ref _selectedAccount, value);
                 ReloadAccount();
             }
         }
@@ -183,7 +197,7 @@ namespace Algoloop.ViewModel
         public ReportPeriod SelectedReportPeriod
         {
             get => _selectedReportPeriod;
-            set => Set(ref _selectedReportPeriod, value);
+            set => SetProperty(ref _selectedReportPeriod, value);
         }
 
         public SymbolViewModel SelectedSymbol
@@ -191,7 +205,7 @@ namespace Algoloop.ViewModel
             get => _selectedSymbol;
             set
             {
-                Set(ref _selectedSymbol, value);
+                SetProperty(ref _selectedSymbol, value);
                 RaiseCommands();
             }
         }
@@ -199,13 +213,13 @@ namespace Algoloop.ViewModel
         public bool CheckAll
         {
             get => _checkAll;
-            set => Set(ref _checkAll, value);
+            set => SetProperty(ref _checkAll, value);
         }
 
         public ObservableCollection<DataGridColumn> SymbolColumns
         {
             get => _symbolColumns;
-            set => Set(ref _symbolColumns, value);
+            set => SetProperty(ref _symbolColumns, value);
         }
 
         public void Refresh()
@@ -325,18 +339,18 @@ namespace Algoloop.ViewModel
 
         private void RaiseCommands()
         {
-            ActiveCommand.RaiseCanExecuteChanged();
-            StartCommand.RaiseCanExecuteChanged();
-            StopCommand.RaiseCanExecuteChanged();
-            CheckAllCommand.RaiseCanExecuteChanged();
-            AddSymbolCommand.RaiseCanExecuteChanged();
-            DeleteSymbolsCommand.RaiseCanExecuteChanged();
-            ImportSymbolsCommand.RaiseCanExecuteChanged();
-            ExportSymbolsCommand.RaiseCanExecuteChanged();
-            AddToSymbolListCommand.RaiseCanExecuteChanged();
-            DeleteCommand.RaiseCanExecuteChanged();
-            NewListCommand.RaiseCanExecuteChanged();
-            ImportListCommand.RaiseCanExecuteChanged();
+            ActiveCommand.NotifyCanExecuteChanged();
+            StartCommand.NotifyCanExecuteChanged();
+            StopCommand.NotifyCanExecuteChanged();
+            CheckAllCommand.NotifyCanExecuteChanged();
+            AddSymbolCommand.NotifyCanExecuteChanged();
+            DeleteSymbolsCommand.NotifyCanExecuteChanged();
+            ImportSymbolsCommand.NotifyCanExecuteChanged();
+            ExportSymbolsCommand.NotifyCanExecuteChanged();
+            AddToSymbolListCommand.NotifyCanExecuteChanged();
+            DeleteCommand.NotifyCanExecuteChanged();
+            NewListCommand.NotifyCanExecuteChanged();
+            ImportListCommand.NotifyCanExecuteChanged();
         }
 
         private async Task StartMarketAsync()
@@ -345,27 +359,39 @@ namespace Algoloop.ViewModel
             {
                 DataToModel();
                 _provider = ProviderFactory.CreateProvider(Model.Provider, _settings);
-                if (_provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
-                Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketStarted, Model.Name)));
+                if (_provider == null) throw new ApplicationException(
+                    $"Can not create provider {Model.Provider}");
+                Messenger.Send(new NotificationMessage(
+                    string.Format(Resources.MarketStarted, Model.Name)),
+                    0);
                 await Task.Run(() => MarketLoop(Model)).ConfigureAwait(false);
-                IList<string> symbols = Model.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
+                IList<string> symbols = Model.Symbols.
+                    Where(x => x.Active).Select(m => m.Id).ToList();
                 if (symbols.Any())
                 {
-                    Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketCompleted, Model.Name)));
+                    Messenger.Send(new NotificationMessage(
+                        string.Format(Resources.MarketCompleted, Model.Name)),
+                        0);
                 }
                 else
                 {
-                    Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketNoSymbol, Model.Name)));
+                    Messenger.Send(new NotificationMessage(
+                        string.Format(Resources.MarketNoSymbol, Model.Name)),
+                        0);
                 }
             }
             catch (ApplicationException ex)
             {
-                Messenger.Default.Send(new NotificationMessage(string.Format(Resources.MarketException, Model.Name, ex.Message)));
+                Messenger.Send(new NotificationMessage(
+                    string.Format(Resources.MarketException, Model.Name, ex.Message)),
+                    0);
             }
             catch (Exception ex)
             {
                 Log.Error(ex);
-                Messenger.Default.Send(new NotificationMessage($"{ex.GetType()}: {ex.Message}"));
+                Messenger.Send(new NotificationMessage(
+                    $"{ex.GetType()}: {ex.Message}"),
+                    0);
             }
             finally
             {

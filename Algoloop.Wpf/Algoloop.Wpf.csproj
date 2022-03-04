@@ -138,8 +138,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1108.44" />
-    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.124" />
     <PackageReference Include="StockSharp.Configuration" Version="5.0.123" />
     <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.124" />

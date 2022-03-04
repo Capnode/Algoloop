@@ -23,7 +23,7 @@ using System.IO;
 
 namespace Algoloop.ViewModel
 {
-    public class ResearchViewModel : ViewModel, IDisposable
+    public class ResearchViewModel : ViewModelBase, IDisposable
     {
         private const string _notebook = "Notebook";
         private readonly SettingModel _settings;
@@ -42,19 +42,19 @@ namespace Algoloop.ViewModel
         public string HtmlText
         {
             get => _htmlText;
-            set => Set(ref _htmlText, value);
+            set => SetProperty(ref _htmlText, value);
         }
 
         public string Source
         {
             get => _source;
-            set => Set(ref _source, value);
+            set => SetProperty(ref _source, value);
         }
 
         public bool Initialized
         {
             get => _initialized;
-            private set => Set(ref _initialized, value);
+            private set => SetProperty(ref _initialized, value);
         }
 
         public void Dispose()

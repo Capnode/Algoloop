@@ -19,7 +19,7 @@ using System.Diagnostics;
 
 namespace Algoloop.ViewModel
 {
-    public class PositionViewModel : ViewModel
+    public class PositionViewModel : ViewModelBase
     {
         private string _symbol;
         private string _securityType;
@@ -46,55 +46,55 @@ namespace Algoloop.ViewModel
         public string Symbol
         {
             get => _symbol;
-            set => Set(ref _symbol, value);
+            set => SetProperty(ref _symbol, value);
         }
 
         public string SecurityType
         {
             get => _securityType;
-            set => Set(ref _securityType, value);
+            set => SetProperty(ref _securityType, value);
         }
 
         public string CurrencySymbol
         {
             get => _symbolCurrency;
-            set => Set(ref _symbolCurrency, value);
+            set => SetProperty(ref _symbolCurrency, value);
         }
 
         public decimal AveragePrice
         {
             get => _averagePrice;
-            set => Set(ref _averagePrice, value);
+            set => SetProperty(ref _averagePrice, value);
         }
 
         public decimal Quantity
         {
             get => _quantity;
-            set => Set(ref _quantity, value);
+            set => SetProperty(ref _quantity, value);
         }
 
         public decimal MarketPrice
         {
             get => _marketPrice;
-            set => Set(ref _marketPrice, value);
+            set => SetProperty(ref _marketPrice, value);
         }
 
         public decimal ConversionRate
         {
             get => _conversionRate;
-            set => Set(ref _conversionRate, value);
+            set => SetProperty(ref _conversionRate, value);
         }
 
         public decimal MarketValue
         {
             get => _marketValue;
-            set => Set(ref _marketValue, value);
+            set => SetProperty(ref _marketValue, value);
         }
 
         public decimal UnrealizedPnL
         {
             get => _unrealizedPnL;
-            set => Set(ref _unrealizedPnL, value);
+            set => SetProperty(ref _unrealizedPnL, value);
         }
 
         public void Update(PositionModel position)

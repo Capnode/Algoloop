@@ -13,8 +13,6 @@
  */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Ionic.Zip;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -39,10 +37,11 @@ using stocksharp = StockSharp.Xaml.Charting;
 using static Algoloop.Model.TrackModel;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
+using Microsoft.Toolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {
-    public class TrackViewModel: ViewModel, ITreeViewModel, IComparable, IDisposable
+    public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {
         private bool _isDisposed = false; // To detect redundant calls
         public const string Folder = "Tracks";
@@ -80,13 +79,27 @@ namespace Algoloop.ViewModel
             _markets = markets;
             _settings = settings;
 
-            ActiveCommand = new RelayCommand(() => DoActiveCommand(Model.Active), !IsBusy);
-            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
-            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
-            DeleteCommand = new RelayCommand(() => DoDeleteTrack(), () => !IsBusy && !Active);
-            UseParametersCommand = new RelayCommand(() => DoUseParameters(), () => !IsBusy && !Active);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), m => !IsBusy);
-            CloneStrategyCommand = new RelayCommand<IList>(m => DoCloneStrategy(m), m => !IsBusy);
+            ActiveCommand = new RelayCommand(
+                () => DoActiveCommand(Model.Active),
+                () => !IsBusy);
+            StartCommand = new RelayCommand(
+                () => DoStartCommand(),
+                () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(
+                () => DoStopCommand(),
+                () => !IsBusy && Active);
+            DeleteCommand = new RelayCommand(
+                () => DoDeleteTrack(),
+                () => !IsBusy && !Active);
+            UseParametersCommand = new RelayCommand(
+                () => DoUseParameters(),
+                () => !IsBusy && !Active);
+            ExportSymbolsCommand = new RelayCommand<IList>(
+                m => DoExportSymbols(m),
+                m => !IsBusy);
+            CloneStrategyCommand = new RelayCommand<IList>(
+                m => DoCloneStrategy(m),
+                m => !IsBusy);
             ExportCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
@@ -128,23 +141,26 @@ namespace Algoloop.ViewModel
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
+                    message = string.Format(
+                        CultureInfo.InvariantCulture,
+                        Resources.SelectedCount,
+                        _selectedItems.Count);
                 }
 
-                Messenger.Default.Send(new NotificationMessage(message));
+                Messenger.Send(new NotificationMessage(message), 0);
             }
         }
 
         public IDictionary<string, decimal?> Statistics
         {
             get => _statistics;
-            set => Set(ref _statistics, value);
+            set => SetProperty(ref _statistics, value);
         }
 
         public TrackModel Model
         {
             get => _model;
-            set => Set(ref _model, value);
+            set => SetProperty(ref _model, value);
         }
 
         public string Logs
@@ -152,8 +168,8 @@ namespace Algoloop.ViewModel
             get => _logs;
             set
             {
-                Set(ref _logs, value);
-                RaisePropertyChanged(() => Loglines);
+                SetProperty(ref _logs, value);
+                OnPropertyChanged(nameof(Loglines));
             }
         }
 
@@ -162,55 +178,55 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<SymbolViewModel> Symbols
         {
             get => _symbols;
-            set => Set(ref _symbols, value);
+            set => SetProperty(ref _symbols, value);
         }
 
         public SyncObservableCollection<ParameterViewModel> Parameters
         {
             get => _parameters;
-            set => Set(ref _parameters, value);        
+            set => SetProperty(ref _parameters, value);        
         }
 
         public SyncObservableCollection<Trade> Trades
         {
             get => _trades;
-            set => Set(ref _trades, value);
+            set => SetProperty(ref _trades, value);
         }
 
         public SyncObservableCollection<TrackSymbolViewModel> TrackSymbols
         {
             get => _trackSymbols;
-            set => Set(ref _trackSymbols, value);
+            set => SetProperty(ref _trackSymbols, value);
         }
 
         public SyncObservableCollection<OrderViewModel> Orders
         {
             get => _orders;
-            set => Set(ref _orders, value);
+            set => SetProperty(ref _orders, value);
         }
 
         public SyncObservableCollection<HoldingViewModel> Holdings
         {
             get => _holdings;
-            set => Set(ref _holdings, value);
+            set => SetProperty(ref _holdings, value);
         }
 
         public SyncObservableCollection<IChartViewModel> Charts
         {
             get => _charts;
-            set => Set(ref _charts, value);
+            set => SetProperty(ref _charts, value);
         }
 
         public bool IsSelected
         {
             get => _isSelected;
-            set => Set(ref _isSelected, value);
+            set => SetProperty(ref _isSelected, value);
         }
 
         public bool IsExpanded
         {
             get => _isExpanded;
-            set => Set(ref _isExpanded, value);
+            set => SetProperty(ref _isExpanded, value);
         }
 
         public bool Active
@@ -219,19 +235,19 @@ namespace Algoloop.ViewModel
             set
             {
                 Model.Active = value;
-                RaisePropertyChanged(() => Active);
+                OnPropertyChanged();
 
-                StartCommand.RaiseCanExecuteChanged();
-                StopCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
-                ExportSymbolsCommand.RaiseCanExecuteChanged();
+                StartCommand.NotifyCanExecuteChanged();
+                StopCommand.NotifyCanExecuteChanged();
+                DeleteCommand.NotifyCanExecuteChanged();
+                ExportSymbolsCommand.NotifyCanExecuteChanged();
             }
         }
 
         public string Port
         {
             get => _port;
-            set => Set(ref _port, value);
+            set => SetProperty(ref _port, value);
         }
 
         public void Dispose()
@@ -303,9 +319,11 @@ namespace Algoloop.ViewModel
             AccountModel account = _markets.FindAccount(Model.Account);
 
             // Set search path if not base directory
-            string folder = Path.GetDirectoryName(MainService.FullExePath(Model.AlgorithmLocation));
+            string folder = Path.GetDirectoryName(
+                MainService.FullExePath(Model.AlgorithmLocation));
             string exeFolder = MainService.GetProgramFolder();
-            if (!string.IsNullOrEmpty(folder) && !exeFolder.Equals(folder, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(folder)
+                && !exeFolder.Equals(folder, StringComparison.OrdinalIgnoreCase))
             {
                 StrategyViewModel.AddPath(folder);
             }
@@ -315,7 +333,8 @@ namespace Algoloop.ViewModel
                 .ConfigureAwait(false);
 
             // Split result and logs to separate files
-            if (model.Status.Equals(CompletionStatus.Success) || model.Status.Equals(CompletionStatus.Error))
+            if (model.Status.Equals(CompletionStatus.Success)
+                || model.Status.Equals(CompletionStatus.Error))
             {
                 SplitModelToFiles(model);
             }
@@ -532,7 +551,9 @@ namespace Algoloop.ViewModel
             return Math.Sqrt(variance);
         }
 
-        private static void AddCustomStatistics(BacktestResult result, IDictionary<string, decimal?> statistics)
+        private static void AddCustomStatistics(
+            BacktestResult result,
+            IDictionary<string, decimal?> statistics)
         {
             KeyValuePair<string, Chart> chart = result.Charts.FirstOrDefault(
                 m => m.Key.Equals("Strategy Equity", StringComparison.OrdinalIgnoreCase));
@@ -565,7 +586,8 @@ namespace Algoloop.ViewModel
             // Unzip result file
             ZipFile zipFile;
             BacktestResult result = null;
-            using (StreamReader resultStream = Compression.Unzip(Model.ZipFile, _resultFile, out zipFile))
+            using (StreamReader resultStream = Compression.Unzip(
+                Model.ZipFile, _resultFile, out zipFile))
             using (zipFile)
             {
                 if (resultStream == null)
@@ -600,7 +622,8 @@ namespace Algoloop.ViewModel
             foreach (Trade trade in Trades)
             {
                 TrackSymbolViewModel trackSymbol = TrackSymbols
-                    .FirstOrDefault(m => m.Symbol.Equals(trade.Symbol.Value, StringComparison.OrdinalIgnoreCase));
+                    .FirstOrDefault(m => m.Symbol.Equals(
+                        trade.Symbol.Value, StringComparison.OrdinalIgnoreCase));
                 if (trackSymbol == null)
                 {
                     trackSymbol = new TrackSymbolViewModel(trade.Symbol);
@@ -625,7 +648,8 @@ namespace Algoloop.ViewModel
                     || order.Status.Equals(OrderStatus.Invalid))
                     continue;
 
-                HoldingViewModel holding = Holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
+                HoldingViewModel holding = Holdings.FirstOrDefault(
+                    m => m.Symbol.Equals(order.Symbol));
                 if (holding == null)
                 {
                     holding = new HoldingViewModel(order.Symbol)
@@ -641,7 +665,9 @@ namespace Algoloop.ViewModel
                 else
                 {
                     decimal quantity = holding.Quantity + order.Quantity;
-                    holding.Price = quantity == 0 ? 0 : (holding.Price * holding.Quantity + order.Price * order.Quantity) / quantity;
+                    holding.Price = quantity == 0 ? 0 : 
+                        (holding.Price * holding.Quantity + order.Price * order.Quantity)
+                        / quantity;
                     holding.Quantity += order.Quantity;
                     holding.Profit += order.Value;
                     if (holding.Quantity == 0)
@@ -662,7 +688,8 @@ namespace Algoloop.ViewModel
             }
 
             // Unzip log file
-            using (StreamReader logStream = Compression.Unzip(Model.ZipFile, _logFile, out zipFile))
+            using (StreamReader logStream = Compression.Unzip(
+                Model.ZipFile, _logFile, out zipFile))
             using (zipFile)
             {
                 if (logStream != null)
@@ -672,17 +699,31 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private static void AddStatisticItem(IDictionary<string, decimal?> statistics, string name, string text)
+        private static void AddStatisticItem(
+            IDictionary<string, decimal?> statistics,
+            string name,
+            string text)
         {
-            if (text.Contains("$") && decimal.TryParse(text.Replace("$", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal value))
+            if (text.Contains("$") && decimal.TryParse(
+                text.Replace("$", ""),
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out decimal value))
             {
                 name += "$";
             }
-            else if (text.Contains("%") && decimal.TryParse(text.Replace("%", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            else if (text.Contains("%") && decimal.TryParse(
+                text.Replace("%", ""),
+                NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out value))
             {
                 name += "%";
             }
-            else if (!decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+            else if (!decimal.TryParse(
+                text, NumberStyles.Any,
+                CultureInfo.InvariantCulture,
+                out value))
             {
                 return;
             }
@@ -718,7 +759,9 @@ namespace Algoloop.ViewModel
             }
 
             // Process results
-            BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(model.Result, new[] { new OrderJsonConverter() });
+            BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(
+                model.Result,
+                new[] { new OrderJsonConverter() });
             Debug.Assert(result != default);
             Debug.Assert(result.Charts.Any());
             if (result != null)
@@ -752,12 +795,16 @@ namespace Algoloop.ViewModel
                 AddStatisticItem(statistics, item.Key, item.Value);
             }
 
-            PortfolioStatistics portfolioStatistics = result.TotalPerformance.PortfolioStatistics;
+            PortfolioStatistics portfolioStatistics = 
+                result.TotalPerformance.PortfolioStatistics;
             PropertyInfo[] portfolioProperties = typeof(PortfolioStatistics).GetProperties();
             foreach (PropertyInfo property in portfolioProperties)
             {
                 object value = property.GetValue(portfolioStatistics);
-                AddStatisticItem(statistics, property.Name, Convert.ToString(value, CultureInfo.InvariantCulture));
+                AddStatisticItem(
+                    statistics,
+                    property.Name,
+                    Convert.ToString(value, CultureInfo.InvariantCulture));
             }
 
             TradeStatistics tradeStatistics = result.TotalPerformance.TradeStatistics;
@@ -765,7 +812,10 @@ namespace Algoloop.ViewModel
             foreach (PropertyInfo property in tradeProperties)
             {
                 object value = property.GetValue(tradeStatistics);
-                AddStatisticItem(statistics, property.Name, Convert.ToString(value, CultureInfo.InvariantCulture));
+                AddStatisticItem(
+                    statistics,
+                    property.Name,
+                    Convert.ToString(value, CultureInfo.InvariantCulture));
             }
 
             return statistics;
@@ -852,7 +902,7 @@ namespace Algoloop.ViewModel
                     message = Resources.StrategyCompleted;
                     break;
             }
-            Messenger.Default.Send(new NotificationMessage(message));
+            Messenger.Send(new NotificationMessage(message), 0);
         }
 
         private void DoStopCommand()
@@ -911,7 +961,9 @@ namespace Algoloop.ViewModel
                 if (symbols != null)
                 {
                     strategyModel.Symbols.Clear();
-                    IEnumerable<SymbolModel> symbolModels = symbols.Cast<TrackSymbolViewModel>().Select(m => new SymbolModel(m.Symbol, m.Market, m.Security));
+                    IEnumerable<SymbolModel> symbolModels = symbols.
+                        Cast<TrackSymbolViewModel>().Select(
+                            m => new SymbolModel(m.Symbol, m.Market, m.Security));
                     foreach (SymbolModel symbol in symbolModels)
                     {
                         strategyModel.Symbols.Add(symbol);
@@ -966,10 +1018,19 @@ namespace Algoloop.ViewModel
             foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
                 profit += trade.Value;
-                series.Add(new stocksharp.EquityData { Time = trade.Key, Value = RoundLarge(profit) });
+                series.Add(new stocksharp.EquityData {
+                    Time = trade.Key,
+                    Value = RoundLarge(profit)
+                });
             }
 
-            var viewModel = new EquityChartViewModel("Net profit", stocksharp.ChartIndicatorDrawStyles.Area, Color.Green, 0, false, series);
+            var viewModel = new EquityChartViewModel(
+                "Net profit",
+                stocksharp.ChartIndicatorDrawStyles.Area,
+                Color.Green,
+                0,
+                false,
+                series);
 
             workCharts.Add(viewModel);
 
@@ -980,16 +1041,34 @@ namespace Algoloop.ViewModel
                     Series serie = kvp.Value;
                     if (serie.Values.Count < 2) continue;
                     IEnumerable<stocksharp.EquityData> list = serie.Values.Select(
-                        m => new stocksharp.EquityData { Time = Time.UnixTimeStampToDateTime(m.x), Value = RoundLarge(m.y) });
+                        m => new stocksharp.EquityData {
+                            Time = Time.UnixTimeStampToDateTime(m.x),
+                            Value = RoundLarge(m.y)
+                        });
 
                     viewModel = serie.Name switch
                     {
                         "Equity" => new EquityChartViewModel(
-                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Area, serie.Color, 0, true, list),
+                            serie.Name,
+                            stocksharp.ChartIndicatorDrawStyles.Area,
+                            serie.Color,
+                            0,
+                            true,
+                            list),
                         "Daily Performance" => new EquityChartViewModel(
-                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Histogram, serie.Color, 1, true, list),
+                            serie.Name,
+                            stocksharp.ChartIndicatorDrawStyles.Histogram,
+                            serie.Color,
+                            1,
+                            true,
+                            list),
                         _ => new EquityChartViewModel(
-                            serie.Name, stocksharp.ChartIndicatorDrawStyles.Line, serie.Color, 2, false, list),
+                            serie.Name,
+                            stocksharp.ChartIndicatorDrawStyles.Line,
+                            serie.Color,
+                            2,
+                            false,
+                            list),
                     };
                     workCharts.Add(viewModel);
                 }

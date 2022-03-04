@@ -13,10 +13,8 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Win32;
 using QuantConnect.Logging;
 using System;
@@ -31,7 +29,7 @@ using System.Windows.Data;
 
 namespace Algoloop.ViewModel
 {
-    public class ListViewModel : ViewModel, ITreeViewModel
+    public class ListViewModel : ViewModelBase, ITreeViewModel
     {
         private SymbolViewModel _selectedSymbol;
         private SymbolViewModel _marketSymbol;
@@ -42,12 +40,20 @@ namespace Algoloop.ViewModel
             Market = market ?? throw new ArgumentNullException(nameof(market));
             Model = model;
 
-            DeleteCommand = new RelayCommand(() => Market?.DeleteList(this), () => !IsBusy && !Market.Active);
+            DeleteCommand = new RelayCommand(
+                () => Market?.DeleteList(this), () => !IsBusy && !Market.Active);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            AddSymbolCommand = new RelayCommand<SymbolViewModel>(m => DoAddSymbol(m), m => !IsBusy && !Market.Active && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
-            RemoveSymbolsCommand = new RelayCommand<IList>(m => DoRemoveSymbols(m), m => !IsBusy && !Market.Active && SelectedSymbol != null);
-            ExportListCommand = new RelayCommand(() => DoExportList(), () => !IsBusy && !Market.Active);
+            AddSymbolCommand = new RelayCommand<SymbolViewModel>(
+                m => DoAddSymbol(m),
+                m => !IsBusy
+                    && !Market.Active
+                    && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
+            RemoveSymbolsCommand = new RelayCommand<IList>(
+                m => DoRemoveSymbols(m),
+                m => !IsBusy && !Market.Active && SelectedSymbol != null);
+            ExportListCommand = new RelayCommand(
+                () => DoExportList(), () => !IsBusy && !Market.Active);
 
             DataFromModel();
 
@@ -55,8 +61,10 @@ namespace Algoloop.ViewModel
             {
                 if (e.Item is SymbolViewModel marketSymbol)
                 {
-                    e.Accepted = marketSymbol.Active
-                    && !Symbols.Any(m => m.Model.Id.Equals(marketSymbol.Model.Id, StringComparison.OrdinalIgnoreCase));
+                    e.Accepted = marketSymbol.Active && !Symbols.Any(
+                        m => m.Model.Id.Equals(
+                            marketSymbol.Model.Id,
+                            StringComparison.OrdinalIgnoreCase));
                 }
             };
 
@@ -82,17 +90,20 @@ namespace Algoloop.ViewModel
         public RelayCommand<SymbolViewModel> AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand ExportListCommand { get; }
-        public string DisplayName => Model != null ? $"{Market.Model.Name}: {Model.Name} ({Symbols.Count})" : string.Empty;
+        public string DisplayName => Model != null
+            ? $"{Market.Model.Name}: {Model.Name} ({Symbols.Count})" : string.Empty;
 
         public MarketViewModel Market { get; }
         public ListModel Model { get; }
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public CollectionViewSource MarketSymbols { get; } = new CollectionViewSource();
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; }
+            = new SyncObservableCollection<SymbolViewModel>();
+        public CollectionViewSource MarketSymbols { get; }
+            = new CollectionViewSource();
 
         public SymbolViewModel MarketSymbol
         {
             get => _marketSymbol;
-            set => Set(ref _marketSymbol, value);
+            set => SetProperty(ref _marketSymbol, value);
         }
 
         public IList SelectedItems
@@ -105,10 +116,13 @@ namespace Algoloop.ViewModel
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
+                    message = string.Format(
+                        CultureInfo.InvariantCulture,
+                        Resources.SelectedCount,
+                        _selectedItems.Count);
                 }
 
-                Messenger.Default.Send(new NotificationMessage(message));
+                Messenger.Send(new NotificationMessage(message), 0);
             }
         }
 
@@ -117,8 +131,8 @@ namespace Algoloop.ViewModel
             get => _selectedSymbol;
             set
             {
-                Set(ref _selectedSymbol, value);
-                RemoveSymbolsCommand.RaiseCanExecuteChanged();
+                SetProperty(ref _selectedSymbol, value);
+                RemoveSymbolsCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -127,7 +141,7 @@ namespace Algoloop.ViewModel
             Model.Refresh();
             DataFromModel();
             MarketSymbols.View.Refresh();
-            AddSymbolCommand.RaiseCanExecuteChanged();
+            AddSymbolCommand.NotifyCanExecuteChanged();
         }
 
         public void AddSymbols(IEnumerable<SymbolViewModel> symbols)
@@ -144,7 +158,7 @@ namespace Algoloop.ViewModel
 
             DataToModel();
             MarketSymbols.View.Refresh();
-            AddSymbolCommand.RaiseCanExecuteChanged();
+            AddSymbolCommand.NotifyCanExecuteChanged();
         }
 
         private void DoAddSymbol(SymbolViewModel symbol)
@@ -180,10 +194,14 @@ namespace Algoloop.ViewModel
             {
                 if (marketSymbol.Active)
                 {
-                    SymbolModel symbol = Model.Symbols.FirstOrDefault(m => 
-                        m.Id.Equals(marketSymbol.Model.Id, StringComparison.OrdinalIgnoreCase) &&
-                        m.Market.Equals(marketSymbol.Model.Market, StringComparison.OrdinalIgnoreCase) &&
-                        m.Security == marketSymbol.Model.Security);
+                    SymbolModel symbol = Model.Symbols.FirstOrDefault(
+                        m => m.Id.Equals(
+                            marketSymbol.Model.Id,
+                            StringComparison.OrdinalIgnoreCase)
+                        && m.Market.Equals(
+                            marketSymbol.Model.Market,
+                            StringComparison.OrdinalIgnoreCase)
+                        && m.Security == marketSymbol.Model.Security);
                     if (symbol != null)
                     {
                         Symbols.Add(marketSymbol);
@@ -217,7 +235,7 @@ namespace Algoloop.ViewModel
                 }
 
                 MarketSymbols.View.Refresh();
-                AddSymbolCommand.RaiseCanExecuteChanged();
+                AddSymbolCommand.NotifyCanExecuteChanged();
             }
             finally
             {

@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight.Command;
+using Microsoft.Toolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System;
@@ -24,7 +24,7 @@ using System.Windows;
 
 namespace Algoloop.ViewModel
 {
-    public class SettingsViewModel : ViewModel
+    public class SettingsViewModel : ViewModelBase
     {
         public SettingsViewModel(SettingModel settings)
         {

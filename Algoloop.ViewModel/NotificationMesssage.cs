@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Capnode AB
+ * Copyright 2022 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -12,17 +12,16 @@
  * limitations under the License.
  */
 
-using Microsoft.Toolkit.Mvvm.Input;
+
+using Microsoft.Toolkit.Mvvm.Messaging.Messages;
 
 namespace Algoloop.ViewModel
 {
-    public interface ITreeViewModel
+    // A sample request message to get the current username
+    public class NotificationMessage : ValueChangedMessage<string>
     {
-        bool IsBusy { get; set; }
-        ITreeViewModel SelectedItem { get; set; }
-        RelayCommand DeleteCommand { get; }
-        RelayCommand StartCommand { get; }
-        RelayCommand StopCommand { get; }
-        void Refresh();
+        public NotificationMessage(string message) : base(message)
+        {
+        }
     }
 }

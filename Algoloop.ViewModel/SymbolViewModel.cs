@@ -15,7 +15,7 @@
 using Algoloop.Model;
 using Algoloop.ViewModel.Internal;
 using Capnode.Wpf.DataGrid;
-using GalaSoft.MvvmLight.Command;
+using Microsoft.Toolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Data.Fundamental;
@@ -35,7 +35,7 @@ using System.Windows.Controls;
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolViewModel : ViewModel, ITreeViewModel, IComparable
+    public class SymbolViewModel : ViewModelBase, ITreeViewModel, IComparable
     {
         public enum ReportPeriod { Year, R12, Quarter };
 
@@ -75,14 +75,16 @@ namespace Algoloop.ViewModel
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
-            UpdateCommand = new RelayCommand(() => DoLoadData(Market), () => !IsBusy && Market != null);
+            UpdateCommand = new RelayCommand(
+                () => DoLoadData(Market),
+                () => !IsBusy && Market != null);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
         public decimal Ask
         {
             get => _ask;
-            set => Set(ref _ask, value);
+            set => SetProperty(ref _ask, value);
         }
 
         public decimal AskChange
@@ -94,14 +96,14 @@ namespace Algoloop.ViewModel
                 if (value == 0) return;
 
                 // Raise only when changed
-                RaisePropertyChanged(() => AskChange);
+                OnPropertyChanged();
             }
         }
 
         public decimal Bid
         {
             get => _bid;
-            set => Set(ref _bid, value);
+            set => SetProperty(ref _bid, value);
         }
 
         public decimal BidChange
@@ -113,14 +115,14 @@ namespace Algoloop.ViewModel
                 if (value == 0) return;
 
                 // Raise only when changed
-                RaisePropertyChanged(() => BidChange);
+                OnPropertyChanged();
             }
         }
 
         public decimal Price
         {
             get => _price;
-            set => Set(ref _price, value);
+            set => SetProperty(ref _price, value);
         }
 
         public decimal PriceChange
@@ -132,7 +134,7 @@ namespace Algoloop.ViewModel
                 if (value == 0) return;
 
                 // Raise only when changed
-                RaisePropertyChanged(() => PriceChange);
+                OnPropertyChanged();
             }
         }
 
@@ -155,7 +157,8 @@ namespace Algoloop.ViewModel
         public SymbolModel Model { get; }
         public MarketViewModel Market { get; }
 
-        public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; } = new SyncObservableCollection<ExDataGridRow>();
+        public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; }
+            = new SyncObservableCollection<ExDataGridRow>();
 
         public bool Active
         {
@@ -165,7 +168,7 @@ namespace Algoloop.ViewModel
                 if (Model.Active != value)
                 {
                     Model.Active = value;
-                    RaisePropertyChanged(() => Active);
+                    OnPropertyChanged();
 //                (_parent as StrategyViewModel)?.Refresh();
 //                (_parent as MarketViewModel)?.Refresh();
                 }
@@ -175,19 +178,19 @@ namespace Algoloop.ViewModel
         public bool ShowCharts
         {
             get => _showCharts;
-            set => Set(ref _showCharts, value);
+            set => SetProperty(ref _showCharts, value);
         }
 
         public SyncObservableCollection<IChartViewModel> Charts
         {
             get => _charts;
-            set => Set(ref _charts, value);
+            set => SetProperty(ref _charts, value);
         }
 
         public ObservableCollection<DataGridColumn> PeriodColumns
         {
             get => _periodColumns;
-            set => Set(ref _periodColumns, value);
+            set => SetProperty(ref _periodColumns, value);
         }
 
         public void Refresh()
@@ -227,14 +230,19 @@ namespace Algoloop.ViewModel
         private void LoadCharts(MarketViewModel market)
         {
             Charts.Clear();
-            string filename = PriceFilePath(market, Model, market.SelectedResolution, market.Date);
+            string filename = PriceFilePath(
+                market, Model, market.SelectedResolution, market.Date);
             if (File.Exists(filename))
             {
                 var leanDataReader = new LeanDataReader(filename);
                 IEnumerable<Candle> candles = leanDataReader.Parse().ToCandles();
                 if (candles.Any())
                 {
-                    var viewModel = new StockChartViewModel(Model.Name, ChartCandleDrawStyles.CandleStick, Color.Black, candles);
+                    var viewModel = new StockChartViewModel(
+                        Model.Name,
+                        ChartCandleDrawStyles.CandleStick,
+                        Color.Black,
+                        candles);
                     Charts.Add(viewModel);
                 }
                 ShowCharts = true;
@@ -245,10 +253,15 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private static string PriceFilePath(MarketViewModel market, SymbolModel symbol, Resolution resolution, DateTime date)
+        private static string PriceFilePath(
+            MarketViewModel market,
+            SymbolModel symbol,
+            Resolution resolution,
+            DateTime date)
         {
             var basedir = new DirectoryInfo(market.DataFolder);
-            if (resolution.Equals(Resolution.Daily) || resolution.Equals(Resolution.Hour))
+            if (resolution.Equals(
+                Resolution.Daily) || resolution.Equals(Resolution.Hour))
             {
                 string path = Path.Combine(
                     market.DataFolder,
@@ -267,7 +280,8 @@ namespace Algoloop.ViewModel
                     symbol.Id);
                 if (!Directory.Exists(path)) return null;
                 var dir = new DirectoryInfo(path);
-                string date1 = date.ToString("yyyyMMdd", CultureInfo.InvariantCulture);
+                string date1 = date.ToString(
+                    "yyyyMMdd", CultureInfo.InvariantCulture);
                 string file = dir
                     .GetFiles(date1 + "*.zip")
                     .Select(x => x.FullName)
@@ -281,7 +295,8 @@ namespace Algoloop.ViewModel
             // Reset Fundamentals
             FundamentalRows.Clear();
             PeriodColumns.Clear();
-            ExDataGridColumns.AddTextColumn(PeriodColumns, "Item", "Header", false, true);
+            ExDataGridColumns.AddTextColumn(
+                PeriodColumns, "Item", "Header", false, true);
 
             // Find FineFundamentals folder
             string folder = Path.Combine(
@@ -302,7 +317,8 @@ namespace Algoloop.ViewModel
             FileInfo[] files = d.GetFiles("*.zip");
             foreach (FileInfo file in files)
             {
-                using (StreamReader resultStream = Compression.Unzip(file.FullName, jsonFile, out Ionic.Zip.ZipFile zipFile))
+                using (StreamReader resultStream = Compression.Unzip(
+                    file.FullName, jsonFile, out Ionic.Zip.ZipFile zipFile))
                 using (zipFile)
                 {
                     if (resultStream == null)
@@ -312,7 +328,8 @@ namespace Algoloop.ViewModel
 
                     using JsonReader reader = new JsonTextReader(resultStream);
                     var serializer = new JsonSerializer();
-                    FineFundamental fine = serializer.Deserialize<FineFundamental>(reader);
+                    FineFundamental fine =
+                        serializer.Deserialize<FineFundamental>(reader);
                     LoadFundamentals(fine);
                 }
             }
@@ -330,7 +347,8 @@ namespace Algoloop.ViewModel
             switch (Market.SelectedReportPeriod)
             {
                 case ReportPeriod.Year:
-                    if (periodType != null && periodType.Equals(_annual, StringComparison.OrdinalIgnoreCase))
+                    if (periodType != null && periodType.Equals(
+                        _annual, StringComparison.OrdinalIgnoreCase))
                     {
                         FundamentalYear(fine, date.Year.ToStringInvariant());
                     }
@@ -367,15 +385,33 @@ namespace Algoloop.ViewModel
         {
             DateTime periodEndDate = fine.FinancialStatements.PeriodEndingDate;
             DateTime fileDate = fine.FinancialStatements.FileDate;
-            decimal totalRevenue = Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths, 1 / _million, 4); ;
-            decimal netIncome = Round(fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths, 1 / _million, 4);
-            decimal revenueGrowth = Round(fine.OperationRatios.RevenueGrowth.OneYear, 100, 4);
-            decimal netIncomeGrowth = Round(fine.OperationRatios.NetIncomeGrowth.OneYear, 100, 4);
-            decimal netMargin = Round(fine.OperationRatios.NetMargin.OneYear, 100, 4);
+            decimal totalRevenue = Round(
+                fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths,
+                1 / _million,
+                4); ;
+            decimal netIncome = Round(
+                fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
+                1 / _million,
+                4);
+            decimal revenueGrowth = Round(
+                fine.OperationRatios.RevenueGrowth.OneYear, 100, 4);
+            decimal netIncomeGrowth = Round(
+                fine.OperationRatios.NetIncomeGrowth.OneYear, 100, 4);
+            decimal netMargin = Round(
+                fine.OperationRatios.NetMargin.OneYear, 100, 4);
             decimal peRatio = Round(fine.ValuationRatios.PERatio, 1, 4);
-            decimal operatingCashFlow = Round(fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths, 1 / _million, 4);
-            decimal investingCashFlow = Round(fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths, 1 / _million, 4);
-            decimal financingCashFlow = Round(fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths,1 / _million, 4);
+            decimal operatingCashFlow = Round(
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths,
+                1 / _million,
+                4);
+            decimal investingCashFlow = Round(
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths,
+                1 / _million,
+                4);
+            decimal financingCashFlow = Round(
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths,
+                1 / _million,
+                4);
             decimal sharesOutstanding = fine.CompanyProfile.SharesOutstanding;
 
             SetFundamentals(_periodEndDate, period, periodEndDate.ToShortDateString());
@@ -396,15 +432,31 @@ namespace Algoloop.ViewModel
         {
             DateTime periodEndDate = fine.FinancialStatements.PeriodEndingDate;
             DateTime fileDate = fine.FinancialStatements.FileDate;
-            decimal totalRevenue = Round(fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths, 1 / _million, 4); ;
-            decimal netIncome = Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths, 1 / _million, 4);
-            decimal revenueGrowth = Round(fine.OperationRatios.RevenueGrowth.ThreeMonths, 100, 4);
-            decimal netIncomeGrowth = Round(fine.OperationRatios.NetIncomeGrowth.ThreeMonths, 100, 4);
+            decimal totalRevenue = Round(
+                fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths,
+                1 / _million,
+                4); ;
+            decimal netIncome = Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths,
+                1 / _million,
+                4);
+            decimal revenueGrowth = Round(
+                fine.OperationRatios.RevenueGrowth.ThreeMonths, 100, 4);
+            decimal netIncomeGrowth = Round(
+                fine.OperationRatios.NetIncomeGrowth.ThreeMonths, 100, 4);
             decimal netMargin = Round(fine.OperationRatios.NetMargin.ThreeMonths, 100, 4);
             decimal peRatio = Round(fine.ValuationRatios.PERatio, 1, 4);
-            decimal operatingCashFlow = Round(fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths, 1 / _million, 4);
-            decimal investingCashFlow = Round(fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths, 1 / _million, 4);
-            decimal financingCashFlow = Round(fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths, 1 / _million, 4);
+            decimal operatingCashFlow = Round(
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths,
+                1 / _million,
+                4);
+            decimal investingCashFlow = Round(
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths,
+                1 / _million,
+                4);
+            decimal financingCashFlow = Round(
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths,
+                1 / _million,
+                4);
             decimal sharesOutstanding = fine.CompanyProfile.SharesOutstanding;
 
             if (totalRevenue == 0

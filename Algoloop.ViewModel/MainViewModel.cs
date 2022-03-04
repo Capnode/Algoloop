@@ -15,8 +15,7 @@
 using Algoloop.Model;
 using Algoloop.ViewModel.Properties;
 using Algoloop.ViewModel.Provider;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Toolkit.Mvvm.Input;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
@@ -30,7 +29,7 @@ namespace Algoloop.ViewModel
     /// <summary>
     /// This class contains properties that the main View can data bind to.
     /// </summary>
-    public class MainViewModel : ViewModel
+    public class MainViewModel : ViewModelBase
     {
         private bool _isBusy;
         private string _statusMessage;
@@ -53,9 +52,12 @@ namespace Algoloop.ViewModel
             LogViewModel = logViewModel;
 
             SaveCommand = new RelayCommand(() => SaveConfig(), () => !IsBusy);
-            ExitCommand = new RelayCommand<Window>(window => DoExit(window), window => !IsBusy);
-            UpdateCommand = new RelayCommand(async () => await DoUpdate().ConfigureAwait(false), () => !IsBusy);
-            Messenger.Default.Register<NotificationMessage>(this, OnStatusMessage);
+            ExitCommand = new RelayCommand<Window>(
+                window => DoExit(window), window => !IsBusy);
+            UpdateCommand = new RelayCommand(
+                async () => await DoUpdate().ConfigureAwait(false), () => !IsBusy);
+            Messenger.Register<MainViewModel, NotificationMessage, int>(
+                this, 0, static (r, m) => r.OnStatusMessage(m));
 
             // Set working directory
             string appData = MainService.GetAppDataFolder();
@@ -86,13 +88,13 @@ namespace Algoloop.ViewModel
         public bool IsBusy
         {
             get => _isBusy;
-            set => Set(ref _isBusy, value);
+            set => SetProperty(ref _isBusy, value);
         }
 
         public string StatusMessage
         {
             get => _statusMessage;
-            set => Set(ref _statusMessage, value);
+            set => SetProperty(ref _statusMessage, value);
         }
 
         public void SaveConfig()
@@ -100,7 +102,8 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                Messenger.Default.Send(new NotificationMessage(Resources.SavingConfiguration));
+                Messenger.Send(new NotificationMessage(
+                    Resources.SavingConfiguration), 0);
 
                 string appData = MainService.GetAppDataFolder();
                 if (!Directory.Exists(appData))
@@ -114,7 +117,7 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                Messenger.Default.Send(new NotificationMessage(string.Empty));
+                Messenger.Send(new NotificationMessage(string.Empty), 0);
                 IsBusy = false;
             }
         }
@@ -144,11 +147,11 @@ namespace Algoloop.ViewModel
 
         private void OnStatusMessage(NotificationMessage message)
         {
-            StatusMessage = message.Notification;
-            if (string.IsNullOrWhiteSpace(message.Notification))
+            StatusMessage = message.Value;
+            if (string.IsNullOrWhiteSpace(StatusMessage))
                 return;
 
-            Log.Trace(message.Notification);
+            Log.Trace(StatusMessage);
         }
 
         private void DoExit(Window window)
@@ -170,13 +173,16 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfiguration));
+                Messenger.Send(new NotificationMessage(
+                    Resources.LoadingConfiguration), 0);
 
                 // Set config
                 Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
                 Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
-                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                Config.Set(
+                    "map-file-provider",
+                    "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
 
                 // Initialize data folders
                 string program = MainService.GetProgramFolder();
@@ -190,9 +196,18 @@ namespace Algoloop.ViewModel
                 MainService.Delete(Path.Combine(programDataFolder, "market-hours"));
                 MainService.Delete(Path.Combine(programDataFolder, "symbol-properties"));
                 MainService.DeleteFolders(appDataFolder, "temp*");
-                MainService.CopyDirectory(Path.Combine(program, "Content/AppData"), appDataFolder, false);
-                MainService.CopyDirectory(Path.Combine(program, "Content/ProgramData"), programDataFolder, false);
-                MainService.CopyDirectory(Path.Combine(program, "Content/UserData"), userDataFolder, false);
+                MainService.CopyDirectory(
+                    Path.Combine(program, "Content/AppData"),
+                    appDataFolder,
+                    false);
+                MainService.CopyDirectory(
+                    Path.Combine(program, "Content/ProgramData"),
+                    programDataFolder,
+                    false);
+                MainService.CopyDirectory(
+                    Path.Combine(program, "Content/UserData"),
+                    userDataFolder,
+                    false);
 
                 // Read settings
                 string appData = MainService.GetAppDataFolder();
@@ -207,12 +222,13 @@ namespace Algoloop.ViewModel
 
                 // Initialize Research page
                 ResearchViewModel.Initialize();
-                Messenger.Default.Send(new NotificationMessage(Resources.LoadingConfigurationCompleted));
+                Messenger.Send(new NotificationMessage(
+                    Resources.LoadingConfigurationCompleted), 0);
             }
             catch (Exception ex)
             {
                 string message = $"{ex.Message} ({ex.GetType()})";
-                Messenger.Default.Send(new NotificationMessage(message));
+                Messenger.Send(new NotificationMessage(message), 0);
                 Log.Error(ex, message);
             }
             finally

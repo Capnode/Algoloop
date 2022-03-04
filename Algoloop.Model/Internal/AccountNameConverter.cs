@@ -12,7 +12,7 @@
  * limitations under the License.
 */
 
-using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -24,23 +24,26 @@ namespace Algoloop.Model.Internal
         private readonly MarketsModel _markets;
 
         public AccountNameConverter()
-        {
-            _markets = SimpleIoc.Default.GetInstance<MarketsModel>();
+        {         
+            _markets = Ioc.Default.GetService<MarketsModel>();
         }
 
-        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        public override bool GetStandardValuesSupported(
+            ITypeDescriptorContext context)
         {
             // true means show a combobox
             return true;
         }
 
-        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+        public override bool GetStandardValuesExclusive(
+            ITypeDescriptorContext context)
         {
             // true will limit to list. false will show the list, but allow free-form entry
             return true;
         }
 
-        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        public override StandardValuesCollection GetStandardValues(
+            ITypeDescriptorContext context)
         {
             // Request list of accounts
             IReadOnlyList<AccountModel> accounts = _markets.GetAccounts();

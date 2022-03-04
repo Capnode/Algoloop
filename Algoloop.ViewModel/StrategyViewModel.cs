@@ -14,8 +14,6 @@
 
 using Algoloop.Model;
 using Capnode.Wpf.DataGrid;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect.AlgorithmFactory;
@@ -37,10 +35,11 @@ using System.Windows.Data;
 using System.Diagnostics.Contracts;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
+using Microsoft.Toolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategyViewModel : ViewModel, ITreeViewModel
+    public class StrategyViewModel : ViewModelBase, ITreeViewModel
     {
         public const string DefaultName = "Strategy";
         internal ITreeViewModel _parent;
@@ -66,25 +65,59 @@ namespace Algoloop.ViewModel
             _markets = markets;
             _settings = settings;
 
-            StartCommand = new RelayCommand(() => DoStartCommand(), () => !IsBusy && !Active);
-            StopCommand = new RelayCommand(() => DoStopCommand(), () => !IsBusy && Active);
+            StartCommand = new RelayCommand(
+                () => DoStartCommand(),
+                () => !IsBusy && !Active);
+            StopCommand = new RelayCommand(
+                () => DoStopCommand(),
+                () => !IsBusy && Active);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => !IsBusy);
-            CloneAlgorithmCommand = new RelayCommand(() => DoCloneAlgorithm(), () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmLocation));
-            ExportCommand = new RelayCommand(() => DoExportStrategy(), () => !IsBusy);
-            DeleteCommand = new RelayCommand(() => DoDeleteStrategy(), () => !IsBusy);
-            DeleteAllTracksCommand = new RelayCommand(() => DoDeleteTracks(null), () => !IsBusy);
-            DeleteSelectedTracksCommand = new RelayCommand<IList>(m => DoDeleteTracks(m), m => !IsBusy);
-            UseParametersCommand = new RelayCommand<IList>(m => DoUseParameters(m), m => !IsBusy);
+            CloneAlgorithmCommand = new RelayCommand(
+                () => DoCloneAlgorithm(),
+                () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmLocation));
+            ExportCommand = new RelayCommand(
+                () => DoExportStrategy(),
+                () => !IsBusy);
+            DeleteCommand = new RelayCommand(
+                () => DoDeleteStrategy(),
+                () => !IsBusy);
+            DeleteAllTracksCommand = new RelayCommand(
+                () => DoDeleteTracks(null),
+                () => !IsBusy);
+            DeleteSelectedTracksCommand = new RelayCommand<IList>(
+                m => DoDeleteTracks(m),
+                m => !IsBusy);
+            UseParametersCommand = new RelayCommand<IList>(
+                m => DoUseParameters(m),
+                m => !IsBusy);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
-            DeleteSymbolsCommand = new RelayCommand<IList>(m => DoDeleteSymbols(m), m => !IsBusy && SelectedSymbol != null);
-            ImportSymbolsCommand = new RelayCommand(() => DoImportSymbols(), () => !IsBusy);
-            ExportSymbolsCommand = new RelayCommand<IList>(m => DoExportSymbols(m), trm => !IsBusy && SelectedSymbol != null);
-            TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(m => DoSelectItem(m), m => !IsBusy);
-            MoveUpSymbolsCommand = new RelayCommand<IList>(m => OnMoveUpSymbols(m), m => !IsBusy && SelectedSymbol != null);
-            MoveDownSymbolsCommand = new RelayCommand<IList>(m => OnMoveDownSymbols(m), m => !IsBusy && SelectedSymbol != null);
-            SortSymbolsCommand = new RelayCommand(() => Symbols.Sort(), () => !IsBusy);
-            MoveStrategyCommand = new RelayCommand<ITreeViewModel>(m => OnMoveStrategy(m), m => !IsBusy);
-            DropDownOpenedCommand = new RelayCommand(() => DoDropDownOpenedCommand(), () => !IsBusy);
+            DeleteSymbolsCommand = new RelayCommand<IList>(
+                m => DoDeleteSymbols(m),
+                m => !IsBusy && SelectedSymbol != null);
+            ImportSymbolsCommand = new RelayCommand(
+                () => DoImportSymbols(),
+                () => !IsBusy);
+            ExportSymbolsCommand = new RelayCommand<IList>(
+                m => DoExportSymbols(m),
+                trm => !IsBusy && SelectedSymbol != null);
+            TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(
+                m => DoSelectItem(m),
+                m => !IsBusy);
+            MoveUpSymbolsCommand = new RelayCommand<IList>(
+                m => OnMoveUpSymbols(m),
+                m => !IsBusy && SelectedSymbol != null);
+            MoveDownSymbolsCommand = new RelayCommand<IList>(
+                m => OnMoveDownSymbols(m),
+                m => !IsBusy && SelectedSymbol != null);
+            SortSymbolsCommand = new RelayCommand(
+                () => Symbols.Sort(),
+                () => !IsBusy);
+            MoveStrategyCommand = new RelayCommand<ITreeViewModel>(
+                m => OnMoveStrategy(m),
+                m => !IsBusy);
+            DropDownOpenedCommand = new RelayCommand(
+                () => DoDropDownOpenedCommand(),
+                () => !IsBusy);
 
             Model.NameChanged += StrategyNameChanged;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
@@ -138,19 +171,25 @@ namespace Algoloop.ViewModel
         public RelayCommand DropDownOpenedCommand { get; }
         public StrategyModel Model { get; }
 
-        public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public SyncObservableCollection<ParameterViewModel> Parameters { get; } = new SyncObservableCollection<ParameterViewModel>();
-        public SyncObservableCollection<TrackViewModel> Tracks { get; } = new SyncObservableCollection<TrackViewModel>();
-        public SyncObservableCollection<StrategyViewModel> Strategies { get; } = new SyncObservableCollection<StrategyViewModel>();
-        public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
-        public ObservableCollection<DataGridColumn> TrackColumns { get; } = new ObservableCollection<DataGridColumn>();
+        public SyncObservableCollection<SymbolViewModel> Symbols { get; }
+            = new SyncObservableCollection<SymbolViewModel>();
+        public SyncObservableCollection<ParameterViewModel> Parameters { get; }
+            = new SyncObservableCollection<ParameterViewModel>();
+        public SyncObservableCollection<TrackViewModel> Tracks { get; }
+            = new SyncObservableCollection<TrackViewModel>();
+        public SyncObservableCollection<StrategyViewModel> Strategies { get; }
+            = new SyncObservableCollection<StrategyViewModel>();
+        public SyncObservableCollection<ListViewModel> Lists { get; }
+            = new SyncObservableCollection<ListViewModel>();
+        public ObservableCollection<DataGridColumn> TrackColumns { get; }
+            = new ObservableCollection<DataGridColumn>();
 
         public bool Active 
         {
             get => _active;
             set
             {
-                Set(ref _active, value);
+                SetProperty(ref _active, value);
                 RaiseCommands();
             }
         }
@@ -165,17 +204,20 @@ namespace Algoloop.ViewModel
                 string message = string.Empty;
                 if (_selectedItems?.Count > 0)
                 {
-                    message = string.Format(CultureInfo.InvariantCulture, Resources.SelectedCount, _selectedItems.Count);
+                    message = string.Format(
+                        CultureInfo.InvariantCulture,
+                        Resources.SelectedCount,
+                        _selectedItems.Count);
                 }
 
-                Messenger.Default.Send(new NotificationMessage(message));
+                Messenger.Send(new NotificationMessage(message), 0);
             }
         }
 
         public string DisplayName
         {
             get => _displayName;
-            set => Set(ref _displayName, value);
+            set => SetProperty(ref _displayName, value);
         }
 
         public bool IsSelected
@@ -184,14 +226,14 @@ namespace Algoloop.ViewModel
             set
             {
                 Debug.Assert(!IsBusy, "Can not set Command execute if busy");
-                Set(ref _isSelected, value);
+                SetProperty(ref _isSelected, value);
             }
         }
 
         public bool IsExpanded
         {
             get => _isExpanded;
-            set => Set(ref _isExpanded, value);
+            set => SetProperty(ref _isExpanded, value);
         }
 
         public SymbolViewModel SelectedSymbol
@@ -199,7 +241,7 @@ namespace Algoloop.ViewModel
             get => _selectedSymbol;
             set
             {
-                Set(ref _selectedSymbol, value);
+                SetProperty(ref _selectedSymbol, value);
                 RaiseCommands();
             }
         }
@@ -209,7 +251,7 @@ namespace Algoloop.ViewModel
             get => _selectedTrack;
             set
             {
-                Set(ref _selectedTrack, value);
+                SetProperty(ref _selectedTrack, value);
                 RaiseCommands();
             }
         }
@@ -219,7 +261,7 @@ namespace Algoloop.ViewModel
             get => _selectedList;
             set
             {
-                Set(ref _selectedList, value);
+                SetProperty(ref _selectedList, value);
                 RaiseCommands();
             }
         }
@@ -301,25 +343,25 @@ namespace Algoloop.ViewModel
 
         private void RaiseCommands()
         {
-            StartCommand.RaiseCanExecuteChanged();
-            StopCommand.RaiseCanExecuteChanged();
-            CloneCommand.RaiseCanExecuteChanged();
-            CloneAlgorithmCommand.RaiseCanExecuteChanged();
-            ExportCommand.RaiseCanExecuteChanged();
-            DeleteCommand.RaiseCanExecuteChanged();
-            DeleteAllTracksCommand.RaiseCanExecuteChanged();
-            DeleteSelectedTracksCommand.RaiseCanExecuteChanged();
-            UseParametersCommand.RaiseCanExecuteChanged();
-            AddSymbolCommand.RaiseCanExecuteChanged();
-            DeleteSymbolsCommand.RaiseCanExecuteChanged();
-            ImportSymbolsCommand.RaiseCanExecuteChanged();
-            ExportSymbolsCommand.RaiseCanExecuteChanged();
-            TrackDoubleClickCommand.RaiseCanExecuteChanged();
-            MoveUpSymbolsCommand.RaiseCanExecuteChanged();
-            MoveDownSymbolsCommand.RaiseCanExecuteChanged();
-            SortSymbolsCommand.RaiseCanExecuteChanged();
-            MoveStrategyCommand.RaiseCanExecuteChanged();
-            DropDownOpenedCommand.RaiseCanExecuteChanged();
+            StartCommand.NotifyCanExecuteChanged();
+            StopCommand.NotifyCanExecuteChanged();
+            CloneCommand.NotifyCanExecuteChanged();
+            CloneAlgorithmCommand.NotifyCanExecuteChanged();
+            ExportCommand.NotifyCanExecuteChanged();
+            DeleteCommand.NotifyCanExecuteChanged();
+            DeleteAllTracksCommand.NotifyCanExecuteChanged();
+            DeleteSelectedTracksCommand.NotifyCanExecuteChanged();
+            UseParametersCommand.NotifyCanExecuteChanged();
+            AddSymbolCommand.NotifyCanExecuteChanged();
+            DeleteSymbolsCommand.NotifyCanExecuteChanged();
+            ImportSymbolsCommand.NotifyCanExecuteChanged();
+            ExportSymbolsCommand.NotifyCanExecuteChanged();
+            TrackDoubleClickCommand.NotifyCanExecuteChanged();
+            MoveUpSymbolsCommand.NotifyCanExecuteChanged();
+            MoveDownSymbolsCommand.NotifyCanExecuteChanged();
+            SortSymbolsCommand.NotifyCanExecuteChanged();
+            MoveStrategyCommand.NotifyCanExecuteChanged();
+            DropDownOpenedCommand.NotifyCanExecuteChanged();
         }
 
         private void DoDeleteTracks(IList tracks)
@@ -386,7 +428,9 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
                 if (SelectedList?.Model == null)
                 {
-                    var symbol = new SymbolViewModel(this, new SymbolModel("symbol", Model.Market, Model.Security));
+                    var symbol = new SymbolViewModel(
+                        this,
+                        new SymbolModel("symbol", Model.Market, Model.Security));
                     Symbols.Add(symbol);
                 }
                 else
@@ -431,8 +475,11 @@ namespace Algoloop.ViewModel
             int count = 0;
             var models = GridOptimizerModels(Model, 0);
             int total = models.Count;
-            string message = string.Format(CultureInfo.InvariantCulture, Resources.RunStrategyWithTracks, total);
-            Messenger.Default.Send(new NotificationMessage(message));
+            string message = string.Format(
+                CultureInfo.InvariantCulture,
+                Resources.RunStrategyWithTracks,
+                total);
+            Messenger.Send(new NotificationMessage(message), 0);
 
             var tasks = new List<Task>();
             using (var throttler = new SemaphoreSlim(_settings.MaxBacktests))
@@ -444,13 +491,15 @@ namespace Algoloop.ViewModel
                     count++;
                     var trackModel = new TrackModel(model.AlgorithmName, model);
                     Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
-                    var track = new TrackViewModel(this, trackModel, _markets, _settings);
+                    var track = new TrackViewModel(
+                        this, trackModel, _markets, _settings);
                     Tracks.Add(track);
                     Task task = track
                         .StartTrackAsync()
                         .ContinueWith(m =>
                         {
-                            ExDataGridColumns.AddPropertyColumns(TrackColumns, track.Statistics, "Statistics");
+                            ExDataGridColumns.AddPropertyColumns(
+                                TrackColumns, track.Statistics, "Statistics");
                             throttler.Release();
                         }, TaskScheduler.FromCurrentSynchronizationContext());
                     tasks.Add(task);
@@ -459,7 +508,7 @@ namespace Algoloop.ViewModel
                 await Task.WhenAll(tasks).ConfigureAwait(true);
             }
 
-            Messenger.Default.Send(new NotificationMessage(Active ? Resources.StrategyCompleted : Resources.StrategyAborted));
+            Messenger.Send(new NotificationMessage(Active ? Resources.StrategyCompleted : Resources.StrategyAborted), 0);
             Active = false;
         }
 
@@ -482,7 +531,8 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private List<StrategyModel> GridOptimizerModels(StrategyModel rawModel, int index)
+        private List<StrategyModel> GridOptimizerModels(
+            StrategyModel rawModel, int index)
         {
             var model = new StrategyModel(rawModel);
 
@@ -551,15 +601,21 @@ namespace Algoloop.ViewModel
             TrackColumns.Add(new DataGridCheckBoxColumn()
             {
                 Header = "Active",
-                Binding = new Binding("Active") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged }
+                Binding = new Binding("Active") {
+                    Mode = BindingMode.TwoWay,
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                }
             });
 
-            ExDataGridColumns.AddTextColumn(TrackColumns, "Name", "Model.Name", false, true);
+            ExDataGridColumns.AddTextColumn(
+                TrackColumns, "Name", "Model.Name", false, true);
             foreach (TrackModel TrackModel in Model.Tracks)
             {
-                var TrackViewModel = new TrackViewModel(this, TrackModel, _markets, _settings);
+                var TrackViewModel = new TrackViewModel(
+                    this, TrackModel, _markets, _settings);
                 Tracks.Add(TrackViewModel);
-                ExDataGridColumns.AddPropertyColumns(TrackColumns, TrackViewModel.Statistics, "Statistics");
+                ExDataGridColumns.AddPropertyColumns(
+                    TrackColumns, TrackViewModel.Statistics, "Statistics");
             }
         }
 
@@ -622,7 +678,7 @@ namespace Algoloop.ViewModel
             {
             }
 
-            RaisePropertyChanged(() => Parameters);
+            OnPropertyChanged(nameof(Parameters));
         }
 
         private void DoDeleteSymbols(IList symbols)

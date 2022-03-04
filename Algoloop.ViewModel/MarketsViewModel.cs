@@ -13,8 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel.Internal;
-using GalaSoft.MvvmLight.Command;
+using Microsoft.Toolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System.Diagnostics;
@@ -23,7 +22,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel
 {
-    public class MarketsViewModel : ViewModel
+    public class MarketsViewModel : ViewModelBase
     {
         private readonly SettingModel _settings;
         private ITreeViewModel _selectedItem;
@@ -35,7 +34,8 @@ namespace Algoloop.ViewModel
             _settings = settings;
 
             AddCommand = new RelayCommand(() => DoAddMarket(), () => !IsBusy);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy && vm != null);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>(
+                (vm) => DoSelectedChanged(vm), (vm) => !IsBusy && vm != null);
 
             DataFromModel();
             Debug.Assert(IsUiThread(), "Not UI thread!");
@@ -53,13 +53,13 @@ namespace Algoloop.ViewModel
         public bool IsBusy
         {
             get =>_isBusy;
-            set => Set(ref _isBusy, value);
+            set => SetProperty(ref _isBusy, value);
         }
 
         public ITreeViewModel SelectedItem
         {
             get => _selectedItem;
-            set => Set(ref _selectedItem, value);
+            set => SetProperty(ref _selectedItem, value);
         }
 
         internal bool DoDeleteMarket(MarketViewModel market)

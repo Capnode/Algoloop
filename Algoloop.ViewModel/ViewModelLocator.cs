@@ -21,13 +21,11 @@
   
   In the View:
   DataContext="{Binding Source={StaticResource Locator}, Path=ViewModelName}"
-
-  You can also use Blend to do all this with the tool's support.
-  See http://www.galasoft.ch/mvvm
 */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using System.Diagnostics;
 
 namespace Algoloop.ViewModel
@@ -43,28 +41,37 @@ namespace Algoloop.ViewModel
         /// </summary>
         public ViewModelLocator()
         {
-            Debug.Assert(ViewModel.IsUiThread(), "Not UI thread!");
+            Debug.Assert(ViewModelBase.IsUiThread(), "Not UI thread!");
 
             // Register Algoloop types
-            SimpleIoc.Default.Register<SettingModel>();
-            SimpleIoc.Default.Register<MarketsModel>();
-            SimpleIoc.Default.Register<StrategiesModel>();
-            SimpleIoc.Default.Register<MainViewModel>();
-            SimpleIoc.Default.Register<MarketsViewModel>();
-            SimpleIoc.Default.Register<StrategiesViewModel>();
-            SimpleIoc.Default.Register<ResearchViewModel>();
-            SimpleIoc.Default.Register<LogViewModel>();
-            SimpleIoc.Default.Register<SettingsViewModel>();
-            SimpleIoc.Default.Register<AboutViewModel>();
+            var services = new ServiceCollection();
+            services.AddSingleton<SettingModel>();
+            services.AddSingleton<MarketsModel>();
+            services.AddSingleton<StrategiesModel>();
+            services.AddSingleton<MainViewModel>();
+            services.AddSingleton<MarketsViewModel>();
+            services.AddSingleton<StrategiesViewModel>();
+            services.AddSingleton<ResearchViewModel>();
+            services.AddSingleton<LogViewModel>();
+            services.AddSingleton<SettingsViewModel>();
+            services.AddSingleton<AboutViewModel>();
+            Ioc.Default.ConfigureServices(services.BuildServiceProvider());
         }
 
-        public static MainViewModel MainViewModel => SimpleIoc.Default.GetInstance<MainViewModel>();
-        public static MarketsViewModel MarketsViewModel => SimpleIoc.Default.GetInstance<MarketsViewModel>();
-        public static StrategiesViewModel StrategiesViewModel => SimpleIoc.Default.GetInstance<StrategiesViewModel>();
-        public static ResearchViewModel ResearchViewModel => SimpleIoc.Default.GetInstance<ResearchViewModel>();
-        public static LogViewModel LogViewModel => SimpleIoc.Default.GetInstance<LogViewModel>();
-        public static SettingsViewModel SettingsViewModel => SimpleIoc.Default.GetInstance<SettingsViewModel>();
-        public static AboutViewModel AboutViewModel => SimpleIoc.Default.GetInstance<AboutViewModel>();
+        public static MainViewModel MainViewModel =>
+            Ioc.Default.GetService<MainViewModel>();
+        public static MarketsViewModel MarketsViewModel =>
+            Ioc.Default.GetService<MarketsViewModel>();
+        public static StrategiesViewModel StrategiesViewModel =>
+            Ioc.Default.GetService<StrategiesViewModel>();
+        public static ResearchViewModel ResearchViewModel =>
+            Ioc.Default.GetService<ResearchViewModel>();
+        public static LogViewModel LogViewModel =>
+            Ioc.Default.GetService<LogViewModel>();
+        public static SettingsViewModel SettingsViewModel =>
+            Ioc.Default.GetService<SettingsViewModel>();
+        public static AboutViewModel AboutViewModel =>
+            Ioc.Default.GetService<AboutViewModel>();
 
         public static void Cleanup()
         {

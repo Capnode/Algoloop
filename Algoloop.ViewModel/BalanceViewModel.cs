@@ -19,7 +19,7 @@ using System.Diagnostics;
 
 namespace Algoloop.ViewModel
 {
-    public class BalanceViewModel : ViewModel
+    public class BalanceViewModel : ViewModelBase
     {
         private decimal _cash;
         private decimal _equity;
@@ -43,7 +43,7 @@ namespace Algoloop.ViewModel
         public decimal Cash
         {
             get => _cash;
-            set => Set(ref _cash, value);
+            set => SetProperty(ref _cash, value);
         }
 
         public decimal Equity
@@ -52,7 +52,7 @@ namespace Algoloop.ViewModel
             set
             {
                 EquityChange = value - _equity;
-                Set(ref _equity, value);
+                SetProperty(ref _equity, value);
             }
         }
 
@@ -65,26 +65,26 @@ namespace Algoloop.ViewModel
                 if (value == 0) return;
 
                 // Raise only when changed
-                RaisePropertyChanged(() => EquityChange);
+                OnPropertyChanged();
             }
         }
 
         public decimal Profit
         {
             get => _profit;
-            set => Set(ref _profit, value);
+            set => SetProperty(ref _profit, value);
         }
 
         public decimal DayProfit
         {
             get => _dayProfit;
-            set => Set(ref _dayProfit, value);
+            set => SetProperty(ref _dayProfit, value);
         }
 
         public string Currency
         {
             get => _currency;
-            set => Set(ref _currency, value);
+            set => SetProperty(ref _currency, value);
         }
 
         public void Update(BalanceModel balance)

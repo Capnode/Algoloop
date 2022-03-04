@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using GalaSoft.MvvmLight;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -20,9 +20,9 @@ using System.Windows;
 
 namespace Algoloop.ViewModel
 {
-    public abstract class ViewModel : ViewModelBase
+    public abstract class ViewModelBase : ObservableRecipient
     {
-        public ViewModel()
+        public ViewModelBase()
         {
             Debug.Assert(IsUiThread());
         }

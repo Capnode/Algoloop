@@ -13,7 +13,7 @@
 */
 
 using Algoloop.Model;
-using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -26,7 +26,7 @@ namespace Algoloop.Wpf.Internal
 
         public MarketNameConverter()
         {
-            _markets = SimpleIoc.Default.GetInstance<MarketsModel>();
+            _markets = Ioc.Default.GetService<MarketsModel>();
         }
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)

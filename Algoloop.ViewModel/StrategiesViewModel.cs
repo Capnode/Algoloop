@@ -19,15 +19,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Algoloop.Model;
-using Algoloop.ViewModel.Internal;
-using GalaSoft.MvvmLight.Command;
+using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 
 namespace Algoloop.ViewModel
 {
-    public class StrategiesViewModel : ViewModel, ITreeViewModel
+    public class StrategiesViewModel : ViewModelBase, ITreeViewModel
     {
         private readonly MarketsModel _markets;
         private readonly SettingModel _settings;
@@ -43,9 +42,14 @@ namespace Algoloop.ViewModel
             _settings = settings;
 
             AddCommand = new RelayCommand(() => DoAddStrategy(), () => !IsBusy);
-            ImportCommand = new RelayCommand(() => DoImportStrategies(), () => !IsBusy);
-            ExportCommand = new RelayCommand(() => DoExportStrategies(), () => !IsBusy);
-            SelectedChangedCommand = new RelayCommand<ITreeViewModel>((vm) => DoSelectedChanged(vm), (vm) => !IsBusy && vm != null);
+            ImportCommand = new RelayCommand(
+                () => DoImportStrategies(),
+                () => !IsBusy);
+            ExportCommand = new RelayCommand(
+                () => DoExportStrategies(),
+                () => !IsBusy);
+            SelectedChangedCommand = new RelayCommand<ITreeViewModel>(
+                (vm) => DoSelectedChanged(vm), (vm) => !IsBusy && vm != null);
 
             DataFromModel();
             Debug.Assert(IsUiThread(), "Not UI thread!");
@@ -70,7 +74,7 @@ namespace Algoloop.ViewModel
         public bool IsBusy
         {
             get =>_isBusy;
-            set => Set(ref _isBusy, value);
+            set => SetProperty(ref _isBusy, value);
         }
 
         public ITreeViewModel SelectedItem
@@ -79,7 +83,7 @@ namespace Algoloop.ViewModel
             set
             {
                 Debug.Assert(!IsBusy, "Can not set Command execute if busy");
-                Set(ref _selectedItem, value);
+                SetProperty(ref _selectedItem, value);
            }
         }
 

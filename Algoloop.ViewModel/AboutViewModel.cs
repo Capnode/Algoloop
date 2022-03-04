@@ -19,7 +19,7 @@ using System.Globalization;
 
 namespace Algoloop.ViewModel
 {
-    public class AboutViewModel : ViewModel
+    public class AboutViewModel : ViewModelBase
     {
         public string Title { get; private set; }
         public string ProductName { get; private set; }
@@ -29,9 +29,15 @@ namespace Algoloop.ViewModel
 
         public AboutViewModel()
         {
-            Title = String.Format(CultureInfo.InvariantCulture, "About {0}", AboutModel.AssemblyProduct);
+            Title = String.Format(
+                CultureInfo.InvariantCulture,
+                "About {0}",
+                AboutModel.AssemblyProduct);
             ProductName = AboutModel.AssemblyProduct;
-            Version = String.Format(CultureInfo.InvariantCulture, "Version: {0}", AboutModel.AssemblyVersion);
+            Version = String.Format(
+                CultureInfo.InvariantCulture,
+                "Version: {0}",
+                AboutModel.AssemblyVersion);
             Copyright = AboutModel.AssemblyCopyright;
             Description = AboutModel.AssemblyDescription;
             Debug.Assert(IsUiThread(), "Not UI thread!");

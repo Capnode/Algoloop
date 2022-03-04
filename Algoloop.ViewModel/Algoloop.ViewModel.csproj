@@ -110,6 +110,8 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.124" />
     <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.124" />
   </ItemGroup>

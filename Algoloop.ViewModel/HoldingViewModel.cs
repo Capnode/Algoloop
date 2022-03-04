@@ -18,7 +18,7 @@ using System.Diagnostics;
 
 namespace Algoloop.ViewModel
 {
-    public class HoldingViewModel : ViewModel
+    public class HoldingViewModel : ViewModelBase
     {
         private decimal _price;
         private decimal _quantity;
@@ -36,25 +36,25 @@ namespace Algoloop.ViewModel
         public decimal Price
         {
             get => _price;
-            set => Set(ref _price, value);
+            set => SetProperty(ref _price, value);
         }
 
         public decimal Quantity
         {
             get => _quantity;
-            set => Set(ref _quantity, value);
+            set => SetProperty(ref _quantity, value);
         }
 
         public decimal Profit
         {
             get => _profit;
-            set => Set(ref _profit, value);
+            set => SetProperty(ref _profit, value);
         }
 
         public TimeSpan Duration
         {
             get => _duration;
-            set => Set(ref _duration, value);
+            set => SetProperty(ref _duration, value);
         }
     }
 }
