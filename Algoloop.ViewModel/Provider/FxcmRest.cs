@@ -48,7 +48,7 @@ namespace Algoloop.ViewModel.Provider
 
         public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             if (!_symbolsUpdated)
             {
                 IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
@@ -58,7 +58,7 @@ namespace Algoloop.ViewModel.Provider
                 _api.SubscribeMarketDataAsync(provider.Symbols, update).Wait();
             }
 
-            provider.LastDate = now;
+            provider.LastDate = now.ToLocalTime();
         }
 
         protected override void Dispose(bool disposing)
