@@ -19,7 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class FxcmRest : ProviderBase
     {

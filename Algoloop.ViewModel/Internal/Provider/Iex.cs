@@ -15,34 +15,34 @@
 using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Configuration;
-using QuantConnect.ToolBox.OandaDownloader;
+using QuantConnect.ToolBox.IEX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
-    internal class Oanda : ProviderBase
+    internal class Iex : ProviderBase
     {
         private SettingModel _settings;
 
         public override bool Register(SettingModel settings)
         {
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _settings = settings;
             return base.Register(settings);
         }
 
-        public override void GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetMarketData(ProviderModel model, Action<object> update)
         {
-            if (provider == null) throw new ArgumentNullException(nameof(provider));
+            if (model == null) throw new ArgumentNullException(nameof(model));
             
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
             Config.Set("data-directory", _settings.DataFolder);
             Config.Set("cache-location", _settings.DataFolder);
 
-            IList<string> symbols = provider.Symbols.Select(m => m.Id).ToList();
+            IList<string> symbols = model.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            OandaDownloaderProgram.OandaDownloader(symbols, resolution, provider.LastDate, provider.LastDate);
+            IEXDownloaderProgram.IEXDownloader(symbols, resolution, model.LastDate, model.LastDate);
         }
     }
 }

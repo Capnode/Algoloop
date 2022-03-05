@@ -23,7 +23,7 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class Dukascopy : ProviderBase
     {

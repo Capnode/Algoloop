@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel.Provider;
+using Algoloop.ViewModel.Internal.Provider;
 using Capnode.Wpf.DataGrid;
 using Microsoft.Win32;
 using QuantConnect;

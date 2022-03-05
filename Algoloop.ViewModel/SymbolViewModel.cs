@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel.Internal;
+using Algoloop.ViewModel.Internal.Lean;
 using Capnode.Wpf.DataGrid;
 using Microsoft.Toolkit.Mvvm.Input;
 using Newtonsoft.Json;

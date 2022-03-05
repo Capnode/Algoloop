@@ -15,14 +15,14 @@
 using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Configuration;
-using QuantConnect.ToolBox.IBDownloader;
+using QuantConnect.ToolBox.KrakenDownloader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
-    internal class Ib : ProviderBase
+    internal class Kraken : ProviderBase
     {
         private SettingModel _settings;
 
@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel.Provider
 
             IList<string> symbols = provider.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            IBDownloaderProgram.IBDownloader(symbols, resolution, provider.LastDate, provider.LastDate);
+            KrakenDownloaderProgram.KrakenDownloader(symbols, resolution, provider.LastDate, provider.LastDate);
         }
     }
 }

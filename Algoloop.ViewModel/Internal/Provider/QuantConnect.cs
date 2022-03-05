@@ -23,7 +23,7 @@ using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Logging;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class QuantConnect : ProviderBase
     {

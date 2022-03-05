@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel.Internal;
+using Algoloop.ViewModel.Internal.Lean;
 using StockSharp.Algo.Candles;
 using StockSharp.Xaml.Charting;
 using System.Collections.Generic;

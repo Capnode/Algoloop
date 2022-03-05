@@ -12,10 +12,9 @@
  * limitations under the License.
  */
 
-
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
-    internal class CryptoIq : ProviderBase
+    internal class Gdax : ProviderBase
     {
     }
 }

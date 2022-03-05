@@ -12,9 +12,17 @@
  * limitations under the License.
  */
 
-namespace Algoloop.ViewModel.Provider
+using Algoloop.Model;
+using System;
+
+namespace Algoloop.ViewModel.Internal.Provider
 {
-    internal class Gdax : ProviderBase
+    internal interface IProvider : IDisposable
     {
+        bool Register(SettingModel settings);
+        void Login(ProviderModel provider);
+        void Logout();
+        void GetMarketData(ProviderModel provider, Action<object> update = null);
+        void GetAccounts(ProviderModel provider, Action<object> update = null);
     }
 }

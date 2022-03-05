@@ -25,7 +25,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class ProviderFactory
     {

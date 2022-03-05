@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel.Internal;
+using Algoloop.ViewModel.Internal.Lean;
 using QuantConnect.Logging;
 using System.Diagnostics;
 

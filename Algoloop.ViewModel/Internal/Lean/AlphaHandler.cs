@@ -16,7 +16,7 @@
 
 using QuantConnect.Lean.Engine.Alphas;
 
-namespace Algoloop.ViewModel.Internal
+namespace Algoloop.ViewModel.Internal.Lean
 {
     /// <summary>
     /// Default alpha handler that supports sending insights to the messaging handler, analyzing insights online

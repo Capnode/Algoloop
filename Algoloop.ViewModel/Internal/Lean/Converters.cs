@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Algoloop.ViewModel.Internal
+namespace Algoloop.ViewModel.Internal.Lean
 {
     internal static class Converters
     {

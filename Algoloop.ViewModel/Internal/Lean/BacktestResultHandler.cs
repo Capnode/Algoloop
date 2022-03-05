@@ -20,7 +20,7 @@ using QuantConnect.Logging;
 using System;
 using QuantConnect.Orders;
 
-namespace Algoloop.ViewModel.Internal
+namespace Algoloop.ViewModel.Internal.Lean
 {
     internal class BacktestResultHandler : BacktestingResultHandler
     {

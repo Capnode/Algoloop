@@ -27,7 +27,7 @@ using System.IO;
 using System.Linq;
 using static Algoloop.Model.TrackModel;
 
-namespace Algoloop.ViewModel.Internal
+namespace Algoloop.ViewModel.Internal.Lean
 {
     internal class LeanLauncher : IDisposable
     {

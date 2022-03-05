@@ -12,17 +12,10 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
-using System;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
-    internal interface IProvider : IDisposable
+    internal class CryptoIq : ProviderBase
     {
-        bool Register(SettingModel settings);
-        void Login(ProviderModel provider);
-        void Logout();
-        void GetMarketData(ProviderModel provider, Action<object> update = null);
-        void GetAccounts(ProviderModel provider, Action<object> update = null);
     }
 }

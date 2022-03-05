@@ -13,7 +13,6 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel.Internal;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -27,7 +26,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
     abstract internal class ProviderBase : IProvider
     {

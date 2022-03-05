@@ -16,7 +16,7 @@ using QuantConnect.Logging;
 using System.IO;
 using System.Text;
 
-namespace Algoloop.ViewModel.Internal
+namespace Algoloop.ViewModel.Internal.Lean
 {
     internal class StreamLogger : TextWriter
     {

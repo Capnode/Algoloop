@@ -38,6 +38,7 @@ using static Algoloop.Model.TrackModel;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
 using Microsoft.Toolkit.Mvvm.Input;
+using Algoloop.ViewModel.Internal.Lean;
 
 namespace Algoloop.ViewModel
 {

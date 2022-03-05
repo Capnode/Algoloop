@@ -15,21 +15,21 @@
 using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Configuration;
-using QuantConnect.ToolBox.YahooDownloader;
+using QuantConnect.ToolBox.IBDownloader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Algoloop.ViewModel.Provider
+namespace Algoloop.ViewModel.Internal.Provider
 {
-    internal class Yahoo : ProviderBase
+    internal class Ib : ProviderBase
     {
         private SettingModel _settings;
 
         public override bool Register(SettingModel settings)
         {
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            return base .Register(settings);
+            _settings = settings;
+            return base.Register(settings);
         }
 
         public override void GetMarketData(ProviderModel provider, Action<object> update)
@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel.Provider
 
             IList<string> symbols = provider.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily
-            YahooDownloaderProgram.YahooDownloader(symbols, resolution, provider.LastDate, provider.LastDate);
+            IBDownloaderProgram.IBDownloader(symbols, resolution, provider.LastDate, provider.LastDate);
         }
     }
 }
