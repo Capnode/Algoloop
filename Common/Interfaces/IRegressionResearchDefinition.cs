@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -11,28 +11,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
 
-using Newtonsoft.Json;
-
-namespace QuantConnect.Packets
+namespace QuantConnect.Interfaces
 {
     /// <summary>
-    /// A debugging breakpoint
+    /// Defines interface for research notebooks to be run as part of the research test suite.
     /// </summary>
-    public class Breakpoint
+    public interface IRegressionResearchDefinition
     {
         /// <summary>
-        /// The file name
+        /// This is used by the research regression test system to validate the output
         /// </summary>
-        [JsonProperty(PropertyName = "fileName")]
-        public string FileName { get; set; }
-
-        /// <summary>
-        /// The line number
-        /// </summary>
-        [JsonProperty(PropertyName = "lineNumber")]
-        public int LineNumber { get; set; }
+        /// <remarks>Requires to be implemented last in the file <see cref="ResearchRegressionTests.UpdateResearchRegressionOutputInSourceFile"/>
+        /// get should start from next line</remarks>
+        string ExpectedOutput { get; }
     }
 }

@@ -60,6 +60,7 @@ namespace QuantConnect
             Tuple.Create(CME, 23),
             Tuple.Create(SGX, 24),
             Tuple.Create(HKFE, 25),
+            Tuple.Create(NYSELIFFE, 26),
 
             Tuple.Create(CFE, 33),
             Tuple.Create(FTX, 34),
@@ -154,6 +155,11 @@ namespace QuantConnect
         /// Hong Kong Exchange
         /// </summary>
         public const string HKFE = "hkfe";
+
+        /// <summary>
+        /// London International Financial Futures and Options Exchange
+        /// </summary>
+        public const string NYSELIFFE = "nyseliffe";
 
         /// <summary>
         /// GDAX
