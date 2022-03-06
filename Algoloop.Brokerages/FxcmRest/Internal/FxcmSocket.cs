@@ -25,21 +25,23 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
 {
     internal class FxcmSocket : IDisposable
     {
-        private static string _msgOpen = "0";
-        private static string _msgClose = "1";
-        private static string _msgPing = "2";
-        private static string _msgPong = "3";
-        private static string _msgMessage = "4";
-        private static string _msgUpgrade = "5";
-        private static string _msgNoop = "6";
-        private static string _msgMessageConnect = "40";
-        private static string _msgMessageEvent = "42";
+#pragma warning disable IDE0051 // Remove unused private members
+        private const string _msgOpen = "0";
+        private const string _msgClose = "1";
+        private const string _msgPing = "2";
+        private const string _msgPong = "3";
+        private const string _msgMessage = "4";
+        private const string _msgUpgrade = "5";
+        private const string _msgNoop = "6";
+        private const string _msgMessageConnect = "40";
+        private const string _msgMessageEvent = "42";
+#pragma warning restore IDE0051 // Remove unused private members
 
         private enum ActionType { Connect, Disconnect, Event, Ack, Error, BinaryEvent, BinaryAck };
 
         private readonly IWebSocket _webSocket;
         private readonly ManualResetEvent _hold = new(false);
-        private Timer _keepAliveTimer;
+        private readonly Timer _keepAliveTimer;
 
         internal Action<object> AccountsUpdate { get; set; }
         internal Action<object> SymbolUpdate { get; set; }
