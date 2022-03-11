@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="Content\AppData\Markets.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
