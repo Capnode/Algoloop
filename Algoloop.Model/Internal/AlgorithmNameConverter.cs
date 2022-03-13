@@ -13,6 +13,7 @@
 */
 
 using QuantConnect.AlgorithmFactory;
+using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -44,9 +45,9 @@ namespace Algoloop.Model.Internal
 
             try
             {
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                Assembly assembly = Assembly.LoadFile(assemblyPath);
 
-                //Get the list of extention classes in the library: 
+                // Get the list of extention classes in the library: 
                 List<string> extended = Loader.GetExtendedTypeNames(assembly);
                 List<string> list = assembly.ExportedTypes
                     .Where(m => extended.Contains(m.FullName))
@@ -55,8 +56,9 @@ namespace Algoloop.Model.Internal
                 list.Sort();
                 return new StandardValuesCollection(list);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Error(ex);
             }
 
             string algorithm = Path.GetFileNameWithoutExtension(assemblyPath);

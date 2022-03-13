@@ -33,7 +33,6 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Diagnostics.Contracts;
-using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
 using Microsoft.Toolkit.Mvvm.Input;
 
@@ -647,7 +646,7 @@ namespace Algoloop.ViewModel
             Parameters.Clear();
             try
             {
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                Assembly assembly = Assembly.LoadFile(assemblyPath);
                 if (assembly == null) return;
 
                 IEnumerable<Type> type = assembly
@@ -786,7 +785,7 @@ namespace Algoloop.ViewModel
 
                 // Load assemblies of algorithms
                 string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                Assembly assembly = Assembly.LoadFile(assemblyPath);
                 if (string.IsNullOrEmpty(Model.Name))
                 {
                     Model.Name = assembly.ManifestModule.Name;
