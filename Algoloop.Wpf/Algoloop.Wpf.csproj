@@ -7,7 +7,11 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <NoWarn>NU1701;CA1416</NoWarn>
+    <ApplicationIcon>Resources\AlgoloopIcon.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Resources\AlgoloopIcon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Help.png" />
     <SplashScreen Include="Resources\AlgoloopSplash.png" />
