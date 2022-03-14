@@ -6,7 +6,7 @@
     <RootNamespace>QuantConnect.Lean.Launcher</RootNamespace>
     <AssemblyName>QuantConnect.Lean.Launcher</AssemblyName>
     <TargetFramework>net5.0</TargetFramework>
-    <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win10-x86;win10-x64</RuntimeIdentifiers>
     <LangVersion>9</LangVersion>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>

@@ -2,9 +2,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
-    <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
-    <UseWPF>true</UseWPF>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Platforms>x86;x64</Platforms>
+    <RuntimeIdentifiers>win10-x86;win10-x64</RuntimeIdentifiers>
+    <UseWPF>true</UseWPF>   
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <NoWarn>NU1701;CA1416</NoWarn>
     <ApplicationIcon>Resources\AlgoloopIcon.ico</ApplicationIcon>
