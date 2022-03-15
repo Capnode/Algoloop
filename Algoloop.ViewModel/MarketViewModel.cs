@@ -382,12 +382,14 @@ namespace Algoloop.ViewModel
             }
             catch (ApplicationException ex)
             {
+                Model.Active = false;
                 Messenger.Send(new NotificationMessage(
                     string.Format(Resources.MarketException, Model.Name, ex.Message)),
                     0);
             }
             catch (Exception ex)
             {
+                Model.Active = false;
                 Log.Error(ex);
                 Messenger.Send(new NotificationMessage(
                     $"{ex.GetType()}: {ex.Message}"),
