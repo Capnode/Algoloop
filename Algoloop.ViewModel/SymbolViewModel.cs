@@ -19,7 +19,6 @@ using Microsoft.Toolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Data.Fundamental;
-using QuantConnect.ToolBox;
 using QuantConnect.Util;
 using StockSharp.Algo.Candles;
 using StockSharp.Xaml.Charting;
