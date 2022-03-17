@@ -10,8 +10,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
     <ProjectReference Include="..\Brokerages\QuantConnect.Brokerages.csproj" />
-    <ProjectReference Include="..\Common\QuantConnect.csproj" />
-    <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">

@@ -171,8 +171,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Wpf\Algoloop.Wpf.csproj" />
     <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
-    <ProjectReference Include="..\Optimizer.Launcher\QuantConnect.Optimizer.Launcher.csproj" />
-    <ProjectReference Include="..\Report\QuantConnect.Report.csproj" />
     <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />

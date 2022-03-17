@@ -13,7 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\AlgorithmFactory\QuantConnect.AlgorithmFactory.csproj" />
     <ProjectReference Include="..\Common\QuantConnect.csproj" />
-    <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit">

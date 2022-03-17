@@ -12,16 +12,7 @@
     <NoWarn>NU1701;CA1416</NoWarn>    
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
-    <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
-    <ProjectReference Include="..\Algoloop.Wpf\Algoloop.Wpf.csproj" />
-    <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
-    <ProjectReference Include="..\Common\QuantConnect.csproj" />
-    <ProjectReference Include="..\Configuration\QuantConnect.Configuration.csproj" />
-    <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
-    <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj" />
-    <ProjectReference Include="..\Messaging\QuantConnect.Messaging.csproj" />
-    <ProjectReference Include="..\Queues\QuantConnect.Queues.csproj" />
+    <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">

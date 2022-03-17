@@ -126,23 +126,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
-    <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
-    <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
-    <ProjectReference Include="..\Algorithm.Framework\QuantConnect.Algorithm.Framework.csproj" />
-    <ProjectReference Include="..\AlgorithmFactory\QuantConnect.AlgorithmFactory.csproj" />
-    <ProjectReference Include="..\Algorithm\QuantConnect.Algorithm.csproj" />
-    <ProjectReference Include="..\Api\QuantConnect.Api.csproj" />
-    <ProjectReference Include="..\Brokerages\QuantConnect.Brokerages.csproj" />
     <ProjectReference Include="..\Capnode.Wpf\Capnode.Wpf.csproj" />
-    <ProjectReference Include="..\Common\QuantConnect.csproj" />
-    <ProjectReference Include="..\Compression\QuantConnect.Compression.csproj" />
-    <ProjectReference Include="..\Configuration\QuantConnect.Configuration.csproj" />
-    <ProjectReference Include="..\Engine\QuantConnect.Lean.Engine.csproj" />
-    <ProjectReference Include="..\Indicators\QuantConnect.Indicators.csproj" />
+    <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
     <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />
-    <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj" />
-    <ProjectReference Include="..\Messaging\QuantConnect.Messaging.csproj" />
-    <ProjectReference Include="..\Queues\QuantConnect.Queues.csproj" />
     <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj" />
   </ItemGroup>
 
