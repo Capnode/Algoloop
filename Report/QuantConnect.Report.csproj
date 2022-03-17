@@ -15,6 +15,7 @@
     <DocumentationFile>bin\$(Configuration)\QuantConnect.Report.xml</DocumentationFile>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Description>QuantConnect LEAN Engine: Report Project - Generates live and backtesting reports</Description>
     <LangVersion>9</LangVersion>

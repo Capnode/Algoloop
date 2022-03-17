@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
-    <RuntimeIdentifiers>win10-x86;win10-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
     <LangVersion>latest</LangVersion>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
@@ -128,7 +129,7 @@
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
     <ProjectReference Include="..\Capnode.Wpf\Capnode.Wpf.csproj" />
     <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
-    <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />
+    <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />    
     <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj" />
   </ItemGroup>
 

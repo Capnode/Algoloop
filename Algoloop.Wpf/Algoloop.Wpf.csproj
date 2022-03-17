@@ -6,6 +6,7 @@
     <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
     <UseWPF>true</UseWPF>   
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <NoWarn>NU1701;CA1416</NoWarn>
     <ApplicationIcon>Resources\AlgoloopIcon.ico</ApplicationIcon>
   </PropertyGroup>

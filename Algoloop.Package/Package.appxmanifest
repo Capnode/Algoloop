@@ -8,7 +8,7 @@
 
   <Identity
     Name="CapnodeAB.Algoloop"
-    Publisher="CN=Carl"
+    Publisher="CN=Capnode"
     Version="1.1.3.0" />
 
   <Properties>
