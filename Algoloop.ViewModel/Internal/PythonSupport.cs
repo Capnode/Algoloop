@@ -12,6 +12,8 @@
  * limitations under the License.
  */
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -62,7 +64,30 @@ namespace Algoloop.ViewModel.Internal
 
             sourceFile = Path.Combine(exeFolder, @"QuantConnect.Lean.Launcher.runtimeconfig.json");
             destFile = Path.Combine(home, @".ipython\profile_default\startup\QuantConnect.Lean.Launcher.runtimeconfig.json");
-            File.Copy(sourceFile, destFile, true);
+            CopyRuntimeConfig(sourceFile, destFile);
+        }
+
+        /// <summary>
+        /// Convert runtimeconfig.json file to a format acceptable to Python CLR loader
+        /// </summary>
+        internal static void CopyRuntimeConfig(string sourceFile, string destFile)
+        {
+            string json = File.ReadAllText(sourceFile);
+            JObject root = JObject.Parse(json);
+            JObject runtimeOptions = root["runtimeOptions"] as JObject;
+            JToken frameworks = runtimeOptions["includedFrameworks"];
+            if (frameworks != null)
+            {
+                runtimeOptions["framework"] = frameworks.First();
+                runtimeOptions.Remove("includedFrameworks");
+            }
+
+            using (StreamWriter file = File.CreateText(destFile))
+            using (JsonTextWriter writer = new JsonTextWriter(file))
+            {
+                writer.Formatting = Formatting.Indented;
+                root.WriteTo(writer);
+            }
         }
     }
 }
