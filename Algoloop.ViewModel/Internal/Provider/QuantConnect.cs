@@ -27,6 +27,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class QuantConnect : ProviderBase
     {
+        private const string _version = "13727";
         private const string _security = "Security";
         private const string _zip = ".zip";
         private SettingModel _settings;
@@ -40,9 +41,8 @@ namespace Algoloop.ViewModel.Internal.Provider
         public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
             Contract.Requires(provider != null);
-            string version = AboutModel.AssemblyVersion;
-            var uri = new Uri($"https://github.com/Capnode/Algoloop/archive/Algoloop-{version}.zip");
-            string extract = $"Algoloop-Algoloop-{version}/Data/";
+            var uri = new Uri($"https://github.com/QuantConnect/Lean/archive/refs/tags/{_version}.zip");
+            string extract = $"Lean-{_version}/Data/";
             string filename = "github.zip";
             Log.Trace($"Download {uri}");
             using (var client = new WebClient())
