@@ -320,8 +320,8 @@ namespace Algoloop.ViewModel
             AccountModel account = _markets.FindAccount(Model.Account);
 
             // Set search path if not base directory
-            string folder = Path.GetDirectoryName(
-                MainService.FullExePath(Model.AlgorithmLocation));
+            string folder = Path.GetDirectoryName(MainService.FullExePath(
+                Path.Combine(Model.AlgorithmFolder, Model.AlgorithmFile)));
             string exeFolder = MainService.GetProgramFolder();
             if (!string.IsNullOrEmpty(folder)
                 && !exeFolder.Equals(folder, StringComparison.OrdinalIgnoreCase))

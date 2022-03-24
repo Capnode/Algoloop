@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -50,10 +51,12 @@ namespace Algoloop.Model
             EndDate = strategy.EndDate;
             InitialCapital = strategy.InitialCapital;
             PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
-            AlgorithmLocation = strategy.AlgorithmLocation;
-            AlgorithmName = strategy.AlgorithmName;
             AlgorithmLanguage = strategy.AlgorithmLanguage;
+            AlgorithmFolder = strategy.AlgorithmFolder;
+            AlgorithmFile = strategy.AlgorithmFile;
+            AlgorithmName = strategy.AlgorithmName;
             Resolution = strategy.Resolution;
+
 
             // Clone symbols
             Symbols = new Collection<SymbolModel>(strategy.Symbols.Select(m => new SymbolModel(m)).ToList());
@@ -159,29 +162,36 @@ namespace Algoloop.Model
         public double PcntCapitalPerPosition { get; set; }
 
         [Category("Algorithm")]
-        [DisplayName("File location")]
-        [Description("Algorithm file location")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public string AlgorithmLocation { get; set; }
-
-        [Category("Algorithm")]
-        [DisplayName("Algorithm name")]
-        [Description("Name of algorithm")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public string AlgorithmName { get; set; }
-
-        [Category("Algorithm")]
-        [DisplayName("Algorithm language")]
+        [Display(Name = "Algorithm language", Order = 1)]
         [Description("Programming language of algorithm")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
         public Language AlgorithmLanguage { get; set; }
 
+        [Category("Algorithm")]
+        [Display(Name = "Algorithm folder", Order = 2)]
+        [Description("Directory of algorithm files")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public string AlgorithmFolder { get; set; }
+
+        [Category("Algorithm")]
+        [Display(Name = "Algorithm file", Order = 3)]
+        [Description("File of algorithm")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public string AlgorithmFile { get; set; }
+
+        [Category("Algorithm")]
+        [Display(Name = "Algorithm name", Order = 4)]
+        [Description("Name of algorithm")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public string AlgorithmName { get; set; }
 
         [ReadOnly(true)]
         [Browsable(false)]

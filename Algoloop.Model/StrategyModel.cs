@@ -17,6 +17,8 @@ using QuantConnect;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -27,6 +29,8 @@ namespace Algoloop.Model
     {
         private string _name;
         private string _algorithmLocation;
+        private string _algorithmFolder;
+        private string _algorithmFile;
         private string _algorithmName;
         private string _account = AccountModel.AccountType.Backtest.ToString();
 
@@ -52,9 +56,10 @@ namespace Algoloop.Model
             Resolution = model.Resolution;
             InitialCapital = model.InitialCapital;
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
-            AlgorithmLocation = model.AlgorithmLocation;
-            AlgorithmName = model.AlgorithmName;
             AlgorithmLanguage = model.AlgorithmLanguage;
+            AlgorithmFolder = model.AlgorithmFolder;
+            AlgorithmFile = model.AlgorithmFile;
+            AlgorithmName = model.AlgorithmName;
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m)).ToList());
@@ -75,9 +80,10 @@ namespace Algoloop.Model
             Resolution = model.Resolution;
             InitialCapital = model.InitialCapital;
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
-            AlgorithmLocation = model.AlgorithmLocation;
-            AlgorithmName = model.AlgorithmName;
             AlgorithmLanguage = model.AlgorithmLanguage;
+            AlgorithmFolder = model.AlgorithmFolder;
+            AlgorithmFile = model.AlgorithmFile;
+            AlgorithmName = model.AlgorithmName;
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList());
@@ -193,26 +199,52 @@ namespace Algoloop.Model
         [DataMember]
         public double PcntCapitalPerPosition { get; set; }
 
-        [Category("Algorithm")]
-        [DisplayName("File location")]
-        [Description("Algorithm file location")]
-        [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
-        [RefreshProperties(RefreshProperties.All)]
-        [Browsable(true)]
-        [ReadOnly(false)]
+        [Obsolete]
         [DataMember]
         public string AlgorithmLocation
         {
-            get { return _algorithmLocation; }
-            set
-            {
-                _algorithmLocation = value;
-                AlgorithmNameChanged?.Invoke(_algorithmName);
-            }
+            set => _algorithmLocation = value;
         }
 
         [Category("Algorithm")]
-        [DisplayName("Algorithm name")]
+        [Display(Name = "Algorithm language", Order = 1)]
+        [Description("Programming language of algorithm")]
+        [RefreshProperties(RefreshProperties.Repaint)]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public Language AlgorithmLanguage { get; set; }
+
+        [Category("Algorithm")]
+        [Display(Name = "Algorithm folder", Order = 2)]
+        [Description("Directory of algorithm files")]
+        [Editor(typeof(FolderEditor), typeof(FolderEditor))]
+        [RefreshProperties(RefreshProperties.Repaint)]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string AlgorithmFolder
+        {
+            get => _algorithmFolder;
+            set => _algorithmFolder = value;
+        }
+
+        [Category("Algorithm")]
+        [Display(Name = "Algorithm file", Order = 3)]
+        [Description("File of algorithm")]
+        [TypeConverter(typeof(AlgorithmFileConverter))]
+        [RefreshProperties(RefreshProperties.Repaint)]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string AlgorithmFile
+        {
+            get => _algorithmFile;
+            set => _algorithmFile = value;
+        }
+
+        [Category("Algorithm")]
+        [Display(Name = "Algorithm name", Order = 4)]
         [Description("Name of algorithm")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
         [Browsable(true)]
@@ -220,21 +252,13 @@ namespace Algoloop.Model
         [DataMember]
         public string AlgorithmName
         {
-            get { return _algorithmName; }
+            get => _algorithmName;
             set
             {
                 _algorithmName = value;
                 AlgorithmNameChanged?.Invoke(_algorithmName);
             }
         }
-
-        [Category("Algorithm")]
-        [DisplayName("Algorithm language")]
-        [Description("Programming language of algorithm")]
-        [Browsable(true)]
-        [ReadOnly(false)]
-        [DataMember]
-        public Language AlgorithmLanguage { get; set; }
 
         [Browsable(false)]
         [ReadOnly(false)]
@@ -255,6 +279,18 @@ namespace Algoloop.Model
         [ReadOnly(false)]
         [DataMember]
         public Collection<StrategyModel> Strategies { get; }
+
+        [OnDeserialized]
+        void OnDeserialized(StreamingContext context)
+        {
+            // Database upgrade
+            if (_algorithmLocation != null)
+            {
+                AlgorithmFolder = Path.GetDirectoryName(_algorithmLocation);
+                AlgorithmFile = Path.GetFileName(_algorithmLocation);
+                _algorithmLocation = null;
+            }
+        }
 
         public void Refresh()
         {

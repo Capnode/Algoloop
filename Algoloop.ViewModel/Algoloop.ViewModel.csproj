@@ -127,6 +127,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
+    <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
+    <ProjectReference Include="..\Algorithm.Python\QuantConnect.Algorithm.Python.csproj" />
     <ProjectReference Include="..\Capnode.Wpf\Capnode.Wpf.csproj" />
     <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
     <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />    

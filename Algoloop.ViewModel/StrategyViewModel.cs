@@ -73,7 +73,7 @@ namespace Algoloop.ViewModel
             CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(
                 () => DoCloneAlgorithm(),
-                () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmLocation));
+                () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmFile));
             ExportCommand = new RelayCommand(
                 () => DoExportStrategy(),
                 () => !IsBusy);
@@ -640,7 +640,8 @@ namespace Algoloop.ViewModel
             RaiseCommands();
             if (string.IsNullOrEmpty(algorithmName)) return;
 
-            string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
+            string assemblyPath = MainService.FullExePath(
+                Path.Combine(Model.AlgorithmFolder, Model.AlgorithmFile));
             if (string.IsNullOrEmpty(assemblyPath)) return;
 
             Parameters.Clear();
@@ -784,7 +785,8 @@ namespace Algoloop.ViewModel
                 DataToModel();
 
                 // Load assemblies of algorithms
-                string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
+                string assemblyPath = MainService.FullExePath(
+                    Path.Combine(Model.AlgorithmFolder, Model.AlgorithmFile));
                 Assembly assembly = Assembly.LoadFile(assemblyPath);
                 if (string.IsNullOrEmpty(Model.Name))
                 {

@@ -12,7 +12,7 @@
  * limitations under the License.
 */
 
-using QuantConnect.AlgorithmFactory;
+using QuantConnect.Algorithm;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
@@ -39,20 +39,21 @@ namespace Algoloop.Model.Internal
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var model = context.Instance as StrategyModel;
-            string assemblyPath = MainService.FullExePath(model?.AlgorithmLocation);
-            if (string.IsNullOrEmpty(assemblyPath)) return null;
+            StrategyModel model = context.Instance as StrategyModel ?? throw new ArgumentNullException(nameof(model));
+            string path = MainService.FullExePath(Path.Combine(model.AlgorithmFolder, model.AlgorithmFile));
+            if (string.IsNullOrEmpty(path)) return null;
 
+            List<string> list = new();
             try
             {
-                Assembly assembly = Assembly.LoadFile(assemblyPath);
+                Assembly asm = Assembly.LoadFile(path);
+                var types = asm.GetTypes();
 
-                // Get the list of extention classes in the library: 
-                List<string> extended = Loader.GetExtendedTypeNames(assembly);
-                List<string> list = assembly.ExportedTypes
-                    .Where(m => extended.Contains(m.FullName))
-                    .Select(m => m.Name)
-                    .ToList();
+                foreach (Type strategy in asm.GetTypes().Select(m => m).Where(p => typeof(QCAlgorithm).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract))
+                {
+                    list.Add(Path.GetFileName(strategy.Name));
+                }
+
                 list.Sort();
                 return new StandardValuesCollection(list);
             }
@@ -61,7 +62,7 @@ namespace Algoloop.Model.Internal
                 Log.Error(ex);
             }
 
-            string algorithm = Path.GetFileNameWithoutExtension(assemblyPath);
+            string algorithm = Path.GetFileNameWithoutExtension(path);
             var algorithms = new List<string>() { algorithm };
             return new StandardValuesCollection(algorithms);
         }
