@@ -206,18 +206,22 @@ namespace Algoloop.Model
             set => _algorithmLocation = value;
         }
 
-        [Category("Algorithm")]
-        [Display(Name = "Algorithm language", Order = 1)]
-        [Description("Programming language of algorithm")]
+        [Display(
+            GroupName = "Algorithm",
+            Order = 1,
+            Name = "Algorithm language",
+            Description = "Programming language of algorithm.")]
         [RefreshProperties(RefreshProperties.Repaint)]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
         public Language AlgorithmLanguage { get; set; }
 
-        [Category("Algorithm")]
-        [Display(Name = "Algorithm folder", Order = 2)]
-        [Description("Directory of algorithm files")]
+        [Display(
+            GroupName = "Algorithm",
+            Order = 2,
+            Name = "Algorithm folder", 
+            Description = "Directory of algorithm files. Leave empty to use use install folder.")]
         [Editor(typeof(FolderEditor), typeof(FolderEditor))]
         [RefreshProperties(RefreshProperties.Repaint)]
         [Browsable(true)]
@@ -229,9 +233,11 @@ namespace Algoloop.Model
             set => _algorithmFolder = value;
         }
 
-        [Category("Algorithm")]
-        [Display(Name = "Algorithm file", Order = 3)]
-        [Description("File of algorithm")]
+        [Display(
+            GroupName = "Algorithm",
+            Order = 3,
+            Name = "Algorithm file",
+            Description = "File of algorithm.")]
         [TypeConverter(typeof(AlgorithmFileConverter))]
         [RefreshProperties(RefreshProperties.Repaint)]
         [Browsable(true)]
@@ -243,9 +249,11 @@ namespace Algoloop.Model
             set => _algorithmFile = value;
         }
 
-        [Category("Algorithm")]
-        [Display(Name = "Algorithm name", Order = 4)]
-        [Description("Name of algorithm")]
+        [Display(
+            GroupName = "Algorithm",
+            Order = 4,
+            Name = "Algorithm name",
+            Description = "Name of algorithm.")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
         [Browsable(true)]
         [ReadOnly(false)]
