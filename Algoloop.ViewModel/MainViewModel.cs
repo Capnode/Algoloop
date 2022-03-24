@@ -217,7 +217,7 @@ namespace Algoloop.ViewModel
                 ProviderFactory.RegisterProviders(SettingsViewModel.Model);
 
                 // Read configuration
-                MarketsViewModel.Read(Path.Combine(appData, "Markets.json"));
+                await MarketsViewModel.ReadAsync(Path.Combine(appData, "Markets.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
 
                 // Initialize Research page

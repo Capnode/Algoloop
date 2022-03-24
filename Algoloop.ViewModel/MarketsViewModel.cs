@@ -19,6 +19,7 @@ using QuantConnect.Logging;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
@@ -44,7 +45,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<ITreeViewModel> SelectedChangedCommand { get; }
         public RelayCommand AddCommand { get; }
 
-        public MarketsModel Model { get; }
+        public MarketsModel Model { get; set; }
         public SyncObservableCollection<MarketViewModel> Markets { get; } = new SyncObservableCollection<MarketViewModel>();
 
         /// <summary>
@@ -71,29 +72,22 @@ namespace Algoloop.ViewModel
             return Markets.Remove(market);
         }
 
-        public void Read(string fileName)
+        internal async Task<bool> ReadAsync(string fileName)
         {
             Log.Trace($"Reading {fileName}");
             if (File.Exists(fileName))
             {
-                using StreamReader r = new(fileName);
-                string json = r.ReadToEnd();
-                json = DbUpgrade(json);
-                Model.Copy(JsonConvert.DeserializeObject<MarketsModel>(json));
+                await Task.Run(() =>
+                {
+                    using var r = new StreamReader(fileName);
+                    using var reader = new JsonTextReader(r);
+                    var serializer = new JsonSerializer();
+                    Model = serializer.Deserialize<MarketsModel>(reader);
+                }).ConfigureAwait(true); // Must continue on UI thread
             }
 
             DataFromModel();
-        }
-
-        private static string DbUpgrade(string json)
-        {
-            int version = MainService.DbVersion(json);
-            if (version == 0 && MarketsModel.version > 0)
-            {
-                json = json.Replace("\"Folders\": [", "\"Lists\": [");
-            }
-
-            return json;
+            return true;
         }
 
         internal void Save(string fileName)
@@ -142,6 +136,7 @@ namespace Algoloop.ViewModel
 
         private void DataFromModel()
         {
+            Debug.Assert(IsUiThread());
             Markets.Clear();
             foreach (ProviderModel market in Model.Markets)
             {

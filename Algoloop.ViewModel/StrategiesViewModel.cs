@@ -109,7 +109,7 @@ namespace Algoloop.ViewModel
                     using var reader = new JsonTextReader(r);
                     var serializer = new JsonSerializer();
                     Model = serializer.Deserialize<StrategiesModel>(reader);
-                }).ConfigureAwait(false); // Must continue on UI thread
+                }).ConfigureAwait(true);  // Must continue on UI thread
             }
 
             DataFromModel();
@@ -283,16 +283,13 @@ namespace Algoloop.ViewModel
 
         private void DataFromModel()
         {
-            // Run in UI thread
-            UiThread(() =>
+            Debug.Assert(IsUiThread());
+            Strategies.Clear();
+            foreach (StrategyModel strategyModel in Model.Strategies)
             {
-                Strategies.Clear();
-                foreach (StrategyModel strategyModel in Model.Strategies)
-                {
-                    var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _settings);
-                    AddStrategy(strategyViewModel);
-                }
-            });
+                var strategyViewModel = new StrategyViewModel(this, strategyModel, _markets, _settings);
+                AddStrategy(strategyViewModel);
+            }
         }
 
         private void StartTasks()
