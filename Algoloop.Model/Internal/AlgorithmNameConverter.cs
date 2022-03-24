@@ -40,7 +40,7 @@ namespace Algoloop.Model.Internal
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             StrategyModel model = context.Instance as StrategyModel ?? throw new ArgumentNullException(nameof(model));
-            string path = MainService.FullExePath(Path.Combine(model.AlgorithmFolder, model.AlgorithmFile));
+            string path = MainService.FullExePath(model.AlgorithmFolder, model.AlgorithmFile);
             if (string.IsNullOrEmpty(path)) return null;
 
             List<string> list = new();

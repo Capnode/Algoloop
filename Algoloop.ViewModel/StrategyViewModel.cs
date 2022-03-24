@@ -640,8 +640,7 @@ namespace Algoloop.ViewModel
             RaiseCommands();
             if (string.IsNullOrEmpty(algorithmName)) return;
 
-            string assemblyPath = MainService.FullExePath(
-                Path.Combine(Model.AlgorithmFolder, Model.AlgorithmFile));
+            string assemblyPath = MainService.FullExePath(Model.AlgorithmFolder, Model.AlgorithmFile);
             if (string.IsNullOrEmpty(assemblyPath)) return;
 
             Parameters.Clear();
@@ -785,8 +784,7 @@ namespace Algoloop.ViewModel
                 DataToModel();
 
                 // Load assemblies of algorithms
-                string assemblyPath = MainService.FullExePath(
-                    Path.Combine(Model.AlgorithmFolder, Model.AlgorithmFile));
+                string assemblyPath = MainService.FullExePath(Model.AlgorithmFolder, Model.AlgorithmFile);
                 Assembly assembly = Assembly.LoadFile(assemblyPath);
                 if (string.IsNullOrEmpty(Model.Name))
                 {

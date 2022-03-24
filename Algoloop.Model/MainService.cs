@@ -83,11 +83,10 @@ namespace Algoloop.Model
             }
         }
 
-        public static string FullExePath(string file)
+        public static string FullExePath(string folder, string file)
         {
             if (string.IsNullOrEmpty(file)) return null;
-            if (File.Exists(file)) return file;
-            string path = Path.Combine(GetProgramFolder(), file);
+            string path = Path.Combine(string.IsNullOrEmpty(folder) ? MainService.GetProgramFolder() : folder, file);
             if (File.Exists(path)) return path;
             return null;
         }
