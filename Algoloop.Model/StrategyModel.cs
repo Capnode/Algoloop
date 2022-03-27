@@ -63,8 +63,7 @@ namespace Algoloop.Model
             InitialCapital = model.InitialCapital;
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
             AlgorithmLanguage = model.AlgorithmLanguage;
-            AlgorithmFolder = model.AlgorithmFolder;
-            AlgorithmFile = model.AlgorithmFile;
+            AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
@@ -87,8 +86,7 @@ namespace Algoloop.Model
             InitialCapital = model.InitialCapital;
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
             AlgorithmLanguage = model.AlgorithmLanguage;
-            AlgorithmFolder = model.AlgorithmFolder;
-            AlgorithmFile = model.AlgorithmFile;
+            AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
@@ -205,15 +203,6 @@ namespace Algoloop.Model
         [DataMember]
         public double PcntCapitalPerPosition { get; set; }
 
-        [Browsable(false)]
-        [Obsolete]
-        [DataMember]
-        public string AlgorithmLocation
-        {
-            get => _algorithmLocation;
-            set => _algorithmLocation = value;
-        }
-
         [Category("Algorithm")]
         [PropertyOrder(1)]
         [DisplayName("Algorithm language")]
@@ -234,12 +223,22 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [PropertyOrder(2)]
-        [DisplayName("Algorithm folder")]
-        [Description("Directory of algorithm files. Leave empty to use use install folder.")]
-        [Editor(typeof(FolderEditor), typeof(FolderEditor))]
-        [RefreshProperties(RefreshProperties.Repaint)]
+        [DisplayName("Algorithm location")]
+        [Description("File path to algorithm.")]
+        [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
+        [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
         [ReadOnly(false)]
+        [DataMember]
+        public string AlgorithmLocation
+        {
+            get => _algorithmLocation;
+            set => _algorithmLocation = value;
+        }
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [Obsolete("Property will be removed")]
         [DataMember]
         public string AlgorithmFolder
         {
@@ -247,14 +246,9 @@ namespace Algoloop.Model
             set => _algorithmFolder = value;
         }
 
-        [Category("Algorithm")]
-        [PropertyOrder(3)]
-        [DisplayName("Algorithm file")]
-        [Description("File of algorithm.")]
-        [TypeConverter(typeof(AlgorithmFileConverter))]
-        [RefreshProperties(RefreshProperties.Repaint)]
-        [Browsable(true)]
+        [Browsable(false)]
         [ReadOnly(false)]
+        [Obsolete("Property will be removed")]
         [DataMember]
         public string AlgorithmFile
         {
@@ -263,7 +257,7 @@ namespace Algoloop.Model
         }
 
         [Category("Algorithm")]
-        [PropertyOrder(4)]
+        [PropertyOrder(3)]
         [DisplayName("Algorithm name")]
         [Description("Name of algorithm.")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
@@ -304,22 +298,16 @@ namespace Algoloop.Model
         void OnDeserialized(StreamingContext context)
         {
             // Database upgrade
-            if (_algorithmLocation != null)
+            if (_algorithmLocation == null)
             {
-                AlgorithmFolder = Path.GetDirectoryName(_algorithmLocation);
-                AlgorithmFile = Path.GetFileName(_algorithmLocation);
-                _algorithmLocation = null;
+                AlgorithmLocation = string.IsNullOrEmpty(_algorithmFolder) ? _algorithmFile : Path.Combine(_algorithmFolder, _algorithmFile);
+                _algorithmFolder = null;
+                _algorithmFile = null;
             }
         }
 
         public void Refresh()
         {
-            SetBrowsable(nameof(AlgorithmFolder), true);
-            if (_algorithmLanguage.Equals(Language.CSharp))
-            {
-                SetBrowsable(nameof(AlgorithmFolder), false);
-            }
-
             SetBrowsable(nameof(Market), false);
             if (Account == null
              || Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase)

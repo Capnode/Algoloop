@@ -195,7 +195,7 @@ namespace Algoloop.ViewModel.Internal.Lean
             config["data-folder"] = settings.DataFolder;
             config["data-directory"] = settings.DataFolder;
             config["cache-location"] = settings.DataFolder;
-            string fullPath = MainService.FullExePath(model.AlgorithmFolder, model.AlgorithmFile);
+            string fullPath = MainService.FullExePath(model.AlgorithmLocation);
             config["algorithm-location"] = fullPath;
             string fullFolder = MainService.GetProgramFolder();
             config["plugin-directory"] = fullFolder;

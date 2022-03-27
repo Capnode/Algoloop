@@ -57,8 +57,7 @@ namespace Algoloop.Model
             InitialCapital = strategy.InitialCapital;
             PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
             AlgorithmLanguage = strategy.AlgorithmLanguage;
-            AlgorithmFolder = strategy.AlgorithmFolder;
-            AlgorithmFile = strategy.AlgorithmFile;
+            AlgorithmLocation = strategy.AlgorithmLocation;
             AlgorithmName = strategy.AlgorithmName;
             Resolution = strategy.Resolution;
 
@@ -177,24 +176,15 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [PropertyOrder(2)]
-        [DisplayName("Algorithm folder")]
-        [Description("Directory of algorithm files")]
+        [DisplayName("Algorithm location")]
+        [Description("File path of algorithm files")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
-        public string AlgorithmFolder { get; set; }
+        public string AlgorithmLocation { get; set; }
 
         [Category("Algorithm")]
         [PropertyOrder(3)]
-        [DisplayName("Algorithm file")]
-        [Description("File of algorithm")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public string AlgorithmFile { get; set; }
-
-        [Category("Algorithm")]
-        [PropertyOrder(4)]
         [DisplayName("Algorithm name")]
         [Description("Name of algorithm")]
         [Browsable(true)]

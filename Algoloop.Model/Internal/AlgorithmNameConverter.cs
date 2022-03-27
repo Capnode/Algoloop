@@ -13,13 +13,14 @@
 */
 
 using QuantConnect;
-using QuantConnect.Algorithm;
-using QuantConnect.Util;
+using QuantConnect.AlgorithmFactory;
+using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace Algoloop.Model.Internal
 {
@@ -38,38 +39,45 @@ namespace Algoloop.Model.Internal
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            StrategyModel model = context.Instance as StrategyModel ?? throw new ApplicationException(nameof(context.Instance));
-            string filename = model.AlgorithmFile;
-            switch (model.AlgorithmLanguage)
+            var model = context.Instance as StrategyModel;
+            string path = MainService.FullExePath(model?.AlgorithmLocation);
+            if (string.IsNullOrEmpty(path)) return null;
+            return model.AlgorithmLanguage switch
             {
-                case Language.CSharp:
-                case Language.FSharp:
-                case Language.VisualBasic:
-                    return ClrAlgorithm(filename);
-                case Language.Python:
-                    return PythonAlgorithm(filename);
-                case Language.Java:
-                default:
-                    return new StandardValuesCollection(new List<string>());
+                Language.CSharp or Language.FSharp or Language.VisualBasic => ClrAlgorithm(path),
+                Language.Python => PythonAlgorithm(path),
+                _ => new StandardValuesCollection(new List<string>()),
+            };
+        }
+
+        private static StandardValuesCollection ClrAlgorithm(string assemblyPath)
+        {
+            try
+            {
+                Assembly assembly = Assembly.LoadFile(assemblyPath);
+
+                // Get the list of extention classes in the library: 
+                List<string> extended = Loader.GetExtendedTypeNames(assembly);
+                List<string> list = assembly.ExportedTypes
+                    .Where(m => extended.Contains(m.FullName))
+                    .Select(m => m.Name)
+                    .ToList();
+                list.Sort();
+                return new StandardValuesCollection(list);
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+            }
+
+            return new StandardValuesCollection(new List<string>());
         }
 
-        private StandardValuesCollection ClrAlgorithm(string filename)
+        private static StandardValuesCollection PythonAlgorithm(string path)
         {
-            IEnumerable<Type> types = Composer.Instance.GetExportedTypes<QCAlgorithm>();
-            List<string> list = types
-                .Where(t => t.Module.Name == filename)
-                .Select(m => m.Name)
-                .Distinct()
-                .OrderBy(m => m)
-                .ToList();
-            return new StandardValuesCollection(list);
-        }
-
-        private StandardValuesCollection PythonAlgorithm(string filename)
-        {
-            List<string> list = new () { Path.GetFileNameWithoutExtension(filename) };
-            return new StandardValuesCollection(list);
+            string algorithm = Path.GetFileNameWithoutExtension(path);
+            var algorithms = new List<string>() { algorithm };
+            return new StandardValuesCollection(algorithms);
         }
     }
 }

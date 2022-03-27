@@ -62,8 +62,7 @@ namespace Algoloop.Tests.Lean
             {
                 Account = provider.Name,
                 AlgorithmLanguage = Language.CSharp,
-                AlgorithmFolder = _exeFolder,
-                AlgorithmFile = "QuantConnect.Algorithm.CSharp.dll",
+                AlgorithmLocation = Path.Combine(_exeFolder, "QuantConnect.Algorithm.CSharp.dll"),
                 AlgorithmName = "BasicTemplateFrameworkAlgorithm",
                 StartDate = new DateTime(2016, 01, 01)
             };
