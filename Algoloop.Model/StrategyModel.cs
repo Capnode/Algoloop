@@ -17,17 +17,23 @@ using QuantConnect;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Algoloop.Model
 {
+    [CategoryOrder("Strategy", 1)]
+    [CategoryOrder("Broker", 2)]
+    [CategoryOrder("Capital", 3)]
+    [CategoryOrder("Algorithm", 4)]
+    [CategoryOrder("Data", 5)]
     [DataContract]
     public class StrategyModel : ModelBase
     {
         private string _name;
+        private Language _algorithmLanguage;
         private string _algorithmLocation;
         private string _algorithmFolder;
         private string _algorithmFile;
@@ -93,11 +99,11 @@ namespace Algoloop.Model
 
         [Browsable(false)]
         public Action NameChanged { get; set; }
-        [Browsable(false)]
 
+        [Browsable(false)]
         public Action<string> AlgorithmNameChanged { get; set; }
 
-        [Category("Information")]
+        [Category("Strategy")]
         [DisplayName("Name")]
         [Description("Name of the strategy.")]
         [Browsable(true)]
@@ -199,29 +205,37 @@ namespace Algoloop.Model
         [DataMember]
         public double PcntCapitalPerPosition { get; set; }
 
+        [Browsable(false)]
         [Obsolete]
         [DataMember]
         public string AlgorithmLocation
         {
+            get => _algorithmLocation;
             set => _algorithmLocation = value;
         }
 
-        [Display(
-            GroupName = "Algorithm",
-            Order = 1,
-            Name = "Algorithm language",
-            Description = "Programming language of algorithm.")]
+        [Category("Algorithm")]
+        [PropertyOrder(1)]
+        [DisplayName("Algorithm language")]
+        [Description("Programming language of algorithm.")]
         [RefreshProperties(RefreshProperties.Repaint)]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public Language AlgorithmLanguage { get; set; }
+        public Language AlgorithmLanguage
+        {
+            get => _algorithmLanguage;
+            set
+            {
+                _algorithmLanguage = value;
+                Refresh();
+            }
+        }
 
-        [Display(
-            GroupName = "Algorithm",
-            Order = 2,
-            Name = "Algorithm folder", 
-            Description = "Directory of algorithm files. Leave empty to use use install folder.")]
+        [Category("Algorithm")]
+        [PropertyOrder(2)]
+        [DisplayName("Algorithm folder")]
+        [Description("Directory of algorithm files. Leave empty to use use install folder.")]
         [Editor(typeof(FolderEditor), typeof(FolderEditor))]
         [RefreshProperties(RefreshProperties.Repaint)]
         [Browsable(true)]
@@ -233,11 +247,10 @@ namespace Algoloop.Model
             set => _algorithmFolder = value;
         }
 
-        [Display(
-            GroupName = "Algorithm",
-            Order = 3,
-            Name = "Algorithm file",
-            Description = "File of algorithm.")]
+        [Category("Algorithm")]
+        [PropertyOrder(3)]
+        [DisplayName("Algorithm file")]
+        [Description("File of algorithm.")]
         [TypeConverter(typeof(AlgorithmFileConverter))]
         [RefreshProperties(RefreshProperties.Repaint)]
         [Browsable(true)]
@@ -249,11 +262,10 @@ namespace Algoloop.Model
             set => _algorithmFile = value;
         }
 
-        [Display(
-            GroupName = "Algorithm",
-            Order = 4,
-            Name = "Algorithm name",
-            Description = "Name of algorithm.")]
+        [Category("Algorithm")]
+        [PropertyOrder(4)]
+        [DisplayName("Algorithm name")]
+        [Description("Name of algorithm.")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
         [Browsable(true)]
         [ReadOnly(false)]
@@ -302,15 +314,18 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
+            SetBrowsable(nameof(AlgorithmFolder), true);
+            if (_algorithmLanguage.Equals(Language.CSharp))
+            {
+                SetBrowsable(nameof(AlgorithmFolder), false);
+            }
+
+            SetBrowsable(nameof(Market), false);
             if (Account == null
              || Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase)
              || Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable(nameof(Market), true);
-            }
-            else
-            {
-                SetBrowsable(nameof(Market), false);
             }
         }
     }

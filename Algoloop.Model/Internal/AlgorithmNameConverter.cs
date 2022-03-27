@@ -12,14 +12,14 @@
  * limitations under the License.
 */
 
+using QuantConnect;
 using QuantConnect.Algorithm;
-using QuantConnect.Logging;
+using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Algoloop.Model.Internal
 {
@@ -38,33 +38,38 @@ namespace Algoloop.Model.Internal
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-
-            StrategyModel model = context.Instance as StrategyModel ?? throw new ArgumentNullException(nameof(model));
-            string path = MainService.FullExePath(model.AlgorithmFolder, model.AlgorithmFile);
-            if (string.IsNullOrEmpty(path)) return null;
-
-            List<string> list = new();
-            try
+            StrategyModel model = context.Instance as StrategyModel ?? throw new ApplicationException(nameof(context.Instance));
+            string filename = model.AlgorithmFile;
+            switch (model.AlgorithmLanguage)
             {
-                Assembly asm = Assembly.LoadFile(path);
-                var types = asm.GetTypes();
-
-                foreach (Type strategy in asm.GetTypes().Select(m => m).Where(p => typeof(QCAlgorithm).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract))
-                {
-                    list.Add(Path.GetFileName(strategy.Name));
-                }
-
-                list.Sort();
-                return new StandardValuesCollection(list);
+                case Language.CSharp:
+                case Language.FSharp:
+                case Language.VisualBasic:
+                    return ClrAlgorithm(filename);
+                case Language.Python:
+                    return PythonAlgorithm(filename);
+                case Language.Java:
+                default:
+                    return new StandardValuesCollection(new List<string>());
             }
-            catch (Exception ex)
-            {
-                Log.Error(ex);
-            }
+        }
 
-            string algorithm = Path.GetFileNameWithoutExtension(path);
-            var algorithms = new List<string>() { algorithm };
-            return new StandardValuesCollection(algorithms);
+        private StandardValuesCollection ClrAlgorithm(string filename)
+        {
+            IEnumerable<Type> types = Composer.Instance.GetExportedTypes<QCAlgorithm>();
+            List<string> list = types
+                .Where(t => t.Module.Name == filename)
+                .Select(m => m.Name)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToList();
+            return new StandardValuesCollection(list);
+        }
+
+        private StandardValuesCollection PythonAlgorithm(string filename)
+        {
+            List<string> list = new () { Path.GetFileNameWithoutExtension(filename) };
+            return new StandardValuesCollection(list);
         }
     }
 }

@@ -14,14 +14,12 @@
 
 using QuantConnect;
 using QuantConnect.Algorithm;
-using QuantConnect.Logging;
+using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Algoloop.Model.Internal
 {
@@ -47,52 +45,41 @@ namespace Algoloop.Model.Internal
                 case Language.CSharp:
                 case Language.FSharp:
                 case Language.VisualBasic:
-                    return ClrAlgorithm(folder);
+                    return ClrAlgorithm();
                 case Language.Python:
                     return PythonAlgorithm(folder);
                 case Language.Java:
                 default:
-                    throw new NotImplementedException(model.AlgorithmLanguage.ToString());                        
+                    return new StandardValuesCollection(new List<string>());
             }
         }
 
-        private StandardValuesCollection ClrAlgorithm(string folder)
+        private StandardValuesCollection ClrAlgorithm()
         {
-            List<string> list = new();
-            List<string> paths = new();
-            paths.AddRange(Directory.GetFiles(folder, "*.exe", SearchOption.TopDirectoryOnly));
-            paths.AddRange(Directory.GetFiles(folder, "*.dll", SearchOption.TopDirectoryOnly));
-            foreach (string path in paths)
-            {
-                try
-                {
-                    Assembly asm = Assembly.LoadFile(path);
-                    if (asm.GetTypes().Any(p => typeof(QCAlgorithm).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract))
-                    {
-                        list.Add(Path.GetFileName(path));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex);
-                }
-            }
-
-            list.Sort();
+            IEnumerable<Type> types = Composer.Instance.GetExportedTypes<QCAlgorithm>();
+            List<string> list = types
+                .Where(m => !m.IsAssignableFrom(typeof(QCAlgorithm)))
+                .Select(m => m.Module.Name)
+                .Distinct()
+                .OrderBy(m => m)
+                .ToList();
             return new StandardValuesCollection(list);
         }
 
         private StandardValuesCollection PythonAlgorithm(string folder)
         {
             List<string> list = new();
-            List<string> paths = new();
-            paths.AddRange(Directory.GetFiles(folder, "*.py", SearchOption.TopDirectoryOnly));
-            foreach (string path in paths)
+            if (Directory.Exists(folder))
             {
-                list.Add(Path.GetFileName(path));
-            }
+                List<string> paths = new();
+                paths.AddRange(Directory.GetFiles(folder, "*.py", SearchOption.TopDirectoryOnly));
+                foreach (string path in paths)
+                {
+                    list.Add(Path.GetFileName(path));
+                }
 
-            list.Sort();
+                list.Sort();
+            }
             return new StandardValuesCollection(list);
         }
     }

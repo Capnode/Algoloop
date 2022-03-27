@@ -18,12 +18,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Algoloop.Model
 {
+    [CategoryOrder("Strategy", 1)]
+    [CategoryOrder("Broker", 2)]
+    [CategoryOrder("Capital", 3)]
+    [CategoryOrder("Algorithm", 4)]
+    [CategoryOrder("Data", 5)]
     [Serializable]
     [DataContract]
     public class TrackModel : ModelBase
@@ -72,7 +77,7 @@ namespace Algoloop.Model
             }
         }
 
-        [Category("Information")]
+        [Category("Strategy")]
         [DisplayName("Name")]
         [Description("Name of the track.")]
         [Browsable(true)]
@@ -162,7 +167,8 @@ namespace Algoloop.Model
         public double PcntCapitalPerPosition { get; set; }
 
         [Category("Algorithm")]
-        [Display(Name = "Algorithm language", Order = 1)]
+        [PropertyOrder(1)]
+        [DisplayName("Algorithm language")]
         [Description("Programming language of algorithm")]
         [Browsable(true)]
         [ReadOnly(true)]
@@ -170,7 +176,8 @@ namespace Algoloop.Model
         public Language AlgorithmLanguage { get; set; }
 
         [Category("Algorithm")]
-        [Display(Name = "Algorithm folder", Order = 2)]
+        [PropertyOrder(2)]
+        [DisplayName("Algorithm folder")]
         [Description("Directory of algorithm files")]
         [Browsable(true)]
         [ReadOnly(true)]
@@ -178,7 +185,8 @@ namespace Algoloop.Model
         public string AlgorithmFolder { get; set; }
 
         [Category("Algorithm")]
-        [Display(Name = "Algorithm file", Order = 3)]
+        [PropertyOrder(3)]
+        [DisplayName("Algorithm file")]
         [Description("File of algorithm")]
         [Browsable(true)]
         [ReadOnly(true)]
@@ -186,7 +194,8 @@ namespace Algoloop.Model
         public string AlgorithmFile { get; set; }
 
         [Category("Algorithm")]
-        [Display(Name = "Algorithm name", Order = 4)]
+        [PropertyOrder(4)]
+        [DisplayName("Algorithm name")]
         [Description("Name of algorithm")]
         [Browsable(true)]
         [ReadOnly(true)]
