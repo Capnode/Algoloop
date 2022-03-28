@@ -85,7 +85,7 @@ namespace Algoloop.Wpf
             OpenUrl("https://account.microsoft.com/services");
         }
 
-        private void OpenUrl(string url)
+        private static void OpenUrl(string url)
         {
             try
             {

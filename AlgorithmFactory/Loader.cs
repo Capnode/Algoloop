@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -100,13 +100,8 @@ namespace QuantConnect.AlgorithmFactory
             _debugging = debugging;
             _language = language;
             _workerThread = workerThread;
-            if (multipleTypeNameResolverFunction == null)
-            {
-                throw new ArgumentNullException("multipleTypeNameResolverFunction");
-            }
-
             _loaderTimeLimit = loaderTimeLimit;
-            _multipleTypeNameResolverFunction = multipleTypeNameResolverFunction;
+            _multipleTypeNameResolverFunction = multipleTypeNameResolverFunction ?? throw new ArgumentNullException("multipleTypeNameResolverFunction");
         }
 
 
