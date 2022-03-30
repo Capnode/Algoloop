@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -32,7 +32,7 @@ namespace Algoloop.Model
         [DataMember]
         public Collection<StrategyModel> Strategies { get; } = new Collection<StrategyModel>();
 
-        internal void Copy(StrategiesModel strategiesModel)
+        public void Copy(StrategiesModel strategiesModel)
         {
             Strategies.Clear();
             foreach (StrategyModel strategy in strategiesModel.Strategies)

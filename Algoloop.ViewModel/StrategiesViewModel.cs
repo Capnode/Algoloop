@@ -108,7 +108,7 @@ namespace Algoloop.ViewModel
                     using var r = new StreamReader(fileName);
                     using var reader = new JsonTextReader(r);
                     var serializer = new JsonSerializer();
-                    Model = serializer.Deserialize<StrategiesModel>(reader);
+                    Model.Copy(serializer.Deserialize<StrategiesModel>(reader));
                 }).ConfigureAwait(true);  // Must continue on UI thread
             }
 
