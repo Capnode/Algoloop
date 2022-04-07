@@ -35,6 +35,7 @@ using System.Windows.Data;
 using System.Diagnostics.Contracts;
 using Algoloop.ViewModel.Properties;
 using Microsoft.Toolkit.Mvvm.Input;
+using QuantConnect;
 
 namespace Algoloop.ViewModel
 {
@@ -639,11 +640,11 @@ namespace Algoloop.ViewModel
             StrategyNameChanged();
             RaiseCommands();
             if (string.IsNullOrEmpty(algorithmName)) return;
+            if (Model.AlgorithmLanguage.Equals(Language.Python)) return;
 
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
             if (string.IsNullOrEmpty(assemblyPath)) return;
 
-            Parameters.Clear();
             try
             {
                 Assembly assembly = Assembly.LoadFile(assemblyPath);
@@ -654,11 +655,11 @@ namespace Algoloop.ViewModel
                     .Where(m => m.Name.Equals(algorithmName, StringComparison.OrdinalIgnoreCase));
                 if (type == null || !type.Any()) return;
 
+                Parameters.Clear();
                 foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
                 {
                     string parameterName = parameter.Key;
                     string parameterType = parameter.Value;
-
                     if (_exclude.Contains(parameterName)) continue;
 
                     ParameterModel parameterModel = Model
@@ -673,8 +674,9 @@ namespace Algoloop.ViewModel
                     Parameters.Add(parameterViewModel);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Error(ex);
             }
 
             OnPropertyChanged(nameof(Parameters));
