@@ -31,19 +31,28 @@ namespace Algoloop.Brokerages.FxcmRest
 {
     /// <summary>
     /// https://github.com/fxcm/RestAPI
+    /// Apply for a demo account Generate access token. You can generate one from the Trading Station web.
+    /// Click on User Account > Token Management on the upper right hand of the website. For Live account,
+    /// please send your username to api@fxcm.com, we will need to enable Rest API access. For demo account,
+    /// Rest API access was enabled by default.
+    /// 
+    /// TradingStation Web: https://tradingstation.fxcm.com
     /// </summary>
     public class FxcmClient : IDisposable
     {
         private const string _baseUrlReal = "https://api.fxcm.com";
         private const string _baseUrlDemo = "https://api-demo.fxcm.com";
         private const string _mediatype = @"application/json";
-        private const string _getModel = @"trading/get_model/?models=OpenPosition&models=ClosedPosition" +
+        private const string _getTables = @"trading/get_model/?models=OpenPosition&models=ClosedPosition" +
             "&models=Order&models=Account&models=LeverageProfile&models=Properties";
-//        private const string _getInstruments = @"trading/get_instruments";
+        private const string _subscribeTables = @"trading/subscribe";
+        private const string _unsubscribeTables = @"trading/unsubscribe";
+        //        private const string _getInstruments = @"trading/get_instruments";
         private const string _getModelOffer = @"trading/get_model/?models=Offer";
         private const string _getSymbols = @"trading/get_instruments";
         private const string _subscribe = @"subscribe";
         private const string _unsubscribe = @"unsubscribe";
+        private string[] _tables = { "Offer", "OpenPosition", "ClosedPosition", "Order", "Account", "Summary" };
 
         private bool _isDisposed;
         private string _baseCurrency;
@@ -70,15 +79,33 @@ namespace Algoloop.Brokerages.FxcmRest
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
         }
 
-        public void Logout()
+        public async Task Logout()
         {
+            // Stop subscription
+            if (_fxcmSocket.AccountsUpdate != default)
+            {
+                _fxcmSocket.AccountsUpdate = default;
+                List<KeyValuePair<string, string>> nvc = _tables
+                     .Select(table => new KeyValuePair<string, string>("models", table))
+                     .ToList();
+                string json = await PostAsync(_unsubscribeTables, nvc).ConfigureAwait(false);
+                JObject jo = JObject.Parse(json);
+                JToken jResponse = jo["response"];
+                bool executed = (bool)jResponse["executed"];
+                if (!executed)
+                {
+                    string error = jResponse["error"].ToString();
+                    throw new ApplicationException(error);
+                }
+            }
+
             _fxcmSocket.Close();
         }
 
         public async Task<IReadOnlyList<SymbolModel>> GetSymbolsAsync()
         {
             // {"response":{"executed":true},"data":{"instrument":[{"symbol":"EUR/USD","visible":true,"order":100},
-            Log.Trace("{0}: GetSymbolsAsync", GetType().Name);
+            //Log.Trace(">{0}:GetSymbolsAsync", GetType().Name);
             string json = await GetAsync(_getSymbols).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
@@ -95,6 +122,7 @@ namespace Algoloop.Brokerages.FxcmRest
             foreach (JToken jInstrument in jInstruments)
             {
                 string name = jInstrument["symbol"].ToString();
+                if (string.IsNullOrEmpty(name)) continue;
                 bool visible = (bool)jInstrument["visible"];
                 int order = (int)jInstrument["order"];
                 var symbol = new SymbolModel
@@ -110,6 +138,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 symbols.Add(symbol);
             }
 
+            //Log.Trace("<{0}:GetSymbolsAsync", GetType().Name);
             return symbols;
         }
 
@@ -118,8 +147,8 @@ namespace Algoloop.Brokerages.FxcmRest
             // Skip if subscription active
             if (_fxcmSocket.AccountsUpdate != default && update != default) return;
 
-            Log.Trace("{0}: GetAccountsAsync", GetType().Name);
-            string json = await GetAsync(_getModel).ConfigureAwait(false);
+            //Log.Trace(">{0}:GetAccountsAsync", GetType().Name);
+            string json = await GetAsync(_getTables).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
             bool executed = (bool)jResponse["executed"];
@@ -175,13 +204,29 @@ namespace Algoloop.Brokerages.FxcmRest
             }
 
             update(accounts);
+
+            // Start subscription
+            List<KeyValuePair<string, string>> nvc = _tables
+                 .Select(table => new KeyValuePair<string, string>("models", table))
+                 .ToList();
+            json = await PostAsync(_subscribeTables, nvc).ConfigureAwait(false);
+            jo = JObject.Parse(json);
+            jResponse = jo["response"];
+            executed = (bool)jResponse["executed"];
+            if (!executed)
+            {
+                string error = jResponse["error"].ToString();
+                throw new ApplicationException(error);
+            }
+
             _fxcmSocket.AccountsUpdate = update;
+            //Log.Trace("<{0}:GetAccountsAsync", GetType().Name);
         }
 
         public async Task GetMarketDataAsync(Action<object> update)
         {
 // {"response":{ "executed":true},"offers":[{ "t":0,"ratePrecision":5,"offerId":1,"rollB":-0.7542,"rollS":0.3162,"fractionDigits":5,"pip":0.0001,"defaultSortOrder":100,"currency":"EUR/USD","instrumentType":1,"valueDate":"08062021","time":"2021-08-04T17:00:00.347Z","sell":1.18374,"buy":1.18385,"sellTradable":true,"buyTradable":true,"high":1.19001,"low":1.18329,"volume":1,"pipFraction":0.1,"spread":1.1,"mmr":33.3,"emr":33.3,"lmr":16.65,"minQuantity":1,"maxQuantity":50000000,"instrBaseUnitSize":1,"pipCost":0.08447}
-            Log.Trace("{0}: GetOffersAsync", GetType().Name);
+            //Log.Trace(">{0}:GetOffersAsync", GetType().Name);
             string json = await GetAsync(_getModelOffer).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
@@ -211,12 +256,12 @@ namespace Algoloop.Brokerages.FxcmRest
             }
 
             update(quoteBars);
+            //Log.Trace("<{0}:GetOffersAsync", GetType().Name);
         }
 
         public async Task SubscribeMarketDataAsync(IEnumerable<SymbolModel> symbols, Action<object> update)
         {
-            Log.Trace("{0}: SubscribeMarketDataAsync", GetType().Name);
-
+            //Log.Trace(">{0}:SubscribeMarketDataAsync", GetType().Name);
             List<KeyValuePair<string, string>> nvc = symbols
                 .Where(m => m.Active)
                 .Select(n => new KeyValuePair<string, string>("pairs", n.Name)).ToList();
@@ -230,7 +275,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 string error = jResponse["error"].ToString();
                 throw new ApplicationException(error);
             }
-            var quoteBars = new List<QuoteBar>();
+            List<QuoteBar> quoteBars = new ();
             JArray jPairs = JArray.FromObject(jo["pairs"]);
             foreach (JToken jPair in jPairs)
             {
@@ -242,8 +287,8 @@ namespace Algoloop.Brokerages.FxcmRest
                 decimal ask = jRates[1].ToDecimal();
                 decimal high = jRates[2].ToDecimal();
                 decimal low = jRates[3].ToDecimal();
-                var bidBar = new Bar(0, 0, 0, bid);
-                var askBar = new Bar(0, 0, 0, ask);
+                Bar bidBar = new (0, 0, 0, bid);
+                Bar askBar = new (0, 0, 0, ask);
                 SymbolModel symbolModel = symbols.FirstOrDefault(m => m.Name.Equals(ticker));
                 if (symbolModel == default) continue;
                 Symbol symbol = Symbol.Create(ticker, symbolModel.Security, symbolModel.Market);
@@ -253,12 +298,12 @@ namespace Algoloop.Brokerages.FxcmRest
 
             update(quoteBars);
             _fxcmSocket.SymbolUpdate = update;
+            //Log.Trace("<{0}:SubscribeMarketDataAsync", GetType().Name);
         }
 
-        public async Task UnsubscribeQuotesAsync(IEnumerable<SymbolModel> symbols)
+        public async Task UnsubscribeMarketData(IEnumerable<SymbolModel> symbols)
         {
-            Log.Trace("{0}: UnsubscribeMarketDataAsync", GetType().Name);
-
+            //Log.Trace("{0}:>UnsubscribeMarketDataAsync", GetType().Name);
             List<KeyValuePair<string, string>> nvc = symbols
                 .Where(m => m.Active)
                 .Select(n => new KeyValuePair<string, string>("pairs", n.Name)).ToList();
@@ -272,6 +317,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 string error = jResponse["error"].ToString();
                 throw new ApplicationException(error);
             }
+            //Log.Trace("{0}:<UnsubscribeMarketDataAsync", GetType().Name);
         }
 
         public void Dispose()

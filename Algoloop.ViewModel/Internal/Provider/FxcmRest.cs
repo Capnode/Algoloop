@@ -28,30 +28,35 @@ namespace Algoloop.ViewModel.Internal.Provider
 
         public override void Login(ProviderModel provider)
         {
-            Log.Trace($"Login {provider.Provider}");
+            //Log.Trace($">{GetType().Name}:Login {provider.Provider}");
             base.Login(provider);
             Contract.Requires(provider != null);
             _api = new FxcmClient(provider.Access, provider.ApiKey);
             _api.Login();
             _symbolsUpdated = false;
+            //Log.Trace($"<{GetType().Name}:Login {provider.Provider}");
         }
 
         public override void Logout()
         {
-            _api.Logout();
+            _api.Logout().Wait();
         }
 
         public override void GetAccounts(ProviderModel provider, Action<object> update)
         {
-             _api.GetAccountsAsync(update).Wait();
+            //Log.Trace($">{GetType().Name}:GetAccounts");
+            _api.GetAccountsAsync(update).Wait();
+            //Log.Trace($"<{GetType().Name}:GetAccounts");
         }
 
         public override void GetMarketData(ProviderModel provider, Action<object> update)
         {
+            //Log.Trace($">{GetType().Name}:GetMarketData");
             DateTime now = DateTime.UtcNow;
             if (!_symbolsUpdated)
             {
                 IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
+                var sym = _api.GetMarketDataAsync(update);
                 UpdateSymbols(provider, symbols, true);
                 update(provider.Symbols);
                 _symbolsUpdated = true;
@@ -59,6 +64,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
 
             provider.LastDate = now.ToLocalTime();
+            //Log.Trace($"<{GetType().Name}:GetMarketData");
         }
 
         protected override void Dispose(bool disposing)

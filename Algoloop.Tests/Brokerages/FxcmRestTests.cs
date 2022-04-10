@@ -74,11 +74,11 @@ namespace Algoloop.Tests.Brokerages
         }
 
         [TestMethod]
-        public void LoginAsync()
+        public async Task LoginAsync()
         {
             // Act
             _api.Login();
-            _api.Logout();
+            await _api.Logout();
         }
 
         [TestMethod]
@@ -89,7 +89,8 @@ namespace Algoloop.Tests.Brokerages
             IReadOnlyList<AccountModel> accounts = null;
             await _api.GetAccountsAsync(acct => accounts = acct as IReadOnlyList<AccountModel>)
                 .ConfigureAwait(false);
-            _api.Logout();
+            Thread.Sleep(6000);
+            await _api.Logout();
 
             Assert.IsNotNull(accounts);
             Assert.AreEqual(1, accounts.Count);
@@ -103,7 +104,7 @@ namespace Algoloop.Tests.Brokerages
             _api.Login();
             IReadOnlyList<SymbolModel> symbols = await _api.GetSymbolsAsync()
                 .ConfigureAwait(false);
-            _api.Logout();
+            await _api.Logout();
 
             Assert.IsNotNull(symbols);
             Assert.AreNotEqual(0, symbols.Count);
@@ -123,7 +124,7 @@ namespace Algoloop.Tests.Brokerages
                 }
             }).ConfigureAwait(false);
             Thread.Sleep(6000);
-            _api.Logout();
+            await _api.Logout();
 
             Assert.IsNotNull(list);
             Assert.AreNotEqual(0, list.Count);
@@ -148,11 +149,11 @@ namespace Algoloop.Tests.Brokerages
             Assert.IsNotNull(list);
             Assert.AreNotEqual(0, list.Count);
 
-            await _api.UnsubscribeQuotesAsync(symbols).ConfigureAwait(false);
+            await _api.UnsubscribeMarketData(symbols).ConfigureAwait(false);
             list = null;
             Thread.Sleep(6000);
             Assert.IsNull(list);
-            _api.Logout();
+            await _api.Logout();
         }
 
         protected virtual void Dispose(bool disposing)

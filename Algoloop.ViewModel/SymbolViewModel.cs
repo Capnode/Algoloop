@@ -83,7 +83,11 @@ namespace Algoloop.ViewModel
         public decimal Ask
         {
             get => _ask;
-            set => SetProperty(ref _ask, value);
+            set
+            {
+                AskChange = value - _ask;
+                SetProperty(ref _ask, value);
+            }
         }
 
         public decimal AskChange
@@ -102,7 +106,11 @@ namespace Algoloop.ViewModel
         public decimal Bid
         {
             get => _bid;
-            set => SetProperty(ref _bid, value);
+            set
+            {
+                BidChange = value - _bid;
+                SetProperty(ref _bid, value);
+            }
         }
 
         public decimal BidChange
@@ -121,7 +129,11 @@ namespace Algoloop.ViewModel
         public decimal Price
         {
             get => _price;
-            set => SetProperty(ref _price, value);
+            set
+            {
+                PriceChange = value - _price;
+                SetProperty(ref _price, value);
+            }
         }
 
         public decimal PriceChange

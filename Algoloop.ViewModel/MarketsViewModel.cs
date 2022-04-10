@@ -67,7 +67,7 @@ namespace Algoloop.ViewModel
         {
             Debug.Assert(market != null);
             SelectedItem = null;
-            market.StopMarket();
+            market.Active = false;
             Debug.Assert(!market.Active);
             return Markets.Remove(market);
         }

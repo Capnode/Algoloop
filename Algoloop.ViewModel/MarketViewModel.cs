@@ -316,14 +316,6 @@ namespace Algoloop.ViewModel
             DataToModel();
         }
 
-        internal void StopMarket()
-        {
-            if (Active)
-            {
-                Active = false;
-            }
-        }
-
         private async Task DoActiveCommand(bool value)
         {
             if (value)
@@ -414,6 +406,7 @@ namespace Algoloop.ViewModel
             _provider.Login(model);
             while (model.Active)
             {
+                Log.Trace("MainLoop");
                 _provider.GetAccounts(model, OnAccountsUpdate);
                 _provider.GetMarketData(model, OnMarketUpdate);
 
@@ -431,6 +424,7 @@ namespace Algoloop.ViewModel
 
         private void OnAccountsUpdate(object data)
         {
+            Log.Trace("OnAccountsUpdate");
             if (data is not IEnumerable<AccountModel> accounts)
             {
                 throw new NotImplementedException(data.GetType().Name);
@@ -453,6 +447,7 @@ namespace Algoloop.ViewModel
 
         private void UpdateBalances(Collection<BalanceModel> balances)
         {
+            Log.Trace("UpdateBalances");
             if (balances.Count == Balances.Count)
             {
                 IEnumerator<BalanceViewModel> iBalance = Balances.GetEnumerator();
@@ -477,6 +472,7 @@ namespace Algoloop.ViewModel
 
         private void UpdatePositions(Collection<PositionModel> positions)
         {
+            Log.Trace("UpdatePositions");
             if (positions.Count == Positions.Count)
             {
                 IEnumerator<PositionViewModel> iPosition = Positions.GetEnumerator();
@@ -501,6 +497,7 @@ namespace Algoloop.ViewModel
 
         private void UpdateOrders(Collection<OrderModel> orders)
         {
+            Log.Trace("UpdateOrders");
             if (orders.Count == Balances.Count)
             {
                 IEnumerator<OrderViewModel> iOrder = Orders.GetEnumerator();
@@ -525,6 +522,7 @@ namespace Algoloop.ViewModel
 
         private void OnMarketUpdate(object data)
         {
+            Log.Trace("OnMarketUpdate");
             if (data is IEnumerable<SymbolModel> symbols)
             {
                 Symbols.Clear();
@@ -592,7 +590,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                StopMarket();
+                Active = false;
             }
             finally
             {
@@ -863,45 +861,12 @@ namespace Algoloop.ViewModel
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
-                // Handle DB upgrade
-                if (string.IsNullOrEmpty(symbolModel.Market) || symbolModel.Security == SecurityType.Base)
-                {
-                    DbUpgrade(symbolModel);
-                }
-
                 var symbolViewModel = new SymbolViewModel(this, symbolModel);
                 Symbols.Add(symbolViewModel);
                 ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
             }
 
             Symbols.Sort();
-        }
-
-        private void DbUpgrade(SymbolModel symbol)
-        {
-            var basedir = new DirectoryInfo(DataFolder);
-            foreach (DirectoryInfo securityDir in basedir.GetDirectories())
-            {
-                foreach (DirectoryInfo marketDir in securityDir.GetDirectories())
-                {
-                    foreach (DirectoryInfo resolutionDir in marketDir.GetDirectories())
-                    {
-                        if (resolutionDir.GetDirectories(symbol.Id).Any()
-                            || resolutionDir.GetFiles(symbol.Id + ".zip").Any())
-                        {
-                            if (Enum.TryParse<SecurityType>(securityDir.Name, true, out SecurityType security))
-                            {
-                                symbol.Security = security;
-                                symbol.Market = marketDir.Name;
-                                Log.Trace($"DB upgrade symbol {symbol}");
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-
-            Log.Error($"DB upgrade symbol {symbol} failed!", true);
         }
     }
 }

@@ -67,6 +67,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 
         public virtual void Login(ProviderModel provider)
         {
+            provider.Active = true;
         }
 
         public virtual void Logout()

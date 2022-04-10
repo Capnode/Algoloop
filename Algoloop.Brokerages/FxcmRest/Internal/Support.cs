@@ -42,7 +42,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
                 case 5: return SecurityType.Cfd; // Bullion
                 case 6: return SecurityType.Cfd; // Shares
                 case 7: return SecurityType.Forex; // FX index
-                default: return SecurityType.Cfd; // Undefined
+                default: return SecurityType.Base; // Undefined
             }
         }
 

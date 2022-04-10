@@ -72,7 +72,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
         {
             Log.Trace("Connect");
             _webSocket.Connect();
-            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) throw new ApplicationException($"{GetType().Name} Failed to login");
+            if (!_hold.WaitOne(TimeSpan.FromSeconds(30))) throw new ApplicationException($"{GetType().Name} Failed to login");
             if (!_webSocket.IsOpen) throw new ApplicationException($"{GetType().Name} Failed to login");
         }
 
