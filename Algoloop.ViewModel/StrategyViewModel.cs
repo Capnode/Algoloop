@@ -119,7 +119,7 @@ namespace Algoloop.ViewModel
                 () => DoDropDownOpenedCommand(),
                 () => !IsBusy);
 
-            Model.NameChanged += StrategyNameChanged;
+            Model.NameChanged += SetDisplayName;
             Model.AlgorithmNameChanged += AlgorithmNameChanged;
             DataFromModel();
 
@@ -573,15 +573,24 @@ namespace Algoloop.ViewModel
         private void DataFromModel()
         {
             Debug.Assert(IsUiThread(), "Not UI thread!");
+            SetDisplayName();
+
+            // Copy Symbols
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 symbolModel.Validate();
-                var symbolViewModel = new SymbolViewModel(this, symbolModel);
+                SymbolViewModel symbolViewModel = new (this, symbolModel);
                 Symbols.Add(symbolViewModel);
             }
 
-            AlgorithmNameChanged(Model.AlgorithmName);
+            // Copy Parameters
+            Parameters.Clear();
+            foreach (ParameterModel parameter in Model.Parameters)
+            {
+                ParameterViewModel parameterViewModel = new (parameter);
+                Parameters.Add(parameterViewModel);
+            }
 
             UpdateTracksAndColumns();
 
@@ -619,7 +628,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void StrategyNameChanged()
+        private void SetDisplayName()
         {
             if (!string.IsNullOrWhiteSpace(Model.Name))
             {
@@ -637,11 +646,10 @@ namespace Algoloop.ViewModel
 
         private void AlgorithmNameChanged(string algorithmName)
         {
-            StrategyNameChanged();
+            SetDisplayName();
             RaiseCommands();
             if (string.IsNullOrEmpty(algorithmName)) return;
             if (Model.AlgorithmLanguage.Equals(Language.Python)) return;
-
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
             if (string.IsNullOrEmpty(assemblyPath)) return;
 

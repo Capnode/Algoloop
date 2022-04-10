@@ -41,43 +41,44 @@ namespace Algoloop.Model.Internal
             if (context == null) throw new ArgumentNullException(nameof(context));
             var model = context.Instance as StrategyModel;
             string path = MainService.FullExePath(model?.AlgorithmLocation);
-            if (string.IsNullOrEmpty(path)) return null;
             return model.AlgorithmLanguage switch
             {
-                Language.CSharp or Language.FSharp or Language.VisualBasic => ClrAlgorithm(path),
+                Language.CSharp or Language.FSharp or Language.VisualBasic => ClrAlgorithm(path, model.AlgorithmName),
                 Language.Python => PythonAlgorithm(path),
                 _ => new StandardValuesCollection(new List<string>()),
             };
         }
 
-        private static StandardValuesCollection ClrAlgorithm(string assemblyPath)
+        private static StandardValuesCollection ClrAlgorithm(string path, string name)
         {
-            try
+            if (!string.IsNullOrEmpty(path))
             {
-                Assembly assembly = Assembly.LoadFile(assemblyPath);
+                try
+                {
+                    Assembly assembly = Assembly.LoadFile(path);
 
-                // Get the list of extention classes in the library: 
-                List<string> extended = Loader.GetExtendedTypeNames(assembly);
-                List<string> list = assembly.ExportedTypes
-                    .Where(m => extended.Contains(m.FullName))
-                    .Select(m => m.Name)
-                    .ToList();
-                list.Sort();
-                return new StandardValuesCollection(list);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex);
+                    // Get the list of extention classes in the library: 
+                    List<string> extended = Loader.GetExtendedTypeNames(assembly);
+                    List<string> list = assembly.ExportedTypes
+                        .Where(m => extended.Contains(m.FullName))
+                        .Select(m => m.Name)
+                        .ToList();
+                    list.Sort();
+                    return new StandardValuesCollection(list);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
             }
 
-            return new StandardValuesCollection(new List<string>());
+            return new StandardValuesCollection(new List<string>() { name });
         }
 
         private static StandardValuesCollection PythonAlgorithm(string path)
         {
             string algorithm = Path.GetFileNameWithoutExtension(path);
-            var algorithms = new List<string>() { algorithm };
-            return new StandardValuesCollection(algorithms);
+            return new StandardValuesCollection(new List<string>() { algorithm });
         }
     }
 }
