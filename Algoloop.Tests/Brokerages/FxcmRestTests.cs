@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.FxcmRest;
+using Algoloop.Brokerages.Fxcm;
 using Algoloop.Model;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +22,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
@@ -62,8 +63,8 @@ namespace Algoloop.Tests.Brokerages
 
             IConfigurationRoot config = TestConfig.Create();
             string access = config["fxcmrest-access"];
-            AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
             string key = config["fxcmrest-key"];
+            AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
             _api = new FxcmClient(accessType, key);
         }
 
@@ -84,14 +85,39 @@ namespace Algoloop.Tests.Brokerages
         [TestMethod]
         public async Task GetAccountsAsync()
         {
+            int calls = 0;
+            IReadOnlyList<SymbolModel> symbols = null;
+            IReadOnlyList<QuoteBar> quotes = null;
+            IReadOnlyList<AccountModel> accounts = null;
+
             // Act
             _api.Login();
-            IReadOnlyList<AccountModel> accounts = null;
-            await _api.GetAccountsAsync(acct => accounts = acct as IReadOnlyList<AccountModel>)
-                .ConfigureAwait(false);
+            await _api.GetAccountsAsync(list =>
+            {
+                calls++;
+                if (list is IReadOnlyList<SymbolModel> symbolList)
+                {
+                    symbols = symbolList;
+                }
+                if (list is IReadOnlyList<QuoteBar> quoteList)
+                {
+                    quotes = quoteList;
+                }
+                if (list is IReadOnlyList<AccountModel> accountList)
+                {
+                    accounts = accountList;
+                }
+            }).ConfigureAwait(false);
             Thread.Sleep(6000);
             await _api.Logout();
+            Log.Trace($"count={calls}");
+            Log.Trace($"#symbols={symbols.Count}");
+            Log.Trace($"#quotes={quotes.Count}");
+            Log.Trace($"#accounts={accounts.Count}");
 
+            Assert.AreEqual(3, calls);
+            Assert.IsNotNull(symbols);
+            Assert.IsNotNull(quotes);
             Assert.IsNotNull(accounts);
             Assert.AreEqual(1, accounts.Count);
             Assert.AreEqual(1, accounts[0].Balances.Count);
@@ -105,29 +131,33 @@ namespace Algoloop.Tests.Brokerages
             IReadOnlyList<SymbolModel> symbols = await _api.GetSymbolsAsync()
                 .ConfigureAwait(false);
             await _api.Logout();
+            Log.Trace($"#symbole={symbols.Count}");
 
             Assert.IsNotNull(symbols);
             Assert.AreNotEqual(0, symbols.Count);
         }
 
         [TestMethod]
-        public async Task GetMarketData()
+        public async Task SubscribeSymbolsAsync()
         {
             // Act
             _api.Login();
-            IReadOnlyList<QuoteBar> list = null;
-            await _api.GetMarketDataAsync(m =>
-            {
-                if (m is IReadOnlyList<QuoteBar> quotes)
-                {
-                    list = quotes;
-                }
-            }).ConfigureAwait(false);
-            Thread.Sleep(6000);
+            IReadOnlyList<SymbolModel> symbols = await _api.GetSymbolsAsync()
+                .ConfigureAwait(false);
+            int count1 = symbols.Where(m => m.Active).Count();
+            Log.Trace($"count1={count1}");
+            symbols.First(m => m.Active).Active = false;
+            int count2 = symbols.Where(m => m.Active).Count();
+            Log.Trace($"count2={count2}");
+            await _api.SubscribeSymbolsAsync(symbols)
+                .ConfigureAwait(false);
+            symbols = await _api.GetSymbolsAsync()
+                .ConfigureAwait(false);
+            int count3 = symbols.Where(m => m.Active).Count();
+            Log.Trace($"count3={count3}");
             await _api.Logout();
 
-            Assert.IsNotNull(list);
-            Assert.AreNotEqual(0, list.Count);
+            Assert.IsTrue(count1 > count3);
         }
 
         [TestMethod]

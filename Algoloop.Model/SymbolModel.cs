@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Model.Internal;
 using QuantConnect;
 using System;
 using System.Collections.Generic;
@@ -97,6 +96,17 @@ namespace Algoloop.Model
 
         public void Refresh()
         {
+        }
+
+        public void Update(SymbolModel model)
+        {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
+            Active = model.Active;
+            Id = model.Id;
+            Name = model.Name;
+            Market = model.Market;
+            Security = model.Security;
         }
 
         public int CompareTo(object obj)

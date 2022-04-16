@@ -47,5 +47,16 @@ namespace Algoloop.Model
                 if (!iSrc.Current.Equals(iDest.Current)) return false;
             }
         }
+
+        public static int GetHashCode<T>(IEnumerable<T> src)
+        {
+            int hash = 0;
+            foreach (T item in src)
+            {
+                hash ^= item.GetHashCode();
+            }
+
+            return hash;                
+        }
     }
 }

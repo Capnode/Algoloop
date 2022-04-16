@@ -21,7 +21,7 @@ using System;
 using System.Threading;
 using static QuantConnect.Brokerages.WebSocketClientWrapper;
 
-namespace Algoloop.Brokerages.FxcmRest.Internal
+namespace Algoloop.Brokerages.Fxcm.Internal
 {
     internal class FxcmSocket : IDisposable
     {
@@ -72,7 +72,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
         {
             Log.Trace("Connect");
             _webSocket.Connect();
-            if (!_hold.WaitOne(TimeSpan.FromSeconds(30))) throw new ApplicationException($"{GetType().Name} Failed to login");
+            if (!_hold.WaitOne(TimeSpan.FromSeconds(20))) throw new ApplicationException($"{GetType().Name} Failed to login");
             if (!_webSocket.IsOpen) throw new ApplicationException($"{GetType().Name} Failed to login");
         }
 
@@ -104,7 +104,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
             if (e.Data is TextMessage textMessage)
             {
                 string message = textMessage.Message;
-                Log.Trace($"OnMessage {message}");
+//                Log.Trace($"OnMessage {message}");
 
                 if (message.StartsWith(_msgPong, StringComparison.OrdinalIgnoreCase))
                 {
@@ -125,6 +125,10 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
                     // 42["EUR/USD","{\"Updated\":1614843030623,\"Rates\":[1.20526,1.20539,1.2068999999999999,1.20429],\"Symbol\":\"EUR/USD\"}"]
                     MessageEvent(message[2..]);
                 }
+            }
+            else if(e.Data is BinaryMessage binaryMessage)
+            {
+                Log.Trace($"OnMessage binary");
             }
         }
 

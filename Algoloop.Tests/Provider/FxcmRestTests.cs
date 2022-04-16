@@ -16,9 +16,13 @@ using Algoloop.Model;
 using Algoloop.ViewModel.Internal.Provider;
 using AlgoloopTests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Provider
@@ -28,7 +32,7 @@ namespace Algoloop.Tests.Provider
     {
         private const string _providerName = "fxcmrest";
         private SettingModel _settings;
-        private ProviderModel _broker;
+        private ProviderModel _model;
 
         [TestInitialize]
         public void Initialize()
@@ -41,7 +45,7 @@ namespace Algoloop.Tests.Provider
             string key = config["fxcmrest-key"];
             string access = config["fxcmrest-access"];
 
-            _broker = new ProviderModel
+            _model = new ProviderModel
             {
                 Name = "FxcmRest",
                 Provider = _providerName,
@@ -54,11 +58,57 @@ namespace Algoloop.Tests.Provider
         public void Login()
         {
             // Act
-            using IProvider provider = ProviderFactory.CreateProvider(_broker.Provider, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(_model.Provider, _settings);
             Assert.IsNotNull(provider);
 
-            provider.Login(_broker);
+            provider.Login(_model);
             provider.Logout();
+        }
+
+        [TestMethod()]
+        public void GetUpdate()
+        {
+            int calls = 0;
+            IReadOnlyList<SymbolModel> symbols = null;
+            IReadOnlyList<QuoteBar> quotes = null;
+            IReadOnlyList<AccountModel> accounts = null;
+
+            // Just update symbol list
+            using IProvider provider = ProviderFactory.CreateProvider(_model.Provider, _settings);
+            provider.Login(_model);
+            provider.GetUpdate(_model, list =>
+            {
+                calls++;
+                if (list is IReadOnlyList<SymbolModel> symbolList)
+                {
+                    symbols = symbolList;
+                }
+                if (list is IReadOnlyList<QuoteBar> quoteList)
+                {
+                    quotes = quoteList;
+                }
+                if (list is IReadOnlyList<AccountModel> accountList)
+                {
+                    accounts = accountList;
+                }
+            });
+            Thread.Sleep(6000);
+            provider.Logout();
+
+            Log.Trace($"calls={calls}");
+            Log.Trace($"#symbols={symbols.Count}");
+            Log.Trace($"#quotes={quotes.Count}");
+            Log.Trace($"#accounts={accounts.Count}");
+
+            Assert.IsTrue(calls >= 3);
+            Assert.IsNotNull(symbols);
+            Assert.IsNotNull(quotes);
+            Assert.IsNotNull(accounts);
+            Assert.AreEqual(1, accounts.Count);
+            Assert.AreEqual(1, accounts[0].Balances.Count);
+            Assert.IsTrue(_model.Active);
+            Assert.IsTrue(_model.Symbols.Count > 300);
+            Assert.IsTrue(_model.Symbols.Where(m => m.Active).Count() > 0);
         }
     }
 }

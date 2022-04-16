@@ -68,27 +68,33 @@ namespace Algoloop.ViewModel
                 async () => await DoStartCommand().ConfigureAwait(false),
                 () => !IsBusy && !Active);
             StopCommand = new RelayCommand(
-                () => DoStopCommand(), () => !IsBusy && Active);
+                () => DoStopCommand(),
+                () => !IsBusy && Active);
             CheckAllCommand = new RelayCommand<IList>(
-                m => DoCheckAll(m), m => !IsBusy && !Active && SelectedSymbol != null);
+                m => DoCheckAll(m),
+                m => !IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(
                 m => DoDeleteSymbols(m),
-                m => !IsBusy && !Active && SelectedSymbol != null);
+                m => !IsBusy && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(
-                () => DoImportSymbols(), () => !IsBusy);
+                () => DoImportSymbols(),
+                () => !IsBusy);
             ExportSymbolsCommand = new RelayCommand<IList>(
                 m => DoExportSymbols(m),
                 m => !IsBusy && !Active && SelectedSymbol != null);
             AddToSymbolListCommand = new RelayCommand<IList>(
                 m => DoAddToSymbolList(m),
-                m => !IsBusy && !Active && SelectedSymbol != null);
+                m => !IsBusy && SelectedSymbol != null);
             DeleteCommand = new RelayCommand(
-                () => _parent?.DoDeleteMarket(this), () => !IsBusy && !Active);
+                () => _parent?.DoDeleteMarket(this),
+                () => !IsBusy && !Active);
             NewListCommand = new RelayCommand(
-                () => DoNewList(), () => !IsBusy && !Active);
+                () => DoNewList(),
+                () => !IsBusy && !Active);
             ImportListCommand = new RelayCommand(
-                () => DoImportList(), () => !IsBusy && !Active);
+                () => DoImportList(),
+                () => !IsBusy && !Active);
 
             Model.ModelChanged += DataFromModel;
 
@@ -406,9 +412,8 @@ namespace Algoloop.ViewModel
             _provider.Login(model);
             while (model.Active)
             {
-                Log.Trace("MainLoop");
-                _provider.GetAccounts(model, OnAccountsUpdate);
-                _provider.GetMarketData(model, OnMarketUpdate);
+                Log.Trace("MainLoop", true);
+                _provider.GetUpdate(model, OnUpdate);
 
                 // Update settings page
                 UiThread(() =>
@@ -422,27 +427,92 @@ namespace Algoloop.ViewModel
             _provider.Logout();
         }
 
-        private void OnAccountsUpdate(object data)
+        private void OnUpdate(object data)
         {
-            Log.Trace("OnAccountsUpdate");
-            if (data is not IEnumerable<AccountModel> accounts)
+            if (data is IEnumerable<AccountModel> accounts)
             {
-                throw new NotImplementedException(data.GetType().Name);
+                Model.UpdateAccounts(accounts);
+                UiThread(() => UpdateAccounts(accounts));
+                return;
             }
 
-            Model.UpdateAccounts(accounts);
-            UiThread(() =>
+            if (data is IEnumerable<SymbolModel> symbols)
             {
-                foreach (AccountModel account in accounts)
+                UiThread(() => UpdateSymbols(symbols));
+                Symbols.Sort();
+                return;
+            }
+
+            if (data is QuoteBar quote)
+            {
+                UpdateQuote(quote);
+                return;
+            }
+
+            if (data is IEnumerable<QuoteBar> quotes)
+            {
+                foreach (QuoteBar quoteBar in quotes)
                 {
-                    if (account.Id == Model.DefaultAccountId || accounts.Count() == 1)
-                    {
-                        UpdateBalances(account.Balances);
-                        UpdatePositions(account.Positions);
-                        UpdateOrders(account.Orders);
-                    }
+                    UpdateQuote(quoteBar);
                 }
-            });
+                return;
+            }
+
+            if (data is TradeBar trade)
+            {
+                return;
+            }
+
+            Log.Trace("Not processed");
+        }
+
+        private void UpdateAccounts(IEnumerable<AccountModel> accounts)
+        {
+            foreach (AccountModel account in accounts)
+            {
+                if (account.Id == Model.DefaultAccountId || accounts.Count() == 1)
+                {
+                    UpdateBalances(account.Balances);
+                    UpdatePositions(account.Positions);
+                    UpdateOrders(account.Orders);
+                }
+            }
+        }
+
+        private void UpdateSymbols(IEnumerable<SymbolModel> symbols)
+        {
+            Debug.WriteLine($"UpdateSymbols count={symbols.Count()}");
+            foreach (SymbolModel symbol in symbols)
+            {
+                SymbolViewModel vm = Symbols.FirstOrDefault(m => m.Model.Id.Equals(symbol.Id));
+                if (vm == default)
+                {
+                    vm = new (this, symbol);
+                    Symbols.Add(vm);
+                    ExDataGridColumns.AddPropertyColumns(
+                        SymbolColumns, symbol.Properties, "Model.Properties", false, true);
+                }
+                else
+                {
+                    vm.Update(symbol);
+                }
+            }
+        }
+
+        private void UpdateQuote(QuoteBar quote)
+        {
+            SymbolViewModel symbolVm = Symbols.FirstOrDefault(
+                m => m.Model.Name.Equals(quote.Symbol.ID.Symbol,
+                StringComparison.OrdinalIgnoreCase));
+
+            SymbolModel symbol;
+            if (symbolVm != null)
+            {
+                symbol = symbolVm.Model;
+                symbolVm.Ask = quote.Ask.Close;
+                symbolVm.Bid = quote.Bid.Close;
+
+            }
         }
 
         private void UpdateBalances(Collection<BalanceModel> balances)
@@ -517,64 +587,6 @@ namespace Algoloop.ViewModel
                     var vm = new OrderViewModel(order);
                     Orders.Add(vm);
                 }
-            }
-        }
-
-        private void OnMarketUpdate(object data)
-        {
-            Log.Trace("OnMarketUpdate");
-            if (data is IEnumerable<SymbolModel> symbols)
-            {
-                Symbols.Clear();
-                UiThread(() =>
-                {
-                    foreach (SymbolModel symbolModel in symbols)
-                    {
-                        var symbolViewModel = new SymbolViewModel(this, symbolModel);
-                        Symbols.Add(symbolViewModel);
-                        ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
-                    }
-                });
-
-                Symbols.Sort();
-                return;
-            }
-
-            if (data is QuoteBar quote)
-            {
-                SymbolViewModel symbolVm = Symbols.FirstOrDefault(
-                    m => m.Model.Id.Equals(quote.Symbol.ID.Symbol,
-                    StringComparison.OrdinalIgnoreCase));
-
-                SymbolModel symbol;
-                if (symbolVm != null)
-                {
-                    symbol = symbolVm.Model;
-                    symbolVm.Ask = quote.Ask.Close;
-                    symbolVm.Bid = quote.Bid.Close;
-
-                }
-                else
-                {
-                    symbol = new SymbolModel(quote.Symbol);
-                    Model.Symbols.Add(symbol);
-
-                    UiThread(() =>
-                    {
-                        symbolVm = new SymbolViewModel(this, symbol)
-                        {
-                            Ask = quote.Ask.Close,
-                            Bid = quote.Bid.Close
-                        };
-                        Symbols.Add(symbolVm);
-                    });
-                }
-                return;
-            }
-
-            if (data is TradeBar trade)
-            {
-                return;
             }
         }
 

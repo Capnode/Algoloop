@@ -224,6 +224,12 @@ namespace Algoloop.ViewModel
             return 0;
         }
 
+        public void Update(SymbolModel symbol)
+        {
+            Model.Update(symbol);
+            OnPropertyChanged(nameof(Model));
+        }
+
         private void DoLoadData(MarketViewModel market)
         {
             try

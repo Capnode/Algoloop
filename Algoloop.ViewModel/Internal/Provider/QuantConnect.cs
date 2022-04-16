@@ -38,7 +38,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             return base.Register(settings);
         }
 
-        public override void GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetUpdate(ProviderModel provider, Action<object> update)
         {
             Contract.Requires(provider != null);
             var uri = new Uri($"https://github.com/QuantConnect/Lean/archive/refs/tags/{_version}.zip");

@@ -22,7 +22,6 @@ namespace Algoloop.ViewModel.Internal.Provider
         bool Register(SettingModel settings);
         void Login(ProviderModel provider);
         void Logout();
-        void GetMarketData(ProviderModel provider, Action<object> update = null);
-        void GetAccounts(ProviderModel provider, Action<object> update = null);
+        void GetUpdate(ProviderModel provider, Action<object> update = null);
     }
 }

@@ -17,7 +17,7 @@ using QuantConnect;
 using System;
 using System.Globalization;
 
-namespace Algoloop.Brokerages.FxcmRest.Internal
+namespace Algoloop.Brokerages.Fxcm.Internal
 {
     internal static class Support
     {
@@ -42,6 +42,8 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
                 case 5: return SecurityType.Cfd; // Bullion
                 case 6: return SecurityType.Cfd; // Shares
                 case 7: return SecurityType.Forex; // FX index
+                case 8: return SecurityType.Cfd; // Shares
+                case 9: return SecurityType.Forex; // FX index
                 default: return SecurityType.Base; // Undefined
             }
         }

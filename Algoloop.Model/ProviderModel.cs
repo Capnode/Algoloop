@@ -104,6 +104,7 @@ namespace Algoloop.Model
         [DisplayName("Last date")]
         [Description("Account are updated up to this time.")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
+        [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]

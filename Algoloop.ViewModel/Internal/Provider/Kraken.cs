@@ -32,7 +32,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             return base.Register(settings);
         }
 
-        public override void GetMarketData(ProviderModel provider, Action<object> update)
+        public override void GetUpdate(ProviderModel provider, Action<object> update)
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 

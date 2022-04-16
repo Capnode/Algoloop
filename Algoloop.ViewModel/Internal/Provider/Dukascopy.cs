@@ -86,7 +86,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             return true;
         }
 
-        public override void GetMarketData(ProviderModel market, Action<object> update)
+        public override void GetUpdate(ProviderModel market, Action<object> update)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
 

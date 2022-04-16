@@ -15,11 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
-using Algoloop.Brokerages.FxcmRest.Internal;
+using Algoloop.Brokerages.Fxcm.Internal;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
 using QuantConnect;
@@ -27,9 +29,10 @@ using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using static Algoloop.Model.ProviderModel;
 
-namespace Algoloop.Brokerages.FxcmRest
+namespace Algoloop.Brokerages.Fxcm
 {
     /// <summary>
+    /// https://fxcm-api.readthedocs.io/en/latest/restapi.html
     /// https://github.com/fxcm/RestAPI
     /// Apply for a demo account Generate access token. You can generate one from the Trading Station web.
     /// Click on User Account > Token Management on the upper right hand of the website. For Live account,
@@ -43,15 +46,15 @@ namespace Algoloop.Brokerages.FxcmRest
         private const string _baseUrlReal = "https://api.fxcm.com";
         private const string _baseUrlDemo = "https://api-demo.fxcm.com";
         private const string _mediatype = @"application/json";
-        private const string _getTables = @"trading/get_model/?models=OpenPosition&models=ClosedPosition" +
+        private const string _getTables = @"trading/get_model/?models=Offer&models=OpenPosition&models=ClosedPosition" +
             "&models=Order&models=Account&models=LeverageProfile&models=Properties";
         private const string _subscribeTables = @"trading/subscribe";
         private const string _unsubscribeTables = @"trading/unsubscribe";
-        //        private const string _getInstruments = @"trading/get_instruments";
-        private const string _getModelOffer = @"trading/get_model/?models=Offer";
         private const string _getSymbols = @"trading/get_instruments";
+        private const string _update_subscriptions = @"trading/update_subscriptions";
         private const string _subscribe = @"subscribe";
         private const string _unsubscribe = @"unsubscribe";
+        private const string _contentType = "application/x-www-form-urlencoded";
         private string[] _tables = { "Offer", "OpenPosition", "ClosedPosition", "Order", "Account", "Summary" };
 
         private bool _isDisposed;
@@ -85,10 +88,10 @@ namespace Algoloop.Brokerages.FxcmRest
             if (_fxcmSocket.AccountsUpdate != default)
             {
                 _fxcmSocket.AccountsUpdate = default;
-                List<KeyValuePair<string, string>> nvc = _tables
-                     .Select(table => new KeyValuePair<string, string>("models", table))
+                IList<string> lines = _tables
+                     .Select(table => $"models={table}")
                      .ToList();
-                string json = await PostAsync(_unsubscribeTables, nvc).ConfigureAwait(false);
+                string json = await PostAsync(_unsubscribeTables, lines).ConfigureAwait(false);
                 JObject jo = JObject.Parse(json);
                 JToken jResponse = jo["response"];
                 bool executed = (bool)jResponse["executed"];
@@ -144,9 +147,6 @@ namespace Algoloop.Brokerages.FxcmRest
 
         public async Task GetAccountsAsync(Action<object> update)
         {
-            // Skip if subscription active
-            if (_fxcmSocket.AccountsUpdate != default && update != default) return;
-
             //Log.Trace(">{0}:GetAccountsAsync", GetType().Name);
             string json = await GetAsync(_getTables).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
@@ -163,6 +163,24 @@ namespace Algoloop.Brokerages.FxcmRest
             foreach (JToken jProperty in jProperties)
             {
                 ReadProperty(jProperty);
+            }
+
+            // Offers
+            List<SymbolModel> symbols = new ();
+            List<QuoteBar> quotes = new();
+            JArray jOffers = JArray.FromObject(jo["offers"]);
+            foreach (JToken jSymbol in jOffers)
+            {
+                SymbolModel symbol = ToSymbolModel(jSymbol);
+                if (symbol == null) continue;
+                symbols.Add(symbol);
+                QuoteBar quote = ToQuoteBar(jSymbol);
+                quotes.Add(quote);
+            }
+            if (update != default)
+            {
+                update(symbols);
+                update(quotes);
             }
 
             // Accounts
@@ -203,13 +221,16 @@ namespace Algoloop.Brokerages.FxcmRest
                 account.Positions.Add(position);
             }
 
-            update(accounts);
+            if (update != default)
+            {
+                update(accounts);
+            }
 
             // Start subscription
-            List<KeyValuePair<string, string>> nvc = _tables
-                 .Select(table => new KeyValuePair<string, string>("models", table))
+            IList<string> lines = _tables
+                 .Select(table => $"models={table}")
                  .ToList();
-            json = await PostAsync(_subscribeTables, nvc).ConfigureAwait(false);
+            json = await PostAsync(_subscribeTables, lines).ConfigureAwait(false);
             jo = JObject.Parse(json);
             jResponse = jo["response"];
             executed = (bool)jResponse["executed"];
@@ -223,11 +244,13 @@ namespace Algoloop.Brokerages.FxcmRest
             //Log.Trace("<{0}:GetAccountsAsync", GetType().Name);
         }
 
-        public async Task GetMarketDataAsync(Action<object> update)
+        public async Task SubscribeSymbolsAsync(IEnumerable<SymbolModel> symbols)
         {
-// {"response":{ "executed":true},"offers":[{ "t":0,"ratePrecision":5,"offerId":1,"rollB":-0.7542,"rollS":0.3162,"fractionDigits":5,"pip":0.0001,"defaultSortOrder":100,"currency":"EUR/USD","instrumentType":1,"valueDate":"08062021","time":"2021-08-04T17:00:00.347Z","sell":1.18374,"buy":1.18385,"sellTradable":true,"buyTradable":true,"high":1.19001,"low":1.18329,"volume":1,"pipFraction":0.1,"spread":1.1,"mmr":33.3,"emr":33.3,"lmr":16.65,"minQuantity":1,"maxQuantity":50000000,"instrBaseUnitSize":1,"pipCost":0.08447}
-            //Log.Trace(">{0}:GetOffersAsync", GetType().Name);
-            string json = await GetAsync(_getModelOffer).ConfigureAwait(false);
+            //Log.Trace(">{0}:SubscribeSymbolsAsync", GetType().Name);
+            IList<string> lines = symbols
+                .Select(n => $"symbol={n.Name}&visible={n.Active.ToString().ToLowerInvariant()}")
+                .ToList();
+            string json = await PostAsync(_update_subscriptions, lines).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
             bool executed = (bool)jResponse["executed"];
@@ -236,36 +259,17 @@ namespace Algoloop.Brokerages.FxcmRest
                 string error = jResponse["error"].ToString();
                 throw new ApplicationException(error);
             }
-
-            var quoteBars = new List<QuoteBar>();
-            JArray jOffers = JArray.FromObject(jo["offers"]);
-            foreach (JToken jOffer in jOffers)
-            {
-                string ticker = jOffer["currency"].ToString();
-                if (string.IsNullOrWhiteSpace(ticker)) continue;
-                int instrumentType = (int)jOffer["instrumentType"];
-                SecurityType security = Support.ToSecurityType(instrumentType);
-                Symbol symbol = Symbol.Create(ticker, security, Support.Market);
-                DateTime utcTime = DateTime.Parse(jOffer["time"].ToString());
-                decimal bid = jOffer["sell"].ToDecimal();
-                decimal ask = jOffer["buy"].ToDecimal();
-                var bidBar = new Bar(0, 0, 0, bid);
-                var askBar = new Bar(0, 0, 0, ask);
-                var quoteBar = new QuoteBar(utcTime, symbol, bidBar, 0, askBar, 0);
-                quoteBars.Add(quoteBar);
-            }
-
-            update(quoteBars);
-            //Log.Trace("<{0}:GetOffersAsync", GetType().Name);
+            //Log.Trace("<{0}:SubscribeSymbolsAsync", GetType().Name);
         }
 
         public async Task SubscribeMarketDataAsync(IEnumerable<SymbolModel> symbols, Action<object> update)
         {
             //Log.Trace(">{0}:SubscribeMarketDataAsync", GetType().Name);
-            List<KeyValuePair<string, string>> nvc = symbols
+            IList<string> lines = symbols
                 .Where(m => m.Active)
-                .Select(n => new KeyValuePair<string, string>("pairs", n.Name)).ToList();
-            string json = await PostAsync(_subscribe, nvc).ConfigureAwait(false);
+                .Select(n => $"pairs={n.Name}")
+                .ToList();
+            string json = await PostAsync(_subscribe, lines).ConfigureAwait(false);
 //  { "response":{ "executed":true,"error":""},"pairs":[{ "Updated":1628025032910,"Rates":[1.18608,1.18646,1.18706,1.18578,1.18608,1.18646],"Symbol":"EUR/USD"}]}
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
@@ -296,7 +300,11 @@ namespace Algoloop.Brokerages.FxcmRest
                 quoteBars.Add(quoteBar);
             }
 
-            update(quoteBars);
+            if (update != default)
+            {
+                update(quoteBars);
+            }
+
             _fxcmSocket.SymbolUpdate = update;
             //Log.Trace("<{0}:SubscribeMarketDataAsync", GetType().Name);
         }
@@ -304,10 +312,11 @@ namespace Algoloop.Brokerages.FxcmRest
         public async Task UnsubscribeMarketData(IEnumerable<SymbolModel> symbols)
         {
             //Log.Trace("{0}:>UnsubscribeMarketDataAsync", GetType().Name);
-            List<KeyValuePair<string, string>> nvc = symbols
+            IList<string> lines = symbols
                 .Where(m => m.Active)
-                .Select(n => new KeyValuePair<string, string>("pairs", n.Name)).ToList();
-            string json = await PostAsync(_unsubscribe, nvc).ConfigureAwait(false);
+                .Select(n => $"pairs={n.Name}")
+                .ToList();
+            string json = await PostAsync(_unsubscribe, lines).ConfigureAwait(false);
             // { {"response":{"executed":true,"error":""},"pairs":["EUR/USD"]}
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
@@ -351,17 +360,51 @@ namespace Algoloop.Brokerages.FxcmRest
             }
         }
 
+        private SymbolModel ToSymbolModel(JToken token)
+        {
+            string ticker = token["currency"].ToString();
+            if (string.IsNullOrWhiteSpace(ticker)) return null;
+            int instrumentType = (int)token["instrumentType"];
+            SecurityType security = Support.ToSecurityType(instrumentType);
+            if (security.Equals(SecurityType.Base)) return null;
+
+            SymbolModel symbol = new()
+            {
+                Active = true,
+                Id = token["defaultSortOrder"].ToString(),
+                Name = ticker,
+                Market = Support.Market,
+                Security = security
+            };
+            return symbol;
+        }
+        private QuoteBar ToQuoteBar(JToken token)
+        {
+            string ticker = token["currency"].ToString();
+            if (string.IsNullOrWhiteSpace(ticker)) return null;
+            int instrumentType = (int)token["instrumentType"];
+            SecurityType security = Support.ToSecurityType(instrumentType);
+            Symbol symbol = Symbol.Create(ticker, security, Support.Market);
+            DateTime utcTime = DateTime.Parse(token["time"].ToString());
+            decimal bid = token["sell"].ToDecimal();
+            decimal ask = token["buy"].ToDecimal();
+            Bar bidBar = new (0, 0, 0, bid);
+            Bar askBar = new (0, 0, 0, ask);
+            QuoteBar quoteBar = new (utcTime, symbol, bidBar, 0, askBar, 0);
+            return quoteBar;
+        }
+
         private AccountModel ToAccount(JToken token)
         {
             if (token["isTotal"] != null) return null;
 
-            var account = new AccountModel
+            AccountModel account = new ()
             {
                 Id = token["accountId"].ToString(),
                 Name = token["accountName"].ToString(),
             };
 
-            var balance = new BalanceModel
+            BalanceModel balance = new ()
             {
                 Currency = _baseCurrency,
                 Cash = token["balance"].ToDecimal(),
@@ -440,10 +483,12 @@ namespace Algoloop.Brokerages.FxcmRest
             return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
 
-        private async Task<string> PostAsync(string path, IList<KeyValuePair<string, string>> nvc)
+        private async Task<string> PostAsync(string path, IList<string> lines)
         {
             string uri = _httpClient.BaseAddress + path;
-            using HttpResponseMessage response = await _httpClient.PostAsync(uri, new FormUrlEncodedContent(nvc));
+            string line = string.Join("\r\n", lines).Replace("/", "%2F");
+            StringContent content = new (line, Encoding.UTF8, _contentType);
+            using HttpResponseMessage response = await _httpClient.PostAsync(uri, content);
             if (!response.IsSuccessStatusCode)
             {
                 string message = $"PostAsync fail {(int)response.StatusCode} ({response.ReasonPhrase})";

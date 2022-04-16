@@ -79,11 +79,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
         }
 
-        public virtual void GetAccounts(ProviderModel market, Action<object> update)
-        {
-        }
-
-        public virtual void GetMarketData(ProviderModel market, Action<object> update)
+        public virtual void GetUpdate(ProviderModel market, Action<object> update)
         {
         }
 

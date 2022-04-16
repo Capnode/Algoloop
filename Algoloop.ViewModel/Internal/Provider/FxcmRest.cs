@@ -12,19 +12,22 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.FxcmRest;
+using Algoloop.Brokerages.Fxcm;
 using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class FxcmRest : ProviderBase
     {
         private FxcmClient _api;
-        private bool _symbolsUpdated;
+        private int? _symbolsHash = null;
 
         public override void Login(ProviderModel provider)
         {
@@ -33,7 +36,6 @@ namespace Algoloop.ViewModel.Internal.Provider
             Contract.Requires(provider != null);
             _api = new FxcmClient(provider.Access, provider.ApiKey);
             _api.Login();
-            _symbolsUpdated = false;
             //Log.Trace($"<{GetType().Name}:Login {provider.Provider}");
         }
 
@@ -42,29 +44,29 @@ namespace Algoloop.ViewModel.Internal.Provider
             _api.Logout().Wait();
         }
 
-        public override void GetAccounts(ProviderModel provider, Action<object> update)
+        public override void GetUpdate(ProviderModel provider, Action<object> update)
         {
-            //Log.Trace($">{GetType().Name}:GetAccounts");
-            _api.GetAccountsAsync(update).Wait();
-            //Log.Trace($"<{GetType().Name}:GetAccounts");
-        }
-
-        public override void GetMarketData(ProviderModel provider, Action<object> update)
-        {
-            //Log.Trace($">{GetType().Name}:GetMarketData");
+            //Log.Trace($">{GetType().Name}:GetUpdate");
             DateTime now = DateTime.UtcNow;
-            if (!_symbolsUpdated)
+            int hash = GetHashCode(provider.Symbols);
+            if (hash != _symbolsHash)
             {
+                Debug.WriteLine($"provider Active={provider.Symbols.Where(m => m.Active).Count()}");
                 IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
-                var sym = _api.GetMarketDataAsync(update);
+                Debug.WriteLine($"GetSymbols Active={symbols.Where(m => m.Active).Count()}");
                 UpdateSymbols(provider, symbols, true);
-                update(provider.Symbols);
-                _symbolsUpdated = true;
-                _api.SubscribeMarketDataAsync(provider.Symbols, update).Wait();
+                _api.SubscribeSymbolsAsync(provider.Symbols).Wait();
+                _api.GetAccountsAsync(update).Wait();
+                if (update != default)
+                {
+                    update(provider.Symbols);
+                }
+
+                _symbolsHash = hash;
             }
 
-            provider.LastDate = now.ToLocalTime();
-            //Log.Trace($"<{GetType().Name}:GetMarketData");
+            //            provider.LastDate = now.ToLocalTime();
+            //Log.Trace($"<{GetType().Name}:GetUpdate");
         }
 
         protected override void Dispose(bool disposing)
@@ -79,6 +81,25 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
 
             base.Dispose(disposing);
+        }
+
+        private int GetHashCode(Collection<SymbolModel> symbols)
+        {
+            int hash = 41;
+            foreach (SymbolModel symbol in symbols)
+            {
+                // Suitable nullity checks etc, of course :)
+                if (symbol.Id != null)
+                    hash = hash * 59 + symbol.Id.GetHashCode();
+                hash = hash * 59 + symbol.Active.GetHashCode();
+                if (symbol.Name != null)
+                    hash = hash * 59 + symbol.Name.GetHashCode();
+                if (symbol.Market != null)
+                    hash = hash * 59 + symbol.Market.GetHashCode();
+                hash = hash * 59 + symbol.Security.GetHashCode();
+            }
+
+            return hash;
         }
     }
 }
