@@ -17,7 +17,7 @@ using QuantConnect;
 using System;
 using System.Globalization;
 
-namespace Algoloop.Brokerages.Fxcm.Internal
+namespace Algoloop.Brokerages.FxcmRest.Internal
 {
     internal static class Support
     {

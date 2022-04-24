@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.Fxcm;
+using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
@@ -138,32 +138,39 @@ namespace Algoloop.Tests.Brokerages
         }
 
         [TestMethod]
-        public async Task SubscribeSymbolsAsync()
+        public async Task SubscribeOfferAsync()
         {
             // Act
             _api.Login();
             IReadOnlyList<SymbolModel> symbols = await _api.GetSymbolsAsync()
                 .ConfigureAwait(false);
             int count1 = symbols.Where(m => m.Active).Count();
-            Log.Trace($"count1={count1}");
-            symbols.First(m => m.Active).Active = false;
+            Log.Trace($"#symbols active={count1}");
+            SymbolModel first = symbols.First(m => !m.Active);
+            first.Active = true;
+            await _api.SubscribeOfferAsync(first)
+                .ConfigureAwait(false);
+            symbols = await _api.GetSymbolsAsync()
+                .ConfigureAwait(false);
             int count2 = symbols.Where(m => m.Active).Count();
-            Log.Trace($"count2={count2}");
-            await _api.SubscribeSymbolsAsync(symbols)
+            Log.Trace($"#symbols active={count2}");
+            first.Active = false;
+            await _api.SubscribeOfferAsync(first)
                 .ConfigureAwait(false);
             symbols = await _api.GetSymbolsAsync()
                 .ConfigureAwait(false);
             int count3 = symbols.Where(m => m.Active).Count();
-            Log.Trace($"count3={count3}");
+            Log.Trace($"#symbols active={count3}");
             await _api.Logout();
 
-            Assert.IsTrue(count1 > count3);
+            Assert.IsTrue(count1 < count2);
+            Assert.IsTrue(count1 == count3);
         }
 
         [TestMethod]
         public async Task SubscribeMarketData()
         {
-            List<SymbolModel> symbols = new () { new SymbolModel("EUR/USD", "fxcm", SecurityType.Cfd) };
+            List<SymbolModel> symbols = new() { new SymbolModel("EUR/USD", "fxcm", SecurityType.Cfd) };
 
             // Act
             _api.Login();

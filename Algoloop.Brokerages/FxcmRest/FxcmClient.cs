@@ -21,7 +21,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Algoloop.Brokerages.Fxcm.Internal;
+using Algoloop.Brokerages.FxcmRest.Internal;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
 using QuantConnect;
@@ -29,7 +29,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using static Algoloop.Model.ProviderModel;
 
-namespace Algoloop.Brokerages.Fxcm
+namespace Algoloop.Brokerages.FxcmRest
 {
     /// <summary>
     /// https://fxcm-api.readthedocs.io/en/latest/restapi.html
@@ -244,12 +244,10 @@ namespace Algoloop.Brokerages.Fxcm
             //Log.Trace("<{0}:GetAccountsAsync", GetType().Name);
         }
 
-        public async Task SubscribeSymbolsAsync(IEnumerable<SymbolModel> symbols)
+        public async Task SubscribeOfferAsync(SymbolModel symbol)
         {
             //Log.Trace(">{0}:SubscribeSymbolsAsync", GetType().Name);
-            IList<string> lines = symbols
-                .Select(n => $"symbol={n.Name}&visible={n.Active.ToString().ToLowerInvariant()}")
-                .ToList();
+            IList<string> lines = new List<string>() { $"symbol={symbol.Name}&visible={symbol.Active.ToString().ToLowerInvariant()}" };
             string json = await PostAsync(_update_subscriptions, lines).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];

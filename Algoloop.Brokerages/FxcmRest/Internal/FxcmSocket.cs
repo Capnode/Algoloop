@@ -21,7 +21,7 @@ using System;
 using System.Threading;
 using static QuantConnect.Brokerages.WebSocketClientWrapper;
 
-namespace Algoloop.Brokerages.Fxcm.Internal
+namespace Algoloop.Brokerages.FxcmRest.Internal
 {
     internal class FxcmSocket : IDisposable
     {
@@ -53,7 +53,7 @@ namespace Algoloop.Brokerages.Fxcm.Internal
         public FxcmSocket(Uri uri, string key)
         {
             _webSocket = new WebSocketClientWrapper();
-            _webSocket.Initialize($"wss://{uri.Host}:{uri.Port}/socket.io/?transport=websocket&access_token={key}");
+            _webSocket.Initialize($"wss://{uri.Host}:{uri.Port}/socket.io/?EIO=3&transport=websocket&access_token={key}");
             _webSocket.Open += OnOpen;
             _webSocket.Closed += OnClosed;
             _webSocket.Error += OnError;
@@ -104,7 +104,7 @@ namespace Algoloop.Brokerages.Fxcm.Internal
             if (e.Data is TextMessage textMessage)
             {
                 string message = textMessage.Message;
-//                Log.Trace($"OnMessage {message}");
+                Log.Trace($"OnMessage {message}");
 
                 if (message.StartsWith(_msgPong, StringComparison.OrdinalIgnoreCase))
                 {

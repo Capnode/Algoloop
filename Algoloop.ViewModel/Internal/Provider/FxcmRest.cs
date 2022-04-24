@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.Fxcm;
+using Algoloop.Brokerages.FxcmRest;
 using Algoloop.Model;
 using QuantConnect.Logging;
 using System;
@@ -54,8 +54,18 @@ namespace Algoloop.ViewModel.Internal.Provider
                 Debug.WriteLine($"provider Active={provider.Symbols.Where(m => m.Active).Count()}");
                 IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
                 Debug.WriteLine($"GetSymbols Active={symbols.Where(m => m.Active).Count()}");
+
+                // Sync remote symbol Active property with local
                 UpdateSymbols(provider, symbols, true);
-                _api.SubscribeSymbolsAsync(provider.Symbols).Wait();
+                foreach (SymbolModel symbol in symbols)
+                {
+                    SymbolModel item = provider.Symbols.FirstOrDefault(m => 
+                        m.Name == symbol.Name && m.Active != symbol.Active);
+                    if (item != null) continue;
+                    _api.SubscribeOfferAsync(item).Wait();
+                }
+
+                // Get all account tables
                 _api.GetAccountsAsync(update).Wait();
                 if (update != default)
                 {
