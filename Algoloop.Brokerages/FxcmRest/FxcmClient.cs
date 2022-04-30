@@ -85,9 +85,9 @@ namespace Algoloop.Brokerages.FxcmRest
         public async Task Logout()
         {
             // Stop subscription
-            if (_fxcmSocket.AccountsUpdate != default)
+            if (_fxcmSocket.Update != default)
             {
-                _fxcmSocket.AccountsUpdate = default;
+                _fxcmSocket.Update = default;
                 IList<string> lines = _tables
                      .Select(table => $"models={table}")
                      .ToList();
@@ -240,7 +240,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 throw new ApplicationException(error);
             }
 
-            _fxcmSocket.AccountsUpdate = update;
+            _fxcmSocket.Update = update;
             //Log.Trace("<{0}:GetAccountsAsync", GetType().Name);
         }
 
@@ -303,7 +303,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 update(quoteBars);
             }
 
-            _fxcmSocket.SymbolUpdate = update;
+            _fxcmSocket.Update = update;
             //Log.Trace("<{0}:SubscribeMarketDataAsync", GetType().Name);
         }
 

@@ -61,17 +61,12 @@ namespace Algoloop.ViewModel.Internal.Provider
                 {
                     SymbolModel item = provider.Symbols.FirstOrDefault(m => 
                         m.Name == symbol.Name && m.Active != symbol.Active);
-                    if (item != null) continue;
+                    if (item == null) continue;
                     _api.SubscribeOfferAsync(item).Wait();
                 }
 
                 // Get all account tables
                 _api.GetAccountsAsync(update).Wait();
-                if (update != default)
-                {
-                    update(provider.Symbols);
-                }
-
                 _symbolsHash = hash;
             }
 

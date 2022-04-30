@@ -107,7 +107,7 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(1, accounts.Count);
             Assert.AreEqual(1, accounts[0].Balances.Count);
             Assert.IsTrue(_model.Active);
-            Assert.IsTrue(_model.Symbols.Count > 300);
+            Assert.IsTrue(_model.Symbols.Count > 200);
             Assert.IsTrue(_model.Symbols.Where(m => m.Active).Count() > 0);
         }
     }

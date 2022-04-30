@@ -43,8 +43,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
         private readonly ManualResetEvent _hold = new(false);
         private readonly Timer _keepAliveTimer;
 
-        internal Action<object> AccountsUpdate { get; set; }
-        internal Action<object> SymbolUpdate { get; set; }
+        internal Action<object> Update { get; set; }
 
         public string Sid { get; private set; }
 
@@ -104,8 +103,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
             if (e.Data is TextMessage textMessage)
             {
                 string message = textMessage.Message;
-                Log.Trace($"OnMessage {message}");
-
+//                Log.Trace($"OnMessage {message}");
                 if (message.StartsWith(_msgPong, StringComparison.OrdinalIgnoreCase))
                 {
                     ; // Do nothing
@@ -149,7 +147,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
 
         private void MessageEvent(string json)
         {
-            if (SymbolUpdate == default) return;
+            if (Update == default) return;
 
             JArray jArray = JArray.Parse(json);
             string ticker = jArray[0].ToString();
@@ -168,7 +166,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
             var askBar = new Bar(0, 0, 0, ask);
             var symbol = Symbol.Create(ticker, SecurityType.Forex, Support.Market);
             var quoteBar = new QuoteBar(utcTime, symbol, bidBar, 0, askBar, 0);
-            SymbolUpdate(quoteBar);
+            Update(quoteBar);
         }
     }
 }

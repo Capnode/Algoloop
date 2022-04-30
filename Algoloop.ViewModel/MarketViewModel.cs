@@ -412,7 +412,7 @@ namespace Algoloop.ViewModel
             _provider.Login(model);
             while (model.Active)
             {
-                Log.Trace("MainLoop", true);
+//                Log.Trace("MainLoop", true);
                 _provider.GetUpdate(model, OnUpdate);
 
                 // Update settings page
