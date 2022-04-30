@@ -50,6 +50,10 @@ namespace QuantConnect.Brokerages.Tradier
         public void SetJob(LiveNodePacket job)
         {
             var useSandbox = bool.Parse(job.BrokerageData["tradier-use-sandbox"]);
+            if (job.BrokerageData.TryGetValue("tradier-environment", out string environment) && !string.IsNullOrEmpty(environment))
+            {
+                useSandbox = environment.ToLowerInvariant() == "paper";
+            }
             var accountId = job.BrokerageData["tradier-account-id"];
             var accessToken = job.BrokerageData["tradier-access-token"];
             var aggregator = Composer.Instance.GetExportedValueByTypeName<IDataAggregator>(Config.Get("data-aggregator", "QuantConnect.Lean.Engine.DataFeeds.AggregationManager"), forceTypeNameOnExisting: false);
