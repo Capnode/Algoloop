@@ -199,8 +199,8 @@
                         <TabItem Header="{Binding
                             Symbols.Count,
                             Converter={viewsupport:StringFormatConverter},
-                            ConverterParameter=Symbols ({0}),
-                            FallbackValue=Symbols}">
+                            ConverterParameter=Instruments ({0}),
+                            FallbackValue=Instruments}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
@@ -292,6 +292,67 @@
                                     ExColumnsInfo="{Binding
                                         Source={StaticResource settings},
                                         Path=MarketSymbolsColumnsInfo}">
+                                </wpf:ExDataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="{Binding ActiveSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                            <DockPanel>
+                                <ToolBar DockPanel.Dock="Top">
+                                    <ComboBox
+                                        DisplayMemberPath="Name"
+                                        ItemsSource="{Binding Accounts}"
+                                        MinWidth="120"
+                                        SelectedValue="{Binding
+                                            SelectedAccount,
+                                            Mode=TwoWay}"
+                                        ToolTip="Selected account"
+                                        Visibility="{Binding
+                                            Accounts.Count,
+                                            Converter={viewsupport:BooleanToVisibilityConverter}}">
+                                    </ComboBox>
+                                    <Button
+                                        ToolTip="Add symbol" 
+                                        Command="{Binding AddSymbolCommand}"
+                                        CommandParameter="{Binding ElementName=combobox, Path=SelectedValue}">
+                                        <Image Source="/Resources\Add.png" Width="16" Height="16"/>
+                                    </Button>
+                                    <Button
+                                        ToolTip="Remove symbols"
+                                        Command="{Binding RemoveSymbolsCommand}"
+                                        CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}">
+                                        <Image Source="/Resources\Delete.png" Width="16" Height="16"/>
+                                    </Button>
+                                </ToolBar>
+                                <wpf:ExDataGrid
+                                    x:Name="listbox"
+                                    CanUserFreeze="False"
+                                    CanUserSelectDistinct="True"
+                                    CanUserGroup="False"
+                                    CanUserFilter="True"
+                                    CanUserReorderColumns="True"
+                                    AutoGenerateColumns="False"
+                                    GridLinesVisibility="None"
+                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                    FrozenColumnCount="1"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    ExItemsSource="{Binding ActiveSymbols}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Model.Name}"/>
+                                        <DataGridTextColumn Header="Ask" Binding="{Binding Ask, NotifyOnTargetUpdated=True}">
+                                            <DataGridTextColumn.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource BlinkCell}">
+                                                    <Setter Property="Background" Value="{Binding AskChange, Converter={viewsupport:ToBrushConverter}}" />
+                                                </Style>
+                                            </DataGridTextColumn.CellStyle>
+                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Header="Bid" Binding="{Binding Bid, NotifyOnTargetUpdated=True}">
+                                            <DataGridTextColumn.CellStyle>
+                                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource BlinkCell}">
+                                                    <Setter Property="Background" Value="{Binding BidChange, Converter={viewsupport:ToBrushConverter}}" />
+                                                </Style>
+                                            </DataGridTextColumn.CellStyle>
+                                        </DataGridTextColumn>
+                                    </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>

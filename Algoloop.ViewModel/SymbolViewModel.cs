@@ -180,8 +180,8 @@ namespace Algoloop.ViewModel
                 {
                     Model.Active = value;
                     OnPropertyChanged();
-//                (_parent as StrategyViewModel)?.Refresh();
-//                (_parent as MarketViewModel)?.Refresh();
+                    (_parent as StrategyViewModel)?.Refresh();
+                    (_parent as MarketViewModel)?.Refresh();
                 }
             }
         }

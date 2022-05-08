@@ -54,6 +54,7 @@ namespace Algoloop.ViewModel
         private Resolution _selectedResolution = Resolution.Daily;
         private static ReportPeriod _selectedReportPeriod;
         private AccountViewModel _selectedAccount;
+        private bool _setUpdate;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, ProviderModel marketModel, SettingModel settings)
         {
@@ -137,6 +138,7 @@ namespace Algoloop.ViewModel
         public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
+        public SyncObservableCollection<SymbolViewModel> ActiveSymbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
         public ObservableCollection<AccountViewModel> Accounts { get; } = new ObservableCollection<AccountViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
@@ -230,11 +232,16 @@ namespace Algoloop.ViewModel
 
         public void Refresh()
         {
+            _setUpdate = true;
             Model.Refresh();
             foreach (ListViewModel list in Lists)
             {
                 list.Refresh();
             }
+
+            // Sync Active Symbols to ActiveSymbols
+            IEnumerable<SymbolViewModel> activeSymbols = Symbols.Where(m => m.Active);
+            Collection.SmartCopy(activeSymbols, ActiveSymbols);
         }
 
         internal void DataToModel()
@@ -410,10 +417,20 @@ namespace Algoloop.ViewModel
         private void MarketLoop(ProviderModel model)
         {
             _provider.Login(model);
+            _setUpdate = true;
             while (model.Active)
             {
 //                Log.Trace("MainLoop", true);
-                _provider.GetUpdate(model, OnUpdate);
+
+                if (_setUpdate)
+                {
+                    _provider.SetUpdate(model, OnUpdate);
+                    _setUpdate = false;
+                }
+                else
+                {
+                    _provider.GetUpdate(model, OnUpdate);
+                }
 
                 // Update settings page
                 UiThread(() =>
@@ -873,8 +890,13 @@ namespace Algoloop.ViewModel
             Symbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
-                var symbolViewModel = new SymbolViewModel(this, symbolModel);
+                SymbolViewModel symbolViewModel = new (this, symbolModel);
                 Symbols.Add(symbolViewModel);
+                if (symbolViewModel.Active)
+                {
+                    ActiveSymbols.Add(symbolViewModel);
+                }
+
                 ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
             }
 

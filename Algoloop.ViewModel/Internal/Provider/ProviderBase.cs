@@ -79,6 +79,10 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
         }
 
+        public virtual void SetUpdate(ProviderModel market, Action<object> update)
+        {
+        }
+
         public virtual void GetUpdate(ProviderModel market, Action<object> update)
         {
         }

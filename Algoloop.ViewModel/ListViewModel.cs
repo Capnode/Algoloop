@@ -46,12 +46,10 @@ namespace Algoloop.ViewModel
             StopCommand = new RelayCommand(() => { }, () => false);
             AddSymbolCommand = new RelayCommand<SymbolViewModel>(
                 m => DoAddSymbol(m),
-                m => !IsBusy
-                    && !Market.Active
-                    && MarketSymbols.View.Cast<object>().FirstOrDefault() != null);
+                m => !IsBusy && MarketSymbols.View.Cast<object>().Any());
             RemoveSymbolsCommand = new RelayCommand<IList>(
                 m => DoRemoveSymbols(m),
-                m => !IsBusy && !Market.Active && SelectedSymbol != null);
+                m => !IsBusy && SelectedSymbol != null);
             ExportListCommand = new RelayCommand(
                 () => DoExportList(), () => !IsBusy && !Market.Active);
 
@@ -61,14 +59,13 @@ namespace Algoloop.ViewModel
             {
                 if (e.Item is SymbolViewModel marketSymbol)
                 {
-                    e.Accepted = marketSymbol.Active && !Symbols.Any(
-                        m => m.Model.Id.Equals(
-                            marketSymbol.Model.Id,
-                            StringComparison.OrdinalIgnoreCase));
+                    e.Accepted = !Symbols.Any(m => m.Model.Id.Equals(
+                        marketSymbol.Model.Id,
+                        StringComparison.OrdinalIgnoreCase));
                 }
             };
 
-            MarketSymbols.Source = Market.Symbols;
+            MarketSymbols.Source = Market.ActiveSymbols;
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -158,7 +155,6 @@ namespace Algoloop.ViewModel
 
             DataToModel();
             MarketSymbols.View.Refresh();
-            AddSymbolCommand.NotifyCanExecuteChanged();
         }
 
         private void DoAddSymbol(SymbolViewModel symbol)
@@ -175,6 +171,7 @@ namespace Algoloop.ViewModel
             finally
             {
                 IsBusy = false;
+                AddSymbolCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -235,11 +232,11 @@ namespace Algoloop.ViewModel
                 }
 
                 MarketSymbols.View.Refresh();
-                AddSymbolCommand.NotifyCanExecuteChanged();
             }
             finally
             {
                 IsBusy = false;
+                AddSymbolCommand.NotifyCanExecuteChanged();
             }
         }
 

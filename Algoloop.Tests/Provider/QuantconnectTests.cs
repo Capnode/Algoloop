@@ -55,7 +55,7 @@ namespace Algoloop.Tests.Provider
 
             // Just update symbol list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.GetUpdate(market);
+            provider.GetUpdate(market, null);
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate == date);
             Assert.IsTrue(market.Symbols.Count > 42);
@@ -79,7 +79,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
-            provider.GetUpdate(market);
+            provider.GetUpdate(market, null);
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate > date);
             Assert.IsTrue(market.Symbols.Count > 42);

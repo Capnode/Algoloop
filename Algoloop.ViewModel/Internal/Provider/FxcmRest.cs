@@ -27,7 +27,6 @@ namespace Algoloop.ViewModel.Internal.Provider
     internal class FxcmRest : ProviderBase
     {
         private FxcmClient _api;
-        private int? _symbolsHash = null;
 
         public override void Login(ProviderModel provider)
         {
@@ -44,31 +43,26 @@ namespace Algoloop.ViewModel.Internal.Provider
             _api.Logout().Wait();
         }
 
-        public override void GetUpdate(ProviderModel provider, Action<object> update)
+        public override void SetUpdate(ProviderModel provider, Action<object> update)
         {
             //Log.Trace($">{GetType().Name}:GetUpdate");
             DateTime now = DateTime.UtcNow;
-            int hash = GetHashCode(provider.Symbols);
-            if (hash != _symbolsHash)
+            Debug.WriteLine($"provider Active={provider.Symbols.Where(m => m.Active).Count()}");
+            IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
+            Debug.WriteLine($"GetSymbols Active={symbols.Where(m => m.Active).Count()}");
+
+            // Sync remote symbol Active property with local
+            UpdateSymbols(provider, symbols, true);
+            foreach (SymbolModel symbol in symbols)
             {
-                Debug.WriteLine($"provider Active={provider.Symbols.Where(m => m.Active).Count()}");
-                IReadOnlyList<SymbolModel> symbols = _api.GetSymbolsAsync().Result;
-                Debug.WriteLine($"GetSymbols Active={symbols.Where(m => m.Active).Count()}");
-
-                // Sync remote symbol Active property with local
-                UpdateSymbols(provider, symbols, true);
-                foreach (SymbolModel symbol in symbols)
-                {
-                    SymbolModel item = provider.Symbols.FirstOrDefault(m => 
-                        m.Name == symbol.Name && m.Active != symbol.Active);
-                    if (item == null) continue;
-                    _api.SubscribeOfferAsync(item).Wait();
-                }
-
-                // Get all account tables
-                _api.GetAccountsAsync(update).Wait();
-                _symbolsHash = hash;
+                SymbolModel item = provider.Symbols.FirstOrDefault(m => 
+                    m.Name == symbol.Name && m.Active != symbol.Active);
+                if (item == null) continue;
+                _api.SubscribeOfferAsync(item).Wait();
             }
+
+            // Get all account tables
+            _api.GetAccountsAsync(update).Wait();
 
             //            provider.LastDate = now.ToLocalTime();
             //Log.Trace($"<{GetType().Name}:GetUpdate");
