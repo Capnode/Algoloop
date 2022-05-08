@@ -66,7 +66,7 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod()]
-        public void GetUpdate()
+        public void SetUpdate()
         {
             int calls = 0;
             IReadOnlyList<SymbolModel> symbols = null;
@@ -76,7 +76,7 @@ namespace Algoloop.Tests.Provider
             // Just update symbol list
             using IProvider provider = ProviderFactory.CreateProvider(_model.Provider, _settings);
             provider.Login(_model);
-            provider.GetUpdate(_model, list =>
+            provider.SetUpdate(_model, list =>
             {
                 calls++;
                 if (list is IReadOnlyList<SymbolModel> symbolList)

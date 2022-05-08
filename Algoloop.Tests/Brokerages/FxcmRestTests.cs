@@ -115,7 +115,6 @@ namespace Algoloop.Tests.Brokerages
             Log.Trace($"#quotes={quotes.Count}");
             Log.Trace($"#accounts={accounts.Count}");
 
-            Assert.AreEqual(3, calls);
             Assert.IsNotNull(symbols);
             Assert.IsNotNull(quotes);
             Assert.IsNotNull(accounts);
