@@ -164,6 +164,7 @@ namespace Algoloop.ViewModel.Internal.Provider
         internal void UpdateAccounts(ProviderModel market, IEnumerable<AccountModel> accounts, Action<object> update)
         {
             if (!Collection.SmartCopy(accounts, market.Accounts)) return;
+            if (update == default) return;
             foreach (AccountModel account in accounts)
             {
                 update(account);
