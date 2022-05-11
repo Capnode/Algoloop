@@ -4,29 +4,29 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="{Binding Title}"
     Width="300"
-    VerticalAlignment="Top"
     Margin="40"
+    VerticalAlignment="Top"
+    DataContext="{Binding Source={StaticResource Locator}, Path=AboutViewModel}"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
-    SizeToContent="Height"
-    DataContext="{Binding Source={StaticResource Locator}, Path=AboutViewModel}" >
+    SizeToContent="Height">
 
     <StackPanel>
-        <Label FontWeight="Bold" Content="{Binding ProductName}" />
-        <Label FontWeight="Bold" Content="{Binding Version}" />
-        <Label FontWeight="Bold" Content="{Binding Copyright}" />
+        <Label Content="{Binding ProductName}" FontWeight="Bold" />
+        <Label Content="{Binding Version}" FontWeight="Bold" />
+        <Label Content="{Binding Copyright}" FontWeight="Bold" />
         <TextBox
             Margin="10"
-            Text="{Binding Description, Mode=OneWay}"
-            TextWrapping="Wrap"
+            Background="LightGray"
             IsReadOnly="True"
-            Background="LightGray" />
+            Text="{Binding Description, Mode=OneWay}"
+            TextWrapping="Wrap" />
         <Button
-            IsDefault="True"
             MinWidth="60"
             Margin="10"
-            Content="OK"
             HorizontalAlignment="Center"
-            Click="OkClick"/>
+            Click="OkClick"
+            Content="OK"
+            IsDefault="True" />
     </StackPanel>
 </Window>

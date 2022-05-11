@@ -2,17 +2,17 @@
     x:Class="Algoloop.Wpf.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    StartupUri="MainWindow.xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    d1p1:Ignorable="d"
     xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    DispatcherUnhandledException="DispatcherUnhandledExceptionHandler">
+    d1p1:Ignorable="d"
+    DispatcherUnhandledException="DispatcherUnhandledExceptionHandler"
+    StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <vm:ViewModelLocator
+                xmlns:vm="clr-namespace:Algoloop.ViewModel;assembly=Algoloop.ViewModel"
                 x:Key="Locator"
-                d:IsDataSource="True"
-                xmlns:vm="clr-namespace:Algoloop.ViewModel;assembly=Algoloop.ViewModel" />
+                d:IsDataSource="True" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
