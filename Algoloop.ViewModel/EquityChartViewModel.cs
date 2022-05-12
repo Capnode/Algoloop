@@ -13,6 +13,7 @@
  */
 
 using Algoloop.ViewModel.Internal.Lean;
+using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
 using System.Collections.Generic;
 using System.Windows.Media;

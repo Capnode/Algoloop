@@ -33,12 +33,13 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
-using stocksharp = StockSharp.Xaml.Charting;
 using static Algoloop.Model.TrackModel;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
 using Microsoft.Toolkit.Mvvm.Input;
 using Algoloop.ViewModel.Internal.Lean;
+using StockSharp.Xaml.Charting;
+using StockSharp.Charting;
 
 namespace Algoloop.ViewModel
 {
@@ -555,9 +556,9 @@ namespace Algoloop.ViewModel
             BacktestResult result,
             IDictionary<string, decimal?> statistics)
         {
-            KeyValuePair<string, Chart> chart = result.Charts.FirstOrDefault(
+            KeyValuePair<string, QuantConnect.Chart> chart = result.Charts.FirstOrDefault(
                 m => m.Key.Equals("Strategy Equity", StringComparison.OrdinalIgnoreCase));
-            if (chart.Equals(default(KeyValuePair<string, Chart>))) return;
+            if (chart.Equals(default(KeyValuePair<string, QuantConnect.Chart>))) return;
 
             KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(
                 m => m.Key.Equals("Equity", StringComparison.OrdinalIgnoreCase));
@@ -1011,14 +1012,14 @@ namespace Algoloop.ViewModel
             Debug.Assert(workCharts.Count == 0);
 
             decimal profit = Model.InitialCapital;
-            var series = new List<stocksharp.EquityData>
+            var series = new List<EquityData>
             {
-                new stocksharp.EquityData { Time = Model.StartDate, Value = profit }
+                new EquityData { Time = Model.StartDate, Value = profit }
             };
             foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
             {
                 profit += trade.Value;
-                series.Add(new stocksharp.EquityData {
+                series.Add(new EquityData {
                     Time = trade.Key,
                     Value = RoundLarge(profit)
                 });
@@ -1026,7 +1027,7 @@ namespace Algoloop.ViewModel
 
             var viewModel = new EquityChartViewModel(
                 "Net profit",
-                stocksharp.ChartIndicatorDrawStyles.Area,
+                ChartIndicatorDrawStyles.Area,
                 Color.Green,
                 0,
                 false,
@@ -1034,14 +1035,14 @@ namespace Algoloop.ViewModel
 
             workCharts.Add(viewModel);
 
-            foreach (KeyValuePair<string, Chart> chart in result.Charts)
+            foreach (KeyValuePair<string, QuantConnect.Chart> chart in result.Charts)
             {
                 foreach (KeyValuePair<string, Series> kvp in chart.Value.Series)
                 {
                     Series serie = kvp.Value;
                     if (serie.Values.Count < 2) continue;
-                    IEnumerable<stocksharp.EquityData> list = serie.Values.Select(
-                        m => new stocksharp.EquityData {
+                    IEnumerable<EquityData> list = serie.Values.Select(
+                        m => new EquityData {
                             Time = Time.UnixTimeStampToDateTime(m.x),
                             Value = RoundLarge(m.y)
                         });
@@ -1050,21 +1051,21 @@ namespace Algoloop.ViewModel
                     {
                         "Equity" => new EquityChartViewModel(
                             serie.Name,
-                            stocksharp.ChartIndicatorDrawStyles.Area,
+                            ChartIndicatorDrawStyles.Area,
                             serie.Color,
                             0,
                             true,
                             list),
                         "Daily Performance" => new EquityChartViewModel(
                             serie.Name,
-                            stocksharp.ChartIndicatorDrawStyles.Histogram,
+                            ChartIndicatorDrawStyles.Histogram,
                             serie.Color,
                             1,
                             true,
                             list),
                         _ => new EquityChartViewModel(
                             serie.Name,
-                            stocksharp.ChartIndicatorDrawStyles.Line,
+                            ChartIndicatorDrawStyles.Line,
                             serie.Color,
                             2,
                             false,

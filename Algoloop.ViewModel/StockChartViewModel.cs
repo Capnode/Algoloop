@@ -14,7 +14,7 @@
 
 using Algoloop.ViewModel.Internal.Lean;
 using StockSharp.Algo.Candles;
-using StockSharp.Xaml.Charting;
+using StockSharp.Charting;
 using System.Collections.Generic;
 using System.Windows.Media;
 

@@ -21,7 +21,7 @@ using QuantConnect;
 using QuantConnect.Data.Fundamental;
 using QuantConnect.Util;
 using StockSharp.Algo.Candles;
-using StockSharp.Xaml.Charting;
+using StockSharp.Charting;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
