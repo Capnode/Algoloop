@@ -5,7 +5,8 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>QuantConnect.Optimizer.Launcher</RootNamespace>
     <AssemblyName>QuantConnect.Optimizer.Launcher</AssemblyName>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
     <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
