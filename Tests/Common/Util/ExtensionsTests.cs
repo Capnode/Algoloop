@@ -42,6 +42,33 @@ namespace QuantConnect.Tests.Common.Util
     [TestFixture]
     public class ExtensionsTests
     {
+        [TestCase(0, 10, 110)]
+        [TestCase(900, 10, 110)]
+        [TestCase(500, 10, 10)]
+
+        [TestCase(0, 100, 100)]
+        [TestCase(100, 100, 100)]
+        [TestCase(500, 100, 100)]
+        [TestCase(990, 100, 200)]
+        [TestCase(900, 100, 200)]
+
+        [TestCase(0, 1000, 1500)]
+        [TestCase(100, 1000, 1000)]
+        [TestCase(500, 1000, 1000)]
+        [TestCase(990, 1000, 1500)]
+
+        [TestCase(0, 10000, 10500)]
+        [TestCase(100, 10000, 10000)]
+        [TestCase(500, 10000, 10000)]
+        [TestCase(990, 10000, 10500)]
+        public void UnevenSecondWaitTime(int nowMilliseconds, int waitInterval, int expectedWaitInterval)
+        {
+            var nowUtc = new DateTime(2022, 04, 1);
+            nowUtc = nowUtc.AddMilliseconds(nowMilliseconds);
+
+            Assert.AreEqual(expectedWaitInterval, nowUtc.GetSecondUnevenWait(waitInterval));
+        }
+
         [TestCase("20220101", false, true, Resolution.Daily)]
         [TestCase("20220101", false, false, Resolution.Daily)]
         [TestCase("20220103 09:31", true, false, Resolution.Minute)]
@@ -892,7 +919,7 @@ namespace QuantConnect.Tests.Common.Util
             using (Py.GIL())
             {
                 // Try to convert a python class which inherits from a C# object
-                value = PythonEngine.ModuleFromString("testModule",
+                value = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -941,8 +968,8 @@ class Test(PythonData):
             using (Py.GIL())
             {
                 // Try to convert a python object as a IndicatorBase<TradeBar>
-                var locals = new PyDict();
-                PythonEngine.Exec("class A:\n    pass", null, locals.Handle);
+                using var locals = new PyDict();
+                PythonEngine.Exec("class A:\n    pass", null, locals);
                 var value = locals.GetItem("A").Invoke();
 
                 IndicatorBase<TradeBar> indicatorBaseTradeBar;
@@ -959,7 +986,7 @@ class Test(PythonData):
             using (Py.GIL())
             {
                 // Try to convert a python class which inherits from a C# object
-                value = PythonEngine.ModuleFromString("testModule",
+                value = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -982,8 +1009,8 @@ class Test(PythonData):
 
             using (Py.GIL())
             {
-                var locals = new PyDict();
-                PythonEngine.Exec(code, null, locals.Handle);
+                using var locals = new PyDict();
+                PythonEngine.Exec(code, null, locals);
                 var pyObject = locals.GetItem("coarseSelector");
                 pyObject.TryConvertToDelegate(out coarseSelector);
             }
@@ -1009,8 +1036,8 @@ class Test(PythonData):
 
             using (Py.GIL())
             {
-                var locals = new PyDict();
-                PythonEngine.Exec("def raise_number(a): raise ValueError(a)", null, locals.Handle);
+                using var locals = new PyDict();
+                PythonEngine.Exec("def raise_number(a): raise ValueError(a)", null, locals);
                 var pyObject = locals.GetItem("raise_number");
                 pyObject.TryConvertToDelegate(out action);
             }
@@ -1022,7 +1049,7 @@ class Test(PythonData):
             }
             catch (PythonException e)
             {
-                Assert.AreEqual($"ValueError : {2}", e.Message);
+                Assert.AreEqual($"{2}", e.Message);
             }
         }
 
@@ -1033,8 +1060,8 @@ class Test(PythonData):
 
             using (Py.GIL())
             {
-                var locals = new PyDict();
-                PythonEngine.Exec("def raise_number(a, b): raise ValueError(a * b)", null, locals.Handle);
+                using var locals = new PyDict();
+                PythonEngine.Exec("def raise_number(a, b): raise ValueError(a * b)", null, locals);
                 var pyObject = locals.GetItem("raise_number");
                 pyObject.TryConvertToDelegate(out action);
             }
@@ -1046,7 +1073,7 @@ class Test(PythonData):
             }
             catch (PythonException e)
             {
-                Assert.AreEqual("ValueError : 6.0", e.Message);
+                Assert.AreEqual("6.0", e.Message);
             }
         }
 
@@ -1057,8 +1084,8 @@ class Test(PythonData):
 
             using (Py.GIL())
             {
-                var locals = new PyDict();
-                PythonEngine.Exec("def raise_number(a, b): raise ValueError(a * b)", null, locals.Handle);
+                using var locals = new PyDict();
+                PythonEngine.Exec("def raise_number(a, b): raise ValueError(a * b)", null, locals);
                 var pyObject = locals.GetItem("raise_number");
                 Assert.Throws<ArgumentException>(() => pyObject.TryConvertToDelegate(out action));
             }
@@ -1132,7 +1159,7 @@ class Test(PythonData):
         {
             using (Py.GIL())
             {
-                var actualDictionary = PythonEngine.ModuleFromString(
+                var actualDictionary = PyModule.FromString(
                     "PyObjectDictionaryConvertToDictionary_Success",
                     @"
 from datetime import datetime as dt
@@ -1165,7 +1192,7 @@ actualDictionary.update({'IBM': dt(2019,10,5)})
         {
             using (Py.GIL())
             {
-                var pyObject = PythonEngine.ModuleFromString(
+                var pyObject = PyModule.FromString(
                     "PyObjectDictionaryConvertToDictionary_FailNotDictionary",
                     "actualDictionary = list()"
                 ).GetAttr("actualDictionary");
@@ -1179,7 +1206,7 @@ actualDictionary.update({'IBM': dt(2019,10,5)})
         {
             using (Py.GIL())
             {
-                var pyObject = PythonEngine.ModuleFromString(
+                var pyObject = PyModule.FromString(
                     "PyObjectDictionaryConvertToDictionary_FailWrongItemType",
                     @"
 actualDictionary = dict()

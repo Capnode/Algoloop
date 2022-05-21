@@ -14,6 +14,7 @@
 
 using Algoloop.ViewModel;
 using MoreLinq;
+using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
@@ -111,13 +112,13 @@ namespace Algoloop.Wpf
             _chart.Clear();
 
             // Collect time-value points of all curves
-            Dictionary<ChartBandElement, decimal> curves = new();
-            Dictionary<DateTimeOffset, List<Tuple<ChartBandElement, decimal>>> points = new ();
+            Dictionary<IChartBandElement, decimal> curves = new();
+            Dictionary<DateTimeOffset, List<Tuple<IChartBandElement, decimal>>> points = new ();
             foreach (object item in _combobox.Items)
             {
                 if (item is EquityChartViewModel model && model.IsVisible)
                 {
-                    ChartBandElement curveElement = _chart.CreateCurve(model.Title, model.Color, ChartIndicatorDrawStyles.Line);
+                    IChartBandElement curveElement = _chart.CreateCurve(model.Title, model.Color, ChartIndicatorDrawStyles.Line);
                     foreach (EquityData equityData in model.Series)
                     {
                         decimal value = equityData.Value;
@@ -127,29 +128,29 @@ namespace Algoloop.Wpf
                         }
 
                         DateTimeOffset time = equityData.Time.Date;
-                        if (!points.TryGetValue(time, out List<Tuple<ChartBandElement, decimal>> list))
+                        if (!points.TryGetValue(time, out List<Tuple<IChartBandElement, decimal>> list))
                         {
-                            list = new List<Tuple<ChartBandElement, decimal>>();
+                            list = new List<Tuple<IChartBandElement, decimal>>();
                             points.Add(time, list);
                         }
-                        list.Add(new Tuple<ChartBandElement, decimal>(curveElement, value));
+                        list.Add(new Tuple<IChartBandElement, decimal>(curveElement, value));
                     }
                 }
             }
 
             // Draw all curves in time order, moment by moment
-            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartBandElement, decimal>>> moment in points.OrderBy(m => m.Key))
+            foreach (KeyValuePair<DateTimeOffset, List<Tuple<IChartBandElement, decimal>>> moment in points.OrderBy(m => m.Key))
             {
                 DateTimeOffset time = moment.Key;
-                ChartDrawData chartData = new();
-                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(time);
-                foreach (KeyValuePair<ChartBandElement, decimal> curve in curves)
+                ChartDrawData chartData = new ();
+                IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(time);
+                foreach (KeyValuePair<IChartBandElement, decimal> curve in curves)
                 {
-                    ChartBandElement chart = curve.Key;
+                    IChartBandElement chart = curve.Key;
                     decimal value = curve.Value;
 
                     // Use actual point it available
-                    Tuple<ChartBandElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
+                    Tuple<IChartBandElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
                     if (pair != default)
                     {
                         value = pair.Item2;

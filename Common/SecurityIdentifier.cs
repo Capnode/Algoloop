@@ -14,7 +14,6 @@
 */
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -45,8 +44,7 @@ namespace QuantConnect
     {
         #region Empty, DefaultDate Fields
 
-        private static readonly ConcurrentDictionary<string, SecurityIdentifier> SecurityIdentifierCache
-            = new ConcurrentDictionary<string, SecurityIdentifier>();
+        private static readonly Dictionary<string, SecurityIdentifier> SecurityIdentifierCache = new();
         private static readonly string MapFileProviderTypeName = Config.Get("map-file-provider", "LocalDiskMapFileProvider");
         private static readonly char[] InvalidCharacters = {'|', ' '};
         private static readonly Lazy<IMapFileProvider> MapFileProvider = new Lazy<IMapFileProvider>(
@@ -165,27 +163,25 @@ namespace QuantConnect
         {
             get
             {
-                try
+                if (_date.HasValue)
                 {
                     return _date.Value;
                 }
-                catch (InvalidOperationException)
+
+                switch (SecurityType)
                 {
-                    switch (SecurityType)
-                    {
-                        case SecurityType.Base:
-                        case SecurityType.Equity:
-                        case SecurityType.Option:
-                        case SecurityType.Future:
-                        case SecurityType.Index:
-                        case SecurityType.FutureOption:
-                        case SecurityType.IndexOption:
-                            var oadate = ExtractFromProperties(DaysOffset, DaysWidth);
-                            _date = DateTime.FromOADate(oadate);
-                            return _date.Value;
-                        default:
-                            throw new InvalidOperationException("Date is only defined for SecurityType.Equity, SecurityType.Option, SecurityType.Future, SecurityType.FutureOption, SecurityType.IndexOption, and SecurityType.Base");
-                    }
+                    case SecurityType.Base:
+                    case SecurityType.Equity:
+                    case SecurityType.Option:
+                    case SecurityType.Future:
+                    case SecurityType.Index:
+                    case SecurityType.FutureOption:
+                    case SecurityType.IndexOption:
+                        var oadate = ExtractFromProperties(DaysOffset, DaysWidth);
+                        _date = DateTime.FromOADate(oadate);
+                        return _date.Value;
+                    default:
+                        throw new InvalidOperationException("Date is only defined for SecurityType.Equity, SecurityType.Option, SecurityType.Future, SecurityType.FutureOption, SecurityType.IndexOption, and SecurityType.Base");
                 }
             }
         }
@@ -234,35 +230,32 @@ namespace QuantConnect
         {
             get
             {
-                try
+                if (_strikePrice.HasValue)
                 {
-                    // will throw 'InvalidOperationException' if not set
                     return _strikePrice.Value;
                 }
-                catch (InvalidOperationException)
+
+                if (!SecurityType.IsOption())
                 {
-                    if (!SecurityType.IsOption())
-                    {
-                        throw new InvalidOperationException("StrikePrice is only defined for SecurityType.Option, SecurityType.FutureOption, and SecurityType.IndexOption");
-                    }
-
-                    // performance: lets calculate strike price once
-                    var scale = ExtractFromProperties(StrikeScaleOffset, StrikeScaleWidth);
-                    var unscaled = ExtractFromProperties(StrikeOffset, StrikeWidth);
-                    var pow = Math.Pow(10, (int)scale - StrikeDefaultScale);
-                    // If the 20th bit is set to 1, we have a negative strike price.
-                    // Let's normalize the strike and explicitly make it negative
-                    if (((unscaled >> 19) & 1) == 1)
-                    {
-                        _strikePrice = -((unscaled ^ 1 << 19) * (decimal)pow);
-                    }
-                    else
-                    {
-                        _strikePrice = unscaled * (decimal)pow;
-                    }
-
-                    return _strikePrice.Value;
+                    throw new InvalidOperationException("StrikePrice is only defined for SecurityType.Option, SecurityType.FutureOption, and SecurityType.IndexOption");
                 }
+
+                // performance: lets calculate strike price once
+                var scale = ExtractFromProperties(StrikeScaleOffset, StrikeScaleWidth);
+                var unscaled = ExtractFromProperties(StrikeOffset, StrikeWidth);
+                var pow = Math.Pow(10, (int)scale - StrikeDefaultScale);
+                // If the 20th bit is set to 1, we have a negative strike price.
+                // Let's normalize the strike and explicitly make it negative
+                if (((unscaled >> 19) & 1) == 1)
+                {
+                    _strikePrice = -((unscaled ^ 1 << 19) * (decimal)pow);
+                }
+                else
+                {
+                    _strikePrice = unscaled * (decimal)pow;
+                }
+
+                return _strikePrice.Value;
             }
         }
 
@@ -275,20 +268,17 @@ namespace QuantConnect
         {
             get
             {
-                try
+                if (_optionRight.HasValue)
                 {
-                    // will throw 'InvalidOperationException' if not set
                     return _optionRight.Value;
                 }
-                catch (InvalidOperationException)
+
+                if (!SecurityType.IsOption())
                 {
-                    if (!SecurityType.IsOption())
-                    {
-                        throw new InvalidOperationException("OptionRight is only defined for SecurityType.Option, SecurityType.FutureOption, and SecurityType.IndexOption");
-                    }
-                    _optionRight = (OptionRight)ExtractFromProperties(PutCallOffset, PutCallWidth);
-                    return _optionRight.Value;
+                    throw new InvalidOperationException("OptionRight is only defined for SecurityType.Option, SecurityType.FutureOption, and SecurityType.IndexOption");
                 }
+                _optionRight = (OptionRight)ExtractFromProperties(PutCallOffset, PutCallWidth);
+                return _optionRight.Value;
             }
         }
 
@@ -301,21 +291,18 @@ namespace QuantConnect
         {
             get
             {
-                try
+                if (_optionStyle.HasValue)
                 {
-                    // will throw 'InvalidOperationException' if not set
                     return _optionStyle.Value;
                 }
-                catch (InvalidOperationException)
-                {
-                    if (!SecurityType.IsOption())
-                    {
-                        throw new InvalidOperationException("OptionStyle is only defined for SecurityType.Option, SecurityType.FutureOption, and SecurityType.IndexOption");
-                    }
 
-                    _optionStyle = (OptionStyle)(ExtractFromProperties(OptionStyleOffset, OptionStyleWidth));
-                    return _optionStyle.Value;
+                if (!SecurityType.IsOption())
+                {
+                    throw new InvalidOperationException("OptionStyle is only defined for SecurityType.Option, SecurityType.FutureOption, and SecurityType.IndexOption");
                 }
+
+                _optionStyle = (OptionStyle)(ExtractFromProperties(OptionStyleOffset, OptionStyleWidth));
+                return _optionStyle.Value;
             }
         }
 
@@ -779,50 +766,61 @@ namespace QuantConnect
         {
             exception = null;
 
-            if (string.IsNullOrWhiteSpace(value) || value == " 0")
+            if (value == null)
             {
                 identifier = Empty;
                 return true;
             }
 
-            // for performance, we first verify if we already have parsed this SecurityIdentifier
-            if (SecurityIdentifierCache.TryGetValue(value, out identifier))
+            lock (SecurityIdentifierCache)
             {
+                // for performance, we first verify if we already have parsed this SecurityIdentifier
+                if (SecurityIdentifierCache.TryGetValue(value, out identifier))
+                {
+                    return true;
+                }
+
+                if (string.IsNullOrWhiteSpace(value) || value == " 0")
+                {
+                    // we know it's not null already let's cache it
+                    SecurityIdentifierCache[value] = identifier = Empty;
+                    return true;
+                }
+
+                // after calling TryGetValue because if it failed it will set identifier to default
+                identifier = Empty;
+
+                try
+                {
+                    var sids = value.Split('|');
+                    for (var i = sids.Length - 1; i > -1; i--)
+                    {
+                        var current = sids[i];
+                        var parts = current.Split(SplitSpace, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length != 2)
+                        {
+                            exception = new FormatException("The string must be splittable on space into two parts.");
+                            return false;
+                        }
+
+                        var symbol = parts[0];
+                        var otherData = parts[1];
+                        var props = otherData.DecodeBase36();
+
+                        // toss the previous in as the underlying, if Empty, ignored by ctor
+                        identifier = new SecurityIdentifier(symbol, props, identifier);
+                    }
+                }
+                catch (Exception error)
+                {
+                    exception = error;
+                    Log.Error($"SecurityIdentifier.TryParseProperties(): Error parsing SecurityIdentifier: '{value}', Exception: {exception}");
+                    return false;
+                }
+
+                SecurityIdentifierCache[value] = identifier;
                 return true;
             }
-            // after calling TryGetValue because if it failed it will set identifier to default
-            identifier = Empty;
-
-            try
-            {
-                var sids = value.Split('|');
-                for (var i = sids.Length - 1; i > -1; i--)
-                {
-                    var current = sids[i];
-                    var parts = current.Split(SplitSpace, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length != 2)
-                    {
-                        exception = new FormatException("The string must be splittable on space into two parts.");
-                        return false;
-                    }
-
-                    var symbol = parts[0];
-                    var otherData = parts[1];
-                    var props = otherData.DecodeBase36();
-
-                    // toss the previous in as the underlying, if Empty, ignored by ctor
-                    identifier = new SecurityIdentifier(symbol, props, identifier);
-                }
-            }
-            catch (Exception error)
-            {
-                exception = error;
-                Log.Error($"SecurityIdentifier.TryParseProperties(): Error parsing SecurityIdentifier: '{value}', Exception: {exception}");
-                return false;
-            }
-
-            SecurityIdentifierCache.TryAdd(value, identifier);
-            return true;
         }
 
         /// <summary>

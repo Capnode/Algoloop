@@ -40,12 +40,12 @@ namespace QuantConnect.Tests.Common.Data
             var tradeBar = new TradeBar { Symbol = Symbols.SPY, Time = now };
             var unlinkedData = new UnlinkedData { Symbol = Symbols.SPY, Time = now };
             var quoteBar = new QuoteBar { Symbol = Symbols.SPY, Time = now };
-            var tick = new Tick(now, Symbols.SPY, 1.1m, 2.1m) {TickType = TickType.Trade};
+            var tick = new Tick(now, Symbols.SPY, 1.1m, 2.1m) { TickType = TickType.Trade };
             var openInterest = new OpenInterest(now, Symbols.SPY, 1);
             var split = new Split(Symbols.SPY, now, 1, 1, SplitType.SplitOccurred);
             var delisting = new Delisting(Symbols.SPY, now, 1, DelistingType.Delisted);
 
-            var slice = new Slice(now, new BaseData[] {quoteBar, tradeBar, unlinkedData, tick, split, delisting, openInterest }, now);
+            var slice = new Slice(now, new BaseData[] { quoteBar, tradeBar, unlinkedData, tick, split, delisting, openInterest }, now);
 
             Assert.AreEqual(slice.Get(typeof(TradeBar))[Symbols.SPY], tradeBar);
             Assert.AreEqual(slice.Get(typeof(UnlinkedData))[Symbols.SPY], unlinkedData);
@@ -345,7 +345,7 @@ namespace QuantConnect.Tests.Common.Data
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                 @"
 from AlgorithmImports import *
 
@@ -364,11 +364,46 @@ def Test(slice):
         }
 
         [Test]
+        public void PythonCustomDataPyObjectValue()
+        {
+            using (Py.GIL())
+            {
+                dynamic testModule = PyModule.FromString("testModule",
+                    @"
+
+from AlgorithmImports import *
+
+class CustomDataTest(PythonData):
+    def Reader(self, config, line, date, isLiveMode):
+        result = CustomDataTest()
+        result.Symbol = config.Symbol
+        result.Value = 10
+        result[""TimeTest""] = datetime.strptime(""2022-05-05"", ""%Y-%m-%d"")
+        return result
+
+def Test(slice, symbol):
+    data = slice.Get(CustomDataTest)
+    return data[symbol][""TimeTest""]");
+                var test = testModule.GetAttr("Test");
+
+                var type = Extensions.CreateType(testModule.GetAttr("CustomDataTest"));
+                var customDataTest = new PythonData(testModule.GetAttr("CustomDataTest")());
+                var config = new SubscriptionDataConfig(type, Symbols.SPY, Resolution.Daily, DateTimeZone.Utc,
+                    DateTimeZone.Utc, false, false, false, isCustom: true);
+                var data1 = customDataTest.Reader(config, "something", DateTime.UtcNow, false);
+
+                var slice = new Slice(DateTime.UtcNow, new[] { data1 }, DateTime.UtcNow);
+
+                Assert.AreEqual(new DateTime(2022, 05, 05), (DateTime)test(new PythonSlice(slice), Symbols.SPY));
+            }
+        }
+
+        [Test]
         public void PythonGetPythonCustomData()
         {
             using (Py.GIL())
             {
-                dynamic testModule = PythonEngine.ModuleFromString("testModule",
+                dynamic testModule = PyModule.FromString("testModule",
                     @"
 
 from AlgorithmImports import *
@@ -420,7 +455,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -442,7 +477,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 from QuantConnect.Tests import *
@@ -465,7 +500,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 from QuantConnect.Tests import *
@@ -488,7 +523,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -513,7 +548,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 from QuantConnect.Tests import *
@@ -540,7 +575,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 from QuantConnect.Tests import *
@@ -565,7 +600,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 from QuantConnect.Tests import *
@@ -590,7 +625,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 from QuantConnect.Data.Custom.IconicTypes import *
@@ -618,7 +653,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 from QuantConnect.Data.Custom.IconicTypes import *
@@ -646,7 +681,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -693,7 +728,7 @@ def Test(slice):
             var tradeBars = new TradeBars { { Symbols.BTCUSD, tradeBar } };
             var quoteBars = new QuoteBars { { Symbols.BTCUSD, quoteBar } };
 
-            var slice = new Slice(DateTime.Now, new List<BaseData>(){ tradeBar, quoteBar }, tradeBars, quoteBars, null, null, null, null, null, null, null, DateTime.Now);
+            var slice = new Slice(DateTime.Now, new List<BaseData>() { tradeBar, quoteBar }, tradeBars, quoteBars, null, null, null, null, null, null, null, DateTime.Now);
 
             var tradeBarData = slice.Get<TradeBar>();
             Assert.AreEqual(1, tradeBarData.Count);
@@ -721,14 +756,14 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
 def Test(slice):
     slice.clear()").GetAttr("Test");
 
-                Assert.Throws<PythonException>(() => test(GetPythonSlice()), "Slice is read-only: cannot clear the collection");
+                Assert.Throws<InvalidOperationException>(() => test(GetPythonSlice()), "Slice is read-only: cannot clear the collection");
             }
         }
 
@@ -737,14 +772,14 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
 def Test(slice):
     slice.popitem()").GetAttr("Test");
 
-                Assert.Throws<PythonException>(() => test(GetPythonSlice()), "Slice is read-only: cannot pop an item from the collection");
+                Assert.Throws<NotSupportedException>(() => test(GetPythonSlice()), "Slice is read-only: cannot pop an item from the collection");
             }
         }
 
@@ -753,14 +788,14 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
 def Test(slice, symbol):
     slice.pop(symbol)").GetAttr("Test");
 
-                Assert.Throws<PythonException>(() => test(GetPythonSlice(), Symbols.SPY), $"Slice is read-only: cannot pop the value for {Symbols.SPY} from the collection");
+                Assert.Throws<InvalidOperationException>(() => test(GetPythonSlice(), Symbols.SPY), $"Slice is read-only: cannot pop the value for {Symbols.SPY} from the collection");
             }
         }
 
@@ -769,14 +804,14 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
 def Test(slice, symbol, default_value):
     slice.pop(symbol, default_value)").GetAttr("Test");
 
-                Assert.Throws<PythonException>(() => test(GetPythonSlice(), Symbols.SPY, null), $"Slice is read-only: cannot pop the value for {Symbols.SPY} from the collection");
+                Assert.Throws<InvalidOperationException>(() => test(GetPythonSlice(), Symbols.SPY, null), $"Slice is read-only: cannot pop the value for {Symbols.SPY} from the collection");
             }
         }
 
@@ -785,7 +820,7 @@ def Test(slice, symbol, default_value):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -793,7 +828,7 @@ def Test(slice, symbol):
     item = { symbol: 1 }
     slice.update(item)").GetAttr("Test");
 
-                Assert.Throws<PythonException>(() => test(GetPythonSlice(), Symbols.SPY), "Slice is read-only: cannot update the collection");
+                Assert.Throws<InvalidOperationException>(() => test(GetPythonSlice(), Symbols.SPY), "Slice is read-only: cannot update the collection");
             }
         }
 
@@ -802,7 +837,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -822,7 +857,7 @@ def Test(slice, symbol, bar):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 AddReference(""QuantConnect.Tests"")
@@ -846,7 +881,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 AddReference(""QuantConnect.Tests"")
@@ -975,7 +1010,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 AddReference(""QuantConnect.Tests"")
@@ -999,7 +1034,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1018,7 +1053,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1037,7 +1072,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1059,7 +1094,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1081,7 +1116,7 @@ def Test(slice):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1100,7 +1135,7 @@ def Test(slice, keys):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1119,7 +1154,7 @@ def Test(slice, keys, default_value):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1129,7 +1164,7 @@ def Test(slice, symbol):
                 var pythonSlice = GetPythonSlice();
                 dynamic expected = pythonSlice[Symbols.SPY];
                 PyObject result = null;
-                Assert.DoesNotThrow(() => result = test(GetPythonSlice(), Symbols.SPY ));
+                Assert.DoesNotThrow(() => result = test(GetPythonSlice(), Symbols.SPY));
                 BaseData actual;
                 Assert.IsTrue(result.TryConvert(out actual));
                 Assert.AreEqual(expected.Symbol, actual.Symbol);
@@ -1142,7 +1177,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1165,7 +1200,7 @@ def Test(slice, symbol, default_value):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1181,7 +1216,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1204,7 +1239,7 @@ def Test(slice, symbol):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1230,7 +1265,7 @@ def Test(slice, symbol, default_value):
         {
             using (Py.GIL())
             {
-                dynamic test = PythonEngine.ModuleFromString("testModule",
+                dynamic test = PyModule.FromString("testModule",
                     @"
 from AlgorithmImports import *
 
@@ -1238,7 +1273,7 @@ def Test(slice, symbol):
     return slice.setdefault(symbol)").GetAttr("Test");
 
                 var symbol = Symbols.EURUSD;
-                Assert.Throws<PythonException>(() => test(GetPythonSlice(), symbol),
+                Assert.Throws<KeyNotFoundException>(() => test(GetPythonSlice(), symbol),
                     $"Slice is read-only: cannot set default value to  for {symbol}");
             }
         }

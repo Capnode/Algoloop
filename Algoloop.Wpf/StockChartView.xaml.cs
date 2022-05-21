@@ -15,6 +15,7 @@
 using Algoloop.ViewModel;
 using MoreLinq;
 using StockSharp.Algo.Candles;
+using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
@@ -76,7 +77,7 @@ namespace Algoloop.Wpf
         {
         }
 
-        private void OnSubscribeIndicatorElement(ChartIndicatorElement arg1, CandleSeries arg2, StockSharp.Algo.Indicators.IIndicator arg3)
+        private void OnSubscribeIndicatorElement(IChartIndicatorElement arg1, CandleSeries arg2, StockSharp.Algo.Indicators.IIndicator arg3)
         {
         }
 
@@ -191,7 +192,7 @@ namespace Algoloop.Wpf
             {
                 DateTimeOffset time = moment.Key;
                 ChartDrawData chartData = new();
-                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(time);
+                IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(time);
                 foreach (KeyValuePair<ChartLineElement, decimal> curve in curves)
                 {
                     ChartLineElement lineElement = curve.Key;
@@ -249,7 +250,7 @@ namespace Algoloop.Wpf
             var chartData = new ChartDrawData();
             foreach (Candle candle in model.Candles)
             {
-                ChartDrawData.ChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
+                IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
                 chartGroup.Add(candleElement, candle);
             }
             _chart.Draw(chartData);
