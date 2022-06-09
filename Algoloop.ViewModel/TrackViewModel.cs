@@ -454,6 +454,30 @@ namespace Algoloop.ViewModel
             return Scale(score);
         }
 
+        internal static double CalculateAthScore(IList<ChartPoint> series)
+        {
+            decimal ath = decimal.MinValue;
+            int days = 0;
+            int athDays = 0;
+            foreach (ChartPoint trade in series)
+            {
+                if (trade.y > ath)
+                {
+                    if (ath != decimal.MinValue)
+                    {
+                        athDays++;
+                    }
+
+                    ath = trade.y;
+                }
+
+                days++;
+            }
+
+            double score = days > 0 ? (double)athDays / days : 0;
+            return score;
+        }
+
         internal static decimal CalcRoMaD(IList<Trade> trades)
         {
             decimal netProfit = trades.Sum(m => m.ProfitLoss - m.TotalFees);
@@ -567,6 +591,9 @@ namespace Algoloop.ViewModel
             List<ChartPoint> series = equity.Value.Values;
             double score = CalculateScore(series);
             statistics.Add("Score", ((decimal)score).RoundToSignificantDigits(4));
+
+            double ath = CalculateAthScore(series);
+            statistics.Add("ATH Score", ((decimal)ath).RoundToSignificantDigits(4));
         }
 
         private static double Scale(double x)
