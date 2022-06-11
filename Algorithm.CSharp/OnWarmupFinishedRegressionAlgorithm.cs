@@ -15,107 +15,79 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using QuantConnect.Algorithm.Framework.Selection;
-using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using QuantConnect.Securities;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Futures framework algorithm that uses open interest to select the active contract.
+    /// Regression algorithm asserting <see cref="OnWarmupFinished"/> is being called
     /// </summary>
-    /// <meta name="tag" content="regression test" />
-    /// <meta name="tag" content="futures" />
-    /// <meta name="tag" content="using data" />
-    /// <meta name="tag" content="filter selection" />
-    public class OpenInterestFuturesRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class OnWarmupFinishedRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private static readonly HashSet<DateTime> ExpectedExpiryDates = new HashSet<DateTime>
-        {
-            new DateTime(2013, 12, 27),
-            new DateTime(2014, 02, 26)
-        };
-
+        private bool _onWarmupFinished;
+        /// <summary>
+        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
+        /// </summary>
         public override void Initialize()
         {
-            UniverseSettings.Resolution = Resolution.Tick;
-
             SetStartDate(2013, 10, 08);
             SetEndDate(2013, 10, 11);
-            SetCash(10000000);
+            SetCash(100000);
 
-            // set framework models
-            SetUniverseSelection(
-                new OpenInterestFutureUniverseSelectionModel(
-                    this,
-                    t => new[] {QuantConnect.Symbol.Create(Futures.Metals.Gold, SecurityType.Future, Market.COMEX)},
-                    null,
-                    ExpectedExpiryDates.Count
-                )
-            );
+            AddEquity("SPY", Resolution.Minute);
+            SetWarmup(TimeSpan.FromDays(1));
         }
 
-        public override void OnData(Slice slice)
+        public override void OnWarmupFinished()
         {
-            if (Transactions.OrdersCount == 0 && slice.HasData)
-            {
-                var matched = slice.Keys.Where(s => !ExpectedExpiryDates.Contains(s.ID.Date)).ToList();
-                if (matched.Count != 0)
-                {
-                    throw new Exception($"{matched.Count}/{slice.Keys.Count} were unexpected expiry date(s): " + string.Join(", ", matched.Select(x => x.ID.Date)));
-                }
+            _onWarmupFinished = true;
+        }
 
-                foreach (var symbol in slice.Keys)
-                {
-                    MarketOrder(symbol, 1);
-                }
-            }
-            else if (Portfolio.Any(p => p.Value.Invested))
+        public override void OnEndOfAlgorithm()
+        {
+            if (!_onWarmupFinished)
             {
-                Liquidate();
+                throw new Exception($"OnWarmupFinished was not called!");
             }
         }
 
         /// <summary>
-        ///     This is used by the regression test system to indicate if the open source Lean repository has the required data to
-        ///     run this algorithm.
+        /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
         public bool CanRunLocally { get; } = true;
 
         /// <summary>
-        ///     This is used by the regression test system to indicate which languages this algorithm is written in.
+        /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = {Language.CSharp};
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 7080848;
+        public long DataPoints => 3943;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 232;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "4"},
-            {"Average Win", "0.00%"},
-            {"Average Loss", "0.00%"},
-            {"Compounding Annual Return", "0.003%"},
+            {"Total Trades", "0"},
+            {"Average Win", "0%"},
+            {"Average Loss", "0%"},
+            {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
-            {"Expectancy", "0.351"},
-            {"Net Profit", "0.000%"},
+            {"Expectancy", "0"},
+            {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
-            {"Loss Rate", "50%"},
-            {"Win Rate", "50%"},
-            {"Profit-Loss Ratio", "1.70"},
+            {"Loss Rate", "0%"},
+            {"Win Rate", "0%"},
+            {"Profit-Loss Ratio", "0"},
             {"Alpha", "0"},
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
@@ -123,15 +95,15 @@ namespace QuantConnect.Algorithm.CSharp
             {"Information Ratio", "-57.739"},
             {"Tracking Error", "0.178"},
             {"Treynor Ratio", "0"},
-            {"Total Fees", "$7.40"},
+            {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
-            {"Lowest Capacity Asset", "GC VOFJUCDY9XNH"},
-            {"Fitness Score", "0.017"},
+            {"Lowest Capacity Asset", ""},
+            {"Fitness Score", "0"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
             {"Sortino Ratio", "79228162514264337593543950335"},
             {"Return Over Maximum Drawdown", "79228162514264337593543950335"},
-            {"Portfolio Turnover", "0.017"},
+            {"Portfolio Turnover", "0"},
             {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},
             {"Total Insights Analysis Completed", "0"},
@@ -145,7 +117,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "75477a2d1f470d97bdbc5689712c54bf"}
+            {"OrderListHash", "d41d8cd98f00b204e9800998ecf8427e"}
         };
     }
 }
