@@ -14,73 +14,83 @@
 */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
-using QuantConnect.Orders;
-using QuantConnect.Interfaces;
 using QuantConnect.Data;
+using QuantConnect.Interfaces;
+using QuantConnect.Securities.Option;
+using QuantConnect.Securities;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// This algorithm asserts that the minimum order size is respected at the moment of
-    /// place an order or update an order
+    /// Regression algorithm excersizing an equity covered option asserting that greeks can be accessed
+    /// and have are not all zero, the same day as the contract expiration date.
     /// </summary>
-    public class MinimumOrderSizeRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class OptionExpiryDateTodayRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private bool _sentOrders;
+        private Symbol _optionSymbol;
+        private bool _triedGreeksCalculation;
+
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 1);
-            SetEndDate(2013, 10, 1);
-            SetBrokerageModel(Brokerages.BrokerageName.Bitfinex, AccountType.Cash);
-            AddCrypto("BTCUSD", Resolution.Hour);
+            SetStartDate(2014, 06, 9);
+            SetEndDate(2014, 06, 15);
+
+            var option = AddOption("AAPL", Resolution.Minute);
+            option.SetFilter((universeFilter) =>
+            {
+                return universeFilter.IncludeWeeklys().Strikes(-1, 1).Expiration(0, 10);
+            });
+            option.PriceModel = OptionPriceModels.BaroneAdesiWhaley();
+            _optionSymbol = option.Symbol;
+
+            SetWarmUp(TimeSpan.FromDays(3));
         }
 
         public override void OnData(Slice slice)
         {
-            if (!_sentOrders)
+            if (IsWarmingUp || Time.Hour > 10)
             {
-                _sentOrders = true;
+                return;
+            }
 
-                // Place an order that will fail because of the size
-                var invalidOrder = MarketOrder("BTCUSD", 0.00002);
-                if (invalidOrder.Status != OrderStatus.Invalid)
+            foreach (var kvp in slice.OptionChains)
+            {
+                if (kvp.Key != _optionSymbol)
                 {
-                    throw new Exception("Invalid order expected, order size is less than allowed");
+                    continue;
                 }
 
-                // Update an order that fails because of the size
-                var validOrderOne = LimitOrder("BTCUSD", 0.0002, Securities["BTCUSD"].Price - 0.1m,  "NotUpdated");
-                validOrderOne.Update(new UpdateOrderFields()
-                {
-                    Quantity = 0.00002m,
-                    Tag = "Updated"
-                });
+                var chain = kvp.Value;
+                // Find the call options expiring today
+                var contracts = chain
+                    .Where(contract => contract.Expiry.Date == Time.Date && contract.Strike < chain.Underlying.Price)
+                    .ToList();
 
-                // Place and update an order that will succeed
-                var validOrderTwo = LimitOrder("BTCUSD", 0.0002, Securities["BTCUSD"].Price - 0.1m, "NotUpdated");
-                validOrderTwo.Update(new UpdateOrderFields()
+                if (contracts.Count == 0)
                 {
-                    Quantity = 0.002m,
-                    Tag = "Updated"
-                });
+                    return;
+                }
+
+                _triedGreeksCalculation = true;
+
+                foreach (var contract in contracts)
+                {
+                    var greeks = contract.Greeks;
+                    if (greeks.Delta == 0m && greeks.Gamma == 0m && greeks.Theta == 0m && greeks.Vega == 0m && greeks.Rho == 0m)
+                    {
+                        throw new Exception($"Expected greeks to not be zero simultaneously for {contract.Symbol} at contract expiration date {contract.Expiry}");
+                    }
+                }
             }
         }
 
-        public override void OnOrderEvent(OrderEvent orderEvent)
+        public override void OnEndOfAlgorithm()
         {
-            var order = Transactions.GetOrderById(orderEvent.OrderId);
-
-            // Update of validOrderOne is expected to fail
-            if( (order.Id == 2) && (order.LastUpdateTime != null) && (order.Tag == "Updated"))
+            if (!_triedGreeksCalculation)
             {
-                throw new Exception("Order update expected to fail");
-            }
-
-            // Update of validOrdertwo is expected to succeed
-            if ((order.Id == 3) && (order.LastUpdateTime != null) && (order.Tag == "NotUpdated"))
-            {
-                throw new Exception("Order update expected to succeed");
+                throw new Exception("Expected to have tried greeks calculation");
             }
         }
 
@@ -97,19 +107,19 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 54;
+        public long DataPoints => 5227479;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 4;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "2"},
+            {"Total Trades", "0"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
@@ -125,12 +135,12 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "0"},
-            {"Tracking Error", "0"},
+            {"Information Ratio", "5.176"},
+            {"Tracking Error", "0.071"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
-            {"Lowest Capacity Asset", "BTCUSD E3"},
+            {"Lowest Capacity Asset", ""},
             {"Fitness Score", "0"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
@@ -150,7 +160,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "9ada3df9647e0e638d12ba0b14eabe05"}
+            {"OrderListHash", "d41d8cd98f00b204e9800998ecf8427e"}
         };
     }
 }

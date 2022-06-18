@@ -14,73 +14,64 @@
 */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
-using QuantConnect.Orders;
-using QuantConnect.Interfaces;
 using QuantConnect.Data;
+using QuantConnect.Interfaces;
+using QuantConnect.Securities.Equity;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// This algorithm asserts that the minimum order size is respected at the moment of
-    /// place an order or update an order
+    /// This regression algorithm has examples of how to add an equity indicating the <see cref="DataNormalizationMode"/>
+    /// directly with the <see cref="QCAlgorithm.AddEquity"/> method instead of using the <see cref="Equity.SetDataNormalizationMode"/> method.
     /// </summary>
-    public class MinimumOrderSizeRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class SetEquityDataNormalizationModeOnAddEquity : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private bool _sentOrders;
+        private readonly DataNormalizationMode _spyNormalizationMode = DataNormalizationMode.Raw;
+        private readonly DataNormalizationMode _ibmNormalizationMode = DataNormalizationMode.Adjusted;
+        private readonly DataNormalizationMode _aigNormalizationMode = DataNormalizationMode.TotalReturn;
+        private Dictionary<Equity, Tuple<decimal, decimal>> _priceRanges = new Dictionary<Equity, Tuple<decimal, decimal>>();
+
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 1);
-            SetEndDate(2013, 10, 1);
-            SetBrokerageModel(Brokerages.BrokerageName.Bitfinex, AccountType.Cash);
-            AddCrypto("BTCUSD", Resolution.Hour);
+            SetStartDate(2013, 10, 7);
+            SetEndDate(2013, 10, 7);
+
+            var spyEquity = AddEquity("SPY", Resolution.Minute, dataNormalizationMode: _spyNormalizationMode);
+            CheckEquityDataNormalizationMode(spyEquity, _spyNormalizationMode);
+            _priceRanges.Add(spyEquity, new Tuple<decimal, decimal>(167.28m, 168.37m));
+
+            var ibmEquity = AddEquity("IBM", Resolution.Minute, dataNormalizationMode: _ibmNormalizationMode);
+            CheckEquityDataNormalizationMode(ibmEquity, _ibmNormalizationMode);
+            _priceRanges.Add(ibmEquity, new Tuple<decimal, decimal>(135.864131052m, 136.819606508m));
+
+            var aigEquity = AddEquity("AIG", Resolution.Minute, dataNormalizationMode: _aigNormalizationMode);
+            CheckEquityDataNormalizationMode(aigEquity, _aigNormalizationMode);
+            _priceRanges.Add(aigEquity, new Tuple<decimal, decimal>(48.73m, 49.10m));
         }
 
         public override void OnData(Slice slice)
         {
-            if (!_sentOrders)
+            foreach (var kvp in _priceRanges)
             {
-                _sentOrders = true;
+                var equity = kvp.Key;
+                var minExpectedPrice = kvp.Value.Item1;
+                var maxExpectedPrice = kvp.Value.Item2;
 
-                // Place an order that will fail because of the size
-                var invalidOrder = MarketOrder("BTCUSD", 0.00002);
-                if (invalidOrder.Status != OrderStatus.Invalid)
+                if (equity.HasData && (equity.Price < minExpectedPrice || equity.Price > maxExpectedPrice))
                 {
-                    throw new Exception("Invalid order expected, order size is less than allowed");
+                    throw new Exception($"{equity.Symbol}: Price {equity.Price} is  out of expected range [{minExpectedPrice}, {maxExpectedPrice}]");
                 }
-
-                // Update an order that fails because of the size
-                var validOrderOne = LimitOrder("BTCUSD", 0.0002, Securities["BTCUSD"].Price - 0.1m,  "NotUpdated");
-                validOrderOne.Update(new UpdateOrderFields()
-                {
-                    Quantity = 0.00002m,
-                    Tag = "Updated"
-                });
-
-                // Place and update an order that will succeed
-                var validOrderTwo = LimitOrder("BTCUSD", 0.0002, Securities["BTCUSD"].Price - 0.1m, "NotUpdated");
-                validOrderTwo.Update(new UpdateOrderFields()
-                {
-                    Quantity = 0.002m,
-                    Tag = "Updated"
-                });
             }
         }
 
-        public override void OnOrderEvent(OrderEvent orderEvent)
+        private void CheckEquityDataNormalizationMode(Equity equity, DataNormalizationMode expectedNormalizationMode)
         {
-            var order = Transactions.GetOrderById(orderEvent.OrderId);
-
-            // Update of validOrderOne is expected to fail
-            if( (order.Id == 2) && (order.LastUpdateTime != null) && (order.Tag == "Updated"))
+            var subscriptions = SubscriptionManager.Subscriptions.Where(x => x.Symbol == equity.Symbol);
+            if (subscriptions.Any(x => x.DataNormalizationMode != expectedNormalizationMode))
             {
-                throw new Exception("Order update expected to fail");
-            }
-
-            // Update of validOrdertwo is expected to succeed
-            if ((order.Id == 3) && (order.LastUpdateTime != null) && (order.Tag == "NotUpdated"))
-            {
-                throw new Exception("Order update expected to succeed");
+                throw new Exception($"Expected {equity.Symbol} to have data normalization mode {expectedNormalizationMode} but was {subscriptions.First().DataNormalizationMode}");
             }
         }
 
@@ -92,24 +83,24 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 54;
+        public long DataPoints => 2355;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 4;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "2"},
+            {"Total Trades", "0"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
@@ -130,12 +121,12 @@ namespace QuantConnect.Algorithm.CSharp
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
-            {"Lowest Capacity Asset", "BTCUSD E3"},
+            {"Lowest Capacity Asset", ""},
             {"Fitness Score", "0"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
-            {"Sortino Ratio", "79228162514264337593543950335"},
-            {"Return Over Maximum Drawdown", "79228162514264337593543950335"},
+            {"Sortino Ratio", "0"},
+            {"Return Over Maximum Drawdown", "0"},
             {"Portfolio Turnover", "0"},
             {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},
@@ -150,7 +141,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "9ada3df9647e0e638d12ba0b14eabe05"}
+            {"OrderListHash", "d41d8cd98f00b204e9800998ecf8427e"}
         };
     }
 }
