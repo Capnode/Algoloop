@@ -1,4 +1,4 @@
-/* 
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -14,57 +14,77 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using QuantConnect.Data;
+using System.Collections.Generic;
 using QuantConnect.Interfaces;
 using QuantConnect.Securities;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm to test if expired futures contract chains are making their
-    /// way into the timeslices being delivered to OnData()
+    /// Regression algorithm illustrating how to request history data for different data mapping modes.
     /// </summary>
-    public class FuturesExpiredContractRegression : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class HistoryWithDifferentDataMappingModeRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private bool _receivedData;
+        private Symbol _continuousContractSymbol;
 
-        /// <summary>
-        /// Initializes the algorithm state.
-        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 1);
-            SetEndDate(2013, 12, 23);
-            SetCash(1000000);
-
-            // Subscribe to futures ES
-            var future = AddFuture(Futures.Indices.SP500EMini, Resolution.Minute, Market.CME, false);
-            future.SetFilter(TimeSpan.FromDays(0), TimeSpan.FromDays(90));
-        }
-
-        public override void OnData(Slice data)
-        {
-            foreach (var chain in data.FutureChains)
-            {
-                _receivedData = true;
-
-                foreach (var contract in chain.Value.OrderBy(x => x.Expiry))
-                {
-                    if (contract.Expiry.Date < Time.Date)
-                    {
-                        throw new Exception($"Received expired contract {contract} expired: {contract.Expiry} current time: {Time}");
-                    }
-                }
-            }
+            SetStartDate(2013, 10, 6);
+            SetEndDate(2014, 1, 1);
+            _continuousContractSymbol = AddFuture(Futures.Indices.SP500EMini, Resolution.Daily).Symbol;
         }
 
         public override void OnEndOfAlgorithm()
         {
-            if (!_receivedData)
+            var dataMappingModes = ((DataMappingMode[])Enum.GetValues(typeof(DataMappingMode))).ToList();
+            var historyResults = dataMappingModes.Select(dataMappingMode =>
             {
-                throw new Exception("No Futures chains were received in this regression");
+                return History(new [] { _continuousContractSymbol }, StartDate, EndDate, Resolution.Daily, dataMappingMode: dataMappingMode).ToList();
+            }).ToList();
+
+            if (historyResults.Any(x => x.Count != historyResults[0].Count))
+            {
+                throw new Exception("History results bar count did not match");
+            }
+
+            // Check that all history results have a mapping date at some point in the history
+            HashSet<DateTime> mappingDates = new HashSet<DateTime>();
+            for (int i = 0; i < historyResults.Count; i++)
+            {
+                var underlying = historyResults[i].First().Bars.Keys.First().Underlying;
+                int mappingsCount = 0;
+
+                foreach (var slice in historyResults[i])
+                {
+                    var dataUnderlying = slice.Bars.Keys.First().Underlying;
+                    if (dataUnderlying != underlying)
+                    {
+                        underlying = dataUnderlying;
+                        mappingsCount++;
+                        mappingDates.Add(slice.Time.Date);
+                    }
+                }
+
+                if (mappingsCount == 0)
+                {
+                    throw new Exception($"History results for {dataMappingModes[i]} data mapping mode did not contain any mappings");
+                }
+            }
+
+            if (mappingDates.Count < dataMappingModes.Count)
+            {
+                throw new Exception($"History results should have had different mapping dates for each data mapping mode");
+            }
+
+            // Check that close prices at each time are different for different data mapping modes
+            for (int j = 0; j < historyResults[0].Count; j++)
+            {
+                var closePrices = historyResults.Select(hr => hr[j].Bars.First().Value.Close).ToHashSet();
+                if (closePrices.Count != dataMappingModes.Count)
+                {
+                    throw new Exception($"History results close prices should have been different for each data mapping mode at each time");
+                }
             }
         }
 
@@ -76,17 +96,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 972466;
+        public long DataPoints => 1337;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 600;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
@@ -109,8 +129,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-3.102"},
-            {"Tracking Error", "0.091"},
+            {"Information Ratio", "-3.681"},
+            {"Tracking Error", "0.086"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

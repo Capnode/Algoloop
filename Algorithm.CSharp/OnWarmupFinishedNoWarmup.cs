@@ -1,4 +1,4 @@
-/* 
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -14,57 +14,39 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using QuantConnect.Securities;
+using System.Collections.Generic;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm to test if expired futures contract chains are making their
-    /// way into the timeslices being delivered to OnData()
+    /// Regression algorithm asserting <see cref="OnWarmupFinished"/> is called even if no warmup period is set
     /// </summary>
-    public class FuturesExpiredContractRegression : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class OnWarmupFinishedNoWarmup : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private bool _receivedData;
+        private int _onWarmupFinished;
 
         /// <summary>
-        /// Initializes the algorithm state.
+        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 1);
-            SetEndDate(2013, 12, 23);
-            SetCash(1000000);
+            SetStartDate(2013, 10, 07);
+            SetEndDate(2013, 10, 11);
 
-            // Subscribe to futures ES
-            var future = AddFuture(Futures.Indices.SP500EMini, Resolution.Minute, Market.CME, false);
-            future.SetFilter(TimeSpan.FromDays(0), TimeSpan.FromDays(90));
+            AddEquity("SPY", Resolution.Minute);
         }
 
-        public override void OnData(Slice data)
+        public override void OnWarmupFinished()
         {
-            foreach (var chain in data.FutureChains)
-            {
-                _receivedData = true;
-
-                foreach (var contract in chain.Value.OrderBy(x => x.Expiry))
-                {
-                    if (contract.Expiry.Date < Time.Date)
-                    {
-                        throw new Exception($"Received expired contract {contract} expired: {contract.Expiry} current time: {Time}");
-                    }
-                }
-            }
+            _onWarmupFinished++;
         }
 
         public override void OnEndOfAlgorithm()
         {
-            if (!_receivedData)
+            if (_onWarmupFinished != 1)
             {
-                throw new Exception("No Futures chains were received in this regression");
+                throw new Exception($"Unexpected {nameof(OnWarmupFinished)} call count {_onWarmupFinished}!");
             }
         }
 
@@ -76,12 +58,12 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 972466;
+        public long DataPoints => 3943;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -109,8 +91,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-3.102"},
-            {"Tracking Error", "0.091"},
+            {"Information Ratio", "-8.91"},
+            {"Tracking Error", "0.223"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

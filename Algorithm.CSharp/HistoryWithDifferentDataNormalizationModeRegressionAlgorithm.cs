@@ -1,4 +1,4 @@
-/* 
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -14,8 +14,8 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
 using QuantConnect.Securities;
@@ -23,48 +23,60 @@ using QuantConnect.Securities;
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm to test if expired futures contract chains are making their
-    /// way into the timeslices being delivered to OnData()
+    /// Regression algorithm illustrating how to request history data for different data normalization modes.
     /// </summary>
-    public class FuturesExpiredContractRegression : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class HistoryWithDifferentDataNormalizationModeRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private bool _receivedData;
+        private Symbol _aaplEquitySymbol;
+        private Symbol _esFutureSymbol;
 
-        /// <summary>
-        /// Initializes the algorithm state.
-        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 1);
-            SetEndDate(2013, 12, 23);
-            SetCash(1000000);
+            SetStartDate(2013, 10, 7);
+            SetEndDate(2014, 1, 1);
 
-            // Subscribe to futures ES
-            var future = AddFuture(Futures.Indices.SP500EMini, Resolution.Minute, Market.CME, false);
-            future.SetFilter(TimeSpan.FromDays(0), TimeSpan.FromDays(90));
-        }
-
-        public override void OnData(Slice data)
-        {
-            foreach (var chain in data.FutureChains)
-            {
-                _receivedData = true;
-
-                foreach (var contract in chain.Value.OrderBy(x => x.Expiry))
-                {
-                    if (contract.Expiry.Date < Time.Date)
-                    {
-                        throw new Exception($"Received expired contract {contract} expired: {contract.Expiry} current time: {Time}");
-                    }
-                }
-            }
+            _aaplEquitySymbol = AddEquity("AAPL", Resolution.Daily).Symbol;
+            _esFutureSymbol = AddFuture(Futures.Indices.SP500EMini, Resolution.Daily).Symbol;
         }
 
         public override void OnEndOfAlgorithm()
         {
-            if (!_receivedData)
+            var equityDataNormalizationModes = new DataNormalizationMode[]{
+                DataNormalizationMode.Raw,
+                DataNormalizationMode.Adjusted,
+                DataNormalizationMode.SplitAdjusted
+            };
+            CheckHistoryResultsForDataNormalizationModes(_aaplEquitySymbol, StartDate, EndDate, Resolution.Daily, equityDataNormalizationModes);
+
+            var futureDataNormalizationModes = new DataNormalizationMode[]{
+                DataNormalizationMode.Raw,
+                DataNormalizationMode.BackwardsRatio,
+                DataNormalizationMode.BackwardsPanamaCanal,
+                DataNormalizationMode.ForwardPanamaCanal
+            };
+            CheckHistoryResultsForDataNormalizationModes(_esFutureSymbol, StartDate, EndDate, Resolution.Daily, futureDataNormalizationModes);
+        }
+
+        private void CheckHistoryResultsForDataNormalizationModes(Symbol symbol, DateTime start, DateTime end, Resolution resolution,
+            DataNormalizationMode[] dataNormalizationModes)
+        {
+            var historyResults = dataNormalizationModes
+                .Select(x => History(new [] { symbol }, start, end, resolution, dataNormalizationMode: x).ToList())
+                .ToList();
+
+            if (historyResults.Any(x => x.Count == 0 || x.Count != historyResults.First().Count))
             {
-                throw new Exception("No Futures chains were received in this regression");
+                throw new Exception($"History results for {symbol} have different number of bars");
+            }
+
+            // Check that, for each history result, close prices at each time are different for these securities (AAPL and ES)
+            for (int j = 0; j < historyResults[0].Count; j++)
+            {
+                var closePrices = historyResults.Select(hr => hr[j].Bars.First().Value.Close).ToHashSet();
+                if (closePrices.Count != dataNormalizationModes.Length)
+                {
+                    throw new Exception($"History results for {symbol} have different close prices at the same time");
+                }
             }
         }
 
@@ -76,17 +88,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 972466;
+        public long DataPoints => 1387;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 772;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
@@ -109,8 +121,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-3.102"},
-            {"Tracking Error", "0.091"},
+            {"Information Ratio", "-4.178"},
+            {"Tracking Error", "0.085"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

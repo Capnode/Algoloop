@@ -45,12 +45,16 @@ namespace QuantConnect.Data
         /// <param name="endAlgoTz">History request end time in algorithm time zone</param>
         /// <param name="exchangeHours">Security exchange hours</param>
         /// <param name="resolution">The resolution to use. If null will use <see cref="SubscriptionDataConfig.Resolution"/></param>
+        /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
         /// <returns>The new <see cref="HistoryRequest"/></returns>
         public HistoryRequest CreateHistoryRequest(SubscriptionDataConfig subscription,
             DateTime startAlgoTz,
             DateTime endAlgoTz,
             SecurityExchangeHours exchangeHours,
-            Resolution? resolution)
+            Resolution? resolution,
+            DataMappingMode? dataMappingMode = null,
+            DataNormalizationMode? dataNormalizationMode = null)
         {
             resolution ??= subscription.Resolution;
 
@@ -73,6 +77,16 @@ namespace QuantConnect.Data
                 FillForwardResolution = subscription.FillDataForward ? resolution : null,
                 TickType = subscription.TickType
             };
+
+            if (dataMappingMode != null)
+            {
+                request.DataMappingMode = dataMappingMode.Value;
+            }
+
+            if (dataNormalizationMode != null)
+            {
+                request.DataNormalizationMode = dataNormalizationMode.Value;
+            }
 
             return request;
         }

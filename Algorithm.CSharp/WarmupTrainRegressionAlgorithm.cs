@@ -1,4 +1,4 @@
-/* 
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -13,58 +13,45 @@
  * limitations under the License.
 */
 
+using QuantConnect.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using QuantConnect.Data;
-using QuantConnect.Interfaces;
-using QuantConnect.Securities;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm to test if expired futures contract chains are making their
-    /// way into the timeslices being delivered to OnData()
+    /// Regression algorithm asserting "Train" works as expected when enabling warmup, see GH issue #6410
     /// </summary>
-    public class FuturesExpiredContractRegression : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class WarmupTrainRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private bool _receivedData;
+        private int _trained;
 
         /// <summary>
-        /// Initializes the algorithm state.
+        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
         /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 1);
-            SetEndDate(2013, 12, 23);
-            SetCash(1000000);
+            SetStartDate(2018, 1, 1);
+            SetEndDate(2018, 1, 5);
+            foreach (var symbol in new string[] { "EURUSD", "USDJPY" })
+            {
+                AddForex(symbol, Resolution.Minute, Market.Oanda);
+            }
 
-            // Subscribe to futures ES
-            var future = AddFuture(Futures.Indices.SP500EMini, Resolution.Minute, Market.CME, false);
-            future.SetFilter(TimeSpan.FromDays(0), TimeSpan.FromDays(90));
+            Train(TrainMethod);
+            SetWarmUp(100);
         }
 
-        public override void OnData(Slice data)
+        private void TrainMethod()
         {
-            foreach (var chain in data.FutureChains)
-            {
-                _receivedData = true;
-
-                foreach (var contract in chain.Value.OrderBy(x => x.Expiry))
-                {
-                    if (contract.Expiry.Date < Time.Date)
-                    {
-                        throw new Exception($"Received expired contract {contract} expired: {contract.Expiry} current time: {Time}");
-                    }
-                }
-            }
+            _trained++;
         }
 
         public override void OnEndOfAlgorithm()
         {
-            if (!_receivedData)
+            if(_trained != 1)
             {
-                throw new Exception("No Futures chains were received in this regression");
+                throw new Exception($"Unexpected train count {_trained}");
             }
         }
 
@@ -81,12 +68,12 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 972466;
+        public long DataPoints => 36;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 7522;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
@@ -109,8 +96,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-3.102"},
-            {"Tracking Error", "0.091"},
+            {"Information Ratio", "-175.891"},
+            {"Tracking Error", "0.021"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

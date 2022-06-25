@@ -1,4 +1,4 @@
-/* 
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -14,58 +14,64 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using QuantConnect.Securities;
+using QuantConnect.Data.Market;
+using System.Collections.Generic;
+using QuantConnect.Data.Consolidators;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm to test if expired futures contract chains are making their
-    /// way into the timeslices being delivered to OnData()
+    /// Regression algorithm asserting the behavior of a period consolidator
     /// </summary>
-    public class FuturesExpiredContractRegression : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class PeriodConsolidatorRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private bool _receivedData;
+        private Queue<string> _periodConsolidation = new();
+        private Queue<string> _countConsolidation = new();
 
-        /// <summary>
-        /// Initializes the algorithm state.
-        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 1);
-            SetEndDate(2013, 12, 23);
-            SetCash(1000000);
+            SetStartDate(2013, 10, 07);
+            SetEndDate(2013, 10, 08);
+            
+            var symbol = AddEquity("SPY").Symbol;
 
-            // Subscribe to futures ES
-            var future = AddFuture(Futures.Indices.SP500EMini, Resolution.Minute, Market.CME, false);
-            future.SetFilter(TimeSpan.FromDays(0), TimeSpan.FromDays(90));
+            var periodConsolidator = new TradeBarConsolidator(Resolution.Minute.ToTimeSpan());
+            periodConsolidator.DataConsolidated += PeriodConsolidator_DataConsolidated;
+            var countConsolidator = new TradeBarConsolidator(1);
+            countConsolidator.DataConsolidated += CountConsolidator_DataConsolidated;
+
+            SubscriptionManager.AddConsolidator(symbol, periodConsolidator);
+            SubscriptionManager.AddConsolidator(symbol, countConsolidator);
         }
 
-        public override void OnData(Slice data)
+        private void PeriodConsolidator_DataConsolidated(object sender, TradeBar e)
         {
-            foreach (var chain in data.FutureChains)
-            {
-                _receivedData = true;
-
-                foreach (var contract in chain.Value.OrderBy(x => x.Expiry))
-                {
-                    if (contract.Expiry.Date < Time.Date)
-                    {
-                        throw new Exception($"Received expired contract {contract} expired: {contract.Expiry} current time: {Time}");
-                    }
-                }
-            }
+            _periodConsolidation.Enqueue($"{Time} - {e.EndTime} {e}");
+        }
+        private void CountConsolidator_DataConsolidated(object sender, TradeBar e)
+        {
+            _countConsolidation.Enqueue($"{Time} - {e.EndTime} {e}");
         }
 
         public override void OnEndOfAlgorithm()
         {
-            if (!_receivedData)
+            if (_countConsolidation.Count == 0 || _countConsolidation.Count != _periodConsolidation.Count)
             {
-                throw new Exception("No Futures chains were received in this regression");
+                throw new Exception($"Unexpected consolidated data count. Period: {_periodConsolidation.Count} Count: {_countConsolidation.Count}");
             }
+
+            while (_countConsolidation.TryDequeue(out var countData))
+            {
+                var periodData = _periodConsolidation.Dequeue();
+                if (periodData != countData)
+                {
+                    throw new Exception($"Unexpected consolidated data. Period: '{periodData}' != Count: '{countData}'");
+                }
+            }
+            _periodConsolidation.Clear();
+            _countConsolidation.Clear();
         }
 
         /// <summary>
@@ -81,7 +87,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 972466;
+        public long DataPoints => 1582;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -109,8 +115,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-3.102"},
-            {"Tracking Error", "0.091"},
+            {"Information Ratio", "0"},
+            {"Tracking Error", "0"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

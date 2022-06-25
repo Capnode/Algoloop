@@ -2276,6 +2276,9 @@ namespace QuantConnect
                 case "2":
                 case "openinterest":
                     return DataMappingMode.OpenInterest;
+                case "3":
+                case "openinterestannual":
+                    return DataMappingMode.OpenInterestAnnual;
                 default:
                     throw new ArgumentException($"Unexpected DataMappingMode: {dataMappingMode}");
             }
