@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <NoWarn>NU1701;CA1416</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="16.9.4" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj" />
+    <ProjectReference Include="..\Engine\QuantConnect.Lean.Engine.csproj" />
+    <ProjectReference Include="..\Messaging\QuantConnect.Messaging.csproj" />
+    <ProjectReference Include="..\Queues\QuantConnect.Queues.csproj" />
+    <ProjectReference Include="..\Tests\QuantConnect.Tests.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Data\equity\borsdata\daily\abb.st.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\daily\cfish.st.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\daily\omxspi.st.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20170214.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20170515.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20170814.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20171114.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20180214.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20180515.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20180814.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20181114.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\map_files\TextFile1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\usa\map_files\TextFile1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\forex\dukascopy\hour\eurusd.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\market-hours\market-hours-database.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\symbol-properties\symbol-properties-database.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

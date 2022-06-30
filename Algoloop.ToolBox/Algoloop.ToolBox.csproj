@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <StartupObject>Algoloop.ToolBox.Program</StartupObject>
+    <NoWarn>NU1701;CA1416</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
+    <ProjectReference Include="..\Common\QuantConnect.csproj" />
+    <ProjectReference Include="..\Compression\QuantConnect.Compression.csproj" />
+    <ProjectReference Include="..\Configuration\QuantConnect.Configuration.csproj" />
+    <ProjectReference Include="..\Logging\QuantConnect.Logging.csproj" />
+    <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj" />
+  </ItemGroup>
+</Project>
