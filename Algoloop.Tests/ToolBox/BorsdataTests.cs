@@ -29,7 +29,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.Tests.Toolbox
+namespace Algoloop.Tests.ToolBox
 {
     [TestClass]
     public class BorsdataTests
