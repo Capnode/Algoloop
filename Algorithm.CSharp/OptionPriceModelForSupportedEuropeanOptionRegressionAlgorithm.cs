@@ -13,12 +13,7 @@
  * limitations under the License.
 */
 
-using System;
-using System.Linq;
 using System.Collections.Generic;
-using QuantConnect.Data;
-using QuantConnect.Data.Market;
-using QuantConnect.Interfaces;
 using QuantConnect.Securities.Option;
 
 namespace QuantConnect.Algorithm.CSharp
@@ -46,7 +41,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 1406;
+        public override long DataPoints => 211;
 
         /// <summary>
         /// Data Points count of the algorithm history

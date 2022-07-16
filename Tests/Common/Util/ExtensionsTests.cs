@@ -43,6 +43,21 @@ namespace QuantConnect.Tests.Common.Util
     [TestFixture]
     public class ExtensionsTests
     {
+        [TestCase("1000", 0)]
+        [TestCase("0", 0)]
+        [TestCase("1", 0)]
+        [TestCase("1.0", 1)]
+        [TestCase("0.01", 2)]
+        [TestCase("0.001", 3)]
+        [TestCase("0.0001", 4)]
+        [TestCase("0.00001", 5)]
+        [TestCase("0.000001", 6)]
+        public void GetDecimalPlaces(string decimalInput, int expectedResult)
+        {
+            var value = decimal.Parse(decimalInput, NumberStyles.Any, CultureInfo.InvariantCulture);
+            Assert.AreEqual(expectedResult, value.GetDecimalPlaces());
+        }
+
         [TestCase(0, 10, 110)]
         [TestCase(900, 10, 110)]
         [TestCase(500, 10, 10)]
@@ -459,6 +474,31 @@ namespace QuantConnect.Tests.Common.Util
             var hours = MarketHoursDatabase.FromDataFolder().GetExchangeHours(Market.GDAX, null, SecurityType.Crypto);
             var exchangeRounded = time.ExchangeRoundDownInTimeZone(Time.OneHour, hours, TimeZones.Utc, true);
             Assert.AreEqual(expected, exchangeRounded);
+        }
+
+        [Test]
+        // We assert the behavior of noda time convert to utc around daylight saving start and end
+        // Even though start and end un exchange TZ are 1.01:00:00 long (1 day & 1 hour) in utc it's always 1 day
+        public void ConvertToUtcAndDayLightSavings()
+        {
+            {
+                // day light savings starts
+                var start = new DateTime(2011, 3, 12, 19, 0, 0);
+                var end = new DateTime(2011, 3, 13, 20, 0, 0);
+
+                var utcStart = start.ConvertToUtc(TimeZones.NewYork);
+                var utcEnd = end.ConvertToUtc(TimeZones.NewYork);
+                Assert.AreEqual(Time.OneDay, utcEnd - utcStart);
+            }
+            {
+                // day light savings ends
+                var start = new DateTime(2011, 11, 5, 20, 0, 0);
+                var end = new DateTime(2011, 11, 6, 19, 0, 0);
+
+                var utcStart = start.ConvertToUtc(TimeZones.NewYork);
+                var utcEnd = end.ConvertToUtc(TimeZones.NewYork);
+                Assert.AreEqual(Time.OneDay, utcEnd - utcStart);
+            }
         }
 
         [Test]

@@ -251,22 +251,7 @@ namespace QuantConnect.Lean.Engine
 
                 if (timeSlice.SecurityChanges != SecurityChanges.None)
                 {
-                    foreach (var security in timeSlice.SecurityChanges.AddedSecurities)
-                    {
-                        security.IsTradable = true;
-
-                        // uses TryAdd, so don't need to worry about duplicates here
-                        algorithm.Securities.Add(security);
-                    }
-
-                    var activeSecurities = algorithm.UniverseManager.ActiveSecurities;
-                    foreach (var security in timeSlice.SecurityChanges.RemovedSecurities)
-                    {
-                        if (!activeSecurities.ContainsKey(security.Symbol))
-                        {
-                            security.IsTradable = false;
-                        }
-                    }
+                    algorithm.ProcessSecurityChanges(timeSlice.SecurityChanges);
 
                     leanManager.OnSecuritiesChanged(timeSlice.SecurityChanges);
                     realtime.OnSecuritiesChanged(timeSlice.SecurityChanges);
@@ -413,78 +398,10 @@ namespace QuantConnect.Lean.Engine
                 }
 
                 // apply dividends
-                foreach (var dividend in timeSlice.Slice.Dividends.Values)
-                {
-                    Log.Debug($"AlgorithmManager.Run(): {algorithm.Time}: Applying Dividend: {dividend}");
-
-                    Security security = null;
-                    if (_liveMode && algorithm.Securities.TryGetValue(dividend.Symbol, out security))
-                    {
-                        Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Pre-Dividend: {dividend}. " +
-                            $"Security Holdings: {security.Holdings.Quantity} Account Currency Holdings: " +
-                            $"{algorithm.Portfolio.CashBook[algorithm.AccountCurrency].Amount}");
-                    }
-
-                    var mode = algorithm.SubscriptionManager.SubscriptionDataConfigService
-                        .GetSubscriptionDataConfigs(dividend.Symbol)
-                        .DataNormalizationMode();
-
-                    // apply the dividend event to the portfolio
-                    algorithm.Portfolio.ApplyDividend(dividend, _liveMode, mode);
-
-                    if (_liveMode && security != null)
-                    {
-                        Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Post-Dividend: {dividend}. Security " +
-                            $"Holdings: {security.Holdings.Quantity} Account Currency Holdings: " +
-                            $"{algorithm.Portfolio.CashBook[algorithm.AccountCurrency].Amount}");
-                    }
-                }
+                HandleDividends(timeSlice, algorithm, _liveMode);
 
                 // apply splits
-                foreach (var split in timeSlice.Slice.Splits.Values)
-                {
-                    try
-                    {
-                        // only process split occurred events (ignore warnings)
-                        if (split.Type != SplitType.SplitOccurred)
-                        {
-                            continue;
-                        }
-
-                        Log.Debug($"AlgorithmManager.Run(): {algorithm.Time}: Applying Split for {split.Symbol}");
-
-                        Security security = null;
-                        if (_liveMode && algorithm.Securities.TryGetValue(split.Symbol, out security))
-                        {
-                            Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Pre-Split for {split}. Security Price: {security.Price} Holdings: {security.Holdings.Quantity}");
-                        }
-
-                        var mode = algorithm.SubscriptionManager.SubscriptionDataConfigService
-                            .GetSubscriptionDataConfigs(split.Symbol)
-                            .DataNormalizationMode();
-
-                        // apply the split event to the portfolio
-                        algorithm.Portfolio.ApplySplit(split, _liveMode, mode);
-
-                        if (_liveMode && security != null)
-                        {
-                            Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Post-Split for {split}. Security Price: {security.Price} Holdings: {security.Holdings.Quantity}");
-                        }
-
-                        // apply the split to open orders as well in raw mode, all other modes are split adjusted
-                        if (_liveMode || mode == DataNormalizationMode.Raw)
-                        {
-                            // in live mode we always want to have our order match the order at the brokerage, so apply the split to the orders
-                            var openOrders = transactions.GetOpenOrderTickets(ticket => ticket.Symbol == split.Symbol);
-                            algorithm.BrokerageModel.ApplySplit(openOrders.ToList(), split);
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        algorithm.SetRuntimeError(err, "Split event");
-                        return;
-                    }
-                }
+                HandleSplits(timeSlice, algorithm, _liveMode);
 
                 //Update registered consolidators for this symbol index
                 try
@@ -822,6 +739,110 @@ namespace QuantConnect.Lean.Engine
             }
 
             Log.Trace("ProcessVolatilityHistoryRequirements(): finished.");
+        }
+
+        /// <summary>
+        /// Helper method to apply a split to an algorithm instance
+        /// </summary>
+        public static void HandleSplits(TimeSlice timeSlice, IAlgorithm algorithm, bool liveMode)
+        {
+            foreach (var split in timeSlice.Slice.Splits.Values)
+            {
+                try
+                {
+                    // only process split occurred events (ignore warnings)
+                    if (split.Type != SplitType.SplitOccurred)
+                    {
+                        continue;
+                    }
+
+                    if (liveMode && algorithm.IsWarmingUp)
+                    {
+                        // skip past split during live warmup, the algorithms position already reflects them
+                        Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Skip Split during live warmup: {split}");
+                        continue;
+                    }
+
+                    if (Log.DebuggingEnabled)
+                    {
+                        Log.Debug($"AlgorithmManager.Run(): {algorithm.Time}: Applying Split for {split.Symbol}");
+                    }
+
+                    Security security = null;
+                    if (liveMode && algorithm.Securities.TryGetValue(split.Symbol, out security))
+                    {
+                        Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Pre-Split for {split}. Security Price: {security.Price} Holdings: {security.Holdings.Quantity}");
+                    }
+
+                    var mode = algorithm.SubscriptionManager.SubscriptionDataConfigService
+                        .GetSubscriptionDataConfigs(split.Symbol)
+                        .DataNormalizationMode();
+
+                    // apply the split event to the portfolio
+                    algorithm.Portfolio.ApplySplit(split, liveMode, mode);
+
+                    if (liveMode && security != null)
+                    {
+                        Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Post-Split for {split}. Security Price: {security.Price} Holdings: {security.Holdings.Quantity}");
+                    }
+
+                    // apply the split to open orders as well in raw mode, all other modes are split adjusted
+                    if (liveMode || mode == DataNormalizationMode.Raw)
+                    {
+                        // in live mode we always want to have our order match the order at the brokerage, so apply the split to the orders
+                        var openOrders = algorithm.Transactions.GetOpenOrderTickets(ticket => ticket.Symbol == split.Symbol);
+                        algorithm.BrokerageModel.ApplySplit(openOrders.ToList(), split);
+                    }
+                }
+                catch (Exception err)
+                {
+                    algorithm.SetRuntimeError(err, "Split event");
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Helper method to apply a dividend to an algorithm instance
+        /// </summary>
+        public static void HandleDividends(TimeSlice timeSlice, IAlgorithm algorithm, bool liveMode)
+        {
+            foreach (var dividend in timeSlice.Slice.Dividends.Values)
+            {
+                if (liveMode && algorithm.IsWarmingUp)
+                {
+                    // skip past dividends during live warmup, the algorithms position already reflects them
+                    Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Skip Dividend during live warmup: {dividend}");
+                    continue;
+                }
+
+                if (Log.DebuggingEnabled)
+                {
+                    Log.Debug($"AlgorithmManager.Run(): {algorithm.Time}: Applying Dividend: {dividend}");
+                }
+
+                Security security = null;
+                if (liveMode && algorithm.Securities.TryGetValue(dividend.Symbol, out security))
+                {
+                    Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Pre-Dividend: {dividend}. " +
+                        $"Security Holdings: {security.Holdings.Quantity} Account Currency Holdings: " +
+                        $"{algorithm.Portfolio.CashBook[algorithm.AccountCurrency].Amount}");
+                }
+
+                var mode = algorithm.SubscriptionManager.SubscriptionDataConfigService
+                    .GetSubscriptionDataConfigs(dividend.Symbol)
+                    .DataNormalizationMode();
+
+                // apply the dividend event to the portfolio
+                algorithm.Portfolio.ApplyDividend(dividend, liveMode, mode);
+
+                if (liveMode && security != null)
+                {
+                    Log.Trace($"AlgorithmManager.Run(): {algorithm.Time}: Post-Dividend: {dividend}. Security " +
+                        $"Holdings: {security.Holdings.Quantity} Account Currency Holdings: " +
+                        $"{algorithm.Portfolio.CashBook[algorithm.AccountCurrency].Amount}");
+                }
+            }
         }
 
         /// <summary>

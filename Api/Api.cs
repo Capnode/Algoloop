@@ -30,6 +30,7 @@ using QuantConnect.Optimizer.Parameters;
 using QuantConnect.Orders;
 using QuantConnect.Statistics;
 using QuantConnect.Util;
+using QuantConnect.Notifications;
 
 namespace QuantConnect.Api
 {
@@ -367,6 +368,15 @@ namespace QuantConnect.Api
             return result;
         }
 
+        /// <summary>
+        /// Sends a notification
+        /// </summary>
+        /// <param name="notification">The notification to send</param>
+        /// <returns><see cref="RestResponse"/> containing success response and errors</returns>
+        public virtual RestResponse SendNotification(Notification notification)
+        {
+            throw new NotImplementedException($"{nameof(Api)} does not support sending notifications");
+        }
 
         /// <summary>
         /// Create a new backtest request and get the id.
@@ -476,6 +486,34 @@ namespace QuantConnect.Api
 
             // Return only the backtest object
             return result.Backtest;
+        }
+
+        /// <summary>
+        /// Returns the orders of the specified backtest and project id.
+        /// </summary>
+        /// <param name="projectId">Id of the project from which to read the orders</param>
+        /// <param name="backtestId">Id of the backtest from which to read the orders</param>
+        /// <param name="start">Starting index of the orders to be fetched. Required if end > 100</param>
+        /// <param name="end">Last index of the orders to be fetched. Note that end - start must be less than 100</param>
+        /// <remarks>Will throw an <see cref="WebException"/> if there are any API errors</remarks>
+        /// <returns>The list of <see cref="Order"/></returns>
+
+        public List<Order> ReadBacktestOrders(int projectId, string backtestId, int start = 0, int end = 100)
+        {
+            var request = new RestRequest("backtests/read/orders", Method.POST)
+            {
+                RequestFormat = DataFormat.Json
+            };
+
+            request.AddParameter("application/json", JsonConvert.SerializeObject(new
+            {
+                start,
+                end,
+                projectId,
+                backtestId
+            }), ParameterType.RequestBody);
+
+            return MakeRequestOrThrow<OrdersResponseWrapper>(request, nameof(ReadBacktestOrders)).Orders;
         }
 
         /// <summary>
@@ -659,6 +697,32 @@ namespace QuantConnect.Api
 
             ApiConnection.TryRequest(request, out LiveAlgorithmResults result);
             return result;
+        }
+
+        /// <summary>
+        /// Returns the orders of the specified project id live algorithm.
+        /// </summary>
+        /// <param name="projectId">Id of the project from which to read the live orders</param>
+        /// <param name="start">Starting index of the orders to be fetched. Required if end > 100</param>
+        /// <param name="end">Last index of the orders to be fetched. Note that end - start must be less than 100</param>
+        /// <remarks>Will throw an <see cref="WebException"/> if there are any API errors</remarks>
+        /// <returns>The list of <see cref="Order"/></returns>
+
+        public List<Order> ReadLiveOrders(int projectId, int start = 0, int end = 100)
+        {
+            var request = new RestRequest("live/read/orders", Method.POST)
+            {
+                RequestFormat = DataFormat.Json
+            };
+
+            request.AddParameter("application/json", JsonConvert.SerializeObject(new
+            {
+                start,
+                end,
+                projectId
+            }), ParameterType.RequestBody);
+
+            return MakeRequestOrThrow<OrdersResponseWrapper>(request, nameof(ReadLiveOrders)).Orders;
         }
 
         /// <summary>
@@ -1429,6 +1493,25 @@ namespace QuantConnect.Api
             // Trim '/' from start, this can cause issues for _dataFolders without final directory separator in the config
             filePath = filePath.TrimStart('/');
             return filePath;
+        }
+
+        /// <summary>
+        /// Helper method that will execute the given api request and throw an exception if it fails
+        /// </summary>
+        private T MakeRequestOrThrow<T>(RestRequest request, string callerName)
+            where T : RestResponse
+        {
+            if (!ApiConnection.TryRequest(request, out T result))
+            {
+                var errors = string.Empty;
+                if (result != null && result.Errors != null && result.Errors.Count > 0)
+                {
+                    errors = $". Errors: ['{string.Join(",", result.Errors)}']";
+                }
+                throw new WebException($"{callerName} api request failed{errors}");
+            }
+
+            return result;
         }
     }
 }
