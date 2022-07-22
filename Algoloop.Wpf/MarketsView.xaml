@@ -212,7 +212,7 @@
                                             Source="/Resources\Add.png" />
                                     </Button>
                                     <Button
-                                        Command="{Binding DeleteSymbolsCommand}"
+                                        Command="{Binding RemoveSymbolsCommand}"
                                         CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}"
                                         ToolTip="Delete symbols">
                                         <Image

@@ -75,7 +75,7 @@ namespace Algoloop.ViewModel
                 m => DoCheckAll(m),
                 m => !IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
-            DeleteSymbolsCommand = new RelayCommand<IList>(
+            RemoveSymbolsCommand = new RelayCommand<IList>(
                 m => DoDeleteSymbols(m),
                 m => !IsBusy && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(
@@ -124,7 +124,7 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> CheckAllCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand DownloadSymbolListCommand { get; }
-        public RelayCommand<IList> DeleteSymbolsCommand { get; }
+        public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<IList> AddToSymbolListCommand { get; }
@@ -349,7 +349,7 @@ namespace Algoloop.ViewModel
             StopCommand.NotifyCanExecuteChanged();
             CheckAllCommand.NotifyCanExecuteChanged();
             AddSymbolCommand.NotifyCanExecuteChanged();
-            DeleteSymbolsCommand.NotifyCanExecuteChanged();
+            RemoveSymbolsCommand.NotifyCanExecuteChanged();
             ImportSymbolsCommand.NotifyCanExecuteChanged();
             ExportSymbolsCommand.NotifyCanExecuteChanged();
             AddToSymbolListCommand.NotifyCanExecuteChanged();
