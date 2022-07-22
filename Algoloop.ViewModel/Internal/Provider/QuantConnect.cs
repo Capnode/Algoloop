@@ -60,7 +60,7 @@ namespace Algoloop.ViewModel.Internal.Provider
                     // skip directories
                     if (string.IsNullOrEmpty(file.Name)) continue;
                     if (!file.FullName.StartsWith(extract, StringComparison.OrdinalIgnoreCase)) continue;
-                    string path = file.FullName.Substring(extract.Length);
+                    string path = file.FullName[extract.Length..];
                     AddSymbol(symbols, path);
                     string destPath = Path.Combine(dest, path);
                     var outputFile = new FileInfo(destPath);
@@ -111,10 +111,10 @@ namespace Algoloop.ViewModel.Internal.Provider
                     return;
             }
 
-            if (ticker.Contains("."))
+            if (ticker.Contains('.'))
             {
                 if (!ticker.EndsWith(_zip, StringComparison.OrdinalIgnoreCase)) return;
-                ticker = ticker.Substring(0, ticker.Length - _zip.Length);
+                ticker = ticker[..^_zip.Length];
             }
 
             if (symbols

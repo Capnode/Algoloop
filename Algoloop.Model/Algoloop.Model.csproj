@@ -5,8 +5,8 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>    
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <OutputType>Library</OutputType>
     <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
