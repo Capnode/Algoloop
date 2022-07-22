@@ -89,7 +89,13 @@ namespace Algoloop.Wpf
         {
             try
             {
-                Process.Start(url);
+                url = url.Replace("&", "^&");
+                var psi = new ProcessStartInfo("cmd", $"/c start {url}")
+                {
+                    CreateNoWindow = true
+                };
+
+                Process.Start(psi);
             }
             catch (Exception ex)
             {
