@@ -27,21 +27,22 @@ namespace Algoloop.ViewModel.Internal
         private const string _pythonPath = "PYTHONPATH";
         private const string _pythonHome = "PYTHONHOME";
         private const string _pythonnetPyDll = "PYTHONNET_PYDLL";
-        private const string _pythonDll = "python36.dll";
+        private const string _pythonPattern = "python3?.dll";
 
         public static void SetupPython(StringDictionary environment)
         {
             string paths = environment[_path];
             foreach (string folder in paths.Split(";"))
             {
-                string pythonDll = Directory.EnumerateFiles(folder, _pythonDll).FirstOrDefault();
+                if (!Directory.Exists(folder)) continue;
+                string pythonDll = Directory.EnumerateFiles(folder, _pythonPattern).FirstOrDefault();
                 if (pythonDll == default) continue;
                 environment[_pythonnetPyDll] = pythonDll;
                 environment[_pythonHome] = folder;
                 return;
             }
 
-            throw new ApplicationException($"Python is not installed: {_pythonDll} not found");
+            throw new ApplicationException($"Python is not installed: {_pythonPattern} not found");
         }
 
 
