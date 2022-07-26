@@ -59,11 +59,11 @@ namespace Algoloop.Tests.ViewModel
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date,
                 Resolution = Resolution.Daily
             };
-            provider.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+            provider.Symbols.Add(new SymbolModel("EURUSD", Market.Dukascopy, SecurityType.Forex));
             MarketsViewModel markets = new(new MarketsModel(), _setting);
             MarketViewModel market = new (markets, provider, _setting);
             markets.Markets.Add(market);
@@ -82,22 +82,22 @@ namespace Algoloop.Tests.ViewModel
             Assert.AreNotEqual(date, provider.LastDate);
             Assert.AreEqual(78, market.Symbols.Count);
             Assert.AreEqual(1, market.Symbols.Where(m => m.Active).Count());
-            string forexFolder = Path.Combine(_setting.DataFolder, SecurityType.Forex.SecurityTypeToLower(), "dukascopy");
+            string forexFolder = Path.Combine(_setting.DataFolder, SecurityType.Forex.SecurityTypeToLower(), Market.Dukascopy);
             Assert.IsTrue(File.Exists(Path.Combine(forexFolder, "daily", "eurusd.zip")));
             Assert.AreEqual(0, market.Model.Accounts.Count);
         }
 
         [TestMethod()]
-        public void MarketLoop_FxcmRest()
+        public void MarketLoop_Fxcm()
         {
             // Arrange
-            string access = _config["fxcmrest-access"];
+            string access = _config["fxcm-access"];
             AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
-            string key = _config["fxcmrest-key"];
+            string key = _config["fxcm-key"];
 
             ProviderModel provider = new ()
             {
-                Provider = "fxcmrest",
+                Provider = Market.FXCM,
                 Access = accessType,
                 ApiKey = key
             };

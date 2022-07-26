@@ -37,7 +37,6 @@ namespace Algoloop.ToolBox.Borsdata
     {
         private const string _annual = "Annual";
         private const string _quarter = "Quarter";
-        private const string _market = "borsdata";
         private const double _million = 1e6;
         private const int _reportDateLatest = 202;
         private static readonly DateTime _firstDate = new DateTime(1997, 01, 01);
@@ -149,7 +148,7 @@ namespace Algoloop.ToolBox.Borsdata
         {
             if (string.IsNullOrWhiteSpace(inst.Yahoo) || inst.Yahoo.Contains(" ")) return null;
 
-            return new SymbolModel(inst.Yahoo, _market, SecurityType.Equity)
+            return new SymbolModel(inst.Yahoo, Market.Borsdata, SecurityType.Equity)
             {
                 Name = inst.Name,
                 Properties = new Dictionary<string, object>

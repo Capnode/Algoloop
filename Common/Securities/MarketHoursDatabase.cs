@@ -140,27 +140,6 @@ namespace QuantConnect.Securities
                 {
                     var path = Path.Combine(dataFolder, "market-hours", "market-hours-database.json");
                     _dataFolderMarketHoursDatabase = FromFile(path);
-
-                    // Add markets not already present
-                    Market.Reset();
-                    var listing = _dataFolderMarketHoursDatabase.ExchangeHoursListing;
-                    int code = 0;
-                    foreach (var item in listing)
-                    {
-                        SecurityDatabaseKey security = item.Key;
-                        string market = security.Market;
-                        if (Market.Encode(market) == null)
-                        {
-                            while (Market.Decode(code) != null)
-                            {
-                                code++;
-                            }
-
-                            // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
-                            Market.Add(market, code);
-                            code++;
-                        }
-                    }
                 }
             }
             return _dataFolderMarketHoursDatabase;

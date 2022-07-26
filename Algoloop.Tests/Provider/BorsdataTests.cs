@@ -38,7 +38,7 @@ namespace Algoloop.Tests.Provider
             Log.LogHandler = new ConsoleLogHandler();
 
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
-            _equityFolder = Path.Combine(dataFolder, SecurityType.Equity.SecurityTypeToLower(), "borsdata");
+            _equityFolder = Path.Combine(dataFolder, SecurityType.Equity.SecurityTypeToLower(), Market.Borsdata);
             if (Directory.Exists(dataFolder))
             {
                 Directory.Delete(dataFolder, true);
@@ -49,8 +49,8 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Borsdata",
-                Provider = "borsdata",
-                ApiKey = settings["borsdata"],
+                Provider = Market.Borsdata,
+                ApiKey = settings[Market.Borsdata],
                 LastDate = new DateTime(2021, 1, 5),
                 Resolution = Resolution.Daily
             };
@@ -91,7 +91,7 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(symbol0.Active, symbol.Active);
             Assert.AreEqual("Investor B", symbol.Name);
             Assert.AreEqual(SecurityType.Equity, symbol.Security);
-            Assert.AreEqual("borsdata", symbol.Market);
+            Assert.AreEqual(Market.Borsdata, symbol.Market);
             Assert.IsNotNull(symbol.Properties);
             Assert.AreEqual(5, symbol.Properties.Count);
             Assert.IsTrue(File.Exists(Path.Combine(_equityFolder, "daily", "inve-b.st.zip")));

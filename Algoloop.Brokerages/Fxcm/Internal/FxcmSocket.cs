@@ -21,7 +21,7 @@ using System;
 using System.Threading;
 using static QuantConnect.Brokerages.WebSocketClientWrapper;
 
-namespace Algoloop.Brokerages.FxcmRest.Internal
+namespace Algoloop.Brokerages.Fxcm.Internal
 {
     internal class FxcmSocket : IDisposable
     {
@@ -164,7 +164,7 @@ namespace Algoloop.Brokerages.FxcmRest.Internal
             decimal low = jRates[3].ToDecimal();
             var bidBar = new Bar(0, 0, 0, bid);
             var askBar = new Bar(0, 0, 0, ask);
-            var symbol = Symbol.Create(ticker, SecurityType.Forex, Support.Market);
+            var symbol = Symbol.Create(ticker, SecurityType.Forex, Market.FXCM);
             var quoteBar = new QuoteBar(utcTime, symbol, bidBar, 0, askBar, 0);
             Update(quoteBar);
         }

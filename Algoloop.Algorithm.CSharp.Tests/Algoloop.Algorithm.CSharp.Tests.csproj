@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj" />
+    <ProjectReference Include="..\Common\QuantConnect.csproj" />
     <ProjectReference Include="..\Engine\QuantConnect.Lean.Engine.csproj" />
     <ProjectReference Include="..\Messaging\QuantConnect.Messaging.csproj" />
     <ProjectReference Include="..\Queues\QuantConnect.Queues.csproj" />

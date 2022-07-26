@@ -213,9 +213,6 @@ namespace Algoloop.ViewModel
                 string appData = MainService.GetAppDataFolder();
                 await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
 
-                // Register providers
-                ProviderFactory.RegisterProviders(SettingsViewModel.Model);
-
                 // Read configuration
                 await MarketsViewModel.ReadAsync(Path.Combine(appData, "Markets.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);

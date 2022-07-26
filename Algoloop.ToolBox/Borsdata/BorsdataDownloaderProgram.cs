@@ -33,7 +33,6 @@ namespace Algoloop.ToolBox.Borsdata
     public static class BorsdataDownloaderProgram
     {
         private const SecurityType _securityType = SecurityType.Equity;
-        private const string _market = "borsdata";
         private const string _reportInfoFile = "borsdata.csv";
         private const Resolution _resolution = Resolution.Daily;
 
@@ -60,12 +59,12 @@ namespace Algoloop.ToolBox.Borsdata
             try
             {
                 string dataDirectory = Config.Get("data-directory", "../../../Data");
-                Register(dataDirectory, _market);
+                Register(dataDirectory, Market.Borsdata);
                 Setup(dataDirectory);
 
                 // Download the data
                 using var downloader = new BorsdataDataDownloader(apiKey);
-                IEnumerable<Symbol> symbols = tickers.Select(m => Symbol.Create(m, _securityType, _market));
+                IEnumerable<Symbol> symbols = tickers.Select(m => Symbol.Create(m, _securityType, Market.Borsdata));
                 foreach (Symbol symbol in symbols)
                 {
                     DateTime firstDate = DateTime.MaxValue;
@@ -78,7 +77,7 @@ namespace Algoloop.ToolBox.Borsdata
                     }
                     LeanDataWriter writer = new(_resolution, symbol, dataDirectory);
                     writer.Write(data);
-                    UpdateMapFile(symbol.Value, _market, firstDate);
+                    UpdateMapFile(symbol.Value, Market.Borsdata, firstDate);
                 }
 
                 GenerateCoarseFiles(dataDirectory);
@@ -91,7 +90,7 @@ namespace Algoloop.ToolBox.Borsdata
 
         public static void Register(string dataDirectory, string name)
         {
-            if (!name.Equals(_market)) throw new ArgumentOutOfRangeException(nameof(name));
+            if (!name.Equals(Market.Borsdata)) throw new ArgumentOutOfRangeException(nameof(name));
 
             // Set Market Hours
             string folder = Path.Combine(dataDirectory, "market-hours");
@@ -150,7 +149,7 @@ namespace Algoloop.ToolBox.Borsdata
             Directory.CreateDirectory(equityFolder);
 
             // Create map_files filder
-            string mapFilesFolder = Path.Combine(equityFolder, _market, "map_files");
+            string mapFilesFolder = Path.Combine(equityFolder, Market.Borsdata, "map_files");
             Directory.CreateDirectory(mapFilesFolder);
 
             // Copy Report info file
@@ -197,18 +196,18 @@ namespace Algoloop.ToolBox.Borsdata
         {
             var dailyDataFolder = new DirectoryInfo(Path.Combine(
                 dataDirectory, SecurityType.Equity.SecurityTypeToLower(),
-                _market,
+                Market.Borsdata,
                 Resolution.Daily.ResolutionToLower()));
             var destinationFolder = new DirectoryInfo(Path.Combine(
                 dataDirectory,
                 SecurityType.Equity.SecurityTypeToLower(),
-                _market,
+                Market.Borsdata,
                 "fundamental",
                 "coarse"));
             var fineFolder = new DirectoryInfo(Path.Combine(
                 dataDirectory,
                 SecurityType.Equity.SecurityTypeToLower(),
-                _market,
+                Market.Borsdata,
                 "fundamental",
                 "fine"));
             var blackListedTickersFile = new FileInfo("blacklisted-tickers.txt");
@@ -222,7 +221,7 @@ namespace Algoloop.ToolBox.Borsdata
                 dailyDataFolder,
                 destinationFolder,
                 fineFolder,
-                _market,
+                Market.Borsdata,
                 blackListedTickersFile,
                 reservedWordPrefix,
                 mapFileProvider,

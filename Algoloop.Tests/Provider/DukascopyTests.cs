@@ -35,7 +35,7 @@ namespace Algoloop.Tests.Provider
             Log.LogHandler = new ConsoleLogHandler();
 
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
-            _forexFolder = Path.Combine(dataFolder, SecurityType.Forex.SecurityTypeToLower(), "dukascopy");
+            _forexFolder = Path.Combine(dataFolder, SecurityType.Forex.SecurityTypeToLower(), Market.Dukascopy);
 
             if (Directory.Exists(dataFolder))
             {
@@ -54,7 +54,7 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date,
                 Resolution = Resolution.Daily
             };
@@ -78,11 +78,11 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date,
                 Resolution = Resolution.Daily
             };
-            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("EURUSD", Market.Dukascopy, SecurityType.Forex));
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
@@ -104,12 +104,12 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date,
                 Resolution = Resolution.Daily
             };
-            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
-            market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("EURUSD", Market.Dukascopy, SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("GBPUSD", Market.Dukascopy, SecurityType.Forex));
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
@@ -132,12 +132,12 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date,
                 Resolution = Resolution.Tick
             };
-            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
-            market.Symbols.Add(new SymbolModel("GBPUSD", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("EURUSD", Market.Dukascopy, SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("GBPUSD", Market.Dukascopy, SecurityType.Forex));
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
@@ -169,11 +169,11 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date,
                 Resolution = Resolution.Daily
             };
-            market.Symbols.Add(new SymbolModel("noname", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("noname", Market.Dukascopy, SecurityType.Forex));
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
@@ -195,11 +195,11 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date,
                 Resolution = Resolution.Second
             };
-            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("EURUSD", Market.Dukascopy, SecurityType.Forex));
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
@@ -220,11 +220,11 @@ namespace Algoloop.Tests.Provider
             {
                 Active = true,
                 Name = "Dukascopy",
-                Provider = "dukascopy",
+                Provider = Market.Dukascopy,
                 LastDate = date.AddDays(-1),
                 Resolution = Resolution.Second
             };
-            market.Symbols.Add(new SymbolModel("EURUSD", "Dukascopy", SecurityType.Forex));
+            market.Symbols.Add(new SymbolModel("EURUSD", Market.Dukascopy, SecurityType.Forex));
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);

@@ -50,7 +50,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             AlphaRuntimeStatistics expectedAlphaStatistics = null;
             Language language = Language.CSharp;
 
-            RegisterProvider(parameters["market"]);
             Config.Set("parameters", JsonConvert.SerializeObject(parameters));
             Config.Set("data-folder", "Data");
             Config.Set("data-directory", "Data");
@@ -196,24 +195,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             else
             {
                 Assert.AreEqual(expectedValue, actualValue, "Failed on alpha statistics " + field);
-            }
-        }
-
-        private static void RegisterProvider(string name)
-        {
-            if (string.IsNullOrEmpty(name)) return;
-
-            name = name.ToLowerInvariant();
-            if (Market.Encode(name) == null)
-            {
-                // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
-                int code = 0;
-                while (Market.Decode(code) != null)
-                {
-                    code++;
-                }
-
-                Market.Add(name, code);
             }
         }
     }

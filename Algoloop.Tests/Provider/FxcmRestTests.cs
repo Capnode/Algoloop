@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.ViewModel.Internal.Provider;
 using AlgoloopTests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuantConnect;
 using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
@@ -28,9 +29,8 @@ using static Algoloop.Model.ProviderModel;
 namespace Algoloop.Tests.Provider
 {
     [TestClass]
-    public class FxcmRestTests
+    public class FxcmTests
     {
-        private const string _providerName = "fxcmrest";
         private SettingModel _settings;
         private ProviderModel _model;
 
@@ -42,13 +42,13 @@ namespace Algoloop.Tests.Provider
             string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
             _settings = new SettingModel { DataFolder = dataFolder };
             var config = TestConfig.Create();
-            string key = config["fxcmrest-key"];
-            string access = config["fxcmrest-access"];
+            string key = config["fxcm-key"];
+            string access = config["fxcm-access"];
 
             _model = new ProviderModel
             {
-                Name = "FxcmRest",
-                Provider = _providerName,
+                Name = "Fxcm",
+                Provider = Market.FXCM,
                 ApiKey = key,
                 Access = (AccessType)Enum.Parse(typeof(AccessType), access),
             };

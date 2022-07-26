@@ -15,13 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Algoloop.Brokerages.FxcmRest.Internal;
+using Algoloop.Brokerages.Fxcm.Internal;
 using Algoloop.Model;
 using Newtonsoft.Json.Linq;
 using QuantConnect;
@@ -29,7 +28,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using static Algoloop.Model.ProviderModel;
 
-namespace Algoloop.Brokerages.FxcmRest
+namespace Algoloop.Brokerages.Fxcm
 {
     /// <summary>
     /// https://fxcm-api.readthedocs.io/en/latest/restapi.html
@@ -133,7 +132,7 @@ namespace Algoloop.Brokerages.FxcmRest
                     Active = visible,
                     Id = order.ToString(),
                     Name = name,
-                    Market = Support.Market,
+                    Market = Market.FXCM,
                     Security = Support.ToSecurityType(0),
                     Properties = new Dictionary<string, object>()
                 };
@@ -371,7 +370,7 @@ namespace Algoloop.Brokerages.FxcmRest
                 Active = true,
                 Id = token["defaultSortOrder"].ToString(),
                 Name = ticker,
-                Market = Support.Market,
+                Market = Market.FXCM,
                 Security = security
             };
             return symbol;
@@ -382,7 +381,7 @@ namespace Algoloop.Brokerages.FxcmRest
             if (string.IsNullOrWhiteSpace(ticker)) return null;
             int instrumentType = (int)token["instrumentType"];
             SecurityType security = Support.ToSecurityType(instrumentType);
-            Symbol symbol = Symbol.Create(ticker, security, Support.Market);
+            Symbol symbol = Symbol.Create(ticker, security, Market.FXCM);
             DateTime utcTime = DateTime.Parse(token["time"].ToString());
             decimal bid = token["sell"].ToDecimal();
             decimal ask = token["buy"].ToDecimal();
@@ -441,7 +440,7 @@ namespace Algoloop.Brokerages.FxcmRest
             {
                 Id = currency,
                 Name = currency,
-                Market = Support.Market,
+                Market = Market.FXCM,
                 Security = Support.ToSecurityType(currency),
             };
             string entryTime = token["time"].ToString();

@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using QuantConnect;
 using QuantConnect.Logging;
 
 namespace Algoloop.Algorithm.CSharp.Algo.Tests
@@ -41,7 +42,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 new Dictionary<string, string>
                 {
                     { "resolution", "Hour" },
-                    { "market", "dukascopy" },
+                    { "market", Market.Dukascopy },
                     { "symbols", "EURUSD" },
                     { "Mode", "Trend" },
                     { "Periods", "8" },
@@ -67,7 +68,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 new Dictionary<string, string>
                 {
                     { "resolution", "Hour" },
-                    { "market", "dukascopy" },
+                    { "market", Market.Dukascopy },
                     { "symbols", "EURUSD" },
                     { "Mode", "Contrarian" },
                     { "Periods", "8" },

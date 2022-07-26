@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.FxcmRest;
+using Algoloop.Brokerages.Fxcm;
 using Algoloop.Model;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
@@ -30,31 +30,10 @@ using static Algoloop.Model.ProviderModel;
 namespace Algoloop.Tests.Brokerages
 {
     [TestClass]
-    public class FxcmRestTests : IDisposable
+    public class FxcmTests : IDisposable
     {
-        const string _market = "fxcmrest";
         private FxcmClient _api;
         private bool disposedValue;
-
-        [ClassInitialize]
-        public static void Setup(TestContext context)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            // Add a reference to the unknown market
-            int code = 0;
-            while (Market.Decode(code) != null)
-            {
-                code++;
-            }
-
-            Market.Add(_market, code);
-        }
-
-        [ClassCleanup]
-        public static void Teardown()
-        {
-        }
 
         [TestInitialize]
         public void Initialize()
@@ -62,8 +41,8 @@ namespace Algoloop.Tests.Brokerages
             Log.LogHandler = new ConsoleLogHandler();
 
             IConfigurationRoot config = TestConfig.Create();
-            string access = config["fxcmrest-access"];
-            string key = config["fxcmrest-key"];
+            string access = config["fxcm-access"];
+            string key = config["fxcm-key"];
             AccessType accessType = (AccessType)Enum.Parse(typeof(AccessType), access);
             _api = new FxcmClient(accessType, key);
         }
@@ -169,7 +148,7 @@ namespace Algoloop.Tests.Brokerages
         [TestMethod]
         public async Task SubscribeMarketData()
         {
-            List<SymbolModel> symbols = new() { new SymbolModel("EUR/USD", "fxcm", SecurityType.Cfd) };
+            List<SymbolModel> symbols = new() { new SymbolModel("EUR/USD", Market.FXCM, SecurityType.Cfd) };
 
             // Act
             _api.Login();

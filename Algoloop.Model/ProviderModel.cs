@@ -30,12 +30,7 @@ namespace Algoloop.Model
     {
         [NonSerialized]
         public Action ModelChanged;
-
         private string _provider;
-        private const string _borsdata = "borsdata";
-        private const string _avanza = "avanza";
-        private const string _fxcm = "fxcm";
-        private const string _fxcmrest = "fxcmrest";
 
         public enum AccessType { Demo, Real };
 
@@ -147,28 +142,21 @@ namespace Algoloop.Model
         {
             if (string.IsNullOrEmpty(Provider)) return;
 
-            if (Provider.Equals(_fxcm, StringComparison.OrdinalIgnoreCase))
-            {
-                SetBrowsable("Access", true);
-                SetBrowsable("Login", true);
-                SetBrowsable("Password", true);
-                SetBrowsable("ApiKey", false);
-            }
-            else if (Provider.Equals(_fxcmrest, StringComparison.OrdinalIgnoreCase))
+            if (Provider.Equals(Market.FXCM, StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable("Access", true);
                 SetBrowsable("Login", false);
                 SetBrowsable("Password", false);
                 SetBrowsable("ApiKey", true);
             }
-            else if (Provider.Equals(_borsdata, StringComparison.OrdinalIgnoreCase))
+            else if (Provider.Equals(Market.Borsdata, StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable("Access", false);
                 SetBrowsable("Login", false);
                 SetBrowsable("Password", false);
                 SetBrowsable("ApiKey", true);
             }
-            else if (Provider.Equals(_avanza, StringComparison.OrdinalIgnoreCase))
+            else if (Provider.Equals(Market.Avanza, StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable("Access", false);
                 SetBrowsable("Login", true);

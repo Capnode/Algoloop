@@ -27,7 +27,6 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class Dukascopy : ProviderBase
     {
-        private const string _market = "dukascopy";
         private readonly DateTime _firstDate = new(2003, 05, 05);
 
         private readonly IEnumerable<string> _majors = new[] { "AUDUSD", "EURUSD", "GBPUSD", "NZDUSD", "USDCAD", "USDCHF", "USDJPY" };
@@ -137,10 +136,10 @@ namespace Algoloop.ViewModel.Internal.Provider
         private void UpdateSymbols(ProviderModel market)
         {
             var all = new List<SymbolModel>();
-            all.AddRange(_majors.Select(m => new SymbolModel(m, _market, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
-            all.AddRange(_crosses.Select(m => new SymbolModel(m, _market, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Crosses" } } }));
-            all.AddRange(_metals.Select(m => new SymbolModel(m, _market, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Metals" } } }));
-            all.AddRange(_indices.Select(m => new SymbolModel(m, _market, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Indices" } } }));
+            all.AddRange(_majors.Select(m => new SymbolModel(m, Market.Dukascopy, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
+            all.AddRange(_crosses.Select(m => new SymbolModel(m, Market.Dukascopy, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Crosses" } } }));
+            all.AddRange(_metals.Select(m => new SymbolModel(m, Market.Dukascopy, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Metals" } } }));
+            all.AddRange(_indices.Select(m => new SymbolModel(m, Market.Dukascopy, SecurityType.Cfd) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Indices" } } }));
 
             // Exclude unknown symbols
             var downloader = new DukascopyDataDownloader();

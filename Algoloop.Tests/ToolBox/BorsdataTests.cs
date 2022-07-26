@@ -35,7 +35,6 @@ namespace Algoloop.Tests.ToolBox
     public class BorsdataTests
     {
         private const string _datafolder = "Data";
-        private const string _market = "borsdata";
         private const Resolution _resolution = Resolution.Daily;
         private string _equityFolder;
         private string _apiKey;
@@ -55,9 +54,9 @@ namespace Algoloop.Tests.ToolBox
                 Directory.Delete(_datafolder, true);
             }
 
-            _equityFolder = Path.Combine(_datafolder, SecurityType.Equity.SecurityTypeToLower(), _market);
+            _equityFolder = Path.Combine(_datafolder, SecurityType.Equity.SecurityTypeToLower(), Market.Borsdata);
             IConfigurationRoot settings = TestConfig.Create();
-            _apiKey = settings[_market];
+            _apiKey = settings[Market.Borsdata];
         }
 
         [TestCleanup]
@@ -68,7 +67,7 @@ namespace Algoloop.Tests.ToolBox
         [TestMethod]
         public void GetMapFilePath()
         {
-            string actual = MapFile.GetMapFilePath(_market, SecurityType.Equity);
+            string actual = MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity);
             string expected = Path.Combine(_equityFolder, "map_files");
             Assert.AreEqual(expected, actual);
         }
@@ -119,7 +118,7 @@ namespace Algoloop.Tests.ToolBox
 
             // Assert
             string zipfile = Path.Combine(_equityFolder, "daily", "AXFO.ST.zip");
-            string mapRoot = MapFile.GetMapFilePath(_market, SecurityType.Equity);
+            string mapRoot = MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity);
             string mapPath = Path.Combine(mapRoot, "AXFO.ST.csv");
             Assert.IsTrue(File.Exists(zipfile));
             long length = new FileInfo(zipfile).Length;
@@ -190,7 +189,7 @@ namespace Algoloop.Tests.ToolBox
             };
 
             // Invalidate TradeBars
-            IEnumerable<Symbol> symbols = tickers.Select(m => Symbol.Create(m, SecurityType.Equity, _market));
+            IEnumerable<Symbol> symbols = tickers.Select(m => Symbol.Create(m, SecurityType.Equity, Market.Borsdata));
             Symbol symbol = symbols.Single();
             List<BaseData> data = new();
             for (DateTime date = start2; date <= end; date = date.AddDays(1))

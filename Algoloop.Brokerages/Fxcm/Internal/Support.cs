@@ -17,12 +17,10 @@ using QuantConnect;
 using System;
 using System.Globalization;
 
-namespace Algoloop.Brokerages.FxcmRest.Internal
+namespace Algoloop.Brokerages.Fxcm.Internal
 {
     internal static class Support
     {
-        public const string Market = "fxcm";
-
         private static readonly DateTime _epochTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
         public static SecurityType ToSecurityType(string symbol)

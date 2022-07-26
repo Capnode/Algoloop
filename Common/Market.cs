@@ -65,13 +65,20 @@ namespace QuantConnect
             Tuple.Create(CFE, 33),
             Tuple.Create(FTX, 34),
             Tuple.Create(FTXUS, 35),
-            Tuple.Create(BinanceUS, 36)
+            Tuple.Create(BinanceUS, 36),
+
+            Tuple.Create(Borsdata, 256),
+            Tuple.Create(Avanza, 257)
         };
 
         static Market()
         {
-            // Initialize with hardcoded values
-            Reset();
+            // initialize our maps
+            foreach (var market in HardcodedMarkets)
+            {
+                Markets[market.Item1] = market.Item2;
+                ReverseMarkets[market.Item2] = market.Item1;
+            }
         }
 
         /// <summary>
@@ -227,20 +234,14 @@ namespace QuantConnect
         public const string BinanceUS = "binanceus";
 
         /// <summary>
-        /// Reset the map of available markets to initial values.
+        /// Borsdata
         /// </summary>
-        public static void Reset()
-        {
-            Markets.Clear();
-            ReverseMarkets.Clear();
+        public const string Borsdata = "borsdata";
 
-            // initialize our maps
-            foreach (var market in HardcodedMarkets)
-            {
-                Markets[market.Item1] = market.Item2;
-                ReverseMarkets[market.Item2] = market.Item1;
-            }
-        }
+        /// <summary>
+        /// Avanza
+        /// </summary>
+        public const string Avanza = "avanza";
 
         /// <summary>
         /// Adds the specified market to the map of available markets with the specified identifier.

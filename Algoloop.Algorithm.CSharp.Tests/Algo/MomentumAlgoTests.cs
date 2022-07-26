@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using QuantConnect;
 using QuantConnect.Logging;
 
 namespace Algoloop.Algorithm.CSharp.Algo.Tests
@@ -42,7 +43,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 new Dictionary<string, string>
                 {
                     { "resolution", "Daily" },
-                    { "market", "borsdata" },
+                    { "market", Market.Borsdata },
                     { "symbols", "ABB.ST"},
                     { "Period", "100" },
                     { "Hold", "5" }

@@ -13,15 +13,10 @@
  */
 
 using Algoloop.Model;
-using Newtonsoft.Json;
-using QuantConnect;
 using QuantConnect.Securities;
 using QuantConnect.Util;
 using QuantConnect.Logging;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -55,35 +50,6 @@ namespace Algoloop.ViewModel.Internal.Provider
                 }
 
                 throw;
-            }
-        }
-
-        public static void RegisterProviders(SettingModel settings)
-        {
-            Contract.Requires(settings != null);
-
-            MarketHoursDatabase.Reset();
-            MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
-            string originalJson = JsonConvert.SerializeObject(marketHours);
-
-            // Try to register providers to Market
-            Market.Reset();
-            IEnumerable<Type> providers = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IProvider).IsAssignableFrom(p) && !p.IsInterface && !p.IsAbstract);
-            foreach (Type type in providers)
-            {
-                IProvider provider = (IProvider)Activator.CreateInstance(type) ??
-                    throw new ApplicationException($"Can not create provider {type.Name}");
-                provider.Register(settings);
-            }
-
-            // Save market hours database if changed
-            string json = JsonConvert.SerializeObject(marketHours);
-            if (!json.Equals(originalJson, StringComparison.OrdinalIgnoreCase))
-            {
-                string path = Path.Combine(settings.DataFolder, "market-hours", "market-hours-database.json");
-                File.WriteAllText(path, json);
             }
         }
     }

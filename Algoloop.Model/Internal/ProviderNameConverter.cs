@@ -34,14 +34,7 @@ namespace Algoloop.Model.Internal
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            int code = 1;
-            string name;
-            List<string> names = new List<string>();
-            while ((name = Market.Decode(code++)) != null)
-            {
-                names.Add(name);
-            }
-
+            List<string> names = Market.SupportedMarkets();
             names.Sort();
             return new StandardValuesCollection(names);
         }

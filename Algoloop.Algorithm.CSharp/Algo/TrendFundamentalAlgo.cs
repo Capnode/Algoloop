@@ -40,7 +40,7 @@ namespace Algoloop.Algorithm.CSharp
         private readonly string _resolution = "Daily";
 
         [Parameter("market")]
-        private readonly string _market = "Borsdata";
+        private readonly string _market = Market.Borsdata;
 
         [Parameter("Period1")]
         private readonly string _period1 = "0";

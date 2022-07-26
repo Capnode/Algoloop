@@ -12,9 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.FxcmRest;
+using Algoloop.Brokerages.Fxcm;
 using Algoloop.Model;
-using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,7 +23,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
-    internal class FxcmRest : ProviderBase
+    internal class Fxcm : ProviderBase
     {
         private FxcmClient _api;
 
