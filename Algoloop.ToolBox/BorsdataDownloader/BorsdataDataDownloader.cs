@@ -31,7 +31,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.ToolBox.Borsdata
+namespace Algoloop.ToolBox.BorsdataDownloader
 {
     public class BorsdataDataDownloader : IDataDownloader, IDisposable
     {

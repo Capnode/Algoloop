@@ -27,7 +27,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.ToolBox.Borsdata
+namespace Algoloop.ToolBox.BorsdataDownloader
 {
     public static class BorsdataDownloaderProgram
     {

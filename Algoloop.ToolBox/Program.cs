@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Algoloop.ToolBox.Borsdata;
+using Algoloop.ToolBox.BorsdataDownloader;
 using Algoloop.ToolBox.MetastockConverter;
 using McMaster.Extensions.CommandLineUtils;
 using QuantConnect;
