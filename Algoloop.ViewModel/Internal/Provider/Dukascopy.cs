@@ -19,7 +19,6 @@ using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -44,46 +43,6 @@ namespace Algoloop.ViewModel.Internal.Provider
             "AU200AUD", "CH20CHF", "DE30EUR", "ES35EUR", "EU50EUR", "FR40EUR", "UK100GBP", "HK33HKD", "IT40EUR", "JP225JPY",
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
-
-        private SettingModel _settings;
-
-        public override bool Register(SettingModel settings)
-        {
-            Contract.Requires(settings != null);
-            _settings = settings;
-
-            // Register market
-            if (!base.Register(settings)) return false;
-
-            // Register Market Hours
-            MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(settings.DataFolder);
-            Debug.Assert(marketHours != null);
-
-            var exchangeHours = new SecurityExchangeHours(
-                TimeZones.Utc,
-                Enumerable.Empty<DateTime>(),
-                new Dictionary<DayOfWeek, LocalMarketHours>
-                {
-                    { DayOfWeek.Monday, new LocalMarketHours(DayOfWeek.Monday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
-                    { DayOfWeek.Tuesday, new LocalMarketHours(DayOfWeek.Tuesday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
-                    { DayOfWeek.Wednesday, new LocalMarketHours(DayOfWeek.Wednesday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
-                    { DayOfWeek.Thursday, new LocalMarketHours(DayOfWeek.Thursday, new TimeSpan(0, 0, 0), new TimeSpan(1, 0, 0, 0)) },
-                    { DayOfWeek.Friday, new LocalMarketHours(DayOfWeek.Friday, new TimeSpan(0, 0, 0), new TimeSpan(22, 0, 0)) },
-                    { DayOfWeek.Saturday, LocalMarketHours.ClosedAllDay(DayOfWeek.Saturday) },
-                    { DayOfWeek.Sunday, new LocalMarketHours(DayOfWeek.Friday, new TimeSpan(22, 0, 0), new TimeSpan(1, 0, 0, 0)) }
-                },
-                new Dictionary<DateTime, TimeSpan>(),
-                new Dictionary<DateTime, TimeSpan>());
-
-            marketHours.SetEntry(
-                GetType().Name.ToLowerInvariant(),
-                null,
-                SecurityType.Forex,
-                exchangeHours,
-                TimeZones.Utc);
-
-            return true;
-        }
 
         public override void GetUpdate(ProviderModel market, Action<object> update)
         {
@@ -114,9 +73,9 @@ namespace Algoloop.ViewModel.Internal.Provider
 
             IDictionary<string, string> config = new Dictionary<string, string>
             {
-                ["data-directory"] = _settings.DataFolder,
-                ["cache-location"] = _settings.DataFolder,
-                ["data-folder"] = _settings.DataFolder
+                ["data-directory"] = Globals.DataFolder,
+                ["cache-location"] = Globals.DataFolder,
+                ["data-folder"] = Globals.DataFolder
             };
 
             DateTime now = DateTime.UtcNow;

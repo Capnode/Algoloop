@@ -58,7 +58,7 @@ namespace Algoloop.Model
             return path;
         }
 
-        public static void CopyDirectory(string sourceDir, string destDir, bool overwiteFiles)
+        public static void CopyDirectory(string sourceDir, string destDir, bool overwiteFiles = false)
         {
             if (!Directory.Exists(sourceDir))
             {
@@ -67,6 +67,7 @@ namespace Algoloop.Model
             }
 
             // Create all of the directories
+            Directory.CreateDirectory(destDir);
             foreach (string dirPath in Directory.GetDirectories(sourceDir, "*", SearchOption.AllDirectories))
                 Directory.CreateDirectory(dirPath.Replace(sourceDir, destDir));
 

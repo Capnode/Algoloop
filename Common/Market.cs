@@ -68,7 +68,8 @@ namespace QuantConnect
             Tuple.Create(BinanceUS, 36),
 
             Tuple.Create(Borsdata, 256),
-            Tuple.Create(Avanza, 257)
+            Tuple.Create(Metastock, 257),
+            Tuple.Create(Avanza, 258),
         };
 
         static Market()
@@ -237,6 +238,11 @@ namespace QuantConnect
         /// Borsdata
         /// </summary>
         public const string Borsdata = "borsdata";
+
+        /// <summary>
+        /// Avanza
+        /// </summary>
+        public const string Metastock = "metastock";
 
         /// <summary>
         /// Avanza

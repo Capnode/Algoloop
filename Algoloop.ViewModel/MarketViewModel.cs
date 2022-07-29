@@ -363,7 +363,7 @@ namespace Algoloop.ViewModel
             try
             {
                 DataToModel();
-                _provider = ProviderFactory.CreateProvider(Model.Provider, _settings);
+                _provider = ProviderFactory.CreateProvider(Model.Provider);
                 if (_provider == null) throw new ApplicationException(
                     $"Can not create provider {Model.Provider}");
                 Messenger.Send(new NotificationMessage(

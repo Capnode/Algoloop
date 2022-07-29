@@ -24,7 +24,6 @@ using QuantConnect.ToolBox.CoarseUniverseGenerator;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -32,10 +31,6 @@ namespace Algoloop.ToolBox.Borsdata
 {
     public static class BorsdataDownloaderProgram
     {
-        private const SecurityType _securityType = SecurityType.Equity;
-        private const string _reportInfoFile = "borsdata.csv";
-        private const Resolution _resolution = Resolution.Daily;
-
         /// <summary>
         /// Primary entry point to the program
         ///  tickers: list of symbols
@@ -58,29 +53,22 @@ namespace Algoloop.ToolBox.Borsdata
 
             try
             {
-                string dataDirectory = Config.Get("data-directory", "../../../Data");
-                Register(dataDirectory, Market.Borsdata);
-                Setup(dataDirectory);
+                Directory.CreateDirectory(MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity));
 
                 // Download the data
                 using var downloader = new BorsdataDataDownloader(apiKey);
-                IEnumerable<Symbol> symbols = tickers.Select(m => Symbol.Create(m, _securityType, Market.Borsdata));
+                IEnumerable<Symbol> symbols = tickers.Select(m => Symbol.Create(m, SecurityType.Equity, Market.Borsdata));
                 foreach (Symbol symbol in symbols)
                 {
-                    DateTime firstDate = DateTime.MaxValue;
-                    IEnumerable<BaseData> data = downloader.Get(symbol, _resolution, startDate, endDate);
+                    IEnumerable<BaseData> data = downloader.Get(symbol, Resolution.Daily, startDate, endDate);
                     BaseData first = data?.FirstOrDefault();
                     if (first == default) continue;
-                    if (first.Time < firstDate)
-                    {
-                        firstDate = first.Time.Date;
-                    }
-                    LeanDataWriter writer = new(_resolution, symbol, dataDirectory);
+                    LeanDataWriter writer = new (Resolution.Daily, symbol, Globals.DataFolder);
                     writer.Write(data);
-                    UpdateMapFile(symbol.Value, Market.Borsdata, firstDate);
+                    UpdateMapFile(symbol.Value, first.Time.Date);
                 }
 
-                GenerateCoarseFiles(dataDirectory);
+                GenerateCoarseFiles();
             }
             catch (Exception err)
             {
@@ -88,88 +76,11 @@ namespace Algoloop.ToolBox.Borsdata
             }
         }
 
-        public static void Register(string dataDirectory, string name)
-        {
-            if (!name.Equals(Market.Borsdata)) throw new ArgumentOutOfRangeException(nameof(name));
-
-            // Set Market Hours
-            string folder = Path.Combine(dataDirectory, "market-hours");
-            Directory.CreateDirectory(folder);
-            string path = Path.Combine(folder, "market-hours-database.json");
-            if (!File.Exists(path))
-            {
-                var emptyExchangeHours = new Dictionary<SecurityDatabaseKey, MarketHoursDatabase.Entry>();
-                string jsonString = JsonConvert.SerializeObject(new MarketHoursDatabase(emptyExchangeHours));
-                File.WriteAllText(path, jsonString);
-            }
-
-            MarketHoursDatabase marketHours = MarketHoursDatabase.FromDataFolder(dataDirectory);
-            Debug.Assert(marketHours != null);
-
-            var exchangeHours = new SecurityExchangeHours(
-                TimeZones.Amsterdam,
-                Enumerable.Empty<DateTime>(),
-                new Dictionary<DayOfWeek, LocalMarketHours>
-                {
-                    { DayOfWeek.Monday, new LocalMarketHours(DayOfWeek.Monday, new TimeSpan(9, 0, 0), new TimeSpan(17, 30, 0)) },
-                    { DayOfWeek.Tuesday, new LocalMarketHours(DayOfWeek.Tuesday, new TimeSpan(9, 0, 0), new TimeSpan(17, 30, 0)) },
-                    { DayOfWeek.Wednesday, new LocalMarketHours(DayOfWeek.Wednesday, new TimeSpan(9, 0, 0), new TimeSpan(17, 30, 0)) },
-                    { DayOfWeek.Thursday, new LocalMarketHours(DayOfWeek.Thursday, new TimeSpan(9, 0, 0), new TimeSpan(17, 30, 0)) },
-                    { DayOfWeek.Friday, new LocalMarketHours(DayOfWeek.Friday, new TimeSpan(9, 0, 0), new TimeSpan(17, 30, 0)) },
-                    { DayOfWeek.Saturday, LocalMarketHours.ClosedAllDay(DayOfWeek.Saturday) },
-                    { DayOfWeek.Sunday, LocalMarketHours.ClosedAllDay(DayOfWeek.Sunday) }
-                },
-                new Dictionary<DateTime, TimeSpan>(),
-                new Dictionary<DateTime, TimeSpan>());
-
-            marketHours.SetEntry(
-                name,
-                null,
-                SecurityType.Equity,
-                exchangeHours,
-                TimeZones.Amsterdam);
-
-            // Register market
-            if (Market.Encode(name) == null)
-            {
-                // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
-                int code = 0;
-                while (Market.Decode(code) != null)
-                {
-                    code++;
-                }
-
-                Market.Add(name, code);
-            }
-        }
-
-        private static void Setup(string dataDirectory)
-        {
-            string equityFolder = Path.Combine(dataDirectory, nameof(SecurityType.Equity).ToLowerInvariant());
-            Directory.CreateDirectory(equityFolder);
-
-            // Create map_files filder
-            string mapFilesFolder = Path.Combine(equityFolder, Market.Borsdata, "map_files");
-            Directory.CreateDirectory(mapFilesFolder);
-
-            // Copy Report info file
-            string destPath = Path.Combine(equityFolder, _reportInfoFile);
-            FileInfo destInfo = new(destPath);
-
-            string srcPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Content", _reportInfoFile);
-            FileInfo srcInfo = new(srcPath);
-
-            if (srcInfo.LastWriteTime > destInfo.LastWriteTime)
-            {
-                File.Copy(srcPath, destPath, true);
-            }
-        }
-
-        private static void UpdateMapFile(string symbol, string market, DateTime date)
+        private static void UpdateMapFile(string symbol, DateTime date)
         {
             MapFile mapFile;
             IEnumerable<MapFileRow> presentRows;
-            string mapRoot = MapFile.GetMapFilePath(market, _securityType);
+            string mapRoot = MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity);
             string path = Path.Combine(mapRoot, symbol.ToLowerInvariant() + ".csv");
 
             // Check if date is already mapped
@@ -177,7 +88,7 @@ namespace Algoloop.ToolBox.Borsdata
             {
                 IDataProvider dataProvider = Composer.Instance.GetExportedValueByTypeName<IDataProvider>(
                     Config.Get("data-provider", "DefaultDataProvider"));
-                presentRows = MapFileRow.Read(path, market, _securityType, dataProvider);
+                presentRows = MapFileRow.Read(path, Market.Borsdata, SecurityType.Equity, dataProvider);
                 mapFile = new MapFile(symbol, presentRows);
                 if (mapFile.HasData(date)) return;
             }
@@ -189,23 +100,24 @@ namespace Algoloop.ToolBox.Borsdata
                 new MapFileRow(new DateTime(2050, 12, 31), symbol)
             };
             mapFile = new MapFile(symbol, newRows);
-            mapFile.WriteToCsv(market, _securityType);
+            mapFile.WriteToCsv(Market.Borsdata, SecurityType.Equity);
         }
 
-        private static bool GenerateCoarseFiles(string dataDirectory)
+        private static bool GenerateCoarseFiles()
         {
             var dailyDataFolder = new DirectoryInfo(Path.Combine(
-                dataDirectory, SecurityType.Equity.SecurityTypeToLower(),
+                Globals.DataFolder,
+                SecurityType.Equity.SecurityTypeToLower(),
                 Market.Borsdata,
                 Resolution.Daily.ResolutionToLower()));
             var destinationFolder = new DirectoryInfo(Path.Combine(
-                dataDirectory,
+                Globals.DataFolder,
                 SecurityType.Equity.SecurityTypeToLower(),
                 Market.Borsdata,
                 "fundamental",
                 "coarse"));
             var fineFolder = new DirectoryInfo(Path.Combine(
-                dataDirectory,
+                Globals.DataFolder,
                 SecurityType.Equity.SecurityTypeToLower(),
                 Market.Borsdata,
                 "fundamental",

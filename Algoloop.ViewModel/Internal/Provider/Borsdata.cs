@@ -18,7 +18,6 @@ using QuantConnect;
 using QuantConnect.Securities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -26,19 +25,6 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class Borsdata : ProviderBase
     {
-        private SettingModel _settings;
-
-        public override bool Register(SettingModel settings)
-        {
-            Contract.Requires(settings != null, nameof(settings));
-            if (!base.Register(settings)) return false;
-
-            _settings = settings;
-            string providerId = GetType().Name.ToLowerInvariant();
-            BorsdataDownloaderProgram.Register(settings.DataFolder, providerId);
-            return true;
-        }
-
         public override void GetUpdate(ProviderModel market, Action<object> update)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
@@ -65,9 +51,9 @@ namespace Algoloop.ViewModel.Internal.Provider
             };
             IDictionary<string, string> config = new Dictionary<string, string>
             {
-                ["data-directory"] = _settings.DataFolder,
-                ["cache-location"] = _settings.DataFolder,
-                ["data-folder"] = _settings.DataFolder
+                ["data-directory"] = Globals.DataFolder,
+                ["cache-location"] = Globals.DataFolder,
+                ["data-folder"] = Globals.DataFolder
             };
 
             // Download active symbols

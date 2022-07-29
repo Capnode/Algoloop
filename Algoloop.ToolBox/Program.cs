@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Algoloop.ToolBox.Borsdata;
+using Algoloop.ToolBox.MetastockConverter;
 using McMaster.Extensions.CommandLineUtils;
 using QuantConnect;
 using QuantConnect.Configuration;
@@ -109,6 +110,17 @@ namespace Algoloop.ToolBox
                     case "bddl":
                     case "borsdatadownloader":
                         BorsdataDownloaderProgram.BorsdataDownloader(tickers, fromDate, toDate, GetParameterOrExit(optionsObject, "api-key"));
+                        break;
+                }
+            }
+            else
+            {
+                switch (targetApp)
+                {
+                    case "msc":
+                    case "metastockconverter":
+                        MetastockConverterProgram.MetastockConverter(GetParameterOrExit(optionsObject, "source-dir"),
+                                                                     GetParameterOrExit(optionsObject, "destination-dir"));
                         break;
                 }
             }

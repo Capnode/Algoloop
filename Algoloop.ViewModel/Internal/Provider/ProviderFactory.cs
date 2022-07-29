@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
 using QuantConnect.Securities;
 using QuantConnect.Util;
 using QuantConnect.Logging;
@@ -24,10 +23,8 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class ProviderFactory
     {
-        public static IProvider CreateProvider(string name, SettingModel settings)
+        public static IProvider CreateProvider(string name)
         {
-            if (settings == null) throw new ArgumentNullException(nameof(settings));
-
             try
             {
                 Type type = AppDomain.CurrentDomain.GetAssemblies()
@@ -38,7 +35,6 @@ namespace Algoloop.ViewModel.Internal.Provider
 
                 IProvider provider = (IProvider)Activator.CreateInstance(type) ??
                     throw new ApplicationException($"Can not create provider {name}");
-                if (!provider.Register(settings)) return null;
                 return provider;
             }
             catch (ReflectionTypeLoadException ex)

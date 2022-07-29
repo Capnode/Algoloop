@@ -43,14 +43,12 @@ namespace Algoloop.ToolBox.Borsdata
 
         private KpisAllCompRespV1 _lastReports;
         private bool _isDisposed;
-        private readonly string _dataDirectory;
         private readonly ApiClient _api;
         private InstrumentRespV1 _allInstruments;
         private StockSplitRespV1 _splits;
 
         public BorsdataDataDownloader(string apiKey)
         {
-            _dataDirectory = Config.Get("data-directory");
             _api = new ApiClient(apiKey);
         }
 
@@ -169,7 +167,7 @@ namespace Algoloop.ToolBox.Borsdata
         {
             // Create FineFundamentals folder
             string folder = Path.Combine(
-                _dataDirectory,
+                Globals.DataFolder,
                 symbol.ID.SecurityType.SecurityTypeToLower(),
                 symbol.ID.Market,
                 "fundamental",
@@ -447,7 +445,7 @@ namespace Algoloop.ToolBox.Borsdata
             endUtc = endUtc.Date;
             StockPricesRespV1 stockPrices;
             string zipPath = Path.Combine(
-                _dataDirectory,
+                Globals.DataFolder,
                 symbol.ID.SecurityType.SecurityTypeToLower(),
                 symbol.ID.Market,
                 resolution.ResolutionToLower(),

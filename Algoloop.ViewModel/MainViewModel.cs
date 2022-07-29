@@ -14,7 +14,6 @@
 
 using Algoloop.Model;
 using Algoloop.ViewModel.Properties;
-using Algoloop.ViewModel.Internal.Provider;
 using Microsoft.Toolkit.Mvvm.Input;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
@@ -23,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using QuantConnect;
 
 namespace Algoloop.ViewModel
 {
@@ -173,16 +173,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                Messenger.Send(new NotificationMessage(
-                    Resources.LoadingConfiguration), 0);
-
-                // Set config
-                Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
-                Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
-                Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
-                Config.Set(
-                    "map-file-provider",
-                    "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                Messenger.Send(new NotificationMessage(Resources.LoadingConfiguration), 0);
 
                 // Initialize data folders
                 string program = MainService.GetProgramFolder();
@@ -213,9 +204,27 @@ namespace Algoloop.ViewModel
                 string appData = MainService.GetAppDataFolder();
                 await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
 
+                // Set config
+                Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
+                Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
+                Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
+                Config.Set("map-file-provider",
+                           "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                Globals.Reset();
+
                 // Read configuration
                 await MarketsViewModel.ReadAsync(Path.Combine(appData, "Markets.json"));
                 await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
+
+                // Update Data folder
+                MainService.CopyDirectory(
+                    Path.Combine(program, "Content/ProgramData/market-hours"),
+                    Path.Combine(Globals.DataFolder, "market-hours"),
+                    true);
+                MainService.CopyDirectory(
+                    Path.Combine(program, "Content/ProgramData/symbol-properties"),
+                    Path.Combine(Globals.DataFolder, "symbol-properties"),
+                    true);
 
                 // Initialize Research page
                 ResearchViewModel.Initialize();

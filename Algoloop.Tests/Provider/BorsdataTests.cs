@@ -18,6 +18,7 @@ using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
 using System.IO;
@@ -28,8 +29,9 @@ namespace Algoloop.Tests.Provider
     [TestClass]
     public class BorsdataTests
     {
+        private const string DataDirectory = "Data";
+
         private ProviderModel _market;
-        private SettingModel _settings;
         private string _equityFolder;
 
         [TestInitialize]
@@ -37,7 +39,14 @@ namespace Algoloop.Tests.Provider
         {
             Log.LogHandler = new ConsoleLogHandler();
 
-            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+            // Set Globals
+            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDirectory);
+            Config.Set("data-directory", dataFolder);
+            Config.Set("data-folder", dataFolder);
+            Config.Set("cache-location", dataFolder);
+            Config.Set("version-id", string.Empty);
+            Globals.Reset();
+
             _equityFolder = Path.Combine(dataFolder, SecurityType.Equity.SecurityTypeToLower(), Market.Borsdata);
             if (Directory.Exists(dataFolder))
             {
@@ -54,8 +63,6 @@ namespace Algoloop.Tests.Provider
                 LastDate = new DateTime(2021, 1, 5),
                 Resolution = Resolution.Daily
             };
-
-            _settings = new SettingModel { DataFolder = dataFolder };
         }
 
         [TestCleanup]
@@ -77,7 +84,7 @@ namespace Algoloop.Tests.Provider
             _market.Symbols.Add(symbol0);
 
             // Act
-            using IProvider provider = ProviderFactory.CreateProvider(_market.Provider, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
             provider.GetUpdate(_market, null);
             SymbolModel symbol = _market.Symbols.SingleOrDefault();
 

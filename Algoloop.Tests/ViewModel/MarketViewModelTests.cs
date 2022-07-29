@@ -18,6 +18,7 @@ using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
 using System.IO;
@@ -31,6 +32,8 @@ namespace Algoloop.Tests.ViewModel
     [TestClass()]
     public class MarketViewModelTests
     {
+        private const string DataDirectory = "Data";
+        
         private IConfigurationRoot _config;
         private SettingModel _setting;
 
@@ -39,8 +42,16 @@ namespace Algoloop.Tests.ViewModel
         {
             Log.LogHandler = new ConsoleLogHandler();
             _config = TestConfig.Create();
-            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
 
+            // Set Globals
+            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDirectory);
+            Config.Set("data-directory", dataFolder);
+            Config.Set("data-folder", dataFolder);
+            Config.Set("cache-location", dataFolder);
+            Config.Set("version-id", string.Empty);
+            Globals.Reset();
+
+            // Remove Data folder
             if (Directory.Exists(dataFolder))
             {
                 Directory.Delete(dataFolder, true);

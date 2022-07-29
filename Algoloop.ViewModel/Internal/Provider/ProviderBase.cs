@@ -13,10 +13,8 @@
  */
 
 using Algoloop.Model;
-using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
-using QuantConnect.Securities;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,38 +30,6 @@ namespace Algoloop.ViewModel.Internal.Provider
     {
         protected bool _isDisposed;
         private ConfigProcess _process;
-
-        public virtual bool Register(SettingModel settings)
-        {
-            // Get name of virtual class
-            string name = GetType().Name.ToLowerInvariant();
-
-            // Make sure provider is registered
-            if (Market.Encode(name) == null)
-            {
-                // be sure to add a reference to the unknown market, otherwise we won't be able to decode it coming out
-                int code = 0;
-                while (Market.Decode(code) != null)
-                {
-                    code++;
-                }
-
-                Market.Add(name, code);
-            }
-
-            // Make sure Market Hours Database exist
-            string folder = Path.Combine(settings.DataFolder, "market-hours");
-            Directory.CreateDirectory(folder);
-            string path = Path.Combine(folder, "market-hours-database.json");
-            if (!File.Exists(path))
-            {
-                var emptyExchangeHours = new Dictionary<SecurityDatabaseKey, MarketHoursDatabase.Entry>();
-                string jsonString = JsonConvert.SerializeObject(new MarketHoursDatabase(emptyExchangeHours));
-                File.WriteAllText(path, jsonString);
-            }
-
-            return true;
-        }
 
         public virtual void Login(ProviderModel provider)
         {

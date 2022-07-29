@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Model;
 using Algoloop.ToolBox;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
@@ -34,8 +35,11 @@ namespace Algoloop.Tests.ToolBox
     [TestClass]
     public class BorsdataTests
     {
-        private const string _datafolder = "Data";
-        private const Resolution _resolution = Resolution.Daily;
+        private const string DataFolder = "Data";
+        private const string TestData = "TestData";
+        private const string MarketHours = "market-hours";
+        private const string SymbolProperties = "symbol-properties";
+
         private string _equityFolder;
         private string _apiKey;
 
@@ -46,15 +50,28 @@ namespace Algoloop.Tests.ToolBox
             Trace.Listeners.Clear();
             Trace.Listeners.Add(new DefaultTraceListener());
             Log.LogHandler = new ConsoleLogHandler();
-            var dir = Directory.GetCurrentDirectory();
-            Config.Set("data-directory", _datafolder);
-            Config.Set("cache-location", _datafolder);
-            if (Directory.Exists(_datafolder))
-            {
-                Directory.Delete(_datafolder, true);
-            }
 
-            _equityFolder = Path.Combine(_datafolder, SecurityType.Equity.SecurityTypeToLower(), Market.Borsdata);
+            // Set Globals
+            Config.Set("data-directory", DataFolder);
+            Config.Set("data-folder", DataFolder);
+            Config.Set("cache-location", DataFolder);
+            Config.Set("version-id", string.Empty);
+            Globals.Reset();
+
+            // Prepare datafolder
+            if (Directory.Exists(DataFolder))
+            {
+                Directory.Delete(DataFolder, true);
+            }
+            MainService.CopyDirectory(
+                Path.Combine(TestData, MarketHours),
+                Path.Combine(DataFolder, MarketHours));
+            MainService.CopyDirectory(
+                Path.Combine(TestData, SymbolProperties),
+                Path.Combine(DataFolder, SymbolProperties));
+            _equityFolder = Path.Combine(DataFolder, SecurityType.Equity.SecurityTypeToLower(), Market.Borsdata);
+
+            // Settings
             IConfigurationRoot settings = TestConfig.Create();
             _apiKey = settings[Market.Borsdata];
         }
@@ -65,16 +82,17 @@ namespace Algoloop.Tests.ToolBox
         }
 
         [TestMethod]
-        public void GetMapFilePath()
-        {
-            string actual = MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity);
-            string expected = Path.Combine(_equityFolder, "map_files");
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
         public void Download_one_symbol()
         {
+            // Arrange
+            string datafile = Path.Combine(
+                _equityFolder,
+                nameof(Resolution.Daily),
+                "AXFO.ST.zip");
+            string mapfile = Path.Combine(
+                MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity),
+                "AXFO.ST.csv");
+            
             var tickers = new List<string> { "AXFO.ST" };
             var start = new DateTime(2021, 01, 01, 20, 0, 0);
             var end = new DateTime(2021, 01, 10);
@@ -93,7 +111,8 @@ namespace Algoloop.Tests.ToolBox
             Program.Main(args);
 
             // Assert
-            Assert.IsTrue(File.Exists(Path.Combine(_equityFolder, "daily", "AXFO.ST.zip")));
+            Assert.IsTrue(File.Exists(datafile));
+            Assert.IsTrue(File.Exists(mapfile));
         }
 
         [TestMethod]
@@ -196,7 +215,7 @@ namespace Algoloop.Tests.ToolBox
             {
                 data.Add(new TradeBar(date, symbol, 0, 0, 0, 0, 0));
             }
-            LeanDataWriter writer = new(_resolution, symbol, _datafolder);
+            LeanDataWriter writer = new(Resolution.Daily, symbol, DataFolder);
             writer.Write(data);
 
             // Create invalid fundamentals

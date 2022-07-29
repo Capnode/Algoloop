@@ -30,13 +30,6 @@ namespace Algoloop.ViewModel.Internal.Provider
         private const string _version = "14312";
         private const string _security = "Security";
         private const string _zip = ".zip";
-        private SettingModel _settings;
-
-        public override bool Register(SettingModel settings)
-        {
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            return base.Register(settings);
-        }
 
         public override void GetUpdate(ProviderModel provider, Action<object> update)
         {
@@ -52,7 +45,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 
             Log.Trace($"Unpack {uri}");
             IList<SymbolModel> symbols = new List<SymbolModel>();
-            string dest = _settings.DataFolder;
+            string dest = Globals.DataFolder;
             using (var archive = new ZipArchive(File.OpenRead(filename)))
             {
                 foreach (ZipArchiveEntry file in archive.Entries)

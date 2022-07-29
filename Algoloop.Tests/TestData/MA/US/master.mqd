@@ -1,0 +1,29 @@
+[Header]
+Add_Header = 1
+string_Symbol = Ticker
+string_Date = Date
+string_Time = Time
+string_Open = Open
+string_High = High
+string_Low = Low
+string_Close = Close
+string_Volume = Vol
+string_OpenInt = OI
+
+[Fields]
+Symbol = 0
+Date = 1
+Time = 0
+Open = 1
+High = 1
+Low = 1
+Close = 1
+Volume = 1
+OpenInt = 0
+
+[Other]
+Path2ExportFolder = \EXPORT
+Date_Format = YYYYMMDD
+Time_Format = HHMM
+Extension = txt
+InsertTimeField = 1

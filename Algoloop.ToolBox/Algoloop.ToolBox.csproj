@@ -11,6 +11,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <StartupObject>Algoloop.ToolBox.Program</StartupObject>
     <NoWarn>NU1701;CA1416</NoWarn>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />

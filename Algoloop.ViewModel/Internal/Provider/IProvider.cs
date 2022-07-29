@@ -19,7 +19,6 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal interface IProvider : IDisposable
     {
-        bool Register(SettingModel settings);
         void Login(ProviderModel provider);
         void Logout();
         void SetUpdate(ProviderModel provider, Action<object> update);

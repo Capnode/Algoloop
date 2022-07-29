@@ -16,6 +16,7 @@ using Algoloop.Model;
 using Algoloop.ViewModel.Internal.Provider;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
 using System.IO;
@@ -26,20 +27,25 @@ namespace Algoloop.Tests.Provider
     [TestClass()]
     public class QuantconnectTests
     {
-        private SettingModel _settings;
+        private const string DataDirectory = "Data";
 
         [TestInitialize()]
         public void Initialize()
         {
             Log.LogHandler = new ConsoleLogHandler();
 
-            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+            // Set Globals
+            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDirectory);
+            Config.Set("data-directory", dataFolder);
+            Config.Set("data-folder", dataFolder);
+            Config.Set("cache-location", dataFolder);
+            Config.Set("version-id", string.Empty);
+            Globals.Reset();
+
             if (Directory.Exists(dataFolder))
             {
                 Directory.Delete(dataFolder, true);
             }
-
-            _settings = new SettingModel { DataFolder = "Data" };
         }
 
         [TestMethod()]
@@ -54,7 +60,7 @@ namespace Algoloop.Tests.Provider
             };
 
             // Just update symbol list
-            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
             provider.GetUpdate(market, null);
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate == date);
@@ -78,7 +84,7 @@ namespace Algoloop.Tests.Provider
             });
 
             // Dwonload symbol and update list
-            using IProvider provider = ProviderFactory.CreateProvider(market.Provider, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
             provider.GetUpdate(market, null);
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate > date);

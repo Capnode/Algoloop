@@ -24,21 +24,13 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class Kraken : ProviderBase
     {
-        private SettingModel _settings;
-
-        public override bool Register(SettingModel settings)
-        {
-            _settings = settings;
-            return base.Register(settings);
-        }
-
         public override void GetUpdate(ProviderModel provider, Action<object> update)
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 
             Config.Set("log-handler", "QuantConnect.Logging.CompositeLogHandler");
-            Config.Set("data-directory", _settings.DataFolder);
-            Config.Set("cache-location", _settings.DataFolder);
+            Config.Set("data-directory", Globals.DataFolder);
+            Config.Set("cache-location", Globals.DataFolder);
 
             IList<string> symbols = provider.Symbols.Select(m => m.Id).ToList();
             string resolution = Resolution.Daily.ToString(); // Yahoo only support daily

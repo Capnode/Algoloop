@@ -21,11 +21,16 @@ using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Runtime.Serialization;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace Algoloop.Model
 {
-    [Serializable]
+    [CategoryOrder("Market provider", 1)]
+    [CategoryOrder("Source", 2)]
+    [CategoryOrder("Account", 3)]
+    [CategoryOrder("Time", 4)]
     [DataContract]
+    [Serializable]
     public class ProviderModel : ModelBase
     {
         [NonSerialized]
@@ -60,6 +65,15 @@ namespace Algoloop.Model
                 Refresh();
             }
         }
+
+        [Category("Source")]
+        [DisplayName("Source folder")]
+        [Description("Folder to source market data.")]
+        [Editor(typeof(FolderEditor), typeof(FolderEditor))]
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string SourceFolder { get; set; }
 
         [Category("Account")]
         [DisplayName("Access type")]
@@ -96,8 +110,8 @@ namespace Algoloop.Model
         public string ApiKey { get; set; } = string.Empty;
 
         [Category("Time")]
-        [DisplayName("Last date")]
-        [Description("Account are updated up to this time.")]
+        [DisplayName("Update")]
+        [Description("Account is updated up to this time.")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]
@@ -141,35 +155,36 @@ namespace Algoloop.Model
         public void Refresh()
         {
             if (string.IsNullOrEmpty(Provider)) return;
+            bool access = false;
+            bool login = false;
+            bool password = false;
+            bool apiKey = false;
+            bool sourceFolder = false;
 
-            if (Provider.Equals(Market.FXCM, StringComparison.OrdinalIgnoreCase))
+            switch (Provider.ToLowerInvariant())
             {
-                SetBrowsable("Access", true);
-                SetBrowsable("Login", false);
-                SetBrowsable("Password", false);
-                SetBrowsable("ApiKey", true);
+                case Market.FXCM:
+                    access = true;
+                    apiKey = true;
+                    break;
+                case Market.Metastock:
+                    sourceFolder = true;
+                    break;
+                case Market.Borsdata:
+                    apiKey = true;
+                    break;
+                case Market.Avanza:
+                    login = true;
+                    password = true;
+                    apiKey = true;
+                    break;
             }
-            else if (Provider.Equals(Market.Borsdata, StringComparison.OrdinalIgnoreCase))
-            {
-                SetBrowsable("Access", false);
-                SetBrowsable("Login", false);
-                SetBrowsable("Password", false);
-                SetBrowsable("ApiKey", true);
-            }
-            else if (Provider.Equals(Market.Avanza, StringComparison.OrdinalIgnoreCase))
-            {
-                SetBrowsable("Access", false);
-                SetBrowsable("Login", true);
-                SetBrowsable("Password", true);
-                SetBrowsable("ApiKey", true);
-            }
-            else
-            {
-                SetBrowsable("Access", false);
-                SetBrowsable("Login", false);
-                SetBrowsable("Password", false);
-                SetBrowsable("ApiKey", false);
-            }
+
+            SetBrowsable("Access", access);
+            SetBrowsable("Login", login);
+            SetBrowsable("Password", password);
+            SetBrowsable("ApiKey", apiKey);
+            SetBrowsable("SourceFolder", sourceFolder);
         }
 
         public void UpdateAccounts(IEnumerable<AccountModel> accounts)

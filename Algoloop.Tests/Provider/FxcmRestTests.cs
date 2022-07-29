@@ -17,6 +17,7 @@ using Algoloop.ViewModel.Internal.Provider;
 using AlgoloopTests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
+using QuantConnect.Configuration;
 using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using System;
@@ -31,7 +32,7 @@ namespace Algoloop.Tests.Provider
     [TestClass]
     public class FxcmTests
     {
-        private SettingModel _settings;
+        private const string DataDirectory = "Data";
         private ProviderModel _model;
 
         [TestInitialize]
@@ -39,8 +40,14 @@ namespace Algoloop.Tests.Provider
         {
             Log.LogHandler = new ConsoleLogHandler();
 
-            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
-            _settings = new SettingModel { DataFolder = dataFolder };
+            // Set Globals
+            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDirectory);
+            Config.Set("data-directory", dataFolder);
+            Config.Set("data-folder", dataFolder);
+            Config.Set("cache-location", dataFolder);
+            Config.Set("version-id", string.Empty);
+            Globals.Reset();
+
             var config = TestConfig.Create();
             string key = config["fxcm-key"];
             string access = config["fxcm-access"];
@@ -58,7 +65,7 @@ namespace Algoloop.Tests.Provider
         public void Login()
         {
             // Act
-            using IProvider provider = ProviderFactory.CreateProvider(_model.Provider, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(_model.Provider);
             Assert.IsNotNull(provider);
 
             provider.Login(_model);
@@ -74,7 +81,7 @@ namespace Algoloop.Tests.Provider
             IReadOnlyList<AccountModel> accounts = null;
 
             // Just update symbol list
-            using IProvider provider = ProviderFactory.CreateProvider(_model.Provider, _settings);
+            using IProvider provider = ProviderFactory.CreateProvider(_model.Provider);
             provider.Login(_model);
             provider.SetUpdate(_model, list =>
             {
