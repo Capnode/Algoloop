@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ToolBox.Borsdata;
+using Algoloop.ToolBox.BorsdataDownloader;
 using QuantConnect;
 using QuantConnect.Securities;
 using System;
