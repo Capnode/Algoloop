@@ -17,6 +17,7 @@ using QuantConnect.Algorithm;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Portfolio;
 using QuantConnect.Data.UniverseSelection;
+using QuantConnect.Indicators;
 using QuantConnect.Orders;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Securities;
@@ -33,14 +34,31 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
+        private readonly decimal _highSizing;
+        private readonly decimal _lowSizing;
+
+        private decimal _sizing = 1.0M;
         private decimal _initialCapital = 0;
         private readonly InsightCollection _insights = new InsightCollection();
+        private readonly SimpleMovingAverage _equitySma;
 
-        public SlotPortfolio(int slots, bool reinvest, float rebalance)
+        public SlotPortfolio(
+            int slots,
+            bool reinvest,
+            float rebalance,
+            int equityPeriod = 0,
+            float highSizing = 1.0f,
+            float lowSizing = 0f)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
+            _highSizing = (decimal)highSizing;
+            _lowSizing = (decimal)lowSizing;
+            if (equityPeriod > 0)
+            {
+                _equitySma = new SimpleMovingAverage(equityPeriod);
+            }
         }
 
         // Create list of PortfolioTarget objects from Insights
@@ -50,6 +68,17 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (_initialCapital == 0)
             {
                 _initialCapital = algorithm.Portfolio.Cash;
+            }
+
+            // Determine position size dependent on equity curve
+            if (_equitySma != null)
+            {
+                decimal equity = algorithm.Portfolio.TotalPortfolioValue;
+                _equitySma.Update(algorithm.Time, equity);
+                if (_equitySma.IsReady)
+                {
+                    _sizing = _equitySma > equity ? _highSizing : _lowSizing;
+                }
             }
 
             // Calculate number of occupied positions
@@ -70,10 +99,10 @@ namespace Algoloop.Algorithm.CSharp.Model
                 IPortfolioTarget target;
                 if (_reinvest)
                 {
-                    target = PortfolioTarget.Percent(algorithm, insight.Symbol, (int)insight.Direction / (decimal)_slots);
+                    target = PortfolioTarget.Percent(algorithm, insight.Symbol, (int)insight.Direction * _sizing / _slots);
                     if (holdings == 0 && freeSlots > 0)
                     {
-                        decimal amount = Math.Max(cash, 0) / freeSlots;
+                        decimal amount = Math.Max(_sizing * cash, 0) / freeSlots;
                         decimal size = (int)insight.Direction * decimal.Floor(amount / security.Price);
                         var order = new MarketOrder(insight.Symbol, size, DateTime.UtcNow);
                         OrderFee orderFee = security.FeeModel.GetOrderFee(new OrderFeeParameters(security, order));
@@ -88,7 +117,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 else
                 {
                     Debug.Assert(security.Price != 0);
-                    decimal quantity = (int)insight.Direction * decimal.Floor(_initialCapital / _slots / security.Price);
+                    decimal quantity = (int)insight.Direction
+                        * decimal.Floor(_sizing * _initialCapital / _slots / security.Price);
                     target = new PortfolioTarget(insight.Symbol, quantity);
                 }
 
@@ -100,8 +130,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 else
                 {
                     // Check if holdings must be rebalanced
-                    if (_rebalance > 1 &&
-                        holdings >= target.Quantity * _rebalance)
+                    if (_rebalance > 0 && 
+                        (holdings <=  (1 - _rebalance) * target.Quantity || holdings >= (1 + _rebalance) * target.Quantity))
                     {
                         targets.Add(target);
                     }
