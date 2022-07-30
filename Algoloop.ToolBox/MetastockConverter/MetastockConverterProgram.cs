@@ -20,20 +20,20 @@ using QuantConnect.Util;
 using QuantConnect.Data.Market;
 using System.Collections.Generic;
 using QuantConnect;
-using System.Diagnostics;
-using QuantConnect.Securities;
-using Newtonsoft.Json;
 using QuantConnect.Data.Auxiliary;
 using QuantConnect.Interfaces;
 using QuantConnect.Configuration;
 using QuantConnect.ToolBox.CoarseUniverseGenerator;
 using QuantConnect.Logging;
+using Algoloop.Brokerages;
 using Algoloop.Model;
 
 namespace Algoloop.ToolBox.MetastockConverter
 {
     public static class MetastockConverterProgram
     {
+        static private readonly TimeSpan Daily = TimeSpan.FromDays(1);
+
         public static void MetastockConverter(string sourceDirectory, string destinationDirectory)
         {
             //Document the process:
@@ -55,7 +55,20 @@ namespace Algoloop.ToolBox.MetastockConverter
 
             try
             {
+                // Remove folder
+                string folder = Path.Combine(
+                    destinationDirectory,
+                    SecurityType.Equity.SecurityTypeToLower(),
+                    Market.Metastock);
+                if (Directory.Exists(folder))
+                {
+                    Directory.Delete(folder, true);
+                }
+
+                // Create folder structure
                 Directory.CreateDirectory(MapFile.GetMapFilePath(Market.Metastock, SecurityType.Equity));
+
+                // Start converting
                 ReadFolder(new DirectoryInfo(sourceDirectory), destinationDirectory);
                 GenerateCoarseFiles();
             }
@@ -105,25 +118,19 @@ namespace Algoloop.ToolBox.MetastockConverter
             var msDir = new MsDirectory(dir.FullName);
             foreach (MsSecurity security in msDir.GetSecurities())
             {
-                DateTime time0 = DateTime.MinValue;
+                string ticker = MarketHelper.ValidateSymbolName(security.Symbol);
+                Symbol symbol = Symbol.Create(ticker, SecurityType.Equity, Market.Metastock);
                 var bars = new List<TradeBar>();
                 List<MsPrice> prices = security.GetPriceList();
                 foreach (MsPrice price in prices)
                 {
                     try
                     {
-                        // Reset if discontinued time series
-                        DateTime time = price.Date;
-                        TimeSpan elapsed = time - time0;
-                        if (time0 > DateTime.MinValue && elapsed > TimeSpan.FromDays(30))
-                        {
-                            Log.Trace($"Error found in {security.Symbol}: Discontinued time series", true);
-                            bars.Clear();
-                        }
-
                         var bar = new TradeBar
                         {
-                            Time = time,
+                            Symbol = symbol,
+                            Period = Daily,
+                            Time = price.Date,
                             Open = ToDecimal(price.Open),
                             High = ToDecimal(price.High),
                             Low = ToDecimal(price.Low),
@@ -131,7 +138,6 @@ namespace Algoloop.ToolBox.MetastockConverter
                             Volume = (decimal)price.Volume
                         };
                         bars.Add(bar);
-                        time0 = time;
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
@@ -140,10 +146,9 @@ namespace Algoloop.ToolBox.MetastockConverter
                     }
                 }
 
+                bars.ValidateTadeBars();
                 BaseData first = bars.FirstOrDefault();
                 if (first == default) continue;
-                var ticker = security.Symbol.Replace(" ", "-");
-                var symbol = Symbol.Create(ticker, SecurityType.Equity, Market.Metastock);
                 var datawriter = new LeanDataWriter(Resolution.Daily, symbol, destinationDirectory);
                 datawriter.Write(bars);
                 UpdateMapFile(symbol.Value, first.Time.Date);
