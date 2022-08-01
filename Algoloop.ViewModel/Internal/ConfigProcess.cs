@@ -98,9 +98,11 @@ namespace Algoloop.ViewModel.Internal
             _process.StartInfo.WorkingDirectory = workFolder;
 
             // Save config file
-            using StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile));
-            JsonSerializer serializer = new() { Formatting = Formatting.Indented };
-            serializer.Serialize(file, Config);
+            using (StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile)))
+            {
+                JsonSerializer serializer = new() { Formatting = Formatting.Indented };
+                serializer.Serialize(file, Config);
+            }
 
             _started = true;
             _process.Start();
