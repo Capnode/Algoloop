@@ -66,13 +66,13 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
-        [Parameter("Equity period")]
-        private readonly string _equityPeriod = "0";
+        [Parameter("Position sizing period")]
+        private readonly string _periodPosition = "0";
 
-        [Parameter("Position sizing")]
+        [Parameter("Position sizing normal")]
         private readonly string _highSizing = "1";
 
-        [Parameter("Reduced position sizing ")]
+        [Parameter("Position sizing reduced")]
         private readonly string _lowSizing = "0";
 
         [Parameter("Market capitalization (M min)")]
@@ -138,7 +138,7 @@ namespace Algoloop.Algorithm.CSharp
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
-            int equityPeriod = int.Parse(_equityPeriod, CultureInfo.InvariantCulture);
+            int equityPeriod = int.Parse(_periodPosition, CultureInfo.InvariantCulture);
             float highSizing = float.Parse(_highSizing, CultureInfo.InvariantCulture);
             float lowSizing = float.Parse(_lowSizing, CultureInfo.InvariantCulture);
 

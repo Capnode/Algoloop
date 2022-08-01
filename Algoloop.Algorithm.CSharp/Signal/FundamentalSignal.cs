@@ -286,7 +286,7 @@ namespace Algoloop.Algorithm.CSharp
         private void ReadFineFundamental(DateTime date)
         {
             string folder = Path.Combine(
-                Config.Get("data-folder"),
+                Globals.DataFolder,
                 SecurityType.Equity.ToString(),
                 _symbol.ID.Market,
                 "fundamental",

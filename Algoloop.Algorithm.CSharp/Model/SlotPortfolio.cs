@@ -37,16 +37,16 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly decimal _highSizing;
         private readonly decimal _lowSizing;
 
-        private decimal _sizing = 1.0M;
+        private decimal _sizing;
         private decimal _initialCapital = 0;
         private readonly InsightCollection _insights = new InsightCollection();
-        private readonly SimpleMovingAverage _equitySma;
+        private readonly SimpleMovingAverage _sma;
 
         public SlotPortfolio(
             int slots,
             bool reinvest,
             float rebalance,
-            int equityPeriod = 0,
+            int period = 0,
             float highSizing = 1.0f,
             float lowSizing = 0f)
         {
@@ -55,9 +55,10 @@ namespace Algoloop.Algorithm.CSharp.Model
             _rebalance = (decimal)rebalance;
             _highSizing = (decimal)highSizing;
             _lowSizing = (decimal)lowSizing;
-            if (equityPeriod > 0)
+            _sizing = _highSizing;
+            if (period > 0)
             {
-                _equitySma = new SimpleMovingAverage(equityPeriod);
+                _sma = new SimpleMovingAverage(period);
             }
         }
 
@@ -70,14 +71,29 @@ namespace Algoloop.Algorithm.CSharp.Model
                 _initialCapital = algorithm.Portfolio.Cash;
             }
 
-            // Determine position size dependent on equity curve
-            if (_equitySma != null)
+            // Determine position size dependent on benchmark curve
+            if (_sma != null && algorithm.Benchmark != null)
             {
-                decimal equity = algorithm.Portfolio.TotalPortfolioValue;
-                _equitySma.Update(algorithm.Time, equity);
-                if (_equitySma.IsReady)
+                decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
+                _sma.Update(algorithm.Time, benchmark);
+                if (_sma.IsReady)
                 {
-                    _sizing = _equitySma > equity ? _highSizing : _lowSizing;
+                    if (benchmark >= _sma)
+                    {
+                        if (_sizing == _lowSizing)
+                        {
+                            algorithm.Log($"Switching to High {algorithm.Time.ToShortDateString()} {benchmark} {_sma}");
+                        }
+                        _sizing = _highSizing;
+                    }
+                    else
+                    {
+                        if (_sizing == _highSizing)
+                        {
+                            algorithm.Log($"Switching to Low {algorithm.Time.ToShortDateString()} {benchmark} {_sma}");
+                        }
+                        _sizing = _lowSizing;
+                    }
                 }
             }
 
