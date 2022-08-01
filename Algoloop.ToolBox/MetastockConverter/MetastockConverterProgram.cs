@@ -93,12 +93,13 @@ namespace Algoloop.ToolBox.MetastockConverter
             var msDir = new MsDirectory(folder);
             foreach (MsSecurity security in msDir.GetSecurities())
             {
-                var ticker = security.Symbol.Replace(" ", "-");
+                string ticker = MarketHelper.ValidateSymbolName(security.Symbol);
                 var symbol = new SymbolModel(ticker, Market.Metastock, SecurityType.Equity)
                 {
                     Name = security.Name,
                     Properties = new Dictionary<string, object>
                     {
+                        { "Ticker", ticker },
                         { "Marketplace", dir.Name },
                     }
                 };
