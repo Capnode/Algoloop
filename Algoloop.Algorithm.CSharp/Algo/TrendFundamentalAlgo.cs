@@ -66,14 +66,11 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
-        [Parameter("Position sizing period")]
-        private readonly string _periodPosition = "0";
+        [Parameter("Tracker stoploss period")]
+        private readonly string _trackerPeriod = "0";
 
-        [Parameter("Position sizing normal")]
-        private readonly string _highSizing = "1";
-
-        [Parameter("Position sizing reduced")]
-        private readonly string _lowSizing = "0";
+        [Parameter("Benchmark stoploss period")]
+        private readonly string _benchmarkPeriod = "0";
 
         [Parameter("Market capitalization (M min)")]
         private readonly string _marketCap = null;
@@ -138,9 +135,8 @@ namespace Algoloop.Algorithm.CSharp
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
-            int equityPeriod = int.Parse(_periodPosition, CultureInfo.InvariantCulture);
-            float highSizing = float.Parse(_highSizing, CultureInfo.InvariantCulture);
-            float lowSizing = float.Parse(_lowSizing, CultureInfo.InvariantCulture);
+            int trackerPeriod = int.Parse(_trackerPeriod, CultureInfo.InvariantCulture);
+            int benchmarkPeriod = int.Parse(_benchmarkPeriod, CultureInfo.InvariantCulture);
 
             Log($"{GetType().Name} {_slots}");
             List<Symbol> symbols = _symbols
@@ -152,7 +148,7 @@ namespace Algoloop.Algorithm.CSharp
             SetTimeZone(NodaTime.DateTimeZone.Utc);
             UniverseSettings.Resolution = resolution;
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, equityPeriod, highSizing, lowSizing));
+            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, trackerPeriod, benchmarkPeriod));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
@@ -161,7 +157,8 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = new PercentFeeModel(_fee);
                 security.FillModel = new TouchFill();
             });
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, Math.Max(period1, Math.Max(period2, turnoverPeriod)), hold, symbols,
+            int maxPeriod = Math.Max(period1, Math.Max(period2, turnoverPeriod));
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, maxPeriod, hold, symbols,
                 (symbol) => new TurnoverSignal(this, turnoverPeriod, turnover),
                 (symbol) => new SmaCrossSignal(this, symbol, resolution, period1, period2),
                 (symbol) => new FundamentalSignal(

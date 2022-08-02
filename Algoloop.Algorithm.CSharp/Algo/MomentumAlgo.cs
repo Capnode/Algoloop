@@ -63,6 +63,13 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
+        [Parameter("Tracker stoploss period")]
+        private readonly string _trackerPeriod = "0";
+
+        [Parameter("Benchmark stoploss period")]
+        private readonly string _benchmarkPeriod = "0";
+
+
         public override void Initialize()
         {
             SecurityType securityType = (SecurityType)Enum.Parse(typeof(SecurityType), _security);
@@ -74,6 +81,8 @@ namespace Algoloop.Algorithm.CSharp
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
+            int trackerPeriod = int.Parse(_trackerPeriod, CultureInfo.InvariantCulture);
+            int benchmarkPeriod = int.Parse(_benchmarkPeriod, CultureInfo.InvariantCulture);
 
             List<Symbol> symbols = _symbols
                 .Split(';')
@@ -84,7 +93,7 @@ namespace Algoloop.Algorithm.CSharp
             SetTimeZone(NodaTime.DateTimeZone.Utc);
             UniverseSettings.Resolution = resolution;
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance));
+            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, trackerPeriod, benchmarkPeriod));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
@@ -93,7 +102,8 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = new PercentFeeModel(Fee);
                 security.FillModel = new TouchFill();
             });
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, Math.Max(period, turnoverPeriod), hold, symbols,
+            int maxPeriod = Math.Max(period, turnoverPeriod);
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, maxPeriod, hold, symbols,
                 (symbol) => new TurnoverSignal(this, turnoverPeriod, turnover),
                 (symbol) => new MomentumSignal(period)));
         }

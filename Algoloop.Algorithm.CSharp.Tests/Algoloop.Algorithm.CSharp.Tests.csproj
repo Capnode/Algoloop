@@ -31,10 +31,16 @@
     <None Update="Data\equity\borsdata\daily\abb.st.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\equity\borsdata\daily\cfish.st.zip">
+    <None Update="Data\equity\borsdata\daily\atco-a.st.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\daily\eric-b.st.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\equity\borsdata\daily\omxspi.st.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\equity\borsdata\daily\seb-a.st.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20170214.zip">
