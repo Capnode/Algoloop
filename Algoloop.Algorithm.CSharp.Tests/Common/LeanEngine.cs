@@ -50,6 +50,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             AlphaRuntimeStatistics expectedAlphaStatistics = null;
             Language language = Language.CSharp;
 
+            Config.Set("debug-mode", "false");
             Config.Set("parameters", JsonConvert.SerializeObject(parameters));
             Config.Set("data-folder", "Data");
             Config.Set("data-directory", "Data");

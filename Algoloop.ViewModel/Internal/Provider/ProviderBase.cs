@@ -99,7 +99,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             // Set config file
             IDictionary<string, string> config = _process.Config;
             string exeFolder = MainService.GetProgramFolder();
-            config["debug-mode"] = "true";
+            config["debug-mode"] = "false";
             config["composer-dll-directory"] = exeFolder;
             config["results-destination-folder"] = ".";
             config["plugin-directory"] = ".";
