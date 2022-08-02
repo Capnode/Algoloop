@@ -34,8 +34,6 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
-        private readonly int _trackerPeriod;
-        private readonly int _benchmarkPeriod;
 
         private decimal _initialCapital = 0;
         private decimal _sizingFactor = 1;
@@ -54,17 +52,15 @@ namespace Algoloop.Algorithm.CSharp.Model
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
-            _trackerPeriod = trackerPeriod;
-            _benchmarkPeriod = benchmarkPeriod;
 
             _trackerPortfolio = new TrackerPortfolio(_slots, _rebalance);
             if (trackerPeriod > 0)
             {
-                _trackerSma = new SimpleMovingAverage(trackerPeriod);
+                _trackerSma = new SimpleMovingAverage($"Tracker SMA({trackerPeriod})", trackerPeriod);
             }
             if (benchmarkPeriod > 0)
             {
-                _benchmarkSma = new SimpleMovingAverage(benchmarkPeriod);
+                _benchmarkSma = new SimpleMovingAverage($"Benchmark SMA({benchmarkPeriod})", benchmarkPeriod);
             }
         }
 
@@ -88,9 +84,9 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 // decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
                 _trackerSma.Update(algorithm.Time, tracker);
-                algorithm.PlotIndicator($"TrackerSMA{_trackerPeriod}", true, _trackerSma);
                 if (_trackerSma.IsReady)
                 {
+                    algorithm.Plot($"TrackerSMA", _trackerSma);
                     trackerSizingFactor = tracker >= _trackerSma ? 1 : 0;
                 }
             }
@@ -101,9 +97,9 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
                 _benchmarkSma.Update(algorithm.Time, benchmark);
-                algorithm.PlotIndicator($"BenchmarkSMA{_benchmarkPeriod}", true, _benchmarkSma);
                 if (_benchmarkSma.IsReady)
                 {
+                    algorithm.Plot($"BenchmarkSMA", _benchmarkSma);
                     benchmarkSizingFactor = benchmark >= _benchmarkSma ? 1 : 0;
                 }
             }
@@ -156,25 +152,27 @@ namespace Algoloop.Algorithm.CSharp.Model
                     target = new PortfolioTarget(insight.Symbol, quantity);
                 }
 
-                // Create new target if no position yet
-                if (holdings == 0)
+                if (holdings == 0 || target.Quantity == 0)
                 {
+                    // Create new target
+                    targets.Add(target);
+                }
+                else if (_rebalance > 0 && holdings <=  (1 - _rebalance) * target.Quantity)
+                {
+                    // Holdings too small, rebalance up
+                    algorithm.Log($"Rebalance up {target.Symbol} at {algorithm.Time.ToShortDateString()} to quantity={target.Quantity}");
+                    targets.Add(target);
+                }
+                else if (_rebalance > 0 && holdings >= (1 + _rebalance) * target.Quantity)
+                {
+                    // Holdings too large, rebalance down
+                    algorithm.Log($"Rebalance down {target.Symbol} at {algorithm.Time.ToShortDateString()} to quantity={target.Quantity}");
                     targets.Add(target);
                 }
                 else
                 {
-                    // Check if holdings must be rebalanced
-                    if (_rebalance > 0 && 
-                        (holdings <=  (1 - _rebalance) * target.Quantity || holdings >= (1 + _rebalance) * target.Quantity))
-                    {
-                        algorithm.Log($"Rebalance {target.Symbol} at {algorithm.Time.ToShortDateString()} to quatity={target.Quantity}");
-                        targets.Add(target);
-                    }
-                    else
-                    {
-                        // Remove current insight, add again later
-                        _insights.Clear(new[] { insight.Symbol });
-                    }
+                    // Remove current insight, add again later
+                    _insights.Clear(new[] { insight.Symbol });
                 }
             }
 
