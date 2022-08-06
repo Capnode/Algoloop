@@ -36,10 +36,10 @@ using System.Diagnostics.Contracts;
 using static Algoloop.Model.TrackModel;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
-using Microsoft.Toolkit.Mvvm.Input;
 using Algoloop.ViewModel.Internal.Lean;
 using StockSharp.Xaml.Charting;
 using StockSharp.Charting;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {

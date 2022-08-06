@@ -34,8 +34,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Diagnostics.Contracts;
 using Algoloop.ViewModel.Properties;
-using Microsoft.Toolkit.Mvvm.Input;
 using QuantConnect;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {

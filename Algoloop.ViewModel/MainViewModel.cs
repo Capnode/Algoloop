@@ -14,7 +14,6 @@
 
 using Algoloop.Model;
 using Algoloop.ViewModel.Properties;
-using Microsoft.Toolkit.Mvvm.Input;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
@@ -23,6 +22,8 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using QuantConnect;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Algoloop.ViewModel
 {
@@ -56,7 +57,7 @@ namespace Algoloop.ViewModel
                 window => DoExit(window), window => !IsBusy);
             UpdateCommand = new RelayCommand(
                 async () => await DoUpdate().ConfigureAwait(false), () => !IsBusy);
-            Messenger.Register<MainViewModel, NotificationMessage, int>(
+            WeakReferenceMessenger.Default.Register<MainViewModel, NotificationMessage, int>(
                 this, 0, static (r, m) => r.OnStatusMessage(m));
 
             // Set working directory

@@ -24,8 +24,8 @@
 */
 
 using Algoloop.Model;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using System.Diagnostics;
 
 namespace Algoloop.ViewModel

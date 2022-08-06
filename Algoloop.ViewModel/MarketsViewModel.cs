@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System.Diagnostics;

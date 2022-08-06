@@ -15,7 +15,7 @@
 using Algoloop.Model;
 using Algoloop.ViewModel.Internal.Lean;
 using Capnode.Wpf.DataGrid;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Data.Fundamental;

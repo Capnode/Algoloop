@@ -36,7 +36,7 @@ using System.Threading;
 using QuantConnect.Statistics;
 using QuantConnect.Data.Market;
 using Algoloop.ViewModel.Properties;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {

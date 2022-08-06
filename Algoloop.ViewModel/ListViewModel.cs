@@ -14,7 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.ViewModel.Properties;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using QuantConnect.Logging;
 using System;
