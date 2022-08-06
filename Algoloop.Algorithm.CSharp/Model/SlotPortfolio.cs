@@ -107,7 +107,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal sizingFactor = trackerSizingFactor * benchmarkSizingFactor;
             if (sizingFactor != _sizingFactor)
             {
-                algorithm.Log($"Switching to sizing factor {sizingFactor} at {algorithm.Time.ToShortDateString()}");
+                algorithm.Log($"Switching to sizing factor {sizingFactor}");
             }
             _sizingFactor = sizingFactor;
 
@@ -137,6 +137,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                         var order = new MarketOrder(insight.Symbol, size, DateTime.UtcNow);
                         OrderFee orderFee = security.FeeModel.GetOrderFee(new OrderFeeParameters(security, order));
                         amount -= decimal.Ceiling(orderFee);
+                        amount = Math.Max(amount, 0);
                         decimal quantity = (int)insight.Direction * decimal.Floor(amount / security.Price);
                         if (quantity < target.Quantity)
                         {
@@ -160,13 +161,13 @@ namespace Algoloop.Algorithm.CSharp.Model
                 else if (_rebalance > 0 && holdings <=  (1 - _rebalance) * target.Quantity)
                 {
                     // Holdings too small, rebalance up
-                    algorithm.Log($"Rebalance up {target.Symbol} at {algorithm.Time.ToShortDateString()} to quantity={target.Quantity}");
+                    algorithm.Log($"Rebalance up {target.Symbol} to quantity={target.Quantity}");
                     targets.Add(target);
                 }
                 else if (_rebalance > 0 && holdings >= (1 + _rebalance) * target.Quantity)
                 {
                     // Holdings too large, rebalance down
-                    algorithm.Log($"Rebalance down {target.Symbol} at {algorithm.Time.ToShortDateString()} to quantity={target.Quantity}");
+                    algorithm.Log($"Rebalance down {target.Symbol} to quantity={target.Quantity}");
                     targets.Add(target);
                 }
                 else

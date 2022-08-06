@@ -28,8 +28,6 @@ namespace Algoloop.Algorithm.CSharp
 {
     public class TrendFundamentalAlgo : QCAlgorithm
     {
-        private const decimal _fee = 0.0025m;
-
         [Parameter("symbols")]
         private readonly string _symbols = "ABB.ST;ERIC-B.ST;ATCO-A.ST;SEB.ST";
 
@@ -41,6 +39,9 @@ namespace Algoloop.Algorithm.CSharp
 
         [Parameter("market")]
         private readonly string _market = Market.Borsdata;
+
+        [Parameter("Fee")]
+        private readonly string _fee = "0.0025";
 
         [Parameter("Period1")]
         private readonly string _period1 = "0";
@@ -127,6 +128,7 @@ namespace Algoloop.Algorithm.CSharp
         {
             SecurityType securityType = (SecurityType)Enum.Parse(typeof(SecurityType), _security);
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
+            decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
             int period1 = int.Parse(_period1, CultureInfo.InvariantCulture);
             int period2 = int.Parse(_period2, CultureInfo.InvariantCulture);
             int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
@@ -152,9 +154,10 @@ namespace Algoloop.Algorithm.CSharp
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
+            FeeModel feeModel = fee < 1 ? new PercentFeeModel(fee) : new ConstantFeeModel(fee);
             SetSecurityInitializer(security =>
             {
-                security.FeeModel = new PercentFeeModel(_fee);
+                security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
             int maxPeriod = Math.Max(period1, Math.Max(period2, turnoverPeriod));
