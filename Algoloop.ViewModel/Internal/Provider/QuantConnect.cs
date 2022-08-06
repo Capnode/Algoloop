@@ -27,15 +27,15 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class QuantConnect : ProviderBase
     {
-        private const string _version = "14312";
-        private const string _security = "Security";
-        private const string _zip = ".zip";
+        private const string Version = "14312";
+        private const string Security = "Security";
+        private const string Zip = ".zip";
 
         public override void GetUpdate(ProviderModel provider, Action<object> update)
         {
             Contract.Requires(provider != null);
-            var uri = new Uri($"https://github.com/QuantConnect/Lean/archive/refs/tags/{_version}.zip");
-            string extract = $"Lean-{_version}/Data/";
+            var uri = new Uri($"https://github.com/QuantConnect/Lean/archive/refs/tags/{Version}.zip");
+            string extract = $"Lean-{Version}/Data/";
             string filename = "github.zip";
             Log.Trace($"Download {uri}");
             using (var client = new WebClient())
@@ -106,8 +106,8 @@ namespace Algoloop.ViewModel.Internal.Provider
 
             if (ticker.Contains('.'))
             {
-                if (!ticker.EndsWith(_zip, StringComparison.OrdinalIgnoreCase)) return;
-                ticker = ticker[..^_zip.Length];
+                if (!ticker.EndsWith(Zip, StringComparison.OrdinalIgnoreCase)) return;
+                ticker = ticker[..^Zip.Length];
             }
 
             if (symbols
@@ -121,7 +121,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 
             var symbol = new SymbolModel(ticker, marketName, securityType)
             {
-                Properties = new Dictionary<string, object> { { _security, securityType } }
+                Properties = new Dictionary<string, object> { { Security, securityType } }
             };
 
             symbols.Add(symbol);

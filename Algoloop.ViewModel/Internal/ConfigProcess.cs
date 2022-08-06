@@ -26,9 +26,9 @@ namespace Algoloop.ViewModel.Internal
     internal class ConfigProcess: IDisposable
     {
         private const int CTRL_C_EVENT = 0;
-        private const int _timeout = 10000;
-        private const int _maxIndex = 65536;
-        private const string _configfile = "config.json";
+        private const int Timeout = 10000;
+        private const int MaxIndex = 65536;
+        private const string Configfile = "config.json";
         private readonly string _workFolder;
         private readonly bool _useSubfolder;
         private readonly Process _process;
@@ -98,7 +98,7 @@ namespace Algoloop.ViewModel.Internal
             _process.StartInfo.WorkingDirectory = workFolder;
 
             // Save config file
-            using (StreamWriter file = File.CreateText(Path.Combine(workFolder, _configfile)))
+            using (StreamWriter file = File.CreateText(Path.Combine(workFolder, Configfile)))
             {
                 JsonSerializer serializer = new() { Formatting = Formatting.Indented };
                 serializer.Serialize(file, Config);
@@ -117,7 +117,7 @@ namespace Algoloop.ViewModel.Internal
             {
                 lock (_lock)
                 {
-                    for (int index = 0; index < _maxIndex; index++)
+                    for (int index = 0; index < MaxIndex; index++)
                     {
                         string folder = Path.Combine(_workFolder, $"temp{index}");
                         if (Directory.Exists(folder)) continue;
@@ -147,10 +147,10 @@ namespace Algoloop.ViewModel.Internal
                 try
                 {
                     if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return false;
-                    if (_process.WaitForExit(_timeout)) return true;
+                    if (_process.WaitForExit(Timeout)) return true;
                     Debug.Assert(!_process.HasExited);
                     _process.Kill();
-                    if (_process.WaitForExit(_timeout)) return true;
+                    if (_process.WaitForExit(Timeout)) return true;
                     return false;
                 }
                 catch (Exception ex)

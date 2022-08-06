@@ -38,21 +38,21 @@ namespace Algoloop.ViewModel
     {
         public enum ReportPeriod { Year, R12, Quarter };
 
-        private const decimal _million = 1e6m;
-        private const string _annual = "Annual";
+        private const decimal Million = 1e6m;
+        private const string Annual = "Annual";
 
-        private const string _periodEndDate = "End date";
-        private const string _fileDate = "File date";
-        private const string _totalRevenue = "Total Revenue (M)";
-        private const string _netIncome = "Net Income (M)";
-        private const string _revenueGrowth = "Revenue Growth %";
-        private const string _netIncomeGrowth = "Net Income Growth %";
-        private const string _netMargin = "Net Margin %";
-        private const string _peRatio = "PE Ratio";
-        private const string _operatingCashFlow = "Operating cash flow (M)";
-        private const string _investingCashFlow = "Investing cash flow (M)";
-        private const string _financingCashFlow = "Financing cash flow (M)";
-        private const string _sharesOutstanding = "Shares outstanding";
+        private const string PeriodEndDate = "End date";
+        private const string FileDate = "File date";
+        private const string TotalRevenue = "Total Revenue (M)";
+        private const string NetIncome = "Net Income (M)";
+        private const string RevenueGrowth = "Revenue Growth %";
+        private const string NetIncomeGrowth = "Net Income Growth %";
+        private const string NetMargin = "Net Margin %";
+        private const string PeRatio = "PE Ratio";
+        private const string OperatingCashFlow = "Operating cash flow (M)";
+        private const string InvestingCashFlow = "Investing cash flow (M)";
+        private const string FinancingCashFlow = "Financing cash flow (M)";
+        private const string SharesOutstanding = "Shares outstanding";
 
         private readonly ITreeViewModel _parent;
         private SyncObservableCollection<IChartViewModel> _charts = new();
@@ -365,7 +365,7 @@ namespace Algoloop.ViewModel
             {
                 case ReportPeriod.Year:
                     if (periodType != null && periodType.Equals(
-                        _annual, StringComparison.OrdinalIgnoreCase))
+                        Annual, StringComparison.OrdinalIgnoreCase))
                     {
                         FundamentalYear(fine, date.Year.ToStringInvariant());
                     }
@@ -404,11 +404,11 @@ namespace Algoloop.ViewModel
             DateTime fileDate = fine.FinancialStatements.FileDate;
             decimal totalRevenue = Round(
                 fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths,
-                1 / _million,
+                1 / Million,
                 4); ;
             decimal netIncome = Round(
                 fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal revenueGrowth = Round(
                 fine.OperationRatios.RevenueGrowth.OneYear, 100, 4);
@@ -419,30 +419,30 @@ namespace Algoloop.ViewModel
             decimal peRatio = Round(fine.ValuationRatios.PERatio, 1, 4);
             decimal operatingCashFlow = Round(
                 fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal investingCashFlow = Round(
                 fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal financingCashFlow = Round(
                 fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal sharesOutstanding = fine.CompanyProfile.SharesOutstanding;
 
-            SetFundamentals(_periodEndDate, period, periodEndDate.ToShortDateString());
-            SetFundamentals(_fileDate, period, fileDate.ToShortDateString());
-            SetFundamentals(_totalRevenue, period, totalRevenue);
-            SetFundamentals(_netIncome, period, netIncome);
-            SetFundamentals(_revenueGrowth, period, revenueGrowth);
-            SetFundamentals(_netIncomeGrowth, period, netIncomeGrowth);
-            SetFundamentals(_netMargin, period, netMargin);
-            SetFundamentals(_peRatio, period, peRatio);
-            SetFundamentals(_operatingCashFlow, period, operatingCashFlow);
-            SetFundamentals(_investingCashFlow, period, investingCashFlow);
-            SetFundamentals(_financingCashFlow, period, financingCashFlow);
-            SetFundamentals(_sharesOutstanding, period, sharesOutstanding);
+            SetFundamentals(PeriodEndDate, period, periodEndDate.ToShortDateString());
+            SetFundamentals(FileDate, period, fileDate.ToShortDateString());
+            SetFundamentals(TotalRevenue, period, totalRevenue);
+            SetFundamentals(NetIncome, period, netIncome);
+            SetFundamentals(RevenueGrowth, period, revenueGrowth);
+            SetFundamentals(NetIncomeGrowth, period, netIncomeGrowth);
+            SetFundamentals(NetMargin, period, netMargin);
+            SetFundamentals(PeRatio, period, peRatio);
+            SetFundamentals(OperatingCashFlow, period, operatingCashFlow);
+            SetFundamentals(InvestingCashFlow, period, investingCashFlow);
+            SetFundamentals(FinancingCashFlow, period, financingCashFlow);
+            SetFundamentals(SharesOutstanding, period, sharesOutstanding);
         }
 
         private void FundamentalQuarter(FineFundamental fine, string period)
@@ -451,10 +451,10 @@ namespace Algoloop.ViewModel
             DateTime fileDate = fine.FinancialStatements.FileDate;
             decimal totalRevenue = Round(
                 fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths,
-                1 / _million,
+                1 / Million,
                 4); ;
             decimal netIncome = Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal revenueGrowth = Round(
                 fine.OperationRatios.RevenueGrowth.ThreeMonths, 100, 4);
@@ -464,15 +464,15 @@ namespace Algoloop.ViewModel
             decimal peRatio = Round(fine.ValuationRatios.PERatio, 1, 4);
             decimal operatingCashFlow = Round(
                 fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal investingCashFlow = Round(
                 fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal financingCashFlow = Round(
                 fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths,
-                1 / _million,
+                1 / Million,
                 4);
             decimal sharesOutstanding = fine.CompanyProfile.SharesOutstanding;
 
@@ -483,18 +483,18 @@ namespace Algoloop.ViewModel
                 && netMargin == 0)
                 return;
 
-            SetFundamentals(_periodEndDate, period, periodEndDate.ToShortDateString());
-            SetFundamentals(_fileDate, period, fileDate.ToShortDateString());
-            SetFundamentals(_totalRevenue, period, totalRevenue);
-            SetFundamentals(_netIncome, period, netIncome);
-            SetFundamentals(_revenueGrowth, period, revenueGrowth);
-            SetFundamentals(_netIncomeGrowth, period, netIncomeGrowth);
-            SetFundamentals(_netMargin, period, netMargin);
-            SetFundamentals(_peRatio, period, peRatio);
-            SetFundamentals(_operatingCashFlow, period, operatingCashFlow);
-            SetFundamentals(_investingCashFlow, period, investingCashFlow);
-            SetFundamentals(_financingCashFlow, period, financingCashFlow);
-            SetFundamentals(_sharesOutstanding, period, sharesOutstanding);
+            SetFundamentals(PeriodEndDate, period, periodEndDate.ToShortDateString());
+            SetFundamentals(FileDate, period, fileDate.ToShortDateString());
+            SetFundamentals(TotalRevenue, period, totalRevenue);
+            SetFundamentals(NetIncome, period, netIncome);
+            SetFundamentals(RevenueGrowth, period, revenueGrowth);
+            SetFundamentals(NetIncomeGrowth, period, netIncomeGrowth);
+            SetFundamentals(NetMargin, period, netMargin);
+            SetFundamentals(PeRatio, period, peRatio);
+            SetFundamentals(OperatingCashFlow, period, operatingCashFlow);
+            SetFundamentals(InvestingCashFlow, period, investingCashFlow);
+            SetFundamentals(FinancingCashFlow, period, financingCashFlow);
+            SetFundamentals(SharesOutstanding, period, sharesOutstanding);
         }
 
         private static decimal Round(decimal value, decimal multiplier, int decimals)

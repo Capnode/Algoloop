@@ -31,9 +31,9 @@ namespace Algoloop.Wpf
     /// </summary>
     public partial class App : Application
     {
-        private const uint _esContinous = 0x80000000;
-        private const uint _esSystemRequired = 0x00000001;
-//        private const uint _esDisplayRequired = 0x00000002;
+        private const uint EsContinous = 0x80000000;
+        private const uint EsSystemRequired = 0x00000001;
+//        private const uint EsDisplayRequired = 0x00000002;
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint SetThreadExecutionState([In] uint esFlags);
@@ -73,14 +73,14 @@ namespace Algoloop.Wpf
             Algoloop.Wpf.Properties.Settings.Default.Reload();
 
             // Prevent going to sleep mode
-            _ = SetThreadExecutionState(_esContinous | _esSystemRequired);
+            _ = SetThreadExecutionState(EsContinous | EsSystemRequired);
             Log.Trace($"<OnStartup");
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             // Enable sleep mode
-            _ = SetThreadExecutionState(_esContinous);
+            _ = SetThreadExecutionState(EsContinous);
 
             ViewModelLocator.ResearchViewModel.StopJupyter();
             ViewModelLocator.MainViewModel.SaveConfig();

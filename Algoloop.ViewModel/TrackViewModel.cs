@@ -47,10 +47,10 @@ namespace Algoloop.ViewModel
     {
         private bool _isDisposed = false; // To detect redundant calls
         public const string Folder = "Tracks";
-        private const string _logFile = "Logs.log";
-        private const string _resultFile = "Result.json";
-        private const string _zipFile = "track.zip";
-        private const double _daysInYear = 365.24;
+        private const string LogFile = "Logs.log";
+        private const string ResultFile = "Result.json";
+        private const string ZipFile = "track.zip";
+        private const double DaysInYear = 365.24;
 
         private readonly StrategyViewModel _parent;
         private readonly MarketsModel _markets;
@@ -419,7 +419,7 @@ namespace Algoloop.ViewModel
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
             TimeSpan duration = last - first;
-            double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
+            double years = duration.Ticks / (DaysInYear * TimeSpan.TicksPerDay);
 
             // Calculate score
             double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
@@ -615,7 +615,7 @@ namespace Algoloop.ViewModel
             ZipFile zipFile;
             BacktestResult result = null;
             using (StreamReader resultStream = Compression.Unzip(
-                Model.ZipFile, _resultFile, out zipFile))
+                Model.ZipFile, ResultFile, out zipFile))
             using (zipFile)
             {
                 if (resultStream == null)
@@ -717,7 +717,7 @@ namespace Algoloop.ViewModel
 
             // Unzip log file
             using (StreamReader logStream = Compression.Unzip(
-                Model.ZipFile, _logFile, out zipFile))
+                Model.ZipFile, LogFile, out zipFile))
             using (zipFile)
             {
                 if (logStream != null)
@@ -771,7 +771,7 @@ namespace Algoloop.ViewModel
 
             // Create folder for track files
             Directory.CreateDirectory(Folder);
-            string zipFileTemplate = Path.Combine(Folder, _zipFile);
+            string zipFileTemplate = Path.Combine(Folder, ZipFile);
 
             // Save logs and result to zipfile
             lock (_mutex)
@@ -779,8 +779,8 @@ namespace Algoloop.ViewModel
                 string zipFile = UniqueFileName(zipFileTemplate);
                 Compression.ZipData(zipFile, new Dictionary<string, string>
                 {
-                    { _logFile, model.Logs },
-                    { _resultFile, model.Result }
+                    { LogFile, model.Logs },
+                    { ResultFile, model.Result }
                 });
 
                 model.ZipFile = zipFile;

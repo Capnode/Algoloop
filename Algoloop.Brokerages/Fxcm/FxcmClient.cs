@@ -42,18 +42,18 @@ namespace Algoloop.Brokerages.Fxcm
     /// </summary>
     public class FxcmClient : IDisposable
     {
-        private const string _baseUrlReal = "https://api.fxcm.com";
-        private const string _baseUrlDemo = "https://api-demo.fxcm.com";
-        private const string _mediatype = @"application/json";
-        private const string _getTables = @"trading/get_model/?models=Offer&models=OpenPosition&models=ClosedPosition" +
+        private const string BaseUrlReal = "https://api.fxcm.com";
+        private const string BaseUrlDemo = "https://api-demo.fxcm.com";
+        private const string Mediatype = @"application/json";
+        private const string GetTables = @"trading/get_model/?models=Offer&models=OpenPosition&models=ClosedPosition" +
             "&models=Order&models=Account&models=LeverageProfile&models=Properties";
-        private const string _subscribeTables = @"trading/subscribe";
-        private const string _unsubscribeTables = @"trading/unsubscribe";
-        private const string _getSymbols = @"trading/get_instruments";
-        private const string _update_subscriptions = @"trading/update_subscriptions";
-        private const string _subscribe = @"subscribe";
-        private const string _unsubscribe = @"unsubscribe";
-        private const string _contentType = "application/x-www-form-urlencoded";
+        private const string SubscribeTables = @"trading/subscribe";
+        private const string UnsubscribeTables = @"trading/unsubscribe";
+        private const string GetSymbols = @"trading/get_instruments";
+        private const string Update_subscriptions = @"trading/update_subscriptions";
+        private const string Subscribe = @"subscribe";
+        private const string Unsubscribe = @"unsubscribe";
+        private const string ContentType = "application/x-www-form-urlencoded";
         private string[] _tables = { "Offer", "OpenPosition", "ClosedPosition", "Order", "Account", "Summary" };
 
         private bool _isDisposed;
@@ -66,11 +66,11 @@ namespace Algoloop.Brokerages.Fxcm
         public FxcmClient(ProviderModel.AccessType access, string key)
         {
             _key = key;
-            _baseUrl = access.Equals(AccessType.Demo) ? _baseUrlDemo : _baseUrlReal;
+            _baseUrl = access.Equals(AccessType.Demo) ? BaseUrlDemo : BaseUrlReal;
             var uri = new Uri(_baseUrl);
             _fxcmSocket = new FxcmSocket(uri, key);
             _httpClient = new HttpClient { BaseAddress = uri };
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(_mediatype));
+            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(Mediatype));
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "request");
         }
             
@@ -90,7 +90,7 @@ namespace Algoloop.Brokerages.Fxcm
                 IList<string> lines = _tables
                      .Select(table => $"models={table}")
                      .ToList();
-                string json = await PostAsync(_unsubscribeTables, lines).ConfigureAwait(false);
+                string json = await PostAsync(UnsubscribeTables, lines).ConfigureAwait(false);
                 JObject jo = JObject.Parse(json);
                 JToken jResponse = jo["response"];
                 bool executed = (bool)jResponse["executed"];
@@ -108,7 +108,7 @@ namespace Algoloop.Brokerages.Fxcm
         {
             // {"response":{"executed":true},"data":{"instrument":[{"symbol":"EUR/USD","visible":true,"order":100},
             //Log.Trace(">{0}:GetSymbolsAsync", GetType().Name);
-            string json = await GetAsync(_getSymbols).ConfigureAwait(false);
+            string json = await GetAsync(GetSymbols).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
             bool executed = (bool)jResponse["executed"];
@@ -147,7 +147,7 @@ namespace Algoloop.Brokerages.Fxcm
         public async Task GetAccountsAsync(Action<object> update)
         {
             //Log.Trace(">{0}:GetAccountsAsync", GetType().Name);
-            string json = await GetAsync(_getTables).ConfigureAwait(false);
+            string json = await GetAsync(GetTables).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
             bool executed = (bool)jResponse["executed"];
@@ -229,7 +229,7 @@ namespace Algoloop.Brokerages.Fxcm
             IList<string> lines = _tables
                  .Select(table => $"models={table}")
                  .ToList();
-            json = await PostAsync(_subscribeTables, lines).ConfigureAwait(false);
+            json = await PostAsync(SubscribeTables, lines).ConfigureAwait(false);
             jo = JObject.Parse(json);
             jResponse = jo["response"];
             executed = (bool)jResponse["executed"];
@@ -247,7 +247,7 @@ namespace Algoloop.Brokerages.Fxcm
         {
             //Log.Trace(">{0}:SubscribeSymbolsAsync", GetType().Name);
             IList<string> lines = new List<string>() { $"symbol={symbol.Name}&visible={symbol.Active.ToString().ToLowerInvariant()}" };
-            string json = await PostAsync(_update_subscriptions, lines).ConfigureAwait(false);
+            string json = await PostAsync(Update_subscriptions, lines).ConfigureAwait(false);
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
             bool executed = (bool)jResponse["executed"];
@@ -266,7 +266,7 @@ namespace Algoloop.Brokerages.Fxcm
                 .Where(m => m.Active)
                 .Select(n => $"pairs={n.Name}")
                 .ToList();
-            string json = await PostAsync(_subscribe, lines).ConfigureAwait(false);
+            string json = await PostAsync(Subscribe, lines).ConfigureAwait(false);
 //  { "response":{ "executed":true,"error":""},"pairs":[{ "Updated":1628025032910,"Rates":[1.18608,1.18646,1.18706,1.18578,1.18608,1.18646],"Symbol":"EUR/USD"}]}
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
@@ -313,7 +313,7 @@ namespace Algoloop.Brokerages.Fxcm
                 .Where(m => m.Active)
                 .Select(n => $"pairs={n.Name}")
                 .ToList();
-            string json = await PostAsync(_unsubscribe, lines).ConfigureAwait(false);
+            string json = await PostAsync(Unsubscribe, lines).ConfigureAwait(false);
             // { {"response":{"executed":true,"error":""},"pairs":["EUR/USD"]}
             JObject jo = JObject.Parse(json);
             JToken jResponse = jo["response"];
@@ -484,7 +484,7 @@ namespace Algoloop.Brokerages.Fxcm
         {
             string uri = _httpClient.BaseAddress + path;
             string line = string.Join("\r\n", lines).Replace("/", "%2F");
-            StringContent content = new (line, Encoding.UTF8, _contentType);
+            StringContent content = new (line, Encoding.UTF8, ContentType);
             using HttpResponseMessage response = await _httpClient.PostAsync(uri, content);
             if (!response.IsSuccessStatusCode)
             {

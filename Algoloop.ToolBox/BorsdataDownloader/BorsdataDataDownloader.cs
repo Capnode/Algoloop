@@ -35,11 +35,11 @@ namespace Algoloop.ToolBox.BorsdataDownloader
 {
     public class BorsdataDataDownloader : IDataDownloader, IDisposable
     {
-        private const string _annual = "Annual";
-        private const string _quarter = "Quarter";
-        private const double _million = 1e6;
-        private const int _reportDateLatest = 202;
-        private static readonly DateTime _firstDate = new DateTime(1997, 01, 01);
+        private const string Annual = "Annual";
+        private const string Quarter = "Quarter";
+        private const double Million = 1e6;
+        private const int ReportDateLatest = 202;
+        private static readonly DateTime FirstDate = new DateTime(1997, 01, 01);
 
         private KpisAllCompRespV1 _lastReports;
         private bool _isDisposed;
@@ -138,7 +138,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
 
             if (_lastReports == default)
             {
-                _lastReports = _api.GetKpiScreener(_reportDateLatest, TimeType.last, CalcType.latest);
+                _lastReports = _api.GetKpiScreener(ReportDateLatest, TimeType.last, CalcType.latest);
             }
         }
 
@@ -228,23 +228,23 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             foreach (ReportYearV1 report in orderedReports)
             {
                 var fine = new FineFundamental { Symbol = symbol };
-                fine.FinancialStatements.PeriodType = _annual;
+                fine.FinancialStatements.PeriodType = Annual;
                 DateTime endDate = report.ReportEndDate ?? default;
                 fine.FinancialStatements.PeriodEndingDate = endDate;
                 fine.FinancialStatements.FileDate = FileDate(report.ReportDate, report.ReportEndDate);
                 fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths = Multiply(
                     report.Revenues > 0 ? report.Revenues : default,
-                    _million);
-                fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths = Multiply(report.ProfitToEquityHolders, _million);
+                    Million);
+                fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths = Multiply(report.ProfitToEquityHolders, Million);
                 fine.OperationRatios.NetMargin.OneYear = Divide(
                     fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
                     fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
-                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, _million);
-                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, _million);
-                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, _million);
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
                 fine.EarningReports.DividendPerShare.TwelveMonths = Multiply(report.Dividend, 1);
 
-                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * _million);
+                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * Million);
                 if (fine.CompanyProfile.SharesOutstanding > 0)
                 {
                     double earningsPerShare = (double)fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / fine.CompanyProfile.SharesOutstanding;
@@ -275,23 +275,23 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             foreach (ReportR12V1 report in orderedReports)
             {
                 var fine = new FineFundamental { Symbol = symbol };
-                fine.FinancialStatements.PeriodType = _quarter;
+                fine.FinancialStatements.PeriodType = Quarter;
                 DateTime endDate = report.ReportEndDate ?? default;
                 fine.FinancialStatements.PeriodEndingDate = endDate;
                 fine.FinancialStatements.FileDate = FileDate(report.ReportDate, report.ReportEndDate);
                 fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths = Multiply(
                     report.Revenues > 0 ? report.Revenues : default,
-                    _million);
-                fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths = Multiply(report.ProfitToEquityHolders, _million);
+                    Million);
+                fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths = Multiply(report.ProfitToEquityHolders, Million);
                 fine.OperationRatios.NetMargin.OneYear = Divide(
                     fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
                     fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
-                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, _million);
-                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, _million);
-                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, _million);
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
                 fine.EarningReports.DividendPerShare.TwelveMonths = Multiply(report.Dividend, 1);
 
-                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * _million);
+                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * Million);
                 if (fine.CompanyProfile.SharesOutstanding > 0)
                 {
                     double earningsPerShare = (double)fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / fine.CompanyProfile.SharesOutstanding;
@@ -331,16 +331,16 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                 fine.FinancialStatements.FileDate = FileDate(report.ReportDate, report.ReportEndDate);
                 fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths = Multiply(
                     report.Revenues > 0 ? report.Revenues : default,
-                    _million);
-                fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths = Multiply(report.ProfitToEquityHolders, _million);
+                    Million);
+                fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths = Multiply(report.ProfitToEquityHolders, Million);
                 fine.OperationRatios.NetMargin.ThreeMonths = Divide(
                     fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths,
                     fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths);
-                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths = Multiply(report.CashFlowFromFinancingActivities, _million);
-                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths = Multiply(report.CashFlowFromInvestingActivities, _million);
-                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths = Multiply(report.CashFlowFromOperatingActivities, _million);
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
                 fine.EarningReports.DividendPerShare.ThreeMonths = Multiply(report.Dividend, 1);
-                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * _million);
+                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * Million);
 
                 if (last != default)
                 {
@@ -460,7 +460,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                 if (_splits.stockSplitList.Any(m => m.InstrumentId.Equals(instId) && m.SplitDate > afterUtc))
                 {
                     File.Delete(zipPath);
-                    stockPrices = GetStockPrices(instId, symbol, _firstDate, endUtc);
+                    stockPrices = GetStockPrices(instId, symbol, FirstDate, endUtc);
                 }
                 else
                 {
@@ -474,7 +474,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             }
             else
             {
-                stockPrices = GetStockPrices(instId, symbol, _firstDate, endUtc);
+                stockPrices = GetStockPrices(instId, symbol, FirstDate, endUtc);
             }
 
             return ToTradeBars(symbol, stockPrices);

@@ -26,7 +26,7 @@ namespace Algoloop.Algorithm.CSharp
 {
     internal class FundamentalSignal : ISignal
     {
-        private const decimal _million = 1e6m;
+        private const decimal Million = 1e6m;
         
         private readonly Symbol _symbol;
         private readonly decimal? _marketCap;
@@ -75,7 +75,7 @@ namespace Algoloop.Algorithm.CSharp
             {
                 if (decimal.TryParse(marketCap, NumberStyles.Currency, CultureInfo.InvariantCulture, out decimal value))
                 {
-                    _marketCap = value * _million;
+                    _marketCap = value * Million;
                 }
                 else if (marketCap.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
