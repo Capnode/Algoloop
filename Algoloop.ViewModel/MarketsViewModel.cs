@@ -126,7 +126,7 @@ namespace Algoloop.ViewModel
 
         private void DataToModel()
         {
-            Model.Version = MarketsModel.version;
+            Model.Version = MarketsModel.ActualVersion;
             Model.Markets.Clear();
             foreach (MarketViewModel market in Markets)
             {

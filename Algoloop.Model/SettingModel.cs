@@ -24,7 +24,7 @@ namespace Algoloop.Model
     [DataContract]
     public class SettingModel : ModelBase
     {
-        public const int version = 0;
+        public const int ActualVersion = 0;
 
         [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]

@@ -45,13 +45,13 @@ namespace Algoloop.ViewModel
 {
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {
-        private bool _isDisposed = false; // To detect redundant calls
         public const string Folder = "Tracks";
         private const string LogFile = "Logs.log";
         private const string ResultFile = "Result.json";
         private const string ZipFile = "track.zip";
         private const double DaysInYear = 365.24;
 
+        private bool _isDisposed = false; // To detect redundant calls
         private readonly StrategyViewModel _parent;
         private readonly MarketsModel _markets;
         private readonly SettingModel _settings;

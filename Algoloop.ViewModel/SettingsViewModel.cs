@@ -86,7 +86,7 @@ namespace Algoloop.ViewModel
 
         private void DataToModel()
         {
-            Model.Version = SettingModel.version;
+            Model.Version = SettingModel.ActualVersion;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]

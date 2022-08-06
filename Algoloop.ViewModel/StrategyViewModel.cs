@@ -42,16 +42,14 @@ namespace Algoloop.ViewModel
     public class StrategyViewModel : ViewModelBase, ITreeViewModel
     {
         public const string DefaultName = "Strategy";
-        internal ITreeViewModel _parent;
 
+        internal ITreeViewModel _parent;
         private readonly MarketsModel _markets;
         private readonly SettingModel _settings;
-
         private readonly string[] _exclude = new[] { "symbols", "market", "resolution", "security", "startdate", "enddate", "cash" };
         private bool _isSelected;
         private bool _isExpanded;
         private string _displayName;
-
         private SymbolViewModel _selectedSymbol;
         private TrackViewModel _selectedTrack;
         private ListViewModel _selectedList;
