@@ -173,11 +173,6 @@ namespace Algoloop.Model
                 case Market.Borsdata:
                     apiKey = true;
                     break;
-                case Market.Avanza:
-                    login = true;
-                    password = true;
-                    apiKey = true;
-                    break;
             }
 
             SetBrowsable("Access", access);
