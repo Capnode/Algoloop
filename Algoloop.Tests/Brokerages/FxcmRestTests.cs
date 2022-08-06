@@ -29,7 +29,7 @@ using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Brokerages
 {
-    [TestClass]
+    [TestClass, TestCategory("LocalTest")]
     public class FxcmTests : IDisposable
     {
         private FxcmClient _api;

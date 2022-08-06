@@ -32,7 +32,7 @@ using System.Linq;
 
 namespace Algoloop.Tests.ToolBox
 {
-    [TestClass]
+    [TestClass, TestCategory("LocalTest")]
     public class BorsdataTests
     {
         private const string DataFolder = "Data";
