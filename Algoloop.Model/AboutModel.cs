@@ -12,15 +12,16 @@
  * limitations under the License.
  */
 
-using System;
-using System.Globalization;
 using System.Reflection;
 
 namespace Algoloop.Model
 {
     public static class AboutModel
     {
-        public static string AssemblyTitle
+        public static string Version { get; set; } = "0.0.0.0";
+        public static bool UpdateAvailable { get; set; }
+
+        public static string Title
         {
             get
             {
@@ -38,20 +39,7 @@ namespace Algoloop.Model
             }
         }
 
-        public static string AssemblyVersion
-        {
-            get
-            {
-                return String.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}.{1}.{2}",
-                    Assembly.GetExecutingAssembly().GetName().Version.Major,
-                    Assembly.GetExecutingAssembly().GetName().Version.Minor,
-                    Assembly.GetExecutingAssembly().GetName().Version.Build);
-            }
-        }
-
-        public static string AssemblyDescription
+        public static string Description
         {
             get
             {
@@ -65,7 +53,7 @@ namespace Algoloop.Model
             }
         }
 
-        public static string AssemblyProduct
+        public static string Product
         {
             get
             {
@@ -79,7 +67,7 @@ namespace Algoloop.Model
             }
         }
 
-        public static string AssemblyCopyright
+        public static string Copyright
         {
             get
             {
@@ -93,7 +81,7 @@ namespace Algoloop.Model
             }
         }
 
-        public static string AssemblyCompany
+        public static string Company
         {
             get
             {

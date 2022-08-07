@@ -55,12 +55,12 @@ namespace Algoloop.Wpf
             base.OnStartup(e);
 
             // Set Log handler
-            string logfile = Path.Combine(MainService.GetAppDataFolder(), AboutModel.AssemblyProduct + ".log");
+            string logfile = Path.Combine(MainService.GetAppDataFolder(), AboutModel.Product + ".log");
             File.Delete(logfile);
             Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
             Log.DebuggingLevel = Config.GetInt("debug-level", 1);
             Log.LogHandler = new LogItemHandler(logfile);
-            Log.Trace($">Startup \"{AboutModel.AssemblyProduct}\"");
+            Log.Trace($">Startup \"{AboutModel.Product}\"");
             Log.Trace($"ProgramFolder={MainService.GetProgramFolder()}");
             Log.Trace($"AppDataFolder={MainService.GetAppDataFolder()}");
             Log.Trace($"ProgramDataFolder={MainService.GetProgramDataFolder()}");
@@ -86,7 +86,7 @@ namespace Algoloop.Wpf
             ViewModelLocator.MainViewModel.SaveConfig();
             Algoloop.Wpf.Properties.Settings.Default.Save();
 
-            Log.Trace($"Exit \"{AboutModel.AssemblyProduct}\"");
+            Log.Trace($"Exit \"{AboutModel.Product}\"");
             base.OnExit(e);
         }
 

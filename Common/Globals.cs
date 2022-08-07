@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -49,6 +49,12 @@ namespace QuantConnect
             }
 
             CacheDataFolder = Config.Get("cache-location", DataFolder);
+
+            object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+            if (attributes.Length > 0)
+            {
+                Copyright = ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+            }
         }
 
         /// <summary>
@@ -65,5 +71,10 @@ namespace QuantConnect
         /// Data path to cache folder location
         /// </summary>
         public static string CacheDataFolder { get; private set; }
+
+        /// <summary>
+        /// Copyright statement of lean
+        /// </summary>
+        public static string Copyright { get; private set; }
     }
 }
