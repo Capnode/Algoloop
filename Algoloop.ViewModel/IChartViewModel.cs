@@ -12,11 +12,12 @@
  * limitations under the License.
  */
 
+using System;
 using System.Windows.Media;
 
 namespace Algoloop.ViewModel
 {
-    public interface IChartViewModel
+    public interface IChartViewModel : IComparable
     {
         string Title { get; }
         public int SubChart { get; }

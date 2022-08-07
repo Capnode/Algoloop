@@ -15,6 +15,7 @@
 using Algoloop.ViewModel.Internal.Lean;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
+using System;
 using System.Collections.Generic;
 using System.Windows.Media;
 
@@ -44,5 +45,21 @@ namespace Algoloop.ViewModel
         public Color Color { get; }
         public bool IsVisible { get; set; }
         public IEnumerable<EquityData> Series { get; }
+
+        public int CompareTo(object obj)
+        {
+            if (!(obj is IChartViewModel other)) return 0;
+            if (string.IsNullOrWhiteSpace(Title)) return 0;
+            if (string.IsNullOrWhiteSpace(other.Title)) return 0;
+            bool thisUpper = Title == Title.ToUpperInvariant();
+            bool otherUpper = other.Title == other.Title.ToUpperInvariant();
+            if (thisUpper == otherUpper)
+            {
+                return string.Compare(Title, other.Title, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            if (thisUpper) return 1;
+            return -1;
+        }
     }
 }

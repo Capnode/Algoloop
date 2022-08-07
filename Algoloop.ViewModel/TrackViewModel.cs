@@ -1102,6 +1102,7 @@ namespace Algoloop.ViewModel
                 }
             }
 
+            workCharts.Sort();
             Charts = null;
             Charts = workCharts;
         }
