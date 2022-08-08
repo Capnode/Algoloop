@@ -53,7 +53,7 @@ namespace Algoloop.ViewModel
 
             Description = AboutModel.Description;
 
-            Credit = Globals.Copyright + ", Version: " + Globals.Version;
+            Credit = "Lean " + Globals.Version + ", " + Globals.Copyright;
 
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
