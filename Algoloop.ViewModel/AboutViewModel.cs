@@ -46,11 +46,6 @@ namespace Algoloop.ViewModel
 
             Copyright = AboutModel.Copyright;
 
-            if (AboutModel.UpdateAvailable)
-            {
-                Message = "An update is available";
-            }
-
             Description = AboutModel.Description;
 
             Credit = "Lean " + Globals.Version + ", " + Globals.Copyright;

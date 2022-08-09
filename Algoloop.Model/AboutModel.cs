@@ -12,20 +12,22 @@
  * limitations under the License.
  */
 
+using System;
+using System.Globalization;
 using System.Reflection;
 
 namespace Algoloop.Model
 {
     public static class AboutModel
     {
-        public static string Version { get; set; } = "0.0.0.0";
-        public static bool UpdateAvailable { get; set; }
+        private static string _version;
 
         public static string Title
         {
             get
             {
-                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+                object[] attributes = Assembly.GetExecutingAssembly()
+                    .GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
                 if (attributes.Length > 0)
                 {
                     AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
@@ -37,6 +39,27 @@ namespace Algoloop.Model
 
                 return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
             }
+        }
+
+        public static string Version
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_version))
+                {
+                    AssemblyName asm = Assembly.GetExecutingAssembly().GetName();
+                    return String.Format(
+                        CultureInfo.InvariantCulture,
+                        "{0}.{1}.{2}",
+                        asm.Version.Major,
+                        asm.Version.Minor,
+                        asm.Version.Build);
+                }
+
+                return _version;
+            }
+
+            set => _version = value;
         }
 
         public static string Description

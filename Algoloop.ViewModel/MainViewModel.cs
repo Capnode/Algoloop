@@ -24,7 +24,6 @@ using System.Windows;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Windows.ApplicationModel;
 
 namespace Algoloop.ViewModel
 {
@@ -231,9 +230,6 @@ namespace Algoloop.ViewModel
                 // Initialize Research page
                 ResearchViewModel.Initialize();
 
-                // Set package version
-                await CheckForUpdates();
-
                 // Completed
                 Messenger.Send(new NotificationMessage(
                     Resources.LoadingConfigurationCompleted), 0);
@@ -264,42 +260,6 @@ namespace Algoloop.ViewModel
             finally
             {
                 IsBusy = false;
-            }
-        }
-
-        public async Task CheckForUpdates()
-        {
-            try
-            {
-                Package package = Package.Current;
-                var version = package.Id.Version;
-                AboutModel.Version = $"{version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
-
-                PackageUpdateAvailabilityResult result = await package.CheckUpdateAvailabilityAsync();
-                switch (result.Availability)
-                {
-                    case PackageUpdateAvailability.Available:
-                    case PackageUpdateAvailability.Required:
-                        AboutModel.UpdateAvailable = true;
-                        break;
-                    case PackageUpdateAvailability.NoUpdates:
-                        AboutModel.UpdateAvailable = false;
-                        break;
-                    case PackageUpdateAvailability.Unknown:
-                    default:
-                        break;
-                }
-
-                Log.Trace($"Package Version={AboutModel.Version}");
-                Log.Trace($"Package Architecture={package.Id.Architecture}");
-                Log.Trace($"Package PublisherDisplayName={package.PublisherDisplayName}");
-                Log.Trace($"Package DisplayName={package.DisplayName}");
-                Log.Trace($"Package InstalledPath={package.InstalledPath}");
-                Log.Trace($"Package Description={package.Description}");
-                Log.Trace($"Package InstalledDate={package.InstalledDate}");
-            }
-            catch (InvalidOperationException)
-            {
             }
         }
     }
