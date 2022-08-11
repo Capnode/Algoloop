@@ -1103,6 +1103,17 @@ namespace Algoloop.ViewModel
             }
 
             workCharts.Sort();
+
+            // Move Equity chart to top of list
+            IChartViewModel equityChart = workCharts.FirstOrDefault(m => m.Title.Equals("Equity"));
+            if (equityChart != null)
+            {
+                if (workCharts.Remove(equityChart))
+                {
+                    workCharts.Insert(0, equityChart);
+                }
+            }
+
             Charts = null;
             Charts = workCharts;
         }
