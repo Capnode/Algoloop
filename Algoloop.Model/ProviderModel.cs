@@ -60,7 +60,12 @@ namespace Algoloop.Model
             get => _provider;
             set
             {
-                Contract.Requires(value != null);
+                if (value == null)
+                {
+                    _provider = null;
+                    return;
+                }
+
                 _provider = value.ToLowerInvariant();
                 Refresh();
             }
