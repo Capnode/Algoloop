@@ -85,7 +85,7 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(SecurityType.Equity, symbol.Security);
             Assert.AreEqual(Market.Metastock, symbol.Market);
             Assert.IsNotNull(symbol.Properties);
-            Assert.AreEqual(1, symbol.Properties.Count);
+            Assert.AreEqual(2, symbol.Properties.Count);
             Assert.IsTrue(File.Exists(Path.Combine(_equityFolder, "daily", "volvy.zip")));
         }
     }
