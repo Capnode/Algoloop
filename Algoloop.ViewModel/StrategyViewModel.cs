@@ -28,7 +28,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -36,6 +35,7 @@ using System.Diagnostics.Contracts;
 using Algoloop.ViewModel.Properties;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
+using Algoloop.ViewModel.Internal;
 
 namespace Algoloop.ViewModel
 {
@@ -65,11 +65,13 @@ namespace Algoloop.ViewModel
 
             StartCommand = new RelayCommand(
                 () => DoStartCommand(),
-                () => !IsBusy && !Active);
+                () => !IsBusy);
             StopCommand = new RelayCommand(
                 () => DoStopCommand(),
-                () => !IsBusy && Active);
-            CloneCommand = new RelayCommand(() => DoCloneStrategy(), () => !IsBusy);
+                () => !IsBusy);
+            CloneCommand = new RelayCommand(
+                () => DoCloneStrategy(),
+                () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(
                 () => DoCloneAlgorithm(),
                 () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmLocation));
@@ -88,7 +90,9 @@ namespace Algoloop.ViewModel
             UseParametersCommand = new RelayCommand<IList>(
                 m => DoUseParameters(m),
                 m => !IsBusy);
-            AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
+            AddSymbolCommand = new RelayCommand(
+                () => DoAddSymbol(),
+                () => !IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(
                 m => DoDeleteSymbols(m),
                 m => !IsBusy && SelectedSymbol != null);
@@ -480,32 +484,28 @@ namespace Algoloop.ViewModel
             Messenger.Send(new NotificationMessage(message), 0);
 
             var tasks = new List<Task>();
-            using (var throttler = new SemaphoreSlim(_settings.MaxBacktests))
+            foreach (StrategyModel model in models)
             {
-                foreach (StrategyModel model in models)
-                {
-                    await throttler.WaitAsync().ConfigureAwait(true);
-                    if (!Active) break;
-                    count++;
-                    var trackModel = new TrackModel(model.AlgorithmName, model);
-                    Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
-                    var track = new TrackViewModel(
-                        this, trackModel, _markets, _settings);
-                    Tracks.Add(track);
-                    Task task = track
-                        .StartTrackAsync()
-                        .ContinueWith(m =>
-                        {
-                            ExDataGridColumns.AddPropertyColumns(
-                                TrackColumns, track.Statistics, "Statistics");
-                            throttler.Release();
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
-                    tasks.Add(task);
-                }
-
-                await Task.WhenAll(tasks).ConfigureAwait(true);
+                await BacktestManager.Wait().ConfigureAwait(true);
+                if (!Active) break;
+                count++;
+                var trackModel = new TrackModel(model.AlgorithmName, model);
+                Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
+                var track = new TrackViewModel(
+                    this, trackModel, _markets, _settings);
+                Tracks.Add(track);
+                Task task = track
+                    .StartTrackAsync()
+                    .ContinueWith(m =>
+                    {
+                        ExDataGridColumns.AddPropertyColumns(
+                            TrackColumns, track.Statistics, "Statistics");
+                        BacktestManager.Release();
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                tasks.Add(task);
             }
 
+            await Task.WhenAll(tasks).ConfigureAwait(true);
             Messenger.Send(new NotificationMessage(Active ? Resources.StrategyCompleted : Resources.StrategyAborted), 0);
             Active = false;
         }

@@ -24,6 +24,7 @@ using System.Windows;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Algoloop.ViewModel.Internal;
 
 namespace Algoloop.ViewModel
 {
@@ -212,6 +213,9 @@ namespace Algoloop.ViewModel
                 // Read settings
                 await SettingsViewModel.ReadAsync(Path.Combine(programDataFolder, "Settings.json"))
                     .ConfigureAwait(true);
+
+                // Set max backtests
+                BacktestManager.SetSlots(SettingsViewModel.Model.MaxBacktests);
 
                 // Set config
                 Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
