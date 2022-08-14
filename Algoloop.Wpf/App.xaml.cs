@@ -55,16 +55,11 @@ namespace Algoloop.Wpf
             base.OnStartup(e);
 
             // Set Log handler
-            string logfile = Path.Combine(MainService.GetAppDataFolder(), AboutModel.Product + ".log");
+            string logfile = Path.Combine(MainService.GetProgramDataFolder(), AboutModel.Product + ".log");
             File.Delete(logfile);
             Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
             Log.DebuggingLevel = Config.GetInt("debug-level", 1);
             Log.LogHandler = new LogItemHandler(logfile);
-            Log.Trace($">Startup \"{AboutModel.Product}\"");
-            Log.Trace($"ProgramFolder={MainService.GetProgramFolder()}");
-            Log.Trace($"AppDataFolder={MainService.GetAppDataFolder()}");
-            Log.Trace($"ProgramDataFolder={MainService.GetProgramDataFolder()}");
-            Log.Trace($"UserDataFolder={MainService.GetUserDataFolder()}");
 
             // Exception Handling Wiring
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
@@ -74,7 +69,6 @@ namespace Algoloop.Wpf
 
             // Prevent going to sleep mode
             _ = SetThreadExecutionState(EsContinous | EsSystemRequired);
-            Log.Trace($"<OnStartup");
         }
 
         protected override void OnExit(ExitEventArgs e)

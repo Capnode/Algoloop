@@ -45,7 +45,7 @@ namespace Algoloop.ViewModel
 {
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {
-        public const string Folder = "Tracks";
+        public const string TracksFolder = "Tracks";
         private const string LogFile = "Logs.log";
         private const string ResultFile = "Result.json";
         private const string ZipFile = "track.zip";
@@ -605,8 +605,10 @@ namespace Algoloop.ViewModel
 
         private void LoadTrack()
         {
+            string trackFile = Path.Combine(MainService.GetProgramDataFolder(), Model.ZipFile);
+
             // Find track zipfile
-            if (!File.Exists(Model.ZipFile))
+            if (!File.Exists(trackFile))
             {
                 return;
             }
@@ -615,7 +617,7 @@ namespace Algoloop.ViewModel
             ZipFile zipFile;
             BacktestResult result = null;
             using (StreamReader resultStream = Compression.Unzip(
-                Model.ZipFile, ResultFile, out zipFile))
+                trackFile, ResultFile, out zipFile))
             using (zipFile)
             {
                 if (resultStream == null)
@@ -717,7 +719,7 @@ namespace Algoloop.ViewModel
 
             // Unzip log file
             using (StreamReader logStream = Compression.Unzip(
-                Model.ZipFile, LogFile, out zipFile))
+                trackFile, LogFile, out zipFile))
             using (zipFile)
             {
                 if (logStream != null)
@@ -770,8 +772,10 @@ namespace Algoloop.ViewModel
             if (model.Result == null) return;
 
             // Create folder for track files
-            Directory.CreateDirectory(Folder);
-            string zipFileTemplate = Path.Combine(Folder, ZipFile);
+            string programDataFolder = MainService.GetProgramDataFolder();
+            string tracksFolder = Path.Combine(programDataFolder, TracksFolder);
+            Directory.CreateDirectory(tracksFolder);
+            string zipFileTemplate = Path.Combine(tracksFolder, ZipFile);
 
             // Save logs and result to zipfile
             lock (_mutex)
@@ -783,7 +787,7 @@ namespace Algoloop.ViewModel
                     { ResultFile, model.Result }
                 });
 
-                model.ZipFile = zipFile;
+                model.ZipFile = zipFile.Substring(programDataFolder.Length + 1);
             }
 
             // Process results
