@@ -330,7 +330,7 @@ namespace QuantConnect.Data
                 _dataCacheProvider.Store($"{filePath}#{entryName}", bytes);
             }
 
-            Log.Debug($"LeanDataWriter.Write(): Appended: {filePath} @ {entryName}");
+//            Log.Debug($"LeanDataWriter.Write(): Appended: {filePath} @ {entryName}");
         }
 
         /// <summary>
