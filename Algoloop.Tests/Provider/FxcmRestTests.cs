@@ -29,7 +29,7 @@ using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.Provider
 {
-    [TestClass]
+    [TestClass, TestCategory("LocalTest")]
     public class FxcmTests
     {
         private const string DataDirectory = "Data";

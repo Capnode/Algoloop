@@ -83,8 +83,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     continue;
                 }
 
-                if (target.Quantity == 0
-                    || taken++ < _slots)
+                if (quantity <= 0 || taken++ < _slots)
                 {
                     algorithm.LimitOrder(target.Symbol, quantity, security.Close);
                     if (_logOrder)

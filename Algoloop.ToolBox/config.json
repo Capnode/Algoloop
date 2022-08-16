@@ -1,5 +1,5 @@
 {
-  "debug-mode": true,
+  "debug-mode": false,
   "debug-level": 0,
   "composer-dll-directory": ".",
   "plugin-directory": ".",

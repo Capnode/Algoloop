@@ -34,30 +34,33 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
-        private readonly decimal _highSizing;
-        private readonly decimal _lowSizing;
 
-        private decimal _sizing = 1.0M;
         private decimal _initialCapital = 0;
+        private decimal _sizingFactor = 1;
         private readonly InsightCollection _insights = new InsightCollection();
-        private readonly SimpleMovingAverage _equitySma;
+        private readonly SimpleMovingAverage _trackerSma;
+        private readonly SimpleMovingAverage _benchmarkSma;
+        private readonly TrackerPortfolio _trackerPortfolio;
 
         public SlotPortfolio(
             int slots,
             bool reinvest,
             float rebalance,
-            int equityPeriod = 0,
-            float highSizing = 1.0f,
-            float lowSizing = 0f)
+            int trackerPeriod = 0,
+            int benchmarkPeriod = 0)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
-            _highSizing = (decimal)highSizing;
-            _lowSizing = (decimal)lowSizing;
-            if (equityPeriod > 0)
+
+            _trackerPortfolio = new TrackerPortfolio(_slots, _rebalance);
+            if (trackerPeriod > 0)
             {
-                _equitySma = new SimpleMovingAverage(equityPeriod);
+                _trackerSma = new SimpleMovingAverage($"Tracker SMA({trackerPeriod})", trackerPeriod);
+            }
+            if (benchmarkPeriod > 0)
+            {
+                _benchmarkSma = new SimpleMovingAverage($"Benchmark SMA({benchmarkPeriod})", benchmarkPeriod);
             }
         }
 
@@ -70,16 +73,43 @@ namespace Algoloop.Algorithm.CSharp.Model
                 _initialCapital = algorithm.Portfolio.Cash;
             }
 
-            // Determine position size dependent on equity curve
-            if (_equitySma != null)
+            // Add to tracker portfolio
+            _trackerPortfolio.CreateTargets(algorithm, insights);
+            decimal tracker = _trackerPortfolio.GetEquity(algorithm);
+            algorithm.Plot("Tracker", tracker);
+
+            // Determine position size dependent on tracking curve
+            decimal trackerSizingFactor = 1;
+            if (_trackerSma != null)
             {
-                decimal equity = algorithm.Portfolio.TotalPortfolioValue;
-                _equitySma.Update(algorithm.Time, equity);
-                if (_equitySma.IsReady)
+                // decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
+                _trackerSma.Update(algorithm.Time, tracker);
+                if (_trackerSma.IsReady)
                 {
-                    _sizing = _equitySma > equity ? _highSizing : _lowSizing;
+                    algorithm.Plot($"TrackerSMA", _trackerSma);
+                    trackerSizingFactor = tracker >= _trackerSma ? 1 : 0;
                 }
             }
+
+            // Determine position size dependent on benchmark curve
+            decimal benchmarkSizingFactor = 1;
+            if (_benchmarkSma != null)
+            {
+                decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
+                _benchmarkSma.Update(algorithm.Time, benchmark);
+                if (_benchmarkSma.IsReady)
+                {
+                    algorithm.Plot($"BenchmarkSMA", _benchmarkSma);
+                    benchmarkSizingFactor = benchmark >= _benchmarkSma ? 1 : 0;
+                }
+            }
+
+            decimal sizingFactor = trackerSizingFactor * benchmarkSizingFactor;
+            if (sizingFactor != _sizingFactor)
+            {
+                algorithm.Log($"Switching to sizing factor {sizingFactor}");
+            }
+            _sizingFactor = sizingFactor;
 
             // Calculate number of occupied positions
             int taken = algorithm.Securities.Values
@@ -99,14 +129,15 @@ namespace Algoloop.Algorithm.CSharp.Model
                 IPortfolioTarget target;
                 if (_reinvest)
                 {
-                    target = PortfolioTarget.Percent(algorithm, insight.Symbol, (int)insight.Direction * _sizing / _slots);
+                    target = PortfolioTarget.Percent(algorithm, insight.Symbol, (int)insight.Direction * _sizingFactor / _slots);
                     if (holdings == 0 && freeSlots > 0)
                     {
-                        decimal amount = Math.Max(_sizing * cash, 0) / freeSlots;
+                        decimal amount = Math.Max(_sizingFactor * cash, 0) / freeSlots;
                         decimal size = (int)insight.Direction * decimal.Floor(amount / security.Price);
                         var order = new MarketOrder(insight.Symbol, size, DateTime.UtcNow);
                         OrderFee orderFee = security.FeeModel.GetOrderFee(new OrderFeeParameters(security, order));
                         amount -= decimal.Ceiling(orderFee);
+                        amount = Math.Max(amount, 0);
                         decimal quantity = (int)insight.Direction * decimal.Floor(amount / security.Price);
                         if (quantity < target.Quantity)
                         {
@@ -118,28 +149,31 @@ namespace Algoloop.Algorithm.CSharp.Model
                 {
                     Debug.Assert(security.Price != 0);
                     decimal quantity = (int)insight.Direction
-                        * decimal.Floor(_sizing * _initialCapital / _slots / security.Price);
+                        * decimal.Floor(_sizingFactor * _initialCapital / _slots / security.Price);
                     target = new PortfolioTarget(insight.Symbol, quantity);
                 }
 
-                // Create new target if no position yet
-                if (holdings == 0)
+                if (holdings == 0 || target.Quantity == 0)
                 {
+                    // Create new target
+                    targets.Add(target);
+                }
+                else if (_rebalance > 0 && holdings <=  (1 - _rebalance) * target.Quantity)
+                {
+                    // Holdings too small, rebalance up
+                    algorithm.Log($"Rebalance up {target.Symbol} to quantity={target.Quantity}");
+                    targets.Add(target);
+                }
+                else if (_rebalance > 0 && holdings >= (1 + _rebalance) * target.Quantity)
+                {
+                    // Holdings too large, rebalance down
+                    algorithm.Log($"Rebalance down {target.Symbol} to quantity={target.Quantity}");
                     targets.Add(target);
                 }
                 else
                 {
-                    // Check if holdings must be rebalanced
-                    if (_rebalance > 0 && 
-                        (holdings <=  (1 - _rebalance) * target.Quantity || holdings >= (1 + _rebalance) * target.Quantity))
-                    {
-                        targets.Add(target);
-                    }
-                    else
-                    {
-                        // Remove current insight, add again later
-                        _insights.Clear(new[] { insight.Symbol });
-                    }
+                    // Remove current insight, add again later
+                    _insights.Clear(new[] { insight.Symbol });
                 }
             }
 

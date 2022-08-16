@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System.Diagnostics;
@@ -126,7 +126,7 @@ namespace Algoloop.ViewModel
 
         private void DataToModel()
         {
-            Model.Version = MarketsModel.version;
+            Model.Version = MarketsModel.ActualVersion;
             Model.Markets.Clear();
             foreach (MarketViewModel market in Markets)
             {

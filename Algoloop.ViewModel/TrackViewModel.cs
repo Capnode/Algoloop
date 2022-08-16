@@ -36,22 +36,22 @@ using System.Diagnostics.Contracts;
 using static Algoloop.Model.TrackModel;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
-using Microsoft.Toolkit.Mvvm.Input;
 using Algoloop.ViewModel.Internal.Lean;
 using StockSharp.Xaml.Charting;
 using StockSharp.Charting;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {
     public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {
-        private bool _isDisposed = false; // To detect redundant calls
-        public const string Folder = "Tracks";
-        private const string _logFile = "Logs.log";
-        private const string _resultFile = "Result.json";
-        private const string _zipFile = "track.zip";
-        private const double _daysInYear = 365.24;
+        public const string TracksFolder = "Tracks";
+        private const string LogFile = "Logs.log";
+        private const string ResultFile = "Result.json";
+        private const string ZipFile = "track.zip";
+        private const double DaysInYear = 365.24;
 
+        private bool _isDisposed = false; // To detect redundant calls
         private readonly StrategyViewModel _parent;
         private readonly MarketsModel _markets;
         private readonly SettingModel _settings;
@@ -419,7 +419,7 @@ namespace Algoloop.ViewModel
             DateTime first = trades.Min(m => m.EntryTime);
             DateTime last = trades.Max(m => m.ExitTime);
             TimeSpan duration = last - first;
-            double years = duration.Ticks / (_daysInYear * TimeSpan.TicksPerDay);
+            double years = duration.Ticks / (DaysInYear * TimeSpan.TicksPerDay);
 
             // Calculate score
             double netProfit = (double)trades.Sum(m => m.ProfitLoss - m.TotalFees);
@@ -605,8 +605,10 @@ namespace Algoloop.ViewModel
 
         private void LoadTrack()
         {
+            string trackFile = Path.Combine(MainService.GetProgramDataFolder(), Model.ZipFile);
+
             // Find track zipfile
-            if (!File.Exists(Model.ZipFile))
+            if (!File.Exists(trackFile))
             {
                 return;
             }
@@ -615,7 +617,7 @@ namespace Algoloop.ViewModel
             ZipFile zipFile;
             BacktestResult result = null;
             using (StreamReader resultStream = Compression.Unzip(
-                Model.ZipFile, _resultFile, out zipFile))
+                trackFile, ResultFile, out zipFile))
             using (zipFile)
             {
                 if (resultStream == null)
@@ -717,7 +719,7 @@ namespace Algoloop.ViewModel
 
             // Unzip log file
             using (StreamReader logStream = Compression.Unzip(
-                Model.ZipFile, _logFile, out zipFile))
+                trackFile, LogFile, out zipFile))
             using (zipFile)
             {
                 if (logStream != null)
@@ -770,8 +772,10 @@ namespace Algoloop.ViewModel
             if (model.Result == null) return;
 
             // Create folder for track files
-            Directory.CreateDirectory(Folder);
-            string zipFileTemplate = Path.Combine(Folder, _zipFile);
+            string programDataFolder = MainService.GetProgramDataFolder();
+            string tracksFolder = Path.Combine(programDataFolder, TracksFolder);
+            Directory.CreateDirectory(tracksFolder);
+            string zipFileTemplate = Path.Combine(tracksFolder, ZipFile);
 
             // Save logs and result to zipfile
             lock (_mutex)
@@ -779,11 +783,11 @@ namespace Algoloop.ViewModel
                 string zipFile = UniqueFileName(zipFileTemplate);
                 Compression.ZipData(zipFile, new Dictionary<string, string>
                 {
-                    { _logFile, model.Logs },
-                    { _resultFile, model.Result }
+                    { LogFile, model.Logs },
+                    { ResultFile, model.Result }
                 });
 
-                model.ZipFile = zipFile;
+                model.ZipFile = zipFile.Substring(programDataFolder.Length + 1);
             }
 
             // Process results
@@ -1099,6 +1103,18 @@ namespace Algoloop.ViewModel
                             list),
                     };
                     workCharts.Add(viewModel);
+                }
+            }
+
+            workCharts.Sort();
+
+            // Move Equity chart to top of list
+            IChartViewModel equityChart = workCharts.FirstOrDefault(m => m.Title.Equals("Equity"));
+            if (equityChart != null)
+            {
+                if (workCharts.Remove(equityChart))
+                {
+                    workCharts.Insert(0, equityChart);
                 }
             }
 

@@ -12,7 +12,8 @@
  * limitations under the License.
  */
 
-using Microsoft.Toolkit.Mvvm.Input;
+
+using CommunityToolkit.Mvvm.Input;
 
 namespace Algoloop.ViewModel
 {

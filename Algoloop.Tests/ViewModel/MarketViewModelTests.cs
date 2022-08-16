@@ -29,7 +29,7 @@ using static Algoloop.Model.ProviderModel;
 
 namespace Algoloop.Tests.ViewModel
 {
-    [TestClass()]
+    [TestClass(), TestCategory("LocalTest")]
     public class MarketViewModelTests
     {
         private const string DataDirectory = "Data";

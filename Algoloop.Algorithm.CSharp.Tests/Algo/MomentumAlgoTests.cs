@@ -30,6 +30,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         public void Initialize()
         {
             Log.LogHandler = new ConsoleLogHandler();
+            Log.DebuggingEnabled = false;
         }
 
         [TestMethod]
@@ -54,6 +55,33 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             Assert.IsTrue(int.TryParse(trades, out int trade));
             Logger.LogMessage($"trade={trade}");
             Assert.AreEqual(10, trade);
+        }
+
+        [TestMethod]
+        public void Trade_with_Tracker_Portfolio()
+        {
+            Dictionary<string, string> result = TestEngine.Run(
+                "MomentumAlgo",
+                DateTime.Parse("2021-01-01 00:00:00", CultureInfo.InvariantCulture),
+                DateTime.Parse("2021-12-31 23:59:59", CultureInfo.InvariantCulture),
+                10000,
+                new Dictionary<string, string>
+                {
+                    { "resolution", "Daily" },
+                    { "market", Market.Borsdata },
+                    { "symbols", "ABB.ST;ERIC-B.ST;ATCO-A.ST;SEB-A.ST"},
+                    { "Period", "100" },
+                    { "Hold", "1" },
+                    { "Slots", "2" },
+                    { "Rebalance trigger (min)", "0.7" },
+                    { "Tracker stoploss period", "10" },
+                });
+
+            result.ToList().ForEach(m => Console.Out.WriteLine($"{m.Key}={m.Value}"));
+            Assert.IsTrue(result.TryGetValue("Total Trades", out string trades));
+            Assert.IsTrue(int.TryParse(trades, out int trade));
+            Logger.LogMessage($"trade={trade}");
+            Assert.AreEqual(124, trade);
         }
     }
 }

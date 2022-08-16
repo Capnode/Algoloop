@@ -23,48 +23,48 @@ namespace Algoloop.ViewModel.Internal
 {
     internal class PythonSupport
     {
-        private const string _path = "PATH";
-        private const string _pythonPath = "PYTHONPATH";
-        private const string _pythonHome = "PYTHONHOME";
-        private const string _pythonnetPyDll = "PYTHONNET_PYDLL";
-        private const string _pythonPattern = "python3?.dll";
+        private const string Path = "PATH";
+        private const string PythonPath = "PYTHONPATH";
+        private const string PythonHome = "PYTHONHOME";
+        private const string PythonnetPyDll = "PYTHONNET_PYDLL";
+        private const string PythonPattern = "python3?.dll";
 
         public static void SetupPython(StringDictionary environment)
         {
-            string paths = environment[_path];
+            string paths = environment[Path];
             foreach (string folder in paths.Split(";"))
             {
                 if (!Directory.Exists(folder)) continue;
-                string pythonDll = Directory.EnumerateFiles(folder, _pythonPattern).FirstOrDefault();
+                string pythonDll = Directory.EnumerateFiles(folder, PythonPattern).FirstOrDefault();
                 if (pythonDll == default) continue;
-                environment[_pythonnetPyDll] = pythonDll;
-                environment[_pythonHome] = folder;
+                environment[PythonnetPyDll] = pythonDll;
+                environment[PythonHome] = folder;
                 return;
             }
 
-            throw new ApplicationException($"Python is not installed: {_pythonPattern} not found");
+            throw new ApplicationException($"Python is not installed: {PythonPattern} not found");
         }
 
 
         public static void SetupJupyter(StringDictionary environment, string exeFolder)
         {
-            if (environment.ContainsKey(_pythonPath))
+            if (environment.ContainsKey(PythonPath))
             {
-                string pythonpath = environment[_pythonPath];
-                environment[_pythonPath] = exeFolder + ";" + pythonpath;
+                string pythonpath = environment[PythonPath];
+                environment[PythonPath] = exeFolder + ";" + pythonpath;
             }
             else
             {
-                environment[_pythonPath] = exeFolder;
+                environment[PythonPath] = exeFolder;
             }
 
             string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string sourceFile = Path.Combine(exeFolder, "start.py");
-            string destFile = Path.Combine(home, @".ipython\profile_default\startup\quantconnect.py");
+            string sourceFile = System.IO.Path.Combine(exeFolder, "start.py");
+            string destFile = System.IO.Path.Combine(home, @".ipython\profile_default\startup\quantconnect.py");
             File.Copy(sourceFile, destFile, true);
 
-            sourceFile = Path.Combine(exeFolder, @"QuantConnect.Lean.Launcher.runtimeconfig.json");
-            destFile = Path.Combine(home, @".ipython\profile_default\startup\QuantConnect.Lean.Launcher.runtimeconfig.json");
+            sourceFile = System.IO.Path.Combine(exeFolder, @"QuantConnect.Lean.Launcher.runtimeconfig.json");
+            destFile = System.IO.Path.Combine(home, @".ipython\profile_default\startup\QuantConnect.Lean.Launcher.runtimeconfig.json");
             CopyRuntimeConfig(sourceFile, destFile);
         }
 

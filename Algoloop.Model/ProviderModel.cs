@@ -60,7 +60,12 @@ namespace Algoloop.Model
             get => _provider;
             set
             {
-                Contract.Requires(value != null);
+                if (value == null)
+                {
+                    _provider = null;
+                    return;
+                }
+
                 _provider = value.ToLowerInvariant();
                 Refresh();
             }
@@ -171,11 +176,6 @@ namespace Algoloop.Model
                     sourceFolder = true;
                     break;
                 case Market.Borsdata:
-                    apiKey = true;
-                    break;
-                case Market.Avanza:
-                    login = true;
-                    password = true;
                     apiKey = true;
                     break;
             }

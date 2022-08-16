@@ -25,7 +25,7 @@ namespace Algoloop.ViewModel
 {
     public class ResearchViewModel : ViewModelBase, IDisposable
     {
-        private const string _notebook = "Notebook";
+        private const string Notebook = "Notebook";
         private readonly SettingModel _settings;
         private string _htmlText;
         private string _source;
@@ -147,7 +147,7 @@ namespace Algoloop.ViewModel
             if (string.IsNullOrEmpty(_settings.Notebook))
             {
                 string userDataFolder = MainService.GetUserDataFolder();
-                _settings.Notebook = Path.Combine(userDataFolder, _notebook);
+                _settings.Notebook = Path.Combine(userDataFolder, Notebook);
                 Directory.CreateDirectory(_settings.Notebook);
             }
         }

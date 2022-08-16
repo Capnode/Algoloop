@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Model;
+using QuantConnect;
 using System;
 using System.Diagnostics;
 using System.Globalization;
@@ -26,20 +27,29 @@ namespace Algoloop.ViewModel
         public string Version { get; private set; }
         public string Copyright { get; private set; }
         public string Description { get; private set; }
+        public string Message { get; private set; }
+        public string Credit { get; private set; }
 
         public AboutViewModel()
         {
             Title = String.Format(
                 CultureInfo.InvariantCulture,
                 "About {0}",
-                AboutModel.AssemblyProduct);
-            ProductName = AboutModel.AssemblyProduct;
+                AboutModel.Product);
+
+            ProductName = AboutModel.Product;
+
             Version = String.Format(
                 CultureInfo.InvariantCulture,
                 "Version: {0}",
-                AboutModel.AssemblyVersion);
-            Copyright = AboutModel.AssemblyCopyright;
-            Description = AboutModel.AssemblyDescription;
+                AboutModel.Version);
+
+            Copyright = AboutModel.Copyright;
+
+            Description = AboutModel.Description;
+
+            Credit = "Lean " + Globals.Version + ", " + Globals.Copyright;
+
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
     }

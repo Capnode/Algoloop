@@ -1,6 +1,7 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
+ * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +70,6 @@ namespace QuantConnect
 
             Tuple.Create(Borsdata, 256),
             Tuple.Create(Metastock, 257),
-            Tuple.Create(Avanza, 258),
         };
 
         static Market()
@@ -240,14 +240,9 @@ namespace QuantConnect
         public const string Borsdata = "borsdata";
 
         /// <summary>
-        /// Avanza
+        /// Metastock
         /// </summary>
         public const string Metastock = "metastock";
-
-        /// <summary>
-        /// Avanza
-        /// </summary>
-        public const string Avanza = "avanza";
 
         /// <summary>
         /// Adds the specified market to the map of available markets with the specified identifier.

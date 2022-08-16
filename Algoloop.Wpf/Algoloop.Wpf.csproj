@@ -10,11 +10,10 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <NoWarn>NU1701;CA1416</NoWarn>
     <ApplicationIcon>Resources\AlgoloopIcon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Resources\AlgoloopIcon.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Help.png" />
     <SplashScreen Include="Resources\AlgoloopSplash.png" />
     <Resource Include="Doc\Chart.png" />
@@ -50,9 +49,9 @@
     <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.2" />
-    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1264.42" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1293.44" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.131" />
     <PackageReference Include="StockSharp.Configuration" Version="5.0.130" />

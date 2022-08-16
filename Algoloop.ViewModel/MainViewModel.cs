@@ -14,7 +14,6 @@
 
 using Algoloop.Model;
 using Algoloop.ViewModel.Properties;
-using Microsoft.Toolkit.Mvvm.Input;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
@@ -23,6 +22,9 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using QuantConnect;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Algoloop.ViewModel.Internal;
 
 namespace Algoloop.ViewModel
 {
@@ -56,7 +58,7 @@ namespace Algoloop.ViewModel
                 window => DoExit(window), window => !IsBusy);
             UpdateCommand = new RelayCommand(
                 async () => await DoUpdate().ConfigureAwait(false), () => !IsBusy);
-            Messenger.Register<MainViewModel, NotificationMessage, int>(
+            WeakReferenceMessenger.Default.Register<MainViewModel, NotificationMessage, int>(
                 this, 0, static (r, m) => r.OnStatusMessage(m));
 
             // Set working directory
@@ -80,7 +82,7 @@ namespace Algoloop.ViewModel
         public ResearchViewModel ResearchViewModel { get; }
         public LogViewModel LogViewModel { get; }
 
-        public static string Title => AboutModel.AssemblyTitle;
+        public static string Title => AboutModel.Title;
 
         /// <summary>
         /// Mark ongoing operation
@@ -102,18 +104,24 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                Messenger.Send(new NotificationMessage(
-                    Resources.SavingConfiguration), 0);
+                Messenger.Send(new NotificationMessage(Resources.SavingConfiguration), 0);
 
+                // Save config files
+                string programData = MainService.GetProgramDataFolder();
+                string settings = Path.Combine(programData, "Settings.json");
+                string markets = Path.Combine(programData, "Markets.json");
+                string strategies = Path.Combine(programData, "Strategies.json");
+                string logfile = Path.Combine(programData, "Algoloop.log");
+                SettingsViewModel.Save(settings);
+                MarketsViewModel.Save(markets);
+                StrategiesViewModel.Save(strategies);
+
+                // Create backup files
                 string appData = MainService.GetAppDataFolder();
-                if (!Directory.Exists(appData))
-                {
-                    Directory.CreateDirectory(appData);
-                }
-
-                SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
-                MarketsViewModel.Save(Path.Combine(appData, "Markets.json"));
-                StrategiesViewModel.Save(Path.Combine(appData, "Strategies.json"));
+                File.Copy(settings, Path.Combine(appData, "Settings.json"), true);
+                File.Copy(markets, Path.Combine(appData, "Markets.json"), true);
+                File.Copy(strategies, Path.Combine(appData, "Strategies.json"), true);
+                File.Copy(logfile, Path.Combine(appData, "Algoloop.log"), true);
             }
             finally
             {
@@ -128,12 +136,12 @@ namespace Algoloop.ViewModel
 
             // Wait for initialization complete
             await _initializer.ConfigureAwait(true);
-            string appData = MainService.GetAppDataFolder();
+            string programData = MainService.GetProgramDataFolder();
 
             if (update)
             {
                 // Save model and initialize
-                SettingsViewModel.Save(Path.Combine(appData, "Settings.json"));
+                SettingsViewModel.Save(Path.Combine(programData, "Settings.json"));
 
                 // Async initialize without blocking UI
                 _initializer = Initialize();
@@ -141,7 +149,7 @@ namespace Algoloop.ViewModel
             else
             {
                 // Reload old settings
-                await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
+                await SettingsViewModel.ReadAsync(Path.Combine(programData, "Settings.json")).ConfigureAwait(true);
             }
         }
 
@@ -176,58 +184,65 @@ namespace Algoloop.ViewModel
                 Messenger.Send(new NotificationMessage(Resources.LoadingConfiguration), 0);
 
                 // Initialize data folders
-                string program = MainService.GetProgramFolder();
+                string programFolder = MainService.GetProgramFolder();
                 string appDataFolder = MainService.GetAppDataFolder();
                 string programDataFolder = MainService.GetProgramDataFolder();
                 string userDataFolder = MainService.GetUserDataFolder();
-                Log.Trace($"Program folder: {program}");
+                Log.Trace($"Program folder: {programFolder}");
                 Log.Trace($"AppData folder: {appDataFolder}");
                 Log.Trace($"ProgramData folder: {programDataFolder}");
                 Log.Trace($"UserData folder: {userDataFolder}");
-                MainService.Delete(Path.Combine(programDataFolder, "market-hours"));
-                MainService.Delete(Path.Combine(programDataFolder, "symbol-properties"));
-                MainService.DeleteFolders(appDataFolder, "temp*");
+                Directory.CreateDirectory(appDataFolder);
+                Directory.CreateDirectory(programDataFolder);
+
+                // Migrate existing files to new location
+                MainService.DeleteFolders(appDataFolder, "temp*"); 
+                MainService.CopyDirectory(appDataFolder, programDataFolder, false);
+                MainService.DeleteFolders(appDataFolder, "*");
+
+                // Update Market data
                 MainService.CopyDirectory(
-                    Path.Combine(program, "Content/AppData"),
-                    appDataFolder,
-                    false);
-                MainService.CopyDirectory(
-                    Path.Combine(program, "Content/ProgramData"),
+                    Path.Combine(programFolder, "Content/ProgramData"),
                     programDataFolder,
                     false);
                 MainService.CopyDirectory(
-                    Path.Combine(program, "Content/UserData"),
+                    Path.Combine(programFolder, "Content/UserData"),
                     userDataFolder,
                     false);
 
                 // Read settings
-                string appData = MainService.GetAppDataFolder();
-                await SettingsViewModel.ReadAsync(Path.Combine(appData, "Settings.json")).ConfigureAwait(true);
+                await SettingsViewModel.ReadAsync(Path.Combine(programDataFolder, "Settings.json"))
+                    .ConfigureAwait(true);
+
+                // Set max backtests
+                BacktestManager.SetSlots(SettingsViewModel.Model.MaxBacktests);
 
                 // Set config
                 Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
                 Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
-                Config.Set("map-file-provider",
-                           "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
                 Globals.Reset();
 
                 // Read configuration
-                await MarketsViewModel.ReadAsync(Path.Combine(appData, "Markets.json"));
-                await StrategiesViewModel.ReadAsync(Path.Combine(appData, "Strategies.json")).ConfigureAwait(true);
+                await MarketsViewModel.ReadAsync(Path.Combine(programDataFolder, "Markets.json"));
+                await StrategiesViewModel.ReadAsync(Path.Combine(programDataFolder, "Strategies.json"))
+                    .ConfigureAwait(true);
 
                 // Update Data folder
                 MainService.CopyDirectory(
-                    Path.Combine(program, "Content/ProgramData/market-hours"),
+                    Path.Combine(programFolder, "Content/ProgramData/market-hours"),
                     Path.Combine(Globals.DataFolder, "market-hours"),
                     true);
                 MainService.CopyDirectory(
-                    Path.Combine(program, "Content/ProgramData/symbol-properties"),
+                    Path.Combine(programFolder, "Content/ProgramData/symbol-properties"),
                     Path.Combine(Globals.DataFolder, "symbol-properties"),
                     true);
 
                 // Initialize Research page
                 ResearchViewModel.Initialize();
+
+                // Completed
                 Messenger.Send(new NotificationMessage(
                     Resources.LoadingConfigurationCompleted), 0);
             }

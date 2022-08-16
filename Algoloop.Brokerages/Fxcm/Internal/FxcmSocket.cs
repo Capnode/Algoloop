@@ -26,15 +26,15 @@ namespace Algoloop.Brokerages.Fxcm.Internal
     internal class FxcmSocket : IDisposable
     {
 #pragma warning disable IDE0051 // Remove unused private members
-        private const string _msgOpen = "0";
-        private const string _msgClose = "1";
-        private const string _msgPing = "2";
-        private const string _msgPong = "3";
-        private const string _msgMessage = "4";
-        private const string _msgUpgrade = "5";
-        private const string _msgNoop = "6";
-        private const string _msgMessageConnect = "40";
-        private const string _msgMessageEvent = "42";
+        private const string MsgOpen = "0";
+        private const string MsgClose = "1";
+        private const string MsgPing = "2";
+        private const string MsgPong = "3";
+        private const string MsgMessage = "4";
+        private const string MsgUpgrade = "5";
+        private const string MsgNoop = "6";
+        private const string MsgMessageConnect = "40";
+        private const string MsgMessageEvent = "42";
 #pragma warning restore IDE0051 // Remove unused private members
 
         private enum ActionType { Connect, Disconnect, Event, Ack, Error, BinaryEvent, BinaryAck };
@@ -57,7 +57,7 @@ namespace Algoloop.Brokerages.Fxcm.Internal
             _webSocket.Closed += OnClosed;
             _webSocket.Error += OnError;
             _webSocket.Message += OnMessage;
-            _keepAliveTimer = new((x) => _webSocket.Send(_msgPing));
+            _keepAliveTimer = new((x) => _webSocket.Send(MsgPing));
         }
 
         public void Dispose()
@@ -104,27 +104,27 @@ namespace Algoloop.Brokerages.Fxcm.Internal
             {
                 string message = textMessage.Message;
 //                Log.Trace($"OnMessage {message}");
-                if (message.StartsWith(_msgPong, StringComparison.OrdinalIgnoreCase))
+                if (message.StartsWith(MsgPong, StringComparison.OrdinalIgnoreCase))
                 {
                     ; // Do nothing
                 }
-                else if (message.StartsWith(_msgOpen, StringComparison.OrdinalIgnoreCase))
+                else if (message.StartsWith(MsgOpen, StringComparison.OrdinalIgnoreCase))
                 {
                     // 0{"sid":"oTlhP94ieIujcA7aAVdn","upgrades":[],"pingInterval":25000,"pingTimeout":5000}
                     OpenConnect(message[1..]);
                 }
-                else if (message.StartsWith(_msgMessageConnect, StringComparison.OrdinalIgnoreCase))
+                else if (message.StartsWith(MsgMessageConnect, StringComparison.OrdinalIgnoreCase))
                 {
                     // 40
                     MessageConnect(message[2..]);
                 }
-                else if (message.StartsWith(_msgMessageEvent, StringComparison.OrdinalIgnoreCase))
+                else if (message.StartsWith(MsgMessageEvent, StringComparison.OrdinalIgnoreCase))
                 {
                     // 42["EUR/USD","{\"Updated\":1614843030623,\"Rates\":[1.20526,1.20539,1.2068999999999999,1.20429],\"Symbol\":\"EUR/USD\"}"]
                     MessageEvent(message[2..]);
                 }
             }
-            else if(e.Data is BinaryMessage binaryMessage)
+            else if(e.Data is BinaryMessage)
             {
                 Log.Trace($"OnMessage binary");
             }

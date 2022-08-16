@@ -31,8 +31,8 @@ namespace Algoloop.Model
         public static string GetAppDataFolder()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyProduct;
+            string company = AboutModel.Company.Split(' ')[0];
+            string product = AboutModel.Product;
             string path = Path.Combine(appData, company, product);
             Directory.CreateDirectory(path);
             return path;
@@ -41,8 +41,8 @@ namespace Algoloop.Model
         public static string GetProgramDataFolder()
         {
             string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyProduct;
+            string company = AboutModel.Company.Split(' ')[0];
+            string product = AboutModel.Product;
             string path = Path.Combine(programData, company, product);
             Directory.CreateDirectory(path);
             return path;
@@ -51,8 +51,8 @@ namespace Algoloop.Model
         public static string GetUserDataFolder()
         {
             string userData = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            string company = AboutModel.AssemblyCompany.Split(' ')[0];
-            string product = AboutModel.AssemblyProduct;
+            string company = AboutModel.Company.Split(' ')[0];
+            string product = AboutModel.Product;
             string path = Path.Combine(userData, company, product);
             Directory.CreateDirectory(path);
             return path;

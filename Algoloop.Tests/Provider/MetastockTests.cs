@@ -27,8 +27,8 @@ namespace Algoloop.Tests.Provider
     [TestClass]
     public class MetastockTests
     {
-        private const string _sourceDir = "TestData";
-        private const string _destDir = "Data";
+        private const string SourceDir = "TestData";
+        private const string DestDir = "Data";
         
         private ProviderModel _market;
         private string _equityFolder;
@@ -38,7 +38,7 @@ namespace Algoloop.Tests.Provider
         {
             Log.LogHandler = new ConsoleLogHandler();
 
-            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _destDir);
+            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DestDir);
 
             // Set Globals
             Config.Set("data-directory", dataFolder);
@@ -47,7 +47,7 @@ namespace Algoloop.Tests.Provider
             Config.Set("version-id", string.Empty);
             Globals.Reset();
 
-            string sourceFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _sourceDir);
+            string sourceFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, SourceDir);
             _equityFolder = Path.Combine(dataFolder, SecurityType.Equity.SecurityTypeToLower(), Market.Metastock);
 
             // Remove Data folder
@@ -85,7 +85,7 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(SecurityType.Equity, symbol.Security);
             Assert.AreEqual(Market.Metastock, symbol.Market);
             Assert.IsNotNull(symbol.Properties);
-            Assert.AreEqual(1, symbol.Properties.Count);
+            Assert.AreEqual(2, symbol.Properties.Count);
             Assert.IsTrue(File.Exists(Path.Combine(_equityFolder, "daily", "volvy.zip")));
         }
     }

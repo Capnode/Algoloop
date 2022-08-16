@@ -26,7 +26,7 @@ using System.Linq;
 
 namespace Algoloop.Tests.Provider
 {
-    [TestClass]
+    [TestClass, TestCategory("LocalTest")]
     public class BorsdataTests
     {
         private const string DataDirectory = "Data";

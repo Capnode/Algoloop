@@ -11,10 +11,10 @@
     <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Content\AppData\Markets.json">
+    <Content Include="Content\ProgramData\Markets.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\AppData\Strategies.json">
+    <Content Include="Content\ProgramData\Strategies.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Data\equity\usa\daily\aapl.zip">
@@ -114,10 +114,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\LICENSE" Link="Content\ProgramData\LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.131" />
     <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.131" />
   </ItemGroup>

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -24,7 +24,8 @@ namespace Algoloop.Model
     [DataContract]
     public class MarketsModel
     {
-        public const int version = 1;
+        public const int ActualVersion = 1;
+
         private static readonly AccountModel[] _standardAccounts = new[]
         {
             new AccountModel { Name = nameof(AccountModel.AccountType.Backtest) },

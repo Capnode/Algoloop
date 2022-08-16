@@ -80,8 +80,6 @@ namespace Algoloop.ToolBox
                 new CommandLineOption("splits-percentage", CommandOptionType.SingleValue, "[OPTIONAL for RandomDataGenerator. Sets the probability each equity generated will have a stock split event. Note that this is not the total probability for all symbols generated. Only used for Equity. Defaults to 15.0: Example: --splits-percentage=10.0 ]"),
                 new CommandLineOption("dividends-percentage", CommandOptionType.SingleValue, "[OPTIONAL for RandomDataGenerator. Sets the probability each equity generated will have dividends. Note that this is not the probability for all symbols genearted. Only used for Equity. Defaults to 60.0: Example: --dividends-percentage=25.5 ]"),
                 new CommandLineOption("dividend-every-quarter-percentage", CommandOptionType.SingleValue, "[OPTIONAL for RandomDataGenerator. Sets the probability each equity generated will have a dividend event every quarter. Note that this is not the total probability for all symbols generated. Only used for Equity. Defaults to 30.0: Example: --dividend-every-quarter-percentage=15.0 ]"),
-                new CommandLineOption("username", CommandOptionType.SingleValue, "[REQUIRED for AvanzaDownloader]"),
-                new CommandLineOption("password", CommandOptionType.SingleValue, "[REQUIRED for AvanzaDownloader]"),
             };
 
         public static void Main(string[] args)

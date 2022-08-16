@@ -1,6 +1,7 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
+ * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Globalization;
 using NodaTime;
 using NodaTime.TimeZones;
 using QuantConnect.Benchmarks;
@@ -658,6 +660,47 @@ namespace QuantConnect.Algorithm
         public string GetParameter(string name, string defaultValue = null)
         {
             return _parameters.TryGetValue(name, out var value) ? value : defaultValue;
+        }
+
+        /// <summary>
+        /// Gets the parameter with the specified name parsed as an integer. If a parameter with the specified name does not exist,
+        /// or the conversion is not possible, the given default value is returned
+        /// </summary>
+        /// <param name="name">The name of the parameter to get</param>
+        /// <param name="defaultValue">The default value to return</param>
+        /// <returns>The value of the specified parameter, or defaultValue if not found or null if there's no default value</returns>
+        [DocumentationAttribute(ParameterAndOptimization)]
+        public int GetParameter(string name, int defaultValue)
+        {
+            return _parameters.TryGetValue(name, out var strValue) && int.TryParse(strValue, out var value) ? value : defaultValue;
+        }
+
+        /// <summary>
+        /// Gets the parameter with the specified name parsed as a double. If a parameter with the specified name does not exist,
+        /// or the conversion is not possible, the given default value is returned
+        /// </summary>
+        /// <param name="name">The name of the parameter to get</param>
+        /// <param name="defaultValue">The default value to return</param>
+        /// <returns>The value of the specified parameter, or defaultValue if not found or null if there's no default value</returns>
+        [DocumentationAttribute(ParameterAndOptimization)]
+        public double GetParameter(string name, double defaultValue)
+        {
+            return _parameters.TryGetValue(name, out var strValue) &&
+                double.TryParse(strValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var value) ? value : defaultValue;
+        }
+
+        /// <summary>
+        /// Gets the parameter with the specified name parsed as a decimal. If a parameter with the specified name does not exist,
+        /// or the conversion is not possible, the given default value is returned
+        /// </summary>
+        /// <param name="name">The name of the parameter to get</param>
+        /// <param name="defaultValue">The default value to return</param>
+        /// <returns>The value of the specified parameter, or defaultValue if not found or null if there's no default value</returns>
+        [DocumentationAttribute(ParameterAndOptimization)]
+        public decimal GetParameter(string name, decimal defaultValue)
+        {
+            return _parameters.TryGetValue(name, out var strValue) &&
+                decimal.TryParse(strValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var value) ? value : defaultValue;
         }
 
         /// <summary>

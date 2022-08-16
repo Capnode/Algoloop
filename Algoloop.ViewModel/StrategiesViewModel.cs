@@ -19,7 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Algoloop.Model;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
@@ -233,22 +233,23 @@ namespace Algoloop.ViewModel
         {
             Model.Version = StrategiesModel.version;
             Model.Strategies.Clear();
-            string folder = Directory.GetCurrentDirectory();
+            string programDataFolder = MainService.GetProgramDataFolder();
             var inUse = new List<string>();
             foreach (StrategyViewModel strategy in Strategies)
             {
-                inUse.AddRange(TracksInUse(strategy, folder));
+                inUse.AddRange(TracksInUse(strategy, programDataFolder));
                 Model.Strategies.Add(strategy.Model);
                 strategy.DataToModel();
 
                 // Collect files in use
                 inUse.AddRange(strategy.Model.Tracks
                     .Where(m => !string.IsNullOrEmpty(m.ZipFile))
-                    .Select(p => Path.Combine(folder, p.ZipFile)));
+                    .Select(p => Path.Combine(programDataFolder, p.ZipFile)));
             }
 
             // Remove Track files not in use
-            var dir = new DirectoryInfo(TrackViewModel.Folder);
+            string tracksFolder = Path.Combine(programDataFolder, TrackViewModel.TracksFolder);
+            var dir = new DirectoryInfo(tracksFolder);
             if (!dir.Exists)
             {
                 return;

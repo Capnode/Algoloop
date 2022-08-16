@@ -31,9 +31,9 @@ namespace Algoloop.Wpf
     /// </summary>
     public partial class App : Application
     {
-        private const uint _esContinous = 0x80000000;
-        private const uint _esSystemRequired = 0x00000001;
-//        private const uint _esDisplayRequired = 0x00000002;
+        private const uint EsContinous = 0x80000000;
+        private const uint EsSystemRequired = 0x00000001;
+//        private const uint EsDisplayRequired = 0x00000002;
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern uint SetThreadExecutionState([In] uint esFlags);
@@ -55,16 +55,11 @@ namespace Algoloop.Wpf
             base.OnStartup(e);
 
             // Set Log handler
-            string logfile = Path.Combine(MainService.GetAppDataFolder(), AboutModel.AssemblyProduct + ".log");
+            string logfile = Path.Combine(MainService.GetProgramDataFolder(), AboutModel.Product + ".log");
             File.Delete(logfile);
             Log.DebuggingEnabled = Config.GetBool("debug-mode", false);
             Log.DebuggingLevel = Config.GetInt("debug-level", 1);
             Log.LogHandler = new LogItemHandler(logfile);
-            Log.Trace($">Startup \"{AboutModel.AssemblyProduct}\"");
-            Log.Trace($"ProgramFolder={MainService.GetProgramFolder()}");
-            Log.Trace($"AppDataFolder={MainService.GetAppDataFolder()}");
-            Log.Trace($"ProgramDataFolder={MainService.GetProgramDataFolder()}");
-            Log.Trace($"UserDataFolder={MainService.GetUserDataFolder()}");
 
             // Exception Handling Wiring
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
@@ -73,20 +68,19 @@ namespace Algoloop.Wpf
             Algoloop.Wpf.Properties.Settings.Default.Reload();
 
             // Prevent going to sleep mode
-            _ = SetThreadExecutionState(_esContinous | _esSystemRequired);
-            Log.Trace($"<OnStartup");
+            _ = SetThreadExecutionState(EsContinous | EsSystemRequired);
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             // Enable sleep mode
-            _ = SetThreadExecutionState(_esContinous);
+            _ = SetThreadExecutionState(EsContinous);
 
             ViewModelLocator.ResearchViewModel.StopJupyter();
             ViewModelLocator.MainViewModel.SaveConfig();
             Algoloop.Wpf.Properties.Settings.Default.Save();
 
-            Log.Trace($"Exit \"{AboutModel.AssemblyProduct}\"");
+            Log.Trace($"Exit \"{AboutModel.Product}\"");
             base.OnExit(e);
         }
 
