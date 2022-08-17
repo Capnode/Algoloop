@@ -24,14 +24,10 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly SimpleMovingAverage _fastSma;
         private readonly SimpleMovingAverage _slowSma;
         private readonly QCAlgorithm _algorithm;
-        private readonly int _fastPeriod;
-        private readonly int _slowPeriod;
 
         public SmaCrossSignal(QCAlgorithm algorithm, Symbol symbol, Resolution resolution, int fastPeriod, int slowPeriod)
         {
             _algorithm = algorithm;
-            _fastPeriod = fastPeriod;
-            _slowPeriod = slowPeriod;
             if (fastPeriod > 0)
             {
                 _fastSma = new SimpleMovingAverage(fastPeriod);
@@ -47,15 +43,26 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal close = bar.Price;
 //            string action = evaluate ? "Evaluate" : "Update";
 //            _algorithm.Log($"{action} {bar.Time:d} {close}");
-            _fastSma.Update(bar.Time, close);
-            _slowSma.Update(bar.Time, close);
+            _fastSma?.Update(bar.Time, close);
+            _slowSma?.Update(bar.Time, close);
 
             if (!evaluate) return 0;
             if (_fastSma == null && _slowSma == null) return float.NaN;
-            if (_fastSma == null || _slowSma == null) return 0;
-            if (_fastPeriod >= _slowPeriod) return 0;
+            if (_slowSma == null)
+            {
+                if (!_fastSma.IsReady) return 0;
+                return close > _fastSma ? 1 : 0;
+            }
+
+            if (_fastSma == null)
+            {
+                if (!_slowSma.IsReady) return 0;
+                return close > _slowSma ? 1 : 0;
+            }
+
+            if (_fastSma.Period >= _slowSma.Period) return 0;
             if (!_fastSma.IsReady || !_slowSma.IsReady) return 0;
-//            _algorithm.Log($"_fastEma={_fastEma} _slowEma={_slowEma}");
+            //            _algorithm.Log($"_fastEma={_fastEma} _slowEma={_slowEma}");
             return _fastSma > _slowSma ? 1 : 0;
         }
 
