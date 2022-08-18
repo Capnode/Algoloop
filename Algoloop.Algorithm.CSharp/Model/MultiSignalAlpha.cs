@@ -24,8 +24,9 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     public class MultiSignalAlpha : AlphaModel
     {
-        private readonly bool _logSignal = false;
-        private readonly bool _logInsights = false;
+        private const bool LogSignal = false;
+        private const bool LogInsights = false;
+
         private readonly InsightDirection _direction;
         private readonly Resolution _resolution;
         private readonly int _backfill;
@@ -70,7 +71,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 foreach (ISignal symbolData in signals)
                 {
                     float signal = symbolData.Update(pair.Value, evaluate);
-                    if (_logSignal && evaluate)
+                    if (LogSignal && evaluate)
                     {
                         algorithm.Log($"{pair.Key} {symbolData.GetType().Name}: {signal}");
                     }
@@ -128,9 +129,9 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             // Sort insights decending
             insights.Sort((Insight x, Insight y) => Compare(x,y));
-            if (_logInsights)
+            if (LogInsights)
             {
-                LogInsights(algorithm, insights);
+                DoLogInsights(algorithm, insights);
             }
 
             return insights;
@@ -216,7 +217,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             return 0;
         }
 
-        private static void LogInsights(QCAlgorithm algorithm, IEnumerable<Insight> insights)
+        private static void DoLogInsights(QCAlgorithm algorithm, IEnumerable<Insight> insights)
         {
             int i = 0;
             foreach (Insight insight in insights)

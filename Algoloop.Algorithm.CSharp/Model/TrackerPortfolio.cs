@@ -22,6 +22,8 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     internal class TrackerPortfolio : PortfolioConstructionModel
     {
+        private const bool LogOrder = false;
+
         private readonly int _slots;
         private readonly decimal _rebalance;
         private readonly decimal _size;
@@ -49,6 +51,10 @@ namespace Algoloop.Algorithm.CSharp.Model
                 decimal value = security.Price * position.Value;
                 _cash += value;
                 if (!_positions.Remove(position.Key)) throw new ApplicationException($"Can not remove {position.Key}");
+                if (LogOrder)
+                {
+                    algorithm.Log($"Sell {position.Key} {position.Value:0.####} @ {security.Price:0.##}");
+                }
             }
 
             // Add position if new in toplist
@@ -71,6 +77,10 @@ namespace Algoloop.Algorithm.CSharp.Model
                 {
                     _cash -= size;
                     _positions.Add(insight.Symbol, target);
+                    if (LogOrder)
+                    {
+                        algorithm.Log($"Buy {insight.Symbol} {target:0.####} @ {security.Price:0.##}");
+                    }
                 }
             }
 

@@ -29,7 +29,7 @@ namespace Algoloop.Algorithm.CSharp.Model
     // Portfolio construction scaffolding class; basic method args.
     public class SlotPortfolio : PortfolioConstructionModel
     {
-        private readonly bool _logTargets = false;
+        private const bool LogTargets = false;
 
         private readonly int _slots;
         private readonly bool _reinvest;
@@ -191,9 +191,9 @@ namespace Algoloop.Algorithm.CSharp.Model
             // Add toplist in random order
             _insights.AddRange(toplist);
 
-            if (_logTargets)
+            if (LogTargets)
             {
-                LogTargets(algorithm, targets);
+                DoLogTargets(algorithm, targets);
             }
 
             return targets;
@@ -222,7 +222,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             return sb.ToString();
         }
 
-        private static void LogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
+        private static void DoLogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
         {
             int i = 0;
             foreach (IPortfolioTarget target in targets)
