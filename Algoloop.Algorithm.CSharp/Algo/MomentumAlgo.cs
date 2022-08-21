@@ -110,7 +110,7 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void OnEndOfAlgorithm()
         {
-            Log(PortfolioConstruction.ToString());
+            PortfolioConstruction.CreateTargets(this, null);
         }
     }
 }

@@ -24,8 +24,8 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     public class MultiSignalAlpha : AlphaModel
     {
-        private const bool LogSignal = false;
-        private const bool LogInsights = false;
+        private readonly bool LogSignal = false;
+        private readonly bool LogInsights = false;
 
         private readonly InsightDirection _direction;
         private readonly Resolution _resolution;

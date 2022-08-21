@@ -16,20 +16,18 @@ using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Portfolio;
-using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Indicators;
 using QuantConnect.Orders;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Securities;
 using System.Diagnostics;
-using System.Text;
 
 namespace Algoloop.Algorithm.CSharp.Model
 {
     // Portfolio construction scaffolding class; basic method args.
     public class SlotPortfolio : PortfolioConstructionModel
     {
-        private const bool LogTargets = false;
+        private readonly bool LogTargets = false;
 
         private readonly int _slots;
         private readonly bool _reinvest;
@@ -67,6 +65,14 @@ namespace Algoloop.Algorithm.CSharp.Model
         // Create list of PortfolioTarget objects from Insights
         public override IEnumerable<IPortfolioTarget> CreateTargets(QCAlgorithm algorithm, Insight[] insights)
         {
+            if (insights == null)
+            {
+                // End of algorithm
+                _trackerPortfolio.CreateTargets(algorithm, null);
+                LogInsights(algorithm, _insights.OrderByDescending(m => m.CloseTimeUtc).ThenByDescending(m => m.Magnitude));
+                return null;
+            }
+
             // Save initial capital for future use
             if (_initialCapital == 0)
             {
@@ -161,13 +167,13 @@ namespace Algoloop.Algorithm.CSharp.Model
                 else if (_rebalance > 0 && holdings <=  (1 - _rebalance) * target.Quantity)
                 {
                     // Holdings too small, rebalance up
-                    algorithm.Log($"Rebalance up {target.Symbol} to quantity={target.Quantity}");
+                    algorithm.Log($"Rebalance up {target.Symbol} {holdings} to {target.Quantity}");
                     targets.Add(target);
                 }
                 else if (_rebalance > 0 && holdings >= (1 + _rebalance) * target.Quantity)
                 {
                     // Holdings too large, rebalance down
-                    algorithm.Log($"Rebalance down {target.Symbol} to quantity={target.Quantity}");
+                    algorithm.Log($"Rebalance down {target.Symbol} {holdings} to {target.Quantity}");
                     targets.Add(target);
                 }
                 else
@@ -199,27 +205,14 @@ namespace Algoloop.Algorithm.CSharp.Model
             return targets;
         }
 
-        public override void OnSecuritiesChanged(QCAlgorithm algorithm, SecurityChanges changes)
-        {
-        }
-
-        public override string ToString()
-        {
-            return LogInsights(_insights.OrderByDescending(m => m.CloseTimeUtc).ThenByDescending(m => m.Magnitude));
-        }
-
-        private static string LogInsights(IEnumerable<Insight> insights)
+        private static void LogInsights(QCAlgorithm algorithm, IEnumerable<Insight> insights)
         {
             int i = 0;
-            var sb = new StringBuilder();
-            sb.AppendLine("Insight toplist:");
+            algorithm.Log("Insight toplist:");
             foreach (Insight insight in insights)
             {
-                string text = $"Insight {++i} {insight.Symbol} {insight.Magnitude:0.########} {insight.Direction}".ToStringInvariant();
-                sb.AppendLine(text);
+                algorithm.Log($"Insight {++i} {insight.Symbol} {insight.Magnitude:0.########} {insight.Direction}".ToStringInvariant());
             }
-
-            return sb.ToString();
         }
 
         private static void DoLogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
