@@ -32,7 +32,7 @@ namespace QuantConnect.Algorithm.CSharp
         protected OrderTicket Ticket;
         protected Symbol DcOption;
         protected virtual Resolution Resolution => Resolution.Daily;
-        
+
         public override void Initialize()
         {
             SetStartDate(2012, 1, 3);
@@ -51,30 +51,30 @@ namespace QuantConnect.Algorithm.CSharp
                 .Where(x => x.ID.StrikePrice == 17m && x.ID.OptionRight == OptionRight.Call)
                 .Select(x => AddFutureOptionContract(x, Resolution).Symbol)
                 .FirstOrDefault();
-            
+
             // Validate it is the expected contract
             var expectedContract = QuantConnect.Symbol.CreateOption(dc, Market.CME, OptionStyle.American,
                 OptionRight.Call, 17m,
                 new DateTime(2012, 4, 01));
-            
+
             if (DcOption != expectedContract)
             {
                 throw new Exception($"Contract {DcOption} was not the expected contract {expectedContract}");
             }
-            
+
             ScheduleBuySell();
         }
-        
+
         protected virtual void ScheduleBuySell()
         {
-            // Schedule a purchase of this contract tomorrow at 1AM
-            Schedule.On(DateRules.Tomorrow, TimeRules.At(1,0,0), () =>
+            // Schedule a purchase of this contract tomorrow at 10AM when the market is open
+            Schedule.On(DateRules.Tomorrow, TimeRules.At(10,0,0), () =>
             {
                 Ticket = MarketOrder(DcOption, 1);
             });
-            
-            // Schedule liquidation tomorrow at 6PM
-            Schedule.On(DateRules.Tomorrow, TimeRules.At(18,0,0), () =>
+
+            // Schedule liquidation tomorrow at 2PM when the market is open
+            Schedule.On(DateRules.Tomorrow, TimeRules.At(14,0,0), () =>
             {
                 Liquidate();
             });
@@ -99,7 +99,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 throw new Exception($"Expected no holdings at end of algorithm, but are invested in: {string.Join(", ", Portfolio.Keys)}");
             }
-            
+
             if (Ticket.Status != OrderStatus.Filled)
             {
                 throw new Exception("Future option order failed to fill correctly");
@@ -134,30 +134,30 @@ namespace QuantConnect.Algorithm.CSharp
             {"Total Trades", "2"},
             {"Average Win", "0%"},
             {"Average Loss", "-0.82%"},
-            {"Compounding Annual Return", "-66.089%"},
+            {"Compounding Annual Return", "-66.144%"},
             {"Drawdown", "0.800%"},
             {"Expectancy", "-1"},
-            {"Net Profit", "-0.824%"},
-            {"Sharpe Ratio", "-6.993"},
+            {"Net Profit", "-0.825%"},
+            {"Sharpe Ratio", "-6.988"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "100%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "0.466"},
-            {"Beta", "-7.501"},
-            {"Annual Standard Deviation", "0.092"},
+            {"Alpha", "0.467"},
+            {"Beta", "-7.512"},
+            {"Annual Standard Deviation", "0.093"},
             {"Annual Variance", "0.009"},
-            {"Information Ratio", "-7.586"},
+            {"Information Ratio", "-7.581"},
             {"Tracking Error", "0.105"},
             {"Treynor Ratio", "0.086"},
-            {"Total Fees", "$3.70"},
+            {"Total Fees", "$4.94"},
             {"Estimated Strategy Capacity", "$0"},
             {"Lowest Capacity Asset", "DC V5E8P9VAH3IC|DC V5E8P9SH0U0X"},
             {"Fitness Score", "0.006"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
             {"Sortino Ratio", "79228162514264337593543950335"},
-            {"Return Over Maximum Drawdown", "-80.233"},
+            {"Return Over Maximum Drawdown", "-80.18"},
             {"Portfolio Turnover", "0.013"},
             {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},
@@ -172,7 +172,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "f00013930ab4c104a6177485d8090b31"}
+            {"OrderListHash", "dfcf673b46b9054a15babe1b0d734c35"}
         };
     }
 }
