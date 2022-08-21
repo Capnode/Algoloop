@@ -24,11 +24,10 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     public class LimitExecution : ExecutionModel
     {
-        private const bool LogTargets = false;
-        private const bool LogOrder = false;
-
+        private readonly bool LogTargets = false;
+        private readonly bool LogOrder = false;
         private readonly int _slots;
-        private readonly List<IPortfolioTarget> _pending = new List<IPortfolioTarget>();
+        private readonly List<IPortfolioTarget> _pending = new();
 
         public LimitExecution(int slots)
         {
@@ -103,7 +102,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         {
         }
 
-        private void DoLogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
+        private static void DoLogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
         {
             int i = 0;
             foreach (IPortfolioTarget target in targets)

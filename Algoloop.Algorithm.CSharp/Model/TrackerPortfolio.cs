@@ -24,13 +24,14 @@ namespace Algoloop.Algorithm.CSharp.Model
     internal class TrackerPortfolio : PortfolioConstructionModel
     {
         private const decimal InitialCash = 100;
-        private readonly bool LogOrder = false;
 
+        private readonly bool LogOrder = false;
         private readonly int _slots;
         private readonly decimal _rebalance;
+        private readonly List<Trade> _trades = new();
+        private readonly IDictionary<Symbol, Trade> _holdings = new Dictionary<Symbol, Trade>();
+
         private decimal _cash = InitialCash;
-        private List<Trade> _trades = new List<Trade>();
-        private IDictionary<Symbol, Trade> _holdings = new Dictionary<Symbol, Trade>();
         private Insight[] _queue;
 
         public TrackerPortfolio(int slots, decimal rebalance)

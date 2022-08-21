@@ -20,6 +20,7 @@ using QuantConnect.Indicators;
 using QuantConnect.Orders;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Securities;
+using QuantConnect.Statistics;
 using System.Diagnostics;
 
 namespace Algoloop.Algorithm.CSharp.Model
@@ -28,7 +29,7 @@ namespace Algoloop.Algorithm.CSharp.Model
     public class SlotPortfolio : PortfolioConstructionModel
     {
         private readonly bool LogTargets = false;
-
+        private readonly bool LogTrades = false;
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
@@ -70,6 +71,11 @@ namespace Algoloop.Algorithm.CSharp.Model
                 // End of algorithm
                 _trackerPortfolio.CreateTargets(algorithm, null);
                 LogInsights(algorithm, _insights.OrderByDescending(m => m.CloseTimeUtc).ThenByDescending(m => m.Magnitude));
+                if (LogTrades)
+                {
+                    DoLogTrades(algorithm);
+                }
+
                 return null;
             }
 
@@ -203,6 +209,25 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
 
             return targets;
+        }
+
+        private void DoLogTrades(QCAlgorithm algorithm)
+        {
+            decimal cash = _initialCapital;
+            foreach (Trade trade in algorithm.TradeBuilder.ClosedTrades)
+            {
+                decimal profit = trade.Quantity * (trade.ExitPrice - trade.EntryPrice);
+                cash += profit;
+                algorithm.Log($"Trade {trade.EntryTime.ToShortDateString()} {trade.ExitTime.ToShortDateString()} {trade.Symbol} Size={trade.Quantity:0.00} Entry={trade.EntryPrice:0.00} Exit={trade.ExitPrice:0.00} Profit={profit:0.00} Cash={cash:0.00}");
+            }
+
+            foreach (SecurityHolding holding in algorithm.Portfolio.Values)
+            {
+                if (!holding.Invested) continue;
+                decimal profit = holding.Quantity * (holding.Price - holding.AveragePrice);
+                cash += profit;
+                algorithm.Log($"Trade {algorithm.Time.ToShortDateString()} {holding.Symbol.ID.Symbol} Size={holding.Quantity:0.00} Entry={holding.AveragePrice:0.00} Exit={holding.Price:0.00} Profit={profit:0.00} Cash={cash:0.00}");
+            }
         }
 
         private static void LogInsights(QCAlgorithm algorithm, IEnumerable<Insight> insights)
