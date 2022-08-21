@@ -25,7 +25,7 @@ namespace Algoloop.Algorithm.CSharp.Model
     {
         private const decimal InitialCash = 100;
 
-        private readonly bool LogOrder = false;
+        private readonly bool _logOrder = false;
         private readonly int _slots;
         private readonly decimal _rebalance;
         private readonly List<Trade> _trades = new();
@@ -69,7 +69,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 _trades.Add(trade);
                 _cash += value;
                 if (!_holdings.Remove(holding.Key)) throw new ApplicationException($"Can not remove {holding.Key}");
-                if (LogOrder)
+                if (_logOrder)
                 {
                     algorithm.Log($"Sell {holding.Key} {trade.Quantity:0.0000} @ {trade.ExitPrice:0.00} cash={_cash:0.00}");
                 }
@@ -95,7 +95,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 };
 
                 _holdings.Add(insight.Symbol, trade);
-                if (LogOrder)
+                if (_logOrder)
                 {
                     algorithm.Log($"Buy {trade.Symbol} {trade.Quantity:0.0000} @ {trade.EntryPrice:0.00} cash={_cash:0.00}");
                 }
@@ -119,7 +119,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                         value += trade.Quantity * trade.EntryPrice;
                         trade.EntryPrice = value / target;
                         trade.Quantity = target;
-                        if (LogOrder)
+                        if (_logOrder)
                         {
                             algorithm.Log($"Buy rebalance {insight.Symbol} {diff:0.0000} @ {security.Open:0.00} cash={_cash:0.00}");
                         }
@@ -142,7 +142,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                         };
                         _trades.Add(sellTrade);
 
-                        if (LogOrder)
+                        if (_logOrder)
                         {
                             algorithm.Log($"Sell rebalance {sellTrade.Symbol} {sellTrade.Quantity:0.0000} @ {sellTrade.ExitPrice:0.00} cash={_cash:0.00}");
                         }
@@ -170,7 +170,7 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private void LiquidateHoldings(QCAlgorithm algorithm)
         {
-            if (LogOrder)
+            if (_logOrder)
             {
                 algorithm.Log("Liquidate holdings:");
             }
@@ -185,7 +185,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 decimal profit = trade.ExitPrice * trade.Quantity;
                 _cash += profit;
                 _trades.Add(trade);
-                if (LogOrder)
+                if (_logOrder)
                 {
                     algorithm.Log($"Sell {holding.Key} {trade.Quantity:0.0000} @ {trade.ExitPrice:0.00} cash={_cash:0.00}");
                 }
@@ -197,13 +197,13 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 decimal profit = trade.Quantity * (trade.ExitPrice - trade.EntryPrice);
                 cash += profit;
-                if (LogOrder)
+                if (_logOrder)
                 {
                     algorithm.Log($"Trade {trade.EntryTime.ToShortDateString()} {trade.ExitTime.ToShortDateString()} {trade.Symbol} Size={trade.Quantity:0.0000} Entry={trade.EntryPrice:0.00} Exit={trade.ExitPrice:0.00} Profit={profit:0.0000}");
                 }
             }
 
-            if (LogOrder)
+            if (_logOrder)
             {
                 algorithm.Log($"Summary _cash={_cash:0.00} cash={cash:0.00} diff={cash - _cash:0.00}");
             }

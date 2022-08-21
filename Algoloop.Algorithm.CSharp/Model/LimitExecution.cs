@@ -24,8 +24,8 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     public class LimitExecution : ExecutionModel
     {
-        private readonly bool LogTargets = false;
-        private readonly bool LogOrder = false;
+        private readonly bool _logTargets = false;
+        private readonly bool _logOrder = false;
         private readonly int _slots;
         private readonly List<IPortfolioTarget> _pending = new();
 
@@ -54,9 +54,9 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             // Make sure symbol only occurs once
             Debug.Assert(!_pending.GroupBy(x => x.Symbol).Any(g => g.Count() > 1));
-            if (LogTargets)
+            if (_logTargets)
             {
-                DoLogTargets(algorithm, _pending);
+                LogTargets(algorithm, _pending);
             }
 
             // Calculate number of occupied positions
@@ -85,7 +85,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 if (quantity <= 0 || taken++ < _slots)
                 {
                     algorithm.LimitOrder(target.Symbol, quantity, security.Close);
-                    if (LogOrder)
+                    if (_logOrder)
                     {
                         algorithm.Log($"Limit {target.Symbol} quantity={quantity:0} price={security.Close:0.####}".ToStringInvariant());
                     }
@@ -102,7 +102,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         {
         }
 
-        private static void DoLogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
+        private static void LogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
         {
             int i = 0;
             foreach (IPortfolioTarget target in targets)

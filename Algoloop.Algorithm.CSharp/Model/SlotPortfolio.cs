@@ -28,15 +28,15 @@ namespace Algoloop.Algorithm.CSharp.Model
     // Portfolio construction scaffolding class; basic method args.
     public class SlotPortfolio : PortfolioConstructionModel
     {
-        private readonly bool LogTargets = false;
-        private readonly bool LogTrades = false;
+        private readonly bool _logTargets = false;
+        private readonly bool _logTrades = false;
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
 
         private decimal _initialCapital = 0;
         private decimal _sizingFactor = 1;
-        private readonly InsightCollection _insights = new InsightCollection();
+        private readonly InsightCollection _insights = new();
         private readonly SimpleMovingAverage _trackerSma;
         private readonly SimpleMovingAverage _benchmarkSma;
         private readonly TrackerPortfolio _trackerPortfolio;
@@ -71,9 +71,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                 // End of algorithm
                 _trackerPortfolio.CreateTargets(algorithm, null);
                 LogInsights(algorithm, _insights.OrderByDescending(m => m.CloseTimeUtc).ThenByDescending(m => m.Magnitude));
-                if (LogTrades)
+                if (_logTrades)
                 {
-                    DoLogTrades(algorithm);
+                    LogTrades(algorithm);
                 }
 
                 return null;
@@ -173,13 +173,13 @@ namespace Algoloop.Algorithm.CSharp.Model
                 else if (_rebalance > 0 && holdings <=  (1 - _rebalance) * target.Quantity)
                 {
                     // Holdings too small, rebalance up
-                    algorithm.Log($"Rebalance up {target.Symbol} {holdings} to {target.Quantity}");
+                    algorithm.Log($"Rebalance up {target.Symbol} {holdings} to {target.Quantity} @ {security.Price:0.00}");
                     targets.Add(target);
                 }
                 else if (_rebalance > 0 && holdings >= (1 + _rebalance) * target.Quantity)
                 {
                     // Holdings too large, rebalance down
-                    algorithm.Log($"Rebalance down {target.Symbol} {holdings} to {target.Quantity}");
+                    algorithm.Log($"Rebalance down {target.Symbol} {holdings} to {target.Quantity} @ {security.Price:0.00}");
                     targets.Add(target);
                 }
                 else
@@ -203,15 +203,15 @@ namespace Algoloop.Algorithm.CSharp.Model
             // Add toplist in random order
             _insights.AddRange(toplist);
 
-            if (LogTargets)
+            if (_logTargets)
             {
-                DoLogTargets(algorithm, targets);
+                LogTargets(algorithm, targets);
             }
 
             return targets;
         }
 
-        private void DoLogTrades(QCAlgorithm algorithm)
+        private void LogTrades(QCAlgorithm algorithm)
         {
             decimal cash = _initialCapital;
             foreach (Trade trade in algorithm.TradeBuilder.ClosedTrades)
@@ -240,7 +240,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
 
-        private static void DoLogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
+        private static void LogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
         {
             int i = 0;
             foreach (IPortfolioTarget target in targets)
