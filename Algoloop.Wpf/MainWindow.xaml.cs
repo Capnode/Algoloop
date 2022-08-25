@@ -51,12 +51,12 @@ namespace Algoloop.Wpf
             this.SetPlacement(Settings.Default.MainWindowPlacement);
         }
 
-        private void FileSettings(object sender, RoutedEventArgs e)
+        private async void FileSettings(object sender, RoutedEventArgs e)
         {
             MainViewModel model = DataContext as MainViewModel;
             var settingsView = new SettingsView();
             bool update = settingsView.ShowDialog() ?? false;
-            model.DoSettings(update).Wait();
+            await model.DoSettings(update);
         }
 
         private void HelpAbout(object sender, RoutedEventArgs e)
