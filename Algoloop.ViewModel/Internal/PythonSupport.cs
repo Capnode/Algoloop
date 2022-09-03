@@ -12,8 +12,6 @@
  * limitations under the License.
  */
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -23,7 +21,7 @@ namespace Algoloop.ViewModel.Internal
 {
     internal class PythonSupport
     {
-        private const string Path = "PATH";
+        private const string ExePath = "PATH";
         private const string PythonPath = "PYTHONPATH";
         private const string PythonHome = "PYTHONHOME";
         private const string PythonnetPyDll = "PYTHONNET_PYDLL";
@@ -31,7 +29,7 @@ namespace Algoloop.ViewModel.Internal
 
         public static void SetupPython(StringDictionary environment)
         {
-            string paths = environment[Path];
+            string paths = environment[ExePath];
             foreach (string folder in paths.Split(";"))
             {
                 if (!Directory.Exists(folder)) continue;
@@ -45,7 +43,6 @@ namespace Algoloop.ViewModel.Internal
             throw new ApplicationException($"Python is not installed: {PythonPattern} not found");
         }
 
-
         public static void SetupJupyter(StringDictionary environment, string exeFolder)
         {
             if (environment.ContainsKey(PythonPath))
@@ -57,38 +54,7 @@ namespace Algoloop.ViewModel.Internal
             {
                 environment[PythonPath] = exeFolder;
             }
-
-            string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string sourceFile = System.IO.Path.Combine(exeFolder, "start.py");
-            string destFile = System.IO.Path.Combine(home, @".ipython\profile_default\startup\quantconnect.py");
-            File.Copy(sourceFile, destFile, true);
-
-            sourceFile = System.IO.Path.Combine(exeFolder, @"QuantConnect.Lean.Launcher.runtimeconfig.json");
-            destFile = System.IO.Path.Combine(home, @".ipython\profile_default\startup\QuantConnect.Lean.Launcher.runtimeconfig.json");
-            CopyRuntimeConfig(sourceFile, destFile);
         }
 
-        /// <summary>
-        /// Convert runtimeconfig.json file to a format acceptable to Python CLR loader
-        /// </summary>
-        internal static void CopyRuntimeConfig(string sourceFile, string destFile)
-        {
-            string json = File.ReadAllText(sourceFile);
-            JObject root = JObject.Parse(json);
-            JObject runtimeOptions = root["runtimeOptions"] as JObject;
-            JToken frameworks = runtimeOptions["includedFrameworks"];
-            if (frameworks != null)
-            {
-                runtimeOptions["framework"] = frameworks.First();
-                runtimeOptions.Remove("includedFrameworks");
-            }
-
-            using (StreamWriter file = File.CreateText(destFile))
-            using (JsonTextWriter writer = new JsonTextWriter(file))
-            {
-                writer.Formatting = Formatting.Indented;
-                root.WriteTo(writer);
-            }
-        }
     }
 }

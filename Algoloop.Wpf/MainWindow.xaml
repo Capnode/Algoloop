@@ -108,7 +108,7 @@
             <TabItem Header="{Binding StrategiesViewModel.Strategies.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Strategies ({0}), FallbackValue=Strategies}">
                 <view:StrategiesView />
             </TabItem>
-            <TabItem Header="Research" Visibility="{Binding ResearchViewModel.Initialized, Converter={viewsupport:BooleanToVisibilityConverter}}">
+            <TabItem Header="Research">
                 <wv2:WebView2 x:Name="Browser" Source="{Binding ResearchViewModel.Source}" />
             </TabItem>
             <TabItem Header="{Binding LogViewModel.Logs.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Logs ({0}), FallbackValue=Logs}">

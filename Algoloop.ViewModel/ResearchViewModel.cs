@@ -14,24 +14,32 @@
 
 using Algoloop.Model;
 using Algoloop.ViewModel.Internal;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Algoloop.ViewModel
 {
     public class ResearchViewModel : ViewModelBase, IDisposable
     {
         private const string Notebook = "Notebook";
+        private const string InstallPythonPage = @"https://github.com/Capnode/Algoloop/wiki/Install-Python-and-Jupyter-Lab";
+        private const string RuntimeConfig = "QuantConnect.Lean.Launcher.runtimeconfig.json";
+        private const string StartPy = "start.py";
+        private const string InitializeCsx = "Initialize.csx";
+        private const string QuantConnectCsx = "QuantConnect.csx";
+
         private readonly SettingModel _settings;
         private string _htmlText;
         private string _source;
         private ConfigProcess _process;
         private bool _disposed;
-        private bool _initialized;
 
         public ResearchViewModel(SettingModel settings)
         {
@@ -49,12 +57,6 @@ namespace Algoloop.ViewModel
         {
             get => _source;
             set => SetProperty(ref _source, value);
-        }
-
-        public bool Initialized
-        {
-            get => _initialized;
-            private set => SetProperty(ref _initialized, value);
         }
 
         public void Dispose()
@@ -86,7 +88,6 @@ namespace Algoloop.ViewModel
             try
             {
                 StopJupyter();
-                SetNotebookFolder();
                 _process = new ConfigProcess(
                     "jupyter.exe",
                     $"lab --no-browser",
@@ -108,6 +109,7 @@ namespace Algoloop.ViewModel
 
                 // Setup Python and Jupyter environment
                 string exeFolder = MainService.GetProgramFolder();
+                SetNotebookFolder(exeFolder);
                 PythonSupport.SetupJupyter(_process.Environment, exeFolder);
                 PythonSupport.SetupPython(_process.Environment);
 
@@ -122,11 +124,16 @@ namespace Algoloop.ViewModel
 
                 // Start process
                 _process.Start();
-                Initialized = true;
+            }
+            catch (ApplicationException ex)
+            {
+                Log.Error(ex);
+                Source = InstallPythonPage;
+                _process = null;
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Python must also be installed to use Research page.\nSee: https://github.com/QuantConnect/Lean/tree/master/Algorithm.Python#quantconnect-python-algorithm-project \n");
+                Log.Error(ex);
                 _process = null;
             }
         }
@@ -142,14 +149,55 @@ namespace Algoloop.ViewModel
             _process = null;
         }
 
-        private void SetNotebookFolder()
+        private void SetNotebookFolder(string exeFolder)
         {
             if (string.IsNullOrEmpty(_settings.Notebook))
             {
                 string userDataFolder = MainService.GetUserDataFolder();
                 _settings.Notebook = Path.Combine(userDataFolder, Notebook);
-                Directory.CreateDirectory(_settings.Notebook);
             }
+
+            DirectoryInfo notebook = Directory.CreateDirectory(_settings.Notebook);
+            string parent = notebook.Parent.FullName;
+
+            string sourceFile = Path.Combine(exeFolder, StartPy);
+            string destFile = Path.Combine(parent, StartPy);
+            File.Copy(sourceFile, destFile, true);
+
+            sourceFile = Path.Combine(exeFolder, InitializeCsx);
+            destFile = Path.Combine(parent, InitializeCsx);
+            File.Copy(sourceFile, destFile, true);
+
+            sourceFile = Path.Combine(exeFolder, QuantConnectCsx);
+            destFile = Path.Combine(parent, QuantConnectCsx);
+            string content = File.ReadAllText(sourceFile);
+            content = content.Replace("#r \"", $"#r \"{exeFolder}\\");
+            File.WriteAllText(destFile, content);
+
+            sourceFile = Path.Combine(exeFolder, RuntimeConfig);
+            destFile = Path.Combine(parent, RuntimeConfig);
+            CopyRuntimeConfig(sourceFile, destFile);
+        }
+
+        /// <summary>
+        /// Convert runtimeconfig.json file to a format acceptable to Python CLR loader
+        /// </summary>
+        internal static void CopyRuntimeConfig(string sourceFile, string destFile)
+        {
+            string json = File.ReadAllText(sourceFile);
+            JObject root = JObject.Parse(json);
+            JObject runtimeOptions = root["runtimeOptions"] as JObject;
+            JToken frameworks = runtimeOptions["includedFrameworks"];
+            if (frameworks != null)
+            {
+                runtimeOptions["framework"] = frameworks.First();
+                runtimeOptions.Remove("includedFrameworks");
+            }
+
+            using StreamWriter file = File.CreateText(destFile);
+            using JsonTextWriter writer = new(file);
+            writer.Formatting = Formatting.Indented;
+            root.WriteTo(writer);
         }
     }
 }

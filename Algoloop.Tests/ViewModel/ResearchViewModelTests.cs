@@ -13,13 +13,13 @@
  */
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Algoloop.ViewModel.Internal;
 using System.IO;
+using Algoloop.ViewModel;
 
-namespace Algoloop.Tests.ViewModel.Internal
+namespace Algoloop.Tests.ViewModel
 {
     [TestClass()]
-    public class PythonSupportTests
+    public class ResearchViewModelTests
     {
         const string _infile = "infile";
         const string _outfile = "outfile";
@@ -48,11 +48,11 @@ namespace Algoloop.Tests.ViewModel.Internal
             File.WriteAllText(_infile, _runtimeConfigJson);
 
             // Act
-            PythonSupport.CopyRuntimeConfig(_infile, _outfile);
+            ResearchViewModel.CopyRuntimeConfig(_infile, _outfile);
 
             // Assert
-            string result = File.ReadAllText(_outfile);    
-            Assert.IsTrue(_runtimeConfigJson.Length > 0);
+            string result = File.ReadAllText(_outfile);
+            Assert.IsTrue(result.Length > 0);
         }
     }
 }
