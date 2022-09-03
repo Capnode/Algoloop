@@ -110,7 +110,7 @@ namespace QuantConnect.Algorithm
         private Action<Slice> _onDataSlice;
 
         // flips to true when the user
-        private bool _userSetSecurityInitializer = false;
+        private bool _userSetSecurityInitializer;
 
         // warmup resolution variables
         private TimeSpan? _warmupTimeSpan;
@@ -252,6 +252,15 @@ namespace QuantConnect.Algorithm
         /// </summary>
         [DocumentationAttribute(HandlingData)]
         public SubscriptionManager SubscriptionManager
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The project id associated with this algorithm if any
+        /// </summary>
+        public int ProjectId
         {
             get;
             set;
@@ -1123,7 +1132,7 @@ namespace QuantConnect.Algorithm
             // startDate is set by Lean to the default timezone (New York), so we must update it here
             else
             {
-                _startDate = DateTime.UtcNow.ConvertFromUtc(TimeZone).Date;
+                SetLiveModeStartDate();
             }
         }
 
@@ -1550,10 +1559,7 @@ namespace QuantConnect.Algorithm
                 Securities.SetLiveMode(live);
                 if (live)
                 {
-                    _start = DateTime.UtcNow.ConvertFromUtc(TimeZone);
-                    // startDate is set relative to the algorithm's timezone.
-                    _startDate = _start.Date;
-                    _endDate = QuantConnect.Time.EndOfTime;
+                    SetLiveModeStartDate();
                 }
             }
         }
@@ -2898,6 +2904,21 @@ namespace QuantConnect.Algorithm
             }
 
             return tradingDate.Value;
+        }
+
+        /// <summary>
+        /// Helper method to set the start date during live trading
+        /// </summary>
+        private void SetLiveModeStartDate()
+        {
+            if (!LiveMode)
+            {
+                throw new InvalidOperationException("SetLiveModeStartDate should only be called during live trading!");
+            }
+            _start = DateTime.UtcNow.ConvertFromUtc(TimeZone);
+            // startDate is set relative to the algorithm's timezone.
+            _startDate = _start.Date;
+            _endDate = QuantConnect.Time.EndOfTime;
         }
     }
 }

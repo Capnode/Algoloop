@@ -59,7 +59,7 @@ namespace QuantConnect.Algorithm.CSharp
                     if (contract != null)
                     {
                         _contractSymbol = contract.Symbol;
-                        PlaceOrder(_contractSymbol);
+                        MarketOrder(_contractSymbol, 1);
                     }
                 }
             }
@@ -79,11 +79,6 @@ namespace QuantConnect.Algorithm.CSharp
             Log($"{orderEvent}. Delisting on: {_contractSymbol.ID.Date}");
         }
 
-        protected virtual void PlaceOrder(Symbol symbol)
-        {
-            MarketOrder(symbol, 1);
-        }
-
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
@@ -97,7 +92,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public virtual long DataPoints => 386010;
+        public virtual long DataPoints => 398985;
 
         /// <summary>
         /// Data Points count of the algorithm history

@@ -395,6 +395,21 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
         public SubscriptionManager SubscriptionManager => _baseAlgorithm.SubscriptionManager;
 
         /// <summary>
+        /// The project id associated with this algorithm if any
+        /// </summary>
+        public int ProjectId
+        {
+            set
+            {
+                _baseAlgorithm.ProjectId = value;
+            }
+            get
+            {
+                return _baseAlgorithm.ProjectId;
+            }
+        }
+
+        /// <summary>
         /// Current date/time in the algorithm's local time zone
         /// </summary>
         public DateTime Time => _baseAlgorithm.Time;
@@ -756,6 +771,17 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
             {
                 _onOrderEvent(newEvent);
             }
+        }
+
+        /// <summary>
+        /// Will submit an order request to the algorithm
+        /// </summary>
+        /// <param name="request">The request to submit</param>
+        /// <remarks>Will run order prechecks, which include making sure the algorithm is not warming up, security is added and has data among others</remarks>
+        /// <returns>The order ticket</returns>
+        public OrderTicket SubmitOrderRequest(SubmitOrderRequest request)
+        {
+            return _baseAlgorithm.SubmitOrderRequest(request);
         }
 
         /// <summary>

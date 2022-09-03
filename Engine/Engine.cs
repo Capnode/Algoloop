@@ -114,6 +114,8 @@ namespace QuantConnect.Lean.Engine
                     // Save algorithm to cache, load algorithm instance:
                     algorithm = AlgorithmHandlers.Setup.CreateAlgorithmInstance(job, assemblyPath);
 
+                    algorithm.ProjectId = job.ProjectId;
+
                     // Set algorithm in ILeanManager
                     SystemHandlers.LeanManager.SetAlgorithm(algorithm);
 
@@ -121,7 +123,7 @@ namespace QuantConnect.Lean.Engine
                     AlgorithmHandlers.Alphas.Initialize(job, algorithm, SystemHandlers.Notify, SystemHandlers.Api, AlgorithmHandlers.Transactions);
 
                     // initialize the object store
-                    AlgorithmHandlers.ObjectStore.Initialize(algorithm.Name, job.UserId, job.ProjectId, job.UserToken, job.Controls);
+                    AlgorithmHandlers.ObjectStore.Initialize(job.UserId, job.ProjectId, job.UserToken, job.Controls);
 
                     // initialize the data permission manager
                     AlgorithmHandlers.DataPermissionsManager.Initialize(job);
@@ -262,20 +264,19 @@ namespace QuantConnect.Lean.Engine
                 }
 
 
+                var historyProviderName = algorithm?.HistoryProvider != null ? algorithm.HistoryProvider.GetType().FullName : string.Empty;
                 // log the job endpoints
-                Log.Trace("JOB HANDLERS: ");
-                Log.Trace("         DataFeed:     " + AlgorithmHandlers.DataFeed.GetType().FullName);
-                Log.Trace("         Setup:        " + AlgorithmHandlers.Setup.GetType().FullName);
-                Log.Trace("         RealTime:     " + AlgorithmHandlers.RealTime.GetType().FullName);
-                Log.Trace("         Results:      " + AlgorithmHandlers.Results.GetType().FullName);
-                Log.Trace("         Transactions: " + AlgorithmHandlers.Transactions.GetType().FullName);
-                Log.Trace("         Alpha:        " + AlgorithmHandlers.Alphas.GetType().FullName);
-                Log.Trace("         ObjectStore:  " + AlgorithmHandlers.ObjectStore.GetType().FullName);
-                if (algorithm?.HistoryProvider != null)
-                {
-                    Log.Trace("         History Provider:     " + algorithm.HistoryProvider.GetType().FullName);
-                }
-                if (job is LiveNodePacket) Log.Trace("         Brokerage:      " + brokerage?.GetType().FullName);
+                Log.Trace($"JOB HANDLERS:{Environment.NewLine}" +
+                    $"         DataFeed:             {AlgorithmHandlers.DataFeed.GetType().FullName}{Environment.NewLine}" +
+                    $"         Setup:                {AlgorithmHandlers.Setup.GetType().FullName}{Environment.NewLine}" +
+                    $"         RealTime:             {AlgorithmHandlers.RealTime.GetType().FullName}{Environment.NewLine}" +
+                    $"         Results:              {AlgorithmHandlers.Results.GetType().FullName}{Environment.NewLine}" +
+                    $"         Transactions:         {AlgorithmHandlers.Transactions.GetType().FullName}{Environment.NewLine}" +
+                    $"         Alpha:                {AlgorithmHandlers.Alphas.GetType().FullName}{Environment.NewLine}" +
+                    $"         Object Store:         {AlgorithmHandlers.ObjectStore.GetType().FullName}{Environment.NewLine}" +
+                    $"         History Provider:     {historyProviderName}{Environment.NewLine}" +
+                    $"         Brokerage:            {brokerage?.GetType().FullName}{Environment.NewLine}" +
+                    $"         Data Provider:        {AlgorithmHandlers.DataProvider.GetType().FullName}{Environment.NewLine}");
 
                 //-> Using the job + initialization: load the designated handlers:
                 if (initializeComplete)

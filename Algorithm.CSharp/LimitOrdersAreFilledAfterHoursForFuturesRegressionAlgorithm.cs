@@ -27,7 +27,7 @@ namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
     /// Regression algorithm for testing limit orders are filled after hours for futures.
-    /// It also asserts that market and market-on-open orders are not allowed for futures outside of regular market hours
+    /// It also asserts that market-on-open orders are not allowed for futures outside of regular market hours
     /// </summary>
     public class LimitOrdersAreFilledAfterHoursForFuturesRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
@@ -57,13 +57,6 @@ namespace QuantConnect.Algorithm.CSharp
             if (_futureContract.Exchange.ExchangeOpen)
             {
                 throw new Exception("We should be outside regular market hours");
-            }
-
-            // Market order should not be allowed for futures outside of regular market hours
-            var futureContractMarketOrder = MarketOrder(_futureContract.Symbol, 1);
-            if (futureContractMarketOrder.Status != OrderStatus.Invalid)
-            {
-                throw new Exception($"Market order should not be allowed for futures outside of regular market hours");
             }
 
             // Market on open order should not be allowed for futures outside of regular market hours
@@ -120,7 +113,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 81526;
+        public long DataPoints => 82366;
 
         /// <summary>
         /// Data Points count of the algorithm history

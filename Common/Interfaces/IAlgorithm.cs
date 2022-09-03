@@ -69,6 +69,15 @@ namespace QuantConnect.Interfaces
         }
 
         /// <summary>
+        /// The project id associated with this algorithm if any
+        /// </summary>
+        int ProjectId
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Security object collection class stores an array of objects representing representing each security/asset
         /// we have a subscription for.
         /// </summary>
@@ -405,24 +414,6 @@ namespace QuantConnect.Interfaces
         /// brokerage</param>
         void SetBrokerageModel(IBrokerageModel brokerageModel);
 
-        // <summary>
-        // v1.0 Handler for Tick Events [DEPRECATED June-2014]
-        // </summary>
-        // <param name="ticks">Tick Data Packet</param>
-        //void OnTick(Dictionary<string, List<Tick>> ticks);
-
-        // <summary>
-        // v1.0 Handler for TradeBar Events [DEPRECATED June-2014]
-        // </summary>
-        // <param name="tradebars">TradeBar Data Packet</param>
-        //void OnTradeBar(Dictionary<string, TradeBar> tradebars);
-
-        // <summary>
-        // v2.0 Handler for Generic Data Events
-        // </summary>
-        //void OnData(Ticks ticks);
-        //void OnData(TradeBars tradebars);
-
         /// <summary>
         /// v3.0 Handler for all data types
         /// </summary>
@@ -506,6 +497,14 @@ namespace QuantConnect.Interfaces
         /// </summary>
         /// <param name="newEvent">Event information</param>
         void OnOrderEvent(OrderEvent newEvent);
+
+        /// <summary>
+        /// Will submit an order request to the algorithm
+        /// </summary>
+        /// <param name="request">The request to submit</param>
+        /// <remarks>Will run order prechecks, which include making sure the algorithm is not warming up, security is added and has data among others</remarks>
+        /// <returns>The order ticket</returns>
+        OrderTicket SubmitOrderRequest(SubmitOrderRequest request);
 
         /// <summary>
         /// Option assignment event handler. On an option assignment event for short legs the resulting information is passed to this method.

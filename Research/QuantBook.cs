@@ -127,25 +127,26 @@ namespace QuantConnect.Research
                     new AlgorithmManager(false));
                 systemHandlers.LeanManager.SetAlgorithm(this);
 
+                ProjectId = Config.GetInt("project-id");
+
                 algorithmHandlers.DataPermissionsManager.Initialize(new AlgorithmNodePacket(PacketType.BacktestNode)
                 {
                     UserToken = Config.Get("api-access-token"),
                     UserId = Config.GetInt("job-user-id"),
-                    ProjectId = Config.GetInt("project-id"),
+                    ProjectId = ProjectId,
                     OrganizationId = Config.Get("job-organization-id"),
                     Version = Globals.Version
                 });
 
-                algorithmHandlers.ObjectStore.Initialize(Config.Get("research-object-store-name", "QuantBook"),
-                    Config.GetInt("job-user-id"),
-                    Config.GetInt("project-id"),
+                algorithmHandlers.ObjectStore.Initialize(Config.GetInt("job-user-id"),
+                    ProjectId,
                     Config.Get("api-access-token"),
                     new Controls
                     {
                         // if <= 0 we disable periodic persistence and make it synchronous
                         PersistenceIntervalSeconds = -1,
-                        StorageLimitMB = Config.GetInt("storage-limit-mb", 5),
-                        StorageFileCount = Config.GetInt("storage-file-count", 100),
+                        StorageLimit = Config.GetValue("storage-limit", 10737418240L),
+                        StorageFileCount = Config.GetInt("storage-file-count", 10000),
                         StoragePermissions = (FileAccess) Config.GetInt("storage-permissions", (int)FileAccess.ReadWrite)
                     });
                 SetObjectStore(algorithmHandlers.ObjectStore);
