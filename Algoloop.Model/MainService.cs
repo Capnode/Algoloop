@@ -110,5 +110,13 @@ namespace Algoloop.Model
                 Directory.Delete(folder, true);
             }
         }
+
+        public static void DeleteFiles(string path, string pattern)
+        {
+            foreach (string file in Directory.GetFiles(path, pattern, SearchOption.TopDirectoryOnly))
+            {
+                File.Delete(file);
+            }
+        }
     }
 }

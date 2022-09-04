@@ -196,7 +196,8 @@ namespace Algoloop.ViewModel
                 Directory.CreateDirectory(programDataFolder);
 
                 // Migrate existing files to new location
-                MainService.DeleteFolders(appDataFolder, "temp*"); 
+                MainService.DeleteFolders(appDataFolder, "temp*");
+                MainService.DeleteFiles(appDataFolder, "*.log");
                 MainService.CopyDirectory(appDataFolder, programDataFolder, false);
                 MainService.DeleteFolders(appDataFolder, "*");
 
@@ -205,6 +206,8 @@ namespace Algoloop.ViewModel
                     Path.Combine(programFolder, "Content/ProgramData"),
                     programDataFolder,
                     false);
+
+                // Update User data
                 MainService.CopyDirectory(
                     Path.Combine(programFolder, "Content/UserData"),
                     userDataFolder,
