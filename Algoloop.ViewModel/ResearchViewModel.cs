@@ -174,7 +174,7 @@ namespace Algoloop.ViewModel
 
                 // Set config file
                 IDictionary<string, string> config = _process.Config;
-                config["job-user-id"] = _settings.ApiUser;
+                config["job-user-id"] = int.TryParse(_settings.ApiUser, out _) ? _settings.ApiUser : "0";
                 config["api-access-token"] = _settings.ApiToken;
                 config["algorithm-language"] = Language.Python.ToString();
                 config["data-folder"] = _settings.DataFolder.Replace("\\", "/");

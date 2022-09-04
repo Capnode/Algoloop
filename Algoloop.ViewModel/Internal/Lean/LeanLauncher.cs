@@ -175,7 +175,7 @@ namespace Algoloop.ViewModel.Internal.Lean
 //            config["alpha-handler"] = "Algoloop.Lean.AlphaHandler";
             config["alpha-handler"] = "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler";
             config["api-access-token"] = settings.ApiToken ?? string.Empty;
-            config["job-user-id"] = settings.ApiUser ?? "0";
+            config["job-user-id"] = int.TryParse(settings.ApiUser, out _) ? settings.ApiUser : "0";
             config["job-project-id"] = "0";
             config["algorithm-path-python"] = ".";
             config["regression-update-statistics"] = "false";
