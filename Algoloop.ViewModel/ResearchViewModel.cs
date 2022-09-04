@@ -16,13 +16,14 @@ using Algoloop.Model;
 using Algoloop.ViewModel.Internal;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using QuantConnect;
+using System.Reflection;
 
 namespace Algoloop.ViewModel
 {
@@ -31,15 +32,73 @@ namespace Algoloop.ViewModel
         private const string Notebook = "Notebook";
         private const string InstallPythonPage = @"https://github.com/Capnode/Algoloop/wiki/Install-Python-and-Jupyter-Lab";
         private const string RuntimeConfig = "QuantConnect.Lean.Launcher.runtimeconfig.json";
-        private const string StartPy = "start.py";
-        private const string InitializeCsx = "Initialize.csx";
-        private const string QuantConnectCsx = "QuantConnect.csx";
 
         private readonly SettingModel _settings;
         private string _htmlText;
         private string _source;
         private ConfigProcess _process;
         private bool _disposed;
+        private readonly string[] _exeFiles = new string[]
+        {
+            "start.py",
+            "Initialize.csx",
+            "QuantConnect.csx",
+            "Accord.Fuzzy.dll",
+            "Accord.MachineLearning.dll",
+            "Accord.Math.Core.dll",
+            "Accord.Math.dll",
+            "Accord.Statistics.dll",
+            "Accord.dll",
+            "AsyncIO.dll",
+            "CloneExtensions.dll",
+            "CoinAPI.WebSocket.V1.dll",
+            "Common.Logging.Core.dll",
+            "Common.Logging.dll",
+            "CsvHelper.dll",
+            "DotNetZip.dll",
+            "DynamicInterop.dll",
+            "FSharp.Core.dll",
+            "Fasterflect.dll",
+            "ICSharpCode.SharpZipLib.dll",
+            "IQFeed.CSharpApiClient.dll",
+            "LaunchDarkly.EventSource.dll",
+            "MathNet.Numerics.dll",
+            "McMaster.Extensions.CommandLineUtils.dll",
+            "Microsoft.IO.RecyclableMemoryStream.dll",
+            "Microsoft.Windows.SDK.NET.dll",
+            "NaCl.dll",
+            "NetMQ.dll",
+            "Newtonsoft.Json.dll",
+            "NodaTime.dll",
+            "Python.Runtime.dll",
+            "QLNet.dll",
+            "QuantConnect.Algorithm.CSharp.dll",
+            "QuantConnect.Algorithm.Framework.dll",
+            "QuantConnect.Algorithm.dll",
+            "QuantConnect.AlgorithmFactory.dll",
+            "QuantConnect.Api.dll",
+            "QuantConnect.Brokerages.dll",
+            "QuantConnect.Common.dll",
+            "QuantConnect.Compression.dll",
+            "QuantConnect.Configuration.dll",
+            "QuantConnect.Indicators.dll",
+            "QuantConnect.Lean.Engine.dll",
+            "QuantConnect.Lean.Launcher.dll",
+            "QuantConnect.Logging.dll",
+            "QuantConnect.Messaging.dll",
+            "QuantConnect.Queues.dll",
+            "QuantConnect.Research.dll",
+            "QuantConnect.ToolBox.dll",
+            "RDotNet.dll",
+            "RestSharp.dll",
+            "System.ComponentModel.Composition.dll",
+            "System.Private.ServiceModel.dll",
+            "System.ServiceModel.Primitives.dll",
+            "System.ServiceModel.dll",
+            "Utf8Json.dll",
+            "WinRT.Runtime.dll",
+            "protobuf-net.Core.dll",
+        };
 
         public ResearchViewModel(SettingModel settings)
         {
@@ -115,12 +174,23 @@ namespace Algoloop.ViewModel
 
                 // Set config file
                 IDictionary<string, string> config = _process.Config;
+                config["job-user-id"] = _settings.ApiUser;
+                config["api-access-token"] = _settings.ApiToken;
                 config["algorithm-language"] = Language.Python.ToString();
-                config["composer-dll-directory"] = exeFolder.Replace("\\", "/");
                 config["data-folder"] = _settings.DataFolder.Replace("\\", "/");
-                config["api-handler"] = "QuantConnect.Api.Api";
-                config["job-queue-handler"] = "QuantConnect.Queues.JobQueue";
+                config["data-directory"] = _settings.DataFolder.Replace("\\", "/");
+                config["composer-dll-directory"] = "..";
+                config["log-handler"] = "QuantConnect.Logging.CompositeLogHandler";
                 config["messaging-handler"] = "QuantConnect.Messaging.Messaging";
+                config["job-queue-handler"] = "QuantConnect.Queues.JobQueue";
+                config["api-handler"] = "QuantConnect.Api.Api";
+                config["map-file-provider"] = "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider";
+                config["factor-file-provider"] = "QuantConnect.Data.Auxiliary.LocalDiskFactorFileProvider";
+                config["data-provider"] = "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider";
+                config["alpha-handler"] = "QuantConnect.Lean.Engine.Alphas.DefaultAlphaHandler";
+                config["data-channel-provider"] = "DataChannelProvider";
+                config["object-store"] = "QuantConnect.Lean.Engine.Storage.LocalObjectStore";
+                config["data-aggregator"] = "QuantConnect.Lean.Engine.DataFeeds.AggregationManager";
 
                 // Start process
                 _process.Start();
@@ -149,36 +219,6 @@ namespace Algoloop.ViewModel
             _process = null;
         }
 
-        private void SetNotebookFolder(string exeFolder)
-        {
-            if (string.IsNullOrEmpty(_settings.Notebook))
-            {
-                string userDataFolder = MainService.GetUserDataFolder();
-                _settings.Notebook = Path.Combine(userDataFolder, Notebook);
-            }
-
-            DirectoryInfo notebook = Directory.CreateDirectory(_settings.Notebook);
-            string parent = notebook.Parent.FullName;
-
-            string sourceFile = Path.Combine(exeFolder, StartPy);
-            string destFile = Path.Combine(parent, StartPy);
-            File.Copy(sourceFile, destFile, true);
-
-            sourceFile = Path.Combine(exeFolder, InitializeCsx);
-            destFile = Path.Combine(parent, InitializeCsx);
-            File.Copy(sourceFile, destFile, true);
-
-            sourceFile = Path.Combine(exeFolder, QuantConnectCsx);
-            destFile = Path.Combine(parent, QuantConnectCsx);
-            string content = File.ReadAllText(sourceFile);
-            content = content.Replace("#r \"", $"#r \"{exeFolder}\\");
-            File.WriteAllText(destFile, content);
-
-            sourceFile = Path.Combine(exeFolder, RuntimeConfig);
-            destFile = Path.Combine(parent, RuntimeConfig);
-            CopyRuntimeConfig(sourceFile, destFile);
-        }
-
         /// <summary>
         /// Convert runtimeconfig.json file to a format acceptable to Python CLR loader
         /// </summary>
@@ -198,6 +238,43 @@ namespace Algoloop.ViewModel
             using JsonTextWriter writer = new(file);
             writer.Formatting = Formatting.Indented;
             root.WriteTo(writer);
+        }
+
+        private void SetNotebookFolder(string exeFolder)
+        {
+            if (string.IsNullOrEmpty(_settings.Notebook))
+            {
+                string userDataFolder = MainService.GetUserDataFolder();
+                _settings.Notebook = Path.Combine(userDataFolder, Notebook);
+            }
+
+            DirectoryInfo notebook = Directory.CreateDirectory(_settings.Notebook);
+            string parent = notebook.Parent.FullName;
+            CopyExeFiles(exeFolder, parent);
+
+            string sourceFile = Path.Combine(exeFolder, RuntimeConfig);
+            string destFile = Path.Combine(parent, RuntimeConfig);
+            CopyRuntimeConfig(sourceFile, destFile);
+        }
+
+        private void CopyExeFiles(string exeFolder, string notebookFolder)
+        {
+            foreach (string filename in _exeFiles)
+            {
+                // Copy file if newer
+                FileInfo sourceFile = new FileInfo(Path.Combine(exeFolder, filename));
+                if (!sourceFile.Exists)
+                {
+                    Log.Error($"{MethodBase.GetCurrentMethod().DeclaringType.FullName}.{MethodBase.GetCurrentMethod().Name}: {filename} does not exist");
+                    continue;
+                }
+
+                FileInfo destFile = new FileInfo(Path.Combine(notebookFolder, filename));
+                if (sourceFile.LastWriteTime > destFile.LastWriteTime)
+                {
+                    File.Copy(sourceFile.FullName, destFile.FullName, true);
+                }
+            }
         }
     }
 }
