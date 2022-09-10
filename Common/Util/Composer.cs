@@ -84,7 +84,7 @@ namespace QuantConnect.Util
 
             // Resolve full path name just to be safe
             var primaryDllLookupDirectory = new DirectoryInfo(dllDirectoryString).FullName;
-            Log.Trace($"Composer(): Loading Assemblies from {primaryDllLookupDirectory}");
+            //Log.Trace($"Composer(): Loading Assemblies from {primaryDllLookupDirectory}");
 
             var loadFromPluginDir = !string.IsNullOrWhiteSpace(PluginDirectory)
                 && Directory.Exists(PluginDirectory) &&
