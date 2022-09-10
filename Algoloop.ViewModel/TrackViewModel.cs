@@ -605,13 +605,11 @@ namespace Algoloop.ViewModel
 
         private void LoadTrack()
         {
+            if (Model.ZipFile == null) return;
             string trackFile = Path.Combine(MainService.GetProgramDataFolder(), Model.ZipFile);
 
             // Find track zipfile
-            if (!File.Exists(trackFile))
-            {
-                return;
-            }
+            if (!File.Exists(trackFile)) return;
 
             // Unzip result file
             ZipFile zipFile;
