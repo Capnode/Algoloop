@@ -105,6 +105,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             config["plugin-directory"] = ".";
             config["log-handler"] = "ConsoleLogHandler";
             config["map-file-provider"] = "LocalDiskMapFileProvider";
+            config["factor-file-provider"] = "LocalDiskFactorFileProvider";
             config["data-provider"] = "DefaultDataProvider";
             config["version-id"] = String.Empty;
             config["#command"] = cmd;

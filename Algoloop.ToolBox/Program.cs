@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Algoloop.ToolBox.BorsdataDownloader;
+using Algoloop.ToolBox.DukascopyDownloader;
 using Algoloop.ToolBox.MetastockConverter;
 using McMaster.Extensions.CommandLineUtils;
 using QuantConnect;
@@ -108,6 +109,10 @@ namespace Algoloop.ToolBox
                     case "bddl":
                     case "borsdatadownloader":
                         BorsdataDownloaderProgram.BorsdataDownloader(tickers, fromDate, toDate, GetParameterOrExit(optionsObject, "api-key"));
+                        break;
+                    case "ddl":
+                    case "dukascopydownloader":
+                        DukascopyDownloaderProgram.DukascopyDownloader(tickers, resolution, fromDate, toDate);
                         break;
                 }
             }

@@ -79,7 +79,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             };
 
             DateTime now = DateTime.UtcNow;
-            RunProcess("QuantConnect.ToolBox.exe", args, config);
+            RunProcess("Algoloop.ToolBox.exe", args, config);
             if (toDate > now)
             {
                 market.Active = false;
