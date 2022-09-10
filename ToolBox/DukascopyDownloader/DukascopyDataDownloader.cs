@@ -1,7 +1,6 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,37 +134,23 @@ namespace QuantConnect.ToolBox.DukascopyDownloader
 
                 using (var client = new WebClient())
                 {
-                    while (true)
+                    byte[] bytes;
+                    try
                     {
-                        byte[] bytes = null;
-                        try
+                        bytes = client.DownloadData(url);
+                    }
+                    catch (Exception exception)
+                    {
+                        Log.Error(exception);
+                        yield break;
+                    }
+                    if (bytes != null && bytes.Length > 0)
+                    {
+                        var ticks = AppendTicksToList(symbol, bytes, date, timeOffset, pointValue);
+                        foreach (var tick in ticks)
                         {
-                            bytes = client.DownloadData(url);
+                            yield return tick;
                         }
-                        catch (WebException webEx)
-                        {
-                            var response = (HttpWebResponse)webEx.Response;
-                            if (response == default) throw;
-                            if (response.StatusCode >= HttpStatusCode.InternalServerError)
-                            {
-                                Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
-                                continue;
-                            }
-                            else if (response.StatusCode == HttpStatusCode.NotFound)
-                            {
-                                break;
-                            }
-                            throw;
-                        }
-                        if (bytes != null && bytes.Length > 0)
-                        {
-                            var ticks = AppendTicksToList(symbol, bytes, date, timeOffset, pointValue);
-                            foreach (var tick in ticks)
-                            {
-                                yield return tick;
-                            }
-                        }
-                        break;
                     }
                 }
             }
