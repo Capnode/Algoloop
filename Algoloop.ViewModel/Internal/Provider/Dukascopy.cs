@@ -14,11 +14,11 @@
 
 using Algoloop.Model;
 using QuantConnect;
+using QuantConnect.Logging;
 using QuantConnect.Securities;
 using QuantConnect.ToolBox.DukascopyDownloader;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 
@@ -47,7 +47,6 @@ namespace Algoloop.ViewModel.Internal.Provider
         public override void GetUpdate(ProviderModel market, Action<object> update)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
-
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             if (!symbols.Any())
             {
@@ -62,6 +61,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             DateTime toDate = fromDate.AddDays(1).Date;
             string from = fromDate.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string to = toDate.AddTicks(-1).ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            Log.Trace($"{GetType().Name}: Download {resolution} from={from} to={to}");
             string[] args =
             {
                 "--app=DukascopyDownloader",

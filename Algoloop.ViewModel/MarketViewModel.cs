@@ -888,6 +888,7 @@ namespace Algoloop.ViewModel
         private void SymbolsFromModel()
         {
             Symbols.Clear();
+            ActiveSymbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 SymbolViewModel symbolViewModel = new (this, symbolModel);
