@@ -20,6 +20,7 @@ using StockSharp.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Controls.Primitives;
 
 namespace Algoloop.ViewModel.Internal.Lean
 {
@@ -79,8 +80,29 @@ namespace Algoloop.ViewModel.Internal.Lean
                     State = CandleStates.Finished
                 };
             }
+            else if (data is Tick tick)
+            {
+                return new TimeFrameCandle
+                {
+                    Security = security,
+                    OpenTime = tick.Time,
+                    HighTime = tick.Time,
+                    LowTime = tick.Time,
+                    CloseTime = tick.Time,
+                    OpenPrice = tick.Price,
+                    HighPrice = tick.Price,
+                    LowPrice = tick.Price,
+                    ClosePrice = tick.Price,
+                    OpenVolume = 0,
+                    HighVolume = 0,
+                    LowVolume = 0,
+                    CloseVolume = 0,
+                    BuildFrom = DataType.Ticks,
+                    State = CandleStates.Finished
+                };
+            }
 
-            throw new NotImplementedException("Unknown BaseData subclass");
+            throw new NotImplementedException($"Unknown BaseData subclass: {data.GetType()}");
         }
 
         public static IEnumerable<Candle> ToCandles(this IEnumerable<BaseData> data)
