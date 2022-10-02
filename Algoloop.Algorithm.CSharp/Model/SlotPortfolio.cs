@@ -30,6 +30,7 @@ namespace Algoloop.Algorithm.CSharp.Model
     {
         private readonly bool _logTargets = false;
         private readonly bool _logTrades = false;
+        private readonly bool _logInsights = false;
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
@@ -130,7 +131,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             int freeSlots = _slots - taken;
             decimal cash = algorithm.Portfolio.Cash;
 
-            // Create target for new insights
+            // Create targets for all insights in toplist
             var targets = new List<IPortfolioTarget>();
             IEnumerable<Insight> toplist = insights.Take(_slots);
             foreach (Insight insight in toplist)
@@ -192,16 +193,29 @@ namespace Algoloop.Algorithm.CSharp.Model
             // Close expired insights
             foreach (Insight expired in _insights.RemoveExpiredInsights(algorithm.UtcTime))
             {
-                // Add close target if not in target list
-                if (!targets.Any(m => m.Symbol.Equals(expired.Symbol)))
+                // Skip if symbol in target list
+                if (targets.Any(m => m.Symbol.Equals(expired.Symbol))) continue;
+
+                // Check if expired holding still exists
+                Security security = algorithm.Securities[expired.Symbol];
+                decimal holdings = security.Holdings.Quantity;
+                if (holdings != 0)
                 {
+                    // Create zero target
                     var target = new PortfolioTarget(expired.Symbol, 0);
                     targets.Add(target);
+
+                    // Put it back into expired list
+                    _insights.Add(expired);
                 }
             }
 
             // Add toplist in random order
             _insights.AddRange(toplist);
+            if (_logInsights)
+            {
+                LogInsights(algorithm, _insights.OrderByDescending(m => m.CloseTimeUtc).ThenByDescending(m => m.Magnitude));
+            }
 
             if (_logTargets)
             {
@@ -236,7 +250,8 @@ namespace Algoloop.Algorithm.CSharp.Model
             algorithm.Log("Insight toplist:");
             foreach (Insight insight in insights)
             {
-                algorithm.Log($"Insight {++i} {insight.Symbol} {insight.Magnitude:0.########} {insight.Direction}".ToStringInvariant());
+                string expired = insight.IsExpired(algorithm.UtcTime) ? "Expired" : String.Empty;
+                algorithm.Log($"Insight {++i} {insight.Symbol} {insight.Magnitude:0.########} {insight.Direction} {expired}".ToStringInvariant());
             }
         }
 
