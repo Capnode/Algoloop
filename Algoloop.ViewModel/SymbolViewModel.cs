@@ -40,7 +40,6 @@ namespace Algoloop.ViewModel
 
         private const decimal Million = 1e6m;
         private const string Annual = "Annual";
-
         private const string PeriodEndDate = "End date";
         private const string FileDate = "File date";
         private const string TotalRevenue = "Total Revenue (M)";

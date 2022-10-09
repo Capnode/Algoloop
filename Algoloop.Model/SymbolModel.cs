@@ -107,6 +107,7 @@ namespace Algoloop.Model
             Name = model.Name;
             Market = model.Market;
             Security = model.Security;
+            Properties = model.Properties;
         }
 
         public int CompareTo(object obj)

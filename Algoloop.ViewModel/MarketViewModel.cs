@@ -37,6 +37,7 @@ using QuantConnect.Statistics;
 using QuantConnect.Data.Market;
 using Algoloop.ViewModel.Properties;
 using CommunityToolkit.Mvvm.Input;
+using Newtonsoft.Json;
 
 namespace Algoloop.ViewModel
 {
@@ -83,7 +84,7 @@ namespace Algoloop.ViewModel
                 () => !IsBusy);
             ExportSymbolsCommand = new RelayCommand<IList>(
                 m => DoExportSymbols(m),
-                m => !IsBusy && !Active && SelectedSymbol != null);
+                m => !IsBusy && !Active);
             AddToSymbolListCommand = new RelayCommand<IList>(
                 m => DoAddToSymbolList(m),
                 m => !IsBusy && SelectedSymbol != null);
@@ -710,42 +711,49 @@ namespace Algoloop.ViewModel
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
                 Multiselect = false,
-                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+                Filter = "symbol file (*.json)|*.json|All files (*.*)|*.*"
             };
+
             if (openFileDialog.ShowDialog() == false)
+            {
                 return;
+            }
 
             try
             {
                 IsBusy = true;
+                int count = 0;
                 foreach (string fileName in openFileDialog.FileNames)
                 {
                     using var r = new StreamReader(fileName);
-                    while (!r.EndOfStream)
+                    using var reader = new JsonTextReader(r);
+                    var serializer = new JsonSerializer();
+                    List<SymbolModel> models = serializer.Deserialize<List<SymbolModel>>(reader);
+                    count += models.Count;
+                    foreach (SymbolModel model in models)
                     {
-                        string line = r.ReadLine();
-                        foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
+                        SymbolModel symbol = Model.Symbols.FirstOrDefault(m => m.Id.Equals(model.Id, StringComparison.OrdinalIgnoreCase));
+                        if (symbol != null)
                         {
-                            SymbolModel symbol = Model.Symbols.FirstOrDefault(m => m.Id.Equals(name, StringComparison.OrdinalIgnoreCase));
-                            if (symbol != null)
-                            {
-                                symbol.Active = true;
-                            }
-                            else
-                            {
-                                symbol = new SymbolModel(name, string.Empty, SecurityType.Base);
-                                Model.Symbols.Add(symbol);
-                            }
+                            symbol.Update(model);
+                        }
+                        else
+                        {
+                            Model.Symbols.Add(model);
                         }
                     }
                 }
 
                 Lists.ToList().ForEach(m => m.Refresh());
                 DataFromModel();
+                Messenger.Send(new NotificationMessage($"Imported {count} symbols"), 0);
+
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n", true);
+                string message = $"Failed reading {openFileDialog.FileName}";
+                Messenger.Send(new NotificationMessage(message), 0);
+                Log.Error(ex, message, true);
             }
             finally
             {
@@ -757,29 +765,40 @@ namespace Algoloop.ViewModel
         {
             Debug.Assert(symbols != null);
             if (symbols.Count == 0)
-                return;
+            {
+                symbols = Symbols;
+            }
 
-            var saveFileDialog = new SaveFileDialog
+            SaveFileDialog saveFileDialog = new()
             {
                 InitialDirectory = Directory.GetCurrentDirectory(),
-                Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
+                Filter = "symbol file (*.json)|*.json|All files (*.*)|*.*"
             };
+
             if (saveFileDialog.ShowDialog() == false)
+            {
                 return;
+            }
 
             try
             {
                 IsBusy = true;
-                string fileName = saveFileDialog.FileName;
-                using StreamWriter file = File.CreateText(fileName);
+                List<SymbolModel> models = new();
                 foreach (SymbolViewModel symbol in symbols)
                 {
-                    file.WriteLine(symbol.Model.Id);
+                    models.Add(symbol.Model);
                 }
+
+                using StreamWriter stream = File.CreateText(saveFileDialog.FileName);
+                JsonSerializer serializer = new() { Formatting = Formatting.Indented };
+                serializer.Serialize(stream, models);
+                Messenger.Send(new NotificationMessage($"Exported {symbols.Count} symbols"), 0);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n", true);
+                string message = $"Failed writing {saveFileDialog.FileName}";
+                Messenger.Send(new NotificationMessage(message), 0);
+                Log.Error(ex, message, true);
             }
             finally
             {
