@@ -17,7 +17,6 @@ using Algoloop.ViewModel;
 using Algoloop.Wpf.Properties;
 using Algoloop.Wpf.Internal;
 using QuantConnect.Configuration;
-using StockSharp.Xaml;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -31,13 +30,11 @@ namespace Algoloop.Wpf
     {
         public MainWindow()
         {
+            InitializeComponent();
+
             string exeFolder = MainService.GetProgramFolder();
             Config.Set("plugin-directory", exeFolder);
             Config.Set("composer-dll-directory", exeFolder);
-
-            InitializeComponent();
-            ThemeExtensions.DefaultTheme = ThemeExtensions.DefaultLightTheme;
-            ThemeExtensions.ApplyDefaultTheme();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
