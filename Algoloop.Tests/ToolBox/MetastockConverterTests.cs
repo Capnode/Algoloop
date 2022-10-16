@@ -26,8 +26,8 @@ namespace Algoloop.Tests.ToolBox
     [TestClass]
     public class MetastockConverterTests
     {
-//        private const string SourceDir = "TestData";
-        private const string SourceDir = "D:\\MSDATA";
+        private const string SourceDir = "TestData";
+//        private const string SourceDir = "D:\\MSDATA";
         private const string DestDir = "Data";
 
         [TestInitialize]
