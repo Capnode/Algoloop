@@ -123,8 +123,8 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-    <PackageReference Include="StockSharp.Algo" Version="5.0.134" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.134" />
+    <PackageReference Include="StockSharp.Algo" Version="5.0.135" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.135" />
   </ItemGroup>
 
   <ItemGroup>
