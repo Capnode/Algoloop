@@ -1514,11 +1514,11 @@ namespace QuantConnect.Algorithm
 
             //Validate:
             //2. Check Range:
-            //var yesterdayInAlgorithmTimeZone = DateTime.UtcNow.ConvertFromUtc(TimeZone).Date.AddDays(-1);
-            //if (end > yesterdayInAlgorithmTimeZone)
-            //{
-            //    end = yesterdayInAlgorithmTimeZone;
-            //}
+            var now = DateTime.UtcNow.ConvertFromUtc(TimeZone);
+            if (end > now)
+            {
+                end = now;
+            }
 
             //3. Make this at the very end of the requested date
             _endDate = end.RoundDown(TimeSpan.FromDays(1)).AddDays(1).AddTicks(-1);
