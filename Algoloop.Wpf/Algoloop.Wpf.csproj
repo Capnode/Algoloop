@@ -13,8 +13,12 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\Palette.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Resources\AlgoloopIcon.ico" />
     <Resource Include="Resources\Help.png" />
+    <Resource Include="Resources\Palette.png" />
     <SplashScreen Include="Resources\AlgoloopSplash.png" />
     <Resource Include="Doc\Chart.png" />
     <Resource Include="Resources\Exit.png" />

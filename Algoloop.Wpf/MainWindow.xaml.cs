@@ -20,13 +20,15 @@ using QuantConnect.Configuration;
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using DevExpress.Xpf.Core;
 
 namespace Algoloop.Wpf
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : ThemedWindow
     {
         public MainWindow()
         {
@@ -35,6 +37,7 @@ namespace Algoloop.Wpf
             string exeFolder = MainService.GetProgramFolder();
             Config.Set("plugin-directory", exeFolder);
             Config.Set("composer-dll-directory", exeFolder);
+            SetTheme(ApplicationThemeHelper.ApplicationThemeName);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -99,6 +102,32 @@ namespace Algoloop.Wpf
                 // check this: https://github.com/dotnet/corefx/issues/10361
                 Debug.WriteLine($"{ex.GetType()}: {ex.Message}");
             }
+        }
+
+        private void OnTheme(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is MenuItem item)
+            {
+                SetTheme(item.DataContext.ToString());
+            }
+        }
+
+        private void SetTheme(string actualTheme)
+        {
+            _themeMenu.Items.Clear();
+            foreach (Theme theme in Theme.Themes)
+            {
+                var menuItem = new MenuItem
+                {
+                    Header = theme.FullName,
+                    DataContext = theme.Name,
+                    IsChecked = theme.Name == actualTheme
+                };
+
+                _themeMenu.Items.Add(menuItem);
+            }
+
+            ApplicationThemeHelper.ApplicationThemeName = actualTheme;
         }
     }
 }
