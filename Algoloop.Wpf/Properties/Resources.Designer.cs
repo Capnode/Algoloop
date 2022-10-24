@@ -19,7 +19,7 @@ namespace Algoloop.Wpf.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -137,24 +137,6 @@ namespace Algoloop.Wpf.Properties {
             get {
                 object obj = ResourceManager.GetObject("AlgoloopSplash", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Application update: {0}.
-        /// </summary>
-        internal static string AppUpdated {
-            get {
-                return ResourceManager.GetString("AppUpdated", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Application updating {0}%.
-        /// </summary>
-        internal static string AppUpdating {
-            get {
-                return ResourceManager.GetString("AppUpdating", resourceCulture);
             }
         }
         
@@ -279,60 +261,6 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Loading configuration, please wait....
-        /// </summary>
-        internal static string LoadingConfiguration {
-            get {
-                return ResourceManager.GetString("LoadingConfiguration", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loading configuration completed.
-        /// </summary>
-        internal static string LoadingConfigurationCompleted {
-            get {
-                return ResourceManager.GetString("LoadingConfigurationCompleted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Market {0} completed.
-        /// </summary>
-        internal static string MarketCompleted {
-            get {
-                return ResourceManager.GetString("MarketCompleted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Market {0} failed: {1}.
-        /// </summary>
-        internal static string MarketException {
-            get {
-                return ResourceManager.GetString("MarketException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Market {0} has no symbol selected.
-        /// </summary>
-        internal static string MarketNoSymbol {
-            get {
-                return ResourceManager.GetString("MarketNoSymbol", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Market {0} started.
-        /// </summary>
-        internal static string MarketStarted {
-            get {
-                return ResourceManager.GetString("MarketStarted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap MoveDown {
@@ -363,20 +291,12 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No update is available.
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static string NoAppUpdate {
+        internal static System.Drawing.Bitmap Palette {
             get {
-                return ResourceManager.GetString("NoAppUpdate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No symbol selected!.
-        /// </summary>
-        internal static string NoSymbolSelected {
-            get {
-                return ResourceManager.GetString("NoSymbolSelected", resourceCulture);
+                object obj = ResourceManager.GetObject("Palette", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -401,39 +321,12 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Run strategy with {0} track(s).
-        /// </summary>
-        internal static string RunStrategyWithTracks {
-            get {
-                return ResourceManager.GetString("RunStrategyWithTracks", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Save {
             get {
                 object obj = ResourceManager.GetObject("Save", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Saving configuration, please wait....
-        /// </summary>
-        internal static string SavingConfiguration {
-            get {
-                return ResourceManager.GetString("SavingConfiguration", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Selected: {0}.
-        /// </summary>
-        internal static string SelectedCount {
-            get {
-                return ResourceManager.GetString("SelectedCount", resourceCulture);
             }
         }
         
@@ -454,24 +347,6 @@ namespace Algoloop.Wpf.Properties {
             get {
                 object obj = ResourceManager.GetObject("Stop", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Strategy aborted.
-        /// </summary>
-        internal static string StrategyAborted {
-            get {
-                return ResourceManager.GetString("StrategyAborted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Strategy completed.
-        /// </summary>
-        internal static string StrategyCompleted {
-            get {
-                return ResourceManager.GetString("StrategyCompleted", resourceCulture);
             }
         }
         
