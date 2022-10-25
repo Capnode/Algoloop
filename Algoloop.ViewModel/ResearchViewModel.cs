@@ -38,7 +38,7 @@ namespace Algoloop.ViewModel
         private string _source;
         private ConfigProcess _process;
         private bool _disposed;
-        private readonly string[] _exeFiles = new string[]
+        private readonly string[] _exeFiles =
         {
             "start.py",
             "Initialize.csx",
@@ -195,15 +195,10 @@ namespace Algoloop.ViewModel
                 // Start process
                 _process.Start();
             }
-            catch (ApplicationException ex)
-            {
-                Log.Error(ex);
-                Source = InstallPythonPage;
-                _process = null;
-            }
             catch (Exception ex)
             {
                 Log.Error(ex);
+                Source = InstallPythonPage;
                 _process = null;
             }
         }
@@ -213,8 +208,8 @@ namespace Algoloop.ViewModel
             if (_process == null) return;
 
             bool stopped = _process.Abort();
-            Debug.Assert(stopped);
             Log.Trace($"Jupyter process exit: {stopped}");
+            Debug.Assert(stopped);
             _process.Dispose();
             _process = null;
         }
@@ -227,7 +222,7 @@ namespace Algoloop.ViewModel
             string json = File.ReadAllText(sourceFile);
             JObject root = JObject.Parse(json);
             JObject runtimeOptions = root["runtimeOptions"] as JObject;
-            JToken frameworks = runtimeOptions["includedFrameworks"];
+            JToken frameworks = runtimeOptions!["includedFrameworks"];
             if (frameworks != null)
             {
                 runtimeOptions["framework"] = frameworks.First();
@@ -249,7 +244,7 @@ namespace Algoloop.ViewModel
             }
 
             DirectoryInfo notebook = Directory.CreateDirectory(_settings.Notebook);
-            string parent = notebook.Parent.FullName;
+            string parent = notebook.Parent!.FullName;
             CopyExeFiles(exeFolder, parent);
 
             string sourceFile = Path.Combine(exeFolder, RuntimeConfig);
@@ -265,7 +260,7 @@ namespace Algoloop.ViewModel
                 FileInfo sourceFile = new FileInfo(Path.Combine(exeFolder, filename));
                 if (!sourceFile.Exists)
                 {
-                    Log.Error($"{MethodBase.GetCurrentMethod().DeclaringType.FullName}.{MethodBase.GetCurrentMethod().Name}: {filename} does not exist");
+                    Log.Error($"{MethodBase.GetCurrentMethod()!.DeclaringType!.FullName}.{MethodBase.GetCurrentMethod()!.Name}: {filename} does not exist");
                     continue;
                 }
 
