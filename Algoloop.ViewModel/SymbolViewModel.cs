@@ -19,7 +19,6 @@ using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Data.Fundamental;
-using QuantConnect.Util;
 using StockSharp.Algo.Candles;
 using StockSharp.Charting;
 using System;
@@ -404,7 +403,7 @@ namespace Algoloop.ViewModel
             decimal totalRevenue = Round(
                 fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths,
                 1 / Million,
-                4); ;
+                4);
             decimal netIncome = Round(
                 fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
                 1 / Million,
@@ -451,7 +450,7 @@ namespace Algoloop.ViewModel
             decimal totalRevenue = Round(
                 fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths,
                 1 / Million,
-                4); ;
+                4);
             decimal netIncome = Round(fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths,
                 1 / Million,
                 4);

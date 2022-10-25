@@ -22,13 +22,13 @@ namespace Algoloop.ViewModel
 {
     public class AboutViewModel : ViewModelBase
     {
-        public string Title { get; private set; }
-        public string ProductName { get; private set; }
-        public string Version { get; private set; }
-        public string Copyright { get; private set; }
-        public string Description { get; private set; }
-        public string Message { get; private set; }
-        public string Credit { get; private set; }
+        public string Title { get; }
+        public string ProductName { get; }
+        public string Version { get; }
+        public string Copyright { get; }
+        public string Description { get; }
+        public string Message { get; }
+        public string Credit { get; }
 
         public AboutViewModel()
         {
@@ -36,20 +36,15 @@ namespace Algoloop.ViewModel
                 CultureInfo.InvariantCulture,
                 "About {0}",
                 AboutModel.Product);
-
             ProductName = AboutModel.Product;
-
             Version = String.Format(
                 CultureInfo.InvariantCulture,
                 "Version: {0}",
                 AboutModel.Version);
-
             Copyright = AboutModel.Copyright;
-
             Description = AboutModel.Description;
-
+            Message = string.Empty;
             Credit = "Lean " + Globals.Version + ", " + Globals.Copyright;
-
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
     }

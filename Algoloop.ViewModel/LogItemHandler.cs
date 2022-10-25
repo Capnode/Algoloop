@@ -23,7 +23,7 @@ namespace Algoloop.ViewModel
     /// </summary>
     public class LogItemHandler : ILogItemHandler
     {
-        private bool _isDisposed = false; // To detect redundant calls
+        private bool _isDisposed; // To detect redundant calls
         private readonly ILogHandler _fileLogger;
         private Action<LogItem> _logger;
 

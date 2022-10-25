@@ -31,7 +31,6 @@ namespace Algoloop.ViewModel
         /// Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class. 
         /// </summary> 
         public SyncObservableCollection()
-            : base()
         {
             BindingOperations.EnableCollectionSynchronization(this, _lock);
         }
@@ -49,13 +48,13 @@ namespace Algoloop.ViewModel
 
         public void Sort()
         {
-            if (this.Count <= 1)
+            if (Count <= 1)
                 return;
 
             List<T> sorted = this.OrderBy(x => x).ToList();
             for (int i = 0; i < sorted.Count; i++)
             {
-                this.Move(this.IndexOf(sorted[i]), i);
+                Move(IndexOf(sorted[i]), i);
             }
         }
 
@@ -90,7 +89,7 @@ namespace Algoloop.ViewModel
         /// </summary> 
         public void Replace(T item)
         {
-            ReplaceRange(new T[] { item });
+            ReplaceRange(new[] { item });
         }
 
         /// <summary> 

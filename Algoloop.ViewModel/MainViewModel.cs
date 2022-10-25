@@ -55,7 +55,7 @@ namespace Algoloop.ViewModel
 
             SaveCommand = new RelayCommand(() => SaveConfig(), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(
-                window => DoExit(window), window => !IsBusy);
+                window => DoExit(window), _ => !IsBusy);
             UpdateCommand = new RelayCommand(
                 async () => await DoUpdate().ConfigureAwait(false), () => !IsBusy);
             WeakReferenceMessenger.Default.Register<MainViewModel, NotificationMessage, int>(
@@ -72,10 +72,8 @@ namespace Algoloop.ViewModel
         }
 
         public RelayCommand SaveCommand { get; }
-        public RelayCommand SettingsCommand { get; }
         public RelayCommand<Window> ExitCommand { get; }
         public RelayCommand UpdateCommand { get; }
-
         public SettingsViewModel SettingsViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
         public StrategiesViewModel StrategiesViewModel { get; }

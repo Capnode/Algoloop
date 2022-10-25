@@ -18,7 +18,6 @@ using Capnode.Wpf.DataGrid;
 using Microsoft.Win32;
 using QuantConnect;
 using QuantConnect.Logging;
-using QuantConnect.Securities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -74,20 +73,20 @@ namespace Algoloop.ViewModel
                 () => !IsBusy && Active);
             CheckAllCommand = new RelayCommand<IList>(
                 m => DoCheckAll(m),
-                m => !IsBusy && !Active && SelectedSymbol != null);
+                _ => !IsBusy && !Active && SelectedSymbol != null);
             AddSymbolCommand = new RelayCommand(() => DoAddSymbol(), () => !IsBusy);
             RemoveSymbolsCommand = new RelayCommand<IList>(
                 m => DoDeleteSymbols(m),
-                m => !IsBusy && SelectedSymbol != null);
+                _ => !IsBusy && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(
                 () => DoImportSymbols(),
                 () => !IsBusy);
             ExportSymbolsCommand = new RelayCommand<IList>(
                 m => DoExportSymbols(m),
-                m => !IsBusy && !Active);
+                _ => !IsBusy && !Active);
             AddToSymbolListCommand = new RelayCommand<IList>(
                 m => DoAddToSymbolList(m),
-                m => !IsBusy && SelectedSymbol != null);
+                _ => !IsBusy && SelectedSymbol != null);
             DeleteCommand = new RelayCommand(
                 () => _parent?.DoDeleteMarket(this),
                 () => !IsBusy && !Active);
@@ -121,10 +120,8 @@ namespace Algoloop.ViewModel
             set => _parent.SelectedItem = value;
         }
 
-        public RelayCommand<IList> SymbolSelectionChangedCommand { get; }
         public RelayCommand<IList> CheckAllCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
-        public RelayCommand DownloadSymbolListCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
@@ -523,13 +520,10 @@ namespace Algoloop.ViewModel
                 m => m.Model.Name.Equals(quote.Symbol.ID.Symbol,
                 StringComparison.OrdinalIgnoreCase));
 
-            SymbolModel symbol;
             if (symbolVm != null)
             {
-                symbol = symbolVm.Model;
                 symbolVm.Ask = quote.Ask.Close;
                 symbolVm.Bid = quote.Bid.Close;
-
             }
         }
 
@@ -538,12 +532,12 @@ namespace Algoloop.ViewModel
             Log.Trace("UpdateBalances");
             if (balances.Count == Balances.Count)
             {
-                IEnumerator<BalanceViewModel> iBalance = Balances.GetEnumerator();
+                using IEnumerator<BalanceViewModel> iBalance = Balances.GetEnumerator();
                 foreach (BalanceModel balance in balances)
                 {
                     if (iBalance.MoveNext())
                     {
-                        iBalance.Current.Update(balance);
+                        iBalance.Current!.Update(balance);
                     }
                 }
             }
@@ -563,12 +557,12 @@ namespace Algoloop.ViewModel
             Log.Trace("UpdatePositions");
             if (positions.Count == Positions.Count)
             {
-                IEnumerator<PositionViewModel> iPosition = Positions.GetEnumerator();
+                using IEnumerator<PositionViewModel> iPosition = Positions.GetEnumerator();
                 foreach (PositionModel position in positions)
                 {
                     if (iPosition.MoveNext())
                     {
-                        iPosition.Current.Update(position);
+                        iPosition.Current!.Update(position);
                     }
                 }
             }
@@ -588,12 +582,12 @@ namespace Algoloop.ViewModel
             Log.Trace("UpdateOrders");
             if (orders.Count == Balances.Count)
             {
-                IEnumerator<OrderViewModel> iOrder = Orders.GetEnumerator();
+                using IEnumerator<OrderViewModel> iOrder = Orders.GetEnumerator();
                 foreach (OrderModel order in orders)
                 {
                     if (iOrder.MoveNext())
                     {
-                        iOrder.Current.Update(order);
+                        iOrder.Current!.Update(order);
                     }
                 }
             }
@@ -646,8 +640,7 @@ namespace Algoloop.ViewModel
 
         private void DoCheckAll(IList items)
         {
-            List<SymbolViewModel> symbols = items.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(symbols != null);
+            List<SymbolViewModel> symbols = items.Cast<SymbolViewModel>().ToList();
             if (symbols.Count == 0)
                 return;
 
@@ -678,9 +671,7 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = true;
                 // Create a copy of the list before remove
-                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-                Debug.Assert(list != null);
-
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>().ToList();
                 int pos = Symbols.IndexOf(list.First());
                 foreach (SymbolViewModel symbol in list)
                 {
@@ -729,7 +720,7 @@ namespace Algoloop.ViewModel
                     using var reader = new JsonTextReader(r);
                     var serializer = new JsonSerializer();
                     List<SymbolModel> models = serializer.Deserialize<List<SymbolModel>>(reader);
-                    count += models.Count;
+                    count += models!.Count;
                     foreach (SymbolModel model in models)
                     {
                         SymbolModel symbol = Model.Symbols.FirstOrDefault(m => m.Id.Equals(model.Id, StringComparison.OrdinalIgnoreCase));
@@ -808,8 +799,7 @@ namespace Algoloop.ViewModel
 
         private void DoAddToSymbolList(IList items)
         {
-            List<SymbolViewModel> symbols = items.Cast<SymbolViewModel>()?.ToList();
-            Debug.Assert(symbols != null);
+            List<SymbolViewModel> symbols = items.Cast<SymbolViewModel>().ToList();
             if (symbols.Count == 0)
                 return;
 
@@ -852,7 +842,7 @@ namespace Algoloop.ViewModel
                     while (!r.EndOfStream)
                     {
                         string line = r.ReadLine();
-                        foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
+                        foreach (string name in line!.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
                             var symbol = Model.Symbols.FirstOrDefault(m =>
                                 m.Id.Equals(name, StringComparison.OrdinalIgnoreCase) &&

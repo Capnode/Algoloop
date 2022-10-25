@@ -24,7 +24,6 @@ using QuantConnect.Statistics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -51,7 +50,7 @@ namespace Algoloop.ViewModel
         private const string ZipFile = "track.zip";
         private const double DaysInYear = 365.24;
 
-        private bool _isDisposed = false; // To detect redundant calls
+        private bool _isDisposed; // To detect redundant calls
         private readonly StrategyViewModel _parent;
         private readonly MarketsModel _markets;
         private readonly SettingModel _settings;
@@ -98,10 +97,10 @@ namespace Algoloop.ViewModel
                 () => !IsBusy && !Active);
             ExportSymbolsCommand = new RelayCommand<IList>(
                 m => DoExportSymbols(m),
-                m => !IsBusy);
+                _ => !IsBusy);
             CloneStrategyCommand = new RelayCommand<IList>(
                 m => DoCloneStrategy(m),
-                m => !IsBusy);
+                _ => !IsBusy);
             ExportCommand = new RelayCommand(() => { }, () => false);
             CloneCommand = new RelayCommand(() => DoCloneStrategy(null), () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(() => { }, () => false);
@@ -613,7 +612,7 @@ namespace Algoloop.ViewModel
 
             // Unzip result file
             ZipFile zipFile;
-            BacktestResult result = null;
+            BacktestResult result;
             using (StreamReader resultStream = Compression.Unzip(
                 trackFile, ResultFile, out zipFile))
             using (zipFile)
@@ -791,20 +790,18 @@ namespace Algoloop.ViewModel
             // Process results
             BacktestResult result = JsonConvert.DeserializeObject<BacktestResult>(
                 model.Result,
-                new[] { new OrderJsonConverter() });
+                new JsonConverter[] { new OrderJsonConverter() });
             Debug.Assert(result != default);
             Debug.Assert(result.Charts.Any());
-            if (result != null)
-            {
-                // Load trades
-                LoadTrades(result);
 
-                // Load statistics
-                model.Statistics = ReadStatistics(result);
+            // Load trades
+            LoadTrades(result);
 
-                // Clear trades
-                Trades.Clear();
-            }
+            // Load statistics
+            model.Statistics = ReadStatistics(result);
+
+            // Clear trades
+            Trades.Clear();
 
             // Replace results and logs with file references
             model.Result = string.Empty;

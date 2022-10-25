@@ -86,37 +86,37 @@ namespace Algoloop.ViewModel
                 () => !IsBusy);
             DeleteSelectedTracksCommand = new RelayCommand<IList>(
                 m => DoDeleteTracks(m),
-                m => !IsBusy);
+                _ => !IsBusy);
             UseParametersCommand = new RelayCommand<IList>(
                 m => DoUseParameters(m),
-                m => !IsBusy);
+                _ => !IsBusy);
             AddSymbolCommand = new RelayCommand(
                 () => DoAddSymbol(),
                 () => !IsBusy);
             DeleteSymbolsCommand = new RelayCommand<IList>(
                 m => DoDeleteSymbols(m),
-                m => !IsBusy && SelectedSymbol != null);
+                _ => !IsBusy && SelectedSymbol != null);
             ImportSymbolsCommand = new RelayCommand(
                 () => DoImportSymbols(),
                 () => !IsBusy);
             ExportSymbolsCommand = new RelayCommand<IList>(
                 m => DoExportSymbols(m),
-                trm => !IsBusy && SelectedSymbol != null);
+                _ => !IsBusy && SelectedSymbol != null);
             TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(
                 m => DoSelectItem(m),
-                m => !IsBusy);
+                _ => !IsBusy);
             MoveUpSymbolsCommand = new RelayCommand<IList>(
                 m => OnMoveUpSymbols(m),
-                m => !IsBusy && SelectedSymbol != null);
+                _ => !IsBusy && SelectedSymbol != null);
             MoveDownSymbolsCommand = new RelayCommand<IList>(
                 m => OnMoveDownSymbols(m),
-                m => !IsBusy && SelectedSymbol != null);
+                _ => !IsBusy && SelectedSymbol != null);
             SortSymbolsCommand = new RelayCommand(
                 () => Symbols.Sort(),
                 () => !IsBusy);
             MoveStrategyCommand = new RelayCommand<ITreeViewModel>(
                 m => OnMoveStrategy(m),
-                m => !IsBusy);
+                _ => !IsBusy);
             DropDownOpenedCommand = new RelayCommand(
                 () => DoDropDownOpenedCommand(),
                 () => !IsBusy);
@@ -162,7 +162,6 @@ namespace Algoloop.ViewModel
         public RelayCommand<IList> UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
-        public RelayCommand ActiveCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
         public RelayCommand<TrackViewModel> TrackDoubleClickCommand { get; }
@@ -276,7 +275,7 @@ namespace Algoloop.ViewModel
         internal static void AddPath(string path)
         {
             string pathValue = Environment.GetEnvironmentVariable("PATH");
-            if (pathValue.Contains(path))
+            if (pathValue!.Contains(path))
                 return;
 
             pathValue += ";" + path;
@@ -496,7 +495,7 @@ namespace Algoloop.ViewModel
                 Tracks.Add(track);
                 Task task = track
                     .StartTrackAsync()
-                    .ContinueWith(m =>
+                    .ContinueWith(_ =>
                     {
                         ExDataGridColumns.AddPropertyColumns(
                             TrackColumns, track.Statistics, "Statistics");
@@ -654,12 +653,10 @@ namespace Algoloop.ViewModel
             try
             {
                 Assembly assembly = Assembly.LoadFile(assemblyPath);
-                if (assembly == null) return;
-
                 IEnumerable<Type> type = assembly
                     .GetTypes()
                     .Where(m => m.Name.Equals(algorithmName, StringComparison.OrdinalIgnoreCase));
-                if (type == null || !type.Any()) return;
+                if (!type.Any()) return;
 
                 Parameters.Clear();
                 foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
@@ -698,9 +695,7 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = true;
                 // Create a copy of the list before remove
-                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-                Debug.Assert(list != null);
-
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>().ToList();
                 int pos = Symbols.IndexOf(list.First());
                 foreach (SymbolViewModel symbol in list)
                 {
@@ -739,7 +734,7 @@ namespace Algoloop.ViewModel
                     while (!r.EndOfStream)
                     {
                         string line = r.ReadLine();
-                        foreach (string name in line.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
+                        foreach (string name in line!.Split(',').Where(m => !string.IsNullOrWhiteSpace(m)))
                         {
                             if (Model.Symbols.FirstOrDefault(m => m.Id.Equals(name, StringComparison.OrdinalIgnoreCase)) == null)
                             {
@@ -905,9 +900,7 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
 
                 // Create a copy of the list before move
-                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-                Debug.Assert(list != null);
-
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>().ToList();
                 for (int i = 1; i < Symbols.Count; i++)
                 {
                     if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i - 1]))
@@ -932,9 +925,7 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
 
                 // Create a copy of the list before move
-                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-                Debug.Assert(list != null);
-
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>().ToList();
                 for (int i = Symbols.Count - 2; i >= 0; i--)
                 {
                     if (list.Contains(Symbols[i]) && !list.Contains(Symbols[i + 1]))

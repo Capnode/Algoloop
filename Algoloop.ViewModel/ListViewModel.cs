@@ -46,16 +46,16 @@ namespace Algoloop.ViewModel
             StopCommand = new RelayCommand(() => { }, () => false);
             AddSymbolCommand = new RelayCommand<SymbolViewModel>(
                 m => DoAddSymbol(m),
-                m => !IsBusy && MarketSymbols.View.Cast<object>().Any());
+                _ => !IsBusy && MarketSymbols.View.Cast<object>().Any());
             RemoveSymbolsCommand = new RelayCommand<IList>(
                 m => DoRemoveSymbols(m),
-                m => !IsBusy && SelectedSymbol != null);
+                _ => !IsBusy && SelectedSymbol != null);
             ExportListCommand = new RelayCommand(
                 () => DoExportList(), () => !IsBusy && !Market.Active);
 
             DataFromModel();
 
-            MarketSymbols.Filter += (object sender, FilterEventArgs e) =>
+            MarketSymbols.Filter += (object _, FilterEventArgs e) =>
             {
                 if (e.Item is SymbolViewModel marketSymbol)
                 {
@@ -216,9 +216,7 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = true;
                 // Create a copy of the list before remove
-                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>()?.ToList();
-                Debug.Assert(list != null);
-
+                List<SymbolViewModel> list = symbols.Cast<SymbolViewModel>().ToList();
                 int pos = Symbols.IndexOf(list.First());
                 foreach (SymbolViewModel symbol in list)
                 {

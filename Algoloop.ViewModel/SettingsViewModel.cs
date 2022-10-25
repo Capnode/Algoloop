@@ -33,7 +33,7 @@ namespace Algoloop.ViewModel
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
-        public RelayCommand<Window> OkCommand { get; private set; }
+        public RelayCommand<Window> OkCommand { get; }
 
         public SettingModel Model { get; }
 
