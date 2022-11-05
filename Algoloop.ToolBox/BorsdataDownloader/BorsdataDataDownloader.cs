@@ -19,7 +19,6 @@ using Borsdata.Api.Dal.Model;
 using Ionic.Zip;
 using Newtonsoft.Json;
 using QuantConnect;
-using QuantConnect.Configuration;
 using QuantConnect.Data;
 using QuantConnect.Data.Fundamental;
 using QuantConnect.Data.Market;
@@ -200,14 +199,20 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                     }
                 }
 
-                // Check any report after afterUtc
-                KpiV1 report = _lastReports.Values.Where(m =>
-                    m.I.Equals(instId) &&
-                    !string.IsNullOrEmpty(m.S) &&
-                    DateTime.Parse(m.S, CultureInfo.InvariantCulture) > afterUtc).SingleOrDefault();
-                if (report == default) return;
-                DateTime date = DateTime.Parse(report.S, CultureInfo.InvariantCulture);
-                Log.Trace($"{GetType().Name}: {date:d} Update report {symbol.Value}");
+                // Check if any report after afterUtc
+                bool update = false;
+                IEnumerable<KpiV1> reports = _lastReports.Values.Where(m => m.I.Equals(instId) && !string.IsNullOrEmpty(m.S));
+                foreach (KpiV1 report in reports)
+                {
+                    DateTime date = DateTime.Parse(report.S, CultureInfo.InvariantCulture);
+                    if (date > afterUtc)
+                    {
+                        update = true;
+                        Log.Trace($"{GetType().Name}: {date:d} Update report {symbol.Value}");
+                    }
+                }
+
+                if (!update) return;
             }
 
             // Download reports
