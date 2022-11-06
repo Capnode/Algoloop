@@ -130,7 +130,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public Resolution Resolution { get; set; }
+        public Resolution Resolution { get; set; } = Resolution.Daily;
 
         [Browsable(false)]
         [ReadOnly(false)]
