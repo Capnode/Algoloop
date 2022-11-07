@@ -25,7 +25,7 @@ namespace Algoloop.ViewModel.Internal
         private const string PythonPath = "PYTHONPATH";
         private const string PythonHome = "PYTHONHOME";
         private const string PythonnetPyDll = "PYTHONNET_PYDLL";
-        private const string PythonPattern = "python3?.dll";
+        private const string PythonPattern = "python39.dll";
 
         public static void SetupPython(StringDictionary environment)
         {
@@ -55,6 +55,5 @@ namespace Algoloop.ViewModel.Internal
                 environment[PythonPath] = exeFolder;
             }
         }
-
     }
 }
