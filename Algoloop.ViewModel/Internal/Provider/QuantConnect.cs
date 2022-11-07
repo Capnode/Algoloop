@@ -18,7 +18,7 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -27,7 +27,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class QuantConnect : ProviderBase
     {
-        private const string Version = "14398";
+        private const string Version = "14772";
         private const string Security = "Security";
         private const string Zip = ".zip";
 
@@ -38,9 +38,13 @@ namespace Algoloop.ViewModel.Internal.Provider
             string extract = $"Lean-{Version}/Data/";
             string filename = "github.zip";
             Log.Trace($"Download {uri}");
-            using (var client = new WebClient())
+            using (var client = new HttpClient())
             {
-                client.DownloadFile(uri, filename);
+                HttpResponseMessage response = client.GetAsync(uri).Result;
+                using (var fs = new FileStream(filename, FileMode.CreateNew))
+                {
+                    response.Content.CopyToAsync(fs).Wait();
+                }
             }
 
             Log.Trace($"Unpack {uri}");
