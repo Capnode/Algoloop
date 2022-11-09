@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 
 namespace Algoloop.ViewModel.Internal
 {
@@ -25,7 +24,7 @@ namespace Algoloop.ViewModel.Internal
         private const string PythonPath = "PYTHONPATH";
         private const string PythonHome = "PYTHONHOME";
         private const string PythonnetPyDll = "PYTHONNET_PYDLL";
-        private const string PythonPattern = "python39.dll";
+        private const string PythonPattern = "python3?.dll";
 
         public static void SetupPython(StringDictionary environment)
         {
@@ -33,11 +32,17 @@ namespace Algoloop.ViewModel.Internal
             foreach (string folder in paths.Split(";"))
             {
                 if (!Directory.Exists(folder)) continue;
-                string pythonDll = Directory.EnumerateFiles(folder, PythonPattern).FirstOrDefault();
-                if (pythonDll == default) continue;
-                environment[PythonnetPyDll] = pythonDll;
-                environment[PythonHome] = folder;
-                return;
+                var dlls = Directory.EnumerateFiles(folder, PythonPattern);
+                foreach (var dll in dlls)
+                {
+                    // Skip python3.dll
+                    var info = new FileInfo(dll);
+                    string name = info.Name;
+                    if (name.Length < PythonPattern.Length) continue;
+                    environment[PythonnetPyDll] = dll;
+                    environment[PythonHome] = folder;
+                    return;
+                }
             }
 
             throw new ApplicationException($"Python is not installed: {PythonPattern} not found");

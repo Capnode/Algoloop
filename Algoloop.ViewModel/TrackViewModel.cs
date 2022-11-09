@@ -792,7 +792,6 @@ namespace Algoloop.ViewModel
                 model.Result,
                 new JsonConverter[] { new OrderJsonConverter() });
             Debug.Assert(result != default);
-            Debug.Assert(result.Charts.Any());
 
             // Load trades
             LoadTrades(result);
