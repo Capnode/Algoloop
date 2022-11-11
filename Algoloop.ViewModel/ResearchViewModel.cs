@@ -29,7 +29,6 @@ namespace Algoloop.ViewModel
 {
     public class ResearchViewModel : ViewModelBase, IDisposable
     {
-        private const string Notebook = "Notebook";
         private const string InstallPythonPage = @"https://github.com/Capnode/Algoloop/wiki/Install-Python-and-Jupyter-Lab";
         private const string RuntimeConfig = "QuantConnect.Lean.Launcher.runtimeconfig.json";
 
@@ -237,12 +236,6 @@ namespace Algoloop.ViewModel
 
         private void SetNotebookFolder(string exeFolder)
         {
-            if (string.IsNullOrEmpty(_settings.Notebook))
-            {
-                string userDataFolder = MainService.GetUserDataFolder();
-                _settings.Notebook = Path.Combine(userDataFolder, Notebook);
-            }
-
             DirectoryInfo notebook = Directory.CreateDirectory(_settings.Notebook);
             string parent = notebook.Parent!.FullName;
             CopyExeFiles(exeFolder, parent);

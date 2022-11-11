@@ -25,6 +25,8 @@ namespace Algoloop.Model
     public class SettingModel : ModelBase
     {
         public const int ActualVersion = 0;
+        private readonly string _defaultNotebook = Path.Combine(MainService.GetProgramDataFolder(), @"Research\Notebook");
+        private string _notebook;
 
         [Description("Major Version - Increment at breaking change.")]
         [Browsable(false)]
@@ -71,7 +73,11 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public string Notebook { get; set; } = Path.Combine(MainService.GetUserDataFolder(), "Notebook");
+        public string Notebook
+        {
+            get => string.IsNullOrWhiteSpace(_notebook) ? _defaultNotebook : _notebook;
+            set => _notebook = value;
+        }
 
         [DisplayName("Max backtests")]
         [Description("Largest number of simultaneous ongoing backtest execution.")]

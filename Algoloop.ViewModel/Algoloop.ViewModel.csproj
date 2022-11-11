@@ -11,6 +11,11 @@
     <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="..\Algorithm.Python\PythonAlgorithm.cs" Link="Content\ProgramData\Strategies\PythonAlgorithm.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Content\ProgramData\Markets.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -90,19 +95,19 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Research\BasicCSharpQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\BasicCSharpQuantBookTemplate.ipynb</Link>
+      <Link>Content\ProgramData\Research\Notebook\BasicCSharpQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Research\BasicQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\BasicQuantBookTemplate.ipynb</Link>
+      <Link>Content\ProgramData\Research\Notebook\BasicQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Research\KitchenSinkCSharpQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\KitchenSinkCSharpQuantBookTemplate.ipynb</Link>
+      <Link>Content\ProgramData\Research\Notebook\KitchenSinkCSharpQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Research\KitchenSinkQuantBookTemplate.ipynb">
-      <Link>Content\UserData\Notebook\KitchenSinkQuantBookTemplate.ipynb</Link>
+      <Link>Content\ProgramData\Research\Notebook\KitchenSinkQuantBookTemplate.ipynb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Data\market-hours\market-hours-database.json">
@@ -132,7 +137,6 @@
     <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
     <ProjectReference Include="..\Algoloop.ToolBox\Algoloop.ToolBox.csproj" />
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
-    <ProjectReference Include="..\Algorithm.Python\QuantConnect.Algorithm.Python.csproj" />
     <ProjectReference Include="..\Capnode.Wpf\Capnode.Wpf.csproj" />
     <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
     <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />    
@@ -152,6 +156,870 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Content\ProgramData\Research\Notebook\" />
+    <Folder Include="Content\ProgramData\Strategies\Alphas\" />
+    <Folder Include="Content\ProgramData\Strategies\Benchmarks\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Algorithm.Python\AccumulativeInsightPortfolioRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AccumulativeInsightPortfolioRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddAlphaModelAlgorithm.py" Link="Content\ProgramData\Strategies\AddAlphaModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddFutureOptionContractDataStreamingRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AddFutureOptionContractDataStreamingRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddFutureOptionSingleOptionChainSelectedInUniverseFilterRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AddFutureOptionSingleOptionChainSelectedInUniverseFilterRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddOptionContractExpiresRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AddOptionContractExpiresRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddOptionContractFromUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AddOptionContractFromUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddRemoveSecurityRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AddRemoveSecurityRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddRiskManagementAlgorithm.py" Link="Content\ProgramData\Strategies\AddRiskManagementAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AddUniverseSelectionModelAlgorithm.py" Link="Content\ProgramData\Strategies\AddUniverseSelectionModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AllShortableSymbolsCoarseSelectionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AllShortableSymbolsCoarseSelectionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AutoRegressiveIntegratedMovingAverageRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\AutoRegressiveIntegratedMovingAverageRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicCSharpIntegrationTemplateAlgorithm.py" Link="Content\ProgramData\Strategies\BasicCSharpIntegrationTemplateAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicSetAccountCurrencyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicSetAccountCurrencyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateAtreyuAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateAtreyuAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateCfdAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateCfdAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateContinuousFutureAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateContinuousFutureAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateContinuousFutureWithExtendedMarketAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateContinuousFutureWithExtendedMarketAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateCryptoAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateCryptoAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateDailyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateDailyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFillForwardAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFillForwardAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateForexAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateForexAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFutureOptionAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFutureOptionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesConsolidationAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesConsolidationAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesDailyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesDailyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesFrameworkWithExtendedMarketAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesFrameworkWithExtendedMarketAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesHistoryAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesHistoryAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesHistoryWithExtendedMarketHoursAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesHistoryWithExtendedMarketHoursAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesHourlyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesHourlyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesWithExtendedMarketAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesWithExtendedMarketAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesWithExtendedMarketDailyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesWithExtendedMarketDailyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateFuturesWithExtendedMarketHourlyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateFuturesWithExtendedMarketHourlyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateIndexAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateIndexAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateIndexOptionsAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateIndexOptionsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateIndiaAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateIndiaAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateIndiaIndexAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateIndiaIndexAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateIntrinioEconomicData.py" Link="Content\ProgramData\Strategies\BasicTemplateIntrinioEconomicData.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateLibrary.py" Link="Content\ProgramData\Strategies\BasicTemplateLibrary.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionEquityStrategyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionEquityStrategyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsConsolidationAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsConsolidationAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsDailyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsDailyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsFilterUniverseAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsFilterUniverseAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsHistoryAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsHistoryAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsHourlyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsHourlyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionsPriceModel.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionsPriceModel.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionStrategyAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionStrategyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateOptionTradesAlgorithm.py" Link="Content\ProgramData\Strategies\BasicTemplateOptionTradesAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BlackLittermanPortfolioOptimizationFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\BlackLittermanPortfolioOptimizationFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BrokerageModelAlgorithm.py" Link="Content\ProgramData\Strategies\BrokerageModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BubbleAlgorithm.py" Link="Content\ProgramData\Strategies\BubbleAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\build.bat" Link="Content\ProgramData\Strategies\build.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\build.sh" Link="Content\ProgramData\Strategies\build.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CapmAlphaRankingFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\CapmAlphaRankingFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ClassicRenkoConsolidatorAlgorithm.py" Link="Content\ProgramData\Strategies\ClassicRenkoConsolidatorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CoarseFineFundamentalComboAlgorithm.py" Link="Content\ProgramData\Strategies\CoarseFineFundamentalComboAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CoarseFineFundamentalRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CoarseFineFundamentalRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CoarseFineOptionUniverseChainRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CoarseFineOptionUniverseChainRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CoarseFundamentalTop3Algorithm.py" Link="Content\ProgramData\Strategies\CoarseFundamentalTop3Algorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CompositeAlphaModelFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\CompositeAlphaModelFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CompositeRiskManagementModelFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\CompositeRiskManagementModelFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ConfidenceWeightedFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\ConfidenceWeightedFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ConsolidateRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ConsolidateRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ConstituentsQC500GeneratorAlgorithm.py" Link="Content\ProgramData\Strategies\ConstituentsQC500GeneratorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ConstituentsUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ConstituentsUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ContinuousFutureRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ContinuousFutureRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ConvertToFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\ConvertToFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomBenchmarkAlgorithm.py" Link="Content\ProgramData\Strategies\CustomBenchmarkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomBuyingPowerModelAlgorithm.py" Link="Content\ProgramData\Strategies\CustomBuyingPowerModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomChartingAlgorithm.py" Link="Content\ProgramData\Strategies\CustomChartingAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomConsolidatorRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomConsolidatorRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataBenchmarkRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataBenchmarkRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataBitcoinAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataBitcoinAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataIconicTypesAddDataRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataIconicTypesAddDataRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataIndicatorExtensionsAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataIndicatorExtensionsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataLinkedIconicTypeAddDataCoarseSelectionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataLinkedIconicTypeAddDataCoarseSelectionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataLinkedIconicTypeAddDataOnSecuritiesChangedRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataLinkedIconicTypeAddDataOnSecuritiesChangedRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataNIFTYAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataNIFTYAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataPropertiesRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataPropertiesRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataUniverseAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataUniverseAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataUsingMapFileRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomDataUsingMapFileRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomIndicatorAlgorithm.py" Link="Content\ProgramData\Strategies\CustomIndicatorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomModelsAlgorithm.py" Link="Content\ProgramData\Strategies\CustomModelsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomPartialFillModelAlgorithm.py" Link="Content\ProgramData\Strategies\CustomPartialFillModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomSecurityInitializerAlgorithm.py" Link="Content\ProgramData\Strategies\CustomSecurityInitializerAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomUniverseSelectionModelRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomUniverseSelectionModelRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomVolatilityModelAlgorithm.py" Link="Content\ProgramData\Strategies\CustomVolatilityModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomWarmUpPeriodIndicatorAlgorithm.py" Link="Content\ProgramData\Strategies\CustomWarmUpPeriodIndicatorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DailyAlgorithm.py" Link="Content\ProgramData\Strategies\DailyAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DataConsolidationAlgorithm.py" Link="Content\ProgramData\Strategies\DataConsolidationAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DelistingEventsAlgorithm.py" Link="Content\ProgramData\Strategies\DelistingEventsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DisplacedMovingAverageRibbon.py" Link="Content\ProgramData\Strategies\DisplacedMovingAverageRibbon.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DividendAlgorithm.py" Link="Content\ProgramData\Strategies\DividendAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DropboxBaseDataUniverseSelectionAlgorithm.py" Link="Content\ProgramData\Strategies\DropboxBaseDataUniverseSelectionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DropboxCoarseFineAlgorithm.py" Link="Content\ProgramData\Strategies\DropboxCoarseFineAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DropboxUniverseSelectionAlgorithm.py" Link="Content\ProgramData\Strategies\DropboxUniverseSelectionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\DynamicSecurityDataRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\DynamicSecurityDataRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\EmaCrossFuturesFrontMonthAlgorithm.py" Link="Content\ProgramData\Strategies\EmaCrossFuturesFrontMonthAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\EmaCrossUniverseSelectionAlgorithm.py" Link="Content\ProgramData\Strategies\EmaCrossUniverseSelectionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\EmaCrossUniverseSelectionFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\EmaCrossUniverseSelectionFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentsFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\ETFConstituentsFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentUniverseCompositeDelistingRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ETFConstituentUniverseCompositeDelistingRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentUniverseCompositeDelistingRegressionAlgorithmNoAddEquityETF.py" Link="Content\ProgramData\Strategies\ETFConstituentUniverseCompositeDelistingRegressionAlgorithmNoAddEquityETF.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentUniverseFilterFunctionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ETFConstituentUniverseFilterFunctionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentUniverseFrameworkRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ETFConstituentUniverseFrameworkRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentUniverseMappedCompositeRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ETFConstituentUniverseMappedCompositeRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentUniverseRSIAlphaModelAlgorithm.py" Link="Content\ProgramData\Strategies\ETFConstituentUniverseRSIAlphaModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ETFGlobalRotationAlgorithm.py" Link="Content\ProgramData\Strategies\ETFGlobalRotationAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ExpiryHelperAlphaModelFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\ExpiryHelperAlphaModelFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ExtendedMarketTradingRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ExtendedMarketTradingRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FilteredIdentityAlgorithm.py" Link="Content\ProgramData\Strategies\FilteredIdentityAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FilterUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FilterUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FinancialAdvisorDemoAlgorithm.py" Link="Content\ProgramData\Strategies\FinancialAdvisorDemoAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FineFundamentalFilteredUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FineFundamentalFilteredUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FractionalQuantityRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FractionalQuantityRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureContractsExtendedMarketHoursRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureContractsExtendedMarketHoursRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionBuySellCallIntradayRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionBuySellCallIntradayRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionCallITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionCallITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionCallOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionCallOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionDailyRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionDailyRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionHourlyRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionHourlyRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionMultipleContractsInDifferentContractMonthsWithSameUnderlyingFutureRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionMultipleContractsInDifferentContractMonthsWithSameUnderlyingFutureRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionPutITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionPutITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionPutOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionPutOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionShortCallITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionShortCallITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionShortCallOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionShortCallOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionShortPutITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionShortPutITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FutureOptionShortPutOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FutureOptionShortPutOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FuturesAndFuturesOptionsExpiryTimeAndLiquidationRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FuturesAndFuturesOptionsExpiryTimeAndLiquidationRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FuturesExtendedMarketHoursRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\FuturesExtendedMarketHoursRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FuturesMomentumAlgorithm.py" Link="Content\ProgramData\Strategies\FuturesMomentumAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\G10CurrencySelectionModelFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\G10CurrencySelectionModelFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\GetParameterRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\GetParameterRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HistoryAlgorithm.py" Link="Content\ProgramData\Strategies\HistoryAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HistoryTickRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\HistoryTickRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HistoryWithCustomDataSourceRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\HistoryWithCustomDataSourceRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HistoryWithDifferentContinuousContractDepthOffsetsRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\HistoryWithDifferentContinuousContractDepthOffsetsRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HistoryWithDifferentDataMappingModeRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\HistoryWithDifferentDataMappingModeRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HistoryWithDifferentDataNormalizationModeRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\HistoryWithDifferentDataNormalizationModeRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HourReverseSplitRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\HourReverseSplitRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HourSplitRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\HourSplitRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\InceptionDateSelectionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\InceptionDateSelectionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionBuySellCallIntradayRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionBuySellCallIntradayRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionCallITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionCallITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionCallITMGreeksExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionCallITMGreeksExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionCallOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionCallOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionPutITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionPutITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionPutOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionPutOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionShortCallITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionShortCallITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionShortCallOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionShortCallOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionShortPutITMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionShortPutITMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionShortPutOTMExpiryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndexOptionShortPutOTMExpiryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndiaDataRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\IndiaDataRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndicatorSuiteAlgorithm.py" Link="Content\ProgramData\Strategies\IndicatorSuiteAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\IndicatorWarmupAlgorithm.py" Link="Content\ProgramData\Strategies\IndicatorWarmupAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\InsightWeightingFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\InsightWeightingFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\KerasNeuralNetworkAlgorithm.py" Link="Content\ProgramData\Strategies\KerasNeuralNetworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\LimitFillRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\LimitFillRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\LimitIfTouchedRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\LimitIfTouchedRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\LiquidETFUniverseFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\LiquidETFUniverseFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\LiveFeaturesAlgorithm.py" Link="Content\ProgramData\Strategies\LiveFeaturesAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\LongOnlyAlphaStreamAlgorithm.py" Link="Content\ProgramData\Strategies\LongOnlyAlphaStreamAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MACDTrendAlgorithm.py" Link="Content\ProgramData\Strategies\MACDTrendAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\main.py" Link="Content\ProgramData\Strategies\main.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MarginCallEventsAlgorithm.py" Link="Content\ProgramData\Strategies\MarginCallEventsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MarketOnCloseOrderBufferRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\MarketOnCloseOrderBufferRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MarketOnOpenOnCloseAlgorithm.py" Link="Content\ProgramData\Strategies\MarketOnOpenOnCloseAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MaximumPortfolioDrawdownFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\MaximumPortfolioDrawdownFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MeanReversionPortfolioAlgorithm.py" Link="Content\ProgramData\Strategies\MeanReversionPortfolioAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MeanVarianceOptimizationFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\MeanVarianceOptimizationFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MovingAverageCrossAlgorithm.py" Link="Content\ProgramData\Strategies\MovingAverageCrossAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MultipleSymbolConsolidationAlgorithm.py" Link="Content\ProgramData\Strategies\MultipleSymbolConsolidationAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\NamedArgumentsRegression.py" Link="Content\ProgramData\Strategies\NamedArgumentsRegression.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\NLTKSentimentTradingAlgorithm.py" Link="Content\ProgramData\Strategies\NLTKSentimentTradingAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ObjectStoreExampleAlgorithm.py" Link="Content\ProgramData\Strategies\ObjectStoreExampleAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OnEndOfDayRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OnEndOfDayRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OnWarmupFinishedNoWarmup.py" Link="Content\ProgramData\Strategies\OnWarmupFinishedNoWarmup.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OnWarmupFinishedRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OnWarmupFinishedRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionChainConsistencyRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionChainConsistencyRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionChainProviderAlgorithm.py" Link="Content\ProgramData\Strategies\OptionChainProviderAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionDataNullReferenceRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionDataNullReferenceRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionExerciseAssignRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionExerciseAssignRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionOpenInterestRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionOpenInterestRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForOptionStylesBaseRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForOptionStylesBaseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForSupportedAmericanOptionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForSupportedAmericanOptionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForSupportedAmericanOptionTimeSpanWarmupRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForSupportedAmericanOptionTimeSpanWarmupRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForSupportedEuropeanOptionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForSupportedEuropeanOptionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForSupportedEuropeanOptionTimeSpanWarmupRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForSupportedEuropeanOptionTimeSpanWarmupRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForUnsupportedAmericanOptionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForUnsupportedAmericanOptionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForUnsupportedAmericanOptionTimeSpanWarmupRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForUnsupportedAmericanOptionTimeSpanWarmupRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForUnsupportedEuropeanOptionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForUnsupportedEuropeanOptionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionPriceModelForUnsupportedEuropeanOptionTimeSpanWarmupRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionPriceModelForUnsupportedEuropeanOptionTimeSpanWarmupRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionRenameRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionRenameRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionSplitRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\OptionSplitRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OrderTicketDemoAlgorithm.py" Link="Content\ProgramData\Strategies\OrderTicketDemoAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PandasDataFrameFromMultipleTickTypeTickHistoryRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\PandasDataFrameFromMultipleTickTypeTickHistoryRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PandasDataFrameHistoryAlgorithm.py" Link="Content\ProgramData\Strategies\PandasDataFrameHistoryAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ParameterizedAlgorithm.py" Link="Content\ProgramData\Strategies\ParameterizedAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PearsonCorrelationPairsTradingAlphaModelFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\PearsonCorrelationPairsTradingAlphaModelFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PeriodBasedHistoryRequestNotAllowedWithTickResolutionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\PeriodBasedHistoryRequestNotAllowedWithTickResolutionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PortfolioRebalanceOnCustomFuncRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\PortfolioRebalanceOnCustomFuncRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PortfolioRebalanceOnDateRulesRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\PortfolioRebalanceOnDateRulesRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PythonDictionaryFeatureRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\PythonDictionaryFeatureRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PytorchNeuralNetworkAlgorithm.py" Link="Content\ProgramData\Strategies\PytorchNeuralNetworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\QuantConnect.Algorithm.Python.csproj" Link="Content\ProgramData\Strategies\QuantConnect.Algorithm.Python.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\QuantConnect.Algorithm.PythonTools.pyproj" Link="Content\ProgramData\Strategies\QuantConnect.Algorithm.PythonTools.pyproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\QuitAfterInitializationRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\QuitAfterInitializationRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\QuitInInitializationRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\QuitInInitializationRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RawDataRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\RawDataRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RawPricesCoarseUniverseAlgorithm.py" Link="Content\ProgramData\Strategies\RawPricesCoarseUniverseAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RawPricesUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\RawPricesUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\readme.md" Link="Content\ProgramData\Strategies\readme.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RegisterIndicatorRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\RegisterIndicatorRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RegressionAlgorithm.py" Link="Content\ProgramData\Strategies\RegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RegressionChannelAlgorithm.py" Link="Content\ProgramData\Strategies\RegressionChannelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RiskParityPortfolioAlgorithm.py" Link="Content\ProgramData\Strategies\RiskParityPortfolioAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RollingWindowAlgorithm.py" Link="Content\ProgramData\Strategies\RollingWindowAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ScheduledEventsAlgorithm.py" Link="Content\ProgramData\Strategies\ScheduledEventsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ScheduledQueuingAlgorithm.py" Link="Content\ProgramData\Strategies\ScheduledQueuingAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ScheduledUniverseSelectionModelRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ScheduledUniverseSelectionModelRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ScikitLearnLinearRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ScikitLearnLinearRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SectorExposureRiskFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\SectorExposureRiskFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SectorWeightingFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\SectorWeightingFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SecuritySeederRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\SecuritySeederRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SetEquityDataNormalizationModeOnAddEquity.py" Link="Content\ProgramData\Strategies\SetEquityDataNormalizationModeOnAddEquity.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SetHoldingsMultipleTargetsRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\SetHoldingsMultipleTargetsRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SetHoldingsRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\SetHoldingsRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ShortableProviderOrdersRejectedRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ShortableProviderOrdersRejectedRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SliceGetByTypeRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\SliceGetByTypeRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SmaCrossUniverseSelectionAlgorithm.py" Link="Content\ProgramData\Strategies\SmaCrossUniverseSelectionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SpreadExecutionModelRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\SpreadExecutionModelRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\StableCoinsRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\StableCoinsRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\StandardDeviationExecutionModelRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\StandardDeviationExecutionModelRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\StringToSymbolImplicitConversionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\StringToSymbolImplicitConversionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TalibIndicatorsAlgorithm.py" Link="Content\ProgramData\Strategies\TalibIndicatorsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TensorFlowNeuralNetworkAlgorithm.py" Link="Content\ProgramData\Strategies\TensorFlowNeuralNetworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TickHistoryRequestWithoutTickSubscriptionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\TickHistoryRequestWithoutTickSubscriptionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TiingoPriceAlgorithm.py" Link="Content\ProgramData\Strategies\TiingoPriceAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TimeInForceAlgorithm.py" Link="Content\ProgramData\Strategies\TimeInForceAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TrailingStopRiskFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\TrailingStopRiskFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TrainingExampleAlgorithm.py" Link="Content\ProgramData\Strategies\TrainingExampleAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TrainingInitializeRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\TrainingInitializeRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\TwoLegCurrencyConversionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\TwoLegCurrencyConversionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UncorrelatedUniverseSelectionFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\UncorrelatedUniverseSelectionFrameworkAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UniverseSelectionDefinitionsAlgorithm.py" Link="Content\ProgramData\Strategies\UniverseSelectionDefinitionsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UniverseSelectionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\UniverseSelectionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UniverseUnchangedRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\UniverseUnchangedRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UpdateOrderRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\UpdateOrderRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UserDefinedUniverseAlgorithm.py" Link="Content\ProgramData\Strategies\UserDefinedUniverseAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\VolumeWeightedAveragePriceExecutionModelRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\VolumeWeightedAveragePriceExecutionModelRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\WarmupAlgorithm.py" Link="Content\ProgramData\Strategies\WarmupAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\WarmupHistoryAlgorithm.py" Link="Content\ProgramData\Strategies\WarmupHistoryAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\WeeklyUniverseSelectionRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\WeeklyUniverseSelectionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ZeroedBenchmarkRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ZeroedBenchmarkRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Algorithm.Python\Alphas\ContingentClaimsAnalysisDefaultPredictionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\ContingentClaimsAnalysisDefaultPredictionAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\GasAndCrudeOilEnergyCorrelationAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GasAndCrudeOilEnergyCorrelationAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\GlobalEquityMeanReversionIBSAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GlobalEquityMeanReversionIBSAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\GreenblattMagicFormulaAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GreenblattMagicFormulaAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\IntradayReversalCurrencyMarketsAlpha.py" Link="Content\ProgramData\Strategies\Alphas\IntradayReversalCurrencyMarketsAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\MeanReversionLunchBreakAlpha.py" Link="Content\ProgramData\Strategies\Alphas\MeanReversionLunchBreakAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\MortgageRateVolatilityAlpha.py" Link="Content\ProgramData\Strategies\Alphas\MortgageRateVolatilityAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\PriceGapMeanReversionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\PriceGapMeanReversionAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\RebalancingLeveragedETFAlpha.py" Link="Content\ProgramData\Strategies\Alphas\RebalancingLeveragedETFAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\ShareClassMeanReversionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\ShareClassMeanReversionAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\SykesShortMicroCapAlpha.py" Link="Content\ProgramData\Strategies\Alphas\SykesShortMicroCapAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\TriangleExchangeRateArbitrageAlpha.py" Link="Content\ProgramData\Strategies\Alphas\TriangleExchangeRateArbitrageAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py" Link="Content\ProgramData\Strategies\Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\VIXDualThrustAlpha.py" Link="Content\ProgramData\Strategies\Alphas\VIXDualThrustAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Algorithm.Python\Benchmarks\BasicTemplateBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\BasicTemplateBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\CoarseFineUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\CoarseFineUniverseSelectionBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\EmptyEquityAndOptions400Benchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptyEquityAndOptions400Benchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\EmptyMinute400EquityBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptyMinute400EquityBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\EmptySingleSecuritySecondEquityBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptySingleSecuritySecondEquityBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\HistoryRequestBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\HistoryRequestBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\IndicatorRibbonBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\IndicatorRibbonBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\ScheduledEventsBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\ScheduledEventsBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\StatefulCoarseUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\StatefulCoarseUniverseSelectionBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\StatelessCoarseUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\StatelessCoarseUniverseSelectionBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

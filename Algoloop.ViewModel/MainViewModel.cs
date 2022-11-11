@@ -185,11 +185,9 @@ namespace Algoloop.ViewModel
                 string programFolder = MainService.GetProgramFolder();
                 string appDataFolder = MainService.GetAppDataFolder();
                 string programDataFolder = MainService.GetProgramDataFolder();
-                string userDataFolder = MainService.GetUserDataFolder();
                 Log.Trace($"Program folder: {programFolder}");
                 Log.Trace($"AppData folder: {appDataFolder}");
                 Log.Trace($"ProgramData folder: {programDataFolder}");
-                Log.Trace($"UserData folder: {userDataFolder}");
                 Directory.CreateDirectory(appDataFolder);
                 Directory.CreateDirectory(programDataFolder);
 
@@ -203,12 +201,6 @@ namespace Algoloop.ViewModel
                 MainService.CopyDirectory(
                     Path.Combine(programFolder, "Content/ProgramData"),
                     programDataFolder,
-                    false);
-
-                // Update User data
-                MainService.CopyDirectory(
-                    Path.Combine(programFolder, "Content/UserData"),
-                    userDataFolder,
                     false);
 
                 // Read settings
