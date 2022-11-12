@@ -19,6 +19,6 @@
     <PackageReference Include="Extended.Wpf.Toolkit">
       <Version>3.8.2</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
   </ItemGroup>
 </Project>
