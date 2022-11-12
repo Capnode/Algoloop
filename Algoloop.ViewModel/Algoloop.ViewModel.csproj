@@ -139,7 +139,7 @@
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
     <ProjectReference Include="..\Capnode.Wpf\Capnode.Wpf.csproj" />
     <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
-    <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />    
+    <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />
     <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj" />
   </ItemGroup>
 
@@ -156,12 +156,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Content\ProgramData\Research\Notebook\" />
-    <Folder Include="Content\ProgramData\Strategies\Alphas\" />
-    <Folder Include="Content\ProgramData\Strategies\Benchmarks\" />
   </ItemGroup>
 
   <ItemGroup>

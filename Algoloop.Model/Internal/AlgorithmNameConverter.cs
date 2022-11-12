@@ -44,7 +44,7 @@ namespace Algoloop.Model.Internal
             return model.AlgorithmLanguage switch
             {
                 Language.CSharp or Language.FSharp or Language.VisualBasic => ClrAlgorithm(path, model.AlgorithmName),
-                Language.Python => PythonAlgorithm(path),
+                Language.Python => PythonAlgorithm(model?.AlgorithmFolder, model.AlgorithmName),
                 _ => new StandardValuesCollection(new List<string>()),
             };
         }
@@ -75,10 +75,17 @@ namespace Algoloop.Model.Internal
             return new StandardValuesCollection(new List<string>() { name });
         }
 
-        private static StandardValuesCollection PythonAlgorithm(string path)
+        private static StandardValuesCollection PythonAlgorithm(string folder, string name)
         {
-            string algorithm = Path.GetFileNameWithoutExtension(path);
-            return new StandardValuesCollection(new List<string>() { algorithm });
+            if (!string.IsNullOrEmpty(folder))
+            {
+                string[] pyFiles = Directory.GetFiles(folder, "*.py");
+                List<string> list = pyFiles.Select(Path.GetFileNameWithoutExtension).ToList();
+                list.Sort();
+                return new StandardValuesCollection(list);
+            }
+
+            return new StandardValuesCollection(new List<string>() { name });
         }
     }
 }

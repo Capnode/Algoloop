@@ -63,6 +63,7 @@ namespace Algoloop.Model
             InitialCapital = model.InitialCapital;
             PcntCapitalPerPosition = model.PcntCapitalPerPosition;
             AlgorithmLanguage = model.AlgorithmLanguage;
+            AlgorithmFolder = model.AlgorithmFolder;
             AlgorithmLocation = model.AlgorithmLocation;
             AlgorithmName = model.AlgorithmName;
 
@@ -223,6 +224,26 @@ namespace Algoloop.Model
 
         [Category("Algorithm")]
         [PropertyOrder(2)]
+        [DisplayName("Algorithm folder")]
+        [Description("Folder path to algorithm.")]
+        [Editor(typeof(FolderEditor), typeof(FolderEditor))]
+        [RefreshProperties(RefreshProperties.All)]
+        [Browsable(true)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string AlgorithmFolder
+        {
+            get => _algorithmFolder;
+            set
+            {
+                _algorithmFolder = value;
+                _algorithmName = null;
+                Refresh();
+            }
+        }
+
+        [Category("Algorithm")]
+        [PropertyOrder(3)]
         [DisplayName("Algorithm location")]
         [Description("File path to algorithm.")]
         [Editor(typeof(FilenameEditor), typeof(FilenameEditor))]
@@ -236,31 +257,12 @@ namespace Algoloop.Model
             set => _algorithmLocation = value;
         }
 
-        [Browsable(false)]
-        [ReadOnly(false)]
-        [Obsolete("Property will be removed")]
-        [DataMember]
-        public string AlgorithmFolder
-        {
-            get => _algorithmFolder;
-            set => _algorithmFolder = value;
-        }
-
-        [Browsable(false)]
-        [ReadOnly(false)]
-        [Obsolete("Property will be removed")]
-        [DataMember]
-        public string AlgorithmFile
-        {
-            get => _algorithmFile;
-            set => _algorithmFile = value;
-        }
-
         [Category("Algorithm")]
-        [PropertyOrder(3)]
+        [PropertyOrder(4)]
         [DisplayName("Algorithm name")]
         [Description("Name of algorithm.")]
         [TypeConverter(typeof(AlgorithmNameConverter))]
+        [RefreshProperties(RefreshProperties.Repaint)]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
@@ -270,6 +272,7 @@ namespace Algoloop.Model
             set
             {
                 _algorithmName = value;
+                Refresh();
                 AlgorithmNameChanged?.Invoke(_algorithmName);
             }
         }
@@ -294,26 +297,36 @@ namespace Algoloop.Model
         [DataMember]
         public Collection<StrategyModel> Strategies { get; }
 
-        [OnDeserialized]
-        void OnDeserialized(StreamingContext context)
-        {
-            // Database upgrade
-            if (_algorithmLocation == null)
-            {
-                AlgorithmLocation = string.IsNullOrEmpty(_algorithmFolder) ? _algorithmFile : Path.Combine(_algorithmFolder, _algorithmFile);
-                _algorithmFolder = null;
-                _algorithmFile = null;
-            }
-        }
-
         public void Refresh()
         {
-            SetBrowsable(nameof(Market), false);
             if (Account == null
              || Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase)
              || Account.Equals(AccountModel.AccountType.Paper.ToString(), StringComparison.OrdinalIgnoreCase))
             {
                 SetBrowsable(nameof(Market), true);
+            }
+            else
+            {
+                SetBrowsable(nameof(Market), false);
+            }
+
+            if (AlgorithmLanguage == Language.Python)
+            {
+                SetReadonly(nameof(AlgorithmLocation), true);
+                SetBrowsable(nameof(AlgorithmFolder), true);
+                if (string.IsNullOrEmpty(AlgorithmFolder) || string.IsNullOrEmpty(AlgorithmName))
+                {
+                    AlgorithmLocation = null;
+                }
+                else
+                {
+                    AlgorithmLocation = Path.Combine(AlgorithmFolder, AlgorithmName + ".py");
+                }
+            }
+            else
+            {
+                SetReadonly(nameof(AlgorithmLocation), false);
+                SetBrowsable(nameof(AlgorithmFolder), false);
             }
         }
     }

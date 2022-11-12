@@ -74,7 +74,7 @@ namespace Algoloop.ViewModel
                 () => !IsBusy);
             CloneAlgorithmCommand = new RelayCommand(
                 () => DoCloneAlgorithm(),
-                () => !IsBusy && !string.IsNullOrEmpty(Model.AlgorithmLocation));
+                () => !IsBusy);
             ExportCommand = new RelayCommand(
                 () => DoExportStrategy(),
                 () => !IsBusy);
@@ -785,24 +785,32 @@ namespace Algoloop.ViewModel
             {
                 IsBusy = true;
                 DataToModel();
-
-                // Load assemblies of algorithms
-                string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
-                Assembly assembly = Assembly.LoadFile(assemblyPath);
-                if (string.IsNullOrEmpty(Model.Name))
+                List<string> list = null;
+                if (Model.AlgorithmLanguage == Language.Python)
                 {
-                    Model.Name = assembly.ManifestModule.Name;
+                    string[] pyFiles = Directory.GetFiles(Model.AlgorithmFolder, "*.py");
+                    list = pyFiles.Select(Path.GetFileNameWithoutExtension).ToList();
+                }
+                else
+                {
+                    // Load assemblies of algorithms
+                    string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
+                    Assembly assembly = Assembly.LoadFile(assemblyPath);
+                    if (string.IsNullOrEmpty(Model.Name))
+                    {
+                        Model.Name = assembly.ManifestModule.Name;
+                    }
+
+                    //Get the list of extention classes in the library: 
+                    List<string> extended = Loader.GetExtendedTypeNames(assembly);
+                    list = assembly.ExportedTypes
+                        .Where(m => extended.Contains(m.FullName))
+                        .Select(m => m.Name)
+                        .ToList();
                 }
 
-                //Get the list of extention classes in the library: 
-                List<string> extended = Loader.GetExtendedTypeNames(assembly);
-                List<string> list = assembly.ExportedTypes
-                    .Where(m => extended.Contains(m.FullName))
-                    .Select(m => m.Name)
-                    .ToList();
-                list.Sort();
-
                 // Iterate and clone strategies
+                list.Sort();
                 foreach (string algorithm in list)
                 {
                     if (algorithm.Equals(Model.AlgorithmName, StringComparison.OrdinalIgnoreCase))
