@@ -4,6 +4,7 @@
     {
       "Name": "QuantConnect",
       "Provider": "quantconnect",
+      "SourceFolder": null,
       "Access": 0,
       "Login": "",
       "Password": "",
