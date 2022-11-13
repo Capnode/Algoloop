@@ -298,6 +298,8 @@ namespace Algoloop.ViewModel
                 LoadTrack();
                 _loaded = true;
             }
+
+            Model.Refresh();
         }
 
         internal async Task StartTrackAsync()

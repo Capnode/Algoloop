@@ -140,7 +140,6 @@ namespace Algoloop.ViewModel.Internal.Lean
             AccountModel account,
             SettingModel settings)
         {
-            var parameters = new Dictionary<string, string>();
             SetModel(config, model, settings);
             if (model.Account.Equals(AccountModel.AccountType.Backtest.ToString(), StringComparison.OrdinalIgnoreCase))
             {
@@ -155,8 +154,6 @@ namespace Algoloop.ViewModel.Internal.Lean
                 Log.Error("No broker selected", true);
                 return false;
             }
-
-            SetParameters(config, model, parameters);
             return true;
         }
 
@@ -192,6 +189,8 @@ namespace Algoloop.ViewModel.Internal.Lean
             config["lean-manager-type"] = "LocalLeanManager";
             config["transaction-log"] = "";
             config["algorithm-language"] = model.AlgorithmLanguage.ToString();
+            config["algorithm-type-name"] = model.AlgorithmName;
+            config["algorithm-id"] = model.AlgorithmName;
             config["data-folder"] = settings.DataFolder;
             config["data-directory"] = settings.DataFolder;
             config["cache-location"] = settings.DataFolder;
@@ -214,30 +213,38 @@ namespace Algoloop.ViewModel.Internal.Lean
             config["data-feed-max-work-weight"] = "400";
             config["data-feed-queue-type"] = "QuantConnect.Lean.Engine.DataFeeds.WorkScheduling.WorkQueue, QuantConnect.Lean.Engine";
             config["show-missing-data-logs"] = "false";
-
-            config["algorithm-type-name"] = model.AlgorithmName;
-            config["algorithm-id"] = model.AlgorithmName;
-            config["period-start"] = model.StartDate.ToString(CultureInfo.InvariantCulture);
-            config["period-finish"] = model.EndDate.ToString(CultureInfo.InvariantCulture);
-            config["cash-amount"] = model.InitialCapital.ToString(CultureInfo.InvariantCulture);
-
             config["close-automatically"] = "true";
             config["live-data-url"] = "ws://www.quantconnect.com/api/v2/live/data/";
             config["live-data-port"] = "8020";
             if (settings.ApiDownload)
+            {
                 config["data-provider"] = "QuantConnect.Lean.Engine.DataFeeds.ApiDataProvider";
+            }
             else
+            {
                 config["data-provider"] = "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider";
+            }
+
+            if (model.IsDataValid)
+            {
+                config["period-start"] = model.StartDate.ToString(CultureInfo.InvariantCulture);
+                config["period-finish"] = model.EndDate.ToString(CultureInfo.InvariantCulture);
+                config["cash-amount"] = model.InitialCapital.ToString(CultureInfo.InvariantCulture);
+                SetParameters(config, model);
+            }
         }
 
         private static void SetParameters(
             IDictionary<string, string> config,
-            TrackModel model,
-            Dictionary<string, string> parameters)
+            TrackModel model)
         {
-            parameters.Add("market", model.Market);
-            parameters.Add("security", model.Security.ToStringInvariant());
-            parameters.Add("resolution", model.Resolution.ToStringInvariant());
+            var parameters = new Dictionary<string, string>
+            {
+                { "market", model.Market },
+                { "security", model.Security.ToStringInvariant() },
+                { "resolution", model.Resolution.ToStringInvariant() }
+            };
+
             if (!model.Symbols.IsNullOrEmpty())
             {
                 parameters.Add("symbols", string.Join(";", model.Symbols.Where(p => p.Active).Select(m => m.Id)));

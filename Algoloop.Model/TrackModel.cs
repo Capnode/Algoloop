@@ -26,9 +26,8 @@ namespace Algoloop.Model
 {
     [CategoryOrder("Strategy", 1)]
     [CategoryOrder("Broker", 2)]
-    [CategoryOrder("Capital", 3)]
-    [CategoryOrder("Algorithm", 4)]
-    [CategoryOrder("Data", 5)]
+    [CategoryOrder("Algorithm", 3)]
+    [CategoryOrder("Data", 4)]
     [Serializable]
     [DataContract]
     public class TrackModel : ModelBase
@@ -46,21 +45,21 @@ namespace Algoloop.Model
         public TrackModel(string name, StrategyModel strategy)
         {
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
-
             Name = name;
             Account = strategy.Account;
+            AlgorithmLanguage = strategy.AlgorithmLanguage;
+            AlgorithmLocation = strategy.AlgorithmLocation;
+            AlgorithmName = strategy.AlgorithmName;
+
+            IsDataValid = strategy.IsDataValid;
             Market = strategy.Market;
             Security = strategy.Security;
             BarsBack = strategy.BarsBack;
             StartDate = strategy.StartDate;
             EndDate = strategy.EndDate;
+            Resolution = strategy.Resolution;
             InitialCapital = strategy.InitialCapital;
             PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
-            AlgorithmLanguage = strategy.AlgorithmLanguage;
-            AlgorithmLocation = strategy.AlgorithmLocation;
-            AlgorithmName = strategy.AlgorithmName;
-            Resolution = strategy.Resolution;
-
 
             // Clone symbols
             Symbols = new Collection<SymbolModel>(strategy.Symbols.Select(m => new SymbolModel(m)).ToList());
@@ -99,72 +98,6 @@ namespace Algoloop.Model
             }
         }
 
-        [Category("Data")]
-        [DisplayName("Market")]
-        [Description("Market data for backtest. Must match market folder in data folder structure.")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public string Market { get; set; }
-
-        [Category("Data")]
-        [DisplayName("Security type")]
-        [Description("Asset security type. Must match security folder in data folder structure.")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public SecurityType Security { get; set; }
-
-        [Category("Data")]
-        [DisplayName("Bars back")]
-        [Description("Number of bars to backtest")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public int BarsBack { get; set; }
-
-        [Category("Data")]
-        [DisplayName("Date from")]
-        [Description("Backtest from date")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        [Editor(typeof(DateEditor), typeof(DateEditor))]
-        public DateTime StartDate { get; set; } = DateTime.Today;
-
-        [Category("Data")]
-        [DisplayName("Date to")]
-        [Description("Backtest to date")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [Editor(typeof(DateEditor), typeof(DateEditor))]
-        [DataMember]
-        public DateTime EndDate { get; set; } = DateTime.Today;
-
-        [Category("Data")]
-        [DisplayName("Resolution")]
-        [Description("Period resolution. Must match resolution folder in data folder structure.")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public Resolution Resolution { get; set; }
-
-        [Category("Capital")]
-        [DisplayName("Initial capial")]
-        [Description("Start capital")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public long InitialCapital { get; set; }
-
-        [Category("Capital")]
-        [DisplayName("Percent capital per position")]
-        [Description("Capital used for each position")]
-        [Browsable(true)]
-        [ReadOnly(true)]
-        [DataMember]
-        public double PcntCapitalPerPosition { get; set; }
-
         [Category("Algorithm")]
         [PropertyOrder(1)]
         [DisplayName("Algorithm language")]
@@ -191,6 +124,88 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [DataMember]
         public string AlgorithmName { get; set; }
+
+        [Category("Data")]
+        [DisplayName("Set strategy data")]
+        [Description("Set user defined strategy data, symbols and parameters.")]
+        [Browsable(false)]
+        [ReadOnly(true)]
+        [DataMember]
+        public bool IsDataValid { get; set; } = true;
+
+        [Category("Data")]
+        [PropertyOrder(1)]
+        [DisplayName("Market")]
+        [Description("Market data for backtest. Must match market folder in data folder structure.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public string Market { get; set; }
+
+        [Category("Data")]
+        [PropertyOrder(2)]
+        [DisplayName("Security type")]
+        [Description("Asset security type. Must match security folder in data folder structure.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public SecurityType Security { get; set; }
+
+        [Category("Data")]
+        [PropertyOrder(3)]
+        [DisplayName("Bars back")]
+        [Description("Number of bars to backtest")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public int BarsBack { get; set; }
+
+        [Category("Data")]
+        [PropertyOrder(4)]
+        [DisplayName("Date from")]
+        [Description("Backtest from date")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        [Editor(typeof(DateEditor), typeof(DateEditor))]
+        public DateTime StartDate { get; set; } = DateTime.Today;
+
+        [Category("Data")]
+        [PropertyOrder(5)]
+        [DisplayName("Date to")]
+        [Description("Backtest to date")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [Editor(typeof(DateEditor), typeof(DateEditor))]
+        [DataMember]
+        public DateTime EndDate { get; set; } = DateTime.Today;
+
+        [Category("Data")]
+        [PropertyOrder(6)]
+        [DisplayName("Resolution")]
+        [Description("Period resolution. Must match resolution folder in data folder structure.")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public Resolution Resolution { get; set; }
+
+        [Category("Data")]
+        [PropertyOrder(7)]
+        [DisplayName("Initial capial")]
+        [Description("Start capital")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public long InitialCapital { get; set; }
+
+        [Category("Data")]
+        [PropertyOrder(8)]
+        [DisplayName("Percent capital per position")]
+        [Description("Capital used for each position")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public double PcntCapitalPerPosition { get; set; }
 
         [ReadOnly(true)]
         [Browsable(false)]
@@ -231,5 +246,23 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public IDictionary<string, decimal?> Statistics { get; set; }
+
+        public void Refresh()
+        {
+            bool visible = IsDataValid;
+            SetBrowsable(nameof(Market), visible);
+            SetBrowsable(nameof(Security), visible);
+            SetBrowsable(nameof(BarsBack), visible);
+            SetBrowsable(nameof(StartDate), visible);
+            SetBrowsable(nameof(EndDate), visible);
+            SetBrowsable(nameof(Resolution), visible);
+            SetBrowsable(nameof(InitialCapital), visible);
+            SetBrowsable(nameof(PcntCapitalPerPosition), visible);
+        }
+
+        //[OnDeserialized]
+        //private void OnDeserialized(StreamingContext context)
+        //{
+        //}
     }
 }

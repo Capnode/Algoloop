@@ -34,7 +34,8 @@
                         ShowTitle="False" />
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}"
+                     Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <ListBox
                     DockPanel.Dock="Bottom"
                     ItemsSource="{Binding Symbols}"
@@ -49,7 +50,8 @@
                     </ListBox.Resources>
                 </ListBox>
             </TabItem>
-            <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}">
+            <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}"
+                     Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <wpf:ExDataGrid
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
