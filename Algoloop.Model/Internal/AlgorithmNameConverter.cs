@@ -51,6 +51,7 @@ namespace Algoloop.Model.Internal
 
         private static StandardValuesCollection ClrAlgorithm(string path, string name)
         {
+            List<string> list = new() { string.Empty };
             if (!string.IsNullOrEmpty(path))
             {
                 try
@@ -59,10 +60,11 @@ namespace Algoloop.Model.Internal
 
                     // Get the list of extention classes in the library: 
                     List<string> extended = Loader.GetExtendedTypeNames(assembly);
-                    List<string> list = assembly.ExportedTypes
+                    List<string> strategies = assembly.ExportedTypes
                         .Where(m => extended.Contains(m.FullName))
                         .Select(m => m.Name)
                         .ToList();
+                    list.AddRange(strategies);
                     list.Sort();
                     return new StandardValuesCollection(list);
                 }
@@ -72,20 +74,22 @@ namespace Algoloop.Model.Internal
                 }
             }
 
-            return new StandardValuesCollection(new List<string>() { name });
+            return new StandardValuesCollection(list);
         }
 
         private static StandardValuesCollection PythonAlgorithm(string folder, string name)
         {
+            List<string> list = new() { string.Empty };
             if (!string.IsNullOrEmpty(folder))
             {
                 string[] pyFiles = Directory.GetFiles(folder, "*.py");
-                List<string> list = pyFiles.Select(Path.GetFileNameWithoutExtension).ToList();
+                List<string> strategies = pyFiles.Select(Path.GetFileNameWithoutExtension).ToList();
+                list.AddRange(strategies);
                 list.Sort();
                 return new StandardValuesCollection(list);
             }
 
-            return new StandardValuesCollection(new List<string>() { name });
+            return new StandardValuesCollection(list);
         }
     }
 }
