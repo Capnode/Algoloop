@@ -68,7 +68,7 @@ namespace Algoloop.ViewModel.Internal.Lean
             }
         }
 
-        public void Run(TrackModel model, AccountModel account, SettingModel settings)
+        public void Run(TrackModel model, AccountModel account, SettingModel settings, string exeFolder)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             Debug.Assert(model.Status == CompletionStatus.None);
@@ -99,7 +99,7 @@ namespace Algoloop.ViewModel.Internal.Lean
             {
                 if (model.AlgorithmLanguage.Equals(Language.Python))
                 {
-                    PythonSupport.SetupPython(_process.Environment);
+                    PythonSupport.SetupPython(_process.Environment, exeFolder);
                 }
                 _process.Start();
                 _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));

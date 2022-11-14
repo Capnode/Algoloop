@@ -182,6 +182,8 @@ namespace Algoloop.ViewModel
                 Log.Trace($"AppData folder: {appDataFolder}");
                 Log.Trace($"ProgramData folder: {programDataFolder}");
                 Directory.CreateDirectory(programDataFolder);
+                MainService.DeleteFiles(appDataFolder, "*");
+                MainService.DeleteFolders(appDataFolder, "*");
 
                 // Update Market data
                 MainService.CopyDirectory(

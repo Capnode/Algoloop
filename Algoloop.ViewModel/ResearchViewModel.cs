@@ -168,8 +168,7 @@ namespace Algoloop.ViewModel
                 // Setup Python and Jupyter environment
                 string exeFolder = MainService.GetProgramFolder();
                 SetNotebookFolder(exeFolder);
-                PythonSupport.SetupJupyter(_process.Environment, exeFolder);
-                PythonSupport.SetupPython(_process.Environment);
+                PythonSupport.SetupPython(_process.Environment, exeFolder);
 
                 // Set config file
                 IDictionary<string, string> config = _process.Config;
