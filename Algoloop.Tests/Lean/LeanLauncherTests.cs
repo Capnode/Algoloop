@@ -68,7 +68,7 @@ namespace Algoloop.Tests.Lean
             };
 
             using var launcher = new LeanLauncher();
-            launcher.Run(track, account, _settings);
+            launcher.Run(track, account, _settings, _exeFolder);
 
             Assert.IsTrue(track.Status.Equals(CompletionStatus.Success));
             Assert.IsFalse(track.Active);
