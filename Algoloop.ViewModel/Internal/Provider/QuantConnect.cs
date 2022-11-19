@@ -27,7 +27,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class QuantConnect : ProviderBase
     {
-        private const string Version = "14772";
+        private const string Version = "14803";
         private const string Security = "Security";
         private const string Zip = ".zip";
 

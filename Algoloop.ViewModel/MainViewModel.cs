@@ -63,6 +63,7 @@ namespace Algoloop.ViewModel
 
             // Set working directory
             string appData = MainService.GetAppDataFolder();
+            Directory.CreateDirectory(appData);
             Directory.SetCurrentDirectory(appData);
 
             // Async initialize without blocking UI
@@ -109,17 +110,9 @@ namespace Algoloop.ViewModel
                 string settings = Path.Combine(programData, "Settings.json");
                 string markets = Path.Combine(programData, "Markets.json");
                 string strategies = Path.Combine(programData, "Strategies.json");
-                string logfile = Path.Combine(programData, "Algoloop.log");
                 SettingsViewModel.Save(settings);
                 MarketsViewModel.Save(markets);
                 StrategiesViewModel.Save(strategies);
-
-                // Create backup files
-                string appData = MainService.GetAppDataFolder();
-                File.Copy(settings, Path.Combine(appData, "Settings.json"), true);
-                File.Copy(markets, Path.Combine(appData, "Markets.json"), true);
-                File.Copy(strategies, Path.Combine(appData, "Strategies.json"), true);
-                File.Copy(logfile, Path.Combine(appData, "Algoloop.log"), true);
             }
             finally
             {
@@ -188,13 +181,8 @@ namespace Algoloop.ViewModel
                 Log.Trace($"Program folder: {programFolder}");
                 Log.Trace($"AppData folder: {appDataFolder}");
                 Log.Trace($"ProgramData folder: {programDataFolder}");
-                Directory.CreateDirectory(appDataFolder);
                 Directory.CreateDirectory(programDataFolder);
-
-                // Migrate existing files to new location
-                MainService.DeleteFolders(appDataFolder, "temp*");
-                MainService.DeleteFiles(appDataFolder, "*.log");
-                MainService.CopyDirectory(appDataFolder, programDataFolder, false);
+                MainService.DeleteFiles(appDataFolder, "*");
                 MainService.DeleteFolders(appDataFolder, "*");
 
                 // Update Market data

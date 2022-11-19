@@ -471,10 +471,8 @@ namespace Algoloop.ViewModel
         {
             // No IsBusy here
             Active = true;
-            DataToModel();
-
             int count = 0;
-            var models = GridOptimizerModels(Model, 0);
+            List<(StrategyViewModel, StrategyModel)> models = CreateRunList(this);
             int total = models.Count;
             string message = string.Format(
                 CultureInfo.InvariantCulture,
@@ -483,22 +481,21 @@ namespace Algoloop.ViewModel
             Messenger.Send(new NotificationMessage(message), 0);
 
             var tasks = new List<Task>();
-            foreach (StrategyModel model in models)
+            foreach ((StrategyViewModel vm, StrategyModel model) in models)
             {
                 await BacktestManager.Wait().ConfigureAwait(true);
                 if (!Active) break;
                 count++;
                 var trackModel = new TrackModel(model.AlgorithmName, model);
                 Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
-                var track = new TrackViewModel(
-                    this, trackModel, _markets, _settings);
-                Tracks.Add(track);
+                var track = new TrackViewModel(vm, trackModel, _markets, _settings);
+                vm.Tracks.Add(track);
                 Task task = track
                     .StartTrackAsync()
                     .ContinueWith(_ =>
                     {
                         ExDataGridColumns.AddPropertyColumns(
-                            TrackColumns, track.Statistics, "Statistics");
+                            vm.TrackColumns, track.Statistics, "Statistics");
                         BacktestManager.Release();
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 tasks.Add(task);
@@ -507,6 +504,20 @@ namespace Algoloop.ViewModel
             await Task.WhenAll(tasks).ConfigureAwait(true);
             Messenger.Send(new NotificationMessage(Active ? Resources.StrategyCompleted : Resources.StrategyAborted), 0);
             Active = false;
+        }
+
+        private static List<(StrategyViewModel, StrategyModel)> CreateRunList(StrategyViewModel strategyViewModel)
+        {
+            List<(StrategyViewModel, StrategyModel)> list = new();
+            foreach (StrategyViewModel strategy in strategyViewModel.Strategies)
+            {
+                 list.AddRange(CreateRunList(strategy));
+            }
+
+            strategyViewModel.DataToModel();
+            List<StrategyModel> models = GridOptimizerModels(strategyViewModel.Model, 0);
+            list.AddRange(models.Select(m => (strategyViewModel, m)));
+            return list;
         }
 
         private void DoStopCommand()
@@ -528,13 +539,17 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private List<StrategyModel> GridOptimizerModels(
+        private static List<StrategyModel> GridOptimizerModels(
             StrategyModel rawModel, int index)
         {
             var model = new StrategyModel(rawModel);
 
             var list = new List<StrategyModel>();
-            if (index < model.Parameters.Count)
+            if (string.IsNullOrEmpty(model.AlgorithmName))
+            {
+                // Ignore
+            }
+            else if (index < model.Parameters.Count)
             {
                 var parameter = model.Parameters[index];
                 if (parameter.UseRange)

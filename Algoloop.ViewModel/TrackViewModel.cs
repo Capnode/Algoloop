@@ -331,7 +331,7 @@ namespace Algoloop.ViewModel
             }
 
             TrackModel model = Model;
-            await Task.Run(() => _leanLauncher.Run(model, account, _settings))
+            await Task.Run(() => _leanLauncher.Run(model, account, _settings, exeFolder))
                 .ConfigureAwait(false);
 
             // Split result and logs to separate files
