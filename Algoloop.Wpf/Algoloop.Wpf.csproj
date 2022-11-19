@@ -59,7 +59,7 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.137" />
     <PackageReference Include="StockSharp.Configuration" Version="5.0.136" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.136" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.137" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
