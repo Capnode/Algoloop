@@ -11,11 +11,6 @@
     <NoWarn>NU1701;CA1416</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="..\Algorithm.Python\PythonAlgorithm.cs" Link="Content\ProgramData\Strategies\PythonAlgorithm.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Content\ProgramData\Markets.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -156,6 +151,84 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Algorithm.Python\Alphas\ContingentClaimsAnalysisDefaultPredictionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\ContingentClaimsAnalysisDefaultPredictionAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\GasAndCrudeOilEnergyCorrelationAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GasAndCrudeOilEnergyCorrelationAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\GlobalEquityMeanReversionIBSAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GlobalEquityMeanReversionIBSAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\GreenblattMagicFormulaAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GreenblattMagicFormulaAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\IntradayReversalCurrencyMarketsAlpha.py" Link="Content\ProgramData\Strategies\Alphas\IntradayReversalCurrencyMarketsAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\MeanReversionLunchBreakAlpha.py" Link="Content\ProgramData\Strategies\Alphas\MeanReversionLunchBreakAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\MortgageRateVolatilityAlpha.py" Link="Content\ProgramData\Strategies\Alphas\MortgageRateVolatilityAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\PriceGapMeanReversionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\PriceGapMeanReversionAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\RebalancingLeveragedETFAlpha.py" Link="Content\ProgramData\Strategies\Alphas\RebalancingLeveragedETFAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\ShareClassMeanReversionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\ShareClassMeanReversionAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\SykesShortMicroCapAlpha.py" Link="Content\ProgramData\Strategies\Alphas\SykesShortMicroCapAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\TriangleExchangeRateArbitrageAlpha.py" Link="Content\ProgramData\Strategies\Alphas\TriangleExchangeRateArbitrageAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py" Link="Content\ProgramData\Strategies\Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Alphas\VIXDualThrustAlpha.py" Link="Content\ProgramData\Strategies\Alphas\VIXDualThrustAlpha.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\Algorithm.Python\Benchmarks\BasicTemplateBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\BasicTemplateBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\CoarseFineUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\CoarseFineUniverseSelectionBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\EmptyEquityAndOptions400Benchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptyEquityAndOptions400Benchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\EmptyMinute400EquityBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptyMinute400EquityBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\EmptySingleSecuritySecondEquityBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptySingleSecuritySecondEquityBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\HistoryRequestBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\HistoryRequestBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\IndicatorRibbonBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\IndicatorRibbonBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\ScheduledEventsBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\ScheduledEventsBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\StatefulCoarseUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\StatefulCoarseUniverseSelectionBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\Benchmarks\StatelessCoarseUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\StatelessCoarseUniverseSelectionBenchmark.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -324,12 +397,6 @@
     <Content Include="..\Algorithm.Python\BubbleAlgorithm.py" Link="Content\ProgramData\Strategies\BubbleAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Algorithm.Python\build.bat" Link="Content\ProgramData\Strategies\build.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\build.sh" Link="Content\ProgramData\Strategies\build.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Algorithm.Python\CapmAlphaRankingFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\CapmAlphaRankingFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -418,6 +485,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomIndicatorAlgorithm.py" Link="Content\ProgramData\Strategies\CustomIndicatorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomIndicatorWithExtensionAlgorithm.py" Link="Content\ProgramData\Strategies\CustomIndicatorWithExtensionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomModelsAlgorithm.py" Link="Content\ProgramData\Strategies\CustomModelsAlgorithm.py">
@@ -786,12 +856,6 @@
     <Content Include="..\Algorithm.Python\PytorchNeuralNetworkAlgorithm.py" Link="Content\ProgramData\Strategies\PytorchNeuralNetworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Algorithm.Python\QuantConnect.Algorithm.Python.csproj" Link="Content\ProgramData\Strategies\QuantConnect.Algorithm.Python.csproj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\QuantConnect.Algorithm.PythonTools.pyproj" Link="Content\ProgramData\Strategies\QuantConnect.Algorithm.PythonTools.pyproj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Algorithm.Python\QuitAfterInitializationRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\QuitAfterInitializationRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -805,9 +869,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\RawPricesUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\RawPricesUniverseRegressionAlgorithm.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\readme.md" Link="Content\ProgramData\Strategies\readme.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\RegisterIndicatorRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\RegisterIndicatorRegressionAlgorithm.py">
@@ -894,6 +955,9 @@
     <Content Include="..\Algorithm.Python\TrailingStopRiskFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\TrailingStopRiskFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\TrailingStopRiskFrameworkRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\TrailingStopRiskFrameworkRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\TrainingExampleAlgorithm.py" Link="Content\ProgramData\Strategies\TrainingExampleAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -934,84 +998,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\ZeroedBenchmarkRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\ZeroedBenchmarkRegressionAlgorithm.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\Algorithm.Python\Alphas\ContingentClaimsAnalysisDefaultPredictionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\ContingentClaimsAnalysisDefaultPredictionAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\GasAndCrudeOilEnergyCorrelationAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GasAndCrudeOilEnergyCorrelationAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\GlobalEquityMeanReversionIBSAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GlobalEquityMeanReversionIBSAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\GreenblattMagicFormulaAlpha.py" Link="Content\ProgramData\Strategies\Alphas\GreenblattMagicFormulaAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\IntradayReversalCurrencyMarketsAlpha.py" Link="Content\ProgramData\Strategies\Alphas\IntradayReversalCurrencyMarketsAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\MeanReversionLunchBreakAlpha.py" Link="Content\ProgramData\Strategies\Alphas\MeanReversionLunchBreakAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\MortgageRateVolatilityAlpha.py" Link="Content\ProgramData\Strategies\Alphas\MortgageRateVolatilityAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\PriceGapMeanReversionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\PriceGapMeanReversionAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\RebalancingLeveragedETFAlpha.py" Link="Content\ProgramData\Strategies\Alphas\RebalancingLeveragedETFAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\ShareClassMeanReversionAlpha.py" Link="Content\ProgramData\Strategies\Alphas\ShareClassMeanReversionAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\SykesShortMicroCapAlpha.py" Link="Content\ProgramData\Strategies\Alphas\SykesShortMicroCapAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\TriangleExchangeRateArbitrageAlpha.py" Link="Content\ProgramData\Strategies\Alphas\TriangleExchangeRateArbitrageAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py" Link="Content\ProgramData\Strategies\Alphas\TripleLeverageETFPairVolatilityDecayAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Alphas\VIXDualThrustAlpha.py" Link="Content\ProgramData\Strategies\Alphas\VIXDualThrustAlpha.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="..\Algorithm.Python\Benchmarks\BasicTemplateBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\BasicTemplateBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\CoarseFineUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\CoarseFineUniverseSelectionBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\EmptyEquityAndOptions400Benchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptyEquityAndOptions400Benchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\EmptyMinute400EquityBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptyMinute400EquityBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\EmptySingleSecuritySecondEquityBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\EmptySingleSecuritySecondEquityBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\HistoryRequestBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\HistoryRequestBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\IndicatorRibbonBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\IndicatorRibbonBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\ScheduledEventsBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\ScheduledEventsBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\StatefulCoarseUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\StatefulCoarseUniverseSelectionBenchmark.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\Benchmarks\StatelessCoarseUniverseSelectionBenchmark.py" Link="Content\ProgramData\Strategies\Benchmarks\StatelessCoarseUniverseSelectionBenchmark.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
