@@ -16,6 +16,7 @@ using QuantConnect.Logging;
 using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Linq;
 
 namespace Algoloop.ViewModel.Internal
 {
@@ -26,13 +27,15 @@ namespace Algoloop.ViewModel.Internal
         private const string PythonHome = "PYTHONHOME";
         private const string PythonnetPyDll = "PYTHONNET_PYDLL";
         private const string PythonPattern = "python3?.dll";
-        private const string SitePackages = @"Lib\site-packages";
 
         public static void SetupPython(StringDictionary environment, string exeFolder)
         {
-            string paths = environment[ExePath];
-            Log.Trace($"Env[{ExePath}] = {paths}");
-            foreach (string folder in paths.Split(";"))
+            string path = environment[ExePath];
+            string[] paths = path.Trim(';').Split(";");
+            Log.Trace($"Env[{ExePath}] =");
+            paths.ToList().ForEach(m => Log.Trace($"  {m}"));
+
+            foreach (string folder in paths)
             {
                 if (!Directory.Exists(folder))
                     continue;
@@ -46,18 +49,12 @@ namespace Algoloop.ViewModel.Internal
                     if (name.Length < PythonPattern.Length)
                         continue;
 
-                    string pythonpath = Path.Combine(folder, SitePackages) + ";" + exeFolder;
-                    if (environment.ContainsKey(PythonPath))
-                    {
-                        pythonpath = pythonpath + ";" + environment[PythonPath];
-                    }
-
-                    environment[PythonPath] = pythonpath;
-                    Log.Trace($"Env[{PythonPath}] = {pythonpath}");
                     environment[PythonnetPyDll] = dll;
                     Log.Trace($"Env[{PythonnetPyDll}] = {dll}");
                     environment[PythonHome] = folder;
                     Log.Trace($"Env[{PythonHome}] = {folder}");
+                    environment[PythonPath] = exeFolder;
+                    Log.Trace($"Env[{PythonPath}] = {exeFolder}");
                     return;
                 }
             }
