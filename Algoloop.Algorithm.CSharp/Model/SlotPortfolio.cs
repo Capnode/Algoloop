@@ -16,6 +16,7 @@ using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Portfolio;
+using QuantConnect.Benchmarks;
 using QuantConnect.Indicators;
 using QuantConnect.Orders;
 using QuantConnect.Orders.Fees;
@@ -34,34 +35,34 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
-
+        private readonly int _trackerPeriod;
+        private readonly int _indexPeriod;
+        private readonly InsightCollection _insights = new();
+        private readonly TrackerPortfolio _trackerPortfolio;
+        private readonly RateOfChange _trackerRoc;
+        private readonly RateOfChange _indexRoc;
+        private SimpleMovingAverage _trackerSma;
+        private SimpleMovingAverage _indexSma;
         private decimal _initialCapital = 0;
         private decimal _sizingFactor = 1;
-        private readonly InsightCollection _insights = new();
-        private readonly SimpleMovingAverage _trackerSma;
-        private readonly SimpleMovingAverage _benchmarkSma;
-        private readonly TrackerPortfolio _trackerPortfolio;
+        private decimal _benchmark0 = 0;
+        private string _indexName = "Index";
 
         public SlotPortfolio(
             int slots,
             bool reinvest,
             float rebalance,
             int trackerPeriod = 0,
-            int benchmarkPeriod = 0)
+            int indexPeriod = 0)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
-
-            _trackerPortfolio = new TrackerPortfolio(_slots, _rebalance);
-            if (trackerPeriod > 0)
-            {
-                _trackerSma = new SimpleMovingAverage($"Tracker SMA({trackerPeriod})", trackerPeriod);
-            }
-            if (benchmarkPeriod > 0)
-            {
-                _benchmarkSma = new SimpleMovingAverage($"Benchmark SMA({benchmarkPeriod})", benchmarkPeriod);
-            }
+            _trackerPeriod = trackerPeriod;
+            _indexPeriod = indexPeriod;
+            _trackerPortfolio = new TrackerPortfolio(_slots, true, _rebalance);
+            _trackerRoc = new RateOfChange(1);
+            _indexRoc = new RateOfChange(1);
         }
 
         // Create list of PortfolioTarget objects from Insights
@@ -80,22 +81,49 @@ namespace Algoloop.Algorithm.CSharp.Model
                 return null;
             }
 
-            // Save initial capital for future use
+            // Initialize
             if (_initialCapital == 0)
             {
+                // Save initial capital for future use
                 _initialCapital = algorithm.Portfolio.Cash;
+                _benchmark0 = algorithm.Benchmark.Evaluate(algorithm.Time);
+                if (algorithm.Benchmark is SecurityBenchmark sec)
+                {
+                    _indexName = sec.Security.Symbol.ID.Symbol;
+                }
+                if (_trackerPeriod > 0)
+                {
+                    _trackerSma = new SimpleMovingAverage($"Tracker Portfolio SMA({_trackerPeriod})", _trackerPeriod);
+                }
+                if (_indexPeriod > 0)
+                {
+                    _indexSma = new SimpleMovingAverage($"Tracker {_indexName} SMA({_indexPeriod})", _indexPeriod);
+                }
             }
+
+            // Calculate benchmark index
+            decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
+            decimal index = 100 * benchmark / _benchmark0;
+            algorithm.Plot($"Tracker {_indexName}", index);
 
             // Add to tracker portfolio
             _trackerPortfolio.CreateTargets(algorithm, insights);
             decimal tracker = _trackerPortfolio.GetEquity(algorithm);
-            algorithm.Plot("Tracker", tracker);
+            algorithm.Plot("Tracker Portfolio", tracker);
+
+            // Compare portfolio vs index
+            _trackerRoc.Update(algorithm.Time, tracker);
+            _indexRoc.Update(algorithm.Time, benchmark);
+            if (_trackerRoc.IsReady && _indexRoc.IsReady)
+            {
+                decimal diff = _trackerRoc - _indexRoc;
+                algorithm.Plot($"Tracker Portfolio vs {_indexName}", diff);
+            }
 
             // Determine position size dependent on tracking curve
             decimal trackerSizingFactor = 1;
             if (_trackerSma != null)
             {
-                // decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
                 _trackerSma.Update(algorithm.Time, tracker);
                 if (_trackerSma.IsReady)
                 {
@@ -104,20 +132,19 @@ namespace Algoloop.Algorithm.CSharp.Model
                 }
             }
 
-            // Determine position size dependent on benchmark curve
-            decimal benchmarkSizingFactor = 1;
-            if (_benchmarkSma != null)
+            // Determine position size dependent on index curve
+            decimal indexSizingFactor = 1;
+            if (_indexSma != null)
             {
-                decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
-                _benchmarkSma.Update(algorithm.Time, benchmark);
-                if (_benchmarkSma.IsReady)
+                _indexSma.Update(algorithm.Time, index);
+                if (_indexSma.IsReady)
                 {
-                    algorithm.Plot($"BenchmarkSMA", _benchmarkSma);
-                    benchmarkSizingFactor = benchmark >= _benchmarkSma ? 1 : 0;
+                    algorithm.Plot($"IndexSMA", _indexSma);
+                    indexSizingFactor = index >= _indexSma ? 1 : 0;
                 }
             }
 
-            decimal sizingFactor = trackerSizingFactor * benchmarkSizingFactor;
+            decimal sizingFactor = trackerSizingFactor * indexSizingFactor;
             if (sizingFactor != _sizingFactor)
             {
                 algorithm.Log($"Switching to sizing factor {sizingFactor}");

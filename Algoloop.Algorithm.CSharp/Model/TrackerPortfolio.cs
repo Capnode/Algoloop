@@ -27,6 +27,7 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private readonly bool _logOrder = false;
         private readonly int _slots;
+        private readonly bool _reinvest;
         private readonly decimal _rebalance;
         private readonly List<Trade> _trades = new();
         private readonly IDictionary<Symbol, Trade> _holdings = new Dictionary<Symbol, Trade>();
@@ -34,9 +35,10 @@ namespace Algoloop.Algorithm.CSharp.Model
         private decimal _cash = InitialCash;
         private Insight[] _queue;
 
-        public TrackerPortfolio(int slots, decimal rebalance)
+        public TrackerPortfolio(int slots, bool reinvest, decimal rebalance)
         {
             _slots = slots;
+            _reinvest = reinvest;
             _rebalance = rebalance;
         }
 
@@ -76,12 +78,12 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
 
             // Add new position if new in toplist
-            int freeSlots = _slots - _holdings.Count;
-            decimal modelSize = InitialCash / _slots;
-            decimal size = freeSlots > 0 ? Math.Min(modelSize, _cash / freeSlots) : 0;
             foreach (Insight insight in toplist)
             {
-                if (_holdings.ContainsKey(insight.Symbol)) continue;
+                if (_holdings.ContainsKey(insight.Symbol))
+                    continue;
+
+                decimal size = GetModelSize(algorithm);
                 if (size == 0) continue;
                 Security security = algorithm.Securities[insight.Symbol];
                 decimal target = size / security.Open;
@@ -105,11 +107,15 @@ namespace Algoloop.Algorithm.CSharp.Model
             foreach (Insight insight in toplist)
             {
                 Security security = algorithm.Securities[insight.Symbol];
-                decimal modelTarget = modelSize / security.Open;
+                decimal size = GetModelSize(algorithm);
+                decimal modelTarget = size / security.Open;
                 if (_holdings.TryGetValue(insight.Symbol, out Trade trade))
                 {
                     if (_rebalance > 0 && trade.Quantity <= (1 - _rebalance) * modelTarget)
                     {
+                        if (_cash < 0.0001m)
+                            continue; // Not enough cash to buy more
+
                         // Rebalance up
                         decimal target = Math.Min(modelTarget, _cash / security.Open);
                         decimal diff = target - trade.Quantity;
@@ -151,7 +157,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
 
             if (_holdings.Count > _slots) throw new ApplicationException("Too many positions");
-            if (_cash < 0) throw new ApplicationException($"Negative balance {_cash:0.00}");
+            if (_cash < -0.0001m) throw new ApplicationException($"Negative balance {_cash:0.00}");
             return null;
         }
 
@@ -166,6 +172,24 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
 
             return equity.SmartRounding();
+        }
+
+        private decimal GetModelSize(QCAlgorithm algorithm)
+        {
+            if (!_reinvest)
+            {
+                return Math.Min(InitialCash / _slots, _cash);
+            }
+
+            decimal equity = GetEquity(algorithm);
+            decimal modelSize = equity / _slots;
+            int freeSlots = _slots - _holdings.Count;
+            if (freeSlots == 0)
+            {
+                return modelSize;
+            }
+
+            return Math.Min(_cash / freeSlots, modelSize); ;
         }
 
         private void LiquidateHoldings(QCAlgorithm algorithm)
