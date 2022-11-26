@@ -38,14 +38,17 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly int _trackerPeriod;
         private readonly int _indexPeriod;
         private readonly InsightCollection _insights = new();
-        private readonly TrackerPortfolio _trackerPortfolio;
         private readonly RateOfChange _trackerRoc;
-        private readonly RateOfChange _indexRoc;
+        private readonly RateOfChange _benchmarkRoc;
+        private readonly RateOfChange _portfolioRoc;
+        private TrackerPortfolio _trackerPortfolio;
         private SimpleMovingAverage _trackerSma;
         private SimpleMovingAverage _indexSma;
         private decimal _initialCapital = 0;
+        private decimal _portfolioValue0 = 0;
+        private decimal _trackerValue0 = 0;
+        private decimal _benchmarkValue0 = 0;
         private decimal _sizingFactor = 1;
-        private decimal _benchmark0 = 0;
         private string _indexName = "Index";
 
         public SlotPortfolio(
@@ -60,9 +63,9 @@ namespace Algoloop.Algorithm.CSharp.Model
             _rebalance = (decimal)rebalance;
             _trackerPeriod = trackerPeriod;
             _indexPeriod = indexPeriod;
-            _trackerPortfolio = new TrackerPortfolio(_slots, true, _rebalance);
             _trackerRoc = new RateOfChange(1);
-            _indexRoc = new RateOfChange(1);
+            _benchmarkRoc = new RateOfChange(1);
+            _portfolioRoc = new RateOfChange(1);
         }
 
         // Create list of PortfolioTarget objects from Insights
@@ -86,49 +89,59 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 // Save initial capital for future use
                 _initialCapital = algorithm.Portfolio.Cash;
-                _benchmark0 = algorithm.Benchmark.Evaluate(algorithm.Time);
+                _trackerPortfolio = new TrackerPortfolio(_initialCapital, _slots, _reinvest, _rebalance);
+                _trackerValue0 = _trackerPortfolio.GetEquity(algorithm);
+                _portfolioValue0 = algorithm.Portfolio.TotalPortfolioValue;
+                _benchmarkValue0 = algorithm.Benchmark.Evaluate(algorithm.Time);
                 if (algorithm.Benchmark is SecurityBenchmark sec)
                 {
                     _indexName = sec.Security.Symbol.ID.Symbol;
                 }
                 if (_trackerPeriod > 0)
                 {
-                    _trackerSma = new SimpleMovingAverage($"Tracker Portfolio SMA({_trackerPeriod})", _trackerPeriod);
+                    _trackerSma = new SimpleMovingAverage($"Index Tracker SMA({_trackerPeriod})", _trackerPeriod);
                 }
                 if (_indexPeriod > 0)
                 {
-                    _indexSma = new SimpleMovingAverage($"Tracker {_indexName} SMA({_indexPeriod})", _indexPeriod);
+                    _indexSma = new SimpleMovingAverage($"Index {_indexName} SMA({_indexPeriod})", _indexPeriod);
                 }
             }
 
-            // Calculate benchmark index
-            decimal benchmark = algorithm.Benchmark.Evaluate(algorithm.Time);
-            decimal index = 100 * benchmark / _benchmark0;
-            algorithm.Plot($"Tracker {_indexName}", index);
+            // Plot benchmark index
+            decimal benchmarkValue = algorithm.Benchmark.Evaluate(algorithm.Time);
+            decimal benchmarkIndex = 100 * benchmarkValue / _benchmarkValue0;
+            algorithm.Plot($"Index {_indexName}", benchmarkIndex);
+            _benchmarkRoc.Update(algorithm.Time, benchmarkValue);
 
-            // Add to tracker portfolio
+            // Plot tracker index
             _trackerPortfolio.CreateTargets(algorithm, insights);
-            decimal tracker = _trackerPortfolio.GetEquity(algorithm);
-            algorithm.Plot("Tracker Portfolio", tracker);
+            decimal trackerValue = _trackerPortfolio.GetEquity(algorithm);
+            decimal trackerIndex = 100 * trackerValue / _trackerValue0;
+            algorithm.Plot("Index Tracker", trackerIndex);
+            _trackerRoc.Update(algorithm.Time, trackerIndex);
+
+            // Plot portfolio index
+            decimal portfolioValue = algorithm.Portfolio.TotalPortfolioValue;
+            decimal portfolioIndex = 100 * portfolioValue / _portfolioValue0;
+            algorithm.Plot("Index Portfolio", portfolioIndex);
+            _portfolioRoc.Update(algorithm.Time, trackerIndex);
 
             // Compare portfolio vs index
-            _trackerRoc.Update(algorithm.Time, tracker);
-            _indexRoc.Update(algorithm.Time, benchmark);
-            if (_trackerRoc.IsReady && _indexRoc.IsReady)
+            if (_portfolioRoc.IsReady && _benchmarkRoc.IsReady)
             {
-                decimal diff = _trackerRoc - _indexRoc;
-                algorithm.Plot($"Tracker Portfolio vs {_indexName}", diff);
+                decimal diff = _trackerRoc - _benchmarkRoc;
+                algorithm.Plot($"Portfolio vs {_indexName}", diff);
             }
 
             // Determine position size dependent on tracking curve
             decimal trackerSizingFactor = 1;
             if (_trackerSma != null)
             {
-                _trackerSma.Update(algorithm.Time, tracker);
+                _trackerSma.Update(algorithm.Time, trackerIndex);
                 if (_trackerSma.IsReady)
                 {
                     algorithm.Plot($"TrackerSMA", _trackerSma);
-                    trackerSizingFactor = tracker >= _trackerSma ? 1 : 0;
+                    trackerSizingFactor = trackerIndex >= _trackerSma ? 1 : 0;
                 }
             }
 
@@ -136,11 +149,11 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal indexSizingFactor = 1;
             if (_indexSma != null)
             {
-                _indexSma.Update(algorithm.Time, index);
+                _indexSma.Update(algorithm.Time, benchmarkIndex);
                 if (_indexSma.IsReady)
                 {
                     algorithm.Plot($"IndexSMA", _indexSma);
-                    indexSizingFactor = index >= _indexSma ? 1 : 0;
+                    indexSizingFactor = benchmarkIndex >= _indexSma ? 1 : 0;
                 }
             }
 
@@ -187,9 +200,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 }
                 else
                 {
-                    Debug.Assert(security.Price != 0);
-                    decimal quantity = (int)insight.Direction
-                        * decimal.Floor(_sizingFactor * _initialCapital / _slots / security.Price);
+                    decimal amount = _initialCapital / _slots;
+                    decimal quantity = (int)insight.Direction * decimal.Floor(_sizingFactor * amount / security.Price);
                     target = new PortfolioTarget(insight.Symbol, quantity);
                 }
 
@@ -198,13 +210,13 @@ namespace Algoloop.Algorithm.CSharp.Model
                     // Create new target
                     targets.Add(target);
                 }
-                else if (_rebalance > 0 && holdings <=  (1 - _rebalance) * target.Quantity)
+                else if (_rebalance > 0 && holdings <= decimal.Round((1 - _rebalance) * target.Quantity, 6))
                 {
                     // Holdings too small, rebalance up
                     algorithm.Log($"Rebalance up {target.Symbol} {holdings} to {target.Quantity} @ {security.Price:0.00}");
                     targets.Add(target);
                 }
-                else if (_rebalance > 0 && holdings >= (1 + _rebalance) * target.Quantity)
+                else if (_rebalance > 0 && holdings >= decimal.Round((1 + _rebalance) * target.Quantity, 6))
                 {
                     // Holdings too large, rebalance down
                     algorithm.Log($"Rebalance down {target.Symbol} {holdings} to {target.Quantity} @ {security.Price:0.00}");
