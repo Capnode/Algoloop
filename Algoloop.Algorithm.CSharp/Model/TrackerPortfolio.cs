@@ -17,6 +17,7 @@ using QuantConnect.Algorithm;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Portfolio;
 using QuantConnect.Orders;
+using QuantConnect.Orders.Fees;
 using QuantConnect.Securities;
 using QuantConnect.Statistics;
 
@@ -139,6 +140,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         {
             foreach (MarketOrder order in _orders)
             {
+                // Trade today ?
                 Security security = algorithm.Securities[order.Symbol];
                 if (!security.Exchange.DateTimeIsOpen(security.LocalTime))
                 {
@@ -148,6 +150,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                         || !security.Exchange.IsOpenDuringBar(currentBar.Time, currentBar.EndTime, false))
                         continue;
                 }
+
+                // Order fee
+                decimal fee = Fee(order, security);
 
                 _holdings.TryGetValue(order.Symbol, out Trade trade);
                 if (order.Direction == OrderDirection.Sell)
@@ -159,7 +164,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     decimal value = price * order.Quantity;
                     if (order.Price <= security.High)
                     {
-                        _cash -= value;
+                        _cash = _cash - value - fee;
                         trade.ExitTime = algorithm.Time;
                         trade.ExitPrice = price;
                         decimal diff = order.Quantity + trade.Quantity;
@@ -198,7 +203,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     decimal value = price * order.Quantity;
                     if (order.Price >= security.Low)
                     {
-                        _cash -= value;
+                        _cash = _cash - value - fee;
                         if (trade == null)
                         {
                             trade = new Trade
@@ -265,7 +270,13 @@ namespace Algoloop.Algorithm.CSharp.Model
                 Security security = algorithm.Securities[insight.Symbol];
                 decimal quantity = decimal.Floor(size / security.Close);
                 var order = new MarketOrder(insight.Symbol, quantity, algorithm.Time, security.Close);
-                _reserved += order.Value;
+                decimal fee = Fee(order, security);
+                quantity = decimal.Floor((size - fee) / security.Close);
+                if (quantity <= 0)
+                    continue;
+
+                order = new MarketOrder(insight.Symbol, quantity, algorithm.Time, security.Close);
+                _reserved += order.Value + fee;
                 freeSlots--;
                 _orders.Add(order);
             }
@@ -291,7 +302,12 @@ namespace Algoloop.Algorithm.CSharp.Model
 
                     decimal diff = modelQuantity - trade.Quantity;
                     var order = new MarketOrder(insight.Symbol, diff, algorithm.Time, security.Close);
-                    _reserved += order.Value;
+                    decimal fee = Fee(order, security);
+                    decimal value = order.Value + fee;
+                    if (_reserved + value > _cash)
+                        continue;
+
+                    _reserved += value;
                     _orders.Add(order);
                 }
                 else if (_rebalance > 0 && trade.Quantity >= decimal.Round((1 + _rebalance) * modelQuantity, 6))
@@ -302,6 +318,13 @@ namespace Algoloop.Algorithm.CSharp.Model
                     _orders.Add(order);
                 }
             }
+        }
+
+        private static decimal Fee(MarketOrder order, Security security)
+        {
+            OrderFee orderFee = security.FeeModel.GetOrderFee(new OrderFeeParameters(security, order));
+            decimal fee = decimal.Ceiling(orderFee);
+            return fee;
         }
     }
 }
