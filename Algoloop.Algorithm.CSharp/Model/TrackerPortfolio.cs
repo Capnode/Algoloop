@@ -25,14 +25,15 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     internal class TrackerPortfolio : PortfolioConstructionModel
     {
-        private readonly decimal _initialCash;
         private readonly bool _logOrder = false;
+
+        private readonly decimal _initialCash;
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
         private readonly List<MarketOrder> _orders = new();
         private readonly List<Trade> _trades = new();
-        private readonly Dictionary<Symbol, Trade> _holdings = new();
+        private readonly List<Trade> _holdings = new();
 
         private decimal _cash = 0;
         private decimal _reserved = 0;
@@ -50,7 +51,6 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         // Create list of PortfolioTarget objects from Insights
         public override IEnumerable<IPortfolioTarget> CreateTargets(QCAlgorithm algorithm, Insight[] insights)
-        
         {
             if (insights == null)
             {
@@ -77,22 +77,50 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             if (_holdings.Count > _slots)
                 throw new ApplicationException($"{algorithm.Time:d} Too many positions");
-            if (FreeCash < -0.0001m)
+            if (FreeCash.SmartRounding() < 0)
                 throw new ApplicationException($"{algorithm.Time:d} Negative balance {FreeCash:0.00}");
+
             return null;
         }
 
         public decimal GetEquity(QCAlgorithm algorithm)
         {
             decimal equity = _cash;
-            foreach (KeyValuePair<Symbol, Trade> holding in _holdings)
+            foreach (Trade trade in _holdings)
             {
-                Security security = algorithm.Securities[holding.Key];
-                decimal value = security.Price * holding.Value.Quantity;
+                Security security = algorithm.Securities[trade.Symbol];
+                decimal value = security.Price * trade.Quantity;
                 equity += value;
             }
 
             return equity.SmartRounding();
+        }
+
+        public IList<IPortfolioTarget> GetTargets(decimal scale)
+        {
+            var targets = new List<IPortfolioTarget>();
+            foreach (MarketOrder order in _orders)
+            {
+                decimal quantity = order.Quantity;
+                Trade trade = _holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
+                if (trade != null)
+                {
+                    quantity += trade.Quantity;
+                }
+                var target = new PortfolioTarget(order.Symbol, scale * quantity);
+                targets.Add(target);
+            }
+
+            foreach (Trade trade in _holdings)
+            {
+                if (!targets.Any(m => m.Symbol.Equals(trade.Symbol)))
+                {
+                    var target = new PortfolioTarget(trade.Symbol, scale * trade.Quantity);
+                    targets.Add(target);
+                }
+            }
+
+            return targets;
         }
 
         private void LiquidateHoldings(QCAlgorithm algorithm)
@@ -103,37 +131,23 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
 
             // Liquidate holdings
-            foreach (KeyValuePair<Symbol, Trade> holding in _holdings)
+            foreach (Trade trade in _holdings)
             {
-                Security security = algorithm.Securities[holding.Key];
-                Trade trade = holding.Value;
+                var order = new MarketOrder(trade.Symbol, trade.Quantity, trade.ExitTime, trade.ExitPrice);
+                Security security = algorithm.Securities[trade.Symbol];
+                decimal fee = Fee(order, security);
                 trade.ExitPrice = security.Close;
                 trade.ExitTime = algorithm.UtcTime;
-                decimal profit = trade.ExitPrice * trade.Quantity;
+                decimal profit = trade.ExitPrice * trade.Quantity - fee;
                 _cash += profit;
                 _trades.Add(trade);
                 if (_logOrder)
                 {
-                    algorithm.Log($"{algorithm.Time:d} Sell {holding.Key} {trade.Quantity} @ {trade.ExitPrice} cash={_cash:0.00}");
+                    algorithm.Log($"{algorithm.Time:d} Sell {trade.Symbol} {trade.Quantity} @ {trade.ExitPrice} cash={_cash:0.00}");
                 }
             }
+
             _holdings.Clear();
-
-            decimal cash = _initialCash;
-            foreach (Trade trade in _trades)
-            {
-                decimal profit = trade.Quantity * (trade.ExitPrice - trade.EntryPrice);
-                cash += profit;
-                if (_logOrder)
-                {
-                    algorithm.Log($"Trade {trade.EntryTime:d} {trade.ExitTime:d} {trade.Symbol} Size={trade.Quantity} Entry={trade.EntryPrice} Exit={trade.ExitPrice} Profit={profit:0.00}");
-                }
-            }
-
-            if (_logOrder)
-            {
-                algorithm.Log($"Summary _cash={_cash:0.00} cash={cash:0.00} diff={cash - _cash:0.00}");
-            }
         }
 
         private void ProcessOrders(QCAlgorithm algorithm)
@@ -154,7 +168,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 // Order fee
                 decimal fee = Fee(order, security);
 
-                _holdings.TryGetValue(order.Symbol, out Trade trade);
+                Trade trade = _holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
                 if (order.Direction == OrderDirection.Sell)
                 {
                     if (trade == null)
@@ -171,7 +185,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                         if (diff.Equals(0))
                         {
                             _trades.Add(trade);
-                            if (!_holdings.Remove(trade.Symbol)) throw new ApplicationException($"Can not remove {order.Symbol}");
+                            if (!_holdings.Remove(trade)) throw new ApplicationException($"Can not remove {order.Symbol}");
                             if (_logOrder)
                             {
                                 algorithm.Log($"{trade.ExitTime:d} Sell {trade.Symbol} {trade.Quantity} @ {price} cash={_cash:0.00}");
@@ -190,10 +204,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                                 ExitPrice = price,
                             };
                             _trades.Add(sellTrade);
-                            if (_logOrder)
-                            {
-                                algorithm.Log($"{sellTrade.ExitTime:d} Sell rebalance {sellTrade.Symbol} {sellTrade.Quantity} @ {price} cash={_cash:0.00}");
-                            }
+                             algorithm.Log($"{sellTrade.ExitTime:d} Sell rebalance {sellTrade.Symbol} {sellTrade.Quantity} @ {price} cash={_cash:0.00}");
                         }
                     }
                 }
@@ -214,7 +225,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                                 Quantity = order.Quantity,
                             };
 
-                            _holdings.Add(order.Symbol, trade);
+                            _holdings.Add(trade);
                             if (_logOrder)
                             {
                                 algorithm.Log($"{trade.EntryTime:d} Buy {trade.Symbol} {trade.Quantity} @ {price} cash={_cash:0.00}");
@@ -225,10 +236,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                             value += trade.Quantity * trade.EntryPrice;
                             trade.Quantity += order.Quantity;
                             trade.EntryPrice = value / trade.Quantity;
-                            if (_logOrder)
-                            {
-                                algorithm.Log($"{algorithm.Time:d} Buy rebalance {order.Symbol} {order.Quantity} @ {price} cash={_cash:0.00}");
-                            }
+                            algorithm.Log($"{algorithm.Time:d} Buy rebalance {order.Symbol} {order.Quantity} @ {price} cash={_cash:0.00}");
                         }
                     }
                 }
@@ -240,13 +248,13 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private void CloseNotInList(QCAlgorithm algorithm, IEnumerable<Insight> toplist)
         {
-            foreach (KeyValuePair<Symbol, Trade> holding in _holdings.ToArray())
+            foreach (Trade trade in _holdings)
             {
-                if (toplist.Any(m => m.Symbol.Equals(holding.Key)))
+                if (toplist.Any(m => m.Symbol.Equals(trade.Symbol)))
                     continue;
 
-                Security security = algorithm.Securities[holding.Key];
-                var order = new MarketOrder(holding.Key, -holding.Value.Quantity, algorithm.Time, security.Close);
+                Security security = algorithm.Securities[trade.Symbol];
+                var order = new MarketOrder(trade.Symbol, -trade.Quantity, algorithm.Time, security.Close);
                 _orders.Add(order);
             }
         }
@@ -259,10 +267,10 @@ namespace Algoloop.Algorithm.CSharp.Model
                 if (freeSlots == 0)
                     break;
 
-                if (_holdings.ContainsKey(insight.Symbol))
+                if (_holdings.Any(m => m.Symbol.Equals(insight.Symbol)))
                     continue;
 
-                decimal size = (_reinvest ? GetEquity(algorithm) / freeSlots : _initialCash) / _slots;
+                decimal size = (_reinvest ? GetEquity(algorithm) : _initialCash) / _slots;
                 size = Math.Min(size, FreeCash);
                 if (size <= 0)
                     continue;
@@ -286,14 +294,15 @@ namespace Algoloop.Algorithm.CSharp.Model
         {
             foreach (Insight insight in toplist)
             {
-                if (!_holdings.TryGetValue(insight.Symbol, out Trade trade))
+                Trade trade = _holdings.FirstOrDefault(m => m.Symbol.Equals(insight.Symbol));
+                if (trade == null)
                     continue;
 
                 Security security = algorithm.Securities[insight.Symbol];
                 decimal modelSize = (_reinvest ? GetEquity(algorithm) : _initialCash) / _slots;
                 decimal modelQuantity = decimal.Floor(modelSize / security.Close);
 
-                if (_rebalance > 0 && trade.Quantity <= decimal.Round((1 - _rebalance) * modelQuantity, 6))
+                if (_rebalance > 0 && trade.Quantity <= ((1 - _rebalance) * modelQuantity).SmartRounding())
                 {
                     // Rebalance up
                     decimal quantity = decimal.Floor(FreeCash / security.Close);
@@ -310,7 +319,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     _reserved += value;
                     _orders.Add(order);
                 }
-                else if (_rebalance > 0 && trade.Quantity >= decimal.Round((1 + _rebalance) * modelQuantity, 6))
+                else if (_rebalance > 0 && trade.Quantity >= ((1 + _rebalance) * modelQuantity).SmartRounding())
                 {
                     // Rebalance down
                     decimal diff = modelQuantity - trade.Quantity;

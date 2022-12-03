@@ -18,11 +18,8 @@ using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Portfolio;
 using QuantConnect.Benchmarks;
 using QuantConnect.Indicators;
-using QuantConnect.Orders;
-using QuantConnect.Orders.Fees;
 using QuantConnect.Securities;
 using QuantConnect.Statistics;
-using System.Diagnostics;
 
 namespace Algoloop.Algorithm.CSharp.Model
 {
@@ -75,7 +72,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 // End of algorithm
                 _trackerPortfolio.CreateTargets(algorithm, null);
-                LogInsights(algorithm, _insights.OrderByDescending(m => m.CloseTimeUtc).ThenByDescending(m => m.Magnitude));
+                LogInsights(algorithm, _insights.OrderByDescending(m => m.Magnitude));
                 if (_logTrades)
                 {
                     LogTrades(algorithm);
@@ -83,6 +80,22 @@ namespace Algoloop.Algorithm.CSharp.Model
 
                 return null;
             }
+
+            // Remove obsolete insights
+            _insights.RemoveExpiredInsights(algorithm.UtcTime);
+            foreach (Insight insight in insights)
+            {
+                Insight obsolete = _insights.FirstOrDefault(m => m.Symbol.Equals(insight.Symbol));
+                if (obsolete == null)
+                    continue;
+                _insights.Remove(obsolete);
+            }
+
+            // Merge insight lists and sort decending by magnitude
+            _insights.AddRange(insights);
+            insights = _insights.OrderByDescending(m => m.Magnitude).ToArray();
+            _insights.Clear();
+            _insights.AddRange(insights); // Add in random order
 
             // Initialize
             if (_initialCapital == 0)
@@ -161,101 +174,10 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (sizingFactor != _sizingFactor)
             {
                 algorithm.Log($"Switching to sizing factor {sizingFactor}");
-            }
-            _sizingFactor = sizingFactor;
-
-            // Calculate number of occupied positions
-            int taken = algorithm.Securities.Values
-                .Where(m => m.HasData && m.Holdings.Quantity != 0)
-                .Count();
-            int freeSlots = _slots - taken;
-            decimal cash = algorithm.Portfolio.Cash;
-
-            // Create targets for all insights in toplist
-            var targets = new List<IPortfolioTarget>();
-            IEnumerable<Insight> toplist = insights.Take(_slots);
-            foreach (Insight insight in toplist)
-            {
-                // Find current holdings and actual target
-                Security security = algorithm.Securities[insight.Symbol];
-                decimal holdings = security.Holdings.Quantity;
-                IPortfolioTarget target;
-                if (_reinvest)
-                {
-                    target = PortfolioTarget.Percent(algorithm, insight.Symbol, (int)insight.Direction * _sizingFactor / _slots);
-                    if (holdings == 0 && freeSlots > 0)
-                    {
-                        decimal amount = Math.Max(_sizingFactor * cash, 0) / freeSlots;
-                        decimal size = (int)insight.Direction * decimal.Floor(amount / security.Price);
-                        var order = new MarketOrder(insight.Symbol, size, DateTime.UtcNow);
-                        OrderFee orderFee = security.FeeModel.GetOrderFee(new OrderFeeParameters(security, order));
-                        amount -= decimal.Ceiling(orderFee);
-                        amount = Math.Max(amount, 0);
-                        decimal quantity = (int)insight.Direction * decimal.Floor(amount / security.Price);
-                        if (quantity < target.Quantity)
-                        {
-                            target = new PortfolioTarget(insight.Symbol, quantity);
-                        }
-                    }
-                }
-                else
-                {
-                    decimal amount = _initialCapital / _slots;
-                    decimal quantity = (int)insight.Direction * decimal.Floor(_sizingFactor * amount / security.Price);
-                    target = new PortfolioTarget(insight.Symbol, quantity);
-                }
-
-                if (holdings == 0 || target.Quantity == 0)
-                {
-                    // Create new target
-                    targets.Add(target);
-                }
-                else if (_rebalance > 0 && holdings <= decimal.Round((1 - _rebalance) * target.Quantity, 6))
-                {
-                    // Holdings too small, rebalance up
-                    algorithm.Log($"Rebalance up {target.Symbol} {holdings} to {target.Quantity} @ {security.Price:0.00}");
-                    targets.Add(target);
-                }
-                else if (_rebalance > 0 && holdings >= decimal.Round((1 + _rebalance) * target.Quantity, 6))
-                {
-                    // Holdings too large, rebalance down
-                    algorithm.Log($"Rebalance down {target.Symbol} {holdings} to {target.Quantity} @ {security.Price:0.00}");
-                    targets.Add(target);
-                }
-                else
-                {
-                    // Remove current insight, add again later
-                    _insights.Clear(new[] { insight.Symbol });
-                }
+                _sizingFactor = sizingFactor;
             }
 
-            // Close expired insights
-            foreach (Insight expired in _insights.RemoveExpiredInsights(algorithm.UtcTime))
-            {
-                // Skip if symbol in target list
-                if (targets.Any(m => m.Symbol.Equals(expired.Symbol))) continue;
-
-                // Check if expired holding still exists
-                Security security = algorithm.Securities[expired.Symbol];
-                decimal holdings = security.Holdings.Quantity;
-                if (holdings != 0)
-                {
-                    // Create zero target
-                    var target = new PortfolioTarget(expired.Symbol, 0);
-                    targets.Add(target);
-
-                    // Put it back into expired list
-                    _insights.Add(expired);
-                }
-            }
-
-            // Add toplist in random order
-            _insights.AddRange(toplist);
-            if (_logInsights)
-            {
-                LogInsights(algorithm, _insights.OrderByDescending(m => m.CloseTimeUtc).ThenByDescending(m => m.Magnitude));
-            }
-
+            var targets = _trackerPortfolio.GetTargets(sizingFactor);
             if (_logTargets)
             {
                 LogTargets(algorithm, targets);
@@ -294,7 +216,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
 
-        private static void LogTargets(QCAlgorithm algorithm, List<IPortfolioTarget> targets)
+        private static void LogTargets(QCAlgorithm algorithm, IEnumerable<IPortfolioTarget> targets)
         {
             int i = 0;
             foreach (IPortfolioTarget target in targets)
@@ -303,5 +225,4 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
     }
-
 }
