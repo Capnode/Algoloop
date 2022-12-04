@@ -15,13 +15,13 @@
 using Algoloop.Model;
 using Algoloop.ViewModel;
 using Algoloop.Wpf.Properties;
-using Algoloop.Wpf.Internal;
 using QuantConnect.Configuration;
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using DevExpress.Xpf.Core;
+using System.Windows.Interop;
 
 namespace Algoloop.Wpf
 {
@@ -42,13 +42,34 @@ namespace Algoloop.Wpf
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Settings.Default.MainWindowPlacement = this.GetPlacement();
+            IntPtr hWnd = new WindowInteropHelper(this).Handle;
+            ScreenExtensions.WINDOWPLACEMENT placement = ScreenExtensions.GetPlacement(hWnd);
+            Settings.Default.MainWindowPlacement = placement.ToString();
         }
 
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-            this.SetPlacement(Settings.Default.MainWindowPlacement);
+
+            try
+            {
+                ScreenExtensions.WINDOWPLACEMENT placement = new();
+                placement.ReadFromBase64String(Settings.Default.MainWindowPlacement);
+
+                double PrimaryMonitorScaling = ScreenExtensions.GetScalingForPoint(new System.Drawing.Point(1, 1));
+                double CurrentMonitorScaling = ScreenExtensions.GetScalingForPoint(new System.Drawing.Point(placement.rcNormalPosition.left, placement.rcNormalPosition.top));
+                double RescaleFactor = CurrentMonitorScaling / PrimaryMonitorScaling;
+                double width = placement.rcNormalPosition.right - placement.rcNormalPosition.left;
+                double height = placement.rcNormalPosition.bottom - placement.rcNormalPosition.top;
+                placement.rcNormalPosition.right = placement.rcNormalPosition.left + (int)(width / RescaleFactor + 0.5);
+                placement.rcNormalPosition.bottom = placement.rcNormalPosition.top + (int)(height / RescaleFactor + 0.5);
+                IntPtr hWnd = new WindowInteropHelper(this).Handle;
+                ScreenExtensions.SetPlacement(hWnd, placement);
+            }
+            catch (Exception)
+            {
+                // Invalid window placement, ignore
+            }
         }
 
         private async void FileSettings(object sender, RoutedEventArgs e)
