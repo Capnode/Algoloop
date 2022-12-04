@@ -73,6 +73,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Benchmark stoploss period")]
         private readonly string _benchmarkPeriod = "0";
 
+        [Parameter("Stoploss sizing")]
+        private readonly string _stoplossSizing = "0";
+
         [Parameter("Market capitalization (M min)")]
         private readonly string _marketCap = null;
         
@@ -139,6 +142,7 @@ namespace Algoloop.Algorithm.CSharp
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
             int trackerPeriod = int.Parse(_trackerPeriod, CultureInfo.InvariantCulture);
             int benchmarkPeriod = int.Parse(_benchmarkPeriod, CultureInfo.InvariantCulture);
+            decimal stoplossSizing = decimal.Parse(_stoplossSizing, CultureInfo.InvariantCulture);
 
             Log($"{GetType().Name} {_slots}");
             List<Symbol> symbols = _symbols
@@ -150,7 +154,7 @@ namespace Algoloop.Algorithm.CSharp
             SetTimeZone(NodaTime.DateTimeZone.Utc);
             UniverseSettings.Resolution = resolution;
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, trackerPeriod, benchmarkPeriod));
+            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, trackerPeriod, benchmarkPeriod, stoplossSizing));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));

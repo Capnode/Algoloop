@@ -96,7 +96,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             return equity.SmartRounding();
         }
 
-        public IList<IPortfolioTarget> GetTargets(decimal scale)
+        public IList<IPortfolioTarget> GetTargets(decimal leverage)
         {
             var targets = new List<IPortfolioTarget>();
             foreach (MarketOrder order in _orders)
@@ -107,7 +107,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                 {
                     quantity += trade.Quantity;
                 }
-                var target = new PortfolioTarget(order.Symbol, scale * quantity);
+                quantity = leverage * quantity;
+                quantity = quantity > 0 ? decimal.Floor(quantity) : decimal.Ceiling(quantity);
+                var target = new PortfolioTarget(order.Symbol, quantity);
                 targets.Add(target);
             }
 
@@ -115,7 +117,9 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 if (!targets.Any(m => m.Symbol.Equals(trade.Symbol)))
                 {
-                    var target = new PortfolioTarget(trade.Symbol, scale * trade.Quantity);
+                    decimal quantity = leverage * trade.Quantity;
+                    quantity = quantity > 0 ? decimal.Floor(quantity) : decimal.Ceiling(quantity);
+                    var target = new PortfolioTarget(trade.Symbol, quantity);
                     targets.Add(target);
                 }
             }
