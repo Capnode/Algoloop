@@ -67,11 +67,17 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
-        [Parameter("Tracker stoploss period")]
-        private readonly string _trackerPeriod = "0";
+        [Parameter("Tracker stoploss period1")]
+        private readonly string _trackerPeriod1 = "0";
 
-        [Parameter("Benchmark stoploss period")]
-        private readonly string _benchmarkPeriod = "0";
+        [Parameter("Tracker stoploss period2")]
+        private readonly string _trackerPeriod2 = "0";
+
+        [Parameter("Benchmark stoploss period1")]
+        private readonly string _benchmarkPeriod1 = "0";
+
+        [Parameter("Benchmark stoploss period2")]
+        private readonly string _benchmarkPeriod2 = "0";
 
         [Parameter("Stoploss sizing")]
         private readonly string _stoplossSizing = "0";
@@ -140,8 +146,10 @@ namespace Algoloop.Algorithm.CSharp
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
-            int trackerPeriod = int.Parse(_trackerPeriod, CultureInfo.InvariantCulture);
-            int benchmarkPeriod = int.Parse(_benchmarkPeriod, CultureInfo.InvariantCulture);
+            int trackerPeriod1 = int.Parse(_trackerPeriod1, CultureInfo.InvariantCulture);
+            int trackerPeriod2 = int.Parse(_trackerPeriod2, CultureInfo.InvariantCulture);
+            int benchmarkPeriod1 = int.Parse(_benchmarkPeriod1, CultureInfo.InvariantCulture);
+            int benchmarkPeriod2 = int.Parse(_benchmarkPeriod2, CultureInfo.InvariantCulture);
             decimal stoplossSizing = decimal.Parse(_stoplossSizing, CultureInfo.InvariantCulture);
 
             Log($"{GetType().Name} {_slots}");
@@ -154,7 +162,13 @@ namespace Algoloop.Algorithm.CSharp
             SetTimeZone(NodaTime.DateTimeZone.Utc);
             UniverseSettings.Resolution = resolution;
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, trackerPeriod, benchmarkPeriod, stoplossSizing));
+            SetPortfolioConstruction(new SlotPortfolio(
+                slots,
+                reinvest,
+                rebalance,
+                trackerPeriod1, trackerPeriod2,
+                benchmarkPeriod1, benchmarkPeriod2,
+                stoplossSizing));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));

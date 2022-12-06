@@ -1,8 +1,7 @@
 {
   "profiles": {
     "QuantConnect.Lean.Launcher": {
-      "commandName": "Project",
-      "workingDirectory": "C:\\Users\\carlc\\AppData\\Roaming\\Capnode\\Algoloop\\temp0"
+      "commandName": "Project"
     }
   }
 }
