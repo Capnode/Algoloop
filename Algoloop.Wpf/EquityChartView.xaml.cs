@@ -13,7 +13,6 @@
  */
 
 using Algoloop.ViewModel;
-using MoreLinq;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
 using System;
