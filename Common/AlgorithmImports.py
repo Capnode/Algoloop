@@ -22,6 +22,7 @@ path = os.path.dirname(os.path.realpath(__file__))
 
 from clr import AddReference
 AddReference("System")
+AddReference("System.Drawing")
 
 #Load assemblies
 for file in os.listdir(path):
