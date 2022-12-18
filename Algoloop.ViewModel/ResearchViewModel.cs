@@ -177,7 +177,8 @@ namespace Algoloop.ViewModel
                 config["algorithm-language"] = Language.Python.ToString();
                 config["data-folder"] = _settings.DataFolder.Replace("\\", "/");
                 config["data-directory"] = _settings.DataFolder.Replace("\\", "/");
-                config["composer-dll-directory"] = "..";
+                config["composer-dll-directory"] = exeFolder.Replace("\\", "/");
+                config["plugin-directory"] = exeFolder.Replace("\\", "/");
                 config["log-handler"] = "QuantConnect.Logging.CompositeLogHandler";
                 config["messaging-handler"] = "QuantConnect.Messaging.Messaging";
                 config["job-queue-handler"] = "QuantConnect.Queues.JobQueue";
