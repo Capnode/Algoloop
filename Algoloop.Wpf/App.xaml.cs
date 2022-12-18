@@ -29,6 +29,7 @@ namespace Algoloop.Wpf
 {
     /// <summary>
     /// Interaction logic for App.xaml
+    /// https://www.icoconverter.com/
     /// </summary>
     public partial class App : Application
     {
