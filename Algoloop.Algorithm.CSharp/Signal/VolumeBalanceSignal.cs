@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2020 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -15,23 +15,22 @@
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp
 {
-    internal class OnBalanceVolumeSignal : ISignal
+    internal class VolumeBalanceSignal : ISignal
     {
         private readonly RollingWindow<decimal> _window;
         private TradeBar _last;
 
-        public OnBalanceVolumeSignal(int period)
+        public VolumeBalanceSignal(int period)
         {
-            _window = new RollingWindow<decimal>(period - 1);
+            _window = new RollingWindow<decimal>(period);
         }
 
         public float Update(BaseData bar, bool evaluate)
         {
-            if (!(bar is TradeBar tradeBar)) return 0;
+            if (bar is not TradeBar tradeBar) return 0;
             if (_last != null)
             {
                 decimal diff = 0;
@@ -46,12 +45,21 @@ namespace Algoloop.Algorithm.CSharp
 
                 _window.Add(diff);
             }
-            _last = tradeBar;
 
+            _last = tradeBar;
             if (!evaluate) return 0;
             if (!_window.IsReady) return 0;
-            decimal sum = _window.Sum();
-            return decimal.Compare(sum, 0);
+            decimal sum = 0;
+            decimal absSum = 0;
+            foreach (decimal volume in _window)
+            {
+                sum += volume;
+                absSum  += Math.Abs(volume);
+            }
+
+            if (absSum == 0) return 0;
+            decimal volumeBalance = sum / absSum;
+            return (float)Math.Max(0, volumeBalance);
         }
 
         public void Done()
