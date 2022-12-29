@@ -46,7 +46,7 @@ namespace Algoloop.Algorithm.CSharp
         private readonly decimal? _epRatio;
         private readonly decimal? _psRatio;
         private readonly decimal? _spRatio;
-        private readonly List<FineFundamental> _fineFundamentals = new List<FineFundamental>();
+        private readonly List<FineFundamental> _fineFundamentals = new();
 
         public FundamentalSignal(
             QCAlgorithm algorithm,
@@ -293,7 +293,7 @@ namespace Algoloop.Algorithm.CSharp
                 "fine",
                 _symbol.Value.ToLowerInvariant());
 
-            DirectoryInfo d = new DirectoryInfo(folder);
+            DirectoryInfo d = new(folder);
             if (!d.Exists) return;
 
             foreach (FileInfo zipFile in d.GetFiles("*.zip"))
@@ -317,25 +317,23 @@ namespace Algoloop.Algorithm.CSharp
                 using (file)
                 {
                     if (resultStream == null) return;
-                    using (JsonReader reader = new JsonTextReader(resultStream))
-                    {
-                        JsonSerializer serializer = new JsonSerializer();
-                        FineFundamental fine = serializer.Deserialize<FineFundamental>(reader);
+                    using JsonReader reader = new JsonTextReader(resultStream);
+                    JsonSerializer serializer = new();
+                    FineFundamental fine = serializer.Deserialize<FineFundamental>(reader);
 
-                        // Assert no duplicates
-                        Debug.Assert(!_fineFundamentals.Any(m => m.FinancialStatements.FileDate.Date.Equals(fine.FinancialStatements.FileDate.Date)));
+                    // Assert no duplicates
+                    Debug.Assert(!_fineFundamentals.Any(m => m.FinancialStatements.FileDate.Date.Equals(fine.FinancialStatements.FileDate.Date)));
 
-                        // Decending sort
-                        _fineFundamentals.Add(fine);
-                        _fineFundamentals.Sort((x, y) => -DateTime.Compare(x.FinancialStatements.FileDate, y.FinancialStatements.FileDate));
-                    }
+                    // Decending sort
+                    _fineFundamentals.Add(fine);
+                    _fineFundamentals.Sort((x, y) => -DateTime.Compare(x.FinancialStatements.FileDate, y.FinancialStatements.FileDate));
                 }
             }
         }
 
         private float EvaluateFundamentals(decimal price)
         {
-            int count = _fineFundamentals.Count();
+            int count = _fineFundamentals.Count;
             if (count == 0) return 0;
 
             FineFundamental fine = _fineFundamentals[0];

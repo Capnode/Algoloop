@@ -222,14 +222,14 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 if (_trackerSma1.IsReady)
                 {
-                    sizingFactor = _trackerSma1 >= trackerIndex ? 1 : _stoplossSizing;
+                    sizingFactor = trackerIndex >= _trackerSma1 ? 1 : _stoplossSizing;
                 }
             }
             else if (_trackerSma2 != null)
             {
                 if (_trackerSma2.IsReady)
                 {
-                    sizingFactor = _trackerSma2 >= trackerIndex ? 1 : _stoplossSizing;
+                    sizingFactor = trackerIndex >= _trackerSma2 ? 1 : _stoplossSizing;
                 }
             }
 
@@ -272,14 +272,14 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 if (_benchmarkSma1.IsReady)
                 {
-                    sizingFactor = _benchmarkSma1 >= benchmarkIndex ? 1 : _stoplossSizing;
+                    sizingFactor = benchmarkIndex >= _benchmarkSma1 ? 1 : _stoplossSizing;
                 }
             }
             else if (_benchmarkSma2 != null)
             {
                 if (_benchmarkSma2.IsReady)
                 {
-                    sizingFactor = _benchmarkSma2 >= benchmarkIndex ? 1 : _stoplossSizing;
+                    sizingFactor = benchmarkIndex >= _benchmarkSma2 ? 1 : _stoplossSizing;
                 }
             }
 
