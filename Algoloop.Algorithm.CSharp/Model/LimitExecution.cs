@@ -65,7 +65,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 if (quantity == 0)
                     continue;
 
-                if (quantity < 0)
+                if (quantity < 0 || holdings != 0)
                 {
                     algorithm.LimitOrder(target.Symbol, quantity, security.Close);
                     if (_logOrder)
