@@ -54945,7 +54945,49 @@
         }
       ],
       "saturday": [],
-      "holidays": [],
+      "holidays": []
     },
+    "Equity-avanza-[*]": {
+      "dataTimeZone": "CET",
+      "exchangeTimeZone": "CET",
+      "sunday": [],
+      "monday": [
+        {
+          "start": "09:00:00",
+          "end": "17:30:00",
+          "state": "market"
+        }
+      ],
+      "tuesday": [
+        {
+          "start": "09:00:00",
+          "end": "17:30:00",
+          "state": "market"
+        }
+      ],
+      "wednesday": [
+        {
+          "start": "09:00:00",
+          "end": "17:30:00",
+          "state": "market"
+        }
+      ],
+      "thursday": [
+        {
+          "start": "09:00:00",
+          "end": "17:30:00",
+          "state": "market"
+        }
+      ],
+      "friday": [
+        {
+          "start": "09:00:00",
+          "end": "17:30:00",
+          "state": "market"
+        }
+      ],
+      "saturday": [],
+      "holidays": []
+    }
   }
 }
