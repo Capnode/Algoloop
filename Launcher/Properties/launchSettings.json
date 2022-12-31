@@ -1,7 +1,0 @@
-{
-  "profiles": {
-    "QuantConnect.Lean.Launcher": {
-      "commandName": "Project"
-    }
-  }
-}

@@ -205,12 +205,12 @@ namespace QuantConnect.Util
 
                         case Resolution.Second:
                         case Resolution.Minute:
-                            var quoteBar = data as QuoteBar;
-                            if (quoteBar != null)
+                            var bar = data as QuoteBar;
+                            if (bar != null)
                             {
                                 return ToCsv(milliseconds,
-                                    ToNonScaledCsv(quoteBar.Bid), quoteBar.LastBidSize,
-                                    ToNonScaledCsv(quoteBar.Ask), quoteBar.LastAskSize);
+                                    ToNonScaledCsv(bar.Bid), bar.LastBidSize,
+                                    ToNonScaledCsv(bar.Ask), bar.LastAskSize);
                             }
                             var tradeBar = data as TradeBar;
                             if (tradeBar != null)
@@ -221,12 +221,12 @@ namespace QuantConnect.Util
 
                         case Resolution.Hour:
                         case Resolution.Daily:
-                            var bigQuoteBar = data as QuoteBar;
-                            if (bigQuoteBar != null)
+                            var bigBar = data as QuoteBar;
+                            if (bigBar != null)
                             {
                                 return ToCsv(longTime,
-                                    ToNonScaledCsv(bigQuoteBar.Bid), bigQuoteBar.LastBidSize,
-                                    ToNonScaledCsv(bigQuoteBar.Ask), bigQuoteBar.LastAskSize);
+                                    ToNonScaledCsv(bigBar.Bid), bigBar.LastBidSize,
+                                    ToNonScaledCsv(bigBar.Ask), bigBar.LastAskSize);
                             }
                             var bigTradeBar = data as TradeBar;
                             if (bigTradeBar != null)

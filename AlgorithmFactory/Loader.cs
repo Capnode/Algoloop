@@ -101,8 +101,13 @@ namespace QuantConnect.AlgorithmFactory
             _debugging = debugging;
             _language = language;
             _workerThread = workerThread;
+            if (multipleTypeNameResolverFunction == null)
+            {
+                throw new ArgumentNullException("multipleTypeNameResolverFunction");
+            }
+
             _loaderTimeLimit = loaderTimeLimit;
-            _multipleTypeNameResolverFunction = multipleTypeNameResolverFunction ?? throw new ArgumentNullException("multipleTypeNameResolverFunction");
+            _multipleTypeNameResolverFunction = multipleTypeNameResolverFunction;
         }
 
 

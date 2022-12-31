@@ -213,7 +213,6 @@ csx/
 
 # Windows Store app package directory
 AppPackages/
-BundleArtifacts/
 
 # Others
 *.Cache
@@ -275,12 +274,6 @@ QuantConnect.Lean.sln.DotSettings*
 
 #User notebook files
 Research/Notebooks
-secret.config
-/Jupyter/config.json
-.ipynb_checkpoints
-log.txt
 
 #Docker result files
 Results/
-
-*.GeneratedMSBuildEditorConfig.editorconfig
