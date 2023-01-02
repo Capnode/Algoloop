@@ -90,24 +90,28 @@
                     GridLinesVisibility="None"
                     IsReadOnly="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding Symbol.Value}" Header="Symbol" />
-                        <DataGridTextColumn Binding="{Binding Symbol.SecurityType}" Header="Type" />
+                        <DataGridTextColumn
+                            Binding="{Binding EntryTime, StringFormat=u}"
+                            ElementStyle="{StaticResource RightCell}"
+                            Header="Entry time" />
+                        <DataGridTextColumn
+                            Binding="{Binding Symbol.Value}"
+                            Header="Symbol" />
+                        <DataGridTextColumn
+                            Binding="{Binding Symbol.SecurityType}"
+                            Header="Type" />
                         <DataGridTextColumn
                             Binding="{Binding Price}"
                             ElementStyle="{StaticResource RightCell}"
-                            Header="Price" />
+                            Header="Entry price" />
                         <DataGridTextColumn
                             Binding="{Binding Quantity}"
                             ElementStyle="{StaticResource RightCell}"
                             Header="Quantity" />
                         <DataGridTextColumn
-                            Binding="{Binding Profit}"
+                            Binding="{Binding EntryValue}"
                             ElementStyle="{StaticResource RightCell}"
-                            Header="Profit" />
-                        <DataGridTextColumn
-                            Binding="{Binding Duration, StringFormat='{}{0:d\\.hh\\:mm\\:ss}'}"
-                            ElementStyle="{StaticResource RightCell}"
-                            Header="Duration" />
+                            Header="Entry value" />
                     </DataGrid.Columns>
                 </wpf:ExDataGrid>
             </TabItem>

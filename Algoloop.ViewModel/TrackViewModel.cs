@@ -683,10 +683,10 @@ namespace Algoloop.ViewModel
                 {
                     holding = new HoldingViewModel(order.Symbol)
                     {
-                        Price = order.Price,
+                        EntryTime = order.CreatedTime,
+                        Price = order.Price.SmartRounding(),
                         Quantity = order.Quantity,
-                        Profit = order.Value,
-                        Duration = (order.LastUpdateTime ?? Model.EndDate) - order.CreatedTime
+                        EntryValue = order.Value
                     };
 
                     Holdings.Add(holding);
@@ -694,14 +694,17 @@ namespace Algoloop.ViewModel
                 else
                 {
                     decimal quantity = holding.Quantity + order.Quantity;
-                    holding.Price = quantity == 0 ? 0 : 
-                        (holding.Price * holding.Quantity + order.Price * order.Quantity)
-                        / quantity;
-                    holding.Quantity += order.Quantity;
-                    holding.Profit += order.Value;
-                    if (holding.Quantity == 0)
+                    if (quantity == 0)
                     {
                         Holdings.Remove(holding);
+                    }
+                    else
+                    {
+                        decimal value = holding.Price * holding.Quantity + order.Price * order.Quantity;
+                        decimal price = value / quantity;
+                        holding.Quantity = quantity;
+                        holding.Price = price.SmartRounding();
+                        holding.EntryValue = value.SmartRounding();
                     }
                 }
             }

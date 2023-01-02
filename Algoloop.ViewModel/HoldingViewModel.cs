@@ -22,13 +22,19 @@ namespace Algoloop.ViewModel
     {
         private decimal _price;
         private decimal _quantity;
-        private decimal _profit;
-        private TimeSpan _duration;
+        private decimal _entryValue;
+        private DateTime _entryTime;
 
         public HoldingViewModel(Symbol symbol)
         {
             Symbol = symbol;
             Debug.Assert(IsUiThread(), "Not UI thread!");
+        }
+
+        public DateTime EntryTime
+        {
+            get => _entryTime;
+            set => SetProperty(ref _entryTime, value);
         }
 
         public Symbol Symbol { get;}
@@ -45,16 +51,10 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _quantity, value);
         }
 
-        public decimal Profit
+        public decimal EntryValue
         {
-            get => _profit;
-            set => SetProperty(ref _profit, value);
-        }
-
-        public TimeSpan Duration
-        {
-            get => _duration;
-            set => SetProperty(ref _duration, value);
+            get => _entryValue;
+            set => SetProperty(ref _entryValue, value);
         }
     }
 }
