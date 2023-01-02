@@ -169,8 +169,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                         continue;
                 }
 
-                // Order fee
-                decimal fee = Fee(order, security);
+                // Max fee is stored in order Tag field
+                if (!decimal.TryParse(order.Tag, out decimal fee))
+                    continue;
 
                 Trade trade = _holdings.FirstOrDefault(m => m.Symbol.Equals(order.Symbol));
                 if (order.Direction == OrderDirection.Sell)
@@ -259,6 +260,8 @@ namespace Algoloop.Algorithm.CSharp.Model
 
                 Security security = algorithm.Securities[trade.Symbol];
                 var order = new MarketOrder(trade.Symbol, -trade.Quantity, algorithm.Time, security.Close);
+                decimal fee = Fee(order, security);
+                order = new MarketOrder(trade.Symbol, -trade.Quantity, algorithm.Time, security.Close, fee.ToString());
                 _orders.Add(order);
             }
         }
@@ -287,7 +290,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 if (quantity <= 0)
                     continue;
 
-                order = new MarketOrder(insight.Symbol, quantity, algorithm.Time, security.Close);
+                order = new MarketOrder(insight.Symbol, quantity, algorithm.Time, security.Close, fee.ToString());
                 _reserved += order.Value + fee;
                 freeSlots--;
                 _orders.Add(order);
@@ -320,6 +323,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     if (_reserved + value > _cash)
                         continue;
 
+                    order = new MarketOrder(insight.Symbol, diff, algorithm.Time, security.Close, fee.ToString());
                     _reserved += value;
                     _orders.Add(order);
                 }
@@ -328,6 +332,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                     // Rebalance down
                     decimal diff = modelQuantity - trade.Quantity;
                     var order = new MarketOrder(insight.Symbol, diff, algorithm.Time, security.Close);
+                    decimal fee = Fee(order, security);
+                    order = new MarketOrder(insight.Symbol, diff, algorithm.Time, security.Close, fee.ToString());
                     _orders.Add(order);
                 }
             }
