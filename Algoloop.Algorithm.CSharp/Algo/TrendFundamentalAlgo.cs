@@ -41,7 +41,7 @@ namespace Algoloop.Algorithm.CSharp
         private readonly string _market = Market.Borsdata;
 
         [Parameter("Fee")]
-        private readonly string _fee = "0.0025";
+        private readonly string _fee = "0";
 
         [Parameter("Period1")]
         private readonly string _period1 = "0";
