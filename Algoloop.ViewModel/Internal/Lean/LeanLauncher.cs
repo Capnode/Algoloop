@@ -240,10 +240,14 @@ namespace Algoloop.ViewModel.Internal.Lean
         {
             var parameters = new Dictionary<string, string>
             {
-                { "market", model.Market },
                 { "security", model.Security.ToStringInvariant() },
                 { "resolution", model.Resolution.ToStringInvariant() }
             };
+
+            if (!string.IsNullOrEmpty(model.Market))
+            {
+                parameters.Add("market", model.Market);
+            }
 
             if (!model.Symbols.IsNullOrEmpty())
             {
