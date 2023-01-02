@@ -476,7 +476,7 @@ namespace Algoloop.ViewModel
             int total = models.Count;
             string message = string.Format(
                 CultureInfo.InvariantCulture,
-                Resources.RunStrategyWithTracks,
+                Resources.StrategyStarted,
                 total);
             Messenger.Send(new NotificationMessage(message), 0);
 

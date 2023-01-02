@@ -151,15 +151,6 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Run strategy with {0} track(s).
-        /// </summary>
-        internal static string RunStrategyWithTracks {
-            get {
-                return ResourceManager.GetString("RunStrategyWithTracks", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Saving configuration, please wait....
         /// </summary>
         internal static string SavingConfiguration {
@@ -192,6 +183,15 @@ namespace Algoloop.ViewModel.Properties {
         internal static string StrategyCompleted {
             get {
                 return ResourceManager.GetString("StrategyCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy started with {0} track(s).
+        /// </summary>
+        internal static string StrategyStarted {
+            get {
+                return ResourceManager.GetString("StrategyStarted", resourceCulture);
             }
         }
     }

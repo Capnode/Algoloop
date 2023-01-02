@@ -147,9 +147,6 @@
   <data name="NoSymbolSelected" xml:space="preserve">
     <value>No symbol selected!</value>
   </data>
-  <data name="RunStrategyWithTracks" xml:space="preserve">
-    <value>Run strategy with {0} track(s)</value>
-  </data>
   <data name="SavingConfiguration" xml:space="preserve">
     <value>Saving configuration, please wait...</value>
   </data>
@@ -161,5 +158,8 @@
   </data>
   <data name="StrategyCompleted" xml:space="preserve">
     <value>Strategy completed</value>
+  </data>
+  <data name="StrategyStarted" xml:space="preserve">
+    <value>Strategy started with {0} track(s)</value>
   </data>
 </root>
