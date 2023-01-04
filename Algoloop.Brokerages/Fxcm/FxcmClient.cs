@@ -104,46 +104,6 @@ namespace Algoloop.Brokerages.Fxcm
             _fxcmSocket.Close();
         }
 
-        public async Task<IReadOnlyList<SymbolModel>> GetSymbolsAsync()
-        {
-            // {"response":{"executed":true},"data":{"instrument":[{"symbol":"EUR/USD","visible":true,"order":100},
-            //Log.Trace(">{0}:GetSymbolsAsync", GetType().Name);
-            string json = await GetAsync(GetSymbols).ConfigureAwait(false);
-            JObject jo = JObject.Parse(json);
-            JToken jResponse = jo["response"];
-            bool executed = (bool)jResponse["executed"];
-            if (!executed)
-            {
-                string error = jResponse["error"].ToString();
-                throw new ApplicationException(error);
-            }
-
-            var symbols = new List<SymbolModel>();
-            JToken jData = jo["data"];
-            JArray jInstruments = JArray.FromObject(jData["instrument"]);
-            foreach (JToken jInstrument in jInstruments)
-            {
-                string name = jInstrument["symbol"].ToString();
-                if (string.IsNullOrEmpty(name)) continue;
-                bool visible = (bool)jInstrument["visible"];
-                int order = (int)jInstrument["order"];
-                var symbol = new SymbolModel
-                {
-                    Active = visible,
-                    Id = order.ToString(),
-                    Name = name,
-                    Market = Market.FXCM,
-                    Security = Support.ToSecurityType(0),
-                    Properties = new Dictionary<string, object>()
-                };
-
-                symbols.Add(symbol);
-            }
-
-            //Log.Trace("<{0}:GetSymbolsAsync", GetType().Name);
-            return symbols;
-        }
-
         public async Task GetAccountsAsync(Action<object> update)
         {
             //Log.Trace(">{0}:GetAccountsAsync", GetType().Name);
@@ -165,7 +125,7 @@ namespace Algoloop.Brokerages.Fxcm
             }
 
             // Offers
-            List<SymbolModel> symbols = new ();
+            List<SymbolModel> symbols = new();
             List<QuoteBar> quotes = new();
             JArray jOffers = JArray.FromObject(jo["offers"]);
             foreach (JToken jSymbol in jOffers)
@@ -241,6 +201,46 @@ namespace Algoloop.Brokerages.Fxcm
 
             _fxcmSocket.Update = update;
             //Log.Trace("<{0}:GetAccountsAsync", GetType().Name);
+        }
+
+        public async Task<IReadOnlyList<SymbolModel>> GetSymbolsAsync()
+        {
+            // {"response":{"executed":true},"data":{"instrument":[{"symbol":"EUR/USD","visible":true,"order":100},
+            //Log.Trace(">{0}:GetSymbolsAsync", GetType().Name);
+            string json = await GetAsync(GetSymbols).ConfigureAwait(false);
+            JObject jo = JObject.Parse(json);
+            JToken jResponse = jo["response"];
+            bool executed = (bool)jResponse["executed"];
+            if (!executed)
+            {
+                string error = jResponse["error"].ToString();
+                throw new ApplicationException(error);
+            }
+
+            var symbols = new List<SymbolModel>();
+            JToken jData = jo["data"];
+            JArray jInstruments = JArray.FromObject(jData["instrument"]);
+            foreach (JToken jInstrument in jInstruments)
+            {
+                string name = jInstrument["symbol"].ToString();
+                if (string.IsNullOrEmpty(name)) continue;
+                bool visible = (bool)jInstrument["visible"];
+                int order = (int)jInstrument["order"];
+                var symbol = new SymbolModel
+                {
+                    Active = visible,
+                    Id = order.ToString(),
+                    Name = name,
+                    Market = Market.FXCM,
+                    Security = Support.ToSecurityType(0),
+                    Properties = new Dictionary<string, object>()
+                };
+
+                symbols.Add(symbol);
+            }
+
+            //Log.Trace("<{0}:GetSymbolsAsync", GetType().Name);
+            return symbols;
         }
 
         public async Task SubscribeOfferAsync(SymbolModel symbol)
