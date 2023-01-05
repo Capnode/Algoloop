@@ -684,7 +684,7 @@ namespace Algoloop.ViewModel
                     holding = new HoldingViewModel(order.Symbol)
                     {
                         EntryTime = order.CreatedTime,
-                        Price = order.Price.SmartRounding(),
+                        EntryPrice = order.Price.SmartRounding(),
                         Quantity = order.Quantity,
                         EntryValue = order.Value
                     };
@@ -698,12 +698,18 @@ namespace Algoloop.ViewModel
                     {
                         Holdings.Remove(holding);
                     }
-                    else
+                    else if (order.Quantity > 0)
                     {
-                        decimal value = holding.Price * holding.Quantity + order.Price * order.Quantity;
+                        decimal value = holding.EntryPrice * holding.Quantity + order.Price * order.Quantity;
                         decimal price = value / quantity;
                         holding.Quantity = quantity;
-                        holding.Price = price.SmartRounding();
+                        holding.EntryPrice = price.SmartRounding();
+                        holding.EntryValue = value.SmartRounding();
+                    }
+                    else
+                    {
+                        decimal value = holding.EntryPrice * quantity;
+                        holding.Quantity = quantity;
                         holding.EntryValue = value.SmartRounding();
                     }
                 }

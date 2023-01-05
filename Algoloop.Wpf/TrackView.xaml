@@ -101,7 +101,7 @@
                             Binding="{Binding Symbol.SecurityType}"
                             Header="Type" />
                         <DataGridTextColumn
-                            Binding="{Binding Price}"
+                            Binding="{Binding EntryPrice}"
                             ElementStyle="{StaticResource RightCell}"
                             Header="Entry price" />
                         <DataGridTextColumn

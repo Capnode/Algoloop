@@ -20,10 +20,10 @@ namespace Algoloop.ViewModel
 {
     public class HoldingViewModel : ViewModelBase
     {
-        private decimal _price;
+        private DateTime _entryTime;
+        private decimal _entryPrice;
         private decimal _quantity;
         private decimal _entryValue;
-        private DateTime _entryTime;
 
         public HoldingViewModel(Symbol symbol)
         {
@@ -39,10 +39,10 @@ namespace Algoloop.ViewModel
 
         public Symbol Symbol { get;}
 
-        public decimal Price
+        public decimal EntryPrice
         {
-            get => _price;
-            set => SetProperty(ref _price, value);
+            get => _entryPrice;
+            set => SetProperty(ref _entryPrice, value);
         }
 
         public decimal Quantity
