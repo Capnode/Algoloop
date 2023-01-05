@@ -81,7 +81,7 @@ namespace Algoloop.ViewModel
         public ResearchViewModel ResearchViewModel { get; }
         public LogViewModel LogViewModel { get; }
 
-        public static string Title => AboutModel.Title;
+        public static string Title => $"{AboutModel.Title} {AboutModel.Version}";
 
         /// <summary>
         /// Mark ongoing operation
