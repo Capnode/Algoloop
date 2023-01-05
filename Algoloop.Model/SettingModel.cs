@@ -80,7 +80,7 @@ namespace Algoloop.Model
         }
 
         [DisplayName("Max backtests")]
-        [Description("Largest number of simultaneous ongoing backtest execution.")]
+        [Description("Max ongoing backtests.")]
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
