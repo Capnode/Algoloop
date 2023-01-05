@@ -16,7 +16,6 @@ using Ionic.Zip;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Algorithm;
-using QuantConnect.Configuration;
 using QuantConnect.Data;
 using QuantConnect.Data.Fundamental;
 using System.Diagnostics;
@@ -81,6 +80,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _marketCap = decimal.MinValue;
                 }
+                else if (!marketCap.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(marketCap)}' has invalid value: {marketCap}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(netIncome))
@@ -92,6 +95,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (netIncome.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _netIncome = decimal.MinValue;
+                }
+                else if (!netIncome.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(netIncome)}' has invalid value: {netIncome}");
                 }
             }
 
@@ -105,6 +112,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _netIncomeQuarter = decimal.MinValue;
                 }
+                else if (!netIncomeQuarter.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(netIncomeQuarter)}' has invalid value: {netIncomeQuarter}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(netIncomeGrowth))
@@ -116,6 +127,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (netIncomeGrowth.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _netIncomeGrowth = decimal.MinValue;
+                }
+                else if (!netIncomeGrowth.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(netIncomeGrowth)}' has invalid value: {netIncomeGrowth}");
                 }
             }
 
@@ -129,6 +144,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _netIncomeInverseGrowth = decimal.MinValue;
                 }
+                else if (!netIncomeInverseGrowth.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(netIncomeInverseGrowth)}' has invalid value: {netIncomeInverseGrowth}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(netIncomeTrend))
@@ -140,6 +159,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (netIncomeTrend.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _netIncomeTrend = decimal.MinValue;
+                }
+                else if (!netIncomeTrend.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(netIncomeTrend)}' has invalid value: {netIncomeTrend}");
                 }
             }
 
@@ -153,6 +176,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _revenueGrowth = decimal.MinValue;
                 }
+                else if (!revenueGrowth.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(revenueGrowth)}' has invalid value: {revenueGrowth}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(revenueInverseGrowth))
@@ -164,6 +191,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (revenueInverseGrowth.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _revenueInverseGrowth = decimal.MinValue;
+                }
+                else if (!revenueInverseGrowth.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(revenueInverseGrowth)}' has invalid value: {revenueInverseGrowth}");
                 }
             }
 
@@ -177,6 +208,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _revenueTrend = decimal.MinValue;
                 }
+                else if (!revenueTrend.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(revenueTrend)}' has invalid value: {revenueTrend}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(netMargin))
@@ -188,6 +223,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (netMargin.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _netMargin = decimal.MinValue;
+                }
+                else if (!netMargin.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(netMargin)}' has invalid value: {netMargin}");
                 }
             }
 
@@ -201,6 +240,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _netMarginTrend = decimal.MinValue;
                 }
+                else if (!netMarginTrend.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(netMarginTrend)}' has invalid value: {netMarginTrend}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(freeCashFlowMargin))
@@ -212,6 +255,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (freeCashFlowMargin.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _freeCashFlowMargin = decimal.MinValue;
+                }
+                else if (!freeCashFlowMargin.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(freeCashFlowMargin)}' has invalid value: {freeCashFlowMargin}");
                 }
             }
 
@@ -225,6 +272,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _freeCashFlowMarginTrend = decimal.MinValue;
                 }
+                else if (!freeCashFlowMarginTrend.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(freeCashFlowMarginTrend)}' has invalid value: {freeCashFlowMarginTrend}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(peRatio))
@@ -236,6 +287,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (peRatio.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _peRatio = decimal.MinValue;
+                }
+                else if (!peRatio.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(peRatio)}' has invalid value: {peRatio}");
                 }
             }
 
@@ -249,6 +304,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _epRatio = decimal.MinValue;
                 }
+                else if (!epRatio.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(epRatio)}' has invalid value: {epRatio}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(psRatio))
@@ -261,6 +320,10 @@ namespace Algoloop.Algorithm.CSharp
                 {
                     _psRatio = decimal.MinValue;
                 }
+                else if (!psRatio.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(psRatio)}' has invalid value: {psRatio}");
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(spRatio))
@@ -272,6 +335,10 @@ namespace Algoloop.Algorithm.CSharp
                 else if (spRatio.Equals("USE", StringComparison.OrdinalIgnoreCase))
                 {
                     _spRatio = decimal.MinValue;
+                }
+                else if (!spRatio.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(spRatio)}' has invalid value: {spRatio}");
                 }
             }
         }
