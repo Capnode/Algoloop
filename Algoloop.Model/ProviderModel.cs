@@ -122,7 +122,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public DateTime LastDate { get; set; } = DateTime.Today;
+        public DateTime LastDate { get; set; } = DateTime.MinValue;
 
         [Category("Time")]
         [DisplayName("Timeframe")]

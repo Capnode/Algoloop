@@ -247,7 +247,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(false)]
         [DataMember]
-        public SecurityType Security { get; set; }
+        public SecurityType Security { get; set; } = SecurityType.Equity;
 
         [Category("Data")]
         [PropertyOrder(4)]
