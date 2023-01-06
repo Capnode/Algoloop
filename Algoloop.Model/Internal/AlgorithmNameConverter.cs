@@ -51,7 +51,7 @@ namespace Algoloop.Model.Internal
 
         private static StandardValuesCollection ClrAlgorithm(string path, string name)
         {
-            List<string> list = new() { string.Empty };
+            List<string> list = new();
             if (!string.IsNullOrEmpty(path))
             {
                 try
@@ -79,7 +79,7 @@ namespace Algoloop.Model.Internal
 
         private static StandardValuesCollection PythonAlgorithm(string folder, string name)
         {
-            List<string> list = new() { string.Empty };
+            List<string> list = new();
             if (!string.IsNullOrEmpty(folder))
             {
                 string[] pyFiles = Directory.GetFiles(folder, "*.py");

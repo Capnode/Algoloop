@@ -36,6 +36,7 @@ using Algoloop.ViewModel.Properties;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
 using Algoloop.ViewModel.Internal;
+using QuantConnect.Lean.Engine.Setup;
 
 namespace Algoloop.ViewModel
 {
@@ -586,6 +587,7 @@ namespace Algoloop.ViewModel
         {
             Debug.Assert(IsUiThread(), "Not UI thread!");
             SetDisplayName();
+            SetParameters();
 
             // Copy Symbols
             Symbols.Clear();
@@ -596,22 +598,15 @@ namespace Algoloop.ViewModel
                 Symbols.Add(symbolViewModel);
             }
 
-            // Copy Parameters
-            Parameters.Clear();
-            foreach (ParameterModel parameter in Model.Parameters)
-            {
-                ParameterViewModel parameterViewModel = new (parameter);
-                Parameters.Add(parameterViewModel);
-            }
-
-            UpdateTracksAndColumns();
-
+            // Copy Strategies
             Strategies.Clear();
             foreach (StrategyModel strategyModel in Model.Strategies)
             {
                 var strategy = new StrategyViewModel(this, strategyModel, _markets,  _settings);
                 Strategies.Add(strategy);
             }
+
+            UpdateTracksAndColumns();
         }
 
         private void UpdateTracksAndColumns()
@@ -656,11 +651,9 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void AlgorithmNameChanged(string algorithmName)
+        private void SetParameters()
         {
-            SetDisplayName();
-            RaiseCommands();
-            if (string.IsNullOrEmpty(algorithmName)) return;
+            if (string.IsNullOrEmpty(Model.AlgorithmName)) return;
             if (Model.AlgorithmLanguage.Equals(Language.Python)) return;
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
             if (string.IsNullOrEmpty(assemblyPath)) return;
@@ -670,7 +663,7 @@ namespace Algoloop.ViewModel
                 Assembly assembly = Assembly.LoadFile(assemblyPath);
                 IEnumerable<Type> type = assembly
                     .GetTypes()
-                    .Where(m => m.Name.Equals(algorithmName, StringComparison.OrdinalIgnoreCase));
+                    .Where(m => m.Name.Equals(Model.AlgorithmName, StringComparison.OrdinalIgnoreCase));
                 if (!type.Any()) return;
 
                 Parameters.Clear();
@@ -696,7 +689,13 @@ namespace Algoloop.ViewModel
             {
                 Log.Error(ex);
             }
+        }
 
+        private void AlgorithmNameChanged()
+        {
+            SetDisplayName();
+            SetParameters();
+            RaiseCommands();
             OnPropertyChanged(nameof(Parameters));
         }
 

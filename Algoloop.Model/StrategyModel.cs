@@ -101,7 +101,7 @@ namespace Algoloop.Model
         public Action NameChanged { get; set; }
 
         [Browsable(false)]
-        public Action<string> AlgorithmNameChanged { get; set; }
+        public Action AlgorithmNameChanged { get; set; }
 
         [Category("Strategy")]
         [DisplayName("Name")]
@@ -206,7 +206,7 @@ namespace Algoloop.Model
             {
                 _algorithmName = value;
                 Refresh();
-                AlgorithmNameChanged?.Invoke(_algorithmName);
+                AlgorithmNameChanged?.Invoke();
             }
         }
 
