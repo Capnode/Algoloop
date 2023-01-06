@@ -41,8 +41,9 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 10000,
                 new Dictionary<string, string>
                 {
-                    { "resolution", "Hour" },
                     { "market", Market.Dukascopy },
+                    { "security", "Forex" },
+                    { "resolution", "Hour" },
                     { "symbols", "EURUSD" },
                     { "Mode", "Trend" },
                     { "Periods", "8" },
@@ -67,8 +68,9 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 10000,
                 new Dictionary<string, string>
                 {
-                    { "resolution", "Hour" },
                     { "market", Market.Dukascopy },
+                    { "security", "Forex" },
+                    { "resolution", "Hour" },
                     { "symbols", "EURUSD" },
                     { "Mode", "Contrarian" },
                     { "Periods", "8" },

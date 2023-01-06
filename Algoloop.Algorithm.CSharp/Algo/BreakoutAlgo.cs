@@ -22,28 +22,26 @@ using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Parameters;
 using QuantConnect.Securities;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp
 {
     public class BreakoutAlgo : QCAlgorithm
     {
-        private const decimal Fee = 0.0025m;
-
         [Parameter("symbols")]
-        private readonly string _symbols = "ABB.ST;ERIC-B.ST;ATCO-A.ST;SEB.ST";
+        private readonly string _symbols = null;
 
         [Parameter("security")]
-        private readonly string _security = "Equity";
+        private readonly string _security = null;
 
         [Parameter("resolution")]
-        private readonly string _resolution = "Daily";
+        private readonly string _resolution = null;
 
         [Parameter("market")]
-        private readonly string _market = "Borsdata";
+        private readonly string _market = null;
+
+        [Parameter("Fee")]
+        private readonly string _fee = "0";
 
         [Parameter("Period")]
         private readonly string _period = "0";
@@ -68,8 +66,14 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void Initialize()
         {
+            if (string.IsNullOrEmpty(_symbols)) throw new ArgumentNullException(nameof(_symbols));
+            if (string.IsNullOrEmpty(_security)) throw new ArgumentNullException(nameof(_security));
+            if (string.IsNullOrEmpty(_resolution)) throw new ArgumentNullException(nameof(_resolution));
+            if (string.IsNullOrEmpty(_market)) throw new ArgumentNullException(nameof(_market));
+
             SecurityType securityType = (SecurityType)Enum.Parse(typeof(SecurityType), _security);
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
+            decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
             int period = int.Parse(_period, CultureInfo.InvariantCulture);
             int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
@@ -84,16 +88,18 @@ namespace Algoloop.Algorithm.CSharp
                 .ToList();
 
             EnableAutomaticIndicatorWarmUp = true;
-            SetTimeZone(NodaTime.DateTimeZone.Utc);
             UniverseSettings.Resolution = resolution;
+            MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
+            SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
             SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
+            FeeModel feeModel = fee < 1 ? new PercentFeeModel(fee) : new ConstantFeeModel(fee);
             SetSecurityInitializer(security =>
             {
-                security.FeeModel = new PercentFeeModel(Fee);
+                security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, Math.Max(period, turnoverPeriod), hold, symbols,

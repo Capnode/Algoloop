@@ -23,26 +23,26 @@ using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Parameters;
 using QuantConnect.Securities;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp
 {
     public class TideAlgo : QCAlgorithm
     {
         [Parameter("symbols")]
-        private readonly string _symbols = "ABB.ST;ERIC-B.ST;ATCO-A.ST;SEB.ST";
+        private readonly string _symbols = null;
 
         [Parameter("security")]
-        private readonly string _security = "Equity";
+        private readonly string _security = null;
 
         [Parameter("resolution")]
-        private readonly string _resolution = "Daily";
+        private readonly string _resolution = null;
 
         [Parameter("market")]
-        private readonly string _market = "Borsdata";
+        private readonly string _market = null;
+
+        [Parameter("Fee")]
+        private readonly string _fee = "0";
 
         [Parameter("Direction")]
         private readonly string _direction = nameof(InsightDirection.Up);
@@ -64,8 +64,14 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void Initialize()
         {
+            if (string.IsNullOrEmpty(_symbols)) throw new ArgumentNullException(nameof(_symbols));
+            if (string.IsNullOrEmpty(_security)) throw new ArgumentNullException(nameof(_security));
+            if (string.IsNullOrEmpty(_resolution)) throw new ArgumentNullException(nameof(_resolution));
+            if (string.IsNullOrEmpty(_market)) throw new ArgumentNullException(nameof(_market));
+
             SecurityType securityType = (SecurityType)Enum.Parse(typeof(SecurityType), _security);
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
+            decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
             int open = int.Parse(_open, CultureInfo.InvariantCulture);
             InsightDirection direction = (InsightDirection)Enum.Parse(typeof(InsightDirection), _direction);
             int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
@@ -86,7 +92,12 @@ namespace Algoloop.Algorithm.CSharp
             SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance));
             SetExecution(new ImmediateExecutionModel());
             SetRiskManagement(new NullRiskManagementModel());
-            SetSecurityInitializer(s => s.SetFeeModel(new FeeModel()));
+            FeeModel feeModel = fee < 1 ? new PercentFeeModel(fee) : new ConstantFeeModel(fee);
+            SetSecurityInitializer(security =>
+            {
+                security.FeeModel = feeModel;
+                security.FillModel = new TouchFill();
+            });
             SetAlpha(new MultiSignalAlpha(direction, resolution, backfill, hold, symbols,
                 (symbol) => new TideSignal(resolution, direction, open)));
         }

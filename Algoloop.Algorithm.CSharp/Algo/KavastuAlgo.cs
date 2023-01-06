@@ -22,73 +22,47 @@ using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Parameters;
 using QuantConnect.Securities;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp
 {
     public class KavastuAlgo : QCAlgorithm
     {
-        private const decimal _fee = 0.00055m;
-
         [Parameter("symbols")]
-        private readonly string _symbols = "ABB.ST;ERIC-B.ST;ATCO-A.ST;SEB.ST";
+        private readonly string _symbols = null;
 
         [Parameter("security")]
-        private readonly string _security = "Equity";
+        private readonly string _security = null;
 
         [Parameter("resolution")]
-        private readonly string _resolution = "Daily";
+        private readonly string _resolution = null;
 
         [Parameter("market")]
-        private readonly string _market = "Borsdata";
+        private readonly string _market = null;
+
+        [Parameter("Fee")]
+        private readonly string _fee = "0";
 
         [Parameter("Period")]
         private readonly string _period = "0";
 
-        [Parameter("Hold")]
-        private readonly string _hold = "1";
-
         [Parameter("Slots")]
         private readonly string _slots = "1";
-
-        [Parameter("Daily turnover (min)")]
-        private readonly string _turnover = "0";
-
-        [Parameter("Daily turnover period")]
-        private readonly string _turnoverPeriod = "0";
 
         [Parameter("Reinvest")]
         private readonly string _reinvest = "false";
 
-        [Parameter("Rebalance trigger (min)")]
-        private readonly string _rebalance = "0";
-
-        [Parameter("Market capitalization (M min)")]
-        private readonly string _marketCap = null;
-
         [Parameter("Net income (R12 min)")]
         private readonly string _netIncome = null;
 
-        [Parameter("Net income (Q min)")]
-        private readonly string _netIncomeQuarter = null;
-
         [Parameter("Net income growth% (R12 min)")]
         private readonly string _netIncomeGrowth = null;
-
-        [Parameter("Net income inverse growth% (R12 min)")]
-        private readonly string _netIncomeInverseGrowth = null;
 
         [Parameter("Net income trend% (R12 min)")]
         private readonly string _netIncomeTrend = null;
 
         [Parameter("Revenue growth% (R12 min)")]
         private readonly string _revenueGrowth = null;
-
-        [Parameter("Revenue inverse growth% (R12 min)")]
-        private readonly string _revenueInverseGrowth = null;
 
         [Parameter("Revenue trend% (R12 min)")]
         private readonly string _revenueTrend = null;
@@ -98,12 +72,6 @@ namespace Algoloop.Algorithm.CSharp
 
         [Parameter("Net margin trend% (R12 min)")]
         private readonly string _netMarginTrend = null;
-
-        [Parameter("Free cash flow margin% (R12 min)")]
-        private readonly string _freeCashFlowMargin = null;
-
-        [Parameter("Free cash flow margin trend% (R12 min)")]
-        private readonly string _freeCashFlowMarginTrend = null;
 
         [Parameter("PE ratio (R12 min)")]
         private readonly string _peRatio = null;
@@ -119,54 +87,49 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void Initialize()
         {
+            if (string.IsNullOrEmpty(_symbols)) throw new ArgumentNullException(nameof(_symbols));
+            if (string.IsNullOrEmpty(_security)) throw new ArgumentNullException(nameof(_security));
+            if (string.IsNullOrEmpty(_resolution)) throw new ArgumentNullException(nameof(_resolution));
+            if (string.IsNullOrEmpty(_market)) throw new ArgumentNullException(nameof(_market));
+
             SecurityType securityType = (SecurityType)Enum.Parse(typeof(SecurityType), _security);
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
+            decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
             int period = int.Parse(_period, CultureInfo.InvariantCulture);
-            int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
-            long turnover = long.Parse(_turnover, CultureInfo.InvariantCulture);
-            int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
-            float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
-
-            Log($"{GetType().Name} {_slots}");
             List<Symbol> symbols = _symbols
                 .Split(';')
                 .Select(x => QuantConnect.Symbol.Create(x, SecurityType.Equity, _market))
                 .ToList();
 
             EnableAutomaticIndicatorWarmUp = true;
-            SetTimeZone(NodaTime.DateTimeZone.Utc);
             UniverseSettings.Resolution = resolution;
+            MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
+            SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance));
+            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, 0));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
+            FeeModel feeModel = fee < 1 ? new PercentFeeModel(fee) : new ConstantFeeModel(fee);
             SetSecurityInitializer(security =>
             {
-                security.FeeModel = new PercentFeeModel(_fee);
+                security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, Math.Max(period, turnoverPeriod), hold, symbols,
-                (symbol) => new TurnoverSignal(this, turnoverPeriod, turnover),
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, period, 1, symbols,
                 (symbol) => new SmaSignal(this, symbol, resolution, period),
                 (symbol) => new FundamentalSignal(
                     this,
                     symbol,
-                    marketCap: _marketCap,
                     netIncome: _netIncome,
-                    netIncomeQuarter: _netIncomeQuarter,
                     netIncomeGrowth: _netIncomeGrowth,
-                    netIncomeInverseGrowth: _netIncomeInverseGrowth,
                     netIncomeTrend: _netIncomeTrend,
                     revenueGrowth: _revenueGrowth,
-                    revenueInverseGrowth: _revenueInverseGrowth,
                     revenueTrend: _revenueTrend,
                     netMargin: _netMargin,
                     netMarginTrend: _netMarginTrend,
-                    freeCashFlowMargin: _freeCashFlowMargin,
-                    freeCashFlowMarginTrend: _freeCashFlowMarginTrend,
                     peRatio: _peRatio,
                     epRatio: _epRatio,
                     psRatio: _psRatio,
@@ -175,7 +138,7 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void OnEndOfAlgorithm()
         {
-            Log(PortfolioConstruction.ToString());
+            PortfolioConstruction.CreateTargets(this, null);
         }
     }
 }

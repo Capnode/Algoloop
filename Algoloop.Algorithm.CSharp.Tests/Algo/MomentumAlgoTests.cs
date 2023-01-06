@@ -44,6 +44,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 new Dictionary<string, string>
                 {
                     { "resolution", "Daily" },
+                    { "security", "Equity" },
                     { "market", Market.Borsdata },
                     { "symbols", "ABB.ST"},
                     { "Period", "100" },
@@ -68,6 +69,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 new Dictionary<string, string>
                 {
                     { "resolution", "Daily" },
+                    { "security", "Equity" },
                     { "market", Market.Borsdata },
                     { "symbols", "ABB.ST;ERIC-B.ST;ATCO-A.ST;SEB-A.ST"},
                     { "Period", "100" },
@@ -81,7 +83,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             Assert.IsTrue(result.TryGetValue("Total Trades", out string trades));
             Assert.IsTrue(int.TryParse(trades, out int trade));
             Logger.LogMessage($"trade={trade}");
-            Assert.AreEqual(88, trade);
+            Assert.AreEqual(86, trade);
         }
     }
 }

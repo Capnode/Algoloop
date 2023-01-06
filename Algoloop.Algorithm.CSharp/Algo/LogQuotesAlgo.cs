@@ -24,14 +24,14 @@ namespace Algoloop.Algorithm.CSharp
     public class LogQuotesAlgo : QCAlgorithm
     {
         [Parameter("symbols")]
-        private readonly string _symbols = "EURUSD";
+        private readonly string _symbols = null;
         private Symbol _symbol;
 
         [Parameter("resolution")]
-        private readonly string _resolution = "Hour";
+        private readonly string _resolution = null;
 
         [Parameter("market")]
-        private readonly string _market = Market.FXCM;
+        private readonly string _market = null;
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash
@@ -39,6 +39,10 @@ namespace Algoloop.Algorithm.CSharp
         /// </summary>
         public override void Initialize()
         {
+            if (string.IsNullOrEmpty(_symbols)) throw new ArgumentNullException(nameof(_symbols));
+            if (string.IsNullOrEmpty(_resolution)) throw new ArgumentNullException(nameof(_resolution));
+            if (string.IsNullOrEmpty(_market)) throw new ArgumentNullException(nameof(_market));
+
             EnableAutomaticIndicatorWarmUp = true;
             if (!Enum.TryParse(_resolution, out Resolution resolution)) throw new ArgumentException(nameof(_resolution));
             string symbol = _symbols.Split(';')[0];

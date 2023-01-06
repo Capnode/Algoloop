@@ -29,16 +29,16 @@ namespace Algoloop.Algorithm.CSharp
     public class VolumeBalanceAlgo : QCAlgorithm
     {
         [Parameter("symbols")]
-        private readonly string _symbols = "ABB.ST;ERIC-B.ST;ATCO-A.ST;SEB.ST";
+        private readonly string _symbols = null;
 
         [Parameter("security")]
-        private readonly string _security = "Equity";
+        private readonly string _security = null;
 
         [Parameter("resolution")]
-        private readonly string _resolution = "Daily";
+        private readonly string _resolution = null;
 
         [Parameter("market")]
-        private readonly string _market = Market.Borsdata;
+        private readonly string _market = null;
 
         [Parameter("Fee")]
         private readonly string _fee = "0";
@@ -84,6 +84,11 @@ namespace Algoloop.Algorithm.CSharp
 
         public override void Initialize()
         {
+            if (string.IsNullOrEmpty(_symbols)) throw new ArgumentNullException(nameof(_symbols));
+            if (string.IsNullOrEmpty(_security)) throw new ArgumentNullException(nameof(_security));
+            if (string.IsNullOrEmpty(_resolution)) throw new ArgumentNullException(nameof(_resolution));
+            if (string.IsNullOrEmpty(_market)) throw new ArgumentNullException(nameof(_market));
+
             SecurityType securityType = (SecurityType)Enum.Parse(typeof(SecurityType), _security);
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
             decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
@@ -100,16 +105,15 @@ namespace Algoloop.Algorithm.CSharp
             int benchmarkPeriod1 = int.Parse(_benchmarkPeriod1, CultureInfo.InvariantCulture);
             int benchmarkPeriod2 = int.Parse(_benchmarkPeriod2, CultureInfo.InvariantCulture);
             decimal stoplossSizing = decimal.Parse(_stoplossSizing, CultureInfo.InvariantCulture);
-
-            Log($"{GetType().Name} {_slots}");
             List<Symbol> symbols = _symbols
                 .Split(';')
                 .Select(x => QuantConnect.Symbol.Create(x, SecurityType.Equity, _market))
                 .ToList();
 
             EnableAutomaticIndicatorWarmUp = true;
-            SetTimeZone(NodaTime.DateTimeZone.Utc);
             UniverseSettings.Resolution = resolution;
+            MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
+            SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
             SetPortfolioConstruction(new SlotPortfolio(
                 slots,
