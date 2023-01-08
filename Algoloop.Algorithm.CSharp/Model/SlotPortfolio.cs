@@ -113,7 +113,10 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             // Merge insight lists and sort decending by magnitude
             _insights.AddRange(insights);
-            insights = _insights.OrderByDescending(m => m.Magnitude).ToArray();
+            insights = _insights
+                .OrderByDescending(m => m.Magnitude)
+                .ThenBy(m => m.Symbol.ID.Symbol)
+                .ToArray();
             _trackerPortfolio.CreateTargets(algorithm, insights);
             _insights.Clear();
             _insights.AddRange(insights); // Add in random order
