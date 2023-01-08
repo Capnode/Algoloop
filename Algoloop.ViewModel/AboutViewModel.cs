@@ -17,6 +17,7 @@ using QuantConnect;
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 
 namespace Algoloop.ViewModel
 {
@@ -44,7 +45,18 @@ namespace Algoloop.ViewModel
             Copyright = AboutModel.Copyright;
             Description = AboutModel.Description;
             Message = string.Empty;
-            Credit = "Lean " + Globals.Version + ", " + Globals.Copyright;
+
+            // Set Lean Credits
+            object[] attributes = Assembly
+                .GetAssembly(typeof(Globals))
+                .GetCustomAttributes(typeof(AssemblyCopyrightAttribute),
+                false);
+            if (attributes.Length > 0)
+            {
+                string copyright = ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+                Credit = "Lean " + Globals.Version + ", " + copyright;
+            }
+
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
     }
