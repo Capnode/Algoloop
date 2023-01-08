@@ -28,6 +28,10 @@ namespace Algoloop.ViewModel
 {
     public class StrategiesViewModel : ViewModelBase, ITreeViewModel
     {
+        const string StrategiesFile = "Strategies.json";
+        const string BackupFile = "Strategies.bak";
+        const string TempFile = "Strategies.tmp";
+
         private readonly MarketsModel _markets;
         private readonly SettingModel _settings;
 
@@ -87,6 +91,12 @@ namespace Algoloop.ViewModel
            }
         }
 
+        internal void AddStrategy(StrategyViewModel strategy)
+        {
+            strategy._parent = this;
+            Strategies.Add(strategy);
+        }
+
         internal void DeleteStrategy(StrategyViewModel strategy)
         {
             strategy.IsSelected = false;
@@ -98,41 +108,56 @@ namespace Algoloop.ViewModel
             strategy.IsSelected = true;
         }
 
-        internal async Task<bool> ReadAsync(string fileName)
+        internal bool Read(string folder)
         {
-            Log.Trace($"Reading {fileName}");
-            if (File.Exists(fileName))
-            {
-                await Task.Run(() =>
-                {
-                    using var r = new StreamReader(fileName);
-                    using var reader = new JsonTextReader(r);
-                    var serializer = new JsonSerializer();
-                    Model.Copy(serializer.Deserialize<StrategiesModel>(reader));
-                }).ConfigureAwait(true);  // Must continue on UI thread
-            }
-
-            DataFromModel();
-            StartTasks();
-            return true;
+            if (!Directory.Exists(folder)) throw new ArgumentException($"Can not find Folder: {folder}");
+            if (ReadFile(Path.Combine(folder, StrategiesFile))) return true;
+            if (ReadFile(Path.Combine(folder, BackupFile))) return true;
+            return false;
         }
 
-        internal void Save(string fileName)
+        internal void Save(string folder)
         {
+            if (!Directory.Exists(folder)) throw new ArgumentException($"Can not find Folder: {folder}");
+            string fileName = Path.Combine(folder, StrategiesFile);
+            string backupFile = Path.Combine(folder, BackupFile);
+            string tempFile = Path.Combine(folder, TempFile);
+            if (File.Exists(fileName))
+            {
+                File.Copy(fileName, tempFile, true);
+            }
+
             DataToModel();
+            SaveFile(fileName);
+            File.Move(tempFile, backupFile, true);
+        }
 
-            // Do not overwrite if file read error
-            if (!Model.Strategies.Any()) return;
+        private bool ReadFile(string fileName)
+        {
+            try
+            {
+                Log.Trace($"Reading {fileName}");
+                using var r = new StreamReader(fileName);
+                using var reader = new JsonTextReader(r);
+                var serializer = new JsonSerializer();
+                Model.Copy(serializer.Deserialize<StrategiesModel>(reader));
+                DataFromModel();
+                StartTasks();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Trace($"Failed reading {fileName}: {ex.Message}", true);
+                return false;
+            }
+        }
 
+        private void SaveFile(string fileName)
+        {
+            Log.Trace($"Writing {fileName}");
             using StreamWriter file = File.CreateText(fileName);
             var serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Serialize(file, Model);
-        }
-
-        internal void AddStrategy(StrategyViewModel strategy)
-        {
-            strategy._parent = this;
-            Strategies.Add(strategy);
         }
 
         private void DoAddStrategy()
@@ -221,7 +246,12 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                Save(saveFileDialog.FileName);
+                SaveFile(saveFileDialog.FileName);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex);
+                Messenger.Send(ex.Message, 0);
             }
             finally
             {

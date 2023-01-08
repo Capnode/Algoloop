@@ -16,15 +16,18 @@ using Algoloop.Model;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
+using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel
 {
     public class MarketsViewModel : ViewModelBase
     {
+        private const string MarketsFile = "Markets.json";
+        private const string BackupFile = "Markets.bak";
+        private const string TempFile = "Markets.tmp";
+
         private readonly SettingModel _settings;
         private ITreeViewModel _selectedItem;
         private bool _isBusy;
@@ -72,32 +75,53 @@ namespace Algoloop.ViewModel
             return Markets.Remove(market);
         }
 
-        internal async Task<bool> ReadAsync(string fileName)
+        internal bool Read(string folder)
         {
-            Log.Trace($"Reading {fileName}");
-            if (File.Exists(fileName))
-            {
-                await Task.Run(() =>
-                {
-                    using var r = new StreamReader(fileName);
-                    using var reader = new JsonTextReader(r);
-                    var serializer = new JsonSerializer();
-                    MarketsModel model = serializer.Deserialize<MarketsModel>(reader);
-                    Model.Copy(model);
-                }).ConfigureAwait(true); // Must continue on UI thread
-            }
-
-            DataFromModel();
-            return true;
+            if (!Directory.Exists(folder)) throw new ArgumentException($"Can not find Folder: {folder}");
+            if (ReadFile(Path.Combine(folder, MarketsFile))) return true;
+            if (ReadFile(Path.Combine(folder, BackupFile))) return true;
+            return false;
         }
 
-        internal void Save(string fileName)
+        internal void Save(string folder)
         {
+            if (!Directory.Exists(folder)) throw new ArgumentException($"Can not find Folder: {folder}");
+            string fileName = Path.Combine(folder, MarketsFile);
+            string backupFile = Path.Combine(folder, BackupFile);
+            string tempFile = Path.Combine(folder, TempFile);
+            if (File.Exists(fileName))
+            {
+                File.Copy(fileName, tempFile, true);
+            }
+
             DataToModel();
+            SaveFile(fileName);
+            File.Move(tempFile, backupFile, true);
+        }
 
-            // Do not overwrite if file read error
-            if (!Model.Markets.Any()) return;
+        private bool ReadFile(string fileName)
+        {
+            Log.Trace($"Reading {fileName}");
+            try
+            {
+                using var r = new StreamReader(fileName);
+                using var reader = new JsonTextReader(r);
+                var serializer = new JsonSerializer();
+                MarketsModel model = serializer.Deserialize<MarketsModel>(reader);
+                Model.Copy(model);
+                DataFromModel();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Trace($"Failed reading {fileName}: {ex.Message}", true);
+                return false;
+            }
+        }
 
+        private void SaveFile(string fileName)
+        {
+            Log.Trace($"Writing {fileName}");
             using StreamWriter file = File.CreateText(fileName);
             var serializer = new JsonSerializer { Formatting = Formatting.Indented };
             serializer.Serialize(file, Model);

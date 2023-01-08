@@ -79,6 +79,24 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Configuration saved.
+        /// </summary>
+        internal static string ConfigurationSaved {
+            get {
+                return ResourceManager.GetString("ConfigurationSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving configuration, please wait....
+        /// </summary>
+        internal static string ConfigurationSaving {
+            get {
+                return ResourceManager.GetString("ConfigurationSaving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Loading configuration, please wait....
         /// </summary>
         internal static string LoadingConfiguration {
@@ -151,20 +169,20 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Saving configuration, please wait....
-        /// </summary>
-        internal static string SavingConfiguration {
-            get {
-                return ResourceManager.GetString("SavingConfiguration", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Selected: {0}.
         /// </summary>
         internal static string SelectedCount {
             get {
                 return ResourceManager.GetString("SelectedCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings read failed. See logs for details.
+        /// </summary>
+        internal static string SettingsReadFailed {
+            get {
+                return ResourceManager.GetString("SettingsReadFailed", resourceCulture);
             }
         }
         

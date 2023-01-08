@@ -61,14 +61,7 @@ namespace Algoloop.ViewModel
             WeakReferenceMessenger.Default.Register<MainViewModel, NotificationMessage, int>(
                 this, 0, static (r, m) => r.OnStatusMessage(m));
 
-            // Set working directory
-            string appData = MainService.GetAppDataFolder();
-            Directory.CreateDirectory(appData);
-            Directory.SetCurrentDirectory(appData);
-
-            // Async initialize without blocking UI
-            _initializer = Initialize();
-
+            Initialize();
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -100,47 +93,53 @@ namespace Algoloop.ViewModel
 
         public void SaveConfig()
         {
+            IsBusy = true;
+            Messenger.Send(new NotificationMessage(Resources.ConfigurationSaving), 0);
             try
             {
-                IsBusy = true;
-                Messenger.Send(new NotificationMessage(Resources.SavingConfiguration), 0);
-
-                // Save config files
                 string programData = MainService.GetProgramDataFolder();
-                string settings = Path.Combine(programData, "Settings.json");
-                string markets = Path.Combine(programData, "Markets.json");
-                string strategies = Path.Combine(programData, "Strategies.json");
-                SettingsViewModel.Save(settings);
-                MarketsViewModel.Save(markets);
-                StrategiesViewModel.Save(strategies);
+                SettingsViewModel.Save(programData);
+                MarketsViewModel.Save(programData);
+                StrategiesViewModel.Save(programData);
+                Messenger.Send(new NotificationMessage(Resources.ConfigurationSaved), 0);
             }
-            finally
+            catch (Exception ex)
             {
-                Messenger.Send(new NotificationMessage(string.Empty), 0);
-                IsBusy = false;
+                Messenger.Send(new NotificationMessage(ex.Message), 0);
+                Log.Error(ex);
             }
+            IsBusy = false;
         }
 
-        public async Task DoSettings(bool update)
+        public void DoSettings(bool update)
         {
             Debug.Assert(IsUiThread(), "Not UI thread!");
-
-            // Wait for initialization complete
-            await _initializer.ConfigureAwait(true);
             string programData = MainService.GetProgramDataFolder();
-
-            if (update)
+            try
             {
-                // Save model and initialize
-                SettingsViewModel.Save(Path.Combine(programData, "Settings.json"));
-
-                // Async initialize without blocking UI
-                _initializer = Initialize();
+                if (update)
+                {
+                    // Save model and initialize
+                    SettingsViewModel.Save(programData);
+                    Initialize();
+                }
+                else
+                {
+                    // Reload old settings
+                    if (SettingsViewModel.Read(programData))
+                    {
+                        Messenger.Send(new NotificationMessage(string.Empty), 0);
+                    }
+                    else
+                    {
+                        Messenger.Send(new NotificationMessage(Resources.SettingsReadFailed), 0);
+                    }
+                }
             }
-            else
+            catch(Exception ex)
             {
-                // Reload old settings
-                await SettingsViewModel.ReadAsync(Path.Combine(programData, "Settings.json")).ConfigureAwait(true);
+                Log.Error(ex);
+                Messenger.Send(new NotificationMessage(ex.Message), 0) ;
             }
         }
 
@@ -167,12 +166,17 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async Task Initialize()
+        private void Initialize()
         {
             try
             {
                 IsBusy = true;
                 Messenger.Send(new NotificationMessage(Resources.LoadingConfiguration), 0);
+
+                // Set working directory
+                string appData = MainService.GetAppDataFolder();
+                Directory.CreateDirectory(appData);
+                Directory.SetCurrentDirectory(appData);
 
                 // Initialize data folders
                 string programFolder = MainService.GetProgramFolder();
@@ -182,6 +186,8 @@ namespace Algoloop.ViewModel
                 Log.Trace($"AppData folder: {appDataFolder}");
                 Log.Trace($"ProgramData folder: {programDataFolder}");
                 Directory.CreateDirectory(programDataFolder);
+
+                // Cleanup temporary folder
                 MainService.DeleteFiles(appDataFolder, "*");
                 MainService.DeleteFolders(appDataFolder, "*");
 
@@ -192,8 +198,7 @@ namespace Algoloop.ViewModel
                     false);
 
                 // Read settings
-                await SettingsViewModel.ReadAsync(Path.Combine(programDataFolder, "Settings.json"))
-                    .ConfigureAwait(true);
+                SettingsViewModel.Read(programDataFolder);
 
                 // Set max backtests
                 BacktestManager.SetSlots(SettingsViewModel.Model.MaxBacktests);
@@ -203,12 +208,13 @@ namespace Algoloop.ViewModel
                 Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
                 Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                Config.Set("version-id", string.Empty);
                 Globals.Reset();
 
                 // Read configuration
-                await MarketsViewModel.ReadAsync(Path.Combine(programDataFolder, "Markets.json"));
-                await StrategiesViewModel.ReadAsync(Path.Combine(programDataFolder, "Strategies.json"))
-                    .ConfigureAwait(true);
+                MarketsViewModel.Read(programDataFolder);
+                StrategiesViewModel.Read(programDataFolder);
+                Log.Trace($"Starting {AboutModel.Product} {AboutModel.Version}");
 
                 // Update Data folder
                 MainService.CopyDirectory(

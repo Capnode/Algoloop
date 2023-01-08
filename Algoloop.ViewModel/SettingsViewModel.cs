@@ -19,13 +19,16 @@ using QuantConnect.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Algoloop.ViewModel
 {
     public class SettingsViewModel : ViewModelBase
     {
+        const string SettingsFile = "Settings.json";
+        const string BackupFile = "Settings.bak";
+        const string TempFile = "Settings.tmp";
+
         public SettingsViewModel(SettingModel settings)
         {
             Model = settings;
@@ -37,45 +40,55 @@ namespace Algoloop.ViewModel
 
         public SettingModel Model { get; }
 
-        public async Task<bool> ReadAsync(string fileName)
+        internal bool Read(string folder)
         {
-            Log.Trace($"Reading {fileName}");
-            if (File.Exists(fileName))
-            {
-                try
-                {
-                    using StreamReader r = new(fileName);
-                    string json = r.ReadToEnd();
-                    SettingModel settings = JsonConvert.DeserializeObject<SettingModel>(json);
-                    Model.Copy(settings);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex, $"Failed reading {fileName}\n", true);
-                    return false;
-                }
-            }
-
-            DataFromModel();
-            return await Task.FromResult(true).ConfigureAwait(false);
+            if (!Directory.Exists(folder)) throw new ArgumentException($"Can not find Folder: {folder}");
+            if (ReadFile(Path.Combine(folder,SettingsFile))) return true;
+            if (ReadFile(Path.Combine(folder, BackupFile))) return true;
+            return false;
         }
 
-        internal bool Save(string fileName)
+        internal void Save(string folder)
+        {
+            if (!Directory.Exists(folder)) throw new ArgumentException($"Can not find Folder: {folder}");
+            string fileName = Path.Combine(folder, SettingsFile);
+            string backupFile = Path.Combine(folder, BackupFile);
+            string tempFile = Path.Combine(folder, TempFile);
+            if (File.Exists(fileName))
+            {
+                File.Copy(fileName, tempFile, true);
+            }
+
+            DataToModel();
+            SaveFile(fileName);
+            File.Move(tempFile, backupFile, true);
+        }
+
+        private bool ReadFile(string fileName)
         {
             try
             {
-                DataToModel();
-
-                using StreamWriter file = File.CreateText(fileName);
-                JsonSerializer serializer = new() { Formatting = Formatting.Indented };
-                serializer.Serialize(file, Model);
+                Log.Trace($"Reading {fileName}");
+                using StreamReader r = new(fileName);
+                string json = r.ReadToEnd();
+                SettingModel settings = JsonConvert.DeserializeObject<SettingModel>(json);
+                Model.Copy(settings);
+                DataFromModel();
                 return true;
             }
             catch (Exception ex)
             {
-                Log.Error(ex, $"Failed writing {fileName}\n", true);
+                Log.Trace($"Failed reading {fileName}: {ex.Message}", true);
                 return false;
             }
+        }
+
+        private void SaveFile(string fileName)
+        {
+            Log.Trace($"Writing {fileName}");
+            using StreamWriter file = File.CreateText(fileName);
+            JsonSerializer serializer = new() { Formatting = Formatting.Indented };
+            serializer.Serialize(file, Model);
         }
 
         private static void DoOk(Window window)

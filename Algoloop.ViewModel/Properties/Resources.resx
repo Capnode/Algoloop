@@ -123,6 +123,12 @@
   <data name="AppUpdating" xml:space="preserve">
     <value>Application updating {0}%</value>
   </data>
+  <data name="ConfigurationSaved" xml:space="preserve">
+    <value>Configuration saved</value>
+  </data>
+  <data name="ConfigurationSaving" xml:space="preserve">
+    <value>Saving configuration, please wait...</value>
+  </data>
   <data name="LoadingConfiguration" xml:space="preserve">
     <value>Loading configuration, please wait...</value>
   </data>
@@ -147,11 +153,11 @@
   <data name="NoSymbolSelected" xml:space="preserve">
     <value>No symbol selected!</value>
   </data>
-  <data name="SavingConfiguration" xml:space="preserve">
-    <value>Saving configuration, please wait...</value>
-  </data>
   <data name="SelectedCount" xml:space="preserve">
     <value>Selected: {0}</value>
+  </data>
+  <data name="SettingsReadFailed" xml:space="preserve">
+    <value>Settings read failed. See logs for details</value>
   </data>
   <data name="StrategyAborted" xml:space="preserve">
     <value>Strategy aborted</value>

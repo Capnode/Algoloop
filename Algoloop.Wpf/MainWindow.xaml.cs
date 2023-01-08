@@ -72,12 +72,12 @@ namespace Algoloop.Wpf
             }
         }
 
-        private async void FileSettings(object sender, RoutedEventArgs e)
+        private void FileSettings(object sender, RoutedEventArgs e)
         {
             MainViewModel model = DataContext as MainViewModel;
             var settingsView = new SettingsView();
             bool update = settingsView.ShowDialog() ?? false;
-            await model.DoSettings(update);
+            model.DoSettings(update);
         }
 
         private void HelpAbout(object sender, RoutedEventArgs e)
