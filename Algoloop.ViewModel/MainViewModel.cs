@@ -19,7 +19,6 @@ using QuantConnect.Logging;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
@@ -35,7 +34,6 @@ namespace Algoloop.ViewModel
     {
         private bool _isBusy;
         private string _statusMessage;
-        private Task _initializer;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -56,8 +54,6 @@ namespace Algoloop.ViewModel
             SaveCommand = new RelayCommand(() => SaveConfig(), () => !IsBusy);
             ExitCommand = new RelayCommand<Window>(
                 window => DoExit(window), _ => !IsBusy);
-            UpdateCommand = new RelayCommand(
-                async () => await DoUpdate().ConfigureAwait(false), () => !IsBusy);
             WeakReferenceMessenger.Default.Register<MainViewModel, NotificationMessage, int>(
                 this, 0, static (r, m) => r.OnStatusMessage(m));
 
@@ -67,7 +63,6 @@ namespace Algoloop.ViewModel
 
         public RelayCommand SaveCommand { get; }
         public RelayCommand<Window> ExitCommand { get; }
-        public RelayCommand UpdateCommand { get; }
         public SettingsViewModel SettingsViewModel { get; }
         public MarketsViewModel MarketsViewModel { get; }
         public StrategiesViewModel StrategiesViewModel { get; }
@@ -94,7 +89,6 @@ namespace Algoloop.ViewModel
         public void SaveConfig()
         {
             IsBusy = true;
-            Messenger.Send(new NotificationMessage(Resources.ConfigurationSaving), 0);
             try
             {
                 string programData = MainService.GetProgramDataFolder();
@@ -168,11 +162,9 @@ namespace Algoloop.ViewModel
 
         private void Initialize()
         {
+            IsBusy = true;
             try
             {
-                IsBusy = true;
-                Messenger.Send(new NotificationMessage(Resources.LoadingConfiguration), 0);
-
                 // Set working directory
                 string appData = MainService.GetAppDataFolder();
                 Directory.CreateDirectory(appData);
@@ -238,23 +230,6 @@ namespace Algoloop.ViewModel
                 string message = $"{ex.Message} ({ex.GetType()})";
                 Messenger.Send(new NotificationMessage(message), 0);
                 Log.Error(ex, message);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
-
-        private async Task DoUpdate()
-        {
-            await _initializer.ConfigureAwait(false);
-            try
-            {
-                IsBusy = true;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex);
             }
             finally
             {

@@ -88,24 +88,6 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Saving configuration, please wait....
-        /// </summary>
-        internal static string ConfigurationSaving {
-            get {
-                return ResourceManager.GetString("ConfigurationSaving", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loading configuration, please wait....
-        /// </summary>
-        internal static string LoadingConfiguration {
-            get {
-                return ResourceManager.GetString("LoadingConfiguration", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Loading configuration completed.
         /// </summary>
         internal static string LoadingConfigurationCompleted {

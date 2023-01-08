@@ -126,12 +126,6 @@
   <data name="ConfigurationSaved" xml:space="preserve">
     <value>Configuration saved</value>
   </data>
-  <data name="ConfigurationSaving" xml:space="preserve">
-    <value>Saving configuration, please wait...</value>
-  </data>
-  <data name="LoadingConfiguration" xml:space="preserve">
-    <value>Loading configuration, please wait...</value>
-  </data>
   <data name="LoadingConfigurationCompleted" xml:space="preserve">
     <value>Loading configuration completed</value>
   </data>
