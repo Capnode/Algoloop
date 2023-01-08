@@ -32,8 +32,8 @@ namespace Algoloop.ViewModel.Internal
         {
             string path = environment[ExePath];
             string[] paths = path.Trim(';').Split(";");
-            Log.Trace($"Env[{ExePath}] =");
-            paths.ToList().ForEach(m => Log.Trace($"  {m}"));
+//            Log.Trace($"Env[{ExePath}] =");
+//            paths.ToList().ForEach(m => Log.Trace($"  {m}"));
 
             foreach (string folder in paths)
             {
