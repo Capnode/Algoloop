@@ -128,7 +128,7 @@ namespace Algoloop.ViewModel
         }
 
         /// <summary>
-        /// Gets the utc time the order was created.
+        /// Gets the local time the order was created.
         /// </summary>
         public DateTime Time
         {
@@ -137,7 +137,7 @@ namespace Algoloop.ViewModel
         }
 
         /// <summary>
-        /// Gets the utc time the last fill was received, or null if no fills have been received
+        /// Gets the local time the last fill was received, or null if no fills have been received
         /// </summary>
         public DateTime? LastFillTime
         {
@@ -146,7 +146,7 @@ namespace Algoloop.ViewModel
         }
 
         /// <summary>
-        /// Gets the utc time this order was last updated, or null if the order has not been updated.
+        /// Gets the local time this order was last updated, or null if the order has not been updated.
         /// </summary>
         public DateTime? LastUpdateTime
         {
@@ -155,7 +155,7 @@ namespace Algoloop.ViewModel
         }
 
         /// <summary>
-        /// Gets the utc time this order was canceled, or null if the order was not canceled.
+        /// Gets the local time this order was canceled, or null if the order was not canceled.
         /// </summary>
         public DateTime? CanceledTime
         {
@@ -191,7 +191,7 @@ namespace Algoloop.ViewModel
         }
 
         /// <summary>
-        /// Order valid until.
+        /// Order valid until local time
         /// </summary>
         public DateTime ValidUntil
         {
@@ -273,14 +273,14 @@ namespace Algoloop.ViewModel
             Price = order.Price;
             LimitPrice = (order as LimitOrder)?.LimitPrice;
             PriceCurrency = order.PriceCurrency;
-            Time = order.Time;
-            LastFillTime = order.LastFillTime;
-            LastUpdateTime = order.LastUpdateTime;
-            CanceledTime = order.CanceledTime;
+            Time = order.Time.ToLocalTime();
+            LastFillTime = order.LastFillTime?.ToLocalTime();
+            LastUpdateTime = order.LastUpdateTime?.ToLocalTime();
+            CanceledTime = order.CanceledTime?.ToLocalTime();
             Quantity = order.Quantity;
             Type = order.Type;
             Status = order.Status;
-            ValidUntil = ToValidUntil(order);
+            ValidUntil = ToValidUntil(order).ToLocalTime();
             Tag = order.Tag;
             Properties = (OrderProperties)order.Properties;
             SecurityType = order.SecurityType.ToString();

@@ -13,6 +13,7 @@
  */
 
 using QuantConnect;
+using QuantConnect.Orders;
 using System;
 using System.Diagnostics;
 
@@ -25,9 +26,14 @@ namespace Algoloop.ViewModel
         private decimal _quantity;
         private decimal _entryValue;
 
-        public HoldingViewModel(Symbol symbol)
+        public HoldingViewModel(Order order)
         {
-            Symbol = symbol;
+            Symbol = order.Symbol;
+            EntryTime = order.CreatedTime.ToLocalTime();
+            EntryPrice = order.Price.SmartRounding();
+            Quantity = order.Quantity;
+            EntryValue = order.Value;
+
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 

@@ -91,7 +91,7 @@
                     IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn
-                            Binding="{Binding EntryTime, StringFormat=u}"
+                            Binding="{Binding EntryTime, StringFormat=G}"
                             ElementStyle="{StaticResource RightCell}"
                             Header="Entry time" />
                         <DataGridTextColumn
@@ -129,8 +129,8 @@
                     GridLinesVisibility="None"
                     IsReadOnly="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding EntryTime, StringFormat=u}" Header="Entry time" />
-                        <DataGridTextColumn Binding="{Binding ExitTime, StringFormat=u}" Header="Exit time" />
+                        <DataGridTextColumn Binding="{Binding EntryTime, StringFormat=G}" Header="Entry time" />
+                        <DataGridTextColumn Binding="{Binding ExitTime, StringFormat=G}" Header="Exit time" />
                         <DataGridTextColumn Binding="{Binding Direction}" Header="Direction" />
                         <DataGridTextColumn Binding="{Binding Symbol.Value}" Header="Symbol" />
                         <DataGridTextColumn Binding="{Binding Symbol.SecurityType}" Header="Type" />
@@ -183,7 +183,7 @@
                     GridLinesVisibility="None"
                     IsReadOnly="True">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Binding="{Binding Time, StringFormat=u}" Header="Date Time" />
+                        <DataGridTextColumn Binding="{Binding Time, StringFormat=G}" Header="Date Time" />
                         <DataGridTextColumn Binding="{Binding Symbol}" Header="Symbol" />
                         <DataGridTextColumn Binding="{Binding Direction}" Header="Operation" />
                         <DataGridTextColumn Binding="{Binding Type}" Header="Type" />

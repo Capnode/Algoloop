@@ -13,7 +13,6 @@
  */
 
 using QuantConnect;
-using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +21,7 @@ namespace Algoloop.ViewModel
 {
     public class TrackSymbolViewModel
     {
-        readonly List<Trade> _trades = new ();
+        private readonly List<TradeViewModel> _trades = new ();
         private readonly Symbol _symbol;
 
         public TrackSymbolViewModel(Symbol symbol)
@@ -77,7 +76,7 @@ namespace Algoloop.ViewModel
         /// </summary>
         public TimeSpan DrawdownPeriod { get; private set; }
 
-        public void AddTrade(Trade trade)
+        public void AddTrade(TradeViewModel trade)
         {
             _trades.Add(trade);
         }

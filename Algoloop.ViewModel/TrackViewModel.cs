@@ -65,7 +65,7 @@ namespace Algoloop.ViewModel
         private IList _selectedItems;
         private SyncObservableCollection<SymbolViewModel> _symbols = new();
         private SyncObservableCollection<ParameterViewModel> _parameters = new();
-        private SyncObservableCollection<Trade> _trades = new();
+        private SyncObservableCollection<TradeViewModel> _trades = new();
         private SyncObservableCollection<TrackSymbolViewModel> _trackSymbols = new();
         private SyncObservableCollection<OrderViewModel> _orders = new();
         private SyncObservableCollection<HoldingViewModel> _holdings = new();
@@ -188,7 +188,7 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _parameters, value);        
         }
 
-        public SyncObservableCollection<Trade> Trades
+        public SyncObservableCollection<TradeViewModel> Trades
         {
             get => _trades;
             set => SetProperty(ref _trades, value);
@@ -403,7 +403,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal static double CalculateScore(IList<Trade> trades)
+        internal static double CalculateScore(IList<TradeViewModel> trades)
         {
             if (trades == null || !trades.Any())
             {
@@ -479,7 +479,7 @@ namespace Algoloop.ViewModel
             return score;
         }
 
-        internal static decimal CalcRoMaD(IList<Trade> trades)
+        internal static decimal CalcRoMaD(IList<TradeViewModel> trades)
         {
             decimal netProfit = trades.Sum(m => m.ProfitLoss - m.TotalFees);
             decimal drawdown = MaxDrawdown(trades, out TimeSpan period);
@@ -496,7 +496,7 @@ namespace Algoloop.ViewModel
             return sharpe;
         }
 
-        internal static decimal MaxDrawdown(IList<Trade> trades, out TimeSpan period)
+        internal static decimal MaxDrawdown(IList<TradeViewModel> trades, out TimeSpan period)
         {
             period = TimeSpan.Zero;
             if (trades == null || !trades.Any())
@@ -551,7 +551,7 @@ namespace Algoloop.ViewModel
             return (decimal)Math.Sqrt(variance);
         }
 
-        private static double LinearDeviation(IList<Trade> trades)
+        private static double LinearDeviation(IList<TradeViewModel> trades)
         {
             int count = trades.Count;
             if (count == 0)
@@ -635,7 +635,11 @@ namespace Algoloop.ViewModel
             }
 
             // Load trades
-            LoadTrades(result);
+            Debug.Assert(!Trades.Any());
+            foreach (Trade trade in result.TotalPerformance.ClosedTrades)
+            {
+                Trades.Add(new TradeViewModel(trade));
+            }
 
             // Validate if statistics same
             IDictionary<string, decimal?> statistics = ReadStatistics(result);
@@ -648,7 +652,7 @@ namespace Algoloop.ViewModel
             }
 
             // Trade details
-            foreach (Trade trade in Trades)
+            foreach (TradeViewModel trade in Trades)
             {
                 TrackSymbolViewModel trackSymbol = TrackSymbols
                     .FirstOrDefault(m => m.Symbol.Equals(
@@ -681,15 +685,7 @@ namespace Algoloop.ViewModel
                     m => m.Symbol.Equals(order.Symbol));
                 if (holding == null)
                 {
-                    holding = new HoldingViewModel(order.Symbol)
-                    {
-                        EntryTime = order.CreatedTime,
-                        EntryPrice = order.Price.SmartRounding(),
-                        Quantity = order.Quantity,
-                        EntryValue = order.Value
-                    };
-
-                    Holdings.Add(holding);
+                    Holdings.Add(new HoldingViewModel(order));
                 }
                 else
                 {
@@ -804,14 +800,8 @@ namespace Algoloop.ViewModel
                 new JsonConverter[] { new OrderJsonConverter() });
             Debug.Assert(result != default);
 
-            // Load trades
-            LoadTrades(result);
-
             // Load statistics
             model.Statistics = ReadStatistics(result);
-
-            // Clear trades
-            Trades.Clear();
 
             // Replace results and logs with file references
             model.Result = string.Empty;
@@ -856,12 +846,6 @@ namespace Algoloop.ViewModel
             }
 
             return statistics;
-        }
-
-        private void LoadTrades(BacktestResult result)
-        {
-            Debug.Assert(!Trades.Any());
-            result.TotalPerformance.ClosedTrades.ForEach(m => Trades.Add(m));
         }
 
         private static string UniqueFileName(string path)
@@ -1056,7 +1040,7 @@ namespace Algoloop.ViewModel
             {
                 profit += trade.Value;
                 series.Add(new EquityData {
-                    Time = trade.Key,
+                    Time = trade.Key.ToLocalTime(),
                     Value = RoundLarge(profit)
                 });
             }
@@ -1079,7 +1063,7 @@ namespace Algoloop.ViewModel
                     if (serie.Values.Count < 2) continue;
                     IEnumerable<EquityData> list = serie.Values.Select(
                         m => new EquityData {
-                            Time = Time.UnixTimeStampToDateTime(m.x),
+                            Time = Time.UnixTimeStampToDateTime(m.x).ToLocalTime(),
                             Value = RoundLarge(m.y)
                         });
 

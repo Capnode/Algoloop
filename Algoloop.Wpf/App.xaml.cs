@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Markup;
 
 namespace Algoloop.Wpf
 {
@@ -50,6 +51,11 @@ namespace Algoloop.Wpf
             string unc = Assembly.GetExecutingAssembly().Location;
             string folder = Path.GetDirectoryName(unc);
             Directory.SetCurrentDirectory(folder);
+
+            // Localize WPF string formatting
+            FrameworkElement.LanguageProperty.OverrideMetadata(
+                typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
         }
 
         protected override void OnStartup(StartupEventArgs e)

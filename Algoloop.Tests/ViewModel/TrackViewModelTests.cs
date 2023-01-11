@@ -34,12 +34,12 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_idealProfit()
         {
-            var trades = new List<Trade>
+            var trades = new List<TradeViewModel>
             {
-                new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
-                new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
-                new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
-                new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+                new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
             double score = TrackViewModel.CalculateScore(trades);
@@ -49,12 +49,12 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_idealLoss()
         {
-            var trades = new List<Trade>
+            var trades = new List<TradeViewModel>
             {
-                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
-                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
-                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
-                new Trade{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+                new TradeViewModel{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new TradeViewModel{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new TradeViewModel{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new TradeViewModel{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
             double score = TrackViewModel.CalculateScore(trades);
@@ -64,12 +64,12 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_breakeven()
         {
-            var trades = new List<Trade>
+            var trades = new List<TradeViewModel>
             {
-                new Trade{ ProfitLoss = 5, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
-                new Trade{ ProfitLoss = 3, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
-                new Trade{ ProfitLoss = -5, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
-                new Trade{ ProfitLoss = -3, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+                new TradeViewModel{ ProfitLoss = 5, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new TradeViewModel{ ProfitLoss = 3, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new TradeViewModel{ ProfitLoss = -5, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new TradeViewModel{ ProfitLoss = -3, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
             double score = TrackViewModel.CalculateScore(trades);
@@ -79,12 +79,12 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_profit()
         {
-            var trades = new List<Trade>
+            var trades = new List<TradeViewModel>
             {
-                new Trade{ ProfitLoss = 5, MAE = -4, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
-                new Trade{ ProfitLoss = 3, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
-                new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
-                new Trade{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+                new TradeViewModel{ ProfitLoss = 5, MAE = -4, TotalFees = 1, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new TradeViewModel{ ProfitLoss = 3, TotalFees = 1, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
             double score = TrackViewModel.CalculateScore(trades);
@@ -94,12 +94,12 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_loss()
         {
-            var trades = new List<Trade>
+            var trades = new List<TradeViewModel>
             {
-                new Trade{ ProfitLoss = -5,  MAE = -4, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
-                new Trade{ ProfitLoss = -3, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
-                new Trade{ ProfitLoss = -2, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
-                new Trade{ ProfitLoss = 2, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
+                new TradeViewModel{ ProfitLoss = -5,  MAE = -4, EntryTime = new DateTime(2018,01,01), ExitTime = new DateTime(2018,02,01) },
+                new TradeViewModel{ ProfitLoss = -3, EntryTime = new DateTime(2018,03,01), ExitTime = new DateTime(2018,04,01) },
+                new TradeViewModel{ ProfitLoss = -2, EntryTime = new DateTime(2018,05,01), ExitTime = new DateTime(2018,06,01) },
+                new TradeViewModel{ ProfitLoss = 2, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
             double score = TrackViewModel.CalculateScore(trades);
