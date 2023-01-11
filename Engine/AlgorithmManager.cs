@@ -1,7 +1,6 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,12 +180,6 @@ namespace QuantConnect.Lean.Engine
             Log.Trace($"AlgorithmManager.Run(): Begin DataStream - Start: {algorithm.StartDate} Stop: {algorithm.EndDate} Time: {algorithm.Time} Warmup: {algorithm.IsWarmingUp}");
             foreach (var timeSlice in Stream(algorithm, synchronizer, results, token))
             {
-                // Check if end date reached
-                if (timeSlice.Time > algorithm.EndDate)
-                {
-                    break;
-                }
-
                 // reset our timer on each loop
                 TimeLimit.StartNewTimeStep();
 
@@ -491,7 +484,7 @@ namespace QuantConnect.Lean.Engine
                     algorithm.SetRuntimeError(err, "Dividends/Splits/Delistings");
                     return;
                 }
-                
+
                 // Only track pending delistings in non-live mode.
                 if (!algorithm.LiveMode)
                 {
