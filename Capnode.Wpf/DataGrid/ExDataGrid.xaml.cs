@@ -175,7 +175,6 @@ namespace Capnode.Wpf.DataGrid
         {
             if (string.IsNullOrEmpty(ExColumnsInfo)) return;
             string[] infos = ExColumnsInfo.Split(';');
-            if (infos.Length != Columns.Count) return;
             foreach (DataGridColumn column in Columns)
             {
                 for (int i = 0; i < infos.Count(); i++)
