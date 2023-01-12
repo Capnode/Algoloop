@@ -36,7 +36,6 @@ using Algoloop.ViewModel.Properties;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
 using Algoloop.ViewModel.Internal;
-using QuantConnect.Lean.Engine.Setup;
 
 namespace Algoloop.ViewModel
 {
@@ -627,11 +626,11 @@ namespace Algoloop.ViewModel
                 TrackColumns, "Name", "Model.Name", false, true);
             foreach (TrackModel TrackModel in Model.Tracks)
             {
-                var TrackViewModel = new TrackViewModel(
+                var trackViewModel = new TrackViewModel(
                     this, TrackModel, _markets, _settings);
-                Tracks.Add(TrackViewModel);
+                Tracks.Add(trackViewModel);
                 ExDataGridColumns.AddPropertyColumns(
-                    TrackColumns, TrackViewModel.Statistics, "Statistics");
+                    TrackColumns, trackViewModel.Statistics, "Statistics");
             }
         }
 

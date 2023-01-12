@@ -39,6 +39,7 @@ using Algoloop.ViewModel.Internal.Lean;
 using StockSharp.Xaml.Charting;
 using StockSharp.Charting;
 using CommunityToolkit.Mvvm.Input;
+using QuantConnect.Util;
 
 namespace Algoloop.ViewModel
 {
@@ -641,16 +642,6 @@ namespace Algoloop.ViewModel
                 Trades.Add(new TradeViewModel(trade));
             }
 
-            // Validate if statistics same
-            IDictionary<string, decimal?> statistics = ReadStatistics(result);
-            if (Model.Statistics == null
-                || Model.Statistics.Count != statistics.Count
-                || Model.Statistics.Except(statistics).Any())
-            {
-                Trades.Clear();
-                return;
-            }
-
             // Trade details
             foreach (TradeViewModel trade in Trades)
             {
@@ -845,7 +836,8 @@ namespace Algoloop.ViewModel
                     Convert.ToString(value, CultureInfo.InvariantCulture));
             }
 
-            return statistics;
+            var sorted = statistics.OrderBy(m => m.Key).ToDictionary();
+            return sorted;
         }
 
         private static string UniqueFileName(string path)
