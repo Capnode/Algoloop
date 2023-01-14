@@ -11,128 +11,114 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
 
-using QuantConnect.Orders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QuantConnect.Data;
+using QuantConnect.Interfaces;
+using QuantConnect.Orders;
+using QuantConnect.Securities.Option;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm to test combo limit orders
+    /// Algorithm asserting that orders for option strategies can be placed with large quantities as long as there is margin available.
+    /// This asserts the expected behavior in GH issue #5693
     /// </summary>
-    public class ComboLimitOrderAlgorithm : ComboOrderAlgorithm
+    public class LargeQuantityOptionStrategyAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private decimal _limitPrice;
-        private int _comboQuantity;
+        private Symbol _optionSymbol;
 
-        private int _fillCount;
-
-        private decimal _liquidatedQuantity;
-
-        private bool _liquidated;
-
-        protected override int ExpectedFillCount
+        public override void Initialize()
         {
-            get
-            {
-                // times 2 because of liquidation
-                return OrderLegs.Count * 2;
-            }
+            SetStartDate(2015, 12, 24);
+            SetEndDate(2015, 12, 24);
+            SetCash(100000);
+
+            SetSecurityInitializer(x => x.SetMarketPrice(GetLastKnownPrice(x)));
+
+            var equity = AddEquity("GOOG");
+            var option = AddOption("GOOG");
+            _optionSymbol = option.Symbol;
+
+            option.SetFilter(-2, +2, 0, 180);
         }
 
-        protected override IEnumerable<OrderTicket> PlaceComboOrder(List<Leg> legs, int quantity, decimal? limitPrice)
+        public override void OnData(Slice slice)
         {
-            _limitPrice = limitPrice.Value;
-            _comboQuantity = quantity;
-
-            legs.ForEach(x => { x.OrderPrice = null; });
-
-            return ComboLimitOrder(legs, quantity, _limitPrice);
-        }
-
-        public override void OnOrderEvent(OrderEvent orderEvent)
-        {
-            base.OnOrderEvent(orderEvent);
-
-            if (orderEvent.Status == OrderStatus.Filled)
+            if (Portfolio.Invested || !slice.OptionChains.TryGetValue(_optionSymbol, out var chain))
             {
-                _fillCount++;
-                if (_fillCount == OrderLegs.Count)
-                {
-                    Liquidate();
-                }
-                else if (_fillCount < 2 * OrderLegs.Count)
-                {
-                    _liquidatedQuantity += orderEvent.FillQuantity;
-                }
-                else if (_fillCount == 2 * OrderLegs.Count)
-                {
-                    _liquidated = true;
-                    var totalComboQuantity = _comboQuantity * OrderLegs.Select(x => x.Quantity).Sum();
-
-                    if (_liquidatedQuantity != totalComboQuantity)
-                    {
-                        throw new Exception($"Liquidated quantity {_liquidatedQuantity} does not match combo quantity {totalComboQuantity}");
-                    }
-
-                    if (Portfolio.TotalHoldingsValue != 0)
-                    {
-                        throw new Exception($"Portfolio value {Portfolio.TotalPortfolioValue} is not zero");
-                    }
-                }
+                return;
             }
+
+            var putContractsWithLatestExpiry = chain
+                    // puts only
+                    .Where(x => x.Right == OptionRight.Put)
+                    // contracts with latest expiry
+                    .GroupBy(x => x.Expiry)
+                    .OrderBy(x => x.Key)
+                    .Last()
+                    // ordered by strike
+                    .OrderBy(x => x.Strike)
+                    .ToList();
+
+            if (putContractsWithLatestExpiry.Count < 2)
+            {
+                return;
+            }
+
+            var longContract = putContractsWithLatestExpiry[0];
+            var shortContract = putContractsWithLatestExpiry[1];
+
+            var strategy = OptionStrategies.BearPutSpread(_optionSymbol, shortContract.Strike, longContract.Strike, shortContract.Expiry);
+
+            // Before option strategies orders were place as combo orders, only a quantity up to 18 could be used in this case,
+            // even though the remaining margin was enough to support a larger quantity. See GH issue #5693.
+            // We want to assert that with combo orders, large quantities can be used on option strategies
+            Order(strategy, 19);
+
+            Quit($"Margin used: {Portfolio.TotalMarginUsed}; Remaining: {Portfolio.MarginRemaining}");
         }
 
         public override void OnEndOfAlgorithm()
         {
-            base.OnEndOfAlgorithm();
+            var filledOrders = Transactions.GetOrders(x => x.Status == OrderStatus.Filled).ToList();
 
-            if (_limitPrice == null)
+            if (filledOrders.Count != 2)
             {
-                throw new Exception("Limit price was not set");
-            }
-
-            var fillPricesSum = FillOrderEvents.Take(OrderLegs.Count).Select(x => x.FillPrice * x.FillQuantity / _comboQuantity).Sum();
-            if (_limitPrice < fillPricesSum)
-            {
-                throw new Exception($"Limit price expected to be greater that the sum of the fill prices ({fillPricesSum}), but was {_limitPrice}");
-            }
-
-            if (!_liquidated)
-            {
-                throw new Exception("Combo order was not liquidated");
+                throw new Exception($"Expected 2 filled orders but found {filledOrders.Count}");
             }
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
-        public override bool CanRunLocally => true;
+        public bool CanRunLocally { get; } = true;
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp };
+        public Language[] Languages { get; } = { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 884208;
+        public long DataPoints => 2262;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public override int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 25;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "6"},
+            {"Total Trades", "2"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
@@ -151,9 +137,9 @@ namespace QuantConnect.Algorithm.CSharp
             {"Information Ratio", "0"},
             {"Tracking Error", "0"},
             {"Treynor Ratio", "0"},
-            {"Total Fees", "$17.50"},
-            {"Estimated Strategy Capacity", "$5000.00"},
-            {"Lowest Capacity Asset", "GOOCV W78ZERHAOVVQ|GOOCV VP83T1ZUHROL"},
+            {"Total Fees", "$9.50"},
+            {"Estimated Strategy Capacity", "$6000.00"},
+            {"Lowest Capacity Asset", "GOOCV 30AKMELSHQVZA|GOOCV VP83T1ZUHROL"},
             {"Fitness Score", "0"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
@@ -173,7 +159,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Mean Population Magnitude", "0%"},
             {"Rolling Averaged Population Direction", "0%"},
             {"Rolling Averaged Population Magnitude", "0%"},
-            {"OrderListHash", "17a5427a539f2b02a626fda15d6eb13f"}
+            {"OrderListHash", "f063bcbcfbf501dab9c573bd493363b1"}
         };
     }
 }

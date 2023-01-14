@@ -27,6 +27,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Logging;
 using QuantConnect.Securities;
 using QuantConnect.Securities.Future;
+using QuantConnect.Securities.Option;
 using static QuantConnect.StringExtensions;
 
 namespace QuantConnect.Util
@@ -571,8 +572,11 @@ namespace QuantConnect.Util
                 case SecurityType.Crypto:
                     return !isHourOrDaily ? Path.Combine(directory, symbol.Value.ToLowerInvariant()) : directory;
 
-                case SecurityType.Option:
                 case SecurityType.IndexOption:
+                    // For index options, we use the canonical option ticker since it can differ from the underlying's ticker.
+                    return !isHourOrDaily ? Path.Combine(directory, symbol.ID.Symbol.ToLowerInvariant()) : directory;
+
+                case SecurityType.Option:
                     // options uses the underlying symbol for pathing.
                     return !isHourOrDaily ? Path.Combine(directory, symbol.Underlying.Value.ToLowerInvariant()) : directory;
 
@@ -658,7 +662,6 @@ namespace QuantConnect.Util
                     return Invariant($"{formattedDate}_{symbol.Value.ToLowerInvariant()}_{resolution.ResolutionToLower()}_{tickType.TickTypeToLower()}.csv");
 
                 case SecurityType.Option:
-                case SecurityType.IndexOption:
                     var optionPath = symbol.Underlying.Value.ToLowerInvariant();
 
                     if (isHourOrDaily)
@@ -684,14 +687,15 @@ namespace QuantConnect.Util
                         symbol.ID.Date.ToStringInvariant(DateFormat.EightCharacter)
                         ) + ".csv";
 
+                case SecurityType.IndexOption:
                 case SecurityType.FutureOption:
-                    // We want the future option ticker as the lookup name inside the ZIP file
-                    var futureOptionPath = symbol.ID.Symbol.ToLowerInvariant();
+                    // We want the future/index option ticker as the lookup name inside the ZIP file
+                    var optionTickerBasedPath = symbol.ID.Symbol.ToLowerInvariant();
 
                     if (isHourOrDaily)
                     {
                         return string.Join("_",
-                            futureOptionPath,
+                            optionTickerBasedPath,
                             tickType.TickTypeToLower(),
                             symbol.ID.OptionStyle.OptionStyleToLower(),
                             symbol.ID.OptionRight.OptionRightToLower(),
@@ -702,7 +706,7 @@ namespace QuantConnect.Util
 
                     return string.Join("_",
                         formattedDate,
-                        futureOptionPath,
+                        optionTickerBasedPath,
                         resolution.ResolutionToLower(),
                         tickType.TickTypeToLower(),
                         symbol.ID.OptionStyle.OptionStyleToLower(),
@@ -785,7 +789,6 @@ namespace QuantConnect.Util
 
                     return $"{formattedDate}_{tickTypeString}.zip";
                 case SecurityType.Option:
-                case SecurityType.IndexOption:
                     if (isHourOrDaily)
                     {
                         // see TryParsePath: he knows tick type position is 3
@@ -795,12 +798,13 @@ namespace QuantConnect.Util
 
                     return $"{formattedDate}_{tickTypeString}_{symbol.ID.OptionStyle.OptionStyleToLower()}.zip";
 
+                case SecurityType.IndexOption:
                 case SecurityType.FutureOption:
                     if (isHourOrDaily)
                     {
                         // see TryParsePath: he knows tick type position is 3
-                        var futureOptionPath = symbol.ID.Symbol.ToLowerInvariant();
-                        return $"{futureOptionPath}_{date.Year}_{tickTypeString}_{symbol.ID.OptionStyle.OptionStyleToLower()}.zip";
+                        var optionTickerBasedPath = symbol.ID.Symbol.ToLowerInvariant();
+                        return $"{optionTickerBasedPath}_{date.Year}_{tickTypeString}_{symbol.ID.OptionStyle.OptionStyleToLower()}.zip";
                     }
 
                     return $"{formattedDate}_{tickTypeString}_{symbol.ID.OptionStyle.OptionStyleToLower()}.zip";
@@ -883,7 +887,7 @@ namespace QuantConnect.Util
                         var right = parts[3].ParseOptionRight();
                         var strike = Parse.Decimal(parts[4]) / 10000m;
                         var expiry = Parse.DateTimeExact(parts[5], DateFormat.EightCharacter);
-                        return Symbol.CreateOption(symbol.Underlying, symbol.ID.Market, style, right, strike, expiry);
+                        return Symbol.CreateOption(symbol.Underlying, symbol.ID.Symbol, symbol.ID.Market, style, right, strike, expiry);
                     }
                     else
                     {
@@ -891,7 +895,7 @@ namespace QuantConnect.Util
                         var right = parts[5].ParseOptionRight();
                         var strike = Parse.Decimal(parts[6]) / 10000m;
                         var expiry = DateTime.ParseExact(parts[7], DateFormat.EightCharacter, CultureInfo.InvariantCulture);
-                        return Symbol.CreateOption(symbol.Underlying, symbol.ID.Market, style, right, strike, expiry);
+                        return Symbol.CreateOption(symbol.Underlying, symbol.ID.Symbol, symbol.ID.Market, style, right, strike, expiry);
                     }
 
                 case SecurityType.Future:
@@ -1178,9 +1182,17 @@ namespace QuantConnect.Util
                     // Future options have underlying FutureExpiry date as the parent dir for the zips, we need this for our underlying
                     var underlyingFutureExpiryDate = Parse.DateTimeExact(info[startIndex + 4].Substring(0, 8), DateFormat.EightCharacter);
 
+                    var underlyingTicker = OptionSymbol.MapToUnderlying(ticker, securityType);
                     // Create our underlying future and then the Canonical option for this future
-                    var underlyingFuture = Symbol.CreateFuture(ticker, market, underlyingFutureExpiryDate);
+                    var underlyingFuture = Symbol.CreateFuture(underlyingTicker, market, underlyingFutureExpiryDate);
                     symbol = Symbol.CreateCanonicalOption(underlyingFuture);
+                }
+                else if(securityType == SecurityType.IndexOption)
+                {
+                    var underlyingTicker = OptionSymbol.MapToUnderlying(ticker, securityType);
+                    // Create our underlying index and then the Canonical option
+                    var underlyingIndex = Symbol.Create(underlyingTicker, SecurityType.Index, market);
+                    symbol = Symbol.CreateCanonicalOption(underlyingIndex, ticker, market, null);
                 }
                 else
                 {
