@@ -53,9 +53,9 @@
     <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.2" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1462.37" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1518.46" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="StockSharp.Algo" Version="5.0.141" />
     <PackageReference Include="StockSharp.Configuration" Version="5.0.140" />
