@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Algoloop.Model.Internal;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -25,6 +24,16 @@ namespace Algoloop.Model
     public class AccountModel : ModelBase
     {
         public enum AccountType { Backtest, Paper, Live };
+
+        public AccountModel()
+        {
+        }
+
+        public AccountModel(string name)
+        {
+            Id = name;
+            Name = name;
+        }
 
         [Browsable(false)]
         [ReadOnly(false)]
@@ -44,7 +53,7 @@ namespace Algoloop.Model
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
-        public string Name { get; set; } = "Account";
+        public string Name { get; set; } = string.Empty;
 
         [Category("Account")]
         [DisplayName("Active")]
@@ -73,13 +82,9 @@ namespace Algoloop.Model
         [DataMember]
         public Collection<OrderModel> Orders { get; } = new Collection<OrderModel>();
 
-        public void Refresh()
-        {
-        }
-
         public override bool Equals(object obj)
         {
-            if (!(obj is AccountModel other)) return false;
+            if (obj is not AccountModel other) return false;
             if (Provider != other.Provider) return false;
             if (Id != other.Id) return false;
             if (Name != other.Name) return false;

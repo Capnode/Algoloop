@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             _api.Logout().Wait();
         }
 
-        public override void SetUpdate(ProviderModel provider, Action<object> update)
+        public override void GetUpdate(ProviderModel provider, Action<object> update)
         {
             //Log.Trace($">{GetType().Name}:GetUpdate");
             DateTime now = DateTime.UtcNow;
@@ -51,7 +51,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             Debug.WriteLine($"GetSymbols Active={symbols.Where(m => m.Active).Count()}");
 
             // Sync remote symbol Active property with local
-            UpdateSymbols(provider, symbols, true);
+            UpdateSymbols(provider, symbols, update);
             foreach (SymbolModel symbol in symbols)
             {
                 SymbolModel item = provider.Symbols.FirstOrDefault(m => 
@@ -72,32 +72,10 @@ namespace Algoloop.ViewModel.Internal.Provider
             if (_isDisposed) return;
             if (disposing)
             {
-                if (_api != null)
-                {
-                    _api.Dispose();
-                }
+                _api?.Dispose();
             }
 
             base.Dispose(disposing);
-        }
-
-        private int GetHashCode(Collection<SymbolModel> symbols)
-        {
-            int hash = 41;
-            foreach (SymbolModel symbol in symbols)
-            {
-                // Suitable nullity checks etc, of course :)
-                if (symbol.Id != null)
-                    hash = hash * 59 + symbol.Id.GetHashCode();
-                hash = hash * 59 + symbol.Active.GetHashCode();
-                if (symbol.Name != null)
-                    hash = hash * 59 + symbol.Name.GetHashCode();
-                if (symbol.Market != null)
-                    hash = hash * 59 + symbol.Market.GetHashCode();
-                hash = hash * 59 + symbol.Security.GetHashCode();
-            }
-
-            return hash;
         }
     }
 }

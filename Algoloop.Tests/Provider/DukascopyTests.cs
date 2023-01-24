@@ -27,7 +27,10 @@ namespace Algoloop.Tests.Provider
     [TestClass()]
     public class DukascopyTests
     {
-        private const string DataDirectory = "Data";
+        private const string DataFolder = "Data";
+        private const string TestData = "TestData";
+        private const string MarketHours = "market-hours";
+        private const string SymbolProperties = "symbol-properties";
 
         private string _forexFolder;
 
@@ -37,20 +40,32 @@ namespace Algoloop.Tests.Provider
             Log.LogHandler = new ConsoleLogHandler();
 
             // Set Globals
-            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDirectory);
+            string dataFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataFolder);
             Config.Set("data-directory", dataFolder);
             Config.Set("data-folder", dataFolder);
             Config.Set("cache-location", dataFolder);
             Config.Set("version-id", string.Empty);
             Globals.Reset();
 
-            _forexFolder = Path.Combine(dataFolder, SecurityType.Forex.SecurityTypeToLower(), Market.Dukascopy);
+            _forexFolder = Path.Combine(DataFolder, SecurityType.Forex.SecurityTypeToLower(), Market.Dukascopy);
 
-            // Remove Data folder
-            if (Directory.Exists(dataFolder))
+            // Remove temp dirs
+            foreach (string dir in Directory.EnumerateDirectories(".", "temp*", SearchOption.TopDirectoryOnly))
             {
-                Directory.Delete(dataFolder, true);
+                Directory.Delete(dir, true);
             }
+
+            // Prepare datafolder
+            if (Directory.Exists(DataFolder))
+            {
+                Directory.Delete(DataFolder, true);
+            }
+            MainService.CopyDirectory(
+                Path.Combine(TestData, MarketHours),
+                Path.Combine(DataFolder, MarketHours));
+            MainService.CopyDirectory(
+                Path.Combine(TestData, SymbolProperties),
+                Path.Combine(DataFolder, SymbolProperties));
         }
 
         [TestMethod()]

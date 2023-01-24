@@ -27,20 +27,20 @@ namespace Algoloop.Model.Internal
         {
             if (propertyItem == null) throw new ArgumentNullException(nameof(propertyItem));
 
-            Grid panel = new Grid();
+            Grid panel = new();
             panel.ColumnDefinitions.Add(new ColumnDefinition());
             panel.ColumnDefinitions.Add(new ColumnDefinition()
             {
                 Width = GridLength.Auto
             });
 
-            TextBox textBox = new TextBox();
+            TextBox textBox = new();
             textBox.BorderBrush = textBox.Background;
             textBox.HorizontalAlignment = HorizontalAlignment.Stretch;
             textBox.IsEnabled = !propertyItem.IsReadOnly;
             panel.Children.Add(textBox);
 
-            Binding binding = new Binding("Value")
+            Binding binding = new("Value")
             {
                 Source = propertyItem,
                 Mode = propertyItem.IsReadOnly ? BindingMode.OneWay : BindingMode.TwoWay
@@ -51,7 +51,7 @@ namespace Algoloop.Model.Internal
 
             if (!propertyItem.IsReadOnly)
             {
-                Button button = new Button
+                Button button = new()
                 {
                     Content = "   . . .   ",
                     Tag = propertyItem
@@ -67,7 +67,7 @@ namespace Algoloop.Model.Internal
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!(((Button)sender).Tag is PropertyItem item))
+            if (((Button)sender).Tag is not PropertyItem item)
             {
                 return;
             }

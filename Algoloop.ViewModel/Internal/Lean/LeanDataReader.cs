@@ -65,12 +65,9 @@ namespace Algoloop.ViewModel.Internal.Lean
         /// </example>
         public LeanDataReader(string filepath)
         {
-            Symbol symbol;
-            DateTime date;
-            Resolution resolution;
             string zipEntry = null;
 
-            var isFutureOrOption = filepath.Contains("#");
+            var isFutureOrOption = filepath.Contains('#');
 
             if (isFutureOrOption)
             {
@@ -79,7 +76,7 @@ namespace Algoloop.ViewModel.Internal.Lean
             }
 
             var fileInfo = new FileInfo(filepath);
-            if (!LeanData.TryParsePath(fileInfo.FullName, out symbol, out date, out resolution, out var tickType, out var dataType))
+            if (!LeanData.TryParsePath(fileInfo.FullName, out Symbol symbol, out DateTime date, out Resolution resolution, out var tickType, out var dataType))
             {
                 throw new ArgumentException($"File {filepath} cannot be parsed.");
             }
@@ -115,29 +112,25 @@ namespace Algoloop.ViewModel.Internal.Lean
                 yield break;
             }
 
-            var factory = (BaseData) ObjectActivator.GetActivator(_config.Type).Invoke(new object[0]);
+            var factory = (BaseData) ObjectActivator.GetActivator(_config.Type).Invoke(Array.Empty<object>());
 
             if (_config.Type.ImplementsStreamReader())
             {
-                using (var zip = new ZipFile(_zipPath))
+                using var zip = new ZipFile(_zipPath);
+                foreach (var zipEntry in zip.Where(x => _zipentry == null || string.Equals(x.FileName, _zipentry, StringComparison.OrdinalIgnoreCase)))
                 {
-                    foreach (var zipEntry in zip.Where(x => _zipentry == null || string.Equals(x.FileName, _zipentry, StringComparison.OrdinalIgnoreCase)))
+                    // we get the contract symbol from the zip entry if not already provided with the zip entry
+                    var symbol = _config.Symbol;
+                    if (_zipentry == null && (_config.SecurityType == SecurityType.Future || _config.SecurityType.IsOption()))
                     {
-                        // we get the contract symbol from the zip entry if not already provided with the zip entry
-                        var symbol = _config.Symbol;
-                        if(_zipentry == null && (_config.SecurityType == SecurityType.Future || _config.SecurityType.IsOption()))
-                        {
-                            symbol = LeanData.ReadSymbolFromZipEntry(_config.Symbol, _config.Resolution, zipEntry.FileName);
-                        }
-                        using (var entryReader = new StreamReader(zipEntry.OpenReader()))
-                        {
-                            while (!entryReader.EndOfStream)
-                            {
-                                var dataPoint = factory.Reader(_config, entryReader, _date, false);
-                                dataPoint.Symbol = symbol;
-                                yield return dataPoint;
-                            }
-                        }
+                        symbol = LeanData.ReadSymbolFromZipEntry(_config.Symbol, _config.Resolution, zipEntry.FileName);
+                    }
+                    using var entryReader = new StreamReader(zipEntry.OpenReader());
+                    while (!entryReader.EndOfStream)
+                    {
+                        var dataPoint = factory.Reader(_config, entryReader, _date, false);
+                        dataPoint.Symbol = symbol;
+                        yield return dataPoint;
                     }
                 }
             }

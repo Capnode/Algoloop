@@ -25,7 +25,7 @@ namespace Algoloop.Wpf.Internal
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             int i = (int)value;
-            GridLength result = new GridLength(i);
+            GridLength result = new(i);
             return result;
         }
 

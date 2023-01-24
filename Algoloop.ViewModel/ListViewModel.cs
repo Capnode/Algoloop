@@ -32,7 +32,6 @@ namespace Algoloop.ViewModel
     public class ListViewModel : ViewModelBase, ITreeViewModel
     {
         private SymbolViewModel _selectedSymbol;
-        private SymbolViewModel _marketSymbol;
         private IList _selectedItems;
 
         public ListViewModel(MarketViewModel market, ListModel model)
@@ -46,7 +45,7 @@ namespace Algoloop.ViewModel
             StopCommand = new RelayCommand(() => { }, () => false);
             AddSymbolCommand = new RelayCommand<SymbolViewModel>(
                 m => DoAddSymbol(m),
-                _ => !IsBusy && MarketSymbols.View.Cast<object>().Any());
+                _ => !IsBusy);
             RemoveSymbolsCommand = new RelayCommand<IList>(
                 m => DoRemoveSymbols(m),
                 _ => !IsBusy && SelectedSymbol != null);
@@ -54,18 +53,6 @@ namespace Algoloop.ViewModel
                 () => DoExportList(), () => !IsBusy && !Market.Active);
 
             DataFromModel();
-
-            MarketSymbols.Filter += (object _, FilterEventArgs e) =>
-            {
-                if (e.Item is SymbolViewModel marketSymbol)
-                {
-                    e.Accepted = !Symbols.Any(m => m.Model.Id.Equals(
-                        marketSymbol.Model.Id,
-                        StringComparison.OrdinalIgnoreCase));
-                }
-            };
-
-            MarketSymbols.Source = Market.ActiveSymbols;
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -94,14 +81,6 @@ namespace Algoloop.ViewModel
         public ListModel Model { get; }
         public SyncObservableCollection<SymbolViewModel> Symbols { get; }
             = new SyncObservableCollection<SymbolViewModel>();
-        public CollectionViewSource MarketSymbols { get; }
-            = new CollectionViewSource();
-
-        public SymbolViewModel MarketSymbol
-        {
-            get => _marketSymbol;
-            set => SetProperty(ref _marketSymbol, value);
-        }
 
         public IList SelectedItems
         {
@@ -135,10 +114,13 @@ namespace Algoloop.ViewModel
 
         public void Refresh()
         {
-            Model.Refresh();
             DataFromModel();
-            MarketSymbols.View.Refresh();
             AddSymbolCommand.NotifyCanExecuteChanged();
+        }
+
+        public void Update(ListModel model)
+        {
+            Model.Update(model);
         }
 
         public void AddSymbols(IEnumerable<SymbolViewModel> symbols)
@@ -154,7 +136,6 @@ namespace Algoloop.ViewModel
             }
 
             DataToModel();
-            MarketSymbols.View.Refresh();
         }
 
         private void DoAddSymbol(SymbolViewModel symbol)
@@ -171,7 +152,6 @@ namespace Algoloop.ViewModel
             finally
             {
                 IsBusy = false;
-                AddSymbolCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -228,8 +208,6 @@ namespace Algoloop.ViewModel
                 {
                     SelectedSymbol = Symbols[Math.Min(pos, Symbols.Count - 1)];
                 }
-
-                MarketSymbols.View.Refresh();
             }
             finally
             {

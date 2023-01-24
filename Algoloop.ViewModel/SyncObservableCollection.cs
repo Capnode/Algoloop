@@ -25,7 +25,7 @@ namespace Algoloop.ViewModel
     /// </summary>
     public class SyncObservableCollection<T> : ObservableCollection<T>
     {
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         /// <summary> 
         /// Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class. 

@@ -73,7 +73,7 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod()]
-        public void SetUpdate()
+        public void GetUpdate()
         {
             int calls = 0;
             IReadOnlyList<SymbolModel> symbols = null;
@@ -83,7 +83,7 @@ namespace Algoloop.Tests.Provider
             // Just update symbol list
             using IProvider provider = ProviderFactory.CreateProvider(_model.Provider);
             provider.Login(_model);
-            provider.SetUpdate(_model, list =>
+            provider.GetUpdate(_model, list =>
             {
                 calls++;
                 if (list is IReadOnlyList<SymbolModel> symbolList)
@@ -115,7 +115,7 @@ namespace Algoloop.Tests.Provider
             Assert.AreEqual(1, accounts[0].Balances.Count);
             Assert.IsTrue(_model.Active);
             Assert.IsTrue(_model.Symbols.Count > 200);
-            Assert.IsTrue(_model.Symbols.Where(m => m.Active).Count() > 0);
+            Assert.IsTrue(_model.Symbols.Where(m => m.Active).Any());
         }
     }
 }

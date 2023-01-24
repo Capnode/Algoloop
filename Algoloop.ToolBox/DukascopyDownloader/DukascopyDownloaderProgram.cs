@@ -54,13 +54,13 @@ namespace Algoloop.ToolBox.DukascopyDownloader
 
                 foreach (var ticker in tickers)
                 {
-                    if (!downloader.HasSymbol(ticker))
+                    if (!DukascopyDataDownloader.HasSymbol(ticker))
                         throw new ArgumentException("The ticker " + ticker + " is not available.");
                 }
 
                 foreach (var ticker in tickers)
                 {
-                    var securityType = downloader.GetSecurityType(ticker);
+                    var securityType = DukascopyDataDownloader.GetSecurityType(ticker);
                     var symbolObject = Symbol.Create(ticker, securityType, Market.Dukascopy);
                     var data = downloader.Get(new DataDownloaderGetParameters(symbolObject, castResolution, startDate, endDate, TickType.Quote));
 

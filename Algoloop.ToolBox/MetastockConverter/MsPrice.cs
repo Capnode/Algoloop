@@ -38,9 +38,8 @@ namespace Algoloop
     private float _close = float.NaN;
     private float _volume = float.NaN;
     private float _openInterest = float.NaN;
-
-    byte _fields;
-    MsPrice _previous;
+    private readonly byte _fields;
+    private readonly MsPrice _previous;
 
     public MsPrice(byte fields, MsPrice previous)
     {
@@ -186,7 +185,7 @@ namespace Algoloop
     }
 
     [System.Runtime.InteropServices.StructLayout(LayoutKind.Explicit)]
-    struct union
+    struct Union
     {
       [System.Runtime.InteropServices.FieldOffset(0)]
       internal float a;
@@ -194,10 +193,10 @@ namespace Algoloop
       internal uint b;
     };
 
-    float Msbin2Ieee(uint msbin)
+    private static float Msbin2Ieee(uint msbin)
     {
       // Microsoft Basic floating point format to IEEE floating point format
-      union c;
+      Union c;
       c.a = 0;
       if (msbin != 0) 
       {

@@ -29,7 +29,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 
             // Update symbol list
             IEnumerable<SymbolModel> actual = MetastockConverterProgram.GetInstruments(market.SourceFolder);
-            UpdateSymbols(market, actual, true);
+            UpdateSymbols(market, actual, update);
 
             // Setup convert parameters
             DateTime utsNow = DateTime.UtcNow;

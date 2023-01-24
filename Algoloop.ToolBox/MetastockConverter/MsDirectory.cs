@@ -21,7 +21,7 @@ namespace Algoloop
 {
   public class MsDirectory
   {
-    string _path;
+    readonly string _path;
 
     public MsDirectory(string path)
     {
@@ -30,17 +30,17 @@ namespace Algoloop
 
     public List<MsSecurity> GetSecurities()
     {
-      List<MsSecurity> securities = new List<MsSecurity>();
+      List<MsSecurity> securities = new();
       string filePath = _path + @"\MASTER";
       if (File.Exists(filePath))
       {
-        FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        BinaryReader br = new BinaryReader(fs);
+        FileStream fs = new(filePath, FileMode.Open, FileAccess.Read);
+        BinaryReader br = new(fs);
         try
         {
           long size = fs.Length;
           long pos = 0;
-          MsSecurity security = new MsSecurity(_path);
+          MsSecurity security = new(_path);
           pos += security.ReadHeader(br);
           while (pos < size)
           {
@@ -67,13 +67,13 @@ namespace Algoloop
       string filePath = _path + @"\MASTER";
       if (File.Exists(filePath))
       {
-        FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        BinaryReader br = new BinaryReader(fs);
+        FileStream fs = new(filePath, FileMode.Open, FileAccess.Read);
+        BinaryReader br = new(fs);
         try
         {
           long size = fs.Length;
           long pos = 0;
-          MsSecurity security = new MsSecurity(_path);
+          MsSecurity security = new(_path);
           pos += security.ReadHeader(br);
           while (pos < size)
           {

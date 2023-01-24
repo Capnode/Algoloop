@@ -40,10 +40,7 @@ namespace Algoloop.ViewModel.Internal.Lean
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects)
-                if (_process != null)
-                {
-                    _process.Dispose();
-                }
+                _process?.Dispose();
             }
 
             // TODO: free unmanaged resources (unmanaged objects) and override finalizer

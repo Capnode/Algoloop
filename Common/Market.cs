@@ -71,6 +71,7 @@ namespace QuantConnect
             Tuple.Create(Borsdata, 256),
             Tuple.Create(Metastock, 257),
             Tuple.Create(Avanza, 258),
+            Tuple.Create(QuantConnect, 259),
         };
 
         static Market()
@@ -249,6 +250,11 @@ namespace QuantConnect
         /// Avanza
         /// </summary>
         public const string Avanza = "avanza";
+
+        /// <summary>
+        /// Avanza
+        /// </summary>
+        public const string QuantConnect = "quantconnect";
 
         /// <summary>
         /// Adds the specified market to the map of available markets with the specified identifier.

@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using QuantConnect;
 using QuantConnect.Data;
@@ -33,7 +32,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
     /// </summary>
     public class DukascopyDataDownloader : IDataDownloader
     {
-        private readonly DukascopySymbolMapper _symbolMapper = new DukascopySymbolMapper();
+        private readonly DukascopySymbolMapper _symbolMapper = new();
         private const int DukascopyTickLength = 20;
 
         /// <summary>
@@ -41,9 +40,9 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         /// <param name="symbol"></param>
         /// <returns>Returns true if the symbol is available</returns>
-        public bool HasSymbol(string symbol)
+        public static bool HasSymbol(string symbol)
         {
-            return _symbolMapper.IsKnownLeanSymbol(Symbol.Create(symbol, GetSecurityType(symbol), Market.Dukascopy));
+            return DukascopySymbolMapper.IsKnownLeanSymbol(Symbol.Create(symbol, GetSecurityType(symbol), Market.Dukascopy));
         }
 
         /// <summary>
@@ -51,9 +50,9 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         /// <param name="symbol">The symbol</param>
         /// <returns>The security type</returns>
-        public SecurityType GetSecurityType(string symbol)
+        public static SecurityType GetSecurityType(string symbol)
         {
-            return _symbolMapper.GetLeanSecurityType(symbol);
+            return DukascopySymbolMapper.GetLeanSecurityType(symbol);
         }
 
         /// <summary>
@@ -74,7 +73,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
                 yield break;
             }
 
-            if (!_symbolMapper.IsKnownLeanSymbol(symbol))
+            if (!DukascopySymbolMapper.IsKnownLeanSymbol(symbol))
                 throw new ArgumentException("Invalid symbol requested: " + symbol.Value);
 
             if (symbol.ID.SecurityType != SecurityType.Forex && symbol.ID.SecurityType != SecurityType.Cfd)
@@ -125,7 +124,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         private IEnumerable<Tick> DownloadTicks(Symbol symbol, DateTime date)
         {
             var dukascopySymbol = _symbolMapper.GetBrokerageSymbol(symbol);
-            var pointValue = _symbolMapper.GetPointValue(symbol);
+            var pointValue = DukascopySymbolMapper.GetPointValue(symbol);
 
             for (var hour = 0; hour < 24; hour++)
             {
@@ -135,40 +134,38 @@ namespace Algoloop.ToolBox.DukascopyDownloader
                           $"{date.Year.ToStringInvariant("D4")}/{(date.Month - 1).ToStringInvariant("D2")}/" +
                           $"{date.Day.ToStringInvariant("D2")}/{hour.ToStringInvariant("D2")}h_ticks.bi5";
 
-                using (var client = new WebClient())
+                using var client = new WebClient();
+                while (true)
                 {
-                    while (true)
+                    byte[] bytes = null;
+                    try
                     {
-                        byte[] bytes = null;
-                        try
-                        {
-                            bytes = client.DownloadData(url);
-                        }
-                        catch (WebException webEx)
-                        {
-                            var response = (HttpWebResponse)webEx.Response;
-                            if (response == default) throw;
-                            if (response.StatusCode >= HttpStatusCode.InternalServerError)
-                            {
-                                Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
-                                continue;
-                            }
-                            else if (response.StatusCode == HttpStatusCode.NotFound)
-                            {
-                                break;
-                            }
-                            throw;
-                        }
-                        if (bytes != null && bytes.Length > 0)
-                        {
-                            var ticks = AppendTicksToList(symbol, bytes, date, timeOffset, pointValue);
-                            foreach (var tick in ticks)
-                            {
-                                yield return tick;
-                            }
-                        }
-                        break;
+                        bytes = client.DownloadData(url);
                     }
+                    catch (WebException webEx)
+                    {
+                        var response = (HttpWebResponse)webEx.Response;
+                        if (response == default) throw;
+                        if (response.StatusCode >= HttpStatusCode.InternalServerError)
+                        {
+                            Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
+                            continue;
+                        }
+                        else if (response.StatusCode == HttpStatusCode.NotFound)
+                        {
+                            break;
+                        }
+                        throw;
+                    }
+                    if (bytes != null && bytes.Length > 0)
+                    {
+                        var ticks = AppendTicksToList(symbol, bytes, date, timeOffset, pointValue);
+                        foreach (var tick in ticks)
+                        {
+                            yield return tick;
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -221,7 +218,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
 
         private static byte[] Decompress(byte[] inputBytes)
         {
-            MemoryStream newInStream = new MemoryStream(inputBytes);
+            MemoryStream newInStream = new(inputBytes);
             Decoder decoder = new();
             newInStream.Seek(0, 0);
             MemoryStream newOutStream = new();

@@ -54,7 +54,7 @@ namespace Algoloop.ViewModel
         private Resolution _selectedResolution = Resolution.Daily;
         private static ReportPeriod _selectedReportPeriod;
         private AccountViewModel _selectedAccount;
-        private bool _setUpdate;
+        private bool _active;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, ProviderModel marketModel, SettingModel settings)
         {
@@ -63,7 +63,7 @@ namespace Algoloop.ViewModel
             _settings = settings;
 
             ActiveCommand = new RelayCommand(
-                async () => await DoActiveCommand(Model.Active).ConfigureAwait(false),
+                async () => await DoActiveCommand(Active).ConfigureAwait(false),
                 () => !IsBusy);
             StartCommand = new RelayCommand(
                 async () => await DoStartCommand().ConfigureAwait(false),
@@ -97,10 +97,9 @@ namespace Algoloop.ViewModel
                 () => DoImportList(),
                 () => !IsBusy && !Active);
 
-            Model.ModelChanged += DataFromModel;
-
             DataFromModel();
-//            DoActiveCommand(Active).Wait();
+            Model.Active = false; // Not running now
+            ActiveCommand.Execute(null);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
@@ -136,7 +135,6 @@ namespace Algoloop.ViewModel
         public IEnumerable<Resolution> ResolutionList { get; } = new[] { Resolution.Daily, Resolution.Hour, Resolution.Minute, Resolution.Second, Resolution.Tick };
         public IEnumerable<ReportPeriod> ReportPeriodList { get; } = new[] { ReportPeriod.Year, ReportPeriod.R12, ReportPeriod.Quarter };
         public SyncObservableCollection<SymbolViewModel> Symbols { get; } = new SyncObservableCollection<SymbolViewModel>();
-        public SyncObservableCollection<SymbolViewModel> ActiveSymbols { get; } = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ListViewModel> Lists { get; } = new SyncObservableCollection<ListViewModel>();
         public ObservableCollection<AccountViewModel> Accounts { get; } = new ObservableCollection<AccountViewModel>();
         public SyncObservableCollection<BalanceViewModel> Balances { get; } = new SyncObservableCollection<BalanceViewModel>();
@@ -163,11 +161,10 @@ namespace Algoloop.ViewModel
 
         public bool Active
         {
-            get => Model.Active;
+            get => _active;
             set
             {
-                Model.Active = value;
-                OnPropertyChanged();
+                SetProperty(ref _active, value);
                 RaiseCommands();
             }
         }
@@ -230,20 +227,16 @@ namespace Algoloop.ViewModel
 
         public void Refresh()
         {
-            _setUpdate = true;
             Model.Refresh();
             foreach (ListViewModel list in Lists)
             {
                 list.Refresh();
             }
-
-            // Sync Active Symbols to ActiveSymbols
-            IEnumerable<SymbolViewModel> activeSymbols = Symbols.Where(m => m.Active);
-            Collection.SmartCopy(activeSymbols, ActiveSymbols);
         }
 
         internal void DataToModel()
         {
+            Model.Active = Active;
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
@@ -334,10 +327,6 @@ namespace Algoloop.ViewModel
                 // No IsBusy
                 await StartMarketAsync().ConfigureAwait(false);
             }
-            else
-            {
-                Model.Active = false;
-            }
         }
 
         private void RaiseCommands()
@@ -358,6 +347,12 @@ namespace Algoloop.ViewModel
 
         private async Task StartMarketAsync()
         {
+            // Check if already started
+            if (Model.Active)
+            {
+                return;
+            }
+
             try
             {
                 DataToModel();
@@ -367,7 +362,7 @@ namespace Algoloop.ViewModel
                 Messenger.Send(new NotificationMessage(
                     string.Format(Resources.MarketStarted, Model.Name)),
                     0);
-                await Task.Run(() => MarketLoop(Model)).ConfigureAwait(false);
+                await Task.Run(() => MarketLoop()).ConfigureAwait(false);
                 IList<string> symbols = Model.Symbols.
                     Where(x => x.Active).Select(m => m.Id).ToList();
                 if (symbols.Any())
@@ -385,14 +380,12 @@ namespace Algoloop.ViewModel
             }
             catch (ApplicationException ex)
             {
-                Model.Active = false;
                 Messenger.Send(new NotificationMessage(
                     string.Format(Resources.MarketException, Model.Name, ex.Message)),
                     0);
             }
             catch (Exception ex)
             {
-                Model.Active = false;
                 Log.Error(ex);
                 Messenger.Send(new NotificationMessage(
                     $"{ex.GetType()}: {ex.Message}"),
@@ -400,39 +393,27 @@ namespace Algoloop.ViewModel
             }
             finally
             {
-                _provider?.Dispose();
-                _provider = null;
                 UiThread(() =>
                 {
-                    ProviderModel model = Model;
-                    Model = null;
-                    Model = model;
-                    DataFromModel();
+                    Model.Active = false;
+                    Active = false;
                 });
+                _provider?.Dispose();
+                _provider = null;
             }
         }
 
-        private void MarketLoop(ProviderModel model)
+        private void MarketLoop()
         {
-            _provider.Login(model);
-            _setUpdate = true;
-            while (model.Active)
+            _provider.Login(Model);
+            while (Active && Model.Active)
             {
-//                Log.Trace("MainLoop", true);
-
-                if (_setUpdate)
-                {
-                    _provider.SetUpdate(model, OnUpdate);
-                    _setUpdate = false;
-                }
-                else
-                {
-                    _provider.GetUpdate(model, OnUpdate);
-                }
+                _provider.GetUpdate(Model, OnUpdate);
 
                 // Update settings page
                 UiThread(() =>
                 {
+                    ProviderModel model = Model;
                     Model = null;
                     Model = model;
                 });
@@ -444,17 +425,9 @@ namespace Algoloop.ViewModel
 
         private void OnUpdate(object data)
         {
-            if (data is IEnumerable<AccountModel> accounts)
+            if (data is Tick tick)
             {
-                Model.UpdateAccounts(accounts);
-                UiThread(() => UpdateAccounts(accounts));
-                return;
-            }
-
-            if (data is IEnumerable<SymbolModel> symbols)
-            {
-                UiThread(() => UpdateSymbols(symbols));
-                Symbols.Sort();
+                UpdateTick(tick);
                 return;
             }
 
@@ -478,25 +451,68 @@ namespace Algoloop.ViewModel
                 return;
             }
 
+            if (data is IEnumerable<SymbolModel> symbols)
+            {
+                UiThread(() => UpdateSymbols(symbols));
+                Symbols.Sort();
+                return;
+            }
+
+            if (data is IEnumerable<AccountModel> accounts)
+            {
+                Model.UpdateAccounts(accounts);
+                UiThread(() => UpdateAccounts(accounts));
+                return;
+            }
+
+            if (data is IEnumerable<ListModel> lists)
+            {
+                UiThread(() => UpdateLists(lists));
+                return;
+            }
+
             Log.Trace("Not processed");
         }
 
         private void UpdateAccounts(IEnumerable<AccountModel> accounts)
         {
-            foreach (AccountModel account in accounts)
+            if (accounts.Count() == Accounts.Count)
             {
-                if (account.Id == Model.DefaultAccountId || accounts.Count() == 1)
+                using IEnumerator<AccountViewModel> iAccount = Accounts.GetEnumerator();
+                foreach (AccountModel account in accounts)
                 {
-                    UpdateBalances(account.Balances);
-                    UpdatePositions(account.Positions);
-                    UpdateOrders(account.Orders);
+                    if (iAccount.MoveNext())
+                    {
+                        iAccount.Current!.Update(account);
+                    }
+                    if (account.Id == Model.DefaultAccountId || accounts.Count() == 1)
+                    {
+                        UpdateBalances(account.Balances);
+                        UpdatePositions(account.Positions);
+                        UpdateOrders(account.Orders);
+                    }
+                }
+            }
+            else
+            {
+                Accounts.Clear();
+                foreach (AccountModel account in accounts)
+                {
+                    var vm = new AccountViewModel(account);
+                    Accounts.Add(vm);
+
+                    if (account.Id == Model.DefaultAccountId || accounts.Count() == 1)
+                    {
+                        UpdateBalances(account.Balances);
+                        UpdatePositions(account.Positions);
+                        UpdateOrders(account.Orders);
+                    }
                 }
             }
         }
 
         private void UpdateSymbols(IEnumerable<SymbolModel> symbols)
         {
-            Debug.WriteLine($"UpdateSymbols count={symbols.Count()}");
             foreach (SymbolModel symbol in symbols)
             {
                 SymbolViewModel vm = Symbols.FirstOrDefault(m => m.Model.Id.Equals(symbol.Id));
@@ -511,6 +527,43 @@ namespace Algoloop.ViewModel
                 {
                     vm.Update(symbol);
                 }
+            }
+        }
+
+        private void UpdateLists(IEnumerable<ListModel> lists)
+        {
+            if (lists.Count() == Lists.Count)
+            {
+                using IEnumerator<ListViewModel> iList = Lists.GetEnumerator();
+                foreach (ListModel list in lists)
+                {
+                    if (iList.MoveNext())
+                    {
+                        iList.Current!.Update(list);
+                    }
+                }
+            }
+            else
+            {
+                Lists.Clear();
+                foreach (ListModel list in lists)
+                {
+                    var vm = new ListViewModel(this, list);
+                    Lists.Add(vm);
+                }
+            }
+        }
+
+        private void UpdateTick(Tick tick)
+        {
+            SymbolViewModel symbolVm = Symbols.FirstOrDefault(
+                m => m.Model.Name.Equals(tick.Symbol.ID.Symbol,
+                StringComparison.OrdinalIgnoreCase));
+
+            if (symbolVm != null)
+            {
+                symbolVm.Ask = tick.AskPrice;
+                symbolVm.Bid = tick.BidPrice;
             }
         }
 
@@ -529,7 +582,6 @@ namespace Algoloop.ViewModel
 
         private void UpdateBalances(Collection<BalanceModel> balances)
         {
-            Log.Trace("UpdateBalances");
             if (balances.Count == Balances.Count)
             {
                 using IEnumerator<BalanceViewModel> iBalance = Balances.GetEnumerator();
@@ -554,7 +606,6 @@ namespace Algoloop.ViewModel
 
         private void UpdatePositions(Collection<PositionModel> positions)
         {
-            Log.Trace("UpdatePositions");
             if (positions.Count == Positions.Count)
             {
                 using IEnumerator<PositionViewModel> iPosition = Positions.GetEnumerator();
@@ -579,7 +630,6 @@ namespace Algoloop.ViewModel
 
         private void UpdateOrders(Collection<OrderModel> orders)
         {
-            Log.Trace("UpdateOrders");
             if (orders.Count == Balances.Count)
             {
                 using IEnumerator<OrderViewModel> iOrder = Orders.GetEnumerator();
@@ -897,16 +947,10 @@ namespace Algoloop.ViewModel
         private void SymbolsFromModel()
         {
             Symbols.Clear();
-            ActiveSymbols.Clear();
             foreach (SymbolModel symbolModel in Model.Symbols)
             {
                 SymbolViewModel symbolViewModel = new (this, symbolModel);
                 Symbols.Add(symbolViewModel);
-                if (symbolViewModel.Active)
-                {
-                    ActiveSymbols.Add(symbolViewModel);
-                }
-
                 ExDataGridColumns.AddPropertyColumns(SymbolColumns, symbolModel.Properties, "Model.Properties", false, true);
             }
 

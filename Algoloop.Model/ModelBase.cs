@@ -27,7 +27,7 @@ namespace Algoloop.Model
             PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
             BrowsableAttribute attribute = (BrowsableAttribute)descriptor.Attributes[typeof(BrowsableAttribute)];
             Type gtype = attribute.GetType();
-            FieldInfo[] fields = attribute.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fields = gtype.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
             Debug.Assert(fields.Length == 1);
             FieldInfo fieldToChange = fields[0];
             fieldToChange.SetValue(attribute, value);

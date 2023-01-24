@@ -79,7 +79,7 @@ namespace Algoloop.Wpf.Internal
             base.ContextMenu.Items.Clear();
             foreach (var column in base.Columns)
             {
-                MenuItem item = new MenuItem
+                MenuItem item = new()
                 {
                     Header = column.Header,
                     IsCheckable = true,
@@ -171,7 +171,7 @@ namespace Algoloop.Wpf.Internal
                 lastColumn.Width = new DataGridLength(1.0, DataGridLengthUnitType.Star);
         }
 
-        private string SerializeObjectToXML<T>(T item)
+        private static string SerializeObjectToXML<T>(T item)
         {
             var xs = new XmlSerializer(typeof(T));
             using var stringWriter = new StringWriter();
@@ -179,10 +179,10 @@ namespace Algoloop.Wpf.Internal
             return stringWriter.ToString();
         }
 
-        private T DeserializeFromXml<T>(string xml)
+        private static T DeserializeFromXml<T>(string xml)
         {
             T result;
-            XmlSerializer ser = new XmlSerializer(typeof(T));
+            XmlSerializer ser = new(typeof(T));
             using (TextReader tr = new StringReader(xml))
             {
                 result = (T)ser.Deserialize(tr);

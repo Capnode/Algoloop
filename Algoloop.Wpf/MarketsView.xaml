@@ -21,6 +21,7 @@
             <Setter Property="TextAlignment" Value="Right" />
         </Style>
         <Style x:Key="BlinkCell" TargetType="{x:Type DataGridCell}">
+            <Setter Property="Foreground" Value="Black" />
             <Style.Triggers>
                 <EventTrigger RoutedEvent="Binding.TargetUpdated">
                     <BeginStoryboard>
@@ -201,7 +202,7 @@
                                         <CheckBox
                                             VerticalAlignment="Center"
                                             Command="{Binding CheckAllCommand}"
-                                            CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}"
+                                            CommandParameter="{Binding ElementName=marketSymbolDataGrid, Path=SelectedItems}"
                                             IsChecked="{Binding CheckAll}"
                                             ToolTip="Check all selected" />
                                     </Grid>
@@ -213,7 +214,7 @@
                                     </Button>
                                     <Button
                                         Command="{Binding RemoveSymbolsCommand}"
-                                        CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}"
+                                        CommandParameter="{Binding ElementName=marketSymbolDataGrid, Path=SelectedItems}"
                                         ToolTip="Delete symbols">
                                         <Image
                                             Width="16"
@@ -230,7 +231,7 @@
                                     </Button>
                                     <Button
                                         Command="{Binding ExportSymbolsCommand}"
-                                        CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}"
+                                        CommandParameter="{Binding ElementName=marketSymbolDataGrid, Path=SelectedItems}"
                                         ToolTip="Export symbols ...">
                                         <Image
                                             Width="16"
@@ -239,7 +240,7 @@
                                     </Button>
                                     <Button
                                         Command="{Binding AddToSymbolListCommand}"
-                                        CommandParameter="{Binding ElementName=marketSymbolList, Path=SelectedItems}"
+                                        CommandParameter="{Binding ElementName=marketSymbolDataGrid, Path=SelectedItems}"
                                         ToolTip="Add to new symbol list">
                                         <Image
                                             Width="16"
@@ -248,7 +249,7 @@
                                     </Button>
                                 </ToolBar>
                                 <wpf:ExDataGrid
-                                    x:Name="marketSymbolList"
+                                    x:Name="marketSymbolDataGrid"
                                     AutoGenerateColumns="False"
                                     CanUserFilter="True"
                                     CanUserFreeze="False"
@@ -261,68 +262,7 @@
                                     ExSelectedItems="{Binding SelectedItems}"
                                     FrozenColumnCount="1"
                                     GridLinesVisibility="None"
-                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}" />
-                            </DockPanel>
-                        </TabItem>
-                        <TabItem Header="{Binding ActiveSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
-                            <DockPanel>
-                                <ToolBar DockPanel.Dock="Top">
-                                    <ComboBox
-                                        MinWidth="120"
-                                        DisplayMemberPath="Name"
-                                        ItemsSource="{Binding Accounts}"
-                                        SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
-                                        ToolTip="Selected account"
-                                        Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}" />
-                                    <Button
-                                        Command="{Binding AddSymbolCommand}"
-                                        CommandParameter="{Binding ElementName=combobox, Path=SelectedValue}"
-                                        ToolTip="Add symbol">
-                                        <Image
-                                            Width="16"
-                                            Height="16"
-                                            Source="/Resources\Add.png" />
-                                    </Button>
-                                    <Button
-                                        Command="{Binding RemoveSymbolsCommand}"
-                                        CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}"
-                                        ToolTip="Remove symbols">
-                                        <Image
-                                            Width="16"
-                                            Height="16"
-                                            Source="/Resources\Delete.png" />
-                                    </Button>
-                                </ToolBar>
-                                <wpf:ExDataGrid
-                                    x:Name="listbox"
-                                    AutoGenerateColumns="False"
-                                    CanUserFilter="True"
-                                    CanUserFreeze="False"
-                                    CanUserGroup="False"
-                                    CanUserReorderColumns="True"
-                                    CanUserSelectDistinct="True"
-                                    ExItemsSource="{Binding ActiveSymbols}"
-                                    ExSelectedItems="{Binding SelectedItems}"
-                                    FrozenColumnCount="1"
-                                    GridLinesVisibility="None"
                                     SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Binding="{Binding Model.Name}" Header="Name" />
-                                        <DataGridTextColumn Binding="{Binding Ask, NotifyOnTargetUpdated=True}" Header="Ask">
-                                            <DataGridTextColumn.CellStyle>
-                                                <Style BasedOn="{StaticResource BlinkCell}" TargetType="{x:Type DataGridCell}">
-                                                    <Setter Property="Background" Value="{Binding AskChange, Converter={viewsupport:ToBrushConverter}}" />
-                                                </Style>
-                                            </DataGridTextColumn.CellStyle>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Bid, NotifyOnTargetUpdated=True}" Header="Bid">
-                                            <DataGridTextColumn.CellStyle>
-                                                <Style BasedOn="{StaticResource BlinkCell}" TargetType="{x:Type DataGridCell}">
-                                                    <Setter Property="Background" Value="{Binding BidChange, Converter={viewsupport:ToBrushConverter}}" />
-                                                </Style>
-                                            </DataGridTextColumn.CellStyle>
-                                        </DataGridTextColumn>
-                                    </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
@@ -566,9 +506,7 @@
                                     <ComboBox
                                         Name="combobox"
                                         MinWidth="120"
-                                        DisplayMemberPath="Model.Name"
-                                        ItemsSource="{Binding MarketSymbols.View}"
-                                        SelectedValue="{Binding MarketSymbol, Mode=TwoWay}" />
+                                        DisplayMemberPath="Model.Name" />
                                     <Button
                                         Command="{Binding AddSymbolCommand}"
                                         CommandParameter="{Binding ElementName=combobox, Path=SelectedValue}"
@@ -580,7 +518,7 @@
                                     </Button>
                                     <Button
                                         Command="{Binding RemoveSymbolsCommand}"
-                                        CommandParameter="{Binding ElementName=listbox, Path=SelectedItems}"
+                                        CommandParameter="{Binding ElementName=marketListDataGrid, Path=SelectedItems}"
                                         ToolTip="Remove symbols">
                                         <Image
                                             Width="16"
@@ -589,13 +527,14 @@
                                     </Button>
                                 </ToolBar>
                                 <wpf:ExDataGrid
-                                    x:Name="listbox"
+                                    x:Name="marketListDataGrid"
                                     AutoGenerateColumns="False"
-                                    CanUserFilter="True"
+                                    CanUserFilter="False"
                                     CanUserFreeze="False"
                                     CanUserGroup="False"
                                     CanUserReorderColumns="True"
                                     CanUserSelectDistinct="True"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=MarketSymbolListsColumnsInfo}"
                                     ExItemsSource="{Binding Symbols}"
                                     ExSelectedItems="{Binding SelectedItems}"
                                     FrozenColumnCount="1"
@@ -690,6 +629,7 @@
                                     CanUserGroup="False"
                                     CanUserReorderColumns="False"
                                     CanUserSelectDistinct="False"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=FundamentalsColumnsInfo}"
                                     ExColumns="{Binding PeriodColumns}"
                                     ExItemsSource="{Binding FundamentalRows}"
                                     FrozenColumnCount="1"

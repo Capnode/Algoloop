@@ -144,7 +144,7 @@ namespace Algoloop.Tests.ToolBox
             Assert.IsTrue(File.Exists(mapPath));
             string map = File.ReadAllText(mapPath);
             Assert.IsTrue(map.Length > 0);
-            string firstDate = map.Substring(0, 8);
+            string firstDate = map[..8];
 
             var end2 = new DateTime(2021, 11, 15);
             string to2 = end2.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
@@ -166,7 +166,7 @@ namespace Algoloop.Tests.ToolBox
             Assert.IsTrue(length2 > length, "Append file failed");
             map = File.ReadAllText(mapPath);
             Assert.IsTrue(map.Length > 0);
-            string firstDate2 = map.Substring(0, 8);
+            string firstDate2 = map[..8];
             Assert.AreEqual(firstDate, firstDate2);
         }
 

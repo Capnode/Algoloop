@@ -45,10 +45,6 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
         }
 
-        public virtual void SetUpdate(ProviderModel market, Action<object> update)
-        {
-        }
-
         public virtual void GetUpdate(ProviderModel market, Action<object> update)
         {
         }
@@ -59,10 +55,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             if (disposing)
             {
                 // TODO: dispose managed state (managed objects)
-                if (_process != null)
-                {
-                    _process.Dispose();
-                }
+                _process?.Dispose();
             }
 
             // TODO: free unmanaged resources (unmanaged objects) and override finalizer
@@ -130,59 +123,99 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
         }
 
-        internal void UpdateAccounts(ProviderModel market, IEnumerable<AccountModel> accounts, Action<object> update)
+        internal static void UpdateAccounts(ProviderModel market, IEnumerable<AccountModel> accounts, Action<object> update)
         {
             if (!Collection.SmartCopy(accounts, market.Accounts)) return;
-            if (update == default) return;
-            foreach (AccountModel account in accounts)
-            {
-                update(account);
-            }
+            update?.Invoke(accounts);
         }
 
         protected static void UpdateSymbols(
             ProviderModel market,
             IEnumerable<SymbolModel> actual,
-            bool addNew)
+            Action<object> update,
+            bool addSymbols = true)
         {
             Contract.Requires(market != null, nameof(market));
             Contract.Requires(actual != null, nameof(actual));
 
             // Collect list of obsolete symbols
-            Collection<SymbolModel> symbols = market.Symbols;
-            List<SymbolModel> discarded = symbols.ToList();
+            bool symbolsChanged = false;
+            bool listChanged = false;
+            List<SymbolModel> obsoleteSymbols = market.Symbols.ToList();
             foreach (SymbolModel item in actual)
             {
-                SymbolModel symbol = symbols.FirstOrDefault(x => x.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase)
+                // Add or update symbol
+                SymbolModel symbol = market.Symbols.FirstOrDefault(x => x.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase)
                     && (x.Market.Equals(item.Market, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(x.Market))
                     && (x.Security.Equals(item.Security) || x.Security.Equals(SecurityType.Base)));
-                if (symbol == default)
+                if (symbol == default )
                 {
-                    if (addNew)
+                    symbol = item;
+                    symbolsChanged = true;
+                    if (addSymbols)
                     {
-                        var symbolModel = new SymbolModel(item.Id, item.Market, item.Security)
-                        {
-                            Active = item.Active,
-                            Name = item.Name,
-                            Properties = item.Properties
-                        };
-                        symbols.Add(symbolModel);
+                        market.Symbols.Add(symbol);
                     }
                 }
-                else
+                else if (!symbol.Equals(item))
                 {
                     // Update properties
                     symbol.Name = item.Name;
                     symbol.Market = item.Market;
                     symbol.Security = item.Security;
                     symbol.Properties = item.Properties;
-                    discarded.Remove(symbol);
+                    symbolsChanged = true;
+                    obsoleteSymbols.Remove(symbol);
+                }
+                else
+                {
+                    obsoleteSymbols.Remove(symbol);
+                    symbol = item;
+                }
+
+                // Skip adding to list if not active
+                if (!symbol.Active) continue;
+
+                // Add symbol to list
+                string security = symbol.Security.ToString();
+                ListModel list = market.Lists.FirstOrDefault(m => m.Id != null && m.Id.Equals(security));
+                if (list == null)
+                {
+                    list = new ListModel(security);
+                    market.Lists.Add(list);
+                    listChanged = true;
+                }
+
+                if (!list.Symbols.Contains(symbol))
+                {
+                    list.Symbols.Add(item);
+                    listChanged = true;
                 }
             }
 
-            foreach (SymbolModel old in discarded)
+            // Remove discared symbols
+            foreach (SymbolModel old in obsoleteSymbols)
             {
-                symbols.Remove(old);
+                market.Symbols.Remove(old);
+                foreach (ListModel list in market.Lists)
+                {
+                    if (list.Symbols.Remove(old))
+                    {
+                        listChanged = true;
+                    }
+                }
+            }
+
+            // Update symbols
+            if (symbolsChanged)
+            {
+                update?.Invoke(market.Symbols);
+            }
+
+            // Update lists
+            if (listChanged)
+            {
+                update?.Invoke(market.Lists);
             }
         }
     }

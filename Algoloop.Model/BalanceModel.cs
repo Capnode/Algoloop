@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2021 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect.Securities;
 using System;
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -22,6 +23,15 @@ namespace Algoloop.Model
     [DataContract]
     public class BalanceModel : ModelBase
     {
+        public BalanceModel()
+        {
+        }
+
+        public BalanceModel(CashAmount cashAmount)
+        {
+            Currency = cashAmount.Currency;
+            Cash = cashAmount.Amount;
+        }
 
         [Category("Balance")]
         [DisplayName("Currency")]
@@ -65,7 +75,7 @@ namespace Algoloop.Model
 
         public override bool Equals(object obj)
         {
-            if (!(obj is BalanceModel other)) return false;
+            if (obj is not BalanceModel other) return false;
             if (Currency != other.Currency) return false;
             if (Cash != other.Cash) return false;
             if (Equity != other.Equity) return false;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -28,6 +28,12 @@ namespace Algoloop.Model
         {
         }
 
+        public ListModel(string name)
+        {
+            Id = name;
+            Name = name;
+        }
+
         public ListModel(IEnumerable<SymbolModel> symbols)
         {
             foreach (SymbolModel symbol in symbols)
@@ -55,14 +61,20 @@ namespace Algoloop.Model
         [DataMember]
         public Collection<SymbolModel> Symbols { get; } = new Collection<SymbolModel>();
 
+        public void Update(ListModel model)
+        {
+            if (Symbols.Equals(model.Symbols)) return;
+            Symbols.Clear();
+            foreach (SymbolModel symbol in model.Symbols)
+            {
+                Symbols.Add(symbol);
+            }
+        }
+
         public int CompareTo(object obj)
         {
             var a = obj as ListModel;
             return string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public void Refresh()
-        {
         }
     }
 }

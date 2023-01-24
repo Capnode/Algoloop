@@ -60,7 +60,7 @@ namespace Algoloop
     byte[] _symbol; // Symbol	A	12	14	Stock symbol
     byte _autorun; // AutoRun	A	52	1	ASCII ‘*’ for autorun
 
-    private string _root;
+    private readonly string _root;
 
     internal MsSecurity(string root)
     {
@@ -69,10 +69,9 @@ namespace Algoloop
 
     public int CompareTo(object obj)
     {
-      MsSecurity security = obj as MsSecurity;
-      if (security == null)
-        throw new ArgumentException("object is not a MsSecurity");
-      return Name.CompareTo(security.Name);
+        if (obj is not MsSecurity security)
+            throw new ArgumentException("object is not a MsSecurity");
+        return Name.CompareTo(security.Name);
     }
 
     internal long ReadHeader(BinaryReader br)
@@ -174,15 +173,15 @@ namespace Algoloop
 
     public List<MsPrice> GetPriceList()
     {
-      List<MsPrice> prices = new List<MsPrice>();
+      List<MsPrice> prices = new();
       string datFile = Filename + ".dat";
       if (File.Exists(datFile))
       {
-        FileStream fs = new FileStream(datFile, FileMode.Open, FileAccess.Read);
-        BinaryReader br = new BinaryReader(fs);
+        FileStream fs = new(datFile, FileMode.Open, FileAccess.Read);
+        BinaryReader br = new(fs);
         try
         {
-          MsPrice price = new MsPrice(Fields, null); // Header
+          MsPrice price = new(Fields, null); // Header
           long size = fs.Length;
           long pos = 0;
           pos += price.Read(br);

@@ -330,7 +330,7 @@ namespace Algoloop.ViewModel
             Direction = message.Direction.ToString();
         }
 
-        private DateTime ToValidUntil(Order order)
+        private static DateTime ToValidUntil(Order order)
         {
             if (order.TimeInForce is DayTimeInForce)
             {

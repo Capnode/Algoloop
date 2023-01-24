@@ -196,6 +196,11 @@ namespace Algoloop.ViewModel
                 BacktestManager.SetSlots(SettingsViewModel.Model.MaxBacktests);
 
                 // Set config
+                if (int.TryParse(SettingsViewModel.Model.ApiUser, out int apiUser))
+                {
+                    Config.Set("job-user-id", apiUser);
+                }
+                Config.Set("api-access-token", SettingsViewModel.Model.ApiToken);
                 Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
                 Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);

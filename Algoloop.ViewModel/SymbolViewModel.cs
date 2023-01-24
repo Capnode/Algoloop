@@ -204,8 +204,6 @@ namespace Algoloop.ViewModel
 
         public void Refresh()
         {
-            Model.Refresh();
-
             if (Market != null)
             {
                 DoLoadData(Market);

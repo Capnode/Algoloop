@@ -1,9 +1,8 @@
-﻿using Borsdata.Api.Dal.Infrastructure;
+using Borsdata.Api.Dal.Infrastructure;
 using Borsdata.Api.Dal.Model;
 using Newtonsoft.Json;
 using QuantConnect.Logging;
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -19,14 +18,11 @@ namespace Borsdata.Api.Dal
     {
         HttpClient _client;
         readonly string _authKey;                // Querystring authKey
-        readonly Stopwatch _timer;               // Check time from last Api call to check Ratelimit
         readonly string _urlRoot;
 
         public ApiClient(string apiKey)
         {
             _authKey = "?authKey="+ apiKey;
-
-            _timer = Stopwatch.StartNew();
             _urlRoot = "https://apiservice.borsdata.se/";
         }
 
@@ -462,24 +458,6 @@ namespace Borsdata.Api.Dal
             return response;
         }
 
-
-        /// <summary>
-        /// Ratelimit to API is 2 req/Sec.
-        /// Check if the time sice last API call is less than 500ms. 
-        /// Then sleep to avoid RateLimit 429.
-        /// </summary>
-        void SleepBeforeNewApiCall()
-        {
-            _timer.Stop();
-            if (_timer.ElapsedMilliseconds < 500)
-            {
-                int sleepms = 550 - (int)_timer.ElapsedMilliseconds; //Add 50 extra ms.
-                Log.Trace("Sleep Before New Api Call ms:" + sleepms);
-                System.Threading.Thread.Sleep(sleepms);
-            }
-            _timer.Restart();
-        }
-
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
@@ -502,7 +480,7 @@ namespace Borsdata.Api.Dal
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
             // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
         #endregion
 

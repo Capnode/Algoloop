@@ -36,5 +36,11 @@ namespace Algoloop.ViewModel
                 OnPropertyChanged();
             }
         }
+
+        internal void Update(AccountModel account)
+        {
+            Name = account.Name;
+            Model = account;
+        }
     }
 }

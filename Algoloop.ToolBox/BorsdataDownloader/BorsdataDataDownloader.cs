@@ -38,7 +38,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
         private const string Quarter = "Quarter";
         private const double Million = 1e6;
         private const int ReportDateLatest = 202;
-        private static readonly DateTime FirstDate = new DateTime(1997, 01, 01);
+        private static readonly DateTime FirstDate = new(1997, 01, 01);
 
         private KpisAllCompRespV1 _lastReports;
         private bool _isDisposed;
@@ -113,10 +113,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             if (_isDisposed) return;
             if (disposing)
             {
-                if (_api != null)
-                {
-                    _api.Dispose();
-                }
+                _api?.Dispose();
             }
 
             _isDisposed = true;
@@ -143,7 +140,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
 
         private static SymbolModel CreateSymbolModel(InstrumentV1 inst)
         {
-            if (string.IsNullOrWhiteSpace(inst.Yahoo) || inst.Yahoo.Contains(" ")) return null;
+            if (string.IsNullOrWhiteSpace(inst.Yahoo) || inst.Yahoo.Contains(' ')) return null;
 
             return new SymbolModel(inst.Yahoo, Market.Borsdata, SecurityType.Equity)
             {
@@ -183,7 +180,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             else
             {
                 // Remove reports after afterUtc
-                DirectoryInfo d = new DirectoryInfo(folder);
+                DirectoryInfo d = new(folder);
                 foreach (FileInfo zipFile in d.GetFiles("*.zip"))
                 {
                     string fileName = Path.GetFileNameWithoutExtension(zipFile.Name);
@@ -410,27 +407,23 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                 // Do not update some values
                 fine.FinancialStatements.PeriodType = null;
 
-                using (StreamReader resultStream = Compression.Unzip(zipPath, jsonFile, out ZipFile zFile))
+                using StreamReader resultStream = Compression.Unzip(zipPath, jsonFile, out ZipFile zFile);
+                Debug.Assert(resultStream != null);
+                Debug.Assert(zipFile != null);
+                using (zFile)
                 {
-                    Debug.Assert(resultStream != null);
-                    Debug.Assert(zipFile != null);
-                    using (zFile)
-                    {
-                        using (JsonReader reader = new JsonTextReader(resultStream))
-                        {
-                            JsonSerializer serializer = new JsonSerializer();
-                            FineFundamental updated = serializer.Deserialize<FineFundamental>(reader);
-                            Debug.Assert(updated != null);
-                            updated.CompanyProfile.UpdateValues(fine.CompanyProfile);
-                            updated.FinancialStatements.UpdateValues(fine.FinancialStatements);
-                            updated.OperationRatios.UpdateValues(fine.OperationRatios);
-                            updated.ValuationRatios.UpdateValues(fine.ValuationRatios);
-                            fine = updated;
-                        }
-                    }
-
-                    File.Delete(zipPath);
+                    using JsonReader reader = new JsonTextReader(resultStream);
+                    JsonSerializer serializer = new();
+                    FineFundamental updated = serializer.Deserialize<FineFundamental>(reader);
+                    Debug.Assert(updated != null);
+                    updated.CompanyProfile.UpdateValues(fine.CompanyProfile);
+                    updated.FinancialStatements.UpdateValues(fine.FinancialStatements);
+                    updated.OperationRatios.UpdateValues(fine.OperationRatios);
+                    updated.ValuationRatios.UpdateValues(fine.ValuationRatios);
+                    fine = updated;
                 }
+
+                File.Delete(zipPath);
             }
 
             // Skip if Quarter report only
@@ -465,11 +458,11 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                 if (_splits.stockSplitList.Any(m => m.InstrumentId.Equals(instId) && m.SplitDate > afterUtc))
                 {
                     File.Delete(zipPath);
-                    stockPrices = GetStockPrices(instId, symbol, FirstDate, endUtc);
+                    stockPrices = GetStockPrices(instId, FirstDate, endUtc);
                 }
                 else
                 {
-                    stockPrices = GetStockPrices(instId, symbol, fromDate, endUtc);
+                    stockPrices = GetStockPrices(instId, fromDate, endUtc);
                     if (stockPrices.StockPricesList.Count == 0)
                     {
                         Log.Trace($"{GetType().Name}: Prices not found: {symbol} {fromDate:d} to {endUtc:d}");
@@ -479,13 +472,13 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             }
             else
             {
-                stockPrices = GetStockPrices(instId, symbol, FirstDate, endUtc);
+                stockPrices = GetStockPrices(instId, FirstDate, endUtc);
             }
 
             return ToTradeBars(symbol, stockPrices);
         }
 
-        private StockPricesRespV1 GetStockPrices(long instId, Symbol symbol, DateTime fromDate, DateTime toDate)
+        private StockPricesRespV1 GetStockPrices(long instId, DateTime fromDate, DateTime toDate)
         {
             //Log.Trace("{0}: Download prices {1} {2} {3}",
             //    GetType().Name,

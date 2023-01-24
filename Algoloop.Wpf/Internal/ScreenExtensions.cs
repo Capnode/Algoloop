@@ -32,8 +32,7 @@ internal static class ScreenExtensions
     public static double GetScalingForPoint(System.Drawing.Point aPoint)
     {
         var mon = MonitorFromPoint(aPoint, 2/*MONITOR_DEFAULTTONEAREST*/);
-        uint dpiX, dpiY;
-        GetDpiForMonitor(mon, DpiType.Effective, out dpiX, out dpiY);
+        GetDpiForMonitor(mon, DpiType.Effective, out uint dpiX, out uint _);
         return (double)dpiX / 96.0;
     }
 
@@ -64,7 +63,7 @@ internal static class ScreenExtensions
 
     public static WINDOWPLACEMENT GetPlacement(IntPtr hWnd)
     {
-        WINDOWPLACEMENT placement = new WINDOWPLACEMENT();
+        WINDOWPLACEMENT placement = new();
         placement.length = Marshal.SizeOf(placement);
         GetWindowPlacement(hWnd, ref placement);
         return placement;

@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect;
 using System;
 using System.Runtime.Serialization;
 
@@ -21,6 +22,16 @@ namespace Algoloop.Model
     {
         public PositionModel()
         {
+        }
+
+        public PositionModel(Holding holding)
+        {
+            Symbol = new SymbolModel(holding.Symbol);
+            Quantity= holding.Quantity;
+            AveragePrice= holding.AveragePrice;
+            MarketPrice= holding.MarketPrice;
+            PriceCurrency = holding.CurrencySymbol;
+            MarketValue= holding.MarketValue;
         }
 
         /// <summary>

@@ -132,10 +132,7 @@ namespace Algoloop.ViewModel
             if (disposing)
             {
                 // Dispose managed state (managed objects).
-                if (_process != null)
-                {
-                    _process.Dispose();
-                }
+                _process?.Dispose();
             }
 
             _disposed = true;
@@ -250,14 +247,14 @@ namespace Algoloop.ViewModel
             foreach (string filename in _exeFiles)
             {
                 // Copy file if newer
-                FileInfo sourceFile = new FileInfo(Path.Combine(exeFolder, filename));
+                FileInfo sourceFile = new(Path.Combine(exeFolder, filename));
                 if (!sourceFile.Exists)
                 {
                     Log.Error($"{MethodBase.GetCurrentMethod()!.DeclaringType!.FullName}.{MethodBase.GetCurrentMethod()!.Name}: {filename} does not exist");
                     continue;
                 }
 
-                FileInfo destFile = new FileInfo(Path.Combine(notebookFolder, filename));
+                FileInfo destFile = new(Path.Combine(notebookFolder, filename));
                 if (sourceFile.LastWriteTime > destFile.LastWriteTime)
                 {
                     File.Copy(sourceFile.FullName, destFile.FullName, true);

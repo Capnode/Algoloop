@@ -24,12 +24,16 @@ namespace Algoloop.Model
     [DataContract]
     public class SymbolModel : ModelBase, IComparable
     {
+        private IDictionary<string, object> _properties;
+        private Symbol _symbol;
+
         public SymbolModel()
         {
         }
 
         public SymbolModel(Symbol symbol)
         {
+            _symbol = symbol;
             Id = symbol.ID.Symbol;
             Name = symbol.ID.Symbol;
             Market = symbol.ID.Market;
@@ -80,7 +84,27 @@ namespace Algoloop.Model
         public SecurityType Security { get; set; }
 
         [DataMember]
-        public IDictionary<string, object> Properties { get; set; }
+        public IDictionary<string, object> Properties
+        {
+            get
+            {
+                if (_properties != default) return _properties;
+                _properties = new Dictionary<string, object>();
+                return _properties;
+            }
+
+            set => _properties = value;
+        }
+
+        public Symbol LeanSymbol
+        {
+            get
+            {
+                if (_symbol != default) return _symbol;
+                _symbol = Symbol.Create(Name, Security, Market);
+                return _symbol;
+            }
+        }
 
         /// <summary>
         /// Make sure property Id is valid
@@ -92,10 +116,6 @@ namespace Algoloop.Model
                 Id = Name;
                 Debug.Assert(!string.IsNullOrEmpty(Id));
             }
-        }
-
-        public void Refresh()
-        {
         }
 
         public void Update(SymbolModel model)
@@ -129,7 +149,15 @@ namespace Algoloop.Model
 
         public override bool Equals(object obj)
         {
-            if (!(obj is SymbolModel other)) return false;
+            if (obj is Symbol symbol)
+            {
+                if (Name != symbol.ID.Symbol) return false;
+                if (Market != symbol.ID.Market) return false;
+                if (Security != symbol.ID.SecurityType) return false;
+                return true;
+            }
+
+            if (obj is not SymbolModel other) return false;
             if (Id != other.Id) return false;
             if (Active != other.Active) return false;
             if (Name != other.Name) return false;

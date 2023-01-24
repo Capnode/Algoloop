@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -13,6 +13,7 @@
  */
 
 using QuantConnect.Orders;
+using QuantConnect.Orders.TimeInForces;
 using System;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
@@ -23,6 +24,33 @@ namespace Algoloop.Model
     {
         public OrderModel()
         {
+        }
+
+        public OrderModel(Order order)
+        {
+            Id = order.Id;
+            ContingentId = order.ContingentId;
+            Symbol = order.Symbol.Value;
+            BrokerId = new Collection<string>(order.BrokerId);
+            Symbol = order.Symbol.Value;
+            Price = order.Price;
+            LimitPrice = (order as LimitOrder)?.LimitPrice ?? 0;
+            PriceCurrency = order.PriceCurrency;
+            Time = order.Time.ToLocalTime();
+            LastFillTime = order.LastFillTime?.ToLocalTime();
+            LastUpdateTime = order.LastUpdateTime?.ToLocalTime();
+            CanceledTime = order.CanceledTime?.ToLocalTime();
+            Quantity = order.Quantity;
+            Type = order.Type;
+            Status = order.Status;
+            ValidUntil = ToValidUntil(order).ToLocalTime();
+            Tag = order.Tag;
+            Properties = (OrderProperties)order.Properties;
+            SecurityType = order.SecurityType.ToString();
+            Direction = order.Direction.ToString();
+            OrderValue = order.Value;
+            OrderSubmissionData = order.OrderSubmissionData;
+            IsMarketable = order.IsMarketable;
         }
 
         [DataMember]
@@ -154,5 +182,23 @@ namespace Algoloop.Model
         /// </summary>
         [DataMember]
         public bool IsMarketable { get; set; }
+
+        private static DateTime ToValidUntil(Order order)
+        {
+            if (order.TimeInForce is DayTimeInForce)
+            {
+                //TODO: Fix also for next day orders
+                return order.Time.Date.AddDays(1).AddTicks(-1);
+            }
+            else if (order.TimeInForce is GoodTilCanceledTimeInForce)
+            {
+                return DateTime.MaxValue;
+            }
+            else if (order.TimeInForce is GoodTilDateTimeInForce date)
+            {
+                return date.Expiry;
+            }
+            return DateTime.MinValue;
+        }
     }
 }

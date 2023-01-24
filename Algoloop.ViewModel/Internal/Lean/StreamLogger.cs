@@ -20,7 +20,7 @@ namespace Algoloop.ViewModel.Internal.Lean
 {
     internal class StreamLogger : TextWriter
     {
-        private readonly StringBuilder _sb = new StringBuilder();
+        private readonly StringBuilder _sb = new();
         private readonly ILogHandler _logger;
 
         public StreamLogger(ILogHandler logger)

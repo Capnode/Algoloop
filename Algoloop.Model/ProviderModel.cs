@@ -34,7 +34,6 @@ namespace Algoloop.Model
     public class ProviderModel : ModelBase
     {
         [NonSerialized]
-        public Action ModelChanged;
         private string _provider;
 
         public enum AccessType { Demo, Real };
@@ -114,6 +113,14 @@ namespace Algoloop.Model
         [DataMember]
         public string ApiKey { get; set; } = string.Empty;
 
+        [Category("Account")]
+        [DisplayName("Account id")]
+        [Description("User account number/identifier.")]
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public string AccountId { get; set; } = string.Empty;
+
         [Category("Time")]
         [DisplayName("Update")]
         [Description("Account is updated up to this time.")]
@@ -164,6 +171,7 @@ namespace Algoloop.Model
             bool login = false;
             bool password = false;
             bool apiKey = false;
+            bool accountId = false;
             bool sourceFolder = false;
 
             switch (Provider.ToLowerInvariant())
@@ -171,6 +179,11 @@ namespace Algoloop.Model
                 case Market.FXCM:
                     access = true;
                     apiKey = true;
+                    break;
+                case Market.Oanda:
+                    access = true;
+                    apiKey = true;
+                    accountId = true;
                     break;
                 case Market.Metastock:
                     sourceFolder = true;
@@ -180,11 +193,12 @@ namespace Algoloop.Model
                     break;
             }
 
-            SetBrowsable("Access", access);
-            SetBrowsable("Login", login);
-            SetBrowsable("Password", password);
-            SetBrowsable("ApiKey", apiKey);
-            SetBrowsable("SourceFolder", sourceFolder);
+            SetBrowsable(nameof(Access), access);
+            SetBrowsable(nameof(Login), login);
+            SetBrowsable(nameof(Password), password);
+            SetBrowsable(nameof(ApiKey), apiKey);
+            SetBrowsable(nameof(AccountId), accountId);
+            SetBrowsable(nameof(SourceFolder), sourceFolder);
         }
 
         public void UpdateAccounts(IEnumerable<AccountModel> accounts)
@@ -211,12 +225,6 @@ namespace Algoloop.Model
         internal void AddList(ListModel list)
         {
             Lists.Add(list);
-            ModelChanged?.Invoke();
-        }
-
-        internal static IEnumerable<SymbolModel> GetActiveSymbols(ListModel list)
-        {
-            return list.Symbols.Where(m => m.Active);
         }
     }
 }

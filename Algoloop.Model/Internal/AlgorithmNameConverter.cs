@@ -43,13 +43,13 @@ namespace Algoloop.Model.Internal
             string path = MainService.FullExePath(model?.AlgorithmLocation);
             return model.AlgorithmLanguage switch
             {
-                Language.CSharp or Language.FSharp or Language.VisualBasic => ClrAlgorithm(path, model.AlgorithmName),
-                Language.Python => PythonAlgorithm(model?.AlgorithmFolder, model.AlgorithmName),
+                Language.CSharp or Language.FSharp or Language.VisualBasic => ClrAlgorithm(path),
+                Language.Python => PythonAlgorithm(model?.AlgorithmFolder),
                 _ => new StandardValuesCollection(new List<string>()),
             };
         }
 
-        private static StandardValuesCollection ClrAlgorithm(string path, string name)
+        private static StandardValuesCollection ClrAlgorithm(string path)
         {
             List<string> list = new();
             if (!string.IsNullOrEmpty(path))
@@ -77,7 +77,7 @@ namespace Algoloop.Model.Internal
             return new StandardValuesCollection(list);
         }
 
-        private static StandardValuesCollection PythonAlgorithm(string folder, string name)
+        private static StandardValuesCollection PythonAlgorithm(string folder)
         {
             List<string> list = new();
             if (!string.IsNullOrEmpty(folder))

@@ -41,10 +41,8 @@ namespace Algoloop.ViewModel.Internal.Provider
             using (var client = new HttpClient())
             {
                 HttpResponseMessage response = client.GetAsync(uri).Result;
-                using (var fs = new FileStream(filename, FileMode.CreateNew))
-                {
-                    response.Content.CopyToAsync(fs).Wait();
-                }
+                using var fs = new FileStream(filename, FileMode.CreateNew);
+                response.Content.CopyToAsync(fs).Wait();
             }
 
             Log.Trace($"Unpack {uri}");
@@ -79,7 +77,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             File.Delete(filename);
 
             // Update symbol list
-            UpdateSymbols(provider, symbols, true);
+            UpdateSymbols(provider, symbols, update);
 
             Log.Trace($"Unpack {uri} completed");
             provider.Active = false;

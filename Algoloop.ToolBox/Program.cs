@@ -22,6 +22,7 @@ using McMaster.Extensions.CommandLineUtils;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
+using QuantConnect.ToolBox.OandaDownloader;
 using QuantConnect.Util;
 
 namespace Algoloop.ToolBox
@@ -33,8 +34,8 @@ namespace Algoloop.ToolBox
         private const string ApplicationHelpText = "\nThe ToolBox is a wrapper of market download tools. "
                                                    + "Each require a different set of parameters. Example: --app=YahooDownloader --tickers="
                                                    + "SPY,AAPL --resolution=Daily --from-date=yyyyMMdd-HH:mm:ss --to-date=yyyyMMdd-HH:mm:ss";
-        private static readonly List<CommandLineOption> Options = new List<CommandLineOption>
-            {
+        private static readonly List<CommandLineOption> Options = new()
+        {
                 new CommandLineOption("app", CommandOptionType.SingleValue,
                                                      "[REQUIRED] Target tool, CASE INSENSITIVE: GDAXDownloader or GDAXDL/CryptoiqDownloader or CDL"
                                                      + "/DukascopyDownloader or DDL/IEXDownloader or IEXDL"
@@ -106,13 +107,14 @@ namespace Algoloop.ToolBox
                     : DateTime.UtcNow;
                 switch (targetApp)
                 {
-                    case "bddl":
                     case "borsdatadownloader":
                         BorsdataDownloaderProgram.BorsdataDownloader(tickers, fromDate, toDate, GetParameterOrExit(optionsObject, "api-key"));
                         break;
-                    case "ddl":
                     case "dukascopydownloader":
                         DukascopyDownloaderProgram.DukascopyDownloader(tickers, resolution, fromDate, toDate);
+                        break;
+                    case "oandadownloader":
+                        OandaDownloaderProgram.OandaDownloader(tickers, resolution, fromDate, toDate);
                         break;
                 }
             }

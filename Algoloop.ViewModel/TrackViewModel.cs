@@ -729,7 +729,7 @@ namespace Algoloop.ViewModel
             string name,
             string text)
         {
-            if (text.Contains("$") && decimal.TryParse(
+            if (text.Contains('$') && decimal.TryParse(
                 text.Replace("$", ""),
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
@@ -737,7 +737,7 @@ namespace Algoloop.ViewModel
             {
                 name += "$";
             }
-            else if (text.Contains("%") && decimal.TryParse(
+            else if (text.Contains('%') && decimal.TryParse(
                 text.Replace("%", ""),
                 NumberStyles.Any,
                 CultureInfo.InvariantCulture,
@@ -762,7 +762,7 @@ namespace Algoloop.ViewModel
             statistics.Add(name, value);
         }
 
-        private void SplitModelToFiles(TrackModel model)
+        private static void SplitModelToFiles(TrackModel model)
         {
             if (model.Result == null) return;
 
@@ -782,7 +782,7 @@ namespace Algoloop.ViewModel
                     { ResultFile, model.Result }
                 });
 
-                model.ZipFile = zipFile.Substring(programDataFolder.Length + 1);
+                model.ZipFile = zipFile[(programDataFolder.Length + 1)..];
             }
 
             // Process results

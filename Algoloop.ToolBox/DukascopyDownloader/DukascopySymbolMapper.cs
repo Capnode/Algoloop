@@ -40,7 +40,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// The list of mappings from Dukascopy symbols to Lean symbols.
         /// </summary>
         /// <remarks>T1 is Dukascopy symbol, T2 is Lean symbol, T3 is point value (used by downloader)</remarks>
-        private static readonly TupleList<string, string, int> DukascopySymbolMappings = new TupleList<string, string, int>
+        private static readonly TupleList<string, string, int> DukascopySymbolMappings = new()
         {
             { "AUDCAD", "AUDCAD", 100000 },
             { "AUDCHF", "AUDCHF", 100000 },
@@ -128,14 +128,14 @@ namespace Algoloop.ToolBox.DukascopyDownloader
             { "ZARJPY", "ZARJPY", 100000 }
         };
 
-        private static readonly Dictionary<string, string> MapDukascopyToLean = new Dictionary<string, string>();
-        private static readonly Dictionary<string, string> MapLeanToDukascopy = new Dictionary<string, string>();
-        private static readonly Dictionary<string, int> PointValues = new Dictionary<string, int>();
+        private static readonly Dictionary<string, string> MapDukascopyToLean = new();
+        private static readonly Dictionary<string, string> MapLeanToDukascopy = new();
+        private static readonly Dictionary<string, int> PointValues = new();
 
         /// <summary>
         /// The list of known Dukascopy currencies.
         /// </summary>
-        private static readonly HashSet<string> KnownCurrencies = new HashSet<string>
+        private static readonly HashSet<string> KnownCurrencies = new()
         {
             "AUD", "BRL", "CAD", "CHF", "CNH", "DKK", "EUR", "GBP", "HKD", "HUF", "JPY", "MXN", "NOK", "NZD", "PLN", "RUB", "SEK", "SGD", "TRY", "USD", "ZAR"
         };
@@ -184,7 +184,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// <param name="strike">The strike of the security (if applicable)</param>
         /// <param name="optionRight">The option right of the security (if applicable)</param>
         /// <returns>A new Lean Symbol instance</returns>
-        public Symbol GetLeanSymbol(string brokerageSymbol, SecurityType securityType, string market, DateTime expirationDate = default(DateTime), decimal strike = 0, OptionRight optionRight = 0)
+        public Symbol GetLeanSymbol(string brokerageSymbol, SecurityType securityType, string market, DateTime expirationDate = default, decimal strike = 0, OptionRight optionRight = 0)
         {
             if (string.IsNullOrWhiteSpace(brokerageSymbol))
                 throw new ArgumentException("Invalid Dukascopy symbol: " + brokerageSymbol);
@@ -206,9 +206,9 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         /// <param name="brokerageSymbol">The Dukascopy symbol</param>
         /// <returns>The security type</returns>
-        public SecurityType GetBrokerageSecurityType(string brokerageSymbol)
+        public static SecurityType GetBrokerageSecurityType(string brokerageSymbol)
         {
-            return (brokerageSymbol.Length == 6 && KnownCurrencies.Contains(brokerageSymbol.Substring(0, 3)) && KnownCurrencies.Contains(brokerageSymbol.Substring(3, 3)))
+            return (brokerageSymbol.Length == 6 && KnownCurrencies.Contains(brokerageSymbol[..3]) && KnownCurrencies.Contains(brokerageSymbol.Substring(3, 3)))
                 ? SecurityType.Forex
                 : SecurityType.Cfd;
         }
@@ -218,10 +218,9 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         /// <param name="leanSymbol">The Lean symbol</param>
         /// <returns>The security type</returns>
-        public SecurityType GetLeanSecurityType(string leanSymbol)
+        public static SecurityType GetLeanSecurityType(string leanSymbol)
         {
-            string dukascopySymbol;
-            if (!MapLeanToDukascopy.TryGetValue(leanSymbol, out dukascopySymbol))
+            if (!MapLeanToDukascopy.TryGetValue(leanSymbol, out string dukascopySymbol))
                 throw new ArgumentException("Unknown Lean symbol: " + leanSymbol);
 
             return GetBrokerageSecurityType(dukascopySymbol);
@@ -232,7 +231,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         /// <param name="brokerageSymbol">The Dukascopy symbol</param>
         /// <returns>True if Dukascopy supports the symbol</returns>
-        public bool IsKnownBrokerageSymbol(string brokerageSymbol)
+        public static bool IsKnownBrokerageSymbol(string brokerageSymbol)
         {
             return brokerageSymbol != null && MapDukascopyToLean.ContainsKey(brokerageSymbol);
         }
@@ -242,7 +241,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         /// <param name="symbol">The Lean symbol</param>
         /// <returns>True if Dukascopy supports the symbol</returns>
-        public bool IsKnownLeanSymbol(Symbol symbol)
+        public static bool IsKnownLeanSymbol(Symbol symbol)
         {
             if (symbol == null || string.IsNullOrWhiteSpace(symbol.Value))
                 return false;
@@ -255,7 +254,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// <summary>
         /// Returns the point value for a Lean symbol
         /// </summary>
-        public int GetPointValue(Symbol symbol)
+        public static int GetPointValue(Symbol symbol)
         {
             return PointValues[symbol.Value];
         }
@@ -265,8 +264,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         private static string ConvertDukascopySymbolToLeanSymbol(string dukascopySymbol)
         {
-            string leanSymbol;
-            return MapDukascopyToLean.TryGetValue(dukascopySymbol, out leanSymbol) ? leanSymbol : string.Empty;
+            return MapDukascopyToLean.TryGetValue(dukascopySymbol, out string leanSymbol) ? leanSymbol : string.Empty;
         }
 
         /// <summary>
@@ -274,8 +272,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// </summary>
         private static string ConvertLeanSymbolToDukascopySymbol(string leanSymbol)
         {
-            string dukascopySymbol;
-            return MapLeanToDukascopy.TryGetValue(leanSymbol, out dukascopySymbol) ? dukascopySymbol : string.Empty;
+            return MapLeanToDukascopy.TryGetValue(leanSymbol, out string dukascopySymbol) ? dukascopySymbol : string.Empty;
         }
 
     }

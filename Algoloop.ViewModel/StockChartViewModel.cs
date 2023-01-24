@@ -45,7 +45,7 @@ namespace Algoloop.ViewModel
 
         public int CompareTo(object obj)
         {
-            if (!(obj is IChartViewModel other)) return 0;
+            if (obj is not IChartViewModel other) return 0;
             if (string.IsNullOrWhiteSpace(Title)) return 0;
             if (string.IsNullOrWhiteSpace(other.Title)) return 0;
             bool thisUpper = Title == Title.ToUpperInvariant();

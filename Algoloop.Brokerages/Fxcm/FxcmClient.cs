@@ -54,7 +54,7 @@ namespace Algoloop.Brokerages.Fxcm
         private const string Subscribe = @"subscribe";
         private const string Unsubscribe = @"unsubscribe";
         private const string ContentType = "application/x-www-form-urlencoded";
-        private string[] _tables = { "Offer", "OpenPosition", "ClosedPosition", "Order", "Account", "Summary" };
+        private readonly string[] _tables = { "Offer", "OpenPosition", "ClosedPosition", "Order", "Account", "Summary" };
 
         private bool _isDisposed;
         private string _baseCurrency;
@@ -233,7 +233,6 @@ namespace Algoloop.Brokerages.Fxcm
                     Name = name,
                     Market = Market.FXCM,
                     Security = Support.ToSecurityType(0),
-                    Properties = new Dictionary<string, object>()
                 };
 
                 symbols.Add(symbol);
@@ -357,7 +356,7 @@ namespace Algoloop.Brokerages.Fxcm
             }
         }
 
-        private SymbolModel ToSymbolModel(JToken token)
+        private static SymbolModel ToSymbolModel(JToken token)
         {
             string ticker = token["currency"].ToString();
             if (string.IsNullOrWhiteSpace(ticker)) return null;
@@ -375,7 +374,8 @@ namespace Algoloop.Brokerages.Fxcm
             };
             return symbol;
         }
-        private QuoteBar ToQuoteBar(JToken token)
+
+        private static QuoteBar ToQuoteBar(JToken token)
         {
             string ticker = token["currency"].ToString();
             if (string.IsNullOrWhiteSpace(ticker)) return null;

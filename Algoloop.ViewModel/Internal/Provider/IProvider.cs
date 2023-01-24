@@ -21,7 +21,6 @@ namespace Algoloop.ViewModel.Internal.Provider
     {
         void Login(ProviderModel provider);
         void Logout();
-        void SetUpdate(ProviderModel provider, Action<object> update);
         void GetUpdate(ProviderModel provider, Action<object> update);
     }
 }

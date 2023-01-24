@@ -21,7 +21,7 @@ namespace Algoloop.Brokerages.Fxcm.Internal
 {
     internal static class Support
     {
-        private static readonly DateTime _epochTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        private static readonly DateTime _epochTime = new(1970, 1, 1, 0, 0, 0, 0);
 
         public static SecurityType ToSecurityType(string symbol)
         {
@@ -31,19 +31,19 @@ namespace Algoloop.Brokerages.Fxcm.Internal
 
         public static SecurityType ToSecurityType(int number)
         {
-            switch (number)
+            return number switch
             {
-                case 1: return SecurityType.Forex; // Forex
-                case 2: return SecurityType.Cfd; // Indices
-                case 3: return SecurityType.Cfd; // Commodity
-                case 4: return SecurityType.Cfd; // Treasury
-                case 5: return SecurityType.Cfd; // Bullion
-                case 6: return SecurityType.Cfd; // Shares
-                case 7: return SecurityType.Forex; // FX index
-                case 8: return SecurityType.Cfd; // Shares
-                case 9: return SecurityType.Forex; // FX index
-                default: return SecurityType.Base; // Undefined
-            }
+                1 => SecurityType.Forex,// Forex
+                2 => SecurityType.Cfd,// Indices
+                3 => SecurityType.Cfd,// Commodity
+                4 => SecurityType.Cfd,// Treasury
+                5 => SecurityType.Cfd,// Bullion
+                6 => SecurityType.Cfd,// Shares
+                7 => SecurityType.Forex,// FX index
+                8 => SecurityType.Cfd,// Shares
+                9 => SecurityType.Forex,// FX index
+                _ => SecurityType.Base,// Undefined
+            };
         }
 
         public static DateTime ToTime(string time)

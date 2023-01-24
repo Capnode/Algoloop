@@ -27,7 +27,7 @@ namespace Algoloop.Model.Internal
         {
             if (propertyItem == null) throw new ArgumentNullException(nameof(propertyItem));
 
-            DateTimePicker picker = new DateTimePicker
+            DateTimePicker picker = new()
             {
                 Format = DateTimeFormat.ShortDate,
                 HorizontalAlignment = HorizontalAlignment.Left,

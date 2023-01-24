@@ -31,10 +31,10 @@ namespace Algoloop.ViewModel.Internal.Provider
             if (!market.Resolution.Equals(Resolution.Daily)) throw new ArgumentException(nameof(market.Resolution));
 
             // Update symbol list
+            bool addSymbols = market.Symbols.Count != 1;
             using var downloader = new BorsdataDataDownloader(market.ApiKey);
             IEnumerable<SymbolModel> actual = downloader.GetInstruments();
-            bool addNew = market.Symbols.Count != 1; // For test
-            UpdateSymbols(market, actual, addNew);
+            UpdateSymbols(market, actual, update, addSymbols);
 
             // Setup download parameters
             IList<string> symbols = market.Symbols.Select(m => m.Id).ToList();

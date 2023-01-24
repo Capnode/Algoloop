@@ -50,7 +50,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
             if (!symbols.Any())
             {
-                UpdateSymbols(market);
+                UpdateSymbols(market, update);
                 market.Active = false;
                 return;
             }
@@ -89,10 +89,10 @@ namespace Algoloop.ViewModel.Internal.Provider
                 market.LastDate = toDate.ToLocalTime();
             }
 
-            UpdateSymbols(market);
+            UpdateSymbols(market, update);
         }
 
-        private void UpdateSymbols(ProviderModel market)
+        private void UpdateSymbols(ProviderModel market, Action<object> update)
         {
             var all = new List<SymbolModel>();
             all.AddRange(_majors.Select(m => new SymbolModel(m, Market.Dukascopy, SecurityType.Forex) { Active = false, Properties = new Dictionary<string, object> { { "Category", "Majors" } } }));
@@ -103,7 +103,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             // Exclude unknown symbols
             var downloader = new DukascopyDataDownloader();
             IEnumerable<SymbolModel> actual = all.Where(m => downloader.HasSymbol(m.Id));
-            UpdateSymbols(market, actual, true);
+            UpdateSymbols(market, actual, update);
         }
     }
 }

@@ -61,11 +61,15 @@ namespace Algoloop.ViewModel
 
             DataToModel();
             SaveFile(fileName);
-            File.Move(tempFile, backupFile, true);
+            if (File.Exists(tempFile))
+            {
+                File.Move(tempFile, backupFile, true);
+            }
         }
 
         private bool ReadFile(string fileName)
         {
+            if (!File.Exists(fileName)) return false;
             try
             {
                 Log.Trace($"Reading {fileName}");
