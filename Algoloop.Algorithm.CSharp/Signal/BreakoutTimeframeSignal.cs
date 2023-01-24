@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -69,9 +69,8 @@ namespace Algoloop.Algorithm.CSharp.Model
             Dispose(false);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (!evaluate) return 0;
             return _score;
         }
 

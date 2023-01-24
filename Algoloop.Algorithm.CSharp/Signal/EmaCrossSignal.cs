@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
@@ -23,13 +22,12 @@ namespace Algoloop.Algorithm.CSharp.Model
     {
         private readonly ExponentialMovingAverage _fastEma;
         private readonly ExponentialMovingAverage _slowEma;
-        private readonly QCAlgorithm _algorithm;
         private readonly int _fastPeriod;
         private readonly int _slowPeriod;
 
-        public EmaCrossSignal(QCAlgorithm algorithm, Symbol symbol, Resolution resolution, int fastPeriod, int slowPeriod)
+        public EmaCrossSignal(QCAlgorithm algorithm, int fastPeriod, int slowPeriod)
         {
-            _algorithm = algorithm;
+            _ = algorithm;
             _fastPeriod = fastPeriod;
             _slowPeriod = slowPeriod;
             if (fastPeriod > 0)
@@ -42,15 +40,13 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             decimal close = bar.Price;
 //            string action = evaluate ? "Evaluate" : "Update";
 //            _algorithm.Log($"{action} {bar.Time:d} {close}");
             _fastEma.Update(bar.Time, close);
             _slowEma.Update(bar.Time, close);
-
-            if (!evaluate) return 0;
             if (_fastEma == null && _slowEma == null) return float.NaN;
             if (_fastEma == null || _slowEma == null) return 0;
             if (_fastPeriod >= _slowPeriod) return 0;

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -34,20 +34,17 @@ namespace Algoloop.Algorithm.CSharp.Model
             _lowerLine = algorithm.MIN(symbol, period, resolution, Field.High);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             if (!_upperLine.IsReady) return 0;
             if (!_lowerLine.IsReady) return 0;
             float score = 0;
             float close = (float)(decimal)_close;
 
-            if (evaluate)
+            if (0 < _lower && _lower < _upper && _upper < close)
             {
-                if (0 < _lower && _lower < _upper && _upper < close)
-                {
-                    float spread = _upper - _lower;
-                    score = close / spread;
-                }
+                float spread = _upper - _lower;
+                score = close / spread;
             }
 
             _upper = (float)(decimal)_upperLine;

@@ -20,22 +20,13 @@ namespace Algoloop.Algorithm.CSharp
 {
     internal class VolumeSpreadSignal : ISignal
     {
-        private readonly QCAlgorithm _algorithm;
-
-        public VolumeSpreadSignal(QCAlgorithm algorithm, int period)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            _algorithm = algorithm;
-        }
-
-        public float Update(BaseData bar, bool evaluate)
-        {
-            if (!(bar is TradeBar tradeBar)) return 0;
+            if (bar is not TradeBar tradeBar) return 0;
             if (tradeBar.Volume == 0) return 0;
             decimal spread = tradeBar.High - tradeBar.Low;
             decimal vsa = spread / tradeBar.Volume;
-            _algorithm.Plot($"{bar.Symbol.ID.Symbol} VSA", vsa);
-
-            if (!evaluate) return 0;
+            algorithm.Plot($"{bar.Symbol.ID.Symbol} VSA", vsa);
             return 1;
         }
 

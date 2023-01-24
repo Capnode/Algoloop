@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
 using System;
@@ -30,7 +31,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             _std = new StandardDeviation(period - 1);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             decimal close = bar.Price;
             _roc.Update(bar.Time, close);
@@ -42,7 +43,6 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
 
             _last = close;
-            if (!evaluate) return 0;
             if (!_roc.IsReady) return 0;
             if (!_std.IsReady) return 0;
             //                    Algorithm.Log($"{Algorithm.Time:yyyyMMdd} {bar.Symbol.Value} {FineFundamental.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths:0} {FineFundamental.OperationRatios.RevenueGrowth.OneYear:0.####}");

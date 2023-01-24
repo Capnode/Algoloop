@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
 
@@ -26,11 +27,10 @@ namespace Algoloop.Algorithm.CSharp
             _roc = new RateOfChange(period);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             decimal close = bar.Price;
             _roc.Update(bar.Time, close);
-            if (!evaluate) return 0;
             if (!_roc.IsReady) return 0;
             float roc = (float)(decimal)_roc;
             return roc;

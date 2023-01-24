@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,26 +12,25 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
-using System;
 
 namespace Algoloop.Algorithm.CSharp.Model
 {
     public class LinearSignal : ISignal
     {
-        private RollingWindow<float> _win;
+        private readonly RollingWindow<float> _win;
 
         public LinearSignal(int period)
         {
             _win = new RollingWindow<float>(period);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             decimal close = bar.Price;
             _win.Add((float)close);
-            if (!evaluate) return 0;
             if (!_win.IsReady) return 0;
             int count = _win.Count - 1;
             float init = _win[count];

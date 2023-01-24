@@ -28,10 +28,9 @@ namespace Algoloop.Algorithm.CSharp.Model
             _aroon = algorithm.AROON(symbol, period, resolution);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             if (!_aroon.IsReady) return 0;
-            if (!evaluate) return 0;
             return decimal.Compare(_aroon.AroonUp, _aroon.AroonDown);
         }
 

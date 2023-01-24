@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -22,6 +22,7 @@ namespace Algoloop.Algorithm.CSharp.Model
     public class SmaSignal : ISignal
     {
         private readonly SimpleMovingAverage _sma;
+        private DateTime _time;
 
         public SmaSignal(QCAlgorithm algorithm, Symbol symbol, Resolution resolution, int period)
         {
@@ -31,9 +32,11 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (!evaluate) return 0;
+//            algorithm.Log($"{bar.Time:d} {bar.Price}");
+            if (bar.Time <= _time) throw new ApplicationException("Duplicate bars");
+            _time = bar.Time;
             if (_sma == null) return float.NaN;
             if (!_sma.IsReady) return 0;
             return decimal.Compare(bar.Price, _sma);

@@ -17,25 +17,24 @@ using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp.Model
 {
     public class TrendSignal : ISignal
     {
+#pragma warning disable IDE0052 // Remove unread private members
         private readonly Minimum _min;
         private readonly ExponentialMovingAverage _ema1;
         private readonly Momentum _mom;
         private readonly Trix _trix;
         private readonly PivotPointsHighLow _pphl;
-        private readonly QCAlgorithm _algorithm;
+#pragma warning restore IDE0052 // Remove unread private members
         private readonly int _period1;
         private readonly int _period2;
-        private ExponentialMovingAverage _ema2;
+        private readonly ExponentialMovingAverage _ema2;
 
         public TrendSignal(QCAlgorithm algorithm, Symbol symbol, Resolution resolution, int period1, int period2)
         {
-            _algorithm = algorithm;
             _period1 = period1;
             _period2 = period2;
             if (period1 > 0)
@@ -52,11 +51,11 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (!evaluate) return 0;
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
             var tradebar = bar as TradeBar;
-
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
 
             // Top result: sharpe=2.276, Period=0, Trades=1804
 

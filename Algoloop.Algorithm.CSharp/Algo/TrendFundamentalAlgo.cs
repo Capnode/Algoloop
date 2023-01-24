@@ -184,10 +184,10 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            int maxPeriod = Math.Max(period1, Math.Max(period2, turnoverPeriod));
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, maxPeriod, hold, symbols,
-                (symbol) => new TurnoverSignal(this, turnoverPeriod, turnover),
-                (symbol) => new SmaCrossSignal(this, symbol, resolution, period1, period2),
+            SetWarmUp(Math.Max(period1, Math.Max(period2, turnoverPeriod)), Resolution.Daily);
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
+                (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
+                (symbol) => new SmaCrossSignal(period1, period2),
                 (symbol) => new FundamentalSignal(
                     this,
                     symbol,

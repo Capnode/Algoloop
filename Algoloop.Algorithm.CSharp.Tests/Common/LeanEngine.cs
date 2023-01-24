@@ -82,49 +82,46 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 Config.Set("algorithm-location", algorithmLocation);
 
                 // Store initial log variables
-                using (var algorithmHandlers = LeanEngineAlgorithmHandlers.FromConfiguration(Composer.Instance))
-                using (var systemHandlers = LeanEngineSystemHandlers.FromConfiguration(Composer.Instance))
-                using (var workerThread = new TestWorkerThread())
+                using var algorithmHandlers = LeanEngineAlgorithmHandlers.FromConfiguration(Composer.Instance);
+                using var systemHandlers = LeanEngineSystemHandlers.FromConfiguration(Composer.Instance);
+                using var workerThread = new TestWorkerThread();
+                Log.Trace("");
+                Log.Trace("{0}: Running " + algorithm + "...", DateTime.UtcNow);
+                Log.Trace("");
+
+
+                // run the algorithm in its own thread
+                var engine = new QuantConnect.Lean.Engine.Engine(systemHandlers, algorithmHandlers, false);
+                Task.Factory.StartNew(() =>
                 {
-                    Log.Trace("");
-                    Log.Trace("{0}: Running " + algorithm + "...", DateTime.UtcNow);
-                    Log.Trace("");
-
-
-                    // run the algorithm in its own thread
-                    var engine = new QuantConnect.Lean.Engine.Engine(systemHandlers, algorithmHandlers, false);
-                    Task.Factory.StartNew(() =>
+                    try
                     {
-                        try
+                        var job = (BacktestNodePacket)systemHandlers.JobQueue.NextJob(out string algorithmPath);
+                        job.BacktestId = algorithm;
+                        job.PeriodStart = startDate;
+                        job.PeriodFinish = endDate;
+                        if (initialCash.HasValue)
                         {
-                            string algorithmPath;
-                            var job = (BacktestNodePacket)systemHandlers.JobQueue.NextJob(out algorithmPath);
-                            job.BacktestId = algorithm;
-                            job.PeriodStart = startDate;
-                            job.PeriodFinish = endDate;
-                            if (initialCash.HasValue)
-                            {
-                                job.CashAmount = new CashAmount(initialCash.Value, Currencies.USD);
-                            }
-                            algorithmManager = new AlgorithmManager(false, job);
-
-                            systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
-
-                            engine.Run(job, algorithmManager, algorithmPath, workerThread);
+                            job.CashAmount = new CashAmount(initialCash.Value, Currencies.USD);
                         }
-                        catch (Exception e)
-                        {
-                            Log.Trace($"Error in AlgorithmRunner task: {e}");
-                        }
-                    }).Wait();
+                        algorithmManager = new AlgorithmManager(false, job);
 
-                    var backtestingResultHandler = (BacktestingResultHandler)algorithmHandlers.Results;
-                    results = backtestingResultHandler;
-                    statistics = backtestingResultHandler.FinalStatistics;
+                        systemHandlers.LeanManager.Initialize(systemHandlers, algorithmHandlers, job, algorithmManager);
 
-                    var defaultAlphaHandler = (DefaultAlphaHandler)algorithmHandlers.Alphas;
-                    alphaStatistics = defaultAlphaHandler.RuntimeStatistics;
-                }
+                        engine.Run(job, algorithmManager, algorithmPath, workerThread);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Trace($"Error in AlgorithmRunner task: {e}");
+                    }
+                }).Wait();
+
+                var backtestingResultHandler = (BacktestingResultHandler)algorithmHandlers.Results;
+                results = backtestingResultHandler;
+                statistics = backtestingResultHandler.FinalStatistics;
+
+                var defaultAlphaHandler = (DefaultAlphaHandler)algorithmHandlers.Alphas;
+                alphaStatistics = defaultAlphaHandler.RuntimeStatistics;
             }
             catch (Exception ex)
             {
@@ -141,8 +138,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
 
             foreach (var expectedStat in expectedStatistics)
             {
-                string result;
-                Assert.IsTrue(statistics.TryGetValue(expectedStat.Key, out result), "Missing key: " + expectedStat.Key);
+                Assert.IsTrue(statistics.TryGetValue(expectedStat.Key, out string result), "Missing key: " + expectedStat.Key);
 
                 // normalize -0 & 0, they are the same thing
                 var expected = expectedStat.Value;
@@ -184,14 +180,14 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         {
             // extract field name from expression
             var field = selector.AsEnumerable().OfType<MemberExpression>().First().ToString();
-            field = field.Substring(field.IndexOf('.') + 1);
+            field = field[(field.IndexOf('.') + 1)..];
 
             var func = selector.Compile();
             var expectedValue = func(expected);
             var actualValue = func(actual);
-            if (expectedValue is double)
+            if (expectedValue is double value)
             {
-                Assert.AreEqual((double)expectedValue, (double)actualValue, 1e-4, "Failed on alpha statistics " + field);
+                Assert.AreEqual(value, (double)actualValue, 1e-4, "Failed on alpha statistics " + field);
             }
             else
             {

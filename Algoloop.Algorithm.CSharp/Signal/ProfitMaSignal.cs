@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,9 +12,9 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -27,15 +27,14 @@ namespace Algoloop.Algorithm.CSharp
             _window = new RollingWindow<float>(period);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             _window.Add((float)bar.Price);
-            if (!evaluate) return 0;
             if (!_window.IsReady) return 0;
 
             float first = _window.First();
             float last = _window.Last();
-            float ma = _window.Sum() / _window.Count();
+            float ma = _window.Sum() / _window.Count;
             float maDiff = first - ma;
             if (maDiff <= 0) return 0;
             float profit = first - last;

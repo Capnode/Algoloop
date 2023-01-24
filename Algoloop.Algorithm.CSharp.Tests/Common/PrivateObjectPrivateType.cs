@@ -17,7 +17,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         // bind everything
         private const BindingFlags BindToEveryThing = BindingFlags.Default | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public;
 
-        private static BindingFlags constructorFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance | BindingFlags.NonPublic;
+        private static readonly BindingFlags constructorFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.CreateInstance | BindingFlags.NonPublic;
 
         private object target;     // automatically initialized to null
         private Type originalType; // automatically initialized to null
@@ -34,8 +34,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         {
             ValidateAccessString(memberToAccess);
 
-            PrivateObject temp = obj as PrivateObject;
-            if (temp == null)
+            if (obj is not PrivateObject temp)
             {
                 temp = new PrivateObject(obj);
             }
@@ -369,7 +368,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
 
                     // Look in the method cache to see if there is a generic method
                     // on the incoming type that contains the correct signature.
-                    member = this.GetGenericMethodFromCache(name, parameterTypes, typeArguments, bindingFlags, null);
+                    member = this.GetGenericMethodFromCache(name, parameterTypes, typeArguments, bindingFlags);
                 }
 
                 if (member == null)
@@ -728,13 +727,11 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             this.methodCache = new Dictionary<string, LinkedList<MethodInfo>>();
 
             MethodInfo[] members = t.GetMethods(BindToEveryThing);
-            LinkedList<MethodInfo> listByName; // automatically initialized to null
-
             foreach (MethodInfo member in members)
             {
                 if (member.IsGenericMethod || member.IsGenericMethodDefinition)
                 {
-                    if (!this.GenericMethodCache.TryGetValue(member.Name, out listByName))
+                    if (!this.GenericMethodCache.TryGetValue(member.Name, out LinkedList<MethodInfo> listByName))
                     {
                         listByName = new LinkedList<MethodInfo>();
                         this.GenericMethodCache.Add(member.Name, listByName);
@@ -755,14 +752,14 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         /// <param name="bindingFlags"><see cref="BindingFlags"/> to further filter the method signatures.</param>
         /// <param name="modifiers">Modifiers for parameters.</param>
         /// <returns>A methodinfo instance.</returns>
-        private MethodInfo GetGenericMethodFromCache(string methodName, Type[] parameterTypes, Type[] typeArguments, BindingFlags bindingFlags, ParameterModifier[] modifiers)
+        private MethodInfo GetGenericMethodFromCache(string methodName, Type[] parameterTypes, Type[] typeArguments, BindingFlags bindingFlags)
         {
             Debug.Assert(!string.IsNullOrEmpty(methodName), "Invalid method name.");
             Debug.Assert(parameterTypes != null, "Invalid parameter type array.");
             Debug.Assert(typeArguments != null, "Invalid type arguments array.");
 
             // Build a preliminary list of method candidates that contain roughly the same signature.
-            var methodCandidates = this.GetMethodCandidates(methodName, parameterTypes, typeArguments, bindingFlags, modifiers);
+            var methodCandidates = this.GetMethodCandidates(methodName, parameterTypes, typeArguments, bindingFlags);
 
             // Search of ambiguous methods (methods with the same signature).
             MethodInfo[] finalCandidates = new MethodInfo[methodCandidates.Count];
@@ -785,19 +782,17 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             }
 
             // Now that we have a preliminary list of candidates, select the most appropriate one.
-            return RuntimeTypeHelper.SelectMethod(bindingFlags, finalCandidates, parameterTypes, modifiers) as MethodInfo;
+            return RuntimeTypeHelper.SelectMethod(finalCandidates, parameterTypes) as MethodInfo;
         }
 
-        private LinkedList<MethodInfo> GetMethodCandidates(string methodName, Type[] parameterTypes, Type[] typeArguments, BindingFlags bindingFlags, ParameterModifier[] modifiers)
+        private LinkedList<MethodInfo> GetMethodCandidates(string methodName, Type[] parameterTypes, Type[] typeArguments, BindingFlags bindingFlags)
         {
             Debug.Assert(!string.IsNullOrEmpty(methodName), "methodName should not be null.");
             Debug.Assert(parameterTypes != null, "parameterTypes should not be null.");
             Debug.Assert(typeArguments != null, "typeArguments should not be null.");
 
-            LinkedList<MethodInfo> methodCandidates = new LinkedList<MethodInfo>();
-            LinkedList<MethodInfo> methods = null;
-
-            if (!this.GenericMethodCache.TryGetValue(methodName, out methods))
+            LinkedList<MethodInfo> methodCandidates = new();
+            if (!this.GenericMethodCache.TryGetValue(methodName, out LinkedList<MethodInfo> methods))
             {
                 return methodCandidates;
             }
@@ -807,10 +802,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             foreach (MethodInfo candidate in methods)
             {
                 bool paramMatch = true;
-                ParameterInfo[] candidateParams = null;
                 Type[] genericArgs = candidate.GetGenericArguments();
-                Type sourceParameterType = null;
-
                 if (genericArgs.Length != typeArguments.Length)
                 {
                     continue;
@@ -819,7 +811,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 // Since we can't just get the correct MethodInfo from Reflection,
                 // we will just match the number of parameters, their order, and their type
                 var methodCandidate = candidate;
-                candidateParams = methodCandidate.GetParameters();
+                ParameterInfo[] candidateParams = methodCandidate.GetParameters();
 
                 if (candidateParams.Length != parameterTypes.Length)
                 {
@@ -833,8 +825,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
 
                     foreach (ParameterInfo candidateParam in candidateParams)
                     {
-                        sourceParameterType = parameterTypes[i++];
-
+                        Type sourceParameterType = parameterTypes[i++];
                         if (candidateParam.ParameterType.ContainsGenericParameters)
                         {
                             // Since we have a generic parameter here, just make sure the IsArray matches.
@@ -885,7 +876,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         /// <summary>
         /// The wrapped type.
         /// </summary>
-        private Type type;
+        private readonly Type type;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PrivateType"/> class that contains the private type.
@@ -906,12 +897,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         /// <param name="type">The wrapped Type to create.</param>
         public PrivateType(Type type)
         {
-            if (type == null)
-            {
-                throw new ArgumentNullException("type");
-            }
-
-            this.type = type;
+            this.type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
         /// <summary>
@@ -1473,11 +1459,11 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         /// <param name="types">Types</param>
         /// <param name="modifiers">Parameter modifiers.</param>
         /// <returns>Matching method. Null if none matches.</returns>
-        internal static MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types, ParameterModifier[] modifiers)
+        internal static MethodBase SelectMethod(MethodBase[] match, Type[] types)
         {
             if (match == null)
             {
-                throw new ArgumentNullException("match");
+                throw new ArgumentNullException(nameof(match));
             }
 
             int i;
@@ -1577,7 +1563,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 {
                     if (newMin == 2)
                     {
-                        currentMin = i;
                         ambig = false;
                         currentMin = i;
                     }

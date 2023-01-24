@@ -23,7 +23,7 @@ namespace Algoloop.Algorithm.CSharp.Model
     {
         private readonly int _signal;
         private readonly MovingAverageConvergenceDivergence _macd;
-        private int _fast;
+        private readonly int _fast;
         private readonly int _slow;
 
         public MacdSignal(QCAlgorithm algorithm, Symbol symbol, Resolution resolution, int fast, int slow, int signal)
@@ -42,9 +42,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 Field.Close);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (!evaluate) return 0;
             if (_fast == 0 && _slow == 0 && _signal == 0) return 1; // Bypass signal
             if (_macd == default) return 0;
             if (!_macd.IsReady) return 0;

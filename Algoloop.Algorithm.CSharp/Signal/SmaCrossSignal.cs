@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
@@ -23,11 +22,10 @@ namespace Algoloop.Algorithm.CSharp.Model
     {
         private readonly SimpleMovingAverage _fastSma;
         private readonly SimpleMovingAverage _slowSma;
-        private readonly QCAlgorithm _algorithm;
+        private DateTime _time;
 
-        public SmaCrossSignal(QCAlgorithm algorithm, Symbol symbol, Resolution resolution, int fastPeriod, int slowPeriod)
+        public SmaCrossSignal(int fastPeriod, int slowPeriod)
         {
-            _algorithm = algorithm;
             if (fastPeriod > 0)
             {
                 _fastSma = new SimpleMovingAverage(fastPeriod);
@@ -38,15 +36,16 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
+            if (bar.Time <= _time) throw new ApplicationException("Duplicate bars");
+            _time = bar.Time;
             decimal close = bar.Price;
-//            string action = evaluate ? "Evaluate" : "Update";
-//            _algorithm.Log($"{action} {bar.Time:d} {close}");
+            //string action = evaluate ? "Evaluate" : "Update";
+            //algorithm.Log($"{action} {bar.Time:d} {close}");
             _fastSma?.Update(bar.Time, close);
             _slowSma?.Update(bar.Time, close);
 
-            if (!evaluate) return 0;
             if (_fastSma == null && _slowSma == null) return float.NaN;
             if (_slowSma == null)
             {
@@ -62,7 +61,7 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             if (_fastSma.Period >= _slowSma.Period) return 0;
             if (!_fastSma.IsReady || !_slowSma.IsReady) return 0;
-            //            _algorithm.Log($"_fastEma={_fastEma} _slowEma={_slowEma}");
+//            algorithm.Log($"_fastSma={_fastSma} _slowSma={_slowSma}");
             return _fastSma > _slowSma ? 1 : 0;
         }
 

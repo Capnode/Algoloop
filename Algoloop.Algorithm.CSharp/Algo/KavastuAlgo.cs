@@ -52,6 +52,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Reinvest")]
         private readonly string _reinvest = "false";
 
+        [Parameter("Market capitalization (M min)")]
+        private readonly string _marketCap = null;
+
         [Parameter("Net income (R12 min)")]
         private readonly string _netIncome = null;
 
@@ -118,11 +121,13 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, period, 1, symbols,
+            SetWarmUp(period, Resolution.Daily);
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, 1, symbols,
                 (symbol) => new SmaSignal(this, symbol, resolution, period),
                 (symbol) => new FundamentalSignal(
                     this,
                     symbol,
+                    marketCap: _marketCap,
                     netIncome: _netIncome,
                     netIncomeGrowth: _netIncomeGrowth,
                     netIncomeTrend: _netIncomeTrend,

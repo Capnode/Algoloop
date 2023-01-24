@@ -29,7 +29,6 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private readonly InsightDirection _direction;
         private readonly Resolution _resolution;
-        private readonly int _backfill;
         private readonly int _hold;
         private readonly IEnumerable<Symbol> _symbols;
         private readonly Func<Symbol, ISignal>[] _factories;
@@ -38,14 +37,12 @@ namespace Algoloop.Algorithm.CSharp.Model
         public MultiSignalAlpha(
             InsightDirection direction,
             Resolution resolution,
-            int backfill,
             int hold,
             IEnumerable<Symbol> symbols,
             params Func<Symbol, ISignal>[] factories)
         {
             _direction = direction;
             _resolution = resolution;
-            _backfill = backfill;
             _hold = hold;
             _symbols = symbols;
             _factories = factories;
@@ -70,18 +67,13 @@ namespace Algoloop.Algorithm.CSharp.Model
                 float score = _direction.Equals(InsightDirection.Up) ? 1 : _direction.Equals(InsightDirection.Down) ? -1 : float.NaN;
                 foreach (ISignal symbolData in signals)
                 {
-                    float signal = symbolData.Update(pair.Value, evaluate);
-                    if (LogSignal && evaluate)
+                    float signal = symbolData.Update(algorithm, pair.Value);
+                    if (LogSignal)
                     {
                         algorithm.Log($"{pair.Key} {symbolData.GetType().Name}: {signal}");
                     }
 
-                    if (!evaluate || float.IsNaN(signal))
-                    {
-                        // Pass filter
-                        continue;
-                    }
-                    else if (float.IsNaN(score))
+                    if (float.IsNaN(score))
                     {
                         score = signal;
                     }
@@ -98,14 +90,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                         score = 0;
                     }
 
-                    if (score == 0)
-                    {
-                        // Found final signal
-                        evaluate = false;
-                    }
                 }
 
-                if (score == 0 || float.IsNaN(score))
+                if (score == 0)
                 {
                     continue;
                 }
@@ -165,19 +152,6 @@ namespace Algoloop.Algorithm.CSharp.Model
                         _signals.Add(symbol, list.ToArray());
                     }
                 }
-
-                IEnumerable<Slice> history = algorithm.History(symbols, _backfill, _resolution);
-                history.PushThrough(bar =>
-                {
-                    if (_signals.TryGetValue(bar.Symbol, out ISignal[] list))
-                    {
-                        foreach (ISignal signal in list)
-                        {
-                            Debug.Assert(signal != null);
-                            signal.Update(bar, false);
-                        }
-                    }
-                });
             }
         }
 

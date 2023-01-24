@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 
@@ -21,17 +22,15 @@ namespace Algoloop.Algorithm.CSharp
     {
         private TradeBar _last;
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (!(bar is TradeBar tradeBar)) return 0;
+            if (bar is not TradeBar tradeBar) return 0;
             decimal diff = 0;
             if (_last != null)
             {
                 diff = -(bar.Price - _last.Price) / _last.Price;
             }
             _last = tradeBar;
-
-            if (!evaluate) return 0;
             return diff > 0 ? (float)diff : 0;
         }
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2020 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp
 {
@@ -31,9 +31,9 @@ namespace Algoloop.Algorithm.CSharp
             _delta = new RollingWindow<float>(period);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (!(bar is TradeBar tradeBar)) return 0;
+            if (bar is not TradeBar tradeBar) return 0;
 
             if (_last != null)
             {
@@ -45,7 +45,6 @@ namespace Algoloop.Algorithm.CSharp
 
             _last = tradeBar;
 
-            if (!evaluate) return 0;
             if (!_delta.IsReady) return 0;
             if (!_total.IsReady) return 0;
             float deltaSum = _delta.Sum();

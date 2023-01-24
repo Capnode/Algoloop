@@ -129,8 +129,9 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, Math.Max(period, turnoverPeriod), hold, symbols,
-                (symbol) => new TurnoverSignal(this, turnoverPeriod, turnover),
+            Math.Max(Math.Max(period, turnoverPeriod), turnoverPeriod);
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
+                (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new FundamentalSignal(
                     this,
                     symbol,

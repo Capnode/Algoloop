@@ -102,9 +102,10 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, Math.Max(period, turnoverPeriod), hold, symbols,
-                (symbol) => new TurnoverSignal(this, turnoverPeriod, turnover),
-                (symbol) => new VolumeSpreadSignal(this, period)));
+            SetWarmUp(Math.Max(period, turnoverPeriod), Resolution.Daily);
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
+                (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
+                (symbol) => new VolumeSpreadSignal()));
         }
 
         public override void OnEndOfAlgorithm()

@@ -68,7 +68,6 @@ namespace Algoloop.Algorithm.CSharp
             string psRatio = null,
             string spRatio = null)
         {
-            _ = algorithm;
             _symbol = symbol;
             if (!string.IsNullOrWhiteSpace(marketCap))
             {
@@ -343,9 +342,8 @@ namespace Algoloop.Algorithm.CSharp
             }
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (!evaluate) return 0;
             ReadFineFundamental(bar.Time);
             return EvaluateFundamentals(bar.Price);
         }

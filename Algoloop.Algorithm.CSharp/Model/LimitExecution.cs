@@ -41,6 +41,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         public override void Execute(QCAlgorithm algorithm, IPortfolioTarget[] targets)
         {
             if (algorithm == default) throw new ArgumentNullException(nameof(algorithm));
+            if (algorithm.IsWarmingUp) return;
             if (_logTargets)
             {
                 LogTargets(algorithm, targets);

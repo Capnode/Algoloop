@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
@@ -28,7 +29,7 @@ namespace Algoloop.Algorithm.CSharp
             _window = new RollingWindow<decimal>(period);
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             if (bar is not TradeBar tradeBar) return 0;
             if (_last != null)
@@ -47,7 +48,6 @@ namespace Algoloop.Algorithm.CSharp
             }
 
             _last = tradeBar;
-            if (!evaluate) return 0;
             if (!_window.IsReady) return 0;
             decimal sum = 0;
             decimal absSum = 0;

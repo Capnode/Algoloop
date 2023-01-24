@@ -16,22 +16,17 @@ using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
-using System.Linq;
 
 namespace Algoloop.Algorithm.CSharp
 {
     internal class TurnoverSignal : ISignal
     {
-#pragma warning disable IDE0052 // Remove unread private members
-        private readonly QCAlgorithm _algorithm;
-#pragma warning restore IDE0052 // Remove unread private members
         private readonly int _period;
         private readonly long _turnover;
         private readonly RollingWindow<long> _window;
 
-        public TurnoverSignal(QCAlgorithm algorithm, int period, long turnover)
+        public TurnoverSignal(int period, long turnover)
         {
-            _algorithm = algorithm;
             _period = period;
             _turnover = turnover;
             if (period > 0)
@@ -40,9 +35,9 @@ namespace Algoloop.Algorithm.CSharp
             }
         }
 
-        public float Update(BaseData bar, bool evaluate)
+        public float Update(QCAlgorithm algorithm, BaseData bar)
         {
-            if (_window == null) return float.NaN;
+            if (_window == null) return 1;
             long turnover = 0;
             if (bar is TradeBar tradebar)
             {
@@ -50,15 +45,9 @@ namespace Algoloop.Algorithm.CSharp
             }
 
             _window.Add(turnover);
-            if (!evaluate) return 0;
             if (!_window.IsReady) return 0;
             int count = _window.Count(m => m >= _turnover);
-            if (count > _period / 2)
-            {
-                return float.NaN;
-            }
-
-            return 0;
+            return count > _period / 2 ? 1 : 0;
         }
 
         public void Done()

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2019 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,13 +12,14 @@
  * limitations under the License.
  */
 
+using QuantConnect.Algorithm;
 using QuantConnect.Data;
 
 namespace Algoloop.Algorithm.CSharp
 {
     public interface ISignal
     {
-        float Update(BaseData bar, bool evaluate);
+        float Update(QCAlgorithm algorithm, BaseData bar);
         void Done();
     }
 }

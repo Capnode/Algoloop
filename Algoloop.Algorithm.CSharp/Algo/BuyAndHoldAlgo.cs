@@ -78,7 +78,7 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, 0, 1, symbols));
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, 1, symbols));
         }
 
         public override void OnEndOfAlgorithm()
