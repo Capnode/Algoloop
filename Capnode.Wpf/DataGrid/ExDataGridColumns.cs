@@ -24,8 +24,8 @@ namespace Capnode.Wpf.DataGrid
 {
     public static class ExDataGridColumns
     {
-        static readonly Style _rightCellStyle = new Style(typeof(TextBlock));
-        static readonly Style _leftCellStyle = new Style(typeof(TextBlock));
+        static readonly Style _rightCellStyle = new(typeof(TextBlock));
+        static readonly Style _leftCellStyle = new(typeof(TextBlock));
 
         static ExDataGridColumns()
         {

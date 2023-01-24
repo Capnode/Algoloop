@@ -44,7 +44,7 @@ namespace Capnode.Wpf.DataGrid
 
         public ObservableCollection<CheckboxComboItem> DistinctPropertyValues { get; set; }
 
-        public bool HasPredicate { get { return FilterText.Length > 0 || DistinctPropertyValues.Where(d => d.IsChecked).Count() > 0; } }
+        public bool HasPredicate { get { return FilterText.Length > 0 || DistinctPropertyValues.Where(d => d.IsChecked).Any(); } }
 
         public OptionColumnInfo FilterColumnInfo { get; set; }
 
@@ -122,12 +122,12 @@ namespace Capnode.Wpf.DataGrid
 
         public bool FilterReadOnly
         {
-            get { return DistinctPropertyValues.Where(i => i.IsChecked).Count() > 0; }
+            get { return DistinctPropertyValues.Where(i => i.IsChecked).Any(); }
         }
 
         public bool FilterOperationsEnabled
         {
-            get { return DistinctPropertyValues.Where(i => i.IsChecked).Count() == 0; }
+            get { return !DistinctPropertyValues.Where(i => i.IsChecked).Any(); }
         }
 
 
@@ -135,7 +135,7 @@ namespace Capnode.Wpf.DataGrid
         {
             get
             {
-                if (DistinctPropertyValues.Where(i => i.IsChecked).Count() > 0)
+                if (DistinctPropertyValues.Where(i => i.IsChecked).Any())
                     return SystemColors.ControlBrush;
                 else
                     return Brushes.White;
@@ -162,7 +162,7 @@ namespace Capnode.Wpf.DataGrid
         {
             get
             {
-                if (DistinctPropertyValues.Where(i => i.IsChecked).Count() > 0)
+                if (DistinctPropertyValues.Where(i => i.IsChecked).Any())
                     return FilterOperations.Where(f => f.FilterOption == Enums.FilterOperation.Equals).FirstOrDefault();
                 return _SelectedFilterOperation;
             }
@@ -203,11 +203,8 @@ namespace Capnode.Wpf.DataGrid
             while (parent != null)
             {
                 parent = (UIElement)VisualTreeHelper.GetParent(parent);
-                if (colHeader == null)
-                    colHeader = parent as DataGridColumnHeader;
-
-                if (Grid == null)
-                    Grid = parent as ExDataGrid;
+                colHeader ??= parent as DataGridColumnHeader;
+                Grid ??= parent as ExDataGrid;
             }
 
             if (colHeader != null)
@@ -343,7 +340,7 @@ namespace Capnode.Wpf.DataGrid
         public Predicate<object> GeneratePredicate()
         {
             Predicate<object> predicate = null;
-            if (DistinctPropertyValues.Where(i => i.IsChecked).Count() > 0)
+            if (DistinctPropertyValues.Where(i => i.IsChecked).Any())
             {
                 foreach (var item in DistinctPropertyValues.Where(i => i.IsChecked))
                 {
@@ -360,7 +357,6 @@ namespace Capnode.Wpf.DataGrid
             return predicate;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         protected static Predicate<object> GenerateFilterPredicate(string propertyName, string filterValue, Type objType, Type propType, FilterOperationItem filterItem)
         {
             if (filterItem == null) return null;
@@ -376,29 +372,19 @@ namespace Capnode.Wpf.DataGrid
             linq.Expression prop = ExpressionProperty(propertyName, param);
             ConstantExpression val = linq.Expression.Constant(filterValue);
 
-            switch (filterItem.FilterOption)
+            return filterItem.FilterOption switch
             {
-                case Enums.FilterOperation.Contains:
-                    return ExpressionHelper.GenerateGeneric(prop, val, propType, objParam, "Contains");
-                case Enums.FilterOperation.EndsWith:
-                    return ExpressionHelper.GenerateGeneric(prop, val, propType, objParam, "EndsWith");
-                case Enums.FilterOperation.StartsWith:
-                    return ExpressionHelper.GenerateGeneric(prop, val, propType, objParam, "StartsWith");
-                case Enums.FilterOperation.Equals:
-                    return ExpressionHelper.GenerateEquals(prop, filterValue, propType, objParam);
-                case Enums.FilterOperation.NotEquals:
-                    return ExpressionHelper.GenerateNotEquals(prop, filterValue, propType, objParam);
-                case Enums.FilterOperation.GreaterThanEqual:
-                    return ExpressionHelper.GenerateGreaterThanEqual(prop, filterValue, propType, objParam);
-                case Enums.FilterOperation.LessThanEqual:
-                    return ExpressionHelper.GenerateLessThanEqual(prop, filterValue, propType, objParam);
-                case Enums.FilterOperation.GreaterThan:
-                    return ExpressionHelper.GenerateGreaterThan(prop, filterValue, propType, objParam);
-                case Enums.FilterOperation.LessThan:
-                    return ExpressionHelper.GenerateLessThan(prop, filterValue, propType, objParam);
-                default:
-                    throw new ArgumentException("Could not decode Search Mode.  Did you add a new value to the enum, or send in Unknown?");
-            }
+                Enums.FilterOperation.Contains => ExpressionHelper.GenerateGeneric(prop, val, propType, objParam, "Contains"),
+                Enums.FilterOperation.EndsWith => ExpressionHelper.GenerateGeneric(prop, val, propType, objParam, "EndsWith"),
+                Enums.FilterOperation.StartsWith => ExpressionHelper.GenerateGeneric(prop, val, propType, objParam, "StartsWith"),
+                Enums.FilterOperation.Equals => ExpressionHelper.GenerateEquals(prop, filterValue, propType, objParam),
+                Enums.FilterOperation.NotEquals => ExpressionHelper.GenerateNotEquals(prop, filterValue, propType, objParam),
+                Enums.FilterOperation.GreaterThanEqual => ExpressionHelper.GenerateGreaterThanEqual(prop, filterValue, propType, objParam),
+                Enums.FilterOperation.LessThanEqual => ExpressionHelper.GenerateLessThanEqual(prop, filterValue, propType, objParam),
+                Enums.FilterOperation.GreaterThan => ExpressionHelper.GenerateGreaterThan(prop, filterValue, propType, objParam),
+                Enums.FilterOperation.LessThan => ExpressionHelper.GenerateLessThan(prop, filterValue, propType, objParam),
+                _ => throw new ArgumentException("Could not decode Search Mode.  Did you add a new value to the enum, or send in Unknown?"),
+            };
         }
 
         private static linq.Expression ExpressionProperty(string propertyName, linq.Expression expr)
@@ -460,7 +446,6 @@ namespace Capnode.Wpf.DataGrid
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         private void CbDistinctProperties_DropDownOpened(object sender, EventArgs e)
         {
             if (_boundColumnPropertyAccessor == null)
@@ -468,13 +453,13 @@ namespace Capnode.Wpf.DataGrid
 
             if (DistinctPropertyValues.Count == 0)
             {
-                List<object> result = new List<object>();
+                List<object> result = new();
                 foreach (var i in Grid.ExItemsSource)
                 {
                     object value = _boundColumnPropertyAccessor(i);
                     if (value != null)
                     {
-                        if (result.Where(o => o.ToString() == value.ToString()).Count() == 0)
+                        if (!result.Any(o => o.ToString() == value.ToString()))
                         {
                             result.Add(value);
                         }
@@ -520,7 +505,7 @@ namespace Capnode.Wpf.DataGrid
             var list = DistinctPropertyValues.Where(i => i.IsChecked).ToList();
             if (list.Count > 0)
             {
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 foreach (var i in DistinctPropertyValues.Where(i => i.IsChecked))
                 {
                     sb.AppendFormat(CultureInfo.InvariantCulture, "{0}{1}", sb.Length > 0 ? "," : "", i);

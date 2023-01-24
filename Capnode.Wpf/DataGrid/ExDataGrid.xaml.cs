@@ -38,7 +38,7 @@ namespace Capnode.Wpf.DataGrid
         internal event CancelableFilterChangedEventHandler BeforeFilterChangedEventHandler;
         internal event FilterChangedEventHandler AfterFilterChanged;
 
-        private readonly List<ColumnOptionControl> _optionControls = new List<ColumnOptionControl>();
+        private readonly List<ColumnOptionControl> _optionControls = new();
         private readonly PropertyChangedEventHandler _filterHandler;
 
         public static readonly DependencyProperty ExItemsSourceProperty = DependencyProperty.Register(
@@ -175,18 +175,28 @@ namespace Capnode.Wpf.DataGrid
         {
             if (string.IsNullOrEmpty(ExColumnsInfo)) return;
             string[] infos = ExColumnsInfo.Split(';');
+            List<string> headers = new();
+            foreach (string info in infos)
+            {
+                if (Columns.Any(m => m.Header.Equals(info)))
+                {
+                    headers.Add(info);
+                }
+            }
+
             foreach (DataGridColumn column in Columns)
             {
-                for (int i = 0; i < infos.Count(); i++)
+                int index = 0;
+                foreach (string header in headers)
                 {
-                    string header = infos[i];
                     if (column.Header.Equals(header))
                     {
-                        if (column.DisplayIndex != i)
+                        if (column.DisplayIndex != index)
                         {
-                            column.DisplayIndex = i;
+                            column.DisplayIndex = index;
                         }
                     }
+                    index++;
                 }
             }
         }
@@ -534,8 +544,7 @@ namespace Capnode.Wpf.DataGrid
             //Since visibility for column contrls is set off the ColumnFilterControl by the base grid, we need to 
             //update the ColumnOptionControl since it is a seperate object.
             var ctrl = _optionControls.Where(c => c.FilterColumnInfo != null && columnFilterControl.FilterColumnInfo != null && c.FilterColumnInfo.Column == columnFilterControl.FilterColumnInfo.Column).FirstOrDefault();
-            if (ctrl != null)
-                ctrl.ResetVisibility();
+            ctrl?.ResetVisibility();
         }
         #region INotifyPropertyChanged Members
 

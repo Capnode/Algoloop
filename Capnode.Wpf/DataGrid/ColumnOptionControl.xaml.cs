@@ -25,10 +25,10 @@ namespace Capnode.Wpf.DataGrid
 {
     public partial class ColumnOptionControl : UserControl, INotifyPropertyChanged
     {
-        private readonly FilterOperationItem _addPin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Pin Column", "/Capnode.Wpf;component/Images/PinUp.png");
-        private readonly FilterOperationItem _addGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Add Grouping", "/Capnode.Wpf;component/Images/GroupBy.png");
-        private readonly FilterOperationItem _removePin = new FilterOperationItem(Enums.FilterOperation.Unknown, "Unpin Column", "/Capnode.Wpf;component/Images/pinDown.png");
-        private readonly FilterOperationItem _removeGroup = new FilterOperationItem(Enums.FilterOperation.Unknown, "Remove Grouping", "/Capnode.Wpf;component/Images/RemoveGroupBy.png");
+        private readonly FilterOperationItem _addPin = new(Enums.FilterOperation.Unknown, "Pin Column", "/Capnode.Wpf;component/Images/PinUp.png");
+        private readonly FilterOperationItem _addGroup = new(Enums.FilterOperation.Unknown, "Add Grouping", "/Capnode.Wpf;component/Images/GroupBy.png");
+        private readonly FilterOperationItem _removePin = new(Enums.FilterOperation.Unknown, "Unpin Column", "/Capnode.Wpf;component/Images/pinDown.png");
+        private readonly FilterOperationItem _removeGroup = new(Enums.FilterOperation.Unknown, "Remove Grouping", "/Capnode.Wpf;component/Images/RemoveGroupBy.png");
 
         public ExDataGrid Grid { get; set; }
 
@@ -124,11 +124,8 @@ namespace Capnode.Wpf.DataGrid
             while (parent != null)
             {
                 parent = (UIElement)VisualTreeHelper.GetParent(parent);
-                if (colHeader == null)
-                    colHeader = parent as DataGridColumnHeader;
-
-                if (Grid == null)
-                    Grid = parent as ExDataGrid;
+                colHeader ??= parent as DataGridColumnHeader;
+                Grid ??= parent as ExDataGrid;
             }
 
             if (colHeader != null)
