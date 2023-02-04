@@ -75,6 +75,7 @@ namespace Algoloop.Wpf
         private void FileSettings(object sender, RoutedEventArgs e)
         {
             MainViewModel model = DataContext as MainViewModel;
+            model.SaveConfig();
             var settingsView = new SettingsView();
             bool update = settingsView.ShowDialog() ?? false;
             model.DoSettings(update);
