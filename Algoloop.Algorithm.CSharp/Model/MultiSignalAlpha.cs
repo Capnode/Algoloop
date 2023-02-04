@@ -62,8 +62,6 @@ namespace Algoloop.Algorithm.CSharp.Model
                 bool ok = _signals.TryGetValue(symbol, out ISignal[] signals);
                 Debug.Assert(ok);
                 if (!ok) continue;
-
-                bool evaluate = true;
                 float score = _direction.Equals(InsightDirection.Up) ? 1 : _direction.Equals(InsightDirection.Down) ? -1 : float.NaN;
                 foreach (ISignal symbolData in signals)
                 {
@@ -92,11 +90,7 @@ namespace Algoloop.Algorithm.CSharp.Model
 
                 }
 
-                if (score == 0)
-                {
-                    continue;
-                }
-
+                if (score == 0) continue;
                 TimeSpan period = _resolution.ToTimeSpan().Multiply(_hold).Subtract(TimeSpan.FromTicks(1));
                 DateTime closeTimeUtc = algorithm.UtcTime.Add(period);
 

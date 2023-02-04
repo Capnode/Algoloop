@@ -82,6 +82,9 @@ namespace Algoloop.Algorithm.CSharp.Model
         // Create list of PortfolioTarget objects from Insights
         public override IEnumerable<IPortfolioTarget> CreateTargets(QCAlgorithm algorithm, Insight[] insights)
         {
+            if (algorithm.Time < algorithm.StartDate)
+                return Enumerable.Empty<IPortfolioTarget>();
+
             // Initialize ?
             if (_initialCapital == 0)
             {
