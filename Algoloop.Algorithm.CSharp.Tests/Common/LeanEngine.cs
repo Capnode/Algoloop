@@ -36,15 +36,15 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
 {
     public static class TestEngine
     {
-        internal static Dictionary<string, string> Run(
+        public static Dictionary<string, string> Run(
             string algorithm,
+            string algorithmLocation,
             DateTime startDate,
             DateTime endDate,
             decimal? initialCash,
             Dictionary<string, string> parameters)
         {
             string setupHandler = "RegressionSetupHandlerWrapper";
-            string algorithmLocation = "Algoloop.Algorithm.CSharp.dll";
             AlgorithmStatus expectedFinalStatus = AlgorithmStatus.Completed;
             Dictionary<string, string> expectedStatistics = new ();
             AlphaRuntimeStatistics expectedAlphaStatistics = null;

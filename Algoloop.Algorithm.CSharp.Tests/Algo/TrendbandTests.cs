@@ -25,6 +25,8 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
     [TestClass()]
     public class TrendbandTests
     {
+        private const string AlgorithmLocation = "Algoloop.Algorithm.CSharp.dll";
+
         [TestInitialize]
         public void Initialize()
         {
@@ -36,6 +38,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         {
             Dictionary<string, string> result = TestEngine.Run(
                 "TrendbandAlgo",
+                AlgorithmLocation,
                 DateTime.Parse("2018-01-01 00:00:00", CultureInfo.InvariantCulture),
                 DateTime.Parse("2018-12-31 23:59:59", CultureInfo.InvariantCulture),
                 10000,
@@ -63,6 +66,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         {
             Dictionary<string, string> result = TestEngine.Run(
                 "TrendbandAlgo",
+                AlgorithmLocation,
                 DateTime.Parse("2018-01-01 00:00:00", CultureInfo.InvariantCulture),
                 DateTime.Parse("2018-12-31 23:59:59", CultureInfo.InvariantCulture),
                 10000,
