@@ -61,7 +61,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             int trackerPeriod2 = 0,
             int indexPeriod1 = 0,
             int indexPeriod2 = 0,
-            decimal stoplossSizing = 1)
+            decimal stoplossSizing = 0)
         {
             _slots = slots;
             _reinvest = reinvest;

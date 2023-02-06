@@ -68,7 +68,7 @@ namespace Algoloop.Algorithm.CSharp
         private readonly string _rebalance = "0";
 
         [Parameter("Tracker vs Benchmark stoploss period")]
-        private readonly string _rocPeriod = "1";
+        private readonly string _rocPeriod = "0";
 
         [Parameter("Tracker stoploss period1")]
         private readonly string _trackerPeriod1 = "0";
