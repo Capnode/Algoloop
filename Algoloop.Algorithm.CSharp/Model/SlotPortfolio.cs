@@ -33,21 +33,17 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
-        private readonly int _trackerPeriod1;
-        private readonly int _trackerPeriod2;
-        private readonly int _indexPeriod1;
-        private readonly int _indexPeriod2;
         private readonly decimal _stoplossSizing;
         private readonly InsightCollection _insights = new();
         private readonly RateOfChange _trackerRoc;
         private readonly RateOfChange _benchmarkRoc;
         private readonly RateOfChange _portfolioRoc;
+        private readonly SimpleMovingAverage _trackerSma1;
+        private readonly SimpleMovingAverage _trackerSma2;
+        private readonly SimpleMovingAverage _benchmarkSma1;
+        private readonly SimpleMovingAverage _benchmarkSma2;
 
         private TrackerPortfolio _trackerPortfolio;
-        private SimpleMovingAverage _trackerSma1;
-        private SimpleMovingAverage _trackerSma2;
-        private SimpleMovingAverage _benchmarkSma1;
-        private SimpleMovingAverage _benchmarkSma2;
         private decimal _initialCapital = 0;
         private decimal _portfolioValue0 = 0;
         private decimal _trackerValue0 = 0;
@@ -60,23 +56,39 @@ namespace Algoloop.Algorithm.CSharp.Model
             int slots,
             bool reinvest,
             float rebalance,
+            int rocPeriod = 0,
             int trackerPeriod1 = 0,
             int trackerPeriod2 = 0,
             int indexPeriod1 = 0,
             int indexPeriod2 = 0,
-            decimal stoplossSizing = 0)
+            decimal stoplossSizing = 1)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
-            _trackerPeriod1 = trackerPeriod1;
-            _trackerPeriod2 = trackerPeriod2;
-            _indexPeriod1 = indexPeriod1;
-            _indexPeriod2 = indexPeriod2;
             _stoplossSizing = stoplossSizing;
-            _trackerRoc = new RateOfChange(1);
-            _benchmarkRoc = new RateOfChange(1);
-            _portfolioRoc = new RateOfChange(1);
+            if (rocPeriod > 0)
+            {
+                _trackerRoc = new RateOfChange(rocPeriod);
+                _benchmarkRoc = new RateOfChange(rocPeriod);
+                _portfolioRoc = new RateOfChange(rocPeriod);
+            }
+            if (trackerPeriod1 > 0)
+            {
+                _trackerSma1 = new SimpleMovingAverage($"Index Tracker SMA({trackerPeriod1})", trackerPeriod1);
+            }
+            if (trackerPeriod2 > 0)
+            {
+                _trackerSma2 = new SimpleMovingAverage($"Index Tracker SMA({trackerPeriod2})", trackerPeriod2);
+            }
+            if (indexPeriod1 > 0)
+            {
+                _benchmarkSma1 = new SimpleMovingAverage($"Index {_indexName} SMA({indexPeriod1})", indexPeriod1);
+            }
+            if (indexPeriod2 > 0)
+            {
+                _benchmarkSma2 = new SimpleMovingAverage($"Index {_indexName} SMA({indexPeriod2})", indexPeriod2);
+            }
         }
 
         // Create list of PortfolioTarget objects from Insights
@@ -168,43 +180,27 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 _indexName = sec.Security.Symbol.ID.Symbol;
             }
-            if (_trackerPeriod1 > 0)
-            {
-                _trackerSma1 = new SimpleMovingAverage($"Index Tracker SMA({_trackerPeriod1})", _trackerPeriod1);
-            }
-            if (_trackerPeriod2 > 0)
-            {
-                _trackerSma2 = new SimpleMovingAverage($"Index Tracker SMA({_trackerPeriod2})", _trackerPeriod2);
-            }
-            if (_indexPeriod1 > 0)
-            {
-                _benchmarkSma1 = new SimpleMovingAverage($"Index {_indexName} SMA({_indexPeriod1})", _indexPeriod1);
-            }
-            if (_indexPeriod2 > 0)
-            {
-                _benchmarkSma2 = new SimpleMovingAverage($"Index {_indexName} SMA({_indexPeriod2})", _indexPeriod2);
-            }
         }
 
         private void ProcessPortfolio(QCAlgorithm algorithm, decimal portfolioValue)
         {
             decimal portfolioIndex = 100 * portfolioValue / _portfolioValue0;
             algorithm.Plot("Index Portfolio", portfolioIndex);
-            _portfolioRoc.Update(algorithm.Time, portfolioIndex);
+            _portfolioRoc?.Update(algorithm.Time, portfolioIndex);
         }
 
         private decimal ProcessTracker(QCAlgorithm algorithm, decimal trackerValue)
         {
             decimal trackerIndex = 100 * trackerValue / _trackerValue0;
             algorithm.Plot("Index Tracker", trackerIndex);
-            _trackerRoc.Update(algorithm.Time, trackerIndex);
+            _trackerRoc?.Update(algorithm.Time, trackerIndex);
 
             if (_trackerSma1 != null)
             {
                 _trackerSma1.Update(algorithm.Time, trackerIndex);
                 if (_trackerSma1.IsReady)
                 {
-                    algorithm.Plot($"TrackerSMA", _trackerSma1);
+                    algorithm.Plot($"TrackerSMA({_trackerSma1.Period})", _trackerSma1);
                 }
             }
             if (_trackerSma2 != null)
@@ -212,12 +208,26 @@ namespace Algoloop.Algorithm.CSharp.Model
                 _trackerSma2.Update(algorithm.Time, trackerIndex);
                 if (_trackerSma2.IsReady)
                 {
-                    algorithm.Plot($"TrackerSMA", _trackerSma2);
+                    algorithm.Plot($"TrackerSMA({_trackerSma2.Period})", _trackerSma2);
                 }
             }
 
             decimal sizingFactor = 1;
-            if (_trackerSma1 != null && _trackerSma2 != null)
+            if (_trackerRoc != null && _benchmarkRoc != null)
+            {
+                if (_trackerRoc.IsReady && _benchmarkRoc.IsReady)
+                {
+                    if (_trackerRoc >= _benchmarkRoc && _trackerRoc > 0)
+                    {
+                        sizingFactor = 1;
+                    }
+                    else
+                    {
+                        sizingFactor = _stoplossSizing;
+                    }
+                }
+            }
+            else if (_trackerSma1 != null && _trackerSma2 != null)
             {
                 if (_trackerSma1.IsReady && _trackerSma2.IsReady)
                 {
@@ -247,14 +257,14 @@ namespace Algoloop.Algorithm.CSharp.Model
             // Plot benchmark index
             decimal benchmarkIndex = 100 * benchmarkValue / _benchmarkValue0;
             algorithm.Plot($"Index {_indexName}", benchmarkIndex);
-            _benchmarkRoc.Update(algorithm.Time, benchmarkValue);
+            _benchmarkRoc?.Update(algorithm.Time, benchmarkValue);
 
             if (_benchmarkSma1 != null)
             {
                 _benchmarkSma1.Update(algorithm.Time, benchmarkIndex);
                 if (_benchmarkSma1.IsReady)
                 {
-                    algorithm.Plot($"IndexSMA", _benchmarkSma1);
+                    algorithm.Plot($"IndexSMA({_benchmarkSma1.Period})", _benchmarkSma1);
                 }
             }
             if (_benchmarkSma2 != null)
@@ -262,7 +272,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 _benchmarkSma2.Update(algorithm.Time, benchmarkIndex);
                 if (_benchmarkSma2.IsReady)
                 {
-                    algorithm.Plot($"IndexSMA", _benchmarkSma2);
+                    algorithm.Plot($"IndexSMA({_benchmarkSma2.Period})", _benchmarkSma2);
                 }
             }
 
@@ -295,10 +305,10 @@ namespace Algoloop.Algorithm.CSharp.Model
         private void PlotRoc(QCAlgorithm algorithm)
         {
             // Compare portfolio vs index
-            if (_portfolioRoc.IsReady && _benchmarkRoc.IsReady)
+            if ((_trackerRoc?.IsReady ?? false) && (_benchmarkRoc?.IsReady ?? false))
             {
                 decimal diff = _trackerRoc - _benchmarkRoc;
-                algorithm.Plot($"Portfolio vs {_indexName}", diff);
+                algorithm.Plot($"Tracker({_trackerRoc.Period}) vs {_indexName}({_benchmarkRoc.Period})", diff);
             }
         }
 
