@@ -254,6 +254,9 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private decimal ProcessBenchmark(QCAlgorithm algorithm, decimal benchmarkValue)
         {
+            decimal sizingFactor = 1;
+            if (_benchmarkValue0 == 0) return sizingFactor;
+
             // Plot benchmark index
             decimal benchmarkIndex = 100 * benchmarkValue / _benchmarkValue0;
             algorithm.Plot($"Index {_indexName}", benchmarkIndex);
@@ -276,7 +279,6 @@ namespace Algoloop.Algorithm.CSharp.Model
                 }
             }
 
-            decimal sizingFactor = 1;
             if (_benchmarkSma1 != null && _benchmarkSma2 != null)
             {
                 if (_benchmarkSma1.IsReady && _benchmarkSma2.IsReady)

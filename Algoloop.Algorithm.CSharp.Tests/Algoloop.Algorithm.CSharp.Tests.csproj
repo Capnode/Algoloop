@@ -78,10 +78,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Data\market-hours\" />
-    <Folder Include="Data\symbol-properties\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\Data\symbol-properties\symbol-properties-database.csv" Link="Data\symbol-properties\symbol-properties-database.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
