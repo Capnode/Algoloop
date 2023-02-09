@@ -217,7 +217,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 if (_trackerRoc.IsReady && _benchmarkRoc.IsReady)
                 {
-                    if (_trackerRoc >= _benchmarkRoc && _trackerRoc > 0)
+                    if (_trackerRoc >= _benchmarkRoc)
                     {
                         sizingFactor = 1;
                     }

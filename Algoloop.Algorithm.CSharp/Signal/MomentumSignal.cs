@@ -24,21 +24,24 @@ namespace Algoloop.Algorithm.CSharp
 
         public MomentumSignal(int period)
         {
-            _roc = new RateOfChange(period);
+            if (period > 0)
+            {
+                _roc = new RateOfChange(period);
+            }
         }
 
         public float Update(QCAlgorithm algorithm, BaseData bar)
         {
+            if (_roc == null) return 1;
             decimal close = bar.Price;
             _roc.Update(bar.Time, close);
             if (!_roc.IsReady) return 0;
             float roc = (float)(decimal)_roc;
-            return roc;
+            return roc >= 0 ? 1 : 0;
         }
 
         public void Done()
         {
-            throw new System.NotImplementedException();
         }
     }
 }
