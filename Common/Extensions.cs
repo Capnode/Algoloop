@@ -198,7 +198,7 @@ namespace QuantConnect
                 }
                 catch (WebException ex)
                 {
-                    Log.Error(ex, $"DownloadData(): failed for: '{url}'");
+                    Log.Error(ex, $"DownloadData(): {Messages.Extensions.DownloadDataFailed(url)}");
                     return null;
                 }
             }
@@ -218,7 +218,7 @@ namespace QuantConnect
                 }
                 catch (Exception ex)
                 {
-                    Log.Error(ex, $"DownloadByteArray(): failed for: '{url}'");
+                    Log.Error(ex, $"DownloadByteArray(): {Messages.Extensions.DownloadDataFailed(url)}");
                     return null;
                 }
             }
@@ -302,12 +302,7 @@ namespace QuantConnect
         /// <remarks>The value of this method is normalization</remarks>
         public static string GetZeroPriceMessage(this Symbol symbol)
         {
-            return $"{symbol}: The security does not have an accurate price as it has not yet received a bar of data. " +
-                   "Before placing a trade (or using SetHoldings) warm up your algorithm with SetWarmup, or use slice.Contains(symbol)" +
-                   " to confirm the Slice object has price before using the data. Data does not necessarily all arrive at the same" +
-                   " time so your algorithm should confirm the data is ready before using it. In live trading this can mean you do" +
-                   " not have an active subscription to the asset class you're trying to trade. If using custom data make sure you've" +
-                   " set the 'Value' property.";
+            return Messages.Extensions.ZeroPriceForSecurity(symbol);
         }
 
         /// <summary>
@@ -409,11 +404,11 @@ namespace QuantConnect
                     {
                         token.Cancel(false);
                     }
-                    Log.Trace($"StopSafely(): waiting for '{thread.Name}' thread to stop...");
+                    Log.Trace($"StopSafely(): {Messages.Extensions.WaitingForThreadToStopSafely(thread.Name)}");
                     // just in case we add a time out
                     if (!thread.Join(timeout))
                     {
-                        Log.Error($"StopSafely(): Timeout waiting for '{thread.Name}' thread to stop");
+                        Log.Error($"StopSafely(): {Messages.Extensions.TimeoutWaitingForThreadToStopSafely(thread.Name)}");
                     }
                 }
                 catch (Exception exception)
@@ -627,15 +622,14 @@ namespace QuantConnect
             var objectActivator = ObjectActivator.GetActivator(type);
             if (objectActivator == null)
             {
-                throw new ArgumentException($"Data type \'{type.Name}\' missing parameterless constructor " +
-                    $"E.g. public {type.Name}() {{ }}");
+                throw new ArgumentException(Messages.Extensions.DataTypeMissingParameterlessConstructor(type));
             }
 
             var instance = objectActivator.Invoke(new object[] { type });
             if(instance == null)
             {
                 // shouldn't happen but just in case...
-                throw new ArgumentException($"Failed to create instance of type \'{type.Name}\'");
+                throw new ArgumentException(Messages.Extensions.FailedToCreateInstanceOfType(type));
             }
 
             // we expect 'instance' to inherit BaseData in most cases so we use 'as' versus 'IsAssignableFrom'
@@ -643,7 +637,7 @@ namespace QuantConnect
             var result = instance as BaseData;
             if (result == null)
             {
-                throw new ArgumentException($"Data type \'{type.Name}\' does not inherit required {nameof(BaseData)}");
+                throw new ArgumentException(Messages.Extensions.TypeIsNotBaseData(type));
             }
             return result;
         }
@@ -1179,7 +1173,7 @@ namespace QuantConnect
             if (input.IsNaNOrInfinity())
             {
                 throw new ArgumentException(
-                    $"It is not possible to cast a non-finite floating-point value ({input}) as decimal. Please review math operations and verify the result is valid.",
+                    Messages.Extensions.CannotCastNonFiniteFloatingPointValueToDecimal(input),
                     nameof(input),
                     new NotFiniteNumberException(input)
                 );
@@ -1875,7 +1869,7 @@ namespace QuantConnect
                 if (Time.OneMinute == timeSpan) return Resolution.Minute;
                 if (Time.OneHour   == timeSpan) return Resolution.Hour;
                 if (Time.OneDay    == timeSpan) return Resolution.Daily;
-                throw new InvalidOperationException(Invariant($"Unable to exactly convert time span ('{timeSpan}') to resolution."));
+                throw new InvalidOperationException(Messages.Extensions.UnableToConvertTimeSpanToResolution(timeSpan));
             }
 
             // for non-perfect matches
@@ -1906,7 +1900,7 @@ namespace QuantConnect
 
             if (InvalidSecurityTypes.Add(value))
             {
-                Log.Error($"Extensions.TryParseSecurityType(): Attempted to parse unknown SecurityType: {value}");
+                Log.Error($"Extensions.TryParseSecurityType(): {Messages.Extensions.UnableToParseUnknownSecurityType(value)}");
             }
 
             return false;
@@ -2161,7 +2155,7 @@ namespace QuantConnect
         {
             if (!securityType.HasOptions() && !securityType.IsOption())
             {
-                throw new ArgumentException($"The SecurityType {securityType} has no default OptionStyle, because it has no options available for it");
+                throw new ArgumentException(Messages.Extensions.NoDefaultOptionStyleForSecurityType(securityType));
             }
 
             switch (securityType)
@@ -2190,7 +2184,7 @@ namespace QuantConnect
                 case "european":
                     return OptionStyle.European;
                 default:
-                    throw new ArgumentException($"Unexpected OptionStyle: {optionStyle}");
+                    throw new ArgumentException(Messages.Extensions.UnknownOptionStyle(optionStyle));
             }
         }
 
@@ -2209,7 +2203,7 @@ namespace QuantConnect
                 case "put":
                     return OptionRight.Put;
                 default:
-                    throw new ArgumentException($"Unexpected OptionRight: {optionRight}");
+                    throw new ArgumentException(Messages.Extensions.UnknownOptionRight(optionRight));
             }
         }
 
@@ -2248,7 +2242,7 @@ namespace QuantConnect
                 case OptionRight.Put:
                     return "put";
                 default:
-                    throw new ArgumentException($"Unexpected OptionRight: {optionRight}");
+                    throw new ArgumentException(Messages.Extensions.UnknownOptionRight(optionRight));
             }
         }
 
@@ -2267,7 +2261,7 @@ namespace QuantConnect
                 case OptionStyle.European:
                     return "european";
                 default:
-                    throw new ArgumentException($"Unexpected OptionStyle: {optionStyle}");
+                    throw new ArgumentException(Messages.Extensions.UnknownOptionStyle(optionStyle));
             }
         }
 
@@ -2298,7 +2292,7 @@ namespace QuantConnect
                 case "openinterestannual":
                     return DataMappingMode.OpenInterestAnnual;
                 default:
-                    throw new ArgumentException($"Unexpected DataMappingMode: {dataMappingMode}");
+                    throw new ArgumentException(Messages.Extensions.UnknownDataMappingMode(dataMappingMode));
             }
         }
 
@@ -2606,7 +2600,7 @@ namespace QuantConnect
 
             if (!typeof(MulticastDelegate).IsAssignableFrom(type))
             {
-                throw new ArgumentException($"TryConvertToDelegate cannot be used to convert a PyObject into {type}.");
+                throw new ArgumentException(Messages.Extensions.ConvertToDelegateCannotConverPyObjectToType("TryConvertToDelegate", type));
             }
 
             result = default(T);
@@ -2739,7 +2733,7 @@ namespace QuantConnect
             }
             else
             {
-                throw new ArgumentException($"ConvertToDelegate cannot be used to convert a PyObject into {typeof(T)}.");
+                throw new ArgumentException(Messages.Extensions.ConvertToDelegateCannotConverPyObjectToType("ConvertToDelegate", typeof(T)));
             }
         }
 
@@ -2777,10 +2771,7 @@ namespace QuantConnect
                 }
                 catch (Exception e)
                 {
-                    throw new ArgumentException(
-                        $"ConvertToDictionary cannot be used to convert a {inputType} into {targetType}. Reason: {e.Message}",
-                        e
-                    );
+                    throw new ArgumentException(Messages.Extensions.ConvertToDictionaryFailed(inputType, targetType, e.Message), e);
                 }
             }
 
@@ -2817,11 +2808,7 @@ namespace QuantConnect
                         }
                         catch (Exception e)
                         {
-                            throw new ArgumentException(
-                                "Argument type should be Symbol or a list of Symbol. " +
-                                $"Object: {item}. Type: {item.GetPythonType()}",
-                                e
-                            );
+                            throw new ArgumentException(Messages.Extensions.ConvertToSymbolEnumerableFailed(item), e);
                         }
 
                         yield return symbol;
@@ -2869,7 +2856,7 @@ namespace QuantConnect
             {
                 using (Py.GIL())
                 {
-                    throw new ArgumentException($"GetEnumString(): {pyObject.Repr()} is not a C# Type.");
+                    throw new ArgumentException($"GetEnumString(): {Messages.Extensions.ObjectFromPythonIsNotACSharpType(pyObject.Repr())}");
                 }
             }
         }
@@ -3094,7 +3081,7 @@ namespace QuantConnect
         {
             if (symbol.SecurityType != SecurityType.Future || symbol.IsCanonical())
             {
-                throw new InvalidOperationException("Adjusting a symbol by an offset is currently only supported for non canonical futures");
+                throw new InvalidOperationException(Messages.Extensions.ErrorAdjustingSymbolByOffset);
             }
 
             var expiration = symbol.ID.Date;
@@ -3156,7 +3143,7 @@ namespace QuantConnect
         {
             if(dataProvider == null)
             {
-                throw new ArgumentException($"The provided '{nameof(IDataProvider)}' instance is null. Are you missing some initialization step?");
+                throw new ArgumentException(Messages.Extensions.NullDataProvider);
             }
             var stream = dataProvider.Fetch(file);
             if (stream == null)
@@ -3391,7 +3378,7 @@ namespace QuantConnect
         {
             if (source == null || source.Length == 0)
             {
-                throw new ArgumentException($"Source cannot be null or empty.");
+                throw new ArgumentException(Messages.Extensions.NullOrEmptySourceToConvertToHexString);
             }
 
             var hex = new StringBuilder(source.Length * 2);
@@ -3468,7 +3455,7 @@ namespace QuantConnect
         /// </summary>
         public static void SetRuntimeError(this IAlgorithm algorithm, Exception exception, string context)
         {
-            Log.Error(exception, $"Extensions.SetRuntimeError(): RuntimeError at {algorithm.UtcTime} UTC. Context: {context}");
+            Log.Error(exception, $"Extensions.SetRuntimeError(): {Messages.Extensions.RuntimeError(algorithm, context)}");
             exception = StackExceptionInterpreter.Instance.Value.Interpret(exception);
             algorithm.RunTimeError = exception;
             algorithm.SetStatus(AlgorithmStatus.RuntimeError);
@@ -3486,7 +3473,7 @@ namespace QuantConnect
         {
             if (!symbol.SecurityType.IsOption())
             {
-                throw new ArgumentException("CreateOptionChain requires an option symbol.");
+                throw new ArgumentException(Messages.Extensions.CreateOptionChainRequiresOptionSymbol);
             }
 
             // rewrite non-canonical symbols to be canonical
@@ -3799,7 +3786,7 @@ namespace QuantConnect
 
             if (!result.HasValue)
             {
-                throw new ArgumentException("The list of values cannot be empty");
+                throw new ArgumentException(Messages.Extensions.GreatestCommonDivisorEmptyList);
             }
 
             return result.Value;
