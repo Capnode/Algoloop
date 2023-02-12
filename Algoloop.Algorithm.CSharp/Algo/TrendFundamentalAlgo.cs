@@ -67,19 +67,22 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
+        [Parameter("Tracker range stoploss period")]
+        private readonly string _rangePeriod = "0";
+
         [Parameter("Tracker vs Benchmark stoploss period")]
         private readonly string _rocPeriod = "0";
 
-        [Parameter("Tracker stoploss period1")]
+        [Parameter("Tracker sma stoploss period1")]
         private readonly string _trackerPeriod1 = "0";
 
-        [Parameter("Tracker stoploss period2")]
+        [Parameter("Tracker sma stoploss period2")]
         private readonly string _trackerPeriod2 = "0";
 
-        [Parameter("Benchmark stoploss period1")]
+        [Parameter("Benchmark sma stoploss period1")]
         private readonly string _benchmarkPeriod1 = "0";
 
-        [Parameter("Benchmark stoploss period2")]
+        [Parameter("Benchmark sma stoploss period2")]
         private readonly string _benchmarkPeriod2 = "0";
 
         [Parameter("Stoploss sizing")]
@@ -154,6 +157,7 @@ namespace Algoloop.Algorithm.CSharp
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
+            int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
             int rocPeriod = int.Parse(_rocPeriod, CultureInfo.InvariantCulture);
             int trackerPeriod1 = int.Parse(_trackerPeriod1, CultureInfo.InvariantCulture);
             int trackerPeriod2 = int.Parse(_trackerPeriod2, CultureInfo.InvariantCulture);
@@ -174,6 +178,7 @@ namespace Algoloop.Algorithm.CSharp
                 slots,
                 reinvest,
                 rebalance,
+                rangePeriod,
                 rocPeriod,
                 trackerPeriod1 >= 0 ? trackerPeriod1 : period1,
                 trackerPeriod2 >= 0 ? trackerPeriod2 : period2,
@@ -189,7 +194,8 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetWarmUp(Math.Max(period1, Math.Max(period2, turnoverPeriod)), Resolution.Daily);
+            int warmupPeriod = Math.Max(rangePeriod, Math.Max(rocPeriod, Math.Max(period1, Math.Max(period2, turnoverPeriod))));
+            SetWarmUp(warmupPeriod, Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new SmaCrossSignal(period1, period2),
