@@ -192,7 +192,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         private void ProcessPortfolio(QCAlgorithm algorithm, decimal portfolioValue)
         {
             decimal portfolioIndex = 100 * portfolioValue / _portfolioValue0;
-            algorithm.Plot("Portfolio", portfolioIndex);
+            algorithm.Plot("Tracker Portfolio", portfolioIndex);
             _portfolioRoc?.Update(algorithm.Time, portfolioIndex);
         }
 
@@ -204,13 +204,17 @@ namespace Algoloop.Algorithm.CSharp.Model
             _trackerSma1?.Update(algorithm.Time, trackerIndex);
             _trackerSma2?.Update(algorithm.Time, trackerIndex);
 
-            decimal sizingFactor = _sizingFactor; // Current sizing factor
+            decimal sizingFactor = 1;
             if (_trackerLow != null && _trackerLow.IsReady)
             {
                 algorithm.Plot("TrackerLow", _trackerLow);
                 if (trackerIndex < _trackerLow)
                 {
                     sizingFactor = _stoplossSizing;
+                }
+                else
+                {
+                    sizingFactor = _sizingFactor; // Current sizing factor
                 }
             }
             if (_trackerHigh != null && _trackerHigh.IsReady)
@@ -219,6 +223,10 @@ namespace Algoloop.Algorithm.CSharp.Model
                 if (trackerIndex > _trackerHigh)
                 {
                     sizingFactor = 1;
+                }
+                else
+                {
+                    sizingFactor = _sizingFactor; // Current sizing factor
                 }
             }
 
@@ -230,13 +238,17 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (_trackerSma2 != null && _trackerSma2.IsReady)
             {
                 algorithm.Plot("TrackerSMA2", _trackerSma2);
-                if (_trackerSma1 != null && _trackerSma1.IsReady)
+                sizingFactor = trackerIndex >= _trackerSma2 ? 1 : _stoplossSizing;
+            }
+            if (_trackerSma1 != null && _trackerSma2 != null)
+            {
+                if (_trackerSma1.IsReady && _trackerSma2.IsReady)
                 {
                     sizingFactor = _trackerSma1 >= _trackerSma2 ? 1 : _stoplossSizing;
                 }
                 else
                 {
-                    sizingFactor = trackerIndex >= _trackerSma2 ? 1 : _stoplossSizing;
+                    sizingFactor = 1;
                 }
             }
 
@@ -252,12 +264,13 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             // Plot benchmark index
             decimal benchmarkIndex = 100 * benchmarkValue / _benchmarkValue0;
-            algorithm.Plot($"{_indexName}", benchmarkIndex);
+            algorithm.Plot($"Tracker {_indexName}", benchmarkIndex);
             _benchmarkRoc?.Update(algorithm.Time, benchmarkValue);
+            _benchmarkSma1?.Update(algorithm.Time, benchmarkIndex);
+            _benchmarkSma2?.Update(algorithm.Time, benchmarkIndex);
 
             if (_benchmarkSma1 != null)
             {
-                _benchmarkSma1.Update(algorithm.Time, benchmarkIndex);
                 if (_benchmarkSma1.IsReady)
                 {
                     algorithm.Plot("IndexSMA1", _benchmarkSma1);
@@ -265,7 +278,6 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
             if (_benchmarkSma2 != null)
             {
-                _benchmarkSma2.Update(algorithm.Time, benchmarkIndex);
                 if (_benchmarkSma2.IsReady)
                 {
                     algorithm.Plot("IndexSMA2", _benchmarkSma2);
@@ -301,7 +313,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         {
             // Both TrackerRoc and BenchmarkRoc must be updated
             if (_trackerRoc == null || _benchmarkRoc == null) return 1;
-            if (!_trackerRoc.IsReady || !_benchmarkRoc.IsReady) return 0;
+            if (!_trackerRoc.IsReady || !_benchmarkRoc.IsReady) return 1;
             decimal diff = _trackerRoc - _benchmarkRoc;
             algorithm.Plot($"Tracker({_trackerRoc.Period}) vs {_indexName}({_benchmarkRoc.Period})", diff);
             if (diff >= 0) return 1;
