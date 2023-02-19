@@ -11,43 +11,88 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
 
+using System;
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using System;
+using QuantConnect.Securities;
+using QuantConnect.Data.Market;
 using System.Collections.Generic;
-using System.Linq;
+using QuantConnect.Securities.Future;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm which tests the default option price model
+    /// Continuous Futures Regression algorithm asserting bug fix for GH issue #6840
     /// </summary>
-    /// <meta name="tag" content="options" />
-    public class DefaultOptionPriceModelRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class ContinuousFuturesDailyRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        private SymbolChangedEvent _symbolChangedEvent;
+        private Future _continuousContract;
+        private decimal _previousFactor;
+
+        /// <summary>
+        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
+        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2021, 1, 4);
-            SetEndDate(2021, 1, 4);
-            SetCash(100000);
+            SetStartDate(2013, 10, 08);
+            SetEndDate(2013, 12, 25);
 
-            AddIndex("SPX");
-            AddIndexOption("SPX");
+            _continuousContract = AddFuture(Futures.Indices.SP500EMini,
+                dataNormalizationMode: DataNormalizationMode.ForwardPanamaCanal,
+                dataMappingMode: DataMappingMode.LastTradingDay,
+                contractDepthOffset: 0,
+                resolution: Resolution.Daily
+            );
         }
 
-        public override void OnData(Slice slice)
+        /// <summary>
+        /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
+        /// </summary>
+        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
+        public override void OnData(Slice data)
         {
-            if (slice.OptionChains.Any(kvp => kvp.Value.Any(
-                    contract => contract.Greeks.Delta == 0 &&
-                        contract.Greeks.Gamma == 0 && 
-                        contract.Greeks.Theta == 0 && 
-                        contract.Greeks.Vega == 0 && 
-                        contract.Greeks.Rho == 0)))
+            foreach (var changedEvent in data.SymbolChangedEvents.Values)
             {
-                throw new Exception("All Greeks are zero - Pricing Model is not ready!");
+                if (changedEvent.Symbol == _continuousContract.Symbol)
+                {
+                    _symbolChangedEvent = changedEvent;
+                    Log($"{Time} - SymbolChanged event: {changedEvent}. New expiration {_continuousContract.Mapped.ID.Date}");
+                }
+            }
+
+            if (!data.Bars.TryGetValue(_continuousContract.Symbol, out var continuousBar))
+            {
+                return;
+            }
+
+            var mappedBar = Securities[_continuousContract.Mapped].Cache.GetData<TradeBar>();
+            if (mappedBar == null || continuousBar.EndTime != mappedBar.EndTime)
+            {
+                return;
+            }
+            var priceFactor = continuousBar.Close - mappedBar.Close;
+            Debug($"{Time} - Price factor {priceFactor}");
+
+            if(_symbolChangedEvent != null)
+            {
+                if(_previousFactor == priceFactor)
+                {
+                    throw new Exception($"Price factor did not change after symbol changed! {Time} {priceFactor}");
+                }
+
+                Quit("We asserted what we wanted");
+            }
+            _previousFactor = priceFactor;
+        }
+
+        public override void OnEndOfAlgorithm()
+        {
+            if (_symbolChangedEvent == null)
+            {
+                throw new Exception("Unexpected a symbol changed event but got none!");
             }
         }
 
@@ -64,7 +109,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 7488;
+        public long DataPoints => 1395;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -92,8 +137,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "0"},
-            {"Tracking Error", "0"},
+            {"Information Ratio", "-4.63"},
+            {"Tracking Error", "0.088"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
@@ -101,8 +146,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Fitness Score", "0"},
             {"Kelly Criterion Estimate", "0"},
             {"Kelly Criterion Probability Value", "0"},
-            {"Sortino Ratio", "0"},
-            {"Return Over Maximum Drawdown", "0"},
+            {"Sortino Ratio", "79228162514264337593543950335"},
+            {"Return Over Maximum Drawdown", "79228162514264337593543950335"},
             {"Portfolio Turnover", "0"},
             {"Total Insights Generated", "0"},
             {"Total Insights Closed", "0"},

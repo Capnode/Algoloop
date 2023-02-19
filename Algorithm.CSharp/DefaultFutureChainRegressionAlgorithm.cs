@@ -11,47 +11,68 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
 
+using System;
+using System.Linq;
+using QuantConnect.Interfaces;
+using QuantConnect.Securities;
 using System.Collections.Generic;
-using QuantConnect.Securities.Option;
+using QuantConnect.Data.UniverseSelection;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm exercising an index covered European style option, using an option price model
-    /// that supports European style options and asserting that the option price model is used.
+    /// Regression algorithm reproducing GH issue #6829 where the default future chain selection would let some contracts through
     /// </summary>
-    public class OptionPriceModelForSupportedEuropeanOptionRegressionAlgorithm : OptionPriceModelForOptionStylesBaseRegressionAlgorithm
+    public class DefaultFutureChainRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        /// <summary>
+        /// Initialize your algorithm and add desired assets.
+        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2021, 1, 14);
-            SetEndDate(2021, 1, 14);
+            SetStartDate(2013, 10, 08);
+            SetEndDate(2013, 12, 10);
 
-            var option = AddIndexOption("SPX", Resolution.Hour);
-            // BlackScholes model supports European style options
-            option.PriceModel = OptionPriceModels.BlackScholes();
-
-            SetWarmup(7, Resolution.Daily);
-
-            Init(option, optionStyleIsSupported: true);
+            AddFuture(Futures.Metals.Gold);
         }
+
+        public override void OnSecuritiesChanged(SecurityChanges changes)
+        {
+            foreach (var addedSecurity in changes.AddedSecurities.Where(added => !added.Symbol.IsCanonical()))
+            {
+                // With no future chain filters specified, it should return no contracts in security changes event.
+                // The canonical continuous future will get mapped and emit symbol changed events, while it's current mapped security is an internal feed
+                throw new Exception($"We expect no non canonical security to be added: {addedSecurity.Symbol}");
+            }
+        }
+
+        /// <summary>
+        /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
+        /// </summary>
+        public bool CanRunLocally { get; } = true;
+
+        /// <summary>
+        /// This is used by the regression test system to indicate which languages this algorithm is written in.
+        /// </summary>
+        public Language[] Languages { get; } = { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 216;
+        public long DataPoints => 473924;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public override int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Trades", "0"},
             {"Average Win", "0%"},
@@ -69,8 +90,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "0"},
-            {"Tracking Error", "0"},
+            {"Information Ratio", "-5.145"},
+            {"Tracking Error", "0.083"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

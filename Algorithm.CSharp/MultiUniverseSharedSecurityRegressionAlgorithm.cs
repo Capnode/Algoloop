@@ -13,45 +13,78 @@
  * limitations under the License.
 */
 
+using System;
+using System.Linq;
+using QuantConnect.Data;
+using QuantConnect.Interfaces;
 using System.Collections.Generic;
-using QuantConnect.Securities.Option;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm exercising an index covered European style option, using an option price model
-    /// that supports European style options and asserting that the option price model is used.
+    /// Regression algorithm reproducing the root issue of GH #6885, where multiple universes share the same security using different configurations
     /// </summary>
-    public class OptionPriceModelForSupportedEuropeanOptionRegressionAlgorithm : OptionPriceModelForOptionStylesBaseRegressionAlgorithm
+    public class MultiUniverseSharedSecurityRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        /// <summary>
+        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
+        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2021, 1, 14);
-            SetEndDate(2021, 1, 14);
+            SetStartDate(2013, 10, 07);
+            SetEndDate(2013, 10, 11);
 
-            var option = AddIndexOption("SPX", Resolution.Hour);
-            // BlackScholes model supports European style options
-            option.PriceModel = OptionPriceModels.BlackScholes();
+            AddEquity("SPY", Resolution.Minute);
 
-            SetWarmup(7, Resolution.Daily);
-
-            Init(option, optionStyleIsSupported: true);
+            // the universe bellow will use 'Hour' resolution so that the data feed configuration is different that the above
+            UniverseSettings.Resolution = Resolution.Hour;
+            AddUniverse("my-universe", x =>
+            {
+                if (x.Day == 8)
+                {
+                    return new List<string> { "SPY" };
+                }
+                return Enumerable.Empty<string>();
+            });
         }
+
+        /// <summary>
+        /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
+        /// </summary>
+        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
+        public override void OnData(Slice data)
+        {
+            var spy = Securities["SPY"];
+            if (!spy.IsTradable || spy.Price == 0)
+            {
+                throw new Exception("'SPY' should always be tradable and have a price even if removed by the custom universe!");
+            }
+        }
+
+        /// <summary>
+        /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
+        /// </summary>
+        public bool CanRunLocally { get; } = true;
+
+        /// <summary>
+        /// This is used by the regression test system to indicate which languages this algorithm is written in.
+        /// </summary>
+        public Language[] Languages { get; } = { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 216;
+        public long DataPoints => 4309;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public override int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Trades", "0"},
             {"Average Win", "0%"},
@@ -69,8 +102,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "0"},
-            {"Tracking Error", "0"},
+            {"Information Ratio", "-8.91"},
+            {"Tracking Error", "0.223"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
