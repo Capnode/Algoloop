@@ -67,6 +67,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Tracker vs Benchmark stoploss period")]
         private readonly string _rocPeriod = "0";
 
+        [Parameter("Tracker range stoploss period")]
+        private readonly string _rangePeriod = "0";
+
         [Parameter("Tracker stoploss period")]
         private readonly string _trackerPeriod = "0";
 
@@ -92,6 +95,7 @@ namespace Algoloop.Algorithm.CSharp
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
             int rocPeriod = int.Parse(_rocPeriod, CultureInfo.InvariantCulture);
+            int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
             int trackerPeriod = int.Parse(_trackerPeriod, CultureInfo.InvariantCulture);
             int benchmarkPeriod = int.Parse(_benchmarkPeriod, CultureInfo.InvariantCulture);
 
@@ -105,7 +109,7 @@ namespace Algoloop.Algorithm.CSharp
             MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
             SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, rocPeriod, trackerPeriod, benchmarkPeriod));
+            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, rocPeriod, rangePeriod, trackerPeriod, benchmarkPeriod));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));

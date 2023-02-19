@@ -67,11 +67,11 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
-        [Parameter("Tracker range stoploss period")]
-        private readonly string _rangePeriod = "0";
-
         [Parameter("Tracker vs Benchmark stoploss period")]
         private readonly string _rocPeriod = "0";
+
+        [Parameter("Tracker range stoploss period")]
+        private readonly string _rangePeriod = "0";
 
         [Parameter("Tracker sma stoploss period1")]
         private readonly string _trackerPeriod1 = "0";
@@ -157,8 +157,8 @@ namespace Algoloop.Algorithm.CSharp
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
-            int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
             int rocPeriod = int.Parse(_rocPeriod, CultureInfo.InvariantCulture);
+            int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
             int trackerPeriod1 = int.Parse(_trackerPeriod1, CultureInfo.InvariantCulture);
             int trackerPeriod2 = int.Parse(_trackerPeriod2, CultureInfo.InvariantCulture);
             int benchmarkPeriod1 = int.Parse(_benchmarkPeriod1, CultureInfo.InvariantCulture);
@@ -178,8 +178,8 @@ namespace Algoloop.Algorithm.CSharp
                 slots,
                 reinvest,
                 rebalance,
-                rangePeriod,
                 rocPeriod,
+                rangePeriod,
                 trackerPeriod1 >= 0 ? trackerPeriod1 : period1,
                 trackerPeriod2 >= 0 ? trackerPeriod2 : period2,
                 benchmarkPeriod1 >= 0 ? benchmarkPeriod1 : period1,

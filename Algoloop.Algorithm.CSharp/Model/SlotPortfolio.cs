@@ -26,6 +26,8 @@ namespace Algoloop.Algorithm.CSharp.Model
     // Portfolio construction scaffolding class; basic method args.
     public class SlotPortfolio : PortfolioConstructionModel
     {
+        private const int RocPeriod = 250;
+
         private readonly bool _logTargets = false;
         private readonly bool _logTrades = false;
         private readonly bool _logInsights = false;
@@ -56,14 +58,14 @@ namespace Algoloop.Algorithm.CSharp.Model
         public SlotPortfolio(
             int slots,
             bool reinvest,
-            float rebalance,
+            float rebalance = 0,
+            int rocPeriod = RocPeriod,
             int rangePeriod = 0,
-            int rocPeriod = 0,
             int trackerPeriod1 = 0,
             int trackerPeriod2 = 0,
             int indexPeriod1 = 0,
             int indexPeriod2 = 0,
-            decimal stoplossSizing = 0)
+            decimal stoplossSizing = 1)
         {
             _slots = slots;
             _reinvest = reinvest;
