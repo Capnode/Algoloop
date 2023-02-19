@@ -45,8 +45,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Optimizer", "O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Optimizer.Launcher", "Optimizer.Launcher\QuantConnect.Optimizer.Launcher.csproj", "{6415C4AE-7BC8-4A76-ADFD-D9F22E126865}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "QuantConnect.PythonToolbox", "PythonToolbox\QuantConnect.PythonToolbox.pyproj", "{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Queues", "Queues\QuantConnect.Queues.csproj", "{FAF8CCBB-E313-4CB2-A3C0-71B917983584}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Report", "Report\QuantConnect.Report.csproj", "{69541EE1-09CC-45FD-A341-7012CA7878F7}"
@@ -70,6 +68,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.ToolBox", "Algoloop.ToolBox\Algoloop.ToolBox.csproj", "{7F2727D6-9405-4D51-9DF0-BDFAB9B4D5B8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Algorithm.CSharp.Tests", "Algoloop.Algorithm.CSharp.Tests\Algoloop.Algorithm.CSharp.Tests.csproj", "{DC70C6FB-5898-4C97-AA7F-F4B67E575AA2}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "QuantConnect.Algorithm.PythonTools", "Algorithm.Python\QuantConnect.Algorithm.PythonTools.pyproj", "{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -505,16 +505,6 @@ Global
 		{6415C4AE-7BC8-4A76-ADFD-D9F22E126865}.Release|x64.Build.0 = Release|x64
 		{6415C4AE-7BC8-4A76-ADFD-D9F22E126865}.Release|x86.ActiveCfg = Release|x64
 		{6415C4AE-7BC8-4A76-ADFD-D9F22E126865}.Release|x86.Build.0 = Release|x64
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Debug|arm64.ActiveCfg = Debug|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|ARM.ActiveCfg = Release|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|arm64.ActiveCfg = Release|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|x64.ActiveCfg = Release|Any CPU
-		{1C47F4DB-2AFF-4FAE-9142-B33BE654A516}.Release|x86.ActiveCfg = Release|Any CPU
 		{FAF8CCBB-E313-4CB2-A3C0-71B917983584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FAF8CCBB-E313-4CB2-A3C0-71B917983584}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAF8CCBB-E313-4CB2-A3C0-71B917983584}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -715,6 +705,16 @@ Global
 		{DC70C6FB-5898-4C97-AA7F-F4B67E575AA2}.Release|x64.Build.0 = Release|x64
 		{DC70C6FB-5898-4C97-AA7F-F4B67E575AA2}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC70C6FB-5898-4C97-AA7F-F4B67E575AA2}.Release|x86.Build.0 = Release|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Release|arm64.ActiveCfg = Release|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Release|x64.ActiveCfg = Release|Any CPU
+		{4A5DED1F-3E34-40E2-B1F2-9A8A02195508}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
