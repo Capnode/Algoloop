@@ -232,7 +232,7 @@ namespace QuantConnect.Lean.Engine
                 {
                     if (hasOnDataSymbolChangedEvents)
                     {
-                        methodInvokers[typeof (SymbolChangedEvents)](algorithm, timeSlice.Slice.SymbolChangedEvents);
+                        methodInvokers[typeof(SymbolChangedEvents)](algorithm, timeSlice.Slice.SymbolChangedEvents);
                     }
                     foreach (var symbol in timeSlice.Slice.SymbolChangedEvents.Keys)
                     {
@@ -283,7 +283,7 @@ namespace QuantConnect.Lean.Engine
                             Security security;
                             if (algorithm.Securities.TryGetValue(data.Symbol, out security))
                             {
-                                security.Cache.StoreData(new[] {data}, data.GetType());
+                                security.Cache.StoreData(new[] { data }, data.GetType());
                             }
                         }
                     }
@@ -489,7 +489,7 @@ namespace QuantConnect.Lean.Engine
                 if (!algorithm.LiveMode)
                 {
                     // Keep this up to date even though we don't process delistings here anymore
-                    foreach(var delisting in timeSlice.Slice.Delistings.Values)
+                    foreach (var delisting in timeSlice.Slice.Delistings.Values)
                     {
                         if (delisting.Type == DelistingType.Warning)
                         {
@@ -676,7 +676,7 @@ namespace QuantConnect.Lean.Engine
                         // send some status to the user letting them know we're done history, but still warming up,
                         // catching up to real time data
                         nextWarmupStatusTime = now.AddSeconds(2);
-                        var newPercent = (int) (100*(timeSlice.Time.Ticks - startTimeTicks)/(double) (warmupEndTicks - startTimeTicks));
+                        var newPercent = (int)(100 * (timeSlice.Time.Ticks - startTimeTicks) / (double)(warmupEndTicks - startTimeTicks));
                         // if there isn't any progress don't send the same update many times
                         if (newPercent != warmingUpPercent)
                         {
@@ -856,7 +856,7 @@ namespace QuantConnect.Lean.Engine
         /// <returns>True if the method existed and was added to the collection</returns>
         private bool AddMethodInvoker<T>(IAlgorithm algorithm, Dictionary<Type, MethodInvoker> methodInvokers, string methodName = "OnData")
         {
-            var newSplitMethodInfo = algorithm.GetType().GetMethod(methodName, new[] {typeof (T)});
+            var newSplitMethodInfo = algorithm.GetType().GetMethod(methodName, new[] { typeof(T) });
             if (newSplitMethodInfo != null)
             {
                 methodInvokers.Add(typeof(T), newSplitMethodInfo.DelegateForCallMethod());

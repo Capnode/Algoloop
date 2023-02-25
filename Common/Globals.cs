@@ -1,7 +1,6 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +37,7 @@ namespace QuantConnect
         /// <summary>
         /// Resets global values with the Config data.
         /// </summary>
-        public static void Reset ()
+        public static void Reset()
         {
             DataFolder = Config.Get("data-folder", Config.Get("data-directory", @"../../../Data/"));
 

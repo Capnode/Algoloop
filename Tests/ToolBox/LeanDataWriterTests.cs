@@ -1,7 +1,6 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,16 +58,6 @@ namespace QuantConnect.Tests.ToolBox
                 new Tick(Parse.DateTime("3/16/2017 12:00:00 PM"), sym, 1.0m, 2.0m),
                 new Tick(Parse.DateTime("3/16/2017 12:00:01 PM"), sym, 3.0m, 4.0m),
                 new Tick(Parse.DateTime("3/16/2017 12:00:02 PM"), sym, 5.0m, 6.0m),
-            };
-        }
-
-        private List<Tick> GetTicks2(Symbol sym)
-        {
-            return new List<Tick>()
-            {
-                new Tick(Parse.DateTime("3/16/2017 12:00:03 PM"), sym, 11.0m, 12.0m),
-                new Tick(Parse.DateTime("3/16/2017 12:00:04 PM"), sym, 13.0m, 14.0m),
-                new Tick(Parse.DateTime("3/16/2017 12:00:05 PM"), sym, 15.0m, 16.0m),
             };
         }
 
@@ -313,7 +302,7 @@ namespace QuantConnect.Tests.ToolBox
             // Create our writer and LocalHistory brokerage to "download" from
             var writer = new LeanDataWriter(_dataDirectory, resolution, securityType, tickType);
             var brokerage = new LocalHistoryBrokerage();
-            var symbols = new List<Symbol>() {symbol};
+            var symbols = new List<Symbol>() { symbol };
 
             // "Download" and write to file
             writer.DownloadAndSave(brokerage, symbols, startTimeUtc, endTimeUtc);
@@ -416,7 +405,7 @@ namespace QuantConnect.Tests.ToolBox
         /// <summary>
         /// Fake brokerage that just uses Local Disk Data to do history requests
         /// </summary>
-        internal class LocalHistoryBrokerage : NullBrokerage 
+        internal class LocalHistoryBrokerage : NullBrokerage
         {
             private readonly IDataCacheProvider _dataCacheProvider;
             private readonly IHistoryProvider _historyProvider;
@@ -450,7 +439,7 @@ namespace QuantConnect.Tests.ToolBox
 
             public override IEnumerable<BaseData> GetHistory(HistoryRequest request)
             {
-                var requests = new List<HistoryRequest> {request};
+                var requests = new List<HistoryRequest> { request };
                 var slices = _historyProvider.GetHistory(requests, DateTimeZone.Utc);
 
                 // Grab all the bar values for this
