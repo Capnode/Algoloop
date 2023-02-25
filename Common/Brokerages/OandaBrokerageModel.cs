@@ -13,6 +13,7 @@
  * limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 using QuantConnect.Benchmarks;
 using QuantConnect.Orders;
@@ -40,6 +41,13 @@ namespace QuantConnect.Brokerages
             {SecurityType.Cfd, Market.Oanda}
         }.ToReadOnlyDictionary();
 
+        private readonly HashSet<OrderType> _supportedOrderTypes = new()
+        {
+            OrderType.Limit,
+            OrderType.Market,
+            OrderType.StopMarket
+        };
+
         /// <summary>
         /// Gets a map of the default markets to be used for each security type
         /// </summary>
@@ -53,6 +61,10 @@ namespace QuantConnect.Brokerages
         public OandaBrokerageModel(AccountType accountType = AccountType.Margin)
             : base(accountType)
         {
+            if (accountType == AccountType.Cash)
+            {
+                throw new InvalidOperationException($"Oanda brokerage can only be used with a {AccountType.Margin} account type");
+            }
         }
 
         /// <summary>
@@ -80,10 +92,10 @@ namespace QuantConnect.Brokerages
             }
 
             // validate order type
-            if (order.Type != OrderType.Limit && order.Type != OrderType.Market && order.Type != OrderType.StopMarket)
+            if (!_supportedOrderTypes.Contains(order.Type))
             {
                 message = new BrokerageMessageEvent(BrokerageMessageType.Warning, "NotSupported",
-                    Messages.DefaultBrokerageModel.UnsupportedOrderType(this, order));
+                    Messages.DefaultBrokerageModel.UnsupportedOrderType(this, order, _supportedOrderTypes));
 
                 return false;
             }
