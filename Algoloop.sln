@@ -36,6 +36,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Indicators", "Indicators\QuantConnect.Indicators.csproj", "{24057A0C-D3EB-474C-A080-A58049976681}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Lean.Launcher", "Launcher\QuantConnect.Lean.Launcher.csproj", "{495DCDEB-C852-42B5-B8E9-0BA4C84575C7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FEEDA758-03C9-42ED-9AC7-3C8AC2B74CC2} = {FEEDA758-03C9-42ED-9AC7-3C8AC2B74CC2}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Logging", "Logging\QuantConnect.Logging.csproj", "{701A1899-B0DB-4431-864B-CF12FAF13B5E}"
 EndProject
@@ -57,8 +60,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.ToolBox", "Too
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.ViewModel", "Algoloop.ViewModel\Algoloop.ViewModel.csproj", "{D0D24830-311F-4028-A427-CEF37F792442}"
 	ProjectSection(ProjectDependencies) = postProject
-		{6415C4AE-7BC8-4A76-ADFD-D9F22E126865} = {6415C4AE-7BC8-4A76-ADFD-D9F22E126865}
 		{495DCDEB-C852-42B5-B8E9-0BA4C84575C7} = {495DCDEB-C852-42B5-B8E9-0BA4C84575C7}
+		{6415C4AE-7BC8-4A76-ADFD-D9F22E126865} = {6415C4AE-7BC8-4A76-ADFD-D9F22E126865}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Model", "Algoloop.Model\Algoloop.Model.csproj", "{8B2C72B2-69D0-4146-B200-30EEAC55DFE7}"

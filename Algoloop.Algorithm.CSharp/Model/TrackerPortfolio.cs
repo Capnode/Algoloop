@@ -261,6 +261,14 @@ namespace Algoloop.Algorithm.CSharp.Model
                 Security security = algorithm.Securities[trade.Symbol];
                 var order = new MarketOrder(trade.Symbol, -trade.Quantity, algorithm.Time, security.Close);
                 decimal fee = Fee(order, security);
+                decimal cost = order.Value + fee;
+                if (cost > 0)
+                {
+                    if (FreeCash - cost < 0)
+                        continue;
+                     _reserved += cost;
+                }
+
                 order = new MarketOrder(trade.Symbol, -trade.Quantity, algorithm.Time, security.Close, fee.ToString());
                 _orders.Add(order);
             }
@@ -291,6 +299,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                     continue;
 
                 order = new MarketOrder(insight.Symbol, quantity, algorithm.Time, security.Close, fee.ToString());
+                if (order.Value < 2 * fee)
+                    continue;
+
                 _reserved += order.Value + fee;
                 freeSlots--;
                 _orders.Add(order);
@@ -324,6 +335,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                         continue;
 
                     order = new MarketOrder(insight.Symbol, diff, algorithm.Time, security.Close, fee.ToString());
+                    if (order.Value < 2 * fee)
+                        continue;
+
                     _reserved += value;
                     _orders.Add(order);
                 }
@@ -333,6 +347,14 @@ namespace Algoloop.Algorithm.CSharp.Model
                     decimal diff = modelQuantity - trade.Quantity;
                     var order = new MarketOrder(insight.Symbol, diff, algorithm.Time, security.Close);
                     decimal fee = Fee(order, security);
+                    decimal cost = order.Value + fee;
+                    if (cost > 0)
+                    {
+                        if (FreeCash - cost < 0)
+                            continue;
+                        _reserved += cost;
+                    }
+
                     order = new MarketOrder(insight.Symbol, diff, algorithm.Time, security.Close, fee.ToString());
                     _orders.Add(order);
                 }
