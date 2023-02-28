@@ -58,7 +58,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             Assert.IsTrue(result.TryGetValue("Total Trades", out string trades));
             Assert.IsTrue(int.TryParse(trades, out int trade));
             Logger.LogMessage($"trade={trade}");
-            Assert.AreEqual(10, trade);
+            Assert.AreEqual(8, trade);
         }
 
         [TestMethod]
@@ -81,13 +81,14 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                     { "Slots", "2" },
                     { "Rebalance trigger (min)", "0.7" },
                     { "Tracker stoploss period", "10" },
+                    { "Stoploss sizing", "0" },
                 });
 
             result.ToList().ForEach(m => Console.Out.WriteLine($"{m.Key}={m.Value}"));
             Assert.IsTrue(result.TryGetValue("Total Trades", out string trades));
             Assert.IsTrue(int.TryParse(trades, out int trade));
             Logger.LogMessage($"trade={trade}");
-            Assert.AreEqual(88, trade);
+            Assert.AreEqual(102, trade);
         }
     }
 }

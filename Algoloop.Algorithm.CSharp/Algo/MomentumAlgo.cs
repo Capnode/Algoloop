@@ -76,6 +76,8 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Benchmark stoploss period")]
         private readonly string _benchmarkPeriod = "0";
 
+        [Parameter("Stoploss sizing")]
+        private readonly string _stoplossSizing = "1";
 
         public override void Initialize()
         {
@@ -98,6 +100,7 @@ namespace Algoloop.Algorithm.CSharp
             int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
             int trackerPeriod = int.Parse(_trackerPeriod, CultureInfo.InvariantCulture);
             int benchmarkPeriod = int.Parse(_benchmarkPeriod, CultureInfo.InvariantCulture);
+            decimal stoplossSizing = decimal.Parse(_stoplossSizing, CultureInfo.InvariantCulture);
 
             List<Symbol> symbols = _symbols
                 .Split(';')
@@ -109,7 +112,17 @@ namespace Algoloop.Algorithm.CSharp
             MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
             SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance, rocPeriod, rangePeriod, trackerPeriod, benchmarkPeriod));
+            SetPortfolioConstruction(new SlotPortfolio(
+                slots,
+                reinvest,
+                rebalance,
+                0,
+                rocPeriod,
+                trackerPeriod,
+                benchmarkPeriod,
+                0,
+                0,
+                stoplossSizing));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
