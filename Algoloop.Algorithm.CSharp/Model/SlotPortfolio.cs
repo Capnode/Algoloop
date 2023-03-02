@@ -59,7 +59,6 @@ namespace Algoloop.Algorithm.CSharp.Model
             int slots,
             bool reinvest,
             float rebalance = 0,
-            int rocPeriod = RocPeriod,
             int rangePeriod = 0,
             int trackerPeriod1 = 0,
             int trackerPeriod2 = 0,
@@ -76,11 +75,11 @@ namespace Algoloop.Algorithm.CSharp.Model
                 _trackerHigh = new Maximum($"Tracker High({rangePeriod})", rangePeriod);
                 _trackerLow = new Minimum($"Tracker Low({rangePeriod})", rangePeriod);
             }
-            if (rocPeriod > 0)
+            if (RocPeriod > 0)
             {
-                _trackerRoc = new RateOfChange(rocPeriod);
-                _benchmarkRoc = new RateOfChange(rocPeriod);
-                _portfolioRoc = new RateOfChange(rocPeriod);
+                _trackerRoc = new RateOfChange(RocPeriod);
+                _benchmarkRoc = new RateOfChange(RocPeriod);
+                _portfolioRoc = new RateOfChange(RocPeriod);
             }
             if (trackerPeriod1 > 0)
             {
@@ -156,10 +155,10 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal trackerSizingFactor = ProcessTracker(algorithm, trackerValue);
             decimal indexSizingFactor = ProcessBenchmark(algorithm, benchmarkValue);
             ProcessPortfolio(algorithm, portfolioValue);
-            decimal rocSizingFactor = ProcessRoc(algorithm);
+            ProcessRoc(algorithm);
 
             // Determine leverage
-            decimal sizingFactor = trackerSizingFactor * indexSizingFactor * rocSizingFactor;
+            decimal sizingFactor = trackerSizingFactor * indexSizingFactor;
             if (sizingFactor != _sizingFactor)
             {
                 _leverage = sizingFactor * portfolioValue / trackerValue;
@@ -317,7 +316,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (_trackerRoc == null || _benchmarkRoc == null) return 1;
             if (!_trackerRoc.IsReady || !_benchmarkRoc.IsReady) return 1;
             decimal diff = _trackerRoc - _benchmarkRoc;
-            algorithm.Plot($"Tracker({_trackerRoc.Period}) vs {_indexName}({_benchmarkRoc.Period})", diff);
+            algorithm.Plot($"Tracker({_trackerRoc.Period}) - {_indexName}({_benchmarkRoc.Period})", diff);
             if (diff >= 0) return 1;
             return _stoplossSizing;
         }
