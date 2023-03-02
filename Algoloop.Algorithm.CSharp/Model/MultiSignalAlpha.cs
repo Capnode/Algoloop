@@ -71,6 +71,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                         algorithm.Log($"{pair.Key} {symbolData.GetType().Name}: {signal}");
                     }
 
+                    if (float.IsNaN(signal)) continue;
                     if (float.IsNaN(score))
                     {
                         score = signal;
@@ -87,10 +88,9 @@ namespace Algoloop.Algorithm.CSharp.Model
                     {
                         score = 0;
                     }
-
                 }
 
-                if (score == 0) continue;
+                if (float.IsNaN(score) || score == 0) continue;
                 TimeSpan period = _resolution.ToTimeSpan().Multiply(_hold).Subtract(TimeSpan.FromTicks(1));
                 DateTime closeTimeUtc = algorithm.UtcTime.Add(period);
 
