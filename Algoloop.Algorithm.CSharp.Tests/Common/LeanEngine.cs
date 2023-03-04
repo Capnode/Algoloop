@@ -59,7 +59,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
 
             AlgorithmManager algorithmManager = null;
             var statistics = new Dictionary<string, string>();
-            var alphaStatistics = new AlphaRuntimeStatistics(new TestAccountCurrencyProvider());
+            var alphaStatistics = new AlphaRuntimeStatistics();
             BacktestingResultHandler results = null;
 
             Composer.Instance.Reset();
@@ -153,19 +153,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 }
 
                 Assert.AreEqual(expected, result, "Failed on " + expectedStat.Key);
-            }
-
-            if (expectedAlphaStatistics != null)
-            {
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.MeanPopulationScore.Direction);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.MeanPopulationScore.Magnitude);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.RollingAveragedPopulationScore.Direction);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.RollingAveragedPopulationScore.Magnitude);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.LongShortRatio);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.TotalInsightsClosed);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.TotalInsightsGenerated);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.TotalAccumulatedEstimatedAlphaValue);
-                AssertAlphaStatistics(expectedAlphaStatistics, alphaStatistics, s => s.TotalInsightsAnalysisCompleted);
             }
 
             // Use reflection to get protected property
