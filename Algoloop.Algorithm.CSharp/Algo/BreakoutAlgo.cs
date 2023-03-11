@@ -52,17 +52,17 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Slots")]
         private readonly string _slots = "1";
 
-        [Parameter("Daily turnover (min)")]
-        private readonly string _turnover = "0";
-
-        [Parameter("Daily turnover period")]
-        private readonly string _turnoverPeriod = "0";
-
         [Parameter("Reinvest")]
         private readonly string _reinvest = "false";
 
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
+
+        [Parameter("Daily turnover (min)")]
+        private readonly string _turnover = "0";
+
+        [Parameter("Daily turnover period")]
+        private readonly string _turnoverPeriod = "0";
 
         public override void Initialize()
         {

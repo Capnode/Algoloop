@@ -55,12 +55,6 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Slots")]
         private readonly string _slots = "1";
 
-        [Parameter("Daily turnover (min)")]
-        private readonly string _turnover = "0";
-
-        [Parameter("Daily turnover period")]
-        private readonly string _turnoverPeriod = "0";
-
         [Parameter("Reinvest")]
         private readonly string _reinvest = "false";
 
@@ -84,6 +78,12 @@ namespace Algoloop.Algorithm.CSharp
 
         [Parameter("Stoploss sizing")]
         private readonly string _stoplossSizing = "1";
+
+        [Parameter("Daily turnover (min)")]
+        private readonly string _turnover = "0";
+
+        [Parameter("Daily turnover period")]
+        private readonly string _turnoverPeriod = "0";
 
         [Parameter("Market capitalization (M min)")]
         private readonly string _marketCap = null;
