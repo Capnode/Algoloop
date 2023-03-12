@@ -132,6 +132,18 @@ namespace QuantConnect
                 return Invariant($@"Warning: No quote information available at {tradeBar.EndTime.ToStringInvariant()} {
                     security.Exchange.TimeZone}, order filled using TradeBar data");
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static string FilledWithOpenDueToFavorableGap(Securities.Security security, TradeBar tradeBar)
+            {
+                return Invariant($@"Due to a favorable gap at {tradeBar.EndTime.ToStringInvariant()} {security.Exchange.TimeZone}, order filled using the open price ({tradeBar.Open})");
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static string FilledWithOpenDueToUnfavorableGap(Securities.Security security, TradeBar tradeBar)
+            {
+                return Invariant($@"Due to an unfavorable gap at {tradeBar.EndTime.ToStringInvariant()} {security.Exchange.TimeZone}, order filled using the open price ({tradeBar.Open})");
+            }
         }
     }
 }

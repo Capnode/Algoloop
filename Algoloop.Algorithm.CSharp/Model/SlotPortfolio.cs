@@ -141,7 +141,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 .ThenBy(m => m.Symbol.ID.Symbol)
                 .ToArray();
             _trackerPortfolio.CreateTargets(algorithm, insights);
-            _insights.Clear();
+            Symbol[] symbols = _insights.Select(m => m.Symbol).ToArray();
+            _insights.Clear(symbols);
             _insights.AddRange(insights); // Add in random order
             if (_logInsights)
             {

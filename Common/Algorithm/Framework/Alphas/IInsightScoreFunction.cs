@@ -11,20 +11,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
 
-using QuantConnect.Lean.Engine.Alphas;
+using System;
+using QuantConnect.Algorithm.Framework.Alphas.Analysis;
 
-namespace Algoloop.ViewModel.Internal.Lean
+namespace QuantConnect.Algorithm.Framework.Alphas
 {
     /// <summary>
-    /// Default alpha handler that supports sending insights to the messaging handler, analyzing insights online
+    /// Abstraction in charge of scoring insights
     /// </summary>
-    internal class AlphaHandler : DefaultAlphaHandler
+    public interface IInsightScoreFunction
     {
-        protected override void StoreInsights()
-        {
-        }
+        /// <summary>
+        /// Method to evaluate and score insights for each time step
+        /// </summary>
+        void Score(InsightManager insightManager, DateTime utcTime);
     }
 }

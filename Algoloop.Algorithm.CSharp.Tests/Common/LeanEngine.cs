@@ -18,7 +18,6 @@ using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Interfaces;
 using QuantConnect.Lean.Engine;
-using QuantConnect.Lean.Engine.Alphas;
 using QuantConnect.Lean.Engine.Results;
 using QuantConnect.Logging;
 using QuantConnect.Orders;
@@ -47,7 +46,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             string setupHandler = "RegressionSetupHandlerWrapper";
             AlgorithmStatus expectedFinalStatus = AlgorithmStatus.Completed;
             Dictionary<string, string> expectedStatistics = new ();
-            AlphaRuntimeStatistics expectedAlphaStatistics = null;
             Language language = Language.CSharp;
 
             Config.Set("debug-mode", "false");
@@ -59,7 +57,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
 
             AlgorithmManager algorithmManager = null;
             var statistics = new Dictionary<string, string>();
-            var alphaStatistics = new AlphaRuntimeStatistics();
             BacktestingResultHandler results = null;
 
             Composer.Instance.Reset();
@@ -120,8 +117,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 results = backtestingResultHandler;
                 statistics = backtestingResultHandler.FinalStatistics;
 
-                var defaultAlphaHandler = (DefaultAlphaHandler)algorithmHandlers.Alphas;
-                alphaStatistics = defaultAlphaHandler.RuntimeStatistics;
             }
             catch (Exception ex)
             {
@@ -161,25 +156,6 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             Assert.IsNotNull(runtimeStatistics);
             Assert.IsNotNull(results.FinalStatistics);
             return runtimeStatistics.Concat(results.FinalStatistics).ToDictionary();
-        }
-
-        private static void AssertAlphaStatistics(AlphaRuntimeStatistics expected, AlphaRuntimeStatistics actual, Expression<Func<AlphaRuntimeStatistics, object>> selector)
-        {
-            // extract field name from expression
-            var field = selector.AsEnumerable().OfType<MemberExpression>().First().ToString();
-            field = field[(field.IndexOf('.') + 1)..];
-
-            var func = selector.Compile();
-            var expectedValue = func(expected);
-            var actualValue = func(actual);
-            if (expectedValue is double value)
-            {
-                Assert.AreEqual(value, (double)actualValue, 1e-4, "Failed on alpha statistics " + field);
-            }
-            else
-            {
-                Assert.AreEqual(expectedValue, actualValue, "Failed on alpha statistics " + field);
-            }
         }
     }
 
