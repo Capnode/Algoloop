@@ -11,44 +11,28 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
 
-using QuantConnect.Data;
-using QuantConnect.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
+
+using QuantConnect.Interfaces;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm which tests the default option price model
+    /// Algorithm asserting that the <see cref="DataNormalizationMode.ScaledRaw"/> data normalization mode is not allowed for adding subscriptions.
     /// </summary>
-    /// <meta name="tag" content="options" />
-    public class DefaultOptionPriceModelRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class ScaledRawDataNormalizationModeNotAllowedSecuritiesAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
         public override void Initialize()
         {
-            SetStartDate(2021, 1, 4);
-            SetEndDate(2021, 1, 4);
+            SetStartDate(2014, 9, 1);
+            SetEndDate(2014, 9, 30);
             SetCash(100000);
 
-            AddIndex("SPX");
-            AddIndexOption("SPX");
-        }
-
-        public override void OnData(Slice slice)
-        {
-            if (slice.OptionChains.Any(kvp => kvp.Value.Any(
-                    contract => contract.Greeks.Delta == 0 &&
-                        contract.Greeks.Gamma == 0 && 
-                        contract.Greeks.Theta == 0 && 
-                        contract.Greeks.Vega == 0 && 
-                        contract.Greeks.Rho == 0)))
-            {
-                throw new Exception("All Greeks are zero - Pricing Model is not ready!");
-            }
+            // Cannot add securities with DataNormalizationMode.ScaledRaw.
+            // The DataManager should throw for this subscription
+            AddEquity("AAPL", Resolution.Daily, dataNormalizationMode: DataNormalizationMode.ScaledRaw);
         }
 
         /// <summary>
@@ -64,7 +48,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 7311;
+        public long DataPoints => 0;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -76,29 +60,6 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "0"},
-            {"Average Win", "0%"},
-            {"Average Loss", "0%"},
-            {"Compounding Annual Return", "0%"},
-            {"Drawdown", "0%"},
-            {"Expectancy", "0"},
-            {"Net Profit", "0%"},
-            {"Sharpe Ratio", "0"},
-            {"Probabilistic Sharpe Ratio", "0%"},
-            {"Loss Rate", "0%"},
-            {"Win Rate", "0%"},
-            {"Profit-Loss Ratio", "0"},
-            {"Alpha", "0"},
-            {"Beta", "0"},
-            {"Annual Standard Deviation", "0"},
-            {"Annual Variance", "0"},
-            {"Information Ratio", "0"},
-            {"Tracking Error", "0"},
-            {"Treynor Ratio", "0"},
-            {"Total Fees", "$0.00"},
-            {"Estimated Strategy Capacity", "$0"},
-            {"Lowest Capacity Asset", ""},
-            {"Portfolio Turnover", "0%"},
             {"OrderListHash", "d41d8cd98f00b204e9800998ecf8427e"}
         };
     }

@@ -11,43 +11,74 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
+
+using System;
+using System.Collections.Generic;
 
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using QuantConnect.Securities;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm which tests the default option price model
+    /// Algorithm asserting that the volatility models don't have big jumps due to price discontinuities on splits and dividends when using raw data
     /// </summary>
-    /// <meta name="tag" content="options" />
-    public class DefaultOptionPriceModelRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class VolatilityModelsWithRawDataAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        private Symbol _aapl;
+
+        private int _splitsCount;
+        private int _dividendsCount;
+
         public override void Initialize()
         {
-            SetStartDate(2021, 1, 4);
-            SetEndDate(2021, 1, 4);
+            SetStartDate(2014, 1, 1);
+            SetEndDate(2014, 12, 31);
             SetCash(100000);
 
-            AddIndex("SPX");
-            AddIndexOption("SPX");
+            var equity = AddEquity("AAPL", Resolution.Daily, dataNormalizationMode: DataNormalizationMode.Raw);
+            equity.SetVolatilityModel(new StandardDeviationOfReturnsVolatilityModel(7));
+
+            _aapl = equity.Symbol;
         }
 
         public override void OnData(Slice slice)
         {
-            if (slice.OptionChains.Any(kvp => kvp.Value.Any(
-                    contract => contract.Greeks.Delta == 0 &&
-                        contract.Greeks.Gamma == 0 && 
-                        contract.Greeks.Theta == 0 && 
-                        contract.Greeks.Vega == 0 && 
-                        contract.Greeks.Rho == 0)))
+            if (slice.Splits.ContainsKey(_aapl))
             {
-                throw new Exception("All Greeks are zero - Pricing Model is not ready!");
+                _splitsCount++;
+            }
+
+            if (slice.Dividends.ContainsKey(_aapl))
+            {
+                _dividendsCount++;
+            }
+        }
+
+        public override void OnEndOfDay(Symbol symbol)
+        {
+            if (symbol != _aapl)
+            {
+                return;
+            }
+
+            // This is expected only in this case, 0.6 is not a magical number of any kind.
+            // Just making sure we don't get big jumps on volatility
+            if (Securities[_aapl].VolatilityModel.Volatility > 0.6m)
+            {
+                throw new Exception(
+                    "Expected volatility to stay less than 0.6 (not big jumps due to price discontinuities on splits and dividends), " +
+                    $"but got {Securities[_aapl].VolatilityModel.Volatility}");
+            }
+        }
+
+        public override void OnEndOfAlgorithm()
+        {
+            if (_splitsCount == 0 || _dividendsCount == 0)
+            {
+                throw new Exception($"Expected to receive at least one split and one dividend, but got {_splitsCount} splits and {_dividendsCount} dividends");
             }
         }
 
@@ -64,12 +95,12 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 7311;
+        public long DataPoints => 2022;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 40;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
@@ -92,8 +123,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "0"},
-            {"Tracking Error", "0"},
+            {"Information Ratio", "-1.025"},
+            {"Tracking Error", "0.094"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

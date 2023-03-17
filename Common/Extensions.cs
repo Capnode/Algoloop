@@ -966,66 +966,6 @@ namespace QuantConnect
         }
 
         /// <summary>
-        /// Removes the specified element to the collection with the specified key. If the entry's count drops to
-        /// zero, then the entry will be removed.
-        /// </summary>
-        /// <typeparam name="TKey">The key type</typeparam>
-        /// <typeparam name="TElement">The collection element type</typeparam>
-        /// <param name="dictionary">The source dictionary to be added to</param>
-        /// <param name="key">The key</param>
-        /// <param name="element">The element to be added</param>
-        public static ImmutableDictionary<TKey, ImmutableHashSet<TElement>> Remove<TKey, TElement>(
-            this ImmutableDictionary<TKey, ImmutableHashSet<TElement>> dictionary,
-            TKey key,
-            TElement element
-            )
-        {
-            ImmutableHashSet<TElement> set;
-            if (!dictionary.TryGetValue(key, out set))
-            {
-                return dictionary;
-            }
-
-            set = set.Remove(element);
-            if (set.Count == 0)
-            {
-                return dictionary.Remove(key);
-            }
-
-            return dictionary.SetItem(key, set);
-        }
-
-        /// <summary>
-        /// Removes the specified element to the collection with the specified key. If the entry's count drops to
-        /// zero, then the entry will be removed.
-        /// </summary>
-        /// <typeparam name="TKey">The key type</typeparam>
-        /// <typeparam name="TElement">The collection element type</typeparam>
-        /// <param name="dictionary">The source dictionary to be added to</param>
-        /// <param name="key">The key</param>
-        /// <param name="element">The element to be added</param>
-        public static ImmutableSortedDictionary<TKey, ImmutableHashSet<TElement>> Remove<TKey, TElement>(
-            this ImmutableSortedDictionary<TKey, ImmutableHashSet<TElement>> dictionary,
-            TKey key,
-            TElement element
-            )
-        {
-            ImmutableHashSet<TElement> set;
-            if (!dictionary.TryGetValue(key, out set))
-            {
-                return dictionary;
-            }
-
-            set = set.Remove(element);
-            if (set.Count == 0)
-            {
-                return dictionary.Remove(key);
-            }
-
-            return dictionary.SetItem(key, set);
-        }
-
-        /// <summary>
         /// Adds the specified Tick to the Ticks collection. If an entry does not exist for the specified key then one will be created.
         /// </summary>
         /// <param name="dictionary">The ticks dictionary</param>
@@ -1037,8 +977,7 @@ namespace QuantConnect
             List<Tick> list;
             if (!dictionary.TryGetValue(key, out list))
             {
-                list = new List<Tick>(1);
-                dictionary.Add(key, list);
+                dictionary[key] = list = new List<Tick>(1);
             }
             list.Add(tick);
         }
@@ -3279,9 +3218,10 @@ namespace QuantConnect
             {
                 case DataNormalizationMode.Adjusted:
                 case DataNormalizationMode.SplitAdjusted:
-                    return data?.Scale(TimesFactor, 1/factor, factor, decimal.Zero);
+                case DataNormalizationMode.ScaledRaw:
+                    return data?.Scale(TimesFactor, 1 / factor, factor, decimal.Zero);
                 case DataNormalizationMode.TotalReturn:
-                    return data.Scale(TimesFactor, 1/factor, factor, sumOfDividends);
+                    return data.Scale(TimesFactor, 1 / factor, factor, sumOfDividends);
 
                 case DataNormalizationMode.BackwardsRatio:
                     return data.Scale(TimesFactor, 1, factor, decimal.Zero);

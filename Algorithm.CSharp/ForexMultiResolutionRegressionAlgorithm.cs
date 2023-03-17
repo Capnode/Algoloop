@@ -11,43 +11,67 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
 
+using System;
+using System.Linq;
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm which tests the default option price model
+    /// This algorithm is a test case for forex symbols at multiple resolutions.
     /// </summary>
-    /// <meta name="tag" content="options" />
-    public class DefaultOptionPriceModelRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class ForexMultiResolutionRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
+        private readonly Dictionary<Symbol, int> _dataPointsPerSymbol = new();
+
+        /// <summary>
+        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
+        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2021, 1, 4);
-            SetEndDate(2021, 1, 4);
-            SetCash(100000);
+            SetStartDate(2013, 10, 7);
+            SetEndDate(2013, 10, 8);
 
-            AddIndex("SPX");
-            AddIndexOption("SPX");
+            var eurgbp = AddForex("EURGBP", Resolution.Daily);
+            _dataPointsPerSymbol.Add(eurgbp.Symbol, 0);
+
+            var gbpusd = AddForex("EURUSD", Resolution.Hour);
+            _dataPointsPerSymbol.Add(gbpusd.Symbol, 0);
         }
 
-        public override void OnData(Slice slice)
+        /// <summary>
+        /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
+        /// </summary>
+        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
+        public override void OnData(Slice data)
         {
-            if (slice.OptionChains.Any(kvp => kvp.Value.Any(
-                    contract => contract.Greeks.Delta == 0 &&
-                        contract.Greeks.Gamma == 0 && 
-                        contract.Greeks.Theta == 0 && 
-                        contract.Greeks.Vega == 0 && 
-                        contract.Greeks.Rho == 0)))
+            foreach (var kvp in data)
             {
-                throw new Exception("All Greeks are zero - Pricing Model is not ready!");
+                var symbol = kvp.Key;
+                _dataPointsPerSymbol[symbol]++;
+
+                if (symbol == "EURUSD" && kvp.Value.IsFillForward)
+                {
+                    throw new Exception($"Unexpected fill forward for 'EURUSD' bar at {Time}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// End of algorithm run event handler. This method is called at the end of a backtest or live trading operation. Intended for closing out logs.
+        /// </summary>
+        public override void OnEndOfAlgorithm()
+        {
+            if (// first bat at '10/7/2013 8:00:00 PM' + hour FFing until next bar '10/8/2013 8:00:00 PM' + 4 more FF bars until 10/9/2013 12:00:00 AM
+                _dataPointsPerSymbol["EURGBP"] != 29
+                // data from '10/7/2013 12:00:00 AM' to '10/9/2013 12:00:00 AM'
+                || _dataPointsPerSymbol["EURUSD"] != 49)
+            {
+                throw new Exception($"Data point count mismatch for symbol {string.Join(",", _dataPointsPerSymbol.Select(kvp => $"{kvp.Key}:{kvp.Value}"))}");
             }
         }
 
@@ -64,12 +88,12 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 7311;
+        public long DataPoints => 100;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 189;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
