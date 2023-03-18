@@ -71,7 +71,7 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod]
-        public void Download_one_symbol()
+        public void GetUpdateOneSymbol()
         {
             // Arrange
             DateTime lastDate = _market.LastDate;
@@ -102,6 +102,30 @@ namespace Algoloop.Tests.Provider
             Assert.IsNotNull(symbol.Properties);
             Assert.AreEqual(5, symbol.Properties.Count);
             Assert.IsTrue(File.Exists(Path.Combine(_equityFolder, "daily", "inve-b.st.zip")));
+        }
+
+        [TestMethod]
+        public void GetUpdateRemoveObsoleteSymbol()
+        {
+            // Arrange
+            DateTime lastDate = _market.LastDate;
+            const string ticker = "SWMA.ST";
+            var symbol0 = new SymbolModel(ticker, string.Empty, SecurityType.Base)
+            {
+                Active = false,
+                Name = ticker
+            };
+            _market.Symbols.Add(symbol0);
+
+            // Act
+            using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
+            provider.GetUpdate(_market, null);
+
+            // Assert
+            Assert.IsNotNull(_market.Symbols);
+            Assert.IsFalse(_market.Active);
+            Assert.IsTrue(_market.LastDate == lastDate);
+            Assert.IsFalse(File.Exists(Path.Combine(_equityFolder, "daily", "swma.st.zip")));
         }
     }
 }

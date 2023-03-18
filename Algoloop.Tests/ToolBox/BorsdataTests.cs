@@ -82,7 +82,7 @@ namespace Algoloop.Tests.ToolBox
         }
 
         [TestMethod]
-        public void Download_one_symbol()
+        public void MainDownloadOneSymbol()
         {
             // Arrange
             string datafile = Path.Combine(
@@ -116,7 +116,7 @@ namespace Algoloop.Tests.ToolBox
         }
 
         [TestMethod]
-        public void Download_symbol_twice()
+        public void MainDownloadSymbolTwice()
         {
             var tickers = new List<string> { "AXFO.ST" };
             var start = new DateTime(2021, 01, 01, 20, 0, 0);
@@ -171,7 +171,7 @@ namespace Algoloop.Tests.ToolBox
         }
 
         [TestMethod]
-        public void Download_symbol_reload()
+        public void MainDownloadSymbolReload()
         {
             // Arrange
             var tickers = new List<string> { "AXFO.ST" };
@@ -243,6 +243,32 @@ namespace Algoloop.Tests.ToolBox
             Assert.AreNotEqual(0m, endBar.Close, "End bar not replaced");
             Assert.IsTrue(File.Exists(fineFile1), "Invalid fine file removed");
             Assert.IsFalse(File.Exists(fineFile2), "Invalid fine file not removed");
+        }
+
+        [TestMethod]
+        public void MainDownloadObsoleteSymbol()
+        {
+            // Arrange
+            var tickers = new List<string> { "SWMA.ST" };
+            var start = new DateTime(2021, 01, 01, 20, 0, 0);
+            var end = new DateTime(2021, 12, 9);
+            string from = start.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string to = end.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string[] args =
+            {
+                "--app=BorsdataDownloader",
+                $"--from-date={from}",
+                $"--to-date={to}",
+                $"--api-key={_apiKey}",
+                $"--tickers={string.Join(",", tickers)}"
+            };
+
+            // Act
+            Program.Main(args);
+
+            // Assert
+            string zipfile = Path.Combine(_equityFolder, "daily", "SWMA.ST.zip");
+            Assert.IsFalse(File.Exists(zipfile));
         }
     }
 }

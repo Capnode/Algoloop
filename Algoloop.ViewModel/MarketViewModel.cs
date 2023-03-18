@@ -397,6 +397,7 @@ namespace Algoloop.ViewModel
                 {
                     Model.Active = false;
                     Active = false;
+                    CleanupViewModel();
                 });
                 _provider?.Dispose();
                 _provider = null;
@@ -421,6 +422,28 @@ namespace Algoloop.ViewModel
             }
 
             _provider.Logout();
+        }
+
+        private void CleanupViewModel()
+        {
+            // Remove obsolete symbols
+            List<SymbolViewModel> obsoleteSymbols = Symbols.ToList();
+            foreach (SymbolModel symbol in Model.Symbols)
+            {
+                SymbolViewModel vm = obsoleteSymbols.FirstOrDefault(m => m.Model.Equals(symbol));
+                if (vm == null) continue;
+                obsoleteSymbols.Remove(vm);
+            }
+
+            if (obsoleteSymbols.Any())
+            {
+                foreach (ListViewModel list in Lists)
+                {
+                    list.Symbols.RemoveRange(obsoleteSymbols);
+                }
+
+                Symbols.RemoveRange(obsoleteSymbols);
+            }
         }
 
         private void OnUpdate(object data)

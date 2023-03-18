@@ -38,6 +38,12 @@ namespace Algoloop.ViewModel.Internal.Provider
 
             // Setup download parameters
             IList<string> symbols = market.Symbols.Select(m => m.Id).ToList();
+            if (!symbols.Any())
+            {
+                market.Active = false;
+                return;
+            }
+
             DateTime utsNow = DateTime.UtcNow;
             string from = market.LastDate.ToUniversalTime().ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string to = utsNow.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);

@@ -76,6 +76,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             {
                 _allInstruments = _api.GetInstruments();
             }
+
             CountriesRespV1 cr = _api.GetCountries();
             BranchesRespV1 br = _api.GetBranches();
             SectorsRespV1 sr = _api.GetSectors();
@@ -465,7 +466,6 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                     stockPrices = GetStockPrices(instId, fromDate, endUtc);
                     if (stockPrices.StockPricesList.Count == 0)
                     {
-                        Log.Trace($"{GetType().Name}: Prices not found: {symbol} {fromDate:d} to {endUtc:d}");
                         return default;
                     }
                 }
