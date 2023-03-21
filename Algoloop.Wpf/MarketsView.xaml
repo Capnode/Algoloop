@@ -20,21 +20,7 @@
         <Style x:Key="RightCell" TargetType="{x:Type TextBlock}">
             <Setter Property="TextAlignment" Value="Right" />
         </Style>
-        <Style x:Key="BlinkCell" TargetType="{x:Type DataGridCell}">
-            <Setter Property="Foreground" Value="Black" />
-            <Style.Triggers>
-                <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                    <BeginStoryboard>
-                        <Storyboard TargetProperty="Background.Color">
-                            <ColorAnimation
-                                BeginTime="0:0:0.2"
-                                To="Transparent"
-                                Duration="0:0:0.5" />
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Style.Triggers>
-        </Style>
+
         <ObjectDataProvider x:Key="settings" ObjectInstance="{x:Static properties:Settings.Default}" />
     </UserControl.Resources>
 
@@ -292,13 +278,7 @@
                                     GridLinesVisibility="None"
                                     IsReadOnly="False">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Binding="{Binding Equity, NotifyOnTargetUpdated=True}" Header="Equity">
-                                            <DataGridTextColumn.CellStyle>
-                                                <Style BasedOn="{StaticResource BlinkCell}" TargetType="{x:Type DataGridCell}">
-                                                    <Setter Property="Background" Value="{Binding EquityChange, Converter={viewsupport:ToBrushConverter}}" />
-                                                </Style>
-                                            </DataGridTextColumn.CellStyle>
-                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Binding="{Binding Equity, NotifyOnTargetUpdated=True}" Header="Equity"/>
                                         <DataGridTextColumn Binding="{Binding Cash, NotifyOnTargetUpdated=True}" Header="Cash" />
                                         <DataGridTextColumn Binding="{Binding Profit, NotifyOnTargetUpdated=True}" Header="Profit" />
                                         <DataGridTextColumn Binding="{Binding DayProfit, NotifyOnTargetUpdated=True}" Header="Profit today" />
@@ -326,7 +306,6 @@
                                     CanUserGroup="False"
                                     CanUserReorderColumns="True"
                                     CanUserSelectDistinct="True"
-                                    CellStyle="{StaticResource BlinkCell}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountOrdersColumnsInfo}"
                                     ExItemsSource="{Binding Orders}"
                                     ExSelectedItems="{Binding SelectedItems}"
@@ -385,7 +364,6 @@
                                     CanUserGroup="False"
                                     CanUserReorderColumns="True"
                                     CanUserSelectDistinct="True"
-                                    CellStyle="{StaticResource BlinkCell}"
                                     ExColumnsInfo="{Binding Source={StaticResource settings}, Path=AccountPositionsColumnsInfo}"
                                     ExItemsSource="{Binding Positions}"
                                     ExSelectedItems="{Binding SelectedItems}"
@@ -527,6 +505,7 @@
                                     </Button>
                                 </ToolBar>
                                 <wpf:ExDataGrid
+                                    TargetUpdated="TargetUpdatedBlinkCell"
                                     x:Name="marketListDataGrid"
                                     AutoGenerateColumns="False"
                                     CanUserFilter="False"
@@ -542,20 +521,8 @@
                                     SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Binding="{Binding Model.Name}" Header="Name" />
-                                        <DataGridTextColumn Binding="{Binding Ask, NotifyOnTargetUpdated=True}" Header="Ask">
-                                            <DataGridTextColumn.CellStyle>
-                                                <Style BasedOn="{StaticResource BlinkCell}" TargetType="{x:Type DataGridCell}">
-                                                    <Setter Property="Background" Value="{Binding AskChange, Converter={viewsupport:ToBrushConverter}}" />
-                                                </Style>
-                                            </DataGridTextColumn.CellStyle>
-                                        </DataGridTextColumn>
-                                        <DataGridTextColumn Binding="{Binding Bid, NotifyOnTargetUpdated=True}" Header="Bid">
-                                            <DataGridTextColumn.CellStyle>
-                                                <Style BasedOn="{StaticResource BlinkCell}" TargetType="{x:Type DataGridCell}">
-                                                    <Setter Property="Background" Value="{Binding BidChange, Converter={viewsupport:ToBrushConverter}}" />
-                                                </Style>
-                                            </DataGridTextColumn.CellStyle>
-                                        </DataGridTextColumn>
+                                        <DataGridTextColumn Binding="{Binding Ask, NotifyOnTargetUpdated=True}" Header="Ask"/>
+                                        <DataGridTextColumn Binding="{Binding Bid, NotifyOnTargetUpdated=True}" Header="Bid"/>
                                     </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </DockPanel>

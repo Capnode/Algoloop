@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -12,7 +12,13 @@
  * limitations under the License.
  */
 
+using System;
+using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Algoloop.Wpf
 {
@@ -21,9 +27,63 @@ namespace Algoloop.Wpf
     /// </summary>
     public partial class MarketsView : UserControl
     {
+        private Dictionary<TextBlock, double> _cellValue = new();
+        private readonly Storyboard _greenBlink = new();
+        private readonly Storyboard _redBlink = new();
+
         public MarketsView()
         {
             InitializeComponent();
+
+            System.Drawing.Color green = System.Drawing.Color.LightGreen;
+            ColorAnimation animation = new ColorAnimation();
+            animation.BeginTime = new TimeSpan(0, 0, 0, 0, 200);
+            animation.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500));
+            animation.From = Color.FromArgb(green.A, green.R, green.G, green.B);
+            animation.To = Color.FromArgb(0, 0, 0, 0);
+            Storyboard.SetTargetProperty(animation, new PropertyPath("(TextBlock.Background).(SolidColorBrush.Color)"));
+            _greenBlink.Children.Add(animation);
+
+            System.Drawing.Color red = System.Drawing.Color.Salmon;
+            animation = new ColorAnimation();
+            animation.BeginTime = new TimeSpan(0, 0, 0, 0, 200);
+            animation.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500));
+            animation.From = Color.FromArgb(red.A, red.R, red.G, red.B);
+            animation.To = Color.FromArgb(0, 0, 0, 0);
+            Storyboard.SetTargetProperty(animation, new PropertyPath("(TextBlock.Background).(SolidColorBrush.Color)"));
+            _redBlink.Children.Add(animation);
+        }
+
+        private void TargetUpdatedBlinkCell(object sender, DataTransferEventArgs e)
+        {
+            TextBlock tb = e.TargetObject as TextBlock;
+            if (tb == null)
+                return;
+
+            if (!_cellValue.ContainsKey(tb))
+            {
+                _cellValue[tb] = 0;
+                tb.Background = Brushes.Transparent;
+                tb.Foreground = Brushes.Black;
+            }
+
+            double prevValue = _cellValue[tb];
+            string text = tb.Text.Replace((char)8722, '-'); // Convert Unicode minus
+            if (!double.TryParse(text, out double currValue))
+                return;
+
+            if (prevValue < currValue)
+            {
+                Storyboard.SetTarget(_greenBlink, tb);
+                _greenBlink.Begin();
+            }
+            else if (prevValue > currValue)
+            {
+                Storyboard.SetTarget(_redBlink, tb);
+                _redBlink.Begin();
+            }
+
+            _cellValue[tb] = currValue;
         }
     }
 }

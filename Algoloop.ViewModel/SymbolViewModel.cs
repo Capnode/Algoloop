@@ -59,9 +59,6 @@ namespace Algoloop.ViewModel
         private decimal _ask;
         private decimal _bid;
         private decimal _price;
-        private decimal _askChange;
-        private decimal _bidChange;
-        private decimal _priceChange;
 
         public SymbolViewModel(ITreeViewModel parent, SymbolModel model)
         {
@@ -81,71 +78,21 @@ namespace Algoloop.ViewModel
         public decimal Ask
         {
             get => _ask;
-            set
-            {
-                AskChange = value - _ask;
-                SetProperty(ref _ask, value);
-            }
-        }
-
-        public decimal AskChange
-        {
-            get => _askChange;
-            set
-            {
-                _askChange = value;
-                if (value == 0) return;
-
-                // Raise only when changed
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _ask, value);
         }
 
         public decimal Bid
         {
             get => _bid;
-            set
-            {
-                BidChange = value - _bid;
-                SetProperty(ref _bid, value);
-            }
-        }
-
-        public decimal BidChange
-        {
-            get => _bidChange;
-            set
-            {
-                _bidChange = value;
-                if (value == 0) return;
-
-                // Raise only when changed
-                OnPropertyChanged();
-            }
+            set => SetProperty(ref _bid, value);
         }
 
         public decimal Price
         {
             get => _price;
-            set
-            {
-                PriceChange = value - _price;
-                SetProperty(ref _price, value);
-            }
+            set => SetProperty(ref _price, value);
         }
 
-        public decimal PriceChange
-        {
-            get => _priceChange;
-            set
-            {
-                _priceChange = value;
-                if (value == 0) return;
-
-                // Raise only when changed
-                OnPropertyChanged();
-            }
-        }
 
         public bool IsBusy
         {
