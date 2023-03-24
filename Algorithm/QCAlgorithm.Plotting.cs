@@ -1,7 +1,8 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- *
+ * Modifications Copyright (C) 2023 Capnode AB
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -201,11 +202,11 @@ namespace QuantConnect.Algorithm
                     ? i + c.Series.Values.Count(s => reservedSeriesNames.Count > 0 && !reservedSeriesNames.Contains(s.Name))
                     : i + c.Series.Count);
 
-                if (seriesCount > 10)
-                {
-                    Error("Exceeded maximum series count: Each backtest can have up to 10 series in total.");
-                    return;
-                }
+                //if (seriesCount > 10)
+                //{
+                //    Error("Exceeded maximum series count: Each backtest can have up to 10 series in total.");
+                //    return;
+                //}
 
                 //If we don't have the series, create it:
                 thisChart.AddSeries(new Series(series));
