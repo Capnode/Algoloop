@@ -198,7 +198,7 @@ namespace QuantConnect.Algorithm
             SetRiskManagement(new NullRiskManagementModel());
             SetUniverseSelection(new NullUniverseSelectionModel());
 
-            Insights = new InsightManager();
+            Insights = new InsightManager(this);
         }
 
         /// <summary>

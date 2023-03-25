@@ -744,9 +744,6 @@
     <Content Include="..\Algorithm.Python\MarketOnOpenOnCloseAlgorithm.py" Link="Content\ProgramData\Strategies\MarketOnOpenOnCloseAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Algorithm.Python\MaximumPortfolioDrawdownFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\MaximumPortfolioDrawdownFrameworkAlgorithm.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Algorithm.Python\MeanReversionPortfolioAlgorithm.py" Link="Content\ProgramData\Strategies\MeanReversionPortfolioAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -949,9 +946,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\TimeInForceAlgorithm.py" Link="Content\ProgramData\Strategies\TimeInForceAlgorithm.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\TrailingStopRiskFrameworkAlgorithm.py" Link="Content\ProgramData\Strategies\TrailingStopRiskFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\TrailingStopRiskFrameworkRegressionAlgorithm.py" Link="Content\ProgramData\Strategies\TrailingStopRiskFrameworkRegressionAlgorithm.py">
