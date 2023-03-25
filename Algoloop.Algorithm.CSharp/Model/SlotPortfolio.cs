@@ -199,14 +199,14 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private void ProcessPortfolio(QCAlgorithm algorithm, decimal portfolioValue)
         {
-            decimal portfolioIndex = 100 * portfolioValue / _portfolioValue0;
+            decimal portfolioIndex = portfolioValue / _portfolioValue0;
             algorithm.Plot("Tracker Portfolio", portfolioIndex);
             _portfolioRoc?.Update(algorithm.Time, portfolioIndex);
         }
 
         private decimal ProcessTracker(QCAlgorithm algorithm, decimal trackerValue)
         {
-            _trackerIndex = 100 * trackerValue / _trackerValue0;
+            _trackerIndex = trackerValue / _trackerValue0;
             algorithm.Plot("Tracker", _trackerIndex);
             _trackerRoc?.Update(algorithm.Time, _trackerIndex);
             _trackerSma1?.Update(algorithm.Time, _trackerIndex);
@@ -270,8 +270,8 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal sizingFactor = 1;
             if (_benchmarkValue0 == 0) return sizingFactor;
 
-            // Plot benchmark index
-            _benchmarkIndex = 100 * benchmarkValue / _benchmarkValue0;
+            // Plot benchmark index 
+            _benchmarkIndex = benchmarkValue / _benchmarkValue0;
             algorithm.Plot($"Tracker {_indexName}", _benchmarkIndex);
             _benchmarkRoc?.Update(algorithm.Time, benchmarkValue);
             _benchmarkSma1?.Update(algorithm.Time, _benchmarkIndex);
