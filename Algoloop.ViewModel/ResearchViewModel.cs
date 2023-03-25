@@ -33,8 +33,7 @@ namespace Algoloop.ViewModel
         private const string RuntimeConfig = "QuantConnect.Lean.Launcher.runtimeconfig.json";
 
         private readonly SettingModel _settings;
-        private string _htmlText;
-        private string _source;
+        private string _source = string.Empty;
         private ConfigProcess _process;
         private bool _disposed;
         private readonly string[] _exeFiles =
@@ -103,12 +102,6 @@ namespace Algoloop.ViewModel
         {
             _settings = settings;
             Debug.Assert(IsUiThread(), "Not UI thread!");
-        }
-
-        public string HtmlText
-        {
-            get => _htmlText;
-            set => SetProperty(ref _htmlText, value);
         }
 
         public string Source
