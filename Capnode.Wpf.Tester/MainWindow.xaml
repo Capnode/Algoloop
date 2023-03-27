@@ -1,12 +1,33 @@
-﻿<Window x:Class="Capnode.Wpf.Tester.MainWindow"
+<Window x:Class="Capnode.Wpf.Tester.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Capnode.Wpf.Tester"
+        xmlns:properties="clr-namespace:Capnode.Wpf.Tester.Properties"
+        xmlns:datagrid="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
 
+    <Window.Resources>
+        <ObjectDataProvider x:Key="settings" ObjectInstance="{x:Static properties:Settings.Default}" />
+    </Window.Resources>
+
+    <Grid>
+        <datagrid:ExDataGrid
+            CanUserAddRows="False"
+            AutoGenerateColumns="False"
+            CanUserFilter="True"
+            CanUserFreeze="False"
+            CanUserGroup="False"
+            CanUserReorderColumns="True"
+            CanUserSelectDistinct="True"
+            FrozenColumnCount="1"
+            GridLinesVisibility="None"
+            ExColumns="{Binding Columns}"
+            ExColumnsInfo="{Binding Source={StaticResource settings}, Path=ExColumnsInfo}"
+            ExSelectedItems="{Binding SelectedItems}"
+            SelectedValue="{Binding Selected, Mode=TwoWay}"
+            ExItemsSource="{Binding Items}">
+        </datagrid:ExDataGrid>
     </Grid>
 </Window>

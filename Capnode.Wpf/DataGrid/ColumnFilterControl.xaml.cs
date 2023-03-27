@@ -530,5 +530,15 @@ namespace Capnode.Wpf.DataGrid
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
         }
         #endregion
+
+        private void cbOperation_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void cbOperation_Selected_1(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

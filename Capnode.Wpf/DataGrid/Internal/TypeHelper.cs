@@ -152,9 +152,11 @@ namespace Capnode.Wpf.DataGrid.Internal
             result = result || p == typeof(int);
             result = result || p == typeof(decimal);
             result = result || p == typeof(float);
+            result = result || p == typeof(double);
             result = result || p == typeof(int?);
             result = result || p == typeof(decimal?);
             result = result || p == typeof(float?);
+            result = result || p == typeof(double?);
             return result;
         }
 
