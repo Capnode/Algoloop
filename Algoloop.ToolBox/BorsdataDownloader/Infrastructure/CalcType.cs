@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace Borsdata.Api.Dal.Infrastructure
 {
-
-    // Enum dont support some words like default so I use class to work around
+    // Enum doesn't support some words like default so I use class as workaround
     public class CalcType
     {
- 
         public static string high { get { return "high"; } }
         public static string latest { get { return "latest"; } }
         public static string low { get { return "low"; } }
@@ -31,6 +29,4 @@ namespace Borsdata.Api.Dal.Infrastructure
         public static string stabil { get { return "stabil"; } }
 
     }
-
-
 }

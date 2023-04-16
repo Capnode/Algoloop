@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.IO;
@@ -13,11 +12,8 @@ using Borsdata.Api.Dal.Infrastructure;
 
 namespace Borsdata.Api.Dal.Model
 {
-
     public partial class InstrumentV1
     {
-
-
         public long? InsId { get; set; }
         public string Name { get; set; }
         public string UrlName { get; set; }
@@ -31,7 +27,6 @@ namespace Borsdata.Api.Dal.Model
         public long? CountryId { get; set; }
         public DateTime? ListingDate { get; set; }
 
-      
         [JsonIgnore]
         public SectorV1 SectorModel { get; set; }
 
@@ -43,15 +38,5 @@ namespace Borsdata.Api.Dal.Model
 
         [JsonIgnore]
         public BranchV1 BranchModel { get; set; }
-
-
-        public InstrumentV1()
-        {
-
-        }
-
-
-        
     }
-
 }

@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Data;
@@ -60,7 +59,8 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                 IEnumerable<Symbol> symbols = tickers.Select(m => Symbol.Create(m, SecurityType.Equity, Market.Borsdata));
                 foreach (Symbol symbol in symbols)
                 {
-                    IEnumerable<BaseData> data = downloader.Get(symbol, Resolution.Daily, startDate, endDate);
+                    var parameters = new DataDownloaderGetParameters(symbol, Resolution.Daily, startDate, endDate);
+                    IEnumerable<BaseData> data = downloader.Get(parameters);
                     BaseData first = data?.FirstOrDefault();
                     if (first == default) continue;
                     LeanDataWriter writer = new (Resolution.Daily, symbol, Globals.DataFolder);

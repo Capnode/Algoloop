@@ -37,7 +37,9 @@ namespace Algoloop.ToolBox.BorsdataDownloader
         private const string Annual = "Annual";
         private const string Quarter = "Quarter";
         private const double Million = 1e6;
-        private const int ReportDateLatest = 202;
+        private const int KpiRevenueGrowth = 94;
+        private const int KpiProfitGrowth = 97;
+        private const int KpiReportDateLatest = 202;
         private static readonly DateTime FirstDate = new(1997, 01, 01);
 
         private KpisAllCompRespV1 _lastReports;
@@ -51,23 +53,29 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             _api = new ApiClient(apiKey);
         }
 
-        public IEnumerable<BaseData> Get(Symbol symbol, Resolution resolution, DateTime afterUtc, DateTime endUtc)
+        public IEnumerable<BaseData> Get(DataDownloaderGetParameters parameters)
         {
             //            Log.Trace($"{GetType().Name}: Get {symbol.Value} {resolution} {startUtc.ToShortDateString()} {startUtc.ToShortTimeString()}");
             Initialize();
-            InstrumentV1 inst = _allInstruments.Instruments.Find(m => m.Yahoo.Equals(symbol.Value));
+            InstrumentV1 inst = _allInstruments.Instruments.Find(m => m.Yahoo.Equals(parameters.Symbol.Value));
             if (inst == default) return null;
 
             // Reload preliminary data
             TimeZoneInfo cetZone = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
-            DateTime afterCet = TimeZoneInfo.ConvertTimeFromUtc(afterUtc, cetZone);
+            DateTime afterCet = TimeZoneInfo.ConvertTimeFromUtc(parameters.StartUtc, cetZone);
+            if (afterCet < FirstDate)
+            {
+                afterCet = FirstDate;
+            }
+
+            // Data is fullly available after 21 CET
             DateTime after = afterCet.Hour < 21 ? afterCet.AddDays(-1).Date : afterCet.Date;
 
             // Download reports
-            DownloadReports(symbol, inst.InsId.Value, after);
+            DownloadReports(parameters.Symbol, inst.InsId.Value, after);
 
             // Download price data
-            return DownloadSymbol(symbol, inst.InsId.Value, resolution, after, endUtc);
+            return DownloadSymbol(parameters.Symbol, inst.InsId.Value, parameters.Resolution, after, parameters.EndUtc);
         }
 
         public IEnumerable<SymbolModel> GetInstruments()
@@ -104,11 +112,6 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             GC.SuppressFinalize(this);
         }
 
-        public IEnumerable<BaseData> Get(DataDownloaderGetParameters dataDownloaderGetParameters)
-        {
-            throw new NotImplementedException();
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             if (_isDisposed) return;
@@ -135,7 +138,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
 
             if (_lastReports == default)
             {
-                _lastReports = _api.GetKpiScreener(ReportDateLatest, TimeType.last, CalcType.latest);
+                _lastReports = _api.GetKpiScreener(KpiReportDateLatest, TimeType.last, CalcType.latest);
             }
         }
 
@@ -162,6 +165,11 @@ namespace Algoloop.ToolBox.BorsdataDownloader
             long instId,
             DateTime afterUtc)
         {
+            // Get latest report date
+            IEnumerable<KpiV1> reports = _lastReports.Values.Where(m => m.I.Equals(instId) && !string.IsNullOrEmpty(m.S));
+            KpiV1 report = reports.SingleOrDefault();
+            DateTime date = report != default ? DateTime.Parse(report.S, CultureInfo.InvariantCulture) : default;
+
             // Create FineFundamentals folder
             string folder = Path.Combine(
                 Globals.DataFolder,
@@ -171,192 +179,205 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                 "fine",
                 symbol.Value.ToLowerInvariant());
 
-            // Check if directory exists
-            if (!Directory.Exists(folder))
+            List<FineFundamental> fundamentals = new();
+            if (Directory.Exists(folder))
             {
-                // Create folder
-                Directory.CreateDirectory(folder);
-                Log.Trace($"{GetType().Name}: Update report {symbol.Value}");
-            }
-            else
-            {
-                // Remove reports after afterUtc
+                // Check if any report after afterUtc
+                if (date <= afterUtc) return;
+
+                // Read all reports from file
                 DirectoryInfo d = new(folder);
                 foreach (FileInfo zipFile in d.GetFiles("*.zip"))
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(zipFile.Name);
-                    DateTime fileDate = DateTime.ParseExact(
-                        fileName,
-                        "yyyyMMdd",
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.None);
-
-                    if (fileDate > afterUtc)
-                    {
-                        zipFile.Delete();
-                    }
+                    FineFundamental fine = ReadFineFundamentalFile(zipFile.FullName, symbol);
+                    DateTime endDate = fine.FinancialStatements.PeriodEndingDate;
+                    if (fundamentals.Any(m => m.FinancialStatements.PeriodEndingDate.Equals(endDate))) continue;
+                    fundamentals.Add(fine);
                 }
-
-                // Check if any report after afterUtc
-                bool update = false;
-                IEnumerable<KpiV1> reports = _lastReports.Values.Where(m => m.I.Equals(instId) && !string.IsNullOrEmpty(m.S));
-                foreach (KpiV1 report in reports)
-                {
-                    DateTime date = DateTime.Parse(report.S, CultureInfo.InvariantCulture);
-                    if (date > afterUtc)
-                    {
-                        update = true;
-                        Log.Trace($"{GetType().Name}: {date:d} Update report {symbol.Value}");
-                    }
-                }
-
-                if (!update) return;
             }
 
-            // Download reports
-            ReportsYearRespV1 reportsYear = _api.GetReportsYear(instId);
-            ReportsR12RespV1 reportsR12 = _api.GetReportsR12(instId);
-            ReportsQuarterRespV1 reportsQuarter = _api.GetReportsQuarter(instId);
+            Log.Trace($"{GetType().Name}: {date:d} Update report {symbol.Value}");
+            //ReportsRespV1 reportsAll = _api.GetReports(instId);
 
             // Update reports
-            ReportsYear(symbol, folder, reportsYear.Reports);
-            ReportsR12(symbol, folder, reportsR12.Reports);
-            ReportsQuarter(symbol, folder, reportsQuarter.Reports);
+            ReportsYear(fundamentals, symbol, instId);
+            ReportsR12(fundamentals, symbol, instId);
+            ReportsQuarter(fundamentals, symbol, instId);
+
+            // Rewrite fundamental files
+            WriteFineFundamentalFiles(fundamentals, symbol, folder);
         }
 
-        private static void ReportsYear(Symbol symbol, string folder, List<ReportYearV1> reports)
+        private void ReportsYear(IList<FineFundamental> fundamentals, Symbol symbol, long instId)
         {
-            FineFundamental last = null;
-            IOrderedEnumerable<ReportYearV1> orderedReports = reports.OrderBy(m => m.ReportEndDate);
+            ReportsYearRespV1 reportsYear = _api.GetReportsYear(instId);
+            IOrderedEnumerable<ReportYearV1> orderedReports = reportsYear.Reports.OrderBy(m => m.ReportEndDate);
             foreach (ReportYearV1 report in orderedReports)
             {
                 var fine = new FineFundamental { Symbol = symbol };
+                fine.SecurityReference.CurrencyId = report.Currency;
                 fine.FinancialStatements.PeriodType = Annual;
-                DateTime endDate = report.ReportEndDate ?? default;
-                fine.FinancialStatements.PeriodEndingDate = endDate;
-                fine.FinancialStatements.FileDate = FileDate(report.ReportDate, report.ReportEndDate);
-                fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths = Multiply(
-                    report.Revenues > 0 ? report.Revenues : default,
-                    Million);
+                fine.FinancialStatements.PeriodEndingDate = report.ReportEndDate ?? default;
+                fine.FinancialStatements.FileDate = FileDate(report.Report_Date, report.ReportEndDate);
+                fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths = Multiply(report.Net_Sales, Million);
+                fine.FinancialStatements.IncomeStatement.OperatingRevenue.TwelveMonths = Multiply(report.Net_Sales, Million);
+                fine.FinancialStatements.IncomeStatement.GrossProfit.TwelveMonths = Multiply(report.GrossIncome, Million);
+                fine.FinancialStatements.IncomeStatement.OperatingIncome.TwelveMonths = Multiply(report.OperatingIncome, Million);
+                fine.FinancialStatements.IncomeStatement.PretaxIncome.TwelveMonths = Multiply(report.ProfitBeforeTax, Million);
                 fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths = Multiply(report.ProfitToEquityHolders, Million);
+                fine.FinancialStatements.BalanceSheet.OtherIntangibleAssets.TwelveMonths = Multiply(report.IntangibleAssets, Million);
+                fine.FinancialStatements.BalanceSheet.NetTangibleAssets.TwelveMonths = Multiply(report.TangibleAssets, Million);
+                fine.FinancialStatements.BalanceSheet.FinancialAssets.TwelveMonths = Multiply(report.FinancialAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalNonCurrentAssets.TwelveMonths = Multiply(report.NonCurrentAssets, Million);
+                fine.FinancialStatements.BalanceSheet.CashAndCashEquivalents.TwelveMonths = Multiply(report.CashAndEquivalents, Million);
+                fine.FinancialStatements.BalanceSheet.CurrentAssets.TwelveMonths = Multiply(report.CurrentAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalAssets.TwelveMonths = Multiply(report.TotalAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalEquity.TwelveMonths = Multiply(report.TotalEquity, Million);
+                fine.FinancialStatements.BalanceSheet.LongTermDebt.TwelveMonths = Multiply(report.NonCurrentLiabilities, Million);
+                fine.FinancialStatements.BalanceSheet.CurrentLiabilities.TwelveMonths = Multiply(report.CurrentLiabilities, Million);
+                fine.FinancialStatements.BalanceSheet.NetDebt.TwelveMonths = Multiply(report.NetDebt, Million);
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.FreeCashFlow.TwelveMonths = Multiply(report.FreeCashFlow, Million);
+                fine.EarningReports.BasicEPS.TwelveMonths = Multiply(report.EarningsPerShare, 1);
+                fine.EarningReports.DividendPerShare.TwelveMonths = Multiply(report.Dividend, 1);
                 fine.OperationRatios.NetMargin.OneYear = Divide(
                     fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
                     fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
-                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
-                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
-                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
-                fine.EarningReports.DividendPerShare.TwelveMonths = Multiply(report.Dividend, 1);
 
-                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * Million);
-                if (fine.CompanyProfile.SharesOutstanding > 0)
-                {
-                    double earningsPerShare = (double)fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / fine.CompanyProfile.SharesOutstanding;
-                    fine.ValuationRatios.PERatio = Divide(report.StockPriceAverage, earningsPerShare);
-                    double salsePerShare = (double)fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / fine.CompanyProfile.SharesOutstanding;
-                    fine.ValuationRatios.PSRatio = Divide(report.StockPriceAverage, salsePerShare);
-                }
+                long shares = (long)((report.NumberOfShares ?? 0) * Million);
+                fine.CompanyProfile.SharesOutstanding = shares;
+                double earningsPerShare = shares > 0 ? (double)fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / shares : 0;
+                double salsePerShare = shares > 0 ? (double)fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / shares : 0;
+                fine.ValuationRatios.PERatio = Divide(report.StockPriceAverage, earningsPerShare);
+                fine.ValuationRatios.PSRatio = Divide(report.StockPriceAverage, salsePerShare);
 
-                if (last != default)
-                {
-                    fine.OperationRatios.RevenueGrowth.OneYear = Growth(
-                        fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths,
-                        last.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
-                    fine.OperationRatios.NetIncomeGrowth.OneYear = Growth(
-                        fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
-                        last.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths);
-                    WriteFineFundamentalFile(symbol, folder, fine);
-                }
+                DateTime lastYear = fine.FinancialStatements.PeriodEndingDate.AddDays(1).AddYears(-1).AddDays(-1);
+                FineFundamental last = fundamentals.LastOrDefault(m => m.FinancialStatements.PeriodEndingDate == lastYear);
+                fine.OperationRatios.RevenueGrowth.OneYear = Growth(
+                    fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths,
+                    last?.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
+                fine.OperationRatios.OperationIncomeGrowth.OneYear = Growth(
+                    fine.FinancialStatements.IncomeStatement.OperatingIncome.TwelveMonths,
+                    last?.FinancialStatements.IncomeStatement.OperatingIncome.TwelveMonths);
+                fine.OperationRatios.NetIncomeGrowth.OneYear = Growth(
+                    fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
+                    last?.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths);
 
-                last = fine;
+                UpdateFineFundamental(fundamentals, fine);
             }
         }
 
-        private static void ReportsR12(Symbol symbol, string folder, List<ReportR12V1> reports)
+        private void ReportsR12(IList<FineFundamental> fundamentals, Symbol symbol, long instId)
         {
-            var fundamentals = new List<FineFundamental>();
-            ReportR12V1[] orderedReports = reports.OrderBy(m => m.ReportEndDate).ToArray();
+            ReportsR12RespV1 reportsR12 = _api.GetReportsR12(instId);
+            ReportR12V1[] orderedReports = reportsR12.Reports.OrderBy(m => m.ReportEndDate).ToArray();
             foreach (ReportR12V1 report in orderedReports)
             {
                 var fine = new FineFundamental { Symbol = symbol };
+                fine.SecurityReference.CurrencyId = report.Currency;
                 fine.FinancialStatements.PeriodType = Quarter;
-                DateTime endDate = report.ReportEndDate ?? default;
-                fine.FinancialStatements.PeriodEndingDate = endDate;
-                fine.FinancialStatements.FileDate = FileDate(report.ReportDate, report.ReportEndDate);
-                fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths = Multiply(
-                    report.Revenues > 0 ? report.Revenues : default,
-                    Million);
+                fine.FinancialStatements.PeriodEndingDate = report.ReportEndDate ?? default;
+                fine.FinancialStatements.FileDate = FileDate(report.Report_Date, report.ReportEndDate);
+                fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths = Multiply(report.Net_Sales, Million);
+                fine.FinancialStatements.IncomeStatement.OperatingRevenue.TwelveMonths = Multiply(report.Net_Sales, Million);
+                fine.FinancialStatements.IncomeStatement.GrossProfit.TwelveMonths = Multiply(report.GrossIncome, Million);
+                fine.FinancialStatements.IncomeStatement.OperatingIncome.TwelveMonths = Multiply(report.OperatingIncome, Million);
+                fine.FinancialStatements.IncomeStatement.PretaxIncome.TwelveMonths = Multiply(report.ProfitBeforeTax, Million);
                 fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths = Multiply(report.ProfitToEquityHolders, Million);
+                fine.FinancialStatements.BalanceSheet.OtherIntangibleAssets.TwelveMonths = Multiply(report.IntangibleAssets, Million);
+                fine.FinancialStatements.BalanceSheet.NetTangibleAssets.TwelveMonths = Multiply(report.TangibleAssets, Million);
+                fine.FinancialStatements.BalanceSheet.FinancialAssets.TwelveMonths = Multiply(report.FinancialAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalNonCurrentAssets.TwelveMonths = Multiply(report.NonCurrentAssets, Million);
+                fine.FinancialStatements.BalanceSheet.CashAndCashEquivalents.TwelveMonths = Multiply(report.CashAndEquivalents, Million);
+                fine.FinancialStatements.BalanceSheet.CurrentAssets.TwelveMonths = Multiply(report.CurrentAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalAssets.TwelveMonths = Multiply(report.TotalAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalEquity.TwelveMonths = Multiply(report.TotalEquity, Million);
+                fine.FinancialStatements.BalanceSheet.LongTermDebt.TwelveMonths = Multiply(report.NonCurrentLiabilities, Million);
+                fine.FinancialStatements.BalanceSheet.CurrentLiabilities.TwelveMonths = Multiply(report.CurrentLiabilities, Million);
+                fine.FinancialStatements.BalanceSheet.NetDebt.TwelveMonths = Multiply(report.NetDebt, Million);
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.FreeCashFlow.TwelveMonths = Multiply(report.FreeCashFlow, Million);
+                fine.EarningReports.BasicEPS.TwelveMonths = Multiply(report.EarningsPerShare, 1);
+                fine.EarningReports.DividendPerShare.TwelveMonths = Multiply(report.Dividend, 1);
                 fine.OperationRatios.NetMargin.OneYear = Divide(
                     fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
                     fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
-                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.TwelveMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
-                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.TwelveMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
-                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.TwelveMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
-                fine.EarningReports.DividendPerShare.TwelveMonths = Multiply(report.Dividend, 1);
 
-                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * Million);
-                if (fine.CompanyProfile.SharesOutstanding > 0)
-                {
-                    double earningsPerShare = (double)fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / fine.CompanyProfile.SharesOutstanding;
-                    fine.ValuationRatios.PERatio = Divide(report.StockPriceAverage, earningsPerShare);
-                    double salsePerShare = (double)fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / fine.CompanyProfile.SharesOutstanding;
-                    fine.ValuationRatios.PSRatio = Divide(report.StockPriceAverage, salsePerShare);
-                }
+                long shares = (long)((report.NumberOfShares ?? 0) * Million);
+                fine.CompanyProfile.SharesOutstanding = shares;
+                double earningsPerShare = shares > 0 ? (double)fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths / shares : 0;
+                double salsePerShare = shares > 0 ? (double)fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths / shares : 0;
+                fine.ValuationRatios.PERatio = Divide(report.StockPriceAverage, earningsPerShare);
+                fine.ValuationRatios.PSRatio = Divide(report.StockPriceAverage, salsePerShare);
 
-                // Find report, at least one year old
-                DateTime nextMonth = fine.FinancialStatements.PeriodEndingDate.AddMonths(1);
-                DateTime before = new DateTime(nextMonth.Year, nextMonth.Month, 1, 0, 0, 0, nextMonth.Kind).AddYears(-1);
-                FineFundamental last = fundamentals.LastOrDefault(m => m.FinancialStatements.PeriodEndingDate < before);
-                if (last != default)
-                {
-                    fine.OperationRatios.RevenueGrowth.OneYear = Growth(
-                        fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths,
-                        last.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
-                    fine.OperationRatios.NetIncomeGrowth.OneYear = Growth(
-                        fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
-                        last.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths);
-                    WriteFineFundamentalFile(symbol, folder, fine);
-                }
+                DateTime lastYear = fine.FinancialStatements.PeriodEndingDate.AddDays(1).AddYears(-1).AddDays(-1);
+                FineFundamental last = fundamentals.LastOrDefault(m => m.FinancialStatements.PeriodEndingDate == lastYear);
+                fine.OperationRatios.RevenueGrowth.OneYear = Growth(
+                    fine.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths,
+                    last?.FinancialStatements.IncomeStatement.TotalRevenue.TwelveMonths);
+                fine.OperationRatios.OperationIncomeGrowth.OneYear = Growth(
+                    fine.FinancialStatements.IncomeStatement.OperatingIncome.TwelveMonths,
+                    last?.FinancialStatements.IncomeStatement.OperatingIncome.TwelveMonths);
+                fine.OperationRatios.NetIncomeGrowth.OneYear = Growth(
+                    fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths,
+                    last?.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths);
 
-                fundamentals.Add(fine);
+                UpdateFineFundamental(fundamentals, fine);
             }
         }
 
-        private static void ReportsQuarter(Symbol symbol, string folder, List<ReportQuarterV1> reports)
+        private void ReportsQuarter(IList<FineFundamental> fundamentals, Symbol symbol, long instId)
         {
-            FineFundamental last = null;
-            IOrderedEnumerable<ReportQuarterV1> orderedReports = reports.OrderBy(m => m.ReportEndDate);
+            ReportsQuarterRespV1 reportsQuarter = _api.GetReportsQuarter(instId);
+            IOrderedEnumerable<ReportQuarterV1> orderedReports = reportsQuarter.Reports.OrderBy(m => m.ReportEndDate);
             foreach (ReportQuarterV1 report in orderedReports)
             {
                 var fine = new FineFundamental { Symbol = symbol };
-                DateTime endDate = report.ReportEndDate ?? default;
-                fine.FinancialStatements.PeriodEndingDate = endDate;
-                fine.FinancialStatements.FileDate = FileDate(report.ReportDate, report.ReportEndDate);
-                fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths = Multiply(
-                    report.Revenues > 0 ? report.Revenues : default,
-                    Million);
+                fine.FinancialStatements.PeriodEndingDate = report.ReportEndDate ?? default;
+                fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths = Multiply(report.Net_Sales, Million);
+                fine.FinancialStatements.IncomeStatement.OperatingRevenue.ThreeMonths = Multiply(report.Net_Sales, Million);
+                fine.FinancialStatements.IncomeStatement.GrossProfit.ThreeMonths = Multiply(report.GrossIncome, Million);
+                fine.FinancialStatements.IncomeStatement.OperatingIncome.ThreeMonths = Multiply(report.OperatingIncome, Million);
+                fine.FinancialStatements.IncomeStatement.PretaxIncome.ThreeMonths = Multiply(report.ProfitBeforeTax, Million);
                 fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths = Multiply(report.ProfitToEquityHolders, Million);
+                fine.FinancialStatements.BalanceSheet.OtherIntangibleAssets.ThreeMonths = Multiply(report.IntangibleAssets, Million);
+                fine.FinancialStatements.BalanceSheet.NetTangibleAssets.ThreeMonths = Multiply(report.TangibleAssets, Million);
+                fine.FinancialStatements.BalanceSheet.FinancialAssets.ThreeMonths = Multiply(report.FinancialAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalNonCurrentAssets.ThreeMonths = Multiply(report.NonCurrentAssets, Million);
+                fine.FinancialStatements.BalanceSheet.CashAndCashEquivalents.ThreeMonths = Multiply(report.CashAndEquivalents, Million);
+                fine.FinancialStatements.BalanceSheet.CurrentAssets.ThreeMonths = Multiply(report.CurrentAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalAssets.ThreeMonths = Multiply(report.TotalAssets, Million);
+                fine.FinancialStatements.BalanceSheet.TotalEquity.ThreeMonths = Multiply(report.TotalEquity, Million);
+                fine.FinancialStatements.BalanceSheet.LongTermDebt.ThreeMonths = Multiply(report.NonCurrentLiabilities, Million);
+                fine.FinancialStatements.BalanceSheet.CurrentLiabilities.ThreeMonths = Multiply(report.CurrentLiabilities, Million);
+                fine.FinancialStatements.BalanceSheet.NetDebt.ThreeMonths = Multiply(report.NetDebt, Million);
+                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
+                fine.FinancialStatements.CashFlowStatement.FreeCashFlow.ThreeMonths = Multiply(report.FreeCashFlow, Million);
+                fine.EarningReports.BasicEPS.ThreeMonths = Multiply(report.EarningsPerShare, 1);
+                fine.EarningReports.DividendPerShare.ThreeMonths = Multiply(report.Dividend, 1);
                 fine.OperationRatios.NetMargin.ThreeMonths = Divide(
                     fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths,
                     fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths);
-                fine.FinancialStatements.CashFlowStatement.FinancingCashFlow.ThreeMonths = Multiply(report.CashFlowFromFinancingActivities, Million);
-                fine.FinancialStatements.CashFlowStatement.InvestingCashFlow.ThreeMonths = Multiply(report.CashFlowFromInvestingActivities, Million);
-                fine.FinancialStatements.CashFlowStatement.OperatingCashFlow.ThreeMonths = Multiply(report.CashFlowFromOperatingActivities, Million);
-                fine.EarningReports.DividendPerShare.ThreeMonths = Multiply(report.Dividend, 1);
-                fine.CompanyProfile.SharesOutstanding = (long)((report.NumberOfShares ?? 0) * Million);
 
-                if (last != default)
-                {
-                    fine.OperationRatios.RevenueGrowth.ThreeMonths = Growth(
-                        fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths,
-                        last.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths);
-                    fine.OperationRatios.NetIncomeGrowth.ThreeMonths = Growth(
-                        fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths,
-                        last.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths);
-                    WriteFineFundamentalFile(symbol, folder, fine);
-                }
+                DateTime lastYear = fine.FinancialStatements.PeriodEndingDate.AddDays(1).AddYears(-1).AddDays(-1);
+                FineFundamental last = fundamentals.LastOrDefault(m => m.FinancialStatements.PeriodEndingDate == lastYear);
+                fine.OperationRatios.RevenueGrowth.ThreeMonths = Growth(
+                    fine.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths,
+                    last?.FinancialStatements.IncomeStatement.TotalRevenue.ThreeMonths);
+                fine.OperationRatios.OperationIncomeGrowth.ThreeMonths = Growth(
+                    fine.FinancialStatements.IncomeStatement.OperatingIncome.ThreeMonths,
+                    last?.FinancialStatements.IncomeStatement.OperatingIncome.ThreeMonths);
+                fine.OperationRatios.NetIncomeGrowth.ThreeMonths = Growth(
+                    fine.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths,
+                    last?.FinancialStatements.IncomeStatement.NetIncome.ThreeMonths);
 
-                last = fine;
+                UpdateFineFundamental(fundamentals, fine);
             }
         }
 
@@ -381,57 +402,71 @@ namespace Algoloop.ToolBox.BorsdataDownloader
 
         private static decimal Divide(double? a, double b)
         {
-            if (a == default || b == 0) return decimal.MinValue;
+            if (a == null || b == 0) return decimal.MinValue;
             return (decimal)(a / b);
         }
 
         private static decimal Multiply(double? a, double b)
         {
-            if (a == default) return decimal.MinValue;
+            if (a == null) return decimal.MinValue;
             return (decimal)(a * b);
         }
 
-        private static decimal Growth(decimal a, decimal b)
+        private static decimal Growth(decimal a, decimal? b)
         {
             if (a < 0) return decimal.MinValue;
-            if (b <= 0) return 0;
-            return (a - b) / b;
+            if ((b ?? 0) <= 0) return decimal.MinValue;
+            return (decimal)((a - b) / b);
         }
 
-        private static void WriteFineFundamentalFile(Symbol symbol, string folder, FineFundamental fine)
+        private static FineFundamental ReadFineFundamentalFile(string zipPath, Symbol symbol)
         {
-            string zipFile = string.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd}.zip", fine.FinancialStatements.FileDate);
-            string zipPath = Path.Combine(folder, zipFile);
             string jsonFile = $"{symbol.Value.ToLowerInvariant()}.json";
-            if (File.Exists(zipPath))
+            using StreamReader resultStream = Compression.Unzip(zipPath, jsonFile, out ZipFile zFile);
+            Debug.Assert(resultStream != null);
+            using (zFile)
             {
-                // Do not update some values
-                fine.FinancialStatements.PeriodType = null;
+                using JsonReader reader = new JsonTextReader(resultStream);
+                JsonSerializer serializer = new();
+                FineFundamental fine = serializer.Deserialize<FineFundamental>(reader);
+                return fine;
+            }
+        }
 
-                using StreamReader resultStream = Compression.Unzip(zipPath, jsonFile, out ZipFile zFile);
-                Debug.Assert(resultStream != null);
-                Debug.Assert(zipFile != null);
-                using (zFile)
-                {
-                    using JsonReader reader = new JsonTextReader(resultStream);
-                    JsonSerializer serializer = new();
-                    FineFundamental updated = serializer.Deserialize<FineFundamental>(reader);
-                    Debug.Assert(updated != null);
-                    updated.CompanyProfile.UpdateValues(fine.CompanyProfile);
-                    updated.FinancialStatements.UpdateValues(fine.FinancialStatements);
-                    updated.OperationRatios.UpdateValues(fine.OperationRatios);
-                    updated.ValuationRatios.UpdateValues(fine.ValuationRatios);
-                    fine = updated;
-                }
-
-                File.Delete(zipPath);
+        private static void WriteFineFundamentalFiles(IList<FineFundamental> fundamentals, Symbol symbol, string folder)
+        {
+            // Remove all files in folder
+            if (Directory.Exists(folder))
+            {
+                Directory.Delete(folder, true);
             }
 
-            // Skip if Quarter report only
-            if (fine.FinancialStatements.PeriodType == default) return;
+            // Write back all fundamentals to files
+            Directory.CreateDirectory(folder);
+            foreach (FineFundamental fine in fundamentals)
+            {
+                // Skip Quarter only reports
+                if (string.IsNullOrEmpty(fine.FinancialStatements.PeriodType)) continue;
 
-            string jsonString = JsonConvert.SerializeObject(fine);
-            Compression.ZipData(zipPath, new Dictionary<string, string> { { jsonFile, jsonString } });
+                string zipFile = string.Format(CultureInfo.InvariantCulture, "{0:yyyyMMdd}.zip", fine.FinancialStatements.FileDate);
+                string zipPath = Path.Combine(folder, zipFile);
+                string jsonFile = $"{symbol.Value.ToLowerInvariant()}.json";
+                string jsonString = JsonConvert.SerializeObject(fine);
+                Compression.ZipData(zipPath, new Dictionary<string, string> { { jsonFile, jsonString } });
+            }
+        }
+
+        private static void UpdateFineFundamental(IList<FineFundamental> fundamentals, FineFundamental fine)
+        {
+            FineFundamental updated = fundamentals.FirstOrDefault(m => m.FinancialStatements.PeriodEndingDate.Equals(fine.FinancialStatements.PeriodEndingDate));
+            if (updated == default)
+            {
+                fundamentals.Add(fine);
+            }
+            else
+            {
+                updated.UpdateValues(fine);
+            }
         }
 
         private IEnumerable<BaseData> DownloadSymbol(

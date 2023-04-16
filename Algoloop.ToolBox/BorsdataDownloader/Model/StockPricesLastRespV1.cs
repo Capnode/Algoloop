@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.IO;
@@ -12,12 +11,9 @@ using Newtonsoft.Json;
 
 namespace Borsdata.Api.Dal.Model
 {
-
     public partial class StockPricesLastRespV1
     {
         public long? Instrument { get; set; }
         public List<StockPriceFullV1> StockPricesList { get; set; }
-
     }
-
 }

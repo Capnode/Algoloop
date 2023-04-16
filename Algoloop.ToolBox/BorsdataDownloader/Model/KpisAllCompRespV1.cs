@@ -13,7 +13,5 @@ namespace Borsdata.Api.Dal.Model
         public string Group { get; set; }
         public string Calculation { get; set; }
         public List<KpiV1> Values { get; set; }
-
-
     }
 }

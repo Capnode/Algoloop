@@ -63,6 +63,7 @@ namespace Algoloop.Tests.ToolBox
             {
                 Directory.Delete(DataFolder, true);
             }
+
             MainService.CopyDirectory(
                 Path.Combine(TestData, MarketHours),
                 Path.Combine(DataFolder, MarketHours));
@@ -270,5 +271,32 @@ namespace Algoloop.Tests.ToolBox
             string zipfile = Path.Combine(_equityFolder, "daily", "SWMA.ST.zip");
             Assert.IsFalse(File.Exists(zipfile));
         }
+
+        [TestMethod]
+        public void MainDownloadAllHistory()
+        {
+            // Arrange
+            var tickers = new List<string> { "AAK.ST" };
+            var start = DateTime.MinValue;
+            var end = new DateTime(2023, 4, 6);
+            string from = start.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string to = end.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string[] args =
+            {
+                "--app=BorsdataDownloader",
+                $"--from-date={from}",
+                $"--to-date={to}",
+                $"--api-key={_apiKey}",
+                $"--tickers={string.Join(",", tickers)}"
+            };
+
+            // Act
+            Program.Main(args);
+
+            // Assert
+            string zipfile = Path.Combine(_equityFolder, "daily", "AAK.ST.zip");
+            Assert.IsTrue(File.Exists(zipfile));
+        }
+
     }
 }

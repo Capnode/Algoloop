@@ -8,6 +8,6 @@ namespace Borsdata.Api.Dal.Infrastructure
 {
     public enum ReportType
     {
-        year =0, r12=1, quarter=2
+        year = 0, r12 = 1, quarter = 2
     }
 }

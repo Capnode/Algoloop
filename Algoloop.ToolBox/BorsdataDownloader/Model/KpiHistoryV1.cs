@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Linq;
 using System.IO;
@@ -13,7 +11,6 @@ using Newtonsoft.Json;
 
 namespace Borsdata.Api.Dal.Model
 {
-
     public partial class KpiHistoryV1
     {
         /// <summary>
@@ -30,7 +27,7 @@ namespace Borsdata.Api.Dal.Model
             this.D = d;
             this.V = v;
         }
-        
+
         /// <summary>
         /// Year
         /// </summary>
@@ -54,8 +51,5 @@ namespace Borsdata.Api.Dal.Model
         /// </summary>
         /// <value>Value</value>
         public double? V { get; set; }
-
-        
     }
-
 }

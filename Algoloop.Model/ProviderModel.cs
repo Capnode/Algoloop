@@ -123,7 +123,7 @@ namespace Algoloop.Model
 
         [Category("Time")]
         [DisplayName("Update")]
-        [Description("Account is updated up to this time.")]
+        [Description("Account is updated up to this time. Note: Change only to reload historic data!")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]

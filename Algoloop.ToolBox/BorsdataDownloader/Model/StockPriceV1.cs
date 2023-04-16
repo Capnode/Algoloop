@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.IO;
@@ -12,11 +11,8 @@ using Newtonsoft.Json;
 
 namespace Borsdata.Api.Dal.Model
 {
-
     public partial class StockPriceV1
     {
-      
-        
         /// <summary>
         /// Date
         /// </summary>
@@ -58,8 +54,5 @@ namespace Borsdata.Api.Dal.Model
         /// <value>Total Volume</value>
         [DataMember(Name="v", EmitDefaultValue=false)]
         public long? V { get; set; }
-
-
     }
-
 }

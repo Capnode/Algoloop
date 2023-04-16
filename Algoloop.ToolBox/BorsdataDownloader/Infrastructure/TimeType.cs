@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace Borsdata.Api.Dal.Infrastructure
 {
-
     public class TimeType
     {
-
         public static string last { get { return "last"; } }
 
         public static string _1week { get { return "1week"; } }
@@ -42,6 +40,4 @@ namespace Borsdata.Api.Dal.Infrastructure
         public static string ma50ma200 { get { return "ma50ma200"; } }
         public static string ma5ma20 { get { return "ma5ma20"; } }
     }
-
-
 }

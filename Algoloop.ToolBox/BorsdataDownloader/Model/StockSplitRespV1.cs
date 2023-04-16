@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.IO;
@@ -12,10 +11,8 @@ using Newtonsoft.Json;
 
 namespace Borsdata.Api.Dal.Model
 {
-
     public partial class StockSplitRespV1
     {
         public List<StockSplitV1> stockSplitList { get; set; }
     }
-
 }

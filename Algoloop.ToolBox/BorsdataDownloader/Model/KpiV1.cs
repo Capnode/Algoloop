@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.IO;
@@ -10,14 +9,10 @@ using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-
 namespace Borsdata.Api.Dal.Model
 {
-   
-    public partial class KpiV1 
+    public partial class KpiV1
     {
-      
-        
         /// <summary>
         /// Instrument Id
         /// </summary>
@@ -35,10 +30,5 @@ namespace Borsdata.Api.Dal.Model
         /// </summary>
         /// <value>String Value</value>
         public string S { get; set; }
-
-   
- 
-
     }
-
 }

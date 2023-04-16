@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Linq;
 using System.IO;
@@ -13,15 +11,9 @@ using Newtonsoft.Json;
 
 namespace Borsdata.Api.Dal.Model
 {
- 
     public partial class ReportsR12RespV1
     {
-    
         public long? Instrument { get; set; }
         public List<ReportR12V1> Reports { get; set; }
-
-
-
     }
-
 }

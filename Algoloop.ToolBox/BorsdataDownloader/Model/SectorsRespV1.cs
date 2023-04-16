@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.IO;
@@ -15,6 +14,5 @@ namespace Borsdata.Api.Dal.Model
     public partial class SectorsRespV1
     {
         public List<SectorV1> Sectors { get; set; }
-
     }
 }

@@ -1,5 +1,3 @@
-
-
 using System;
 using System.Linq;
 using System.IO;
@@ -13,10 +11,8 @@ using Newtonsoft.Json;
 
 namespace Borsdata.Api.Dal.Model
 {
-   
     public partial class KpisCalcUpdatedRespV1
     {
         public DateTime kpisCalcUpdated { get; set; }
     }
-
 }

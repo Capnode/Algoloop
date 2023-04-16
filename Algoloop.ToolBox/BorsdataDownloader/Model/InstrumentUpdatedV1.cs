@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using System.IO;
@@ -11,13 +10,9 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 namespace Borsdata.Api.Dal.Model
 {
-  
-    public partial class InstrumentUpdatedV1 
+    public partial class InstrumentUpdatedV1
     {
         public long? InsId { get; set; }
         public DateTime? UpdatedAt { get; set; }
-
-        
     }
-
 }
