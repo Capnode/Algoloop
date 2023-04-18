@@ -193,7 +193,7 @@ namespace Algoloop.ViewModel
         {
             var openFileDialog = new OpenFileDialog
             {
-                InitialDirectory = Directory.GetCurrentDirectory(),
+                InitialDirectory = MainService.GetUserDataFolder(),
                 Multiselect = true,
                 Filter = "json file (*.json)|*.json|All files (*.*)|*.*"
             };
@@ -223,6 +223,7 @@ namespace Algoloop.ViewModel
             }
             catch (Exception ex)
             {
+                Messenger.Send(new NotificationMessage(ex.Message), 0);
                 Log.Error(ex, $"Failed reading {openFileDialog.FileName}\n", true);
             }
             finally
@@ -236,7 +237,7 @@ namespace Algoloop.ViewModel
             DataToModel();
             var saveFileDialog = new SaveFileDialog
             {
-                InitialDirectory = Directory.GetCurrentDirectory(),
+                InitialDirectory = MainService.GetUserDataFolder(),
                 Filter = "json file (*.json)|*.json|All files (*.*)|*.*"
             };
             if (saveFileDialog.ShowDialog() == false)
@@ -250,7 +251,7 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 Log.Error(ex);
-                Messenger.Send(ex.Message, 0);
+                Messenger.Send(new NotificationMessage(ex.Message), 0);
             }
             finally
             {

@@ -42,6 +42,7 @@ namespace Algoloop.ViewModel
     public class StrategyViewModel : ViewModelBase, ITreeViewModel
     {
         public const string DefaultName = "Strategy";
+        private const string CsvDelimiter = ";";
 
         internal ITreeViewModel _parent;
         private readonly MarketsModel _markets;
@@ -78,6 +79,9 @@ namespace Algoloop.ViewModel
             ExportCommand = new RelayCommand(
                 () => DoExportStrategy(),
                 () => !IsBusy);
+            ExportSelectedTracksCommand = new RelayCommand<IList>(
+                m => DoExportSelectedTracks(m),
+                _ => !IsBusy);
             DeleteCommand = new RelayCommand(
                 () => DoDeleteStrategy(),
                 () => !IsBusy);
@@ -156,6 +160,7 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneCommand { get; }
         public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand ExportCommand { get; }
+        public RelayCommand<IList> ExportSelectedTracksCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand DeleteAllTracksCommand { get; }
         public RelayCommand<IList> DeleteSelectedTracksCommand { get; }
@@ -349,6 +354,7 @@ namespace Algoloop.ViewModel
             CloneCommand.NotifyCanExecuteChanged();
             CloneAlgorithmCommand.NotifyCanExecuteChanged();
             ExportCommand.NotifyCanExecuteChanged();
+            ExportSelectedTracksCommand.NotifyCanExecuteChanged();
             DeleteCommand.NotifyCanExecuteChanged();
             DeleteAllTracksCommand.NotifyCanExecuteChanged();
             DeleteSelectedTracksCommand.NotifyCanExecuteChanged();
@@ -728,7 +734,7 @@ namespace Algoloop.ViewModel
         {
             var openFileDialog = new OpenFileDialog
             {
-                InitialDirectory = Directory.GetCurrentDirectory(),
+                InitialDirectory = MainService.GetUserDataFolder(),
                 Multiselect = false,
                 Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
             };
@@ -846,7 +852,7 @@ namespace Algoloop.ViewModel
             DataToModel();
             var saveFileDialog = new SaveFileDialog
             {
-                InitialDirectory = Directory.GetCurrentDirectory(),
+                InitialDirectory = MainService.GetUserDataFolder(),
                 FileName = Model.Name,
                 Filter = "json file (*.json)|*.json|All files (*.*)|*.*"
             };
@@ -866,6 +872,52 @@ namespace Algoloop.ViewModel
             catch (Exception ex)
             {
                 Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private void DoExportSelectedTracks(IList tracks)
+        {
+            DataToModel();
+            var saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = MainService.GetUserDataFolder(),
+                FileName = DisplayName,
+                Filter = "CSV file (*.csv)|*.csv|All files (*.*)|*.*"
+            };
+
+            if (saveFileDialog.ShowDialog() == false)
+                return;
+
+            try
+            {
+                IsBusy = true;
+                IEnumerable<string> headers = TrackColumns.Select(m => m.Header.ToString());
+                File.WriteAllText(saveFileDialog.FileName, string.Join(CsvDelimiter, headers) + Environment.NewLine);
+                List<TrackViewModel> list = tracks.Count == 0 ? Tracks.ToList() : tracks.Cast<TrackViewModel>().ToList();
+                foreach (TrackViewModel track in list)
+                {
+                    string line = track.Model.Active + CsvDelimiter + track.Model.Name;
+                    foreach (string header in headers.Skip(2))
+                    {
+                        line += CsvDelimiter;
+                        if (track.Model.Statistics.TryGetValue(header, out decimal? value) && value != null)
+                        {
+                            line += decimal.Round(value ?? 0, 4).ToString();
+                        }
+                    }
+
+                    File.AppendAllText(saveFileDialog.FileName, line + Environment.NewLine);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Log.Error(ex, $"Failed writing {saveFileDialog.FileName}\n");
+                Messenger.Send(new NotificationMessage(ex.Message), 0);
             }
             finally
             {

@@ -421,52 +421,73 @@
                                 </wpf:ExDataGrid>
                             </TabItem>
                             <TabItem Header="{Binding Tracks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tracks ({0}), FallbackValue=Tracks}">
-                                <wpf:ExDataGrid
-                                    AutoGenerateColumns="False"
-                                    CanUserFilter="True"
-                                    CanUserFreeze="False"
-                                    CanUserGroup="False"
-                                    CanUserReorderColumns="True"
-                                    CanUserSelectDistinct="True"
-                                    ExColumns="{Binding TrackColumns}"
-                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TracksColumnsInfo}"
-                                    ExItemsSource="{Binding Tracks}"
-                                    ExSelectedItems="{Binding SelectedItems}"
-                                    FrozenColumnCount="2"
-                                    GridLinesVisibility="None"
-                                    SelectedValue="{Binding SelectedTrack, Mode=TwoWay}">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseDoubleClick">
-                                            <i:InvokeCommandAction Command="{Binding TrackDoubleClickCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                    <DataGrid.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem
-                                                Command="{Binding DeleteSelectedTracksCommand}"
-                                                CommandParameter="{Binding Path=PlacementTarget.SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}"
-                                                Header="Delete Tracks">
-                                                <MenuItem.Icon>
-                                                    <Image
-                                                        Width="16"
-                                                        Height="16"
-                                                        Source="/Resources/Delete.png" />
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                            <MenuItem
-                                                Command="{Binding UseParametersCommand}"
-                                                CommandParameter="{Binding Path=PlacementTarget.SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}"
-                                                Header="Use Parameters">
-                                                <MenuItem.Icon>
-                                                    <Image
-                                                        Width="16"
-                                                        Height="16"
-                                                        Source="/Resources/Clone.png" />
-                                                </MenuItem.Icon>
-                                            </MenuItem>
-                                        </ContextMenu>
-                                    </DataGrid.ContextMenu>
-                                </wpf:ExDataGrid>
+                                <DockPanel>
+                                    <ToolBar DockPanel.Dock="Top" ToolBarTray.IsLocked="True">
+                                        <Button ToolTip="Delete tracks"
+                                                Command="{Binding SelectedItem.DeleteSelectedTracksCommand}"
+                                                CommandParameter="{Binding ElementName=trackDataGrid, Path=SelectedItems}">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources/Delete.png" />
+                                        </Button>
+                                        <Button ToolTip="Export tracks"
+                                                Command="{Binding SelectedItem.ExportSelectedTracksCommand}"
+                                                CommandParameter="{Binding ElementName=trackDataGrid, Path=SelectedItems}">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources/Export.png" />
+                                        </Button>
+                                    </ToolBar>
+                                    <wpf:ExDataGrid
+                                        x:Name="trackDataGrid"
+                                        AutoGenerateColumns="False"
+                                        CanUserFilter="True"
+                                        CanUserFreeze="False"
+                                        CanUserGroup="False"
+                                        CanUserReorderColumns="True"
+                                        CanUserSelectDistinct="True"
+                                        ExColumns="{Binding TrackColumns}"
+                                        ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TracksColumnsInfo}"
+                                        ExItemsSource="{Binding Tracks}"
+                                        ExSelectedItems="{Binding SelectedItems}"
+                                        FrozenColumnCount="2"
+                                        GridLinesVisibility="None"
+                                        SelectedValue="{Binding SelectedTrack, Mode=TwoWay}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDoubleClick">
+                                                <i:InvokeCommandAction Command="{Binding TrackDoubleClickCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <DataGrid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem
+                                                    Command="{Binding DeleteSelectedTracksCommand}"
+                                                    CommandParameter="{Binding Path=PlacementTarget.SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}"
+                                                    Header="Delete Tracks">
+                                                    <MenuItem.Icon>
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            Source="/Resources/Delete.png" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem
+                                                    Command="{Binding UseParametersCommand}"
+                                                    CommandParameter="{Binding Path=PlacementTarget.SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}"
+                                                    Header="Use Parameters">
+                                                    <MenuItem.Icon>
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            Source="/Resources/Clone.png" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </DataGrid.ContextMenu>
+                                    </wpf:ExDataGrid>
+                                </DockPanel>
                             </TabItem>
                         </TabControl>
                     </DockPanel>

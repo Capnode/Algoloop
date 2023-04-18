@@ -224,7 +224,7 @@ namespace Algoloop.ViewModel
                 DataToModel();
                 SaveFileDialog saveFileDialog = new()
                 {
-                    InitialDirectory = Directory.GetCurrentDirectory(),
+                    InitialDirectory = MainService.GetUserDataFolder(),
                     Filter = "symbol file (*.csv)|*.csv|All files (*.*)|*.*"
                 };
                 if (saveFileDialog.ShowDialog() == false)
@@ -241,6 +241,7 @@ namespace Algoloop.ViewModel
                 }
                 catch (Exception ex)
                 {
+                    Messenger.Send(new NotificationMessage(ex.Message), 0);
                     Log.Error(ex, $"Failed reading {saveFileDialog.FileName}\n", true);
                 }
             }
