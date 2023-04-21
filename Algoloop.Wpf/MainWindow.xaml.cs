@@ -22,6 +22,7 @@ using System.Windows;
 using System.Windows.Controls;
 using DevExpress.Xpf.Core;
 using System.Windows.Interop;
+using System.Windows.Input;
 
 namespace Algoloop.Wpf
 {
@@ -37,7 +38,7 @@ namespace Algoloop.Wpf
             string exeFolder = MainService.GetProgramFolder();
             Config.Set("plugin-directory", exeFolder);
             Config.Set("composer-dll-directory", exeFolder);
-            SetTheme(ApplicationThemeHelper.ApplicationThemeName);
+            SetTheme(Settings.Default.Theme);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -130,7 +131,9 @@ namespace Algoloop.Wpf
         {
             if (e.OriginalSource is MenuItem item)
             {
+                Mouse.OverrideCursor = Cursors.Wait;
                 SetTheme(item.DataContext.ToString());
+                Mouse.OverrideCursor = null;
             }
         }
 
@@ -139,6 +142,21 @@ namespace Algoloop.Wpf
             _themeMenu.Items.Clear();
             foreach (Theme theme in Theme.Themes)
             {
+                try
+                {
+                    var asm = theme.Assembly;
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (theme.Name == actualTheme)
+                {
+                    ApplicationThemeHelper.ApplicationThemeName = theme.Name;
+                    Settings.Default.Theme = theme.Name;
+                }
+
                 var menuItem = new MenuItem
                 {
                     Header = theme.FullName,
@@ -148,8 +166,6 @@ namespace Algoloop.Wpf
 
                 _themeMenu.Items.Add(menuItem);
             }
-
-            ApplicationThemeHelper.ApplicationThemeName = actualTheme;
         }
     }
 }

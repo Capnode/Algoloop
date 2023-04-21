@@ -53,7 +53,6 @@ namespace Algoloop.Wpf
             _chart.AllowAddOwnTrades = false;
             _chart.AllowAddAxis = false;
             _chart.AllowAddArea = false;
-            _chart.XAxisType = ChartAxisType.CategoryDateTime;
 
             _chart.SubscribeIndicatorElement += OnSubscribeIndicatorElement;
             _chart.UnSubscribeElement += OnUnSubscribeElement;

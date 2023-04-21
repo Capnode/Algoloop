@@ -74,11 +74,6 @@ namespace Algoloop.Wpf
             TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionHandler;
 
             Algoloop.Wpf.Properties.Settings.Default.Reload();
-            string theme = Wpf.Properties.Settings.Default.Theme;
-            if (!string.IsNullOrEmpty(theme))
-            {
-                ApplicationThemeHelper.ApplicationThemeName = theme;
-            }
 
             // Prevent going to sleep mode
             _ = SetThreadExecutionState(EsContinous | EsSystemRequired);
@@ -91,8 +86,7 @@ namespace Algoloop.Wpf
 
             ViewModelLocator.ResearchViewModel.StopJupyter();
             ViewModelLocator.MainViewModel.SaveConfig();
-            Wpf.Properties.Settings.Default.Theme = ApplicationThemeHelper.ApplicationThemeName;
-            Algoloop.Wpf.Properties.Settings.Default.Save();
+            Wpf.Properties.Settings.Default.Save();
 
             Log.Trace($"Exit \"{AboutModel.Product}\"");
             base.OnExit(e);
