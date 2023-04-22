@@ -66,7 +66,10 @@ namespace Algoloop.ToolBox.MetastockConverter
                 }
 
                 // Create folder structure
-                Directory.CreateDirectory(MapFile.GetMapFilePath(Market.Metastock, SecurityType.Equity));
+                string maproot = Path.Combine(
+                    destinationDirectory,
+                    MapFile.GetRelativeMapFilePath(Market.Metastock, SecurityType.Equity));
+                Directory.CreateDirectory(maproot);
 
                 // Start converting
                 ReadFolder(new DirectoryInfo(sourceDirectory), destinationDirectory);
@@ -152,7 +155,7 @@ namespace Algoloop.ToolBox.MetastockConverter
                 if (first == default) continue;
                 var datawriter = new LeanDataWriter(Resolution.Daily, symbol, destinationDirectory);
                 datawriter.Write(bars);
-                UpdateMapFile(symbol.Value, first.Time.Date);
+                UpdateMapFile(destinationDirectory, symbol.Value, first.Time.Date);
             }
         }
 
@@ -164,11 +167,13 @@ namespace Algoloop.ToolBox.MetastockConverter
                 return (decimal)Math.Round(price, 3);
         }
 
-        private static void UpdateMapFile(string symbol, DateTime date)
+        private static void UpdateMapFile(string folder, string symbol, DateTime date)
         {
             MapFile mapFile;
             IEnumerable<MapFileRow> presentRows;
-            string mapRoot = MapFile.GetMapFilePath(Market.Metastock, SecurityType.Equity);
+            string mapRoot = Path.Combine(
+                folder,
+                MapFile.GetRelativeMapFilePath(Market.Metastock, SecurityType.Equity));
             string path = Path.Combine(mapRoot, symbol.ToLowerInvariant() + ".csv");
 
             // Check if date is already mapped

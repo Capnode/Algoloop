@@ -63,7 +63,8 @@ namespace Algoloop.Tests.ToolBox
                 nameof(Resolution.Daily),
                 "volvy.zip");
             string mapfile = Path.Combine(
-                MapFile.GetMapFilePath(Market.Metastock, SecurityType.Equity),
+                DestDir,
+                MapFile.GetRelativeMapFilePath(Market.Metastock, SecurityType.Equity),
                 "volvy.csv");
 
             string[] args =

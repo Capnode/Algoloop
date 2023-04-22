@@ -91,7 +91,8 @@ namespace Algoloop.Tests.ToolBox
                 nameof(Resolution.Daily),
                 "AXFO.ST.zip");
             string mapfile = Path.Combine(
-                MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity),
+                DataFolder,
+                MapFile.GetRelativeMapFilePath(Market.Borsdata, SecurityType.Equity),
                 "AXFO.ST.csv");
             
             var tickers = new List<string> { "AXFO.ST" };
@@ -138,7 +139,9 @@ namespace Algoloop.Tests.ToolBox
 
             // Assert
             string zipfile = Path.Combine(_equityFolder, "daily", "AXFO.ST.zip");
-            string mapRoot = MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity);
+            string mapRoot = Path.Combine(
+                DataFolder,
+                MapFile.GetRelativeMapFilePath(Market.Borsdata, SecurityType.Equity));
             string mapPath = Path.Combine(mapRoot, "AXFO.ST.csv");
             Assert.IsTrue(File.Exists(zipfile));
             long length = new FileInfo(zipfile).Length;

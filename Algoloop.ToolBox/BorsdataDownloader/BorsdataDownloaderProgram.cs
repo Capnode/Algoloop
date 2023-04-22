@@ -52,7 +52,10 @@ namespace Algoloop.ToolBox.BorsdataDownloader
 
             try
             {
-                Directory.CreateDirectory(MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity));
+                string mapRoot = Path.Combine(
+                    Globals.DataFolder,
+                    MapFile.GetRelativeMapFilePath(Market.Borsdata, SecurityType.Equity));
+                Directory.CreateDirectory(mapRoot);
 
                 // Download the data
                 using var downloader = new BorsdataDataDownloader(apiKey);
@@ -80,7 +83,9 @@ namespace Algoloop.ToolBox.BorsdataDownloader
         {
             MapFile mapFile;
             IEnumerable<MapFileRow> presentRows;
-            string mapRoot = MapFile.GetMapFilePath(Market.Borsdata, SecurityType.Equity);
+            string mapRoot = Path.Combine(
+                Globals.DataFolder,
+                MapFile.GetRelativeMapFilePath(Market.Borsdata, SecurityType.Equity));
             string path = Path.Combine(mapRoot, symbol.ToLowerInvariant() + ".csv");
 
             // Check if date is already mapped
