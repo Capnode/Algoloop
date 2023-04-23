@@ -51,9 +51,10 @@ namespace Algoloop.ViewModel.Internal.Lean
                     LowPrice = trade.Low,
                     ClosePrice = trade.Close,
                     OpenVolume = 0,
-                    HighVolume = 0,
+                    HighVolume = trade.Volume,
                     LowVolume = 0,
                     CloseVolume = trade.Volume,
+                    TotalVolume = trade.Volume,
                     BuildFrom = DataType.Ticks,
                     State = CandleStates.Finished
                 };
@@ -76,6 +77,7 @@ namespace Algoloop.ViewModel.Internal.Lean
                     HighVolume = 0,
                     LowVolume = 0,
                     CloseVolume = 0,
+                    TotalVolume = 0,
                     BuildFrom = DataType.Ticks,
                     State = CandleStates.Finished
                 };
@@ -97,6 +99,7 @@ namespace Algoloop.ViewModel.Internal.Lean
                     HighVolume = 0,
                     LowVolume = 0,
                     CloseVolume = 0,
+                    TotalVolume = 0,
                     BuildFrom = DataType.Ticks,
                     State = CandleStates.Finished
                 };

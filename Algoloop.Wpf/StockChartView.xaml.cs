@@ -13,13 +13,16 @@
  */
 
 using Algoloop.ViewModel;
+using Ecng.Collections;
 using StockSharp.Algo.Candles;
+using StockSharp.Algo.Indicators;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -27,7 +30,10 @@ using System.Windows.Controls;
 
 namespace Algoloop.Wpf
 {
-    // StockShart doc: https://doc.stocksharp.com/topics/StockSharpAbout.html
+    /// <summary>
+    /// 
+    /// StockShart doc: https://doc.stocksharp.com/topics/StockSharpAbout.html
+    /// </summary>
     public partial class StockChartView : UserControl
     {
         public static readonly DependencyProperty ItemsSourceProperty = 
@@ -35,11 +41,12 @@ namespace Algoloop.Wpf
             typeof(StockChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
         private bool _isLoaded = false;
 
+        private readonly CachedSynchronizedDictionary<IChartIndicatorElement, IIndicator> _indicators = new();
+
         public StockChartView()
         {
             InitializeComponent();
             Loaded += OnLoaded;
-            Unloaded += OnUnloaded;
 
             _chart.IsInteracted = true;
             _chart.IsAutoRange = true;
@@ -52,10 +59,15 @@ namespace Algoloop.Wpf
             _chart.AllowAddOrders = false;
             _chart.AllowAddOwnTrades = false;
             _chart.AllowAddAxis = false;
-            _chart.AllowAddArea = false;
+            _chart.AllowAddArea = true;
 
+            _chart.SubscribeCandleElement += OnSubscribeCandleElement;
             _chart.SubscribeIndicatorElement += OnSubscribeIndicatorElement;
             _chart.UnSubscribeElement += OnUnSubscribeElement;
+            _chart.AnnotationCreated += OnAnnotationCreated;
+            _chart.AnnotationModified += OnAnnotationModified;
+            _chart.AnnotationDeleted += OnAnnotationDeleted;
+            _chart.AnnotationSelected += OnAnnotationSelected;
         }
 
         public ObservableCollection<IChartViewModel> ItemsSource
@@ -67,19 +79,81 @@ namespace Algoloop.Wpf
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             _isLoaded = true;
+            Window window = Window.GetWindow(this);
+            window.Closing += OnUnloaded;
+
+            //byte[] bytes = Encoding.Default.GetBytes(Properties.Settings.Default.StockChartViewSettingsStorage);
+            //SettingsStorage storage = bytes.Deserialize<SettingsStorage>();
+            //_chart.LoadIfNotNull(storage);
+
             _chart.FillIndicators();
             RedrawCharts();
         }
 
-        private void OnUnSubscribeElement(IChartElement obj)
+        private void OnUnloaded(object sender, CancelEventArgs e)
+        {
+            //var settingsStorage = new SettingsStorage();
+            //_chart.Save(settingsStorage);
+            //byte[] bytes = settingsStorage.Serialize();
+            //Properties.Settings.Default.StockChartViewSettingsStorage = Encoding.Default.GetString(bytes);
+        }
+
+        private void OnSubscribeIndicatorElement(IChartIndicatorElement element, CandleSeries series, IIndicator indicator)
+        {
+            bool oldReset = _chart.DisableIndicatorReset;
+            try
+            {
+                _chart.DisableIndicatorReset = true;
+                indicator.Reset();
+            }
+            finally
+            {
+                _chart.DisableIndicatorReset = oldReset;
+            }
+
+            // Process Candles
+            IChartDrawData chartData = _chart.CreateData();
+            foreach (IChartViewModel chart in _combobox.Items)
+            {
+                if (!chart.IsVisible) continue;
+                if (!(chart is StockChartViewModel stockChart)) continue;
+                foreach (Candle candle in stockChart.Candles)
+                {
+                    chartData.Group(candle.OpenTime).Add(element, indicator.Process(candle));
+                }
+            }
+
+            _chart.Reset(new[] { element });
+            _chart.Draw(chartData);
+
+            _indicators[element] = indicator;
+        }
+
+        private void OnUnSubscribeElement(IChartElement element)
+        {
+            if (element is IChartIndicatorElement indElem)
+            {
+                _indicators.Remove(indElem);
+            }
+        }
+
+        private void OnAnnotationSelected(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
         {
         }
 
-        private void OnSubscribeIndicatorElement(IChartIndicatorElement arg1, CandleSeries arg2, StockSharp.Algo.Indicators.IIndicator arg3)
+        private void OnAnnotationDeleted(IChartAnnotation obj)
         {
         }
 
-        private void OnUnloaded(object sender, RoutedEventArgs e)
+        private void OnAnnotationModified(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
+        {
+        }
+
+        private void OnAnnotationCreated(IChartAnnotation obj)
+        {
+        }
+
+        private void OnSubscribeCandleElement(IChartCandleElement arg1, CandleSeries arg2)
         {
         }
 

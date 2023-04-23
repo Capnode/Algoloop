@@ -53,5 +53,8 @@
     <Setting Name="FundamentalsColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="StockChartViewSettingsStorage" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
