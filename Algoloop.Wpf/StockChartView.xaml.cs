@@ -14,9 +14,11 @@
 
 using Algoloop.ViewModel;
 using Ecng.Collections;
+using Ecng.Serialization;
 using StockSharp.Algo.Candles;
 using StockSharp.Algo.Indicators;
 using StockSharp.Charting;
+using StockSharp.Configuration;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
@@ -25,8 +27,10 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Algoloop.Wpf
 {
@@ -36,9 +40,17 @@ namespace Algoloop.Wpf
     /// </summary>
     public partial class StockChartView : UserControl
     {
-        public static readonly DependencyProperty ItemsSourceProperty = 
-            DependencyProperty.Register("ItemsSource", typeof(ObservableCollection<IChartViewModel>),
-            typeof(StockChartView), new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
+            "ItemsSource",
+            typeof(ObservableCollection<IChartViewModel>),
+            typeof(StockChartView),
+            new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
+        public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register(
+            "Settings",
+            typeof(string),
+            typeof(StockChartView),
+            new FrameworkPropertyMetadata { BindsTwoWayByDefault = true, DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
+
         private bool _isLoaded = false;
 
         private readonly CachedSynchronizedDictionary<IChartIndicatorElement, IIndicator> _indicators = new();
@@ -54,11 +66,11 @@ namespace Algoloop.Wpf
             _chart.MinimumRange = int.MaxValue;
             _chart.ShowOverview = true;
             _chart.ShowPerfStats = false;
-            _chart.AllowAddCandles = false;
+            _chart.AllowAddCandles = true;
             _chart.AllowAddIndicators = true;
             _chart.AllowAddOrders = false;
             _chart.AllowAddOwnTrades = false;
-            _chart.AllowAddAxis = false;
+            _chart.AllowAddAxis = true;
             _chart.AllowAddArea = true;
 
             _chart.SubscribeCandleElement += OnSubscribeCandleElement;
@@ -76,26 +88,31 @@ namespace Algoloop.Wpf
             set => SetValue(ItemsSourceProperty, value);
         }
 
+        public string Settings
+        {
+            get => (string)base.GetValue(SettingsProperty);
+            set => SetValue(SettingsProperty, value);
+        }
+
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             _isLoaded = true;
             Window window = Window.GetWindow(this);
             window.Closing += OnUnloaded;
 
-            //byte[] bytes = Encoding.Default.GetBytes(Properties.Settings.Default.StockChartViewSettingsStorage);
-            //SettingsStorage storage = bytes.Deserialize<SettingsStorage>();
-            //_chart.LoadIfNotNull(storage);
-
             _chart.FillIndicators();
+            byte[] bytes = Encoding.Default.GetBytes(Settings);
+            SettingsStorage storage = bytes.Deserialize<SettingsStorage>();
+            _chart.LoadIfNotNull(storage);
             RedrawCharts();
         }
 
         private void OnUnloaded(object sender, CancelEventArgs e)
         {
-            //var settingsStorage = new SettingsStorage();
-            //_chart.Save(settingsStorage);
-            //byte[] bytes = settingsStorage.Serialize();
-            //Properties.Settings.Default.StockChartViewSettingsStorage = Encoding.Default.GetString(bytes);
+            var settingsStorage = new SettingsStorage();
+            _chart.Save(settingsStorage);
+            byte[] bytes = settingsStorage.Serialize();
+            Settings = Encoding.Default.GetString(bytes);
         }
 
         private void OnSubscribeIndicatorElement(IChartIndicatorElement element, CandleSeries series, IIndicator indicator)
@@ -211,9 +228,14 @@ namespace Algoloop.Wpf
 
         private void RedrawCharts()
         {
-            Dictionary<int, ChartArea> areas = new();
             _chart.IsAutoRange = true;
-            _chart.ClearAreas();
+            _chart.Reset(_chart.Elements);
+            foreach (IChartArea area in _chart.Areas)
+            {
+                area.Elements.Clear();
+                area.XAxises.RemoveRange(area.XAxises.Skip(1));
+                area.YAxises.RemoveRange(area.YAxises.Skip(1));
+            }
 
             // Collect time-value points of all Equity curves
             Dictionary<ChartLineElement, decimal> curves = new();
@@ -221,10 +243,14 @@ namespace Algoloop.Wpf
             foreach (IChartViewModel chart in _combobox.Items)
             {
                 if (!chart.IsVisible) continue;
-                if (!areas.TryGetValue(chart.SubChart, out ChartArea area))
+                IChartArea area;
+                if (chart.SubChart < _chart.Areas.Count)
                 {
-                    area = new();
-                    areas.Add(chart.SubChart, area);
+                    area = _chart.Areas[chart.SubChart];
+                }
+                else
+                {
+                    area = new ChartArea();
                     _chart.AddArea(area);
                 }
 
@@ -288,7 +314,8 @@ namespace Algoloop.Wpf
             foreach (IChartViewModel chart in _combobox.Items)
             {
                 if (!chart.IsVisible) continue;
-                ChartArea area = areas[chart.SubChart];
+                if (chart.SubChart >= _chart.Areas.Count) continue;
+                IChartArea area = _chart.Areas[chart.SubChart];
                 if (chart is StockChartViewModel stockChart)
                 {
                     RedrawChart(area, stockChart);
@@ -298,7 +325,7 @@ namespace Algoloop.Wpf
             _chart.IsAutoRange = false; // Allow user to adjust range
         }
 
-        private void RedrawChart(ChartArea candlesArea, StockChartViewModel model)
+        private void RedrawChart(IChartArea candlesArea, StockChartViewModel model)
         {
             Candle first = model.Candles.FirstOrDefault();
             if (first == default) return;

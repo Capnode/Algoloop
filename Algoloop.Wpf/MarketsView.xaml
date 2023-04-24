@@ -572,7 +572,9 @@
                                         </i:Interaction.Triggers>
                                     </xctk:DateTimePicker>
                                 </ToolBar>
-                                <view:StockChartView ItemsSource="{Binding Charts}" Visibility="{Binding ShowCharts, Converter={viewsupport:BooleanToVisibilityConverter}}" />
+                                <view:StockChartView
+                                    ItemsSource="{Binding Charts}" Visibility="{Binding ShowCharts, Converter={viewsupport:BooleanToVisibilityConverter}}"
+                                    Settings="{Binding Source={StaticResource settings}, Path=MarketViewChartSettings}"/>
                             </DockPanel>
                         </TabItem>
                         <TabItem Header="Fundamentals">

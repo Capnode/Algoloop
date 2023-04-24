@@ -236,7 +236,9 @@
                 </wpf:ExDataGrid>
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
-                <view:StockChartView ItemsSource="{Binding Charts}" />
+                <view:StockChartView
+                    ItemsSource="{Binding Charts}"
+                    Settings="{Binding Source={StaticResource settings}, Path=TrackViewChartSettings}"/>
             </TabItem>
             <TabItem Header="{Binding TrackSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Details ({0}), FallbackValue=Details}">
                 <wpf:ExDataGrid

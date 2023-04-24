@@ -53,7 +53,10 @@
     <Setting Name="FundamentalsColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="StockChartViewSettingsStorage" Type="System.String" Scope="User">
+    <Setting Name="MarketViewChartSettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="TrackViewChartSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

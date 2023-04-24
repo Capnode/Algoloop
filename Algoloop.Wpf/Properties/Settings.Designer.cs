@@ -230,12 +230,24 @@ namespace Algoloop.Wpf.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string StockChartViewSettingsStorage {
+        public string MarketViewChartSettings {
             get {
-                return ((string)(this["StockChartViewSettingsStorage"]));
+                return ((string)(this["MarketViewChartSettings"]));
             }
             set {
-                this["StockChartViewSettingsStorage"] = value;
+                this["MarketViewChartSettings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TrackViewChartSettings {
+            get {
+                return ((string)(this["TrackViewChartSettings"]));
+            }
+            set {
+                this["TrackViewChartSettings"] = value;
             }
         }
     }
