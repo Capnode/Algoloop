@@ -9,6 +9,7 @@
       "Login": "",
       "Password": "",
       "ApiKey": "",
+      "AccountId": "",
       "LastDate": "2020-01-12T00:00:00+01:00",
       "Resolution": 4,
       "Active": false,
@@ -20,7 +21,7 @@
           "Name": "aapl",
           "Market": "usa",
           "Security": 1,
-          "Properties": null
+          "Properties": {}
         },
         {
           "Id": "spy",
@@ -28,7 +29,7 @@
           "Name": "spy",
           "Market": "usa",
           "Security": 1,
-          "Properties": null
+          "Properties": {}
         }
       ],
       "Lists": [
@@ -42,7 +43,7 @@
               "Name": "aapl",
               "Market": "usa",
               "Security": 1,
-              "Properties": null
+              "Properties": {}
             },
             {
               "Id": "spy",
@@ -50,7 +51,7 @@
               "Name": "spy",
               "Market": "usa",
               "Security": 1,
-              "Properties": null
+              "Properties": {}
             }
           ]
         }
