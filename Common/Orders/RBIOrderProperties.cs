@@ -11,22 +11,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
 
-namespace QuantConnect.Data.Shortable
+namespace QuantConnect.Orders
 {
     /// <summary>
-    /// Defines the default Atreyu Shortable Provider
+    /// RBI order properties
     /// </summary>
-    public class AtreyuShortableProvider : LocalDiskShortableProvider
+    public class RBIOrderProperties : OrderProperties
     {
-        /// <summary>
-        /// Initialize an instance of <see cref="AtreyuShortableProvider"/>
-        /// </summary>
-        /// <param name="securityType">SecurityType to read data</param>
-        /// <param name="market">Market to read ETB data</param>
-        public AtreyuShortableProvider(SecurityType securityType, string market) : base(securityType, "atreyu", market)
-        {
-        }
     }
 }

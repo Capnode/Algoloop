@@ -11,61 +11,100 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
 
+using QuantConnect.Data;
+using QuantConnect.Interfaces;
 using QuantConnect.Orders;
+using QuantConnect.Securities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm to test combo leg limit orders
+    /// Regression algorithm asserting we can specify a custom Shortable Provider
     /// </summary>
-    public class ComboLegLimitOrderAlgorithm : ComboOrderAlgorithm
+    public class CustomShortableProviderRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        protected override IEnumerable<OrderTicket> PlaceComboOrder(List<Leg> legs, int quantity, decimal? limitPrice = null)
+        private Security _spy;
+        private OrderTicket _orderId;
+
+        public override void Initialize()
         {
-            return ComboLegLimitOrder(legs, quantity);
+            SetStartDate(2013, 10, 4);
+            SetEndDate(2013, 10, 6);
+            SetCash(10000000);
+
+            _spy = AddEquity("SPY", Resolution.Daily);
+            _spy.SetShortableProvider(new CustomSPYShortableProvider());
+        }
+
+        public override void OnData(Slice slice)
+        {
+            var spyShortableQuantity = _spy.ShortableProvider.ShortableQuantity(_spy.Symbol, Time);
+            if (spyShortableQuantity > 1000)
+            {
+                _orderId = Sell("SPY", (int)spyShortableQuantity);
+            }
         }
 
         public override void OnEndOfAlgorithm()
         {
-            base.OnEndOfAlgorithm();
-
-            if (FillOrderEvents.Zip(OrderLegs).Any(x => x.Second.OrderPrice < x.First.FillPrice))
+            var transactions = Transactions.OrdersCount;
+            if (transactions != 1)
             {
-                throw new Exception($"Limit price expected to be greater that the fill price for each order. Limit prices: {string.Join(",", OrderLegs.Select(x => x.OrderPrice))} Fill prices: {string.Join(",", FillOrderEvents.Select(x => x.FillPrice))}");
+                throw new Exception($"Algorithm should have just 1 order, but was {transactions}");
+            }
+            var orderQuantity = Transactions.GetOrderById(_orderId).Quantity;
+            if (orderQuantity != -1001)
+            {
+                throw new Exception($"Quantity of order {_orderId} should be -1001, but was {orderQuantity}");
+            }
+        }
+
+        private class CustomSPYShortableProvider : IShortableProvider
+        {
+            public long? ShortableQuantity(Symbol symbol, DateTime localTime)
+            {
+                if (localTime < new DateTime(2013, 10, 5))
+                {
+                    return 10;
+                }
+                else
+                {
+                    return 1001;
+                }
             }
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
-        public override bool CanRunLocally => true;
+        public bool CanRunLocally { get; } = true;
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp };
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 475788;
+        public long DataPoints => 17;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public override int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "3"},
+            {"Total Trades", "0"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
@@ -84,11 +123,11 @@ namespace QuantConnect.Algorithm.CSharp
             {"Information Ratio", "0"},
             {"Tracking Error", "0"},
             {"Treynor Ratio", "0"},
-            {"Total Fees", "$75.00"},
-            {"Estimated Strategy Capacity", "$100000.00"},
-            {"Lowest Capacity Asset", "GOOCV W78ZERHAOVVQ|GOOCV VP83T1ZUHROL"},
-            {"Portfolio Turnover", "30.16%"},
-            {"OrderListHash", "2b64aec759a089d23ccf9722d6b87ccd"}
+            {"Total Fees", "$0.00"},
+            {"Estimated Strategy Capacity", "$0"},
+            {"Lowest Capacity Asset", ""},
+            {"Portfolio Turnover", "0%"},
+            {"OrderListHash", "f3552fd04615002c13875b1604a29b6e"}
         };
     }
 }

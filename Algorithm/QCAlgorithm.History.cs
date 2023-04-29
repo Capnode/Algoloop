@@ -224,12 +224,16 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing data over the most recent span for all configured securities</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<Slice> History(TimeSpan span, Resolution? resolution = null, bool? fillForward = null, bool? extendedMarketHours = null,
-            DataMappingMode? dataMappingMode = null)
+            DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null, int? contractDepthOffset = null)
         {
-            return History(Securities.Keys, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode).Memoize();
+            return History(Securities.Keys, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode,
+                dataNormalizationMode, contractDepthOffset).Memoize();
         }
 
         /// <summary>
@@ -242,12 +246,16 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing data over the most recent span for all configured securities</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<Slice> History(int periods, Resolution? resolution = null, bool? fillForward = null, bool? extendedMarketHours = null,
-            DataMappingMode? dataMappingMode = null)
+            DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null, int? contractDepthOffset = null)
         {
-            return History(Securities.Keys, periods, resolution, fillForward, extendedMarketHours, dataMappingMode).Memoize();
+            return History(Securities.Keys, periods, resolution, fillForward, extendedMarketHours, dataMappingMode, dataNormalizationMode,
+                contractDepthOffset).Memoize();
         }
 
         /// <summary>
@@ -260,13 +268,18 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<DataDictionary<T>> History<T>(TimeSpan span, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode ? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
             where T : IBaseData
         {
-            return History<T>(Securities.Keys, span, resolution, fillForward, extendedMarketHours, dataMappingMode).Memoize();
+            return History<T>(Securities.Keys, span, resolution, fillForward, extendedMarketHours, dataMappingMode, dataNormalizationMode,
+                contractDepthOffset).Memoize();
         }
 
         /// <summary>
@@ -280,13 +293,18 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<DataDictionary<T>> History<T>(IEnumerable<Symbol> symbols, TimeSpan span, Resolution? resolution = null,
-            bool? fillForward = null, bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? fillForward = null, bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null,
+            DataNormalizationMode? dataNormalizationMode = null, int? contractDepthOffset = null)
             where T : IBaseData
         {
-            return History<T>(symbols, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode).Memoize();
+            return History<T>(symbols, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode,
+                dataNormalizationMode, contractDepthOffset).Memoize();
         }
 
         /// <summary>
@@ -301,14 +319,19 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<DataDictionary<T>> History<T>(IEnumerable<Symbol> symbols, int periods, Resolution? resolution = null,
-            bool? fillForward = null, bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? fillForward = null, bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null,
+            DataNormalizationMode? dataNormalizationMode = null, int? contractDepthOffset = null)
             where T : IBaseData
         {
             CheckPeriodBasedHistoryRequestResolution(symbols, resolution);
-            var requests = CreateBarCountHistoryRequests(symbols, typeof(T), periods, resolution, fillForward, extendedMarketHours, dataMappingMode);
+            var requests = CreateBarCountHistoryRequests(symbols, typeof(T), periods, resolution, fillForward, extendedMarketHours, dataMappingMode,
+                dataNormalizationMode, contractDepthOffset);
             return GetDataTypedHistory<T>(requests);
         }
 
@@ -323,14 +346,18 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<DataDictionary<T>> History<T>(IEnumerable<Symbol> symbols, DateTime start, DateTime end, Resolution? resolution = null,
-            bool? fillForward = null, bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? fillForward = null, bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null,
+            DataNormalizationMode? dataNormalizationMode = null, int? contractDepthOffset = null)
             where T : IBaseData
         {
             var requests = CreateDateRangeHistoryRequests(symbols, typeof(T), start, end, resolution, fillForward, extendedMarketHours,
-                dataMappingMode);
+                dataMappingMode, dataNormalizationMode, contractDepthOffset);
             return GetDataTypedHistory<T>(requests);
         }
 
@@ -344,13 +371,18 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<T> History<T>(Symbol symbol, TimeSpan span, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
             where T : IBaseData
         {
-            return History<T>(symbol, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode).Memoize();
+            return History<T>(symbol, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode,
+                dataNormalizationMode, contractDepthOffset).Memoize();
         }
 
         /// <summary>
@@ -363,10 +395,14 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<TradeBar> History(Symbol symbol, int periods, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
         {
             if (symbol == null) throw new ArgumentException(_symbolEmptyErrorMessage);
 
@@ -376,7 +412,8 @@ namespace QuantConnect.Algorithm
             var start = _historyRequestFactory.GetStartTimeAlgoTz(symbol, periods, resolution.Value, marketHours.ExchangeHours,
                 marketHours.DataTimeZone, extendedMarketHours);
 
-            return History(symbol, start, Time, resolution, fillForward, extendedMarketHours, dataMappingMode);
+            return History(symbol, start, Time, resolution, fillForward, extendedMarketHours, dataMappingMode, dataNormalizationMode,
+                contractDepthOffset);
         }
 
         /// <summary>
@@ -390,16 +427,20 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<T> History<T>(Symbol symbol, int periods, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
             where T : IBaseData
         {
             resolution = GetResolution(symbol, resolution);
             CheckPeriodBasedHistoryRequestResolution(new[] { symbol }, resolution);
             var requests = CreateBarCountHistoryRequests(new [] { symbol }, typeof(T), periods, resolution, fillForward, extendedMarketHours,
-                dataMappingMode);
+                dataMappingMode, dataNormalizationMode, contractDepthOffset);
             return GetDataTypedHistory<T>(requests, symbol);
         }
 
@@ -413,14 +454,18 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<T> History<T>(Symbol symbol, DateTime start, DateTime end, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
             where T : IBaseData
         {
             var requests = CreateDateRangeHistoryRequests(new[] { symbol }, typeof(T), start, end, resolution, fillForward, extendedMarketHours,
-                dataMappingMode);
+                dataMappingMode, dataNormalizationMode, contractDepthOffset);
             return GetDataTypedHistory<T>(requests, symbol);
         }
 
@@ -433,12 +478,17 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<TradeBar> History(Symbol symbol, TimeSpan span, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
         {
-            return History(symbol, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode);
+            return History(symbol, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode, dataNormalizationMode,
+                contractDepthOffset);
         }
 
         /// <summary>
@@ -451,10 +501,14 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<TradeBar> History(Symbol symbol, DateTime start, DateTime end, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
         {
             var securityType = symbol.ID.SecurityType;
             if (securityType == SecurityType.Forex || securityType == SecurityType.Cfd)
@@ -469,7 +523,8 @@ namespace QuantConnect.Algorithm
                                                     " Please use the generic version with Tick type parameter or provide a list of Symbols to use the Slice history request API.");
             }
 
-            return History(new[] { symbol }, start, end, resolutionToUse, fillForward, extendedMarketHours, dataMappingMode).Get(symbol).Memoize();
+            return History(new[] { symbol }, start, end, resolutionToUse, fillForward, extendedMarketHours, dataMappingMode, dataNormalizationMode,
+                contractDepthOffset).Get(symbol).Memoize();
         }
 
         /// <summary>
@@ -483,12 +538,17 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<Slice> History(IEnumerable<Symbol> symbols, TimeSpan span, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
         {
-            return History(symbols, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode).Memoize();
+            return History(symbols, Time - span, Time, resolution, fillForward, extendedMarketHours, dataMappingMode,
+                dataNormalizationMode, contractDepthOffset).Memoize();
         }
 
         /// <summary>
@@ -502,13 +562,18 @@ namespace QuantConnect.Algorithm
         /// <param name="fillForward">True to fill forward missing data, false otherwise</param>
         /// <param name="extendedMarketHours">True to include extended market hours data, false otherwise</param>
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
+        /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
+        /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<Slice> History(IEnumerable<Symbol> symbols, int periods, Resolution? resolution = null, bool? fillForward = null,
-            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null)
+            bool? extendedMarketHours = null, DataMappingMode? dataMappingMode = null, DataNormalizationMode? dataNormalizationMode = null,
+            int? contractDepthOffset = null)
         {
             CheckPeriodBasedHistoryRequestResolution(symbols, resolution);
-            return History(CreateBarCountHistoryRequests(symbols, periods, resolution, fillForward, extendedMarketHours, dataMappingMode)).Memoize();
+            return History(CreateBarCountHistoryRequests(symbols, periods, resolution, fillForward, extendedMarketHours, dataMappingMode,
+                dataNormalizationMode, contractDepthOffset)).Memoize();
         }
 
         /// <summary>
@@ -523,7 +588,7 @@ namespace QuantConnect.Algorithm
         /// <param name="dataMappingMode">The contract mapping mode to use for the security history request</param>
         /// <param name="dataNormalizationMode">The price scaling mode to use for the securities history</param>
         /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
-        /// For example, 0 (default) will use the front month, 1 will use the back month contract</param>
+        /// For example, 0 will use the front month, 1 will use the back month contract</param>
         /// <returns>An enumerable of slice containing the requested historical data</returns>
         [DocumentationAttribute(HistoricalData)]
         public IEnumerable<Slice> History(IEnumerable<Symbol> symbols, DateTime start, DateTime end, Resolution? resolution = null,
