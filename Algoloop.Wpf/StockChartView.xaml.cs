@@ -133,7 +133,7 @@ namespace Algoloop.Wpf
             foreach (IChartViewModel chart in _combobox.Items)
             {
                 if (!chart.IsVisible) continue;
-                if (!(chart is StockChartViewModel stockChart)) continue;
+                if (chart is not StockChartViewModel stockChart) continue;
                 foreach (Candle candle in stockChart.Candles)
                 {
                     chartData.Group(candle.OpenTime).Add(element, indicator.Process(candle));

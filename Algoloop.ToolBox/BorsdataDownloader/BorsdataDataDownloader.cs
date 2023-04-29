@@ -37,8 +37,6 @@ namespace Algoloop.ToolBox.BorsdataDownloader
         private const string Annual = "Annual";
         private const string Quarter = "Quarter";
         private const double Million = 1e6;
-        private const int KpiRevenueGrowth = 94;
-        private const int KpiProfitGrowth = 97;
         private const int KpiReportDateLatest = 202;
         private static readonly DateTime FirstDate = new(1997, 01, 01);
 

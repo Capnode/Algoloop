@@ -26,7 +26,7 @@ namespace Capnode.Wpf.Tester
     /// </summary>
     public partial class App : Application
     {
-        private string Logger = "Application.Log";
+        private readonly string Logger = "Application.Log";
 
         public App()
         {

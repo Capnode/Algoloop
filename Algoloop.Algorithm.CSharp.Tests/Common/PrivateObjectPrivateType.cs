@@ -100,12 +100,8 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             object o;
             if (parameterTypes != null)
             {
-                ConstructorInfo ci = type.GetConstructor(BindToEveryThing, null, parameterTypes, null);
-                if (ci == null)
-                {
-                    throw new ArgumentException("The constructor with the specified signature could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.");
-                }
-
+                ConstructorInfo ci = type.GetConstructor(BindToEveryThing, null, parameterTypes, null) ?? throw new ArgumentException(
+                    "The constructor with the specified signature could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.");
                 try
                 {
                     o = ci.Invoke(args);
@@ -609,13 +605,10 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             if (parameterTypes != null)
             {
                 PropertyInfo pi = this.originalType.GetProperty(name, bindingFlags, null, null, parameterTypes, null);
-                if (pi == null)
-                {
-                    throw new ArgumentException(
-                        string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
-                }
-
-                return pi.GetValue(this.target, args);
+                return pi == null
+                    ? throw new ArgumentException(
+                        string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name))
+                    : pi.GetValue(this.target, args);
             }
             else
             {
@@ -647,13 +640,8 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         {
             if (parameterTypes != null)
             {
-                PropertyInfo pi = this.originalType.GetProperty(name, bindingFlags, null, null, parameterTypes, null);
-                if (pi == null)
-                {
-                    throw new ArgumentException(
+                PropertyInfo pi = this.originalType.GetProperty(name, bindingFlags, null, null, parameterTypes, null) ?? throw new ArgumentException(
                         string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
-                }
-
                 pi.SetValue(this.target, value, args);
             }
             else
@@ -1032,12 +1020,8 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         {
             if (parameterTypes != null)
             {
-                MethodInfo member = this.type.GetMethod(name, bindingFlags | BindToEveryThing | BindingFlags.Static, null, parameterTypes, null);
-                if (member == null)
-                {
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
-                }
-
+                MethodInfo member = this.type.GetMethod(name, bindingFlags | BindToEveryThing | BindingFlags.Static, null, parameterTypes, null) ?? throw new ArgumentException(
+                    string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
                 try
                 {
                     if (member.IsGenericMethodDefinition)
@@ -1270,12 +1254,9 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             if (parameterTypes != null)
             {
                 PropertyInfo pi = this.type.GetProperty(name, bindingFlags | BindingFlags.Static, null, null, parameterTypes, null);
-                if (pi == null)
-                {
-                    throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
-                }
-
-                return pi.GetValue(null, args);
+                return pi == null
+                    ? throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name))
+                    : pi.GetValue(null, args);
             }
             else
             {
@@ -1307,13 +1288,8 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         {
             if (parameterTypes != null)
             {
-                PropertyInfo pi = this.type.GetProperty(name, bindingFlags | BindingFlags.Static, null, null, parameterTypes, null);
-                if (pi == null)
-                {
-                    throw new ArgumentException(
+                PropertyInfo pi = this.type.GetProperty(name, bindingFlags | BindingFlags.Static, null, null, parameterTypes, null) ?? throw new ArgumentException(
                         string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
-                }
-
                 pi.SetValue(null, value, args);
             }
             else

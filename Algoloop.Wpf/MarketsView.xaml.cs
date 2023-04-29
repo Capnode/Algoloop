@@ -27,7 +27,7 @@ namespace Algoloop.Wpf
     /// </summary>
     public partial class MarketsView : UserControl
     {
-        private Dictionary<TextBlock, double> _cellValue = new();
+        private readonly Dictionary<TextBlock, double> _cellValue = new();
         private readonly Storyboard _greenBlink = new();
         private readonly Storyboard _redBlink = new();
 
@@ -36,28 +36,31 @@ namespace Algoloop.Wpf
             InitializeComponent();
 
             System.Drawing.Color green = System.Drawing.Color.LightGreen;
-            ColorAnimation animation = new ColorAnimation();
-            animation.BeginTime = new TimeSpan(0, 0, 0, 0, 200);
-            animation.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500));
-            animation.From = Color.FromArgb(green.A, green.R, green.G, green.B);
-            animation.To = Color.FromArgb(0, 0, 0, 0);
+            ColorAnimation animation = new()
+            {
+                BeginTime = new TimeSpan(0, 0, 0, 0, 200),
+                Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500)),
+                From = Color.FromArgb(green.A, green.R, green.G, green.B),
+                To = Color.FromArgb(0, 0, 0, 0)
+            };
             Storyboard.SetTargetProperty(animation, new PropertyPath("(TextBlock.Background).(SolidColorBrush.Color)"));
             _greenBlink.Children.Add(animation);
 
             System.Drawing.Color red = System.Drawing.Color.Salmon;
-            animation = new ColorAnimation();
-            animation.BeginTime = new TimeSpan(0, 0, 0, 0, 200);
-            animation.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500));
-            animation.From = Color.FromArgb(red.A, red.R, red.G, red.B);
-            animation.To = Color.FromArgb(0, 0, 0, 0);
+            animation = new ColorAnimation
+            {
+                BeginTime = new TimeSpan(0, 0, 0, 0, 200),
+                Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500)),
+                From = Color.FromArgb(red.A, red.R, red.G, red.B),
+                To = Color.FromArgb(0, 0, 0, 0)
+            };
             Storyboard.SetTargetProperty(animation, new PropertyPath("(TextBlock.Background).(SolidColorBrush.Color)"));
             _redBlink.Children.Add(animation);
         }
 
         private void TargetUpdatedBlinkCell(object sender, DataTransferEventArgs e)
         {
-            TextBlock tb = e.TargetObject as TextBlock;
-            if (tb == null)
+            if (e.TargetObject is not TextBlock tb)
                 return;
 
             if (!_cellValue.ContainsKey(tb))

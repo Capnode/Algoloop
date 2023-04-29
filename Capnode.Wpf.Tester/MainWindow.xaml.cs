@@ -12,7 +12,6 @@
  * limitations under the License.
  */
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -85,7 +84,7 @@ namespace Capnode.Wpf.Tester
 
         // Create the OnPropertyChanged method to raise the event
         // The calling member's name will be used as the parameter.
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
