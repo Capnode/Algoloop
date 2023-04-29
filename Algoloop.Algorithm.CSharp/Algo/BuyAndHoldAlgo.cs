@@ -46,6 +46,12 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Slots")]
         private readonly string _slots = "1";
 
+        [Parameter("Reinvest")]
+        private readonly string _reinvest = "false";
+        
+        [Parameter("Rebalance trigger (min)")]
+        private readonly string _rebalance = "0";
+
         public override void Initialize()
         {
             if (string.IsNullOrEmpty(_symbols)) throw new ArgumentNullException(nameof(_symbols));
@@ -57,6 +63,8 @@ namespace Algoloop.Algorithm.CSharp
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
             decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
+            bool reinvest = bool.Parse(_reinvest);
+            float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
 
             List<Symbol> symbols = _symbols
                 .Split(';')
@@ -68,7 +76,7 @@ namespace Algoloop.Algorithm.CSharp
             MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
             SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, false));
+            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));

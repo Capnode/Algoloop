@@ -64,6 +64,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Daily turnover period")]
         private readonly string _turnoverPeriod = "0";
 
+        [Parameter("Market capitalization (M min)")]
+        private readonly string _marketCap = null;
+        
         [Parameter("Net income (R12 min)")]
         private readonly string _netIncome = null;
 
@@ -129,12 +132,13 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            Math.Max(Math.Max(period, turnoverPeriod), turnoverPeriod);
+            SetWarmUp(Math.Max(period, turnoverPeriod), Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new FundamentalSignal(
                     this,
                     symbol,
+                    marketCap: _marketCap,
                     netIncome: _netIncome,
                     netIncomeQuarter: _netIncomeQuarter,
                     netIncomeGrowth: _netIncomeGrowth,
