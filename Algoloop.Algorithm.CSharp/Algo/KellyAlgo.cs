@@ -58,11 +58,8 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
-        [Parameter("Daily turnover (min)")]
-        private readonly string _turnover = "0";
-
-        [Parameter("Daily turnover period")]
-        private readonly string _turnoverPeriod = "0";
+        [Parameter("Market capitalization (M min)")]
+        private readonly string _marketCap = null;
 
         [Parameter("Net income (R12 min)")]
         private readonly string _netIncome = null;
@@ -73,6 +70,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Net income growth% (R12 min)")]
         private readonly string _netIncomeGrowth = null;
 
+        [Parameter("Net income trend% (R12 min)")]
+        private readonly string _netIncomeTrend = null;
+
         [Parameter("Revenue growth% (R12 min)")]
         private readonly string _revenueGrowth = null;
 
@@ -82,6 +82,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Net margin% (R12 min)")]
         private readonly string _netMargin = null;
 
+        [Parameter("Net margin trend% (R12 min)")]
+        private readonly string _netMarginTrend = null;
+        
         [Parameter("Free cash flow margin% (R12 min)")]
         private readonly string _freeCashFlowMargin = null;
 
@@ -104,8 +107,6 @@ namespace Algoloop.Algorithm.CSharp
             int period = int.Parse(_period, CultureInfo.InvariantCulture);
             int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
-            long turnover = long.Parse(_turnover, CultureInfo.InvariantCulture);
-            int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
             List<Symbol> symbols = _symbols
@@ -128,18 +129,20 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetWarmUp(Math.Max(period, turnoverPeriod), Resolution.Daily);
+            SetWarmUp(period, Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
-                (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new FundamentalSignal(
                     this,
                     symbol,
+                    marketCap: _marketCap,
                     netIncome: _netIncome,
                     netIncomeQuarter: _netIncomeQuarter,
                     netIncomeGrowth: _netIncomeGrowth,
+                    netIncomeTrend: _netIncomeTrend,
                     revenueGrowth: _revenueGrowth,
                     revenueTrend: _revenueTrend,
                     netMargin: _netMargin,
+                    netMarginTrend: _netMarginTrend,
                     freeCashFlowMargin: _freeCashFlowMargin,
                     peRatio: _peRatio,
                     epRatio: _epRatio),

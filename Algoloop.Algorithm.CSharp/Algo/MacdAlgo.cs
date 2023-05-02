@@ -26,7 +26,7 @@ using System.Globalization;
 
 namespace Algoloop.Algorithm.CSharp
 {
-    public class MacdFundamentalAlgo : QCAlgorithm
+    public class MacdAlgo : QCAlgorithm
     {
         [Parameter("symbols")]
         private readonly string _symbols = null;
@@ -63,12 +63,6 @@ namespace Algoloop.Algorithm.CSharp
 
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
-
-        [Parameter("Daily turnover (min)")]
-        private readonly string _turnover = "0";
-
-        [Parameter("Daily turnover period")]
-        private readonly string _turnoverPeriod = "0";
 
         [Parameter("Market capitalization (M min)")]
         private readonly string _marketCap = null;
@@ -136,8 +130,6 @@ namespace Algoloop.Algorithm.CSharp
             int signal = int.Parse(_signal, CultureInfo.InvariantCulture);
             int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
-            long turnover = long.Parse(_turnover, CultureInfo.InvariantCulture);
-            int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
             List<Symbol> symbols = _symbols
@@ -160,9 +152,8 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetWarmUp(Math.Max(slow, turnoverPeriod), Resolution.Daily);
+            SetWarmUp(slow, Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
-                (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new MacdSignal(this, symbol, resolution, fast, slow, signal),
                 (symbol) => new FundamentalSignal(
                     this,
