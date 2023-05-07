@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="Algoloop.Wpf.TrackView"
+    x:Class="Algoloop.Wpf.BacktestView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -83,7 +83,7 @@
                     CanUserGroup="False"
                     CanUserReorderColumns="True"
                     CanUserSelectDistinct="True"
-                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackHoldingsColumnsInfo}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=BacktestHoldingsColumnsInfo}"
                     ExItemsSource="{Binding Holdings}"
                     ExSelectedItems="{Binding SelectedItems}"
                     FrozenColumnCount="1"
@@ -123,7 +123,7 @@
                     CanUserGroup="False"
                     CanUserReorderColumns="True"
                     CanUserSelectDistinct="True"
-                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackTradesColumnsInfo}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=BacktestTradesColumnsInfo}"
                     ExItemsSource="{Binding Trades}"
                     ExSelectedItems="{Binding SelectedItems}"
                     GridLinesVisibility="None"
@@ -177,7 +177,7 @@
                     CanUserGroup="False"
                     CanUserReorderColumns="True"
                     CanUserSelectDistinct="True"
-                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackOrdersColumnsInfo}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=BacktestOrdersColumnsInfo}"
                     ExItemsSource="{Binding Orders}"
                     ExSelectedItems="{Binding SelectedItems}"
                     GridLinesVisibility="None"
@@ -238,9 +238,9 @@
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
                 <view:StockChartView
                     ItemsSource="{Binding Charts}"
-                    Settings="{Binding Source={StaticResource settings}, Path=TrackViewChartSettings}"/>
+                    Settings="{Binding Source={StaticResource settings}, Path=BacktestViewChartSettings}"/>
             </TabItem>
-            <TabItem Header="{Binding TrackSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Details ({0}), FallbackValue=Details}">
+            <TabItem Header="{Binding BacktestSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Details ({0}), FallbackValue=Details}">
                 <wpf:ExDataGrid
                     AutoGenerateColumns="True"
                     CanUserFilter="True"
@@ -248,8 +248,8 @@
                     CanUserGroup="False"
                     CanUserReorderColumns="True"
                     CanUserSelectDistinct="True"
-                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TrackDetailsColumnsInfo}"
-                    ExItemsSource="{Binding TrackSymbols}"
+                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=BacktestDetailsColumnsInfo}"
+                    ExItemsSource="{Binding BacktestSymbols}"
                     ExSelectedItems="{Binding SelectedItems}"
                     FrozenColumnCount="1">
                     <DataGrid.ContextMenu>

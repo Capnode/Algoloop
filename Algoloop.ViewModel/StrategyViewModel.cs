@@ -52,7 +52,7 @@ namespace Algoloop.ViewModel
         private bool _isExpanded;
         private string _displayName;
         private SymbolViewModel _selectedSymbol;
-        private TrackViewModel _selectedTrack;
+        private BacktestViewModel _selectedBacktest;
         private ListViewModel _selectedList;
         private IList _selectedItems;
         private bool _active;
@@ -79,17 +79,17 @@ namespace Algoloop.ViewModel
             ExportCommand = new RelayCommand(
                 () => DoExportStrategy(),
                 () => !IsBusy);
-            ExportSelectedTracksCommand = new RelayCommand<IList>(
-                m => DoExportSelectedTracks(m),
+            ExportSelectedBacktestsCommand = new RelayCommand<IList>(
+                m => DoExportSelectedBacktests(m),
                 _ => !IsBusy);
             DeleteCommand = new RelayCommand(
                 () => DoDeleteStrategy(),
                 () => !IsBusy);
-            DeleteAllTracksCommand = new RelayCommand(
-                () => DoDeleteTracks(null),
+            DeleteAllBacktestsCommand = new RelayCommand(
+                () => DoDeleteBacktests(null),
                 () => !IsBusy);
-            DeleteSelectedTracksCommand = new RelayCommand<IList>(
-                m => DoDeleteTracks(m),
+            DeleteSelectedBacktestsCommand = new RelayCommand<IList>(
+                m => DoDeleteBacktests(m),
                 _ => !IsBusy);
             UseParametersCommand = new RelayCommand<IList>(
                 m => DoUseParameters(m),
@@ -106,7 +106,7 @@ namespace Algoloop.ViewModel
             ExportSymbolsCommand = new RelayCommand<IList>(
                 m => DoExportSymbols(m),
                 _ => !IsBusy && SelectedSymbol != null);
-            TrackDoubleClickCommand = new RelayCommand<TrackViewModel>(
+            BacktestDoubleClickCommand = new RelayCommand<BacktestViewModel>(
                 m => DoSelectItem(m),
                 _ => !IsBusy);
             MoveUpSymbolsCommand = new RelayCommand<IList>(
@@ -160,16 +160,16 @@ namespace Algoloop.ViewModel
         public RelayCommand CloneCommand { get; }
         public RelayCommand CloneAlgorithmCommand { get; }
         public RelayCommand ExportCommand { get; }
-        public RelayCommand<IList> ExportSelectedTracksCommand { get; }
+        public RelayCommand<IList> ExportSelectedBacktestsCommand { get; }
         public RelayCommand DeleteCommand { get; }
-        public RelayCommand DeleteAllTracksCommand { get; }
-        public RelayCommand<IList> DeleteSelectedTracksCommand { get; }
+        public RelayCommand DeleteAllBacktestsCommand { get; }
+        public RelayCommand<IList> DeleteSelectedBacktestsCommand { get; }
         public RelayCommand<IList> UseParametersCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand<IList> DeleteSymbolsCommand { get; }
         public RelayCommand ImportSymbolsCommand { get; }
         public RelayCommand<IList> ExportSymbolsCommand { get; }
-        public RelayCommand<TrackViewModel> TrackDoubleClickCommand { get; }
+        public RelayCommand<BacktestViewModel> BacktestDoubleClickCommand { get; }
         public RelayCommand<IList> MoveUpSymbolsCommand { get; }
         public RelayCommand<IList> MoveDownSymbolsCommand { get; }
         public RelayCommand SortSymbolsCommand { get; }
@@ -181,13 +181,13 @@ namespace Algoloop.ViewModel
             = new SyncObservableCollection<SymbolViewModel>();
         public SyncObservableCollection<ParameterViewModel> Parameters { get; }
             = new SyncObservableCollection<ParameterViewModel>();
-        public SyncObservableCollection<TrackViewModel> Tracks { get; }
-            = new SyncObservableCollection<TrackViewModel>();
+        public SyncObservableCollection<BacktestViewModel> Backtests { get; }
+            = new SyncObservableCollection<BacktestViewModel>();
         public SyncObservableCollection<StrategyViewModel> Strategies { get; }
             = new SyncObservableCollection<StrategyViewModel>();
         public SyncObservableCollection<ListViewModel> Lists { get; }
             = new SyncObservableCollection<ListViewModel>();
-        public ObservableCollection<DataGridColumn> TrackColumns { get; }
+        public ObservableCollection<DataGridColumn> BacktestColumns { get; }
             = new ObservableCollection<DataGridColumn>();
 
         public bool Active 
@@ -252,12 +252,12 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public TrackViewModel SelectedTrack
+        public BacktestViewModel SelectedBacktest
         {
-            get => _selectedTrack;
+            get => _selectedBacktest;
             set
             {
-                SetProperty(ref _selectedTrack, value);
+                SetProperty(ref _selectedBacktest, value);
                 RaiseCommands();
             }
         }
@@ -287,13 +287,13 @@ namespace Algoloop.ViewModel
             Environment.SetEnvironmentVariable("PATH", pathValue);
         }
 
-        internal void UseParameters(TrackViewModel track)
+        internal void UseParameters(BacktestViewModel backtest)
         {
-            if (track == null)
+            if (backtest == null)
                 return;
 
             Parameters.Clear();
-            foreach (ParameterViewModel parameter in track.Parameters)
+            foreach (ParameterViewModel parameter in backtest.Parameters)
             {
                 Parameters.Add(parameter);
             }
@@ -313,10 +313,10 @@ namespace Algoloop.ViewModel
                 Model.Parameters.Add(parameter.Model);
             }
 
-            Model.Tracks.Clear();
-            foreach (TrackViewModel track in Tracks)
+            Model.Backtests.Clear();
+            foreach (BacktestViewModel backtest in Backtests)
             {
-                Model.Tracks.Add(track.Model);
+                Model.Backtests.Add(backtest.Model);
             }
 
             Model.Strategies.Clear();
@@ -327,11 +327,11 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DeleteTrack(TrackViewModel track)
+        internal bool DeleteBacktest(BacktestViewModel backtest)
         {
-            track.StopTrack();
-            Debug.Assert(!track.Active);
-            return Tracks.Remove(track);
+            backtest.StopBacktest();
+            Debug.Assert(!backtest.Active);
+            return Backtests.Remove(backtest);
         }
 
         internal void CloneStrategy(StrategyModel strategyModel)
@@ -354,16 +354,16 @@ namespace Algoloop.ViewModel
             CloneCommand.NotifyCanExecuteChanged();
             CloneAlgorithmCommand.NotifyCanExecuteChanged();
             ExportCommand.NotifyCanExecuteChanged();
-            ExportSelectedTracksCommand.NotifyCanExecuteChanged();
+            ExportSelectedBacktestsCommand.NotifyCanExecuteChanged();
             DeleteCommand.NotifyCanExecuteChanged();
-            DeleteAllTracksCommand.NotifyCanExecuteChanged();
-            DeleteSelectedTracksCommand.NotifyCanExecuteChanged();
+            DeleteAllBacktestsCommand.NotifyCanExecuteChanged();
+            DeleteSelectedBacktestsCommand.NotifyCanExecuteChanged();
             UseParametersCommand.NotifyCanExecuteChanged();
             AddSymbolCommand.NotifyCanExecuteChanged();
             DeleteSymbolsCommand.NotifyCanExecuteChanged();
             ImportSymbolsCommand.NotifyCanExecuteChanged();
             ExportSymbolsCommand.NotifyCanExecuteChanged();
-            TrackDoubleClickCommand.NotifyCanExecuteChanged();
+            BacktestDoubleClickCommand.NotifyCanExecuteChanged();
             MoveUpSymbolsCommand.NotifyCanExecuteChanged();
             MoveDownSymbolsCommand.NotifyCanExecuteChanged();
             SortSymbolsCommand.NotifyCanExecuteChanged();
@@ -371,18 +371,18 @@ namespace Algoloop.ViewModel
             DropDownOpenedCommand.NotifyCanExecuteChanged();
         }
 
-        private void DoDeleteTracks(IList tracks)
+        private void DoDeleteBacktests(IList backtests)
         {
             try
             {
                 IsBusy = true;
-                List<TrackViewModel> list = tracks == null
-                    ? Tracks.ToList()
-                    : tracks.Cast<TrackViewModel>().ToList();
+                List<BacktestViewModel> list = backtests == null
+                    ? Backtests.ToList()
+                    : backtests.Cast<BacktestViewModel>().ToList();
 
-                foreach (TrackViewModel track in list)
+                foreach (BacktestViewModel backtest in list)
                 {
-                    DeleteTrack(track);
+                    DeleteBacktest(backtest);
                 }
 
                 DataToModel();
@@ -417,14 +417,14 @@ namespace Algoloop.ViewModel
             Strategies.Remove(strategy);
         }
 
-        private void DoSelectItem(TrackViewModel track)
+        private void DoSelectItem(BacktestViewModel backtest)
         {
-            if (track == null)
+            if (backtest == null)
                 return;
 
             // No IsBusy
-            track.IsSelected = true;
-            _parent.SelectedItem = track;
+            backtest.IsSelected = true;
+            _parent.SelectedItem = backtest;
             IsExpanded = true;
         }
 
@@ -461,9 +461,9 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                foreach (TrackViewModel track in selected)
+                foreach (BacktestViewModel backtest in selected)
                 {
-                    UseParameters(track);
+                    UseParameters(backtest);
                     break; // skip rest
                 }
             }
@@ -492,16 +492,16 @@ namespace Algoloop.ViewModel
                 await BacktestManager.Wait().ConfigureAwait(true);
                 if (!Active) break;
                 count++;
-                var trackModel = new TrackModel(model.AlgorithmName, model);
-                Log.Trace($"Strategy {trackModel.AlgorithmName} {trackModel.Name} {count}({total})");
-                var track = new TrackViewModel(vm, trackModel, _markets, _settings);
-                vm.Tracks.Add(track);
-                Task task = track
-                    .StartTrackAsync()
+                var backtestModel = new BacktestModel(model.AlgorithmName, model);
+                Log.Trace($"Strategy {backtestModel.AlgorithmName} {backtestModel.Name} {count}({total})");
+                var backtest = new BacktestViewModel(vm, backtestModel, _markets, _settings);
+                vm.Backtests.Add(backtest);
+                Task task = backtest
+                    .StartBacktestAsync()
                     .ContinueWith(_ =>
                     {
                         ExDataGridColumns.AddPropertyColumns(
-                            vm.TrackColumns, track.Statistics, "Statistics");
+                            vm.BacktestColumns, backtest.Statistics, "Statistics");
                         BacktestManager.Release();
                     }, TaskScheduler.FromCurrentSynchronizationContext());
                 tasks.Add(task);
@@ -533,10 +533,10 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
                 Active = false;
 
-                // Stop running tracks
-                foreach (TrackViewModel track in Tracks)
+                // Stop running backtests
+                foreach (BacktestViewModel backtest in Backtests)
                 {
-                    track.StopTrack();
+                    backtest.StopBacktest();
                 }
             }
             finally
@@ -611,15 +611,15 @@ namespace Algoloop.ViewModel
                 Strategies.Add(strategy);
             }
 
-            UpdateTracksAndColumns();
+            UpdateBacktestsAndColumns();
         }
 
-        private void UpdateTracksAndColumns()
+        private void UpdateBacktestsAndColumns()
         {
-            TrackColumns.Clear();
-            Tracks.Clear();
+            BacktestColumns.Clear();
+            Backtests.Clear();
 
-            TrackColumns.Add(new DataGridCheckBoxColumn()
+            BacktestColumns.Add(new DataGridCheckBoxColumn()
             {
                 Header = "Active",
                 Binding = new Binding("Active") {
@@ -629,14 +629,14 @@ namespace Algoloop.ViewModel
             });
 
             ExDataGridColumns.AddTextColumn(
-                TrackColumns, "Name", "Model.Name", false, true);
-            foreach (TrackModel TrackModel in Model.Tracks)
+                BacktestColumns, "Name", "Model.Name", false, true);
+            foreach (BacktestModel BacktestModel in Model.Backtests)
             {
-                var trackViewModel = new TrackViewModel(
-                    this, TrackModel, _markets, _settings);
-                Tracks.Add(trackViewModel);
+                var backtestViewModel = new BacktestViewModel(
+                    this, BacktestModel, _markets, _settings);
+                Backtests.Add(backtestViewModel);
                 ExDataGridColumns.AddPropertyColumns(
-                    TrackColumns, trackViewModel.Statistics, "Statistics");
+                    BacktestColumns, backtestViewModel.Statistics, "Statistics");
             }
         }
 
@@ -879,7 +879,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void DoExportSelectedTracks(IList tracks)
+        private void DoExportSelectedBacktests(IList backtests)
         {
             DataToModel();
             var saveFileDialog = new SaveFileDialog
@@ -895,16 +895,16 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                IEnumerable<string> headers = TrackColumns.Select(m => m.Header.ToString());
+                IEnumerable<string> headers = BacktestColumns.Select(m => m.Header.ToString());
                 File.WriteAllText(saveFileDialog.FileName, string.Join(CsvDelimiter, headers) + Environment.NewLine);
-                List<TrackViewModel> list = tracks.Count == 0 ? Tracks.ToList() : tracks.Cast<TrackViewModel>().ToList();
-                foreach (TrackViewModel track in list)
+                List<BacktestViewModel> list = backtests.Count == 0 ? Backtests.ToList() : backtests.Cast<BacktestViewModel>().ToList();
+                foreach (BacktestViewModel backtest in list)
                 {
-                    string line = track.Model.Active + CsvDelimiter + track.Model.Name;
+                    string line = backtest.Model.Active + CsvDelimiter + backtest.Model.Name;
                     foreach (string header in headers.Skip(2))
                     {
                         line += CsvDelimiter;
-                        if (track.Model.Statistics.TryGetValue(header, out decimal? value) && value != null)
+                        if (backtest.Model.Statistics.TryGetValue(header, out decimal? value) && value != null)
                         {
                             line += decimal.Round(value ?? 0, 4).ToString();
                         }

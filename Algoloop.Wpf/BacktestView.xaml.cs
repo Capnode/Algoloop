@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2018 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -17,11 +17,11 @@ using System.Windows.Controls;
 namespace Algoloop.Wpf
 {
     /// <summary>
-    /// Interaction logic for TrackView.xaml
+    /// Interaction logic for BacktestView.xaml
     /// </summary>
-    public partial class TrackView : UserControl
+    public partial class BacktestView : UserControl
     {
-        public TrackView()
+        public BacktestView()
         {
             InitializeComponent();
         }

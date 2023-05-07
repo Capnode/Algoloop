@@ -46,22 +46,22 @@ namespace Algoloop.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void MoveStrategyCommand_child_to_track_failed()
+        public void MoveStrategyCommand_child_to_backtest_failed()
         {
             var drag = new StrategyViewModel(_strategy, new StrategyModel { Name = "drag" }, null, null);
             _strategy.AddStrategy(drag);
-            var drop = new TrackViewModel(_strategy, new TrackModel { Name = "drop" }, null, null);
-            _strategy.Tracks.Add(drop);
+            var drop = new BacktestViewModel(_strategy, new BacktestModel { Name = "drop" }, null, null);
+            _strategy.Backtests.Add(drop);
             Assert.AreEqual(1, _strategies.Strategies.Count);
             Assert.AreEqual(1, _strategy.Strategies.Count);
-            Assert.AreEqual(1, _strategy.Tracks.Count);
+            Assert.AreEqual(1, _strategy.Backtests.Count);
             Assert.AreEqual(0, drag.Strategies.Count);
 
             Assert.IsTrue(drag.MoveStrategyCommand.CanExecute(null));
             drag.MoveStrategyCommand.Execute(drop);
             Assert.AreEqual(1, _strategies.Strategies.Count);
             Assert.AreEqual(1, _strategy.Strategies.Count);
-            Assert.AreEqual(1, _strategy.Tracks.Count);
+            Assert.AreEqual(1, _strategy.Backtests.Count);
             Assert.AreEqual(0, drag.Strategies.Count);
         }
 

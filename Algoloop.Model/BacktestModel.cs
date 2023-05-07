@@ -30,19 +30,19 @@ namespace Algoloop.Model
     [CategoryOrder("Data", 4)]
     [Serializable]
     [DataContract]
-    public class TrackModel : ModelBase
+    public class BacktestModel : ModelBase
     {
         public enum CompletionStatus { None, Success, Error } ;
 
         private string _account;
 
-        public TrackModel()
+        public BacktestModel()
         {
             Symbols = new Collection<SymbolModel>();
             Parameters = new Collection<ParameterModel>();
         }
 
-        public TrackModel(string name, StrategyModel strategy)
+        public BacktestModel(string name, StrategyModel strategy)
         {
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
             Name = name;
@@ -67,7 +67,7 @@ namespace Algoloop.Model
             // Clone parameters
             Parameters = new Collection<ParameterModel>(strategy.Parameters.Select(m => new ParameterModel(m)).ToList());
 
-            // Use paramerter list as track name
+            // Use paramerter list as backtest name
             string parameters = string.Join(" ", Parameters.Where(m => m.UseValue).Select(m => m.Value));
             if (!string.IsNullOrWhiteSpace(parameters))
             {
@@ -77,11 +77,11 @@ namespace Algoloop.Model
 
         [Category("Strategy")]
         [DisplayName("Name")]
-        [Description("Name of the track.")]
+        [Description("Name of the backtest.")]
         [Browsable(true)]
         [ReadOnly(true)]
         [DataMember]
-        public string Name { get; set; } = "Track";
+        public string Name { get; set; } = "Backtest";
 
         [Category("Broker")]
         [DisplayName("Account")]

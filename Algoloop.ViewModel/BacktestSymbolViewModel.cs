@@ -19,12 +19,12 @@ using System.Linq;
 
 namespace Algoloop.ViewModel
 {
-    public class TrackSymbolViewModel
+    public class BacktestSymbolViewModel
     {
         private readonly List<TradeViewModel> _trades = new ();
         private readonly Symbol _symbol;
 
-        public TrackSymbolViewModel(Symbol symbol)
+        public BacktestSymbolViewModel(Symbol symbol)
         {
             _symbol = symbol;
         }
@@ -92,14 +92,14 @@ namespace Algoloop.ViewModel
             NetProfit = netProfit.RoundToSignificantDigits(2);
 
             // Calculate Return over Max Drawdown Ratio
-            decimal drawdown = TrackViewModel.MaxDrawdown(_trades, out TimeSpan period);
+            decimal drawdown = BacktestViewModel.MaxDrawdown(_trades, out TimeSpan period);
             Drawdown = drawdown.RoundToSignificantDigits(2);
             DrawdownPeriod = period;
             decimal roMaD = drawdown == 0 ? 0 : netProfit / -drawdown;
             RoMaD = roMaD.RoundToSignificantDigits(4);
 
             // Calculate score
-            double score = TrackViewModel.CalculateScore(_trades);
+            double score = BacktestViewModel.CalculateScore(_trades);
             Score = ((decimal)score).RoundToSignificantDigits(4);
         }
     }

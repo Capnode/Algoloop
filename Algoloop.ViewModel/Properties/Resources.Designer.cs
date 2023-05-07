@@ -187,7 +187,7 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Strategy started with {0} track(s).
+        ///   Looks up a localized string similar to Strategy started with {0} backtest(s).
         /// </summary>
         internal static string StrategyStarted {
             get {

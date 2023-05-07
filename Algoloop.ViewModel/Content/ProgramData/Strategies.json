@@ -19,7 +19,7 @@
       "PcntCapitalPerPosition": 0.0,
       "Symbols": [],
       "Parameters": [],
-      "Tracks": [],
+      "Backtests": [],
       "Strategies": [
         {
           "Name": null,
@@ -39,7 +39,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -60,7 +60,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -81,7 +81,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -102,7 +102,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -123,7 +123,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -144,7 +144,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -165,7 +165,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -186,7 +186,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -207,7 +207,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -228,7 +228,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -249,7 +249,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -270,7 +270,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -291,7 +291,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -312,7 +312,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -333,7 +333,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -354,7 +354,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -375,7 +375,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -396,7 +396,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -417,7 +417,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -438,7 +438,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -459,7 +459,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -480,7 +480,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -501,7 +501,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -522,7 +522,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -543,7 +543,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -564,7 +564,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -585,7 +585,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -606,7 +606,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -627,7 +627,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -648,7 +648,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -669,7 +669,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -690,7 +690,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -711,7 +711,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -732,7 +732,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -753,7 +753,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -774,7 +774,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -795,7 +795,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -816,7 +816,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -837,7 +837,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -858,7 +858,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -879,7 +879,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -900,7 +900,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -921,7 +921,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -942,7 +942,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -963,7 +963,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -984,7 +984,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1005,7 +1005,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1026,7 +1026,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1047,7 +1047,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1068,7 +1068,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1089,7 +1089,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1110,7 +1110,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1131,7 +1131,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1152,7 +1152,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1173,7 +1173,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1194,7 +1194,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1215,7 +1215,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1236,7 +1236,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1257,7 +1257,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1278,7 +1278,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1299,7 +1299,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1320,7 +1320,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1341,7 +1341,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1362,7 +1362,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1383,7 +1383,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1404,7 +1404,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1425,7 +1425,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1446,7 +1446,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1467,7 +1467,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1488,7 +1488,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1509,7 +1509,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1530,7 +1530,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1551,7 +1551,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1572,7 +1572,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1593,7 +1593,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1614,7 +1614,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1635,7 +1635,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1656,7 +1656,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1677,7 +1677,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1698,7 +1698,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1719,7 +1719,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1740,7 +1740,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1761,7 +1761,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1782,7 +1782,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1803,7 +1803,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1824,7 +1824,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1845,7 +1845,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1866,7 +1866,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1887,7 +1887,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1908,7 +1908,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1929,7 +1929,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1950,7 +1950,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1971,7 +1971,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -1992,7 +1992,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2013,7 +2013,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2034,7 +2034,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2055,7 +2055,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2076,7 +2076,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2097,7 +2097,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2118,7 +2118,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2139,7 +2139,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2160,7 +2160,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2181,7 +2181,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2202,7 +2202,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2223,7 +2223,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2244,7 +2244,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2265,7 +2265,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2286,7 +2286,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2307,7 +2307,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2328,7 +2328,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2349,7 +2349,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2370,7 +2370,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2391,7 +2391,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2412,7 +2412,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2433,7 +2433,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2454,7 +2454,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2475,7 +2475,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2496,7 +2496,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2517,7 +2517,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2538,7 +2538,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2559,7 +2559,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2580,7 +2580,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2601,7 +2601,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2622,7 +2622,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2643,7 +2643,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2664,7 +2664,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2685,7 +2685,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2706,7 +2706,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2727,7 +2727,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2748,7 +2748,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2769,7 +2769,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2790,7 +2790,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2811,7 +2811,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2832,7 +2832,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2853,7 +2853,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2874,7 +2874,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2895,7 +2895,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2916,7 +2916,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2937,7 +2937,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2958,7 +2958,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -2979,7 +2979,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3000,7 +3000,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3021,7 +3021,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3042,7 +3042,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3063,7 +3063,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3084,7 +3084,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3105,7 +3105,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3126,7 +3126,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3147,7 +3147,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3168,7 +3168,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3189,7 +3189,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3210,7 +3210,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3231,7 +3231,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3252,7 +3252,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3273,7 +3273,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3294,7 +3294,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3315,7 +3315,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3336,7 +3336,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3357,7 +3357,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3378,7 +3378,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3399,7 +3399,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3420,7 +3420,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3441,7 +3441,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3462,7 +3462,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3483,7 +3483,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3504,7 +3504,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3525,7 +3525,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3546,7 +3546,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3567,7 +3567,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3588,7 +3588,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3609,7 +3609,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3630,7 +3630,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3651,7 +3651,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3672,7 +3672,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3693,7 +3693,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3714,7 +3714,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3735,7 +3735,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3756,7 +3756,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3777,7 +3777,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3798,7 +3798,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3819,7 +3819,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3840,7 +3840,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3861,7 +3861,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3882,7 +3882,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3903,7 +3903,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3924,7 +3924,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3945,7 +3945,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3966,7 +3966,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -3987,7 +3987,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4008,7 +4008,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4029,7 +4029,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4050,7 +4050,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4071,7 +4071,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4092,7 +4092,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4113,7 +4113,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4134,7 +4134,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4155,7 +4155,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4176,7 +4176,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4197,7 +4197,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4218,7 +4218,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4239,7 +4239,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4260,7 +4260,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4281,7 +4281,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4302,7 +4302,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4323,7 +4323,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4344,7 +4344,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4365,7 +4365,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4386,7 +4386,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4407,7 +4407,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4428,7 +4428,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4449,7 +4449,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4470,7 +4470,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4491,7 +4491,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4512,7 +4512,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4533,7 +4533,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4554,7 +4554,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4575,7 +4575,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4596,7 +4596,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4617,7 +4617,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4638,7 +4638,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4659,7 +4659,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4680,7 +4680,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4701,7 +4701,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4722,7 +4722,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4743,7 +4743,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4764,7 +4764,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4785,7 +4785,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4806,7 +4806,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4827,7 +4827,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4848,7 +4848,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4869,7 +4869,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4890,7 +4890,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4911,7 +4911,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4932,7 +4932,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4953,7 +4953,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4974,7 +4974,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -4995,7 +4995,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5016,7 +5016,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5037,7 +5037,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5058,7 +5058,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5079,7 +5079,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5100,7 +5100,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5121,7 +5121,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5142,7 +5142,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5163,7 +5163,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5184,7 +5184,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5205,7 +5205,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5226,7 +5226,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5247,7 +5247,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5268,7 +5268,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5289,7 +5289,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5310,7 +5310,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5331,7 +5331,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5352,7 +5352,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5373,7 +5373,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5394,7 +5394,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5415,7 +5415,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5436,7 +5436,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5457,7 +5457,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5478,7 +5478,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5499,7 +5499,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5520,7 +5520,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5541,7 +5541,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5562,7 +5562,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5583,7 +5583,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5604,7 +5604,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5625,7 +5625,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5646,7 +5646,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5667,7 +5667,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5688,7 +5688,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5709,7 +5709,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5730,7 +5730,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5751,7 +5751,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5772,7 +5772,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5793,7 +5793,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5814,7 +5814,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5835,7 +5835,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5856,7 +5856,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5877,7 +5877,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5898,7 +5898,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5919,7 +5919,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5940,7 +5940,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5961,7 +5961,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -5982,7 +5982,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6003,7 +6003,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6024,7 +6024,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6045,7 +6045,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6066,7 +6066,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6087,7 +6087,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6108,7 +6108,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6129,7 +6129,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6150,7 +6150,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6171,7 +6171,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6192,7 +6192,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6213,7 +6213,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6234,7 +6234,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6255,7 +6255,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6276,7 +6276,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6297,7 +6297,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6318,7 +6318,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": [
             {
               "Name": null,
@@ -6338,7 +6338,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6359,7 +6359,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6380,7 +6380,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6401,7 +6401,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6422,7 +6422,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6443,7 +6443,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6464,7 +6464,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6485,7 +6485,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6506,7 +6506,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6527,7 +6527,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6548,7 +6548,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6569,7 +6569,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6590,7 +6590,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6611,7 +6611,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             }
           ]
@@ -6634,7 +6634,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": [
             {
               "Name": null,
@@ -6654,7 +6654,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6675,7 +6675,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6696,7 +6696,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6717,7 +6717,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6738,7 +6738,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6759,7 +6759,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6780,7 +6780,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6801,7 +6801,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6822,7 +6822,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             },
             {
@@ -6843,7 +6843,7 @@
               "PcntCapitalPerPosition": 0.0,
               "Symbols": [],
               "Parameters": [],
-              "Tracks": [],
+              "Backtests": [],
               "Strategies": []
             }
           ]
@@ -6868,7 +6868,7 @@
       "PcntCapitalPerPosition": 0.0,
       "Symbols": [],
       "Parameters": [],
-      "Tracks": [],
+      "Backtests": [],
       "Strategies": [
         {
           "Name": null,
@@ -6888,7 +6888,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6909,7 +6909,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6930,7 +6930,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6951,7 +6951,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6972,7 +6972,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -6993,7 +6993,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7014,7 +7014,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7035,7 +7035,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7056,7 +7056,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7077,7 +7077,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7098,7 +7098,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7119,7 +7119,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7140,7 +7140,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7161,7 +7161,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7182,7 +7182,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7203,7 +7203,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7224,7 +7224,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7245,7 +7245,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7266,7 +7266,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7287,7 +7287,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7308,7 +7308,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7329,7 +7329,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7350,7 +7350,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7371,7 +7371,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7392,7 +7392,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7413,7 +7413,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7434,7 +7434,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7455,7 +7455,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7476,7 +7476,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7497,7 +7497,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7518,7 +7518,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7539,7 +7539,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7560,7 +7560,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7581,7 +7581,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7602,7 +7602,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7623,7 +7623,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7644,7 +7644,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7665,7 +7665,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7686,7 +7686,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7707,7 +7707,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7728,7 +7728,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7749,7 +7749,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7770,7 +7770,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7791,7 +7791,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7812,7 +7812,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7833,7 +7833,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7854,7 +7854,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7875,7 +7875,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7896,7 +7896,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7917,7 +7917,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7938,7 +7938,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7959,7 +7959,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -7980,7 +7980,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8001,7 +8001,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8022,7 +8022,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8043,7 +8043,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8064,7 +8064,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8085,7 +8085,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8106,7 +8106,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8127,7 +8127,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8148,7 +8148,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8169,7 +8169,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8190,7 +8190,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8211,7 +8211,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8232,7 +8232,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8253,7 +8253,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8274,7 +8274,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8295,7 +8295,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8316,7 +8316,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8337,7 +8337,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8358,7 +8358,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8379,7 +8379,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8400,7 +8400,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8421,7 +8421,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8442,7 +8442,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8463,7 +8463,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8484,7 +8484,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8505,7 +8505,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8526,7 +8526,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8547,7 +8547,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8568,7 +8568,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8589,7 +8589,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8610,7 +8610,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8631,7 +8631,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8652,7 +8652,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8673,7 +8673,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8694,7 +8694,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8715,7 +8715,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8736,7 +8736,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8757,7 +8757,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8778,7 +8778,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8799,7 +8799,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8820,7 +8820,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8841,7 +8841,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8862,7 +8862,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8883,7 +8883,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8904,7 +8904,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8925,7 +8925,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8946,7 +8946,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8967,7 +8967,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -8988,7 +8988,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9009,7 +9009,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9030,7 +9030,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9051,7 +9051,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9072,7 +9072,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9093,7 +9093,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9114,7 +9114,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9135,7 +9135,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9156,7 +9156,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9177,7 +9177,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9198,7 +9198,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9219,7 +9219,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9240,7 +9240,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9261,7 +9261,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9282,7 +9282,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9303,7 +9303,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9324,7 +9324,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9345,7 +9345,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9366,7 +9366,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9387,7 +9387,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9408,7 +9408,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9429,7 +9429,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9450,7 +9450,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9471,7 +9471,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9492,7 +9492,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9513,7 +9513,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9534,7 +9534,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9555,7 +9555,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9576,7 +9576,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9597,7 +9597,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9618,7 +9618,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9639,7 +9639,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9660,7 +9660,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9681,7 +9681,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9702,7 +9702,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9723,7 +9723,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9744,7 +9744,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9765,7 +9765,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9786,7 +9786,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9807,7 +9807,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9828,7 +9828,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9849,7 +9849,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9870,7 +9870,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9891,7 +9891,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9912,7 +9912,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9933,7 +9933,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9954,7 +9954,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9975,7 +9975,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -9996,7 +9996,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10017,7 +10017,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10038,7 +10038,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10059,7 +10059,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10080,7 +10080,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10101,7 +10101,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10122,7 +10122,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10143,7 +10143,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10164,7 +10164,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10185,7 +10185,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10206,7 +10206,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10227,7 +10227,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10248,7 +10248,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10269,7 +10269,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10290,7 +10290,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10311,7 +10311,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10332,7 +10332,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10353,7 +10353,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10374,7 +10374,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10395,7 +10395,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10416,7 +10416,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10437,7 +10437,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10458,7 +10458,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10479,7 +10479,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10500,7 +10500,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10521,7 +10521,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10542,7 +10542,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10563,7 +10563,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10584,7 +10584,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10605,7 +10605,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10626,7 +10626,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10647,7 +10647,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10668,7 +10668,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10689,7 +10689,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10710,7 +10710,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10731,7 +10731,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10752,7 +10752,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10773,7 +10773,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10794,7 +10794,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10815,7 +10815,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10836,7 +10836,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10857,7 +10857,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10878,7 +10878,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10899,7 +10899,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10920,7 +10920,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10941,7 +10941,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10962,7 +10962,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -10983,7 +10983,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11004,7 +11004,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11025,7 +11025,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11046,7 +11046,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11067,7 +11067,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11088,7 +11088,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11109,7 +11109,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11130,7 +11130,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11151,7 +11151,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11172,7 +11172,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11193,7 +11193,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11214,7 +11214,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11235,7 +11235,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11256,7 +11256,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11277,7 +11277,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11298,7 +11298,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11319,7 +11319,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11340,7 +11340,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11361,7 +11361,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11382,7 +11382,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11403,7 +11403,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11424,7 +11424,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11445,7 +11445,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11466,7 +11466,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11487,7 +11487,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11508,7 +11508,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11529,7 +11529,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11550,7 +11550,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11571,7 +11571,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11592,7 +11592,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11613,7 +11613,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11634,7 +11634,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11655,7 +11655,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11676,7 +11676,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11697,7 +11697,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11718,7 +11718,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11739,7 +11739,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11760,7 +11760,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11781,7 +11781,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11802,7 +11802,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11823,7 +11823,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11844,7 +11844,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11865,7 +11865,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11886,7 +11886,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11907,7 +11907,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11928,7 +11928,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11949,7 +11949,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11970,7 +11970,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -11991,7 +11991,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12012,7 +12012,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12033,7 +12033,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12054,7 +12054,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12075,7 +12075,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12096,7 +12096,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12117,7 +12117,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12138,7 +12138,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12159,7 +12159,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12180,7 +12180,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12201,7 +12201,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12222,7 +12222,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12243,7 +12243,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12264,7 +12264,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12285,7 +12285,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12306,7 +12306,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12327,7 +12327,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12348,7 +12348,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12369,7 +12369,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12390,7 +12390,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12411,7 +12411,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12432,7 +12432,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12453,7 +12453,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12474,7 +12474,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12495,7 +12495,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12516,7 +12516,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12537,7 +12537,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12558,7 +12558,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12579,7 +12579,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12600,7 +12600,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12621,7 +12621,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12642,7 +12642,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12663,7 +12663,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12684,7 +12684,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12705,7 +12705,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12726,7 +12726,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12747,7 +12747,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12768,7 +12768,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12789,7 +12789,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12810,7 +12810,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12831,7 +12831,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12852,7 +12852,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12873,7 +12873,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12894,7 +12894,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12915,7 +12915,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12936,7 +12936,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12957,7 +12957,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12978,7 +12978,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -12999,7 +12999,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13020,7 +13020,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13041,7 +13041,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13062,7 +13062,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13083,7 +13083,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13104,7 +13104,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13125,7 +13125,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13146,7 +13146,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13167,7 +13167,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13188,7 +13188,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13209,7 +13209,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13230,7 +13230,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13251,7 +13251,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13272,7 +13272,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13293,7 +13293,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13314,7 +13314,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13335,7 +13335,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13356,7 +13356,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13377,7 +13377,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13398,7 +13398,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13419,7 +13419,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13440,7 +13440,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13461,7 +13461,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13482,7 +13482,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13503,7 +13503,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13524,7 +13524,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13545,7 +13545,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13566,7 +13566,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13587,7 +13587,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13608,7 +13608,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13629,7 +13629,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13650,7 +13650,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13671,7 +13671,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13692,7 +13692,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13713,7 +13713,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13734,7 +13734,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13755,7 +13755,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13776,7 +13776,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13797,7 +13797,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13818,7 +13818,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13839,7 +13839,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13860,7 +13860,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13881,7 +13881,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13902,7 +13902,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13923,7 +13923,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13944,7 +13944,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13965,7 +13965,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -13986,7 +13986,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14007,7 +14007,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14028,7 +14028,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14049,7 +14049,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14070,7 +14070,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14091,7 +14091,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14112,7 +14112,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14133,7 +14133,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14154,7 +14154,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14175,7 +14175,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14196,7 +14196,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14217,7 +14217,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14238,7 +14238,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14259,7 +14259,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14280,7 +14280,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14301,7 +14301,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14322,7 +14322,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14343,7 +14343,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14364,7 +14364,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14385,7 +14385,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14406,7 +14406,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14427,7 +14427,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14448,7 +14448,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14469,7 +14469,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14490,7 +14490,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14511,7 +14511,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14532,7 +14532,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14553,7 +14553,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14574,7 +14574,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14595,7 +14595,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14616,7 +14616,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14637,7 +14637,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14658,7 +14658,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14679,7 +14679,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14700,7 +14700,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14721,7 +14721,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14742,7 +14742,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14763,7 +14763,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14784,7 +14784,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14805,7 +14805,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14826,7 +14826,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14847,7 +14847,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14868,7 +14868,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14889,7 +14889,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14910,7 +14910,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14931,7 +14931,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14952,7 +14952,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14973,7 +14973,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -14994,7 +14994,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15015,7 +15015,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15036,7 +15036,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15057,7 +15057,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15078,7 +15078,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15099,7 +15099,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15120,7 +15120,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15141,7 +15141,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15162,7 +15162,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15183,7 +15183,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15204,7 +15204,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15225,7 +15225,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15246,7 +15246,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15267,7 +15267,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15288,7 +15288,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15309,7 +15309,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15330,7 +15330,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15351,7 +15351,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15372,7 +15372,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15393,7 +15393,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15414,7 +15414,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15450,7 +15450,7 @@
               "Range": ""
             }
           ],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15471,7 +15471,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15492,7 +15492,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15513,7 +15513,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15534,7 +15534,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15555,7 +15555,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15576,7 +15576,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15597,7 +15597,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15618,7 +15618,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15639,7 +15639,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15660,7 +15660,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15681,7 +15681,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15702,7 +15702,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15723,7 +15723,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15744,7 +15744,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15765,7 +15765,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15786,7 +15786,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15807,7 +15807,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15828,7 +15828,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15849,7 +15849,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15870,7 +15870,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15891,7 +15891,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15912,7 +15912,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15933,7 +15933,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15954,7 +15954,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15975,7 +15975,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -15996,7 +15996,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16017,7 +16017,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16038,7 +16038,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16059,7 +16059,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16080,7 +16080,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16101,7 +16101,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16122,7 +16122,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16143,7 +16143,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16164,7 +16164,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16185,7 +16185,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16206,7 +16206,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16227,7 +16227,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16248,7 +16248,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16269,7 +16269,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16290,7 +16290,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16311,7 +16311,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16332,7 +16332,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16353,7 +16353,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16374,7 +16374,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16395,7 +16395,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16416,7 +16416,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16437,7 +16437,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16458,7 +16458,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16479,7 +16479,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16500,7 +16500,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16521,7 +16521,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16542,7 +16542,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16563,7 +16563,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16584,7 +16584,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16605,7 +16605,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16626,7 +16626,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16647,7 +16647,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16668,7 +16668,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16689,7 +16689,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16710,7 +16710,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16731,7 +16731,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16752,7 +16752,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16773,7 +16773,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16794,7 +16794,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16815,7 +16815,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16836,7 +16836,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16857,7 +16857,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16878,7 +16878,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16899,7 +16899,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16920,7 +16920,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16941,7 +16941,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16962,7 +16962,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -16983,7 +16983,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17004,7 +17004,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17025,7 +17025,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17046,7 +17046,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17067,7 +17067,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17088,7 +17088,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17109,7 +17109,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17130,7 +17130,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17151,7 +17151,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17172,7 +17172,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17193,7 +17193,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17214,7 +17214,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17235,7 +17235,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17256,7 +17256,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17277,7 +17277,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17298,7 +17298,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17319,7 +17319,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17340,7 +17340,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17361,7 +17361,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17382,7 +17382,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17403,7 +17403,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17424,7 +17424,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17445,7 +17445,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17466,7 +17466,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17487,7 +17487,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17508,7 +17508,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17529,7 +17529,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17550,7 +17550,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17571,7 +17571,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17592,7 +17592,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17613,7 +17613,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17634,7 +17634,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17655,7 +17655,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17676,7 +17676,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17697,7 +17697,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17718,7 +17718,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17739,7 +17739,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17760,7 +17760,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17781,7 +17781,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17802,7 +17802,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17823,7 +17823,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17844,7 +17844,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17865,7 +17865,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         },
         {
@@ -17886,7 +17886,7 @@
           "PcntCapitalPerPosition": 0.0,
           "Symbols": [],
           "Parameters": [],
-          "Tracks": [],
+          "Backtests": [],
           "Strategies": []
         }
       ]

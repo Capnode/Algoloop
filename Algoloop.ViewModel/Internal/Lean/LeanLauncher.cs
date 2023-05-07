@@ -25,7 +25,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using static Algoloop.Model.TrackModel;
+using static Algoloop.Model.BacktestModel;
 
 namespace Algoloop.ViewModel.Internal.Lean
 {
@@ -65,7 +65,7 @@ namespace Algoloop.ViewModel.Internal.Lean
             }
         }
 
-        public void Run(TrackModel model, AccountModel account, SettingModel settings, string exeFolder)
+        public void Run(BacktestModel model, AccountModel account, SettingModel settings, string exeFolder)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             Debug.Assert(model.Status == CompletionStatus.None);
@@ -116,7 +116,7 @@ namespace Algoloop.ViewModel.Internal.Lean
             }
         }
 
-        private static void PostProcess(string folder, TrackModel model)
+        private static void PostProcess(string folder, BacktestModel model)
         {
             string resultFile = Path.Combine(folder, $"{model.AlgorithmName}.json");
             if (File.Exists(resultFile))
@@ -133,7 +133,7 @@ namespace Algoloop.ViewModel.Internal.Lean
 
         private static bool SetConfig(
             IDictionary<string, string> config,
-            TrackModel model,
+            BacktestModel model,
             AccountModel account,
             SettingModel settings)
         {
@@ -156,7 +156,7 @@ namespace Algoloop.ViewModel.Internal.Lean
 
         private static void SetModel(
             IDictionary<string, string> config,
-            TrackModel model,
+            BacktestModel model,
             SettingModel settings)
         {
             config["debug-mode"] = "false";
@@ -233,7 +233,7 @@ namespace Algoloop.ViewModel.Internal.Lean
 
         private static void SetParameters(
             IDictionary<string, string> config,
-            TrackModel model)
+            BacktestModel model)
         {
             var parameters = new Dictionary<string, string>
             {

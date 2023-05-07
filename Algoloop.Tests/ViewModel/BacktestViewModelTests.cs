@@ -23,7 +23,7 @@ using System.Collections.Generic;
 namespace Algoloop.Tests.ViewModel
 {
     [TestClass()]
-    public class TrackViewModelTests
+    public class BacktestViewModelTests
     {
         [TestInitialize()]
         public void Initialize()
@@ -42,7 +42,7 @@ namespace Algoloop.Tests.ViewModel
                 new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(score == 1);
         }
 
@@ -57,7 +57,7 @@ namespace Algoloop.Tests.ViewModel
                 new TradeViewModel{ ProfitLoss = -2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(score == -1);
         }
 
@@ -72,7 +72,7 @@ namespace Algoloop.Tests.ViewModel
                 new TradeViewModel{ ProfitLoss = -3, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(score == 0);
         }
 
@@ -87,7 +87,7 @@ namespace Algoloop.Tests.ViewModel
                 new TradeViewModel{ ProfitLoss = 2, TotalFees = 1, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(Math.Abs(score - 0.3120) < 0.0001);
         }
 
@@ -102,7 +102,7 @@ namespace Algoloop.Tests.ViewModel
                 new TradeViewModel{ ProfitLoss = 2, EntryTime = new DateTime(2018,07,01), ExitTime = new DateTime(2019,01,01) }
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(Math.Abs(score + 0.2193) < 0.0001);
         }
 
@@ -117,7 +117,7 @@ namespace Algoloop.Tests.ViewModel
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 13000 },
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(score == 1);
         }
 
@@ -132,7 +132,7 @@ namespace Algoloop.Tests.ViewModel
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 7000 },
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(score == -1);
         }
 
@@ -147,7 +147,7 @@ namespace Algoloop.Tests.ViewModel
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 10000 },
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(score == 0);
         }
 
@@ -162,7 +162,7 @@ namespace Algoloop.Tests.ViewModel
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 16000 },
             };
 
-            double score = TrackViewModel.CalculateScore(trades);
+            double score = BacktestViewModel.CalculateScore(trades);
             Assert.IsTrue(Math.Abs(score - 0.7698) < 0.0001);
         }
     }

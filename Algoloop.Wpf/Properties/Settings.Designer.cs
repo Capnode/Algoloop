@@ -74,12 +74,12 @@ namespace Algoloop.Wpf.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TracksColumnsInfo {
+        public string BacktestsColumnsInfo {
             get {
-                return ((string)(this["TracksColumnsInfo"]));
+                return ((string)(this["BacktestsColumnsInfo"]));
             }
             set {
-                this["TracksColumnsInfo"] = value;
+                this["BacktestsColumnsInfo"] = value;
             }
         }
         
@@ -158,48 +158,48 @@ namespace Algoloop.Wpf.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TrackHoldingsColumnsInfo {
+        public string BacktestHoldingsColumnsInfo {
             get {
-                return ((string)(this["TrackHoldingsColumnsInfo"]));
+                return ((string)(this["BacktestHoldingsColumnsInfo"]));
             }
             set {
-                this["TrackHoldingsColumnsInfo"] = value;
+                this["BacktestHoldingsColumnsInfo"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TrackTradesColumnsInfo {
+        public string BacktestTradesColumnsInfo {
             get {
-                return ((string)(this["TrackTradesColumnsInfo"]));
+                return ((string)(this["BacktestTradesColumnsInfo"]));
             }
             set {
-                this["TrackTradesColumnsInfo"] = value;
+                this["BacktestTradesColumnsInfo"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TrackOrdersColumnsInfo {
+        public string BacktestOrdersColumnsInfo {
             get {
-                return ((string)(this["TrackOrdersColumnsInfo"]));
+                return ((string)(this["BacktestOrdersColumnsInfo"]));
             }
             set {
-                this["TrackOrdersColumnsInfo"] = value;
+                this["BacktestOrdersColumnsInfo"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TrackDetailsColumnsInfo {
+        public string BacktestDetailsColumnsInfo {
             get {
-                return ((string)(this["TrackDetailsColumnsInfo"]));
+                return ((string)(this["BacktestDetailsColumnsInfo"]));
             }
             set {
-                this["TrackDetailsColumnsInfo"] = value;
+                this["BacktestDetailsColumnsInfo"] = value;
             }
         }
         
@@ -242,12 +242,12 @@ namespace Algoloop.Wpf.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string TrackViewChartSettings {
+        public string BacktestViewChartSettings {
             get {
-                return ((string)(this["TrackViewChartSettings"]));
+                return ((string)(this["BacktestViewChartSettings"]));
             }
             set {
-                this["TrackViewChartSettings"] = value;
+                this["BacktestViewChartSettings"] = value;
             }
         }
     }

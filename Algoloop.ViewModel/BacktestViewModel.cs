@@ -32,7 +32,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
-using static Algoloop.Model.TrackModel;
+using static Algoloop.Model.BacktestModel;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
 using Algoloop.ViewModel.Internal.Lean;
@@ -43,12 +43,12 @@ using QuantConnect.Util;
 
 namespace Algoloop.ViewModel
 {
-    public class TrackViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
+    public class BacktestViewModel: ViewModelBase, ITreeViewModel, IComparable, IDisposable
     {
-        public const string TracksFolder = "Tracks";
+        public const string BacktestsFolder = "Backtests";
         private const string LogFile = "Logs.log";
         private const string ResultFile = "Result.json";
-        private const string ZipFile = "track.zip";
+        private const string ZipFile = "backtest.zip";
         private const double DaysInYear = 365.24;
 
         private bool _isDisposed; // To detect redundant calls
@@ -57,7 +57,7 @@ namespace Algoloop.ViewModel
         private readonly SettingModel _settings;
         private static readonly object _mutex = new();
 
-        private TrackModel _model;
+        private BacktestModel _model;
         private bool _isSelected;
         private bool _isExpanded;
         private SyncObservableCollection<IChartViewModel> _charts = new();
@@ -67,14 +67,14 @@ namespace Algoloop.ViewModel
         private SyncObservableCollection<SymbolViewModel> _symbols = new();
         private SyncObservableCollection<ParameterViewModel> _parameters = new();
         private SyncObservableCollection<TradeViewModel> _trades = new();
-        private SyncObservableCollection<TrackSymbolViewModel> _trackSymbols = new();
+        private SyncObservableCollection<BacktestSymbolViewModel> _backtestSymbols = new();
         private SyncObservableCollection<OrderViewModel> _orders = new();
         private SyncObservableCollection<HoldingViewModel> _holdings = new();
         private bool _loaded;
         private string _logs;
         private readonly LeanLauncher _leanLauncher = new();
 
-        public TrackViewModel(StrategyViewModel parent, TrackModel model, MarketsModel markets, SettingModel settings)
+        public BacktestViewModel(StrategyViewModel parent, BacktestModel model, MarketsModel markets, SettingModel settings)
         {
             _parent = parent;
             Model = model;
@@ -91,7 +91,7 @@ namespace Algoloop.ViewModel
                 () => DoStopCommand(),
                 () => !IsBusy && Active);
             DeleteCommand = new RelayCommand(
-                () => DoDeleteTrack(),
+                () => DoDeleteBacktest(),
                 () => !IsBusy && !Active);
             UseParametersCommand = new RelayCommand(
                 () => DoUseParameters(),
@@ -159,7 +159,7 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _statistics, value);
         }
 
-        public TrackModel Model
+        public BacktestModel Model
         {
             get => _model;
             set => SetProperty(ref _model, value);
@@ -195,10 +195,10 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _trades, value);
         }
 
-        public SyncObservableCollection<TrackSymbolViewModel> TrackSymbols
+        public SyncObservableCollection<BacktestSymbolViewModel> BacktestSymbols
         {
-            get => _trackSymbols;
-            set => SetProperty(ref _trackSymbols, value);
+            get => _backtestSymbols;
+            set => SetProperty(ref _backtestSymbols, value);
         }
 
         public SyncObservableCollection<OrderViewModel> Orders
@@ -276,19 +276,19 @@ namespace Algoloop.ViewModel
             return Model.Name;
         }
 
-        public void DoDeleteTrack()
+        public void DoDeleteBacktest()
         {
             var charts = Charts;
             charts.Clear();
             Charts = null;
             Charts = charts;
 
-            _parent?.DeleteTrack(this);
+            _parent?.DeleteBacktest(this);
         }
 
         public int CompareTo(object obj)
         {
-            var a = obj as TrackViewModel;
+            var a = obj as BacktestViewModel;
             return string.Compare(Model.Name, a?.Model.Name, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -296,14 +296,14 @@ namespace Algoloop.ViewModel
         {
             if (!_loaded)
             {
-                LoadTrack();
+                LoadBacktest();
                 _loaded = true;
             }
 
             Model.Refresh();
         }
 
-        internal async Task StartTrackAsync()
+        internal async Task StartBacktestAsync()
         {
             Debug.Assert(Active);
             ClearRunData();
@@ -331,7 +331,7 @@ namespace Algoloop.ViewModel
                 StrategyViewModel.AddPath(folder);
             }
 
-            TrackModel model = Model;
+            BacktestModel model = Model;
             await Task.Run(() => _leanLauncher.Run(model, account, _settings, exeFolder))
                 .ConfigureAwait(false);
 
@@ -353,7 +353,7 @@ namespace Algoloop.ViewModel
             });
         }
 
-        internal void StopTrack()
+        internal void StopBacktest()
         {
             if (Active)
             {
@@ -399,7 +399,7 @@ namespace Algoloop.ViewModel
 
             if (!_loaded && IsSelected)
             {
-                LoadTrack();
+                LoadBacktest();
                 _loaded = true;
             }
         }
@@ -605,19 +605,19 @@ namespace Algoloop.ViewModel
             return x / Math.Sqrt(c + x * x);
         }
 
-        private void LoadTrack()
+        private void LoadBacktest()
         {
             if (Model.ZipFile == null) return;
-            string trackFile = Path.Combine(MainService.GetProgramDataFolder(), Model.ZipFile);
+            string backtestFile = Path.Combine(MainService.GetProgramDataFolder(), Model.ZipFile);
 
-            // Find track zipfile
-            if (!File.Exists(trackFile)) return;
+            // Find backtest zipfile
+            if (!File.Exists(backtestFile)) return;
 
             // Unzip result file
             ZipFile zipFile;
             BacktestResult result;
             using (StreamReader resultStream = Compression.Unzip(
-                trackFile, ResultFile, out zipFile))
+                backtestFile, ResultFile, out zipFile))
             using (zipFile)
             {
                 if (resultStream == null)
@@ -645,19 +645,19 @@ namespace Algoloop.ViewModel
             // Trade details
             foreach (TradeViewModel trade in Trades)
             {
-                TrackSymbolViewModel trackSymbol = TrackSymbols
+                BacktestSymbolViewModel backtestSymbol = BacktestSymbols
                     .FirstOrDefault(m => m.Symbol.Equals(
                         trade.Symbol.Value, StringComparison.OrdinalIgnoreCase));
-                if (trackSymbol == null)
+                if (backtestSymbol == null)
                 {
-                    trackSymbol = new TrackSymbolViewModel(trade.Symbol);
-                    TrackSymbols.Add(trackSymbol);
+                    backtestSymbol = new BacktestSymbolViewModel(trade.Symbol);
+                    BacktestSymbols.Add(backtestSymbol);
                 }
 
-                trackSymbol.AddTrade(trade);
+                backtestSymbol.AddTrade(trade);
             }
 
-            TrackSymbols.ToList().ForEach(m => m.Calculate());
+            BacktestSymbols.ToList().ForEach(m => m.Calculate());
 
             // Orders result
             foreach (var pair in result.Orders.OrderBy(o => o.Key))
@@ -714,7 +714,7 @@ namespace Algoloop.ViewModel
 
             // Unzip log file
             using (StreamReader logStream = Compression.Unzip(
-                trackFile, LogFile, out zipFile))
+                backtestFile, LogFile, out zipFile))
             using (zipFile)
             {
                 if (logStream != null)
@@ -762,15 +762,15 @@ namespace Algoloop.ViewModel
             statistics.Add(name, value);
         }
 
-        private static void SplitModelToFiles(TrackModel model)
+        private static void SplitModelToFiles(BacktestModel model)
         {
             if (model.Result == null) return;
 
-            // Create folder for track files
+            // Create folder for backtest files
             string programDataFolder = MainService.GetProgramDataFolder();
-            string tracksFolder = Path.Combine(programDataFolder, TracksFolder);
-            Directory.CreateDirectory(tracksFolder);
-            string zipFileTemplate = Path.Combine(tracksFolder, ZipFile);
+            string backtestsFolder = Path.Combine(programDataFolder, BacktestsFolder);
+            Directory.CreateDirectory(backtestsFolder);
+            string zipFileTemplate = Path.Combine(backtestsFolder, ZipFile);
 
             // Save logs and result to zipfile
             lock (_mutex)
@@ -879,7 +879,7 @@ namespace Algoloop.ViewModel
             if (value)
             {
                 // No IsBusy
-                await StartSingleTrackAsync();
+                await StartSingleBacktestAsync();
             }
             else
             {
@@ -899,12 +899,12 @@ namespace Algoloop.ViewModel
         {
             // No IsBusy
             Active = true;
-            await StartSingleTrackAsync();
+            await StartSingleBacktestAsync();
         }
 
-        private async Task StartSingleTrackAsync()
+        private async Task StartSingleBacktestAsync()
         {
-            await StartTrackAsync().ConfigureAwait(false);
+            await StartBacktestAsync().ConfigureAwait(false);
             string message = string.Empty;
             switch (Model.Status)
             {
@@ -923,7 +923,7 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                StopTrack();
+                StopBacktest();
             }
             finally
             {
@@ -950,7 +950,7 @@ namespace Algoloop.ViewModel
                 IsBusy = true;
                 string fileName = saveFileDialog.FileName;
                 using StreamWriter file = File.CreateText(fileName);
-                foreach (TrackSymbolViewModel symbol in symbols)
+                foreach (BacktestSymbolViewModel symbol in symbols)
                 {
                     file.WriteLine(symbol.Symbol);
                 }
@@ -976,7 +976,7 @@ namespace Algoloop.ViewModel
                 {
                     strategyModel.Symbols.Clear();
                     IEnumerable<SymbolModel> symbolModels = symbols.
-                        Cast<TrackSymbolViewModel>().Select(
+                        Cast<BacktestSymbolViewModel>().Select(
                             m => new SymbolModel(m.Symbol, m.Market, m.Security));
                     foreach (SymbolModel symbol in symbolModels)
                     {
@@ -1009,7 +1009,7 @@ namespace Algoloop.ViewModel
             Orders.Clear();
             Holdings.Clear();
             Trades.Clear();
-            TrackSymbols.Clear();
+            BacktestSymbols.Clear();
 
             Statistics.Clear();
             IDictionary<string, decimal?> statistics = Statistics;

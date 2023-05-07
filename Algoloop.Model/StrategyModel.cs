@@ -43,7 +43,7 @@ namespace Algoloop.Model
         {
             Symbols = new Collection<SymbolModel>();
             Parameters = new Collection<ParameterModel>();
-            Tracks = new Collection<TrackModel>();
+            Backtests = new Collection<BacktestModel>();
             Strategies = new Collection<StrategyModel>();
         }
 
@@ -69,11 +69,11 @@ namespace Algoloop.Model
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m)).ToList());
-            Tracks = new Collection<TrackModel>();
+            Backtests = new Collection<BacktestModel>();
             Strategies = new Collection<StrategyModel>();
         }
 
-        public StrategyModel(TrackModel model)
+        public StrategyModel(BacktestModel model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             Account = model.Account;
@@ -93,7 +93,7 @@ namespace Algoloop.Model
 
             Symbols = new Collection<SymbolModel>(model.Symbols.Select(m => new SymbolModel(m)).ToList());
             Parameters = new Collection<ParameterModel>(model.Parameters.Select(m => new ParameterModel(m) { UseRange = false }).ToList());
-            Tracks = new Collection<TrackModel>();
+            Backtests = new Collection<BacktestModel>();
             Strategies = new Collection<StrategyModel>();
         }
 
@@ -318,7 +318,7 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
-        public Collection<TrackModel> Tracks { get; }
+        public Collection<BacktestModel> Backtests { get; }
 
         [Browsable(false)]
         [ReadOnly(false)]

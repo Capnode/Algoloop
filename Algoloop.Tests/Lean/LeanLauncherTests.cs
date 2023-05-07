@@ -19,7 +19,7 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.IO;
-using static Algoloop.Model.TrackModel;
+using static Algoloop.Model.BacktestModel;
 
 namespace Algoloop.Tests.Lean
 {
@@ -58,7 +58,7 @@ namespace Algoloop.Tests.Lean
             {
                 Provider = provider
             };
-            var track = new TrackModel
+            var backtest = new BacktestModel
             {
                 Account = provider.Name,
                 AlgorithmLanguage = Language.CSharp,
@@ -68,14 +68,14 @@ namespace Algoloop.Tests.Lean
             };
 
             using var launcher = new LeanLauncher();
-            launcher.Run(track, account, _settings, _exeFolder);
+            launcher.Run(backtest, account, _settings, _exeFolder);
 
-            Assert.IsTrue(track.Status.Equals(CompletionStatus.Success));
-            Assert.IsFalse(track.Active);
-            Assert.IsNotNull(track.Logs);
-            Assert.IsTrue(track.Logs.Length > 0);
-            Assert.IsNotNull(track.Result);
-            Assert.IsTrue(track.Result.Length > 0);
+            Assert.IsTrue(backtest.Status.Equals(CompletionStatus.Success));
+            Assert.IsFalse(backtest.Active);
+            Assert.IsNotNull(backtest.Logs);
+            Assert.IsTrue(backtest.Logs.Length > 0);
+            Assert.IsNotNull(backtest.Result);
+            Assert.IsTrue(backtest.Result.Length > 0);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -160,6 +160,6 @@
     <value>Strategy completed</value>
   </data>
   <data name="StrategyStarted" xml:space="preserve">
-    <value>Strategy started with {0} track(s)</value>
+    <value>Strategy started with {0} backtest(s)</value>
   </data>
 </root>

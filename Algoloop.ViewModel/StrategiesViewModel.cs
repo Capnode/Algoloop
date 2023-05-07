@@ -210,9 +210,9 @@ namespace Algoloop.ViewModel
                     StrategiesModel strategies = JsonConvert.DeserializeObject<StrategiesModel>(json);
                     foreach (StrategyModel strategy in strategies.Strategies)
                     {
-                        foreach (TrackModel track in strategy.Tracks)
+                        foreach (BacktestModel backtest in strategy.Backtests)
                         {
-                            track.Active = false;
+                            backtest.Active = false;
                         }
 
                         Model.Strategies.Add(strategy);
@@ -267,19 +267,19 @@ namespace Algoloop.ViewModel
             var inUse = new List<string>();
             foreach (StrategyViewModel strategy in Strategies)
             {
-                inUse.AddRange(TracksInUse(strategy, programDataFolder));
+                inUse.AddRange(BacktestsInUse(strategy, programDataFolder));
                 Model.Strategies.Add(strategy.Model);
                 strategy.DataToModel();
 
                 // Collect files in use
-                inUse.AddRange(strategy.Model.Tracks
+                inUse.AddRange(strategy.Model.Backtests
                     .Where(m => !string.IsNullOrEmpty(m.ZipFile))
                     .Select(p => Path.Combine(programDataFolder, p.ZipFile)));
             }
 
-            // Remove Track files not in use
-            string tracksFolder = Path.Combine(programDataFolder, TrackViewModel.TracksFolder);
-            var dir = new DirectoryInfo(tracksFolder);
+            // Remove Backtest files not in use
+            string backtestFolder = Path.Combine(programDataFolder, BacktestViewModel.BacktestsFolder);
+            var dir = new DirectoryInfo(backtestFolder);
             if (!dir.Exists)
             {
                 return;
@@ -294,7 +294,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private IEnumerable<string> TracksInUse(StrategyViewModel parent, string folder)
+        private IEnumerable<string> BacktestsInUse(StrategyViewModel parent, string folder)
         {
             var inUse = new List<string>();
             foreach (StrategyViewModel strategy in parent.Strategies)
@@ -302,11 +302,11 @@ namespace Algoloop.ViewModel
                 strategy.DataToModel();
 
                 // Collect files in use
-                inUse.AddRange(strategy.Model.Tracks
+                inUse.AddRange(strategy.Model.Backtests
                     .Where(m => !string.IsNullOrEmpty(m.ZipFile))
                     .Select(p => Path.Combine(folder, p.ZipFile)));
 
-                inUse.AddRange(TracksInUse(strategy, folder));
+                inUse.AddRange(BacktestsInUse(strategy, folder));
             }
 
             return inUse;
@@ -327,11 +327,11 @@ namespace Algoloop.ViewModel
         {
             foreach (StrategyViewModel strategy in Strategies)
             {
-                foreach (TrackViewModel track in strategy.Tracks)
+                foreach (BacktestViewModel backtest in strategy.Backtests)
                 {
-                    if (track.Active)
+                    if (backtest.Active)
                     {
-                        _ = track.StartTrackAsync();
+                        _ = backtest.StartBacktestAsync();
                     }
                 }
             }

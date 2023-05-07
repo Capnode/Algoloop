@@ -142,7 +142,7 @@
                                 <MultiBinding.Converter>
                                     <viewsupport:CompositeCollectionConverter />
                                 </MultiBinding.Converter>
-                                <Binding Path="Tracks" />
+                                <Binding Path="Backtests" />
                                 <Binding Path="Strategies" />
                             </MultiBinding>
                         </HierarchicalDataTemplate.ItemsSource>
@@ -151,7 +151,7 @@
                                 <TextBlock.Text>
                                     <MultiBinding Converter="{viewsupport:StringSumConverter}" ConverterParameter="{}{0} ({1})">
                                         <Binding Path="DisplayName" />
-                                        <Binding Path="Tracks.Count" />
+                                        <Binding Path="Backtests.Count" />
                                         <Binding Path="Strategies.Count" />
                                     </MultiBinding>
                                 </TextBlock.Text>
@@ -189,7 +189,7 @@
                                                     Source="/Resources/Delete.png" />
                                             </MenuItem.Icon>
                                         </MenuItem>
-                                        <MenuItem Command="{Binding DeleteAllTracksCommand}" Header="Delete Tracks">
+                                        <MenuItem Command="{Binding DeleteAllBacktestsCommand}" Header="Delete Backtests">
                                             <MenuItem.Icon>
                                                 <Image
                                                     Width="16"
@@ -218,13 +218,13 @@
                             </TextBlock>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type vm:TrackViewModel}">
+                    <DataTemplate DataType="{x:Type vm:BacktestViewModel}">
                         <StackPanel Orientation="Horizontal">
                             <CheckBox Command="{Binding ActiveCommand}" IsChecked="{Binding Active}" />
                             <TextBlock Text="{Binding Model.Name}" />
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Command="{Binding DeleteCommand}" Header="Delete Track">
+                                    <MenuItem Command="{Binding DeleteCommand}" Header="Delete Backtest">
                                         <MenuItem.Icon>
                                             <Image
                                                 Width="16"
@@ -420,20 +420,20 @@
                                     </DataGrid.RowStyle>
                                 </wpf:ExDataGrid>
                             </TabItem>
-                            <TabItem Header="{Binding Tracks.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Tracks ({0}), FallbackValue=Tracks}">
+                            <TabItem Header="{Binding Backtests.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Backtests ({0}), FallbackValue=Backtests}">
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top" ToolBarTray.IsLocked="True">
-                                        <Button ToolTip="Delete tracks"
-                                                Command="{Binding SelectedItem.DeleteSelectedTracksCommand}"
-                                                CommandParameter="{Binding ElementName=trackDataGrid, Path=SelectedItems}">
+                                        <Button ToolTip="Delete backtests"
+                                                Command="{Binding SelectedItem.DeleteSelectedBacktestsCommand}"
+                                                CommandParameter="{Binding ElementName=backtestDataGrid, Path=SelectedItems}">
                                             <Image
                                                 Width="16"
                                                 Height="16"
                                                 Source="/Resources/Delete.png" />
                                         </Button>
-                                        <Button ToolTip="Export tracks"
-                                                Command="{Binding SelectedItem.ExportSelectedTracksCommand}"
-                                                CommandParameter="{Binding ElementName=trackDataGrid, Path=SelectedItems}">
+                                        <Button ToolTip="Export backtests"
+                                                Command="{Binding SelectedItem.ExportSelectedBacktestsCommand}"
+                                                CommandParameter="{Binding ElementName=backtestDataGrid, Path=SelectedItems}">
                                             <Image
                                                 Width="16"
                                                 Height="16"
@@ -441,31 +441,31 @@
                                         </Button>
                                     </ToolBar>
                                     <wpf:ExDataGrid
-                                        x:Name="trackDataGrid"
+                                        x:Name="backtestDataGrid"
                                         AutoGenerateColumns="False"
                                         CanUserFilter="True"
                                         CanUserFreeze="False"
                                         CanUserGroup="False"
                                         CanUserReorderColumns="True"
                                         CanUserSelectDistinct="True"
-                                        ExColumns="{Binding TrackColumns}"
-                                        ExColumnsInfo="{Binding Source={StaticResource settings}, Path=TracksColumnsInfo}"
-                                        ExItemsSource="{Binding Tracks}"
+                                        ExColumns="{Binding BacktestColumns}"
+                                        ExColumnsInfo="{Binding Source={StaticResource settings}, Path=BacktestsColumnsInfo}"
+                                        ExItemsSource="{Binding Backtests}"
                                         ExSelectedItems="{Binding SelectedItems}"
                                         FrozenColumnCount="2"
                                         GridLinesVisibility="None"
-                                        SelectedValue="{Binding SelectedTrack, Mode=TwoWay}">
+                                        SelectedValue="{Binding SelectedBacktest, Mode=TwoWay}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="MouseDoubleClick">
-                                                <i:InvokeCommandAction Command="{Binding TrackDoubleClickCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                                <i:InvokeCommandAction Command="{Binding BacktestDoubleClickCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                         <DataGrid.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem
-                                                    Command="{Binding DeleteSelectedTracksCommand}"
+                                                    Command="{Binding DeleteSelectedBacktestsCommand}"
                                                     CommandParameter="{Binding Path=PlacementTarget.SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}"
-                                                    Header="Delete Tracks">
+                                                    Header="Delete Backtests">
                                                     <MenuItem.Icon>
                                                         <Image
                                                             Width="16"
@@ -492,8 +492,8 @@
                         </TabControl>
                     </DockPanel>
                 </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:TrackViewModel}">
-                    <view:TrackView />
+                <DataTemplate DataType="{x:Type vm:BacktestViewModel}">
+                    <view:BacktestView />
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

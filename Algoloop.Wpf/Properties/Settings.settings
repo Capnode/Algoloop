@@ -1,4 +1,4 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='utf-8'?>
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Algoloop.Wpf.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
@@ -14,7 +14,7 @@
     <Setting Name="MarketViewSplitter" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">160</Value>
     </Setting>
-    <Setting Name="TracksColumnsInfo" Type="System.String" Scope="User">
+    <Setting Name="BacktestsColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AccountBalanceColumnsInfo" Type="System.String" Scope="User">
@@ -35,16 +35,16 @@
     <Setting Name="MarketSymbolListsColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TrackHoldingsColumnsInfo" Type="System.String" Scope="User">
+    <Setting Name="BacktestHoldingsColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TrackTradesColumnsInfo" Type="System.String" Scope="User">
+    <Setting Name="BacktestTradesColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TrackOrdersColumnsInfo" Type="System.String" Scope="User">
+    <Setting Name="BacktestOrdersColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TrackDetailsColumnsInfo" Type="System.String" Scope="User">
+    <Setting Name="BacktestDetailsColumnsInfo" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Theme" Type="System.String" Scope="User">
@@ -56,7 +56,7 @@
     <Setting Name="MarketViewChartSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="TrackViewChartSettings" Type="System.String" Scope="User">
+    <Setting Name="BacktestViewChartSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
