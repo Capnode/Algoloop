@@ -1048,14 +1048,14 @@ namespace Algoloop.ViewModel
 
             workCharts.Add(viewModel);
 
-            foreach (KeyValuePair<string, QuantConnect.Chart> chart in result.Charts)
+            foreach (QuantConnect.Chart chart in result.Charts.Values)
             {
-                foreach (KeyValuePair<string, Series> kvp in chart.Value.Series)
+                foreach (Series serie in chart.Series.Values)
                 {
-                    Series serie = kvp.Value;
                     if (serie.Values.Count < 2) continue;
-                    IEnumerable<EquityData> list = serie.Values.Select(
-                        m => new EquityData {
+                    IEnumerable<EquityData> list = serie.Values.Select(m =>
+                        new EquityData
+                        {
                             Time = Time.UnixTimeStampToDateTime(m.x).ToLocalTime(),
                             Value = RoundLarge(m.y)
                         });
