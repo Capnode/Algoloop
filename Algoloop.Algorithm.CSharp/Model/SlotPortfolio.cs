@@ -27,6 +27,7 @@ namespace Algoloop.Algorithm.CSharp.Model
     public class SlotPortfolio : PortfolioConstructionModel
     {
         private const int RocPeriod = 250;
+        private const string TrackerChart = "Tracker";
 
         private readonly bool _logTargets = false;
         private readonly bool _logTrades = false;
@@ -161,7 +162,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             ProcessRoc(algorithm);
             if (_benchmarkIndex > 0)
             {
-                algorithm.Plot($"Tracker / {_indexName}", _trackerIndex / _benchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", _trackerIndex / _benchmarkIndex);
             }
 
             // Determine leverage
@@ -200,14 +201,14 @@ namespace Algoloop.Algorithm.CSharp.Model
         private void ProcessPortfolio(QCAlgorithm algorithm, decimal portfolioValue)
         {
             decimal portfolioIndex = portfolioValue / _portfolioValue0;
-            algorithm.Plot("Tracker Portfolio", portfolioIndex);
+            algorithm.Plot(TrackerChart, "Tracker Portfolio", portfolioIndex);
             _portfolioRoc?.Update(algorithm.Time, portfolioIndex);
         }
 
         private decimal ProcessTracker(QCAlgorithm algorithm, decimal trackerValue)
         {
             _trackerIndex = trackerValue / _trackerValue0;
-            algorithm.Plot("Tracker", _trackerIndex);
+            algorithm.Plot(TrackerChart, "Tracker", _trackerIndex);
             _trackerRoc?.Update(algorithm.Time, _trackerIndex);
             _trackerSma1?.Update(algorithm.Time, _trackerIndex);
             _trackerSma2?.Update(algorithm.Time, _trackerIndex);
@@ -215,7 +216,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal sizingFactor = 1;
             if (_trackerLow != null && _trackerLow.IsReady)
             {
-                algorithm.Plot("TrackerLow", _trackerLow);
+                algorithm.Plot(TrackerChart, "TrackerLow", _trackerLow);
                 if (_trackerIndex < _trackerLow)
                 {
                     sizingFactor = _stoplossSizing;
@@ -227,7 +228,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
             if (_trackerHigh != null && _trackerHigh.IsReady)
             {
-                algorithm.Plot("TrackerHigh", _trackerHigh);
+                algorithm.Plot(TrackerChart, "TrackerHigh", _trackerHigh);
                 if (_trackerIndex > _trackerHigh)
                 {
                     sizingFactor = 1;
@@ -240,12 +241,12 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             if (_trackerSma1 != null && _trackerSma1.IsReady)
             {
-                algorithm.Plot("TrackerSMA1", _trackerSma1);
+                algorithm.Plot(TrackerChart, "TrackerSMA1", _trackerSma1);
                 sizingFactor = _trackerIndex >= _trackerSma1 ? 1 : _stoplossSizing;
             }
             if (_trackerSma2 != null && _trackerSma2.IsReady)
             {
-                algorithm.Plot("TrackerSMA2", _trackerSma2);
+                algorithm.Plot(TrackerChart, "TrackerSMA2", _trackerSma2);
                 sizingFactor = _trackerIndex >= _trackerSma2 ? 1 : _stoplossSizing;
             }
             if (_trackerSma1 != null && _trackerSma2 != null)
@@ -272,7 +273,7 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             // Plot benchmark index 
             _benchmarkIndex = benchmarkValue / _benchmarkValue0;
-            algorithm.Plot($"Tracker {_indexName}", _benchmarkIndex);
+            algorithm.Plot(TrackerChart, $"Tracker {_indexName}", _benchmarkIndex);
             _benchmarkRoc?.Update(algorithm.Time, benchmarkValue);
             _benchmarkSma1?.Update(algorithm.Time, _benchmarkIndex);
             _benchmarkSma2?.Update(algorithm.Time, _benchmarkIndex);
@@ -281,14 +282,14 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 if (_benchmarkSma1.IsReady)
                 {
-                    algorithm.Plot("IndexSMA1", _benchmarkSma1);
+                    algorithm.Plot(TrackerChart, "IndexSMA1", _benchmarkSma1);
                 }
             }
             if (_benchmarkSma2 != null)
             {
                 if (_benchmarkSma2.IsReady)
                 {
-                    algorithm.Plot("IndexSMA2", _benchmarkSma2);
+                    algorithm.Plot(TrackerChart, "IndexSMA2", _benchmarkSma2);
                 }
             }
 
@@ -327,7 +328,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 return 1;
 
             decimal diff = _trackerRoc - _benchmarkRoc;
-            algorithm.Plot($"Tracker({_trackerRoc.Period}) - {_indexName}({_benchmarkRoc.Period})", diff);
+            algorithm.Plot(TrackerChart, $"Tracker({_trackerRoc.Period}) - {_indexName}({_benchmarkRoc.Period})", diff);
             if (diff >= 0)
                 return 1;
 
