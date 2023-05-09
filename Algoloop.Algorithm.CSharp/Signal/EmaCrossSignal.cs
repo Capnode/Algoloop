@@ -43,15 +43,14 @@ namespace Algoloop.Algorithm.CSharp.Model
         public float Update(QCAlgorithm algorithm, BaseData bar)
         {
             decimal close = bar.Price;
-//            string action = evaluate ? "Evaluate" : "Update";
-//            _algorithm.Log($"{action} {bar.Time:d} {close}");
+            //algorithm.Log($"{bar.Time:d} {bar.Symbol.ID.Symbol} {close}");
             _fastEma.Update(bar.Time, close);
             _slowEma.Update(bar.Time, close);
             if (_fastEma == null && _slowEma == null) return float.NaN;
             if (_fastEma == null || _slowEma == null) return 0;
             if (_fastPeriod >= _slowPeriod) return 0;
             if (!_fastEma.IsReady || !_slowEma.IsReady) return 0;
-//            _algorithm.Log($"_fastEma={_fastEma} _slowEma={_slowEma}");
+            //algorithm.Log($"{bar.Time:u} {bar.Symbol.ID.Symbol} _fastEma={_fastEma} _slowEma={_slowEma}");
             return _fastEma > _slowEma ? 1 : 0;
         }
 

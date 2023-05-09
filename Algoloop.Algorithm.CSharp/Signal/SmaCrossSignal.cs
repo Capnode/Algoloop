@@ -41,8 +41,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (bar.Time <= _time) throw new ApplicationException("Duplicate bars");
             _time = bar.Time;
             decimal close = bar.Price;
-            //string action = evaluate ? "Evaluate" : "Update";
-            //algorithm.Log($"{action} {bar.Time:d} {close}");
+            //algorithm.Log($"{bar.Time:d} {bar.Symbol.ID.Symbol} {close}");
             _fastSma?.Update(bar.Time, close);
             _slowSma?.Update(bar.Time, close);
 
@@ -61,7 +60,7 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             if (_fastSma.Period >= _slowSma.Period) return 0;
             if (!_fastSma.IsReady || !_slowSma.IsReady) return 0;
-//            algorithm.Log($"_fastSma={_fastSma} _slowSma={_slowSma}");
+            //algorithm.Log($"{bar.Time:d} {bar.Symbol.ID.Symbol} _fastSma={_fastSma} _slowSma={_slowSma}");
             return _fastSma > _slowSma ? 1 : 0;
         }
 
