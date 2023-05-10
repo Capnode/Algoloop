@@ -660,7 +660,7 @@ namespace QuantConnect.Lean.Engine
                         if (newPercent != warmingUpPercent)
                         {
                             warmingUpPercent = newPercent;
-                            algorithm.Debug($"Processing algorithm warm-up request {warmingUpPercent}%...");
+                            //algorithm.Debug($"Processing algorithm warm-up request {warmingUpPercent}%...");
                             results.SendStatusUpdate(AlgorithmStatus.History, $"{warmingUpPercent}");
                         }
                     }
