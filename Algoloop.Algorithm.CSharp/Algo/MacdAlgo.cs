@@ -152,7 +152,7 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetWarmUp(slow, Resolution.Daily);
+            SetWarmUp((int)(1.1 * slow), Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
                 (symbol) => new MacdSignal(this, symbol, resolution, fast, slow, signal),
                 (symbol) => new FundamentalSignal(

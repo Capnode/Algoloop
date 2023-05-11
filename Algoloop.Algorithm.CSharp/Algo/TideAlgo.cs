@@ -98,7 +98,7 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetWarmUp(backfill, Resolution.Daily);
+            SetWarmUp((int)(1.1 * backfill), Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(direction, resolution, hold, symbols,
                 (symbol) => new TideSignal(resolution, direction, open)));
         }

@@ -190,7 +190,7 @@ namespace Algoloop.Algorithm.CSharp
                 security.FillModel = new TouchFill();
             });
             int warmupPeriod = Math.Max(rangePeriod, Math.Max(period1, Math.Max(period2, turnoverPeriod)));
-            SetWarmUp(warmupPeriod, Resolution.Daily);
+            SetWarmUp((int)(1.1 * warmupPeriod), Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new SmaCrossSignal(period1, period2),

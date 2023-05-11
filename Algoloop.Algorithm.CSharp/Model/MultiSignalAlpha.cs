@@ -33,6 +33,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly IEnumerable<Symbol> _symbols;
         private readonly Func<Symbol, ISignal>[] _factories;
         private readonly IDictionary<Symbol, ISignal[]> _signals = new Dictionary<Symbol, ISignal[]>();
+        private readonly IDictionary<Symbol, float> _scores = new Dictionary<Symbol, float>();
 
         public MultiSignalAlpha(
             InsightDirection direction,
@@ -58,36 +59,49 @@ namespace Algoloop.Algorithm.CSharp.Model
             foreach (KeyValuePair<Symbol, BaseData> pair in data)
             {
                 Symbol symbol = pair.Key;
+                BaseData bar = pair.Value;
                 Debug.Assert(_symbols.Contains(symbol));
-                bool ok = _signals.TryGetValue(symbol, out ISignal[] signals);
-                Debug.Assert(ok);
-                if (!ok) continue;
                 float score = _direction.Equals(InsightDirection.Up) ? 1 : _direction.Equals(InsightDirection.Down) ? -1 : float.NaN;
-                foreach (ISignal symbolData in signals)
+                if (bar.IsFillForward)
                 {
-                    float signal = symbolData.Update(algorithm, pair.Value);
-                    if (LogSignal)
+                    if (!_scores.TryGetValue(symbol, out score))
                     {
-                        algorithm.Log($"{pair.Key} {symbolData.GetType().Name}: {signal}");
+                        score = float.NaN;
+                    }
+                }
+                else
+                {
+                    bool ok = _signals.TryGetValue(symbol, out ISignal[] signals);
+                    Debug.Assert(ok);
+                    if (!ok) continue;
+                    foreach (ISignal symbolData in signals)
+                    {
+                        float signal = symbolData.Update(algorithm, bar);
+                        if (LogSignal)
+                        {
+                            algorithm.Log($"{symbol.ID.Symbol} {symbolData.GetType().Name}: {signal}");
+                        }
+
+                        if (float.IsNaN(signal)) continue;
+                        if (float.IsNaN(score))
+                        {
+                            score = signal;
+                        }
+                        else if (score < 0 && signal < 0)
+                        {
+                        score = - score * signal;
+                        }
+                        else if (score > 0 && signal > 0)
+                        {
+                            score *= signal;
+                        }
+                        else
+                        {
+                            score = 0;
+                        }
                     }
 
-                    if (float.IsNaN(signal)) continue;
-                    if (float.IsNaN(score))
-                    {
-                        score = signal;
-                    }
-                    else if (score < 0 && signal < 0)
-                    {
-                        score = - score * signal;
-                    }
-                    else if (score > 0 && signal > 0)
-                    {
-                        score *= signal;
-                    }
-                    else
-                    {
-                        score = 0;
-                    }
+                    _scores[symbol] = score;
                 }
 
                 if (float.IsNaN(score) || score == 0) continue;

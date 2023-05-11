@@ -121,7 +121,7 @@ namespace Algoloop.Algorithm.CSharp
                 security.FeeModel = feeModel;
                 security.FillModel = new TouchFill();
             });
-            SetWarmUp(period, Resolution.Daily);
+            SetWarmUp((int)(1.1 * period), Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, 1, symbols,
                 (symbol) => new SmaSignal(this, symbol, resolution, period),
                 (symbol) => new FundamentalSignal(
