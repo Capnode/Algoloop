@@ -67,7 +67,13 @@
                         Source="/Resources/Stop.png" />
                 </Button>
             </ToolBar>
-            <TreeView BorderThickness="0" ItemsSource="{Binding Markets}">
+            <TreeView
+                BorderThickness="0"
+                AllowDrop="False"
+                DragOver="TreeView_DragOver"
+                Drop="TreeView_Drop"
+                MouseMove="TreeView_MouseMove"
+                ItemsSource="{Binding Markets}">
                 <TreeView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Command="{Binding AddCommand}" Header="Add Market">
@@ -81,7 +87,7 @@
                     </ContextMenu>
                 </TreeView.ContextMenu>
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectedItemChanged">
+                    <i:EventTrigger EventName="MouseUp">
                         <i:InvokeCommandAction Command="{Binding SelectedChangedCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
@@ -573,7 +579,7 @@
                                     </xctk:DateTimePicker>
                                 </ToolBar>
                                 <view:StockChartView
-                                    ItemsSource="{Binding Charts}" Visibility="{Binding ShowCharts, Converter={viewsupport:BooleanToVisibilityConverter}}"
+                                    ItemsSource="{Binding Charts}"
                                     Settings="{Binding Source={StaticResource settings}, Path=MarketViewChartSettings}"/>
                             </DockPanel>
                         </TabItem>

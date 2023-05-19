@@ -13,6 +13,7 @@
  */
 
 using Algoloop.ViewModel;
+using Algoloop.ViewModel.Internal.Lean;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
 using System;
@@ -113,12 +114,13 @@ namespace Algoloop.Wpf
             // Collect time-value points of all curves
             Dictionary<IChartBandElement, decimal> curves = new();
             Dictionary<DateTimeOffset, List<Tuple<IChartBandElement, decimal>>> points = new ();
-            foreach (object item in _combobox.Items)
+            foreach (IChartViewModel iChart in _combobox.Items)
             {
-                if (item is EquityChartViewModel model && model.IsVisible)
+                if (iChart is not ChartViewModel chart) continue;
+                foreach (QuantConnect.Series series in chart.Chart.Series.Values)
                 {
-                    IChartBandElement curveElement = _chart.CreateCurve(model.Title, model.Color, ChartIndicatorDrawStyles.Line);
-                    foreach (EquityData equityData in model.Series)
+                    IChartBandElement curveElement = _chart.CreateCurve(series.Name, ViewModel.Internal.Lean.StockSharp.ToMediaColor(series.Color), ChartIndicatorDrawStyles.Line);
+                    foreach (EquityData equityData in series.ToEquityData())
                     {
                         decimal value = equityData.Value;
                         if (!curves.ContainsKey(curveElement))

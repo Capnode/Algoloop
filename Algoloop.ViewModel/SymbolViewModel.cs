@@ -18,9 +18,8 @@ using Capnode.Wpf.DataGrid;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect;
+using QuantConnect.Data;
 using QuantConnect.Data.Fundamental;
-using StockSharp.Algo.Candles;
-using StockSharp.Charting;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -76,7 +75,6 @@ namespace Algoloop.ViewModel
         private readonly ITreeViewModel _parent;
         private SyncObservableCollection<IChartViewModel> _charts = new();
         private ObservableCollection<DataGridColumn> _periodColumns = new();
-        private bool _showCharts;
         private decimal _ask;
         private decimal _bid;
         private decimal _price;
@@ -91,7 +89,7 @@ namespace Algoloop.ViewModel
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
             UpdateCommand = new RelayCommand(
-                () => DoLoadData(Market),
+                () => DoLoadData(),
                 () => !IsBusy && Market != null);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
@@ -152,12 +150,6 @@ namespace Algoloop.ViewModel
             }
         }
 
-        public bool ShowCharts
-        {
-            get => _showCharts;
-            set => SetProperty(ref _showCharts, value);
-        }
-
         public SyncObservableCollection<IChartViewModel> Charts
         {
             get => _charts;
@@ -174,7 +166,7 @@ namespace Algoloop.ViewModel
         {
             if (Market != null)
             {
-                DoLoadData(Market);
+                DoLoadData();
             }
         }
 
@@ -194,43 +186,27 @@ namespace Algoloop.ViewModel
             OnPropertyChanged(nameof(Model));
         }
 
-        private void DoLoadData(MarketViewModel market)
+        public IEnumerable<BaseData> History()
+        {
+            string filename = PriceFilePath(Market, Model, Market.SelectedResolution, Market.Date);
+            if (!File.Exists(filename)) return null;
+            var leanDataReader = new LeanDataReader(filename);
+            return leanDataReader.Parse();
+        }
+
+        private void DoLoadData()
         {
             try
             {
                 IsBusy = true;
-                LoadCharts(market);
-                LoadFundamentals(market);
+                Charts.Clear();
+                var chart = new SymbolChartViewModel(this, true);
+                Charts.Add(chart);
+                LoadFundamentals();
             }
             finally
             {
                 IsBusy = false;
-            }
-        }
-
-        private void LoadCharts(MarketViewModel market)
-        {
-            Charts.Clear();
-            string filename = PriceFilePath(
-                market, Model, market.SelectedResolution, market.Date);
-            if (File.Exists(filename))
-            {
-                var leanDataReader = new LeanDataReader(filename);
-                IEnumerable<Candle> candles = leanDataReader.Parse().ToCandles();
-                if (candles.Any())
-                {
-                    var viewModel = new StockChartViewModel(
-                        Model.Name,
-                        ChartCandleDrawStyles.CandleStick,
-                        Color.Black,
-                        candles);
-                    Charts.Add(viewModel);
-                }
-                ShowCharts = true;
-            }
-            else
-            {
-                ShowCharts = false;
             }
         }
 
@@ -271,7 +247,7 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void LoadFundamentals(MarketViewModel market)
+        private void LoadFundamentals()
         {
             // Reset Fundamentals
             FundamentalRows.Clear();
@@ -281,7 +257,7 @@ namespace Algoloop.ViewModel
 
             // Find FineFundamentals folder
             string folder = Path.Combine(
-                market.DataFolder,
+                Market.DataFolder,
                 Model.Security.SecurityTypeToLower(),
                 Model.Market,
                 "fundamental",

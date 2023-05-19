@@ -36,8 +36,6 @@ using static Algoloop.Model.BacktestModel;
 using Algoloop.ViewModel.Internal;
 using Algoloop.ViewModel.Properties;
 using Algoloop.ViewModel.Internal.Lean;
-using StockSharp.Xaml.Charting;
-using StockSharp.Charting;
 using CommunityToolkit.Mvvm.Input;
 using QuantConnect.Util;
 
@@ -50,7 +48,8 @@ namespace Algoloop.ViewModel
         private const string ResultFile = "Result.json";
         private const string ZipFile = "backtest.zip";
         private const double DaysInYear = 365.24;
-
+        private const string StrategyEquity = "Strategy Equity";
+        private const string RealizedProfit = "Realized Profit";
         private bool _isDisposed; // To detect redundant calls
         private readonly StrategyViewModel _parent;
         private readonly MarketsModel _markets;
@@ -583,7 +582,7 @@ namespace Algoloop.ViewModel
             IDictionary<string, decimal?> statistics)
         {
             KeyValuePair<string, QuantConnect.Chart> chart = result.Charts.FirstOrDefault(
-                m => m.Key.Equals("Strategy Equity", StringComparison.OrdinalIgnoreCase));
+                m => m.Key.Equals(StrategyEquity, StringComparison.OrdinalIgnoreCase));
             if (chart.Equals(default(KeyValuePair<string, QuantConnect.Chart>))) return;
 
             KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(
@@ -705,7 +704,7 @@ namespace Algoloop.ViewModel
             // Charts results
             try
             {
-                ParseCharts(result);
+                AddCharts(result);
             }
             catch (Exception ex)
             {
@@ -1019,81 +1018,23 @@ namespace Algoloop.ViewModel
             _loaded = false;
         }
 
-        private void ParseCharts(Result result)
+        private void AddCharts(Result result)
         {
             SyncObservableCollection<IChartViewModel> workCharts = Charts;
             Debug.Assert(workCharts.Count == 0);
-
-            decimal profit = Model.InitialCapital;
-            var series = new List<EquityData>
+            foreach (Chart chart in result.Charts.Values)
             {
-                new EquityData { Time = Model.StartDate, Value = profit }
-            };
-            foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
-            {
-                profit += trade.Value;
-                series.Add(new EquityData {
-                    Time = trade.Key.ToLocalTime(),
-                    Value = RoundLarge(profit)
-                });
+                var chartViewModel = new ChartViewModel(chart, false);
+                workCharts.Add(chartViewModel);
             }
-
-            var viewModel = new EquityChartViewModel(
-                "Net profit",
-                ChartIndicatorDrawStyles.Area,
-                Color.Green,
-                0,
-                false,
-                series);
-
-            workCharts.Add(viewModel);
-
-            foreach (QuantConnect.Chart chart in result.Charts.Values)
-            {
-                foreach (Series serie in chart.Series.Values)
-                {
-                    if (serie.Values.Count < 2) continue;
-                    IEnumerable<EquityData> list = serie.Values.Select(m =>
-                        new EquityData
-                        {
-                            Time = Time.UnixTimeStampToDateTime(m.x).ToLocalTime(),
-                            Value = RoundLarge(m.y)
-                        });
-
-                    viewModel = serie.Name switch
-                    {
-                        "Equity" => new EquityChartViewModel(
-                            serie.Name,
-                            ChartIndicatorDrawStyles.Area,
-                            serie.Color,
-                            0,
-                            true,
-                            list),
-                        "Daily Performance" => new EquityChartViewModel(
-                            serie.Name,
-                            ChartIndicatorDrawStyles.Histogram,
-                            serie.Color,
-                            1,
-                            true,
-                            list),
-                        _ => new EquityChartViewModel(
-                            serie.Name,
-                            ChartIndicatorDrawStyles.Line,
-                            serie.Color,
-                            2,
-                            false,
-                            list),
-                    };
-                    workCharts.Add(viewModel);
-                }
-            }
-
-            workCharts.Sort();
 
             // Move Equity chart to top of list
-            IChartViewModel equityChart = workCharts.FirstOrDefault(m => m.Title.Equals("Equity"));
+            ChartViewModel equityChart = workCharts.FirstOrDefault(m => m.Title.Equals(StrategyEquity)) as ChartViewModel;
             if (equityChart != null)
             {
+                equityChart.IsVisible = true;
+                Series series = Profit(result);
+                equityChart.Chart.AddSeries(series);
                 if (workCharts.Remove(equityChart))
                 {
                     workCharts.Insert(0, equityChart);
@@ -1104,10 +1045,18 @@ namespace Algoloop.ViewModel
             Charts = workCharts;
         }
 
-        private static decimal RoundLarge(decimal value)
+        private Series Profit(Result result)
         {
-            if (value < 1000) return value;
-            return Decimal.Round(value);
+            decimal profit = Model.InitialCapital;
+            var series = new Series(RealizedProfit, SeriesType.Line);
+            foreach (KeyValuePair<DateTime, decimal> trade in result.ProfitLoss)
+            {
+                profit += trade.Value;
+                var point = new ChartPoint(trade.Key.ToLocalTime(), profit);
+                series.AddPoint(point);
+            }
+
+            return series;
         }
     }
 }

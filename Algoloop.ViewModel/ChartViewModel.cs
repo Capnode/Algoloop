@@ -12,11 +12,20 @@
  * limitations under the License.
  */
 
+using QuantConnect;
+
 namespace Algoloop.ViewModel
 {
-    public interface IChartViewModel
+    public class ChartViewModel : ViewModelBase, IChartViewModel
     {
-        string Title { get; }
-        bool IsVisible { get; set; }
+        public ChartViewModel(Chart chart, bool isVisible)
+        {
+            Chart = chart;
+            IsVisible = isVisible;
+        }
+
+        public string Title => Chart.Name;
+        public bool IsVisible { get; set; }
+        public Chart Chart { get; }
     }
 }

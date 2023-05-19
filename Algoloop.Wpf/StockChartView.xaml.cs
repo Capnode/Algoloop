@@ -13,8 +13,11 @@
  */
 
 using Algoloop.ViewModel;
+using Algoloop.ViewModel.Internal.Lean;
 using Ecng.Collections;
 using Ecng.Serialization;
+using QuantConnect;
+using StockSharp.Algo;
 using StockSharp.Algo.Candles;
 using StockSharp.Algo.Indicators;
 using StockSharp.Charting;
@@ -40,6 +43,9 @@ namespace Algoloop.Wpf
     /// </summary>
     public partial class StockChartView : UserControl
     {
+        private const int MaxElementsInArea = 10;
+        private const int MinBars = int.MaxValue;
+
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             "ItemsSource",
             typeof(ObservableCollection<IChartViewModel>),
@@ -52,18 +58,21 @@ namespace Algoloop.Wpf
             new FrameworkPropertyMetadata { BindsTwoWayByDefault = true, DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
 
         private bool _isLoaded = false;
-
+        private bool _inRedraw = false;
         private readonly CachedSynchronizedDictionary<IChartIndicatorElement, IIndicator> _indicators = new();
+        private readonly CollectionSecurityProvider _securityProvider = new();
+        private readonly IDictionary<string, SymbolViewModel> _symbols = new Dictionary<string, SymbolViewModel>();
 
         public StockChartView()
         {
             InitializeComponent();
             Loaded += OnLoaded;
 
-            _chart.IsInteracted = true;
-            _chart.IsAutoRange = true;
+            _chart.Name = "Chart";
+//            _chart.IsInteracted = true;
+//            _chart.IsAutoRange = false;
             _chart.IsAutoScroll = true;
-            _chart.MinimumRange = int.MaxValue;
+            _chart.MinimumRange = MinBars;
             _chart.ShowOverview = true;
             _chart.ShowPerfStats = false;
             _chart.AllowAddCandles = true;
@@ -72,6 +81,7 @@ namespace Algoloop.Wpf
             _chart.AllowAddOwnTrades = false;
             _chart.AllowAddAxis = true;
             _chart.AllowAddArea = true;
+            _chart.AllowDrop = true;
 
             _chart.SubscribeCandleElement += OnSubscribeCandleElement;
             _chart.SubscribeIndicatorElement += OnSubscribeIndicatorElement;
@@ -80,6 +90,15 @@ namespace Algoloop.Wpf
             _chart.AnnotationModified += OnAnnotationModified;
             _chart.AnnotationDeleted += OnAnnotationDeleted;
             _chart.AnnotationSelected += OnAnnotationSelected;
+            _chart.SettingsChanged += OnSettingsChanged;
+            _chart.SubscribeOrderElement += OnSubscribeOrderElement;
+            _chart.SubscribeTradeElement += OnSubscribeTradeElement;
+            _chart.RegisterOrder += OnRegisterOrder;
+            _chart.MoveOrder += OnMoveOrder;
+            _chart.CancelOrder += OnCancelOrder;
+            _chart.Drop += OnDrop;
+
+            _chart.SecurityProvider = _securityProvider;
         }
 
         public ObservableCollection<IChartViewModel> ItemsSource
@@ -90,88 +109,8 @@ namespace Algoloop.Wpf
 
         public string Settings
         {
-            get => (string)base.GetValue(SettingsProperty);
+            get => (string)GetValue(SettingsProperty);
             set => SetValue(SettingsProperty, value);
-        }
-
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            _isLoaded = true;
-            Window window = Window.GetWindow(this);
-            window.Closing += OnUnloaded;
-
-            _chart.FillIndicators();
-            byte[] bytes = Encoding.Default.GetBytes(Settings);
-            SettingsStorage storage = bytes.Deserialize<SettingsStorage>();
-            _chart.LoadIfNotNull(storage);
-            RedrawCharts();
-        }
-
-        private void OnUnloaded(object sender, CancelEventArgs e)
-        {
-            var settingsStorage = new SettingsStorage();
-            _chart.Save(settingsStorage);
-            byte[] bytes = settingsStorage.Serialize();
-            Settings = Encoding.Default.GetString(bytes);
-        }
-
-        private void OnSubscribeIndicatorElement(IChartIndicatorElement element, CandleSeries series, IIndicator indicator)
-        {
-            bool oldReset = _chart.DisableIndicatorReset;
-            try
-            {
-                _chart.DisableIndicatorReset = true;
-                indicator.Reset();
-            }
-            finally
-            {
-                _chart.DisableIndicatorReset = oldReset;
-            }
-
-            // Process Candles
-            IChartDrawData chartData = _chart.CreateData();
-            foreach (IChartViewModel chart in _combobox.Items)
-            {
-                if (!chart.IsVisible) continue;
-                if (chart is not StockChartViewModel stockChart) continue;
-                foreach (Candle candle in stockChart.Candles)
-                {
-                    chartData.Group(candle.OpenTime).Add(element, indicator.Process(candle));
-                }
-            }
-
-            _chart.Reset(new[] { element });
-            _chart.Draw(chartData);
-
-            _indicators[element] = indicator;
-        }
-
-        private void OnUnSubscribeElement(IChartElement element)
-        {
-            if (element is IChartIndicatorElement indElem)
-            {
-                _indicators.Remove(indElem);
-            }
-        }
-
-        private void OnAnnotationSelected(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
-        {
-        }
-
-        private void OnAnnotationDeleted(IChartAnnotation obj)
-        {
-        }
-
-        private void OnAnnotationModified(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
-        {
-        }
-
-        private void OnAnnotationCreated(IChartAnnotation obj)
-        {
-        }
-
-        private void OnSubscribeCandleElement(IChartCandleElement arg1, CandleSeries arg2)
-        {
         }
 
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -194,18 +133,17 @@ namespace Algoloop.Wpf
             }
 
             var charts = e.NewValue as IEnumerable<IChartViewModel>;
-            chart.OnItemsSourceChanged(charts);
+            chart.ItemsSourceChanged(charts);
         }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             List<IChartViewModel> charts = e.NewItems?.Cast<IChartViewModel>().ToList();
-            OnItemsSourceChanged(charts);
+            ItemsSourceChanged(charts);
         }
 
-        private void OnItemsSourceChanged(IEnumerable<IChartViewModel> charts)
+        private void ItemsSourceChanged(IEnumerable<IChartViewModel> charts)
         {
-            // Clear charts
             _combobox.Items.Clear();
             if (charts == null) return;
             foreach (IChartViewModel chart in charts)
@@ -226,78 +164,298 @@ namespace Algoloop.Wpf
             RedrawCharts();
         }
 
-        private void RedrawCharts()
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
-            _chart.IsAutoRange = true;
-            _chart.Reset(_chart.Elements);
-            foreach (IChartArea area in _chart.Areas)
+            if (_isLoaded) return;
+            _isLoaded = true;
+            Window window = Window.GetWindow(this);
+            window.Closing += OnUnloaded;
+
+            try
             {
-                area.Elements.Clear();
-                area.XAxises.RemoveRange(area.XAxises.Skip(1));
-                area.YAxises.RemoveRange(area.YAxises.Skip(1));
+                _chart.FillIndicators();
+                byte[] bytes = Encoding.Default.GetBytes(Settings);
+                SettingsStorage storage = bytes.Deserialize<SettingsStorage>();
+                _chart.Load(storage);
+            }
+            catch (Exception)
+            {
             }
 
-            // Collect time-value points of all Equity curves
-            Dictionary<ChartLineElement, decimal> curves = new();
-            Dictionary<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> points = new();
-            foreach (IChartViewModel chart in _combobox.Items)
+            RedrawCharts();
+        }
+
+        private void OnUnloaded(object sender, CancelEventArgs e)
+        {
+            var settingsStorage = new SettingsStorage();
+            _chart.Save(settingsStorage);
+            byte[] bytes = settingsStorage.Serialize();
+            Settings = Encoding.Default.GetString(bytes);
+        }
+
+        private void OnSettingsChanged()
+        {
+            Debug.WriteLine($"OnSettingsChanged()");
+        }
+
+        private void OnAnnotationSelected(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
+        {
+            Debug.WriteLine($"OnAnnotationSelected()");
+        }
+
+        private void OnAnnotationDeleted(IChartAnnotation obj)
+        {
+            Debug.WriteLine($"OnAnnotationDeleted()");
+        }
+
+        private void OnAnnotationModified(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
+        {
+            Debug.WriteLine($"OnAnnotationModified()");
+        }
+
+        private void OnAnnotationCreated(IChartAnnotation obj)
+        {
+            Debug.WriteLine($"OnAnnotationCreated()");
+        }
+
+        private void OnRegisterOrder(IChartArea arg1, StockSharp.BusinessEntities.Order arg2)
+        {
+            Debug.WriteLine($"OnRegisterOrder()");
+        }
+
+        private void OnMoveOrder(StockSharp.BusinessEntities.Order arg1, decimal arg2)
+        {
+            Debug.WriteLine($"OnMoveOrder()");
+        }
+
+        private void OnCancelOrder(StockSharp.BusinessEntities.Order obj)
+        {
+            Debug.WriteLine($"OnCancelOrder()");
+        }
+
+        private void OnSubscribeTradeElement(IChartTradeElement arg1, StockSharp.BusinessEntities.Security arg2)
+        {
+            Debug.WriteLine($"OnSubscribeTradeElement()");
+        }
+
+        private void OnSubscribeOrderElement(IChartOrderElement arg1, StockSharp.BusinessEntities.Security arg2)
+        {
+            Debug.WriteLine($"OnSubscribeOrderElement()");
+        }
+
+        private void OnDrop(object sender, DragEventArgs e)
+        {
+            if (sender is not ChartPanel panel) return;
+            if (e.Data.GetData(typeof(SymbolViewModel)) is not SymbolViewModel symbol) return;
+            var charts = new List<IChartViewModel>();
+            foreach (IChartViewModel iChart in _combobox.Items)
             {
-                if (!chart.IsVisible) continue;
+                charts.Add(iChart);
+            }
+
+            charts.Add(new SymbolChartViewModel(symbol, true));
+            ItemsSourceChanged(charts);
+            e.Handled = true;
+        }
+
+        private void OnSubscribeCandleElement(IChartCandleElement element, CandleSeries candles)
+        {
+            if (_inRedraw) return;
+            Debug.WriteLine($"OnSubscribeCandleElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"})");
+            if (candles.Security == null) return;
+            _securityProvider.Add(candles.Security);
+            if (!_symbols.TryGetValue(candles.Security.Id, out SymbolViewModel symbol)) return;
+            _chart.Reset(_chart.Elements);
+            element.Update(symbol.Model);
+
+            // Process Candles
+            var chartData = new ChartDrawData();
+            foreach (Candle candle in symbol.History().ToCandles())
+            {
+                IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
+                chartGroup.Add(element, candle);
+            }
+
+//            _chart.Reset(new[] { element });
+            _chart.Draw(chartData);
+        }
+
+        private void OnSubscribeIndicatorElement(IChartIndicatorElement element, CandleSeries candles, IIndicator indicator)
+        {
+            Debug.WriteLine($"OnSubscribeIndicatorElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"}, {indicator.Name ?? "-"})");
+            var oldReset = _chart.DisableIndicatorReset;
+            try
+            {
+                _chart.DisableIndicatorReset = true;
+                indicator.Reset();
+            }
+            finally
+            {
+                _chart.DisableIndicatorReset = oldReset;
+            }
+
+            _indicators[element] = indicator;
+            if (candles.Security == null ) return;
+            if (!_symbols.TryGetValue(candles.Security.Id, out SymbolViewModel symbol)) return;
+
+            // Process Candles
+            IChartDrawData chartData = _chart.CreateData();
+            foreach (Candle candle in symbol.History().ToCandles())
+            {
+                chartData.Group(candle.OpenTime).Add(element, indicator.Process(candle));
+            }
+
+            // Adjust axes
+            IChartArea area = element.ChartArea;
+            element.YAxisId = area.YAxises.First().Id;
+            area.YAxises.RemoveRange(area.YAxises.Skip(1));
+            area.Title = element.FullTitle;
+
+            // Draw
+            _chart.Reset(new[] { element });
+            _chart.Draw(chartData);
+        }
+
+        private void OnUnSubscribeElement(IChartElement element)
+        {
+            Debug.WriteLine($"OnUnSubscribeElement({element.FullTitle ?? "-"})");
+            _chart.Reset(new[] { element });
+            if (element is IChartIndicatorElement indElem)
+            {
+                _indicators.Remove(indElem);
+            }
+        }
+
+        private void RedrawCharts()
+        {
+            _inRedraw = true;
+            _chart.IsAutoRange = true;
+            _chart.Reset(_chart.Elements);
+
+            // Collect time-value points of all Equity curves
+            Dictionary<IChartLineElement, decimal> curves = new();
+            Dictionary<DateTimeOffset, List<Tuple<IChartLineElement, decimal>>> points = new();
+            int areaId = 0;
+            foreach (IChartViewModel iChart in _combobox.Items)
+            {
                 IChartArea area;
-                if (chart.SubChart < _chart.Areas.Count)
+                if (areaId < _chart.Areas.Count)
                 {
-                    area = _chart.Areas[chart.SubChart];
+                    area = _chart.Areas[areaId];
+                    while (HasIndicatorElement(area))
+                    {
+                        if (++areaId < _chart.Areas.Count)
+                        {
+                            area = _chart.Areas[++areaId];
+                        }
+                        else
+                        {
+                            area = new ChartArea();
+                            _chart.AddArea(area);
+                        }
+                    }
+
+                    if (area.Title == iChart.Title)
+                    {
+                        iChart.IsVisible = true;
+                    }
+                    if (!iChart.IsVisible) continue;
                 }
                 else
                 {
+                    if (!iChart.IsVisible) continue;
                     area = new ChartArea();
                     _chart.AddArea(area);
                 }
 
-                if (chart is EquityChartViewModel model)
+                areaId++;
+                area.Title = iChart.Title;
+                if (iChart is not ChartViewModel chart) continue;
+
+                int seriesAreaId = 0;
+                int elementId = 0;
+                foreach (Series series in chart.Chart.Series.Values)
                 {
-                    ChartLineElement lineElement = new()
+                    if (elementId >= MaxElementsInArea)
                     {
-                        FullTitle = model.Title,
-                        Style = model.Style,
-                        Color = model.Color,
-                        AntiAliasing = false,
-                        IsLegend = true,
-                        ShowAxisMarker = true
-                    };
-                    _chart.AddElement(area, lineElement);
-                    foreach (EquityData equityData in model.Series)
+                        // Create new area for extra series
+                        seriesAreaId += 1;
+                        elementId = 0;
+                        if (_chart.Areas.Count <= areaId)
+                        {
+                            _chart.AddArea(new ChartArea());
+                        }
+
+                        area = _chart.Areas[areaId++];
+                        area.Title = iChart.Title + seriesAreaId.ToString();
+                    }
+
+                    IChartLineElement element;
+                    if (area.Elements.Count <= elementId)
+                    {
+                        element = _chart.CreateLineElement();
+                        element.IsVisible = elementId == 0;
+                        _chart.AddElement(area, element);
+                    }
+
+                    element = area.Elements[elementId] as ChartLineElement;
+                    element.Update(series);
+                    elementId++;
+                    element.YAxisId = area.YAxises.First().Id;
+                    foreach (EquityData equityData in series.ToEquityData())
                     {
                         decimal value = equityData.Value;
-                        if (!curves.ContainsKey(lineElement))
+                        if (!curves.ContainsKey(element))
                         {
-                            curves.Add(lineElement, value);
+                            curves.Add(element, value);
                         }
 
                         DateTimeOffset time = equityData.Time.Date;
-                        if (!points.TryGetValue(time, out List<Tuple<ChartLineElement, decimal>> list))
+                        if (!points.TryGetValue(time, out List<Tuple<IChartLineElement, decimal>> list))
                         {
-                            list = new List<Tuple<ChartLineElement, decimal>>();
+                            list = new List<Tuple<IChartLineElement, decimal>>();
                             points.Add(time, list);
                         }
-                        list.Add(new Tuple<ChartLineElement, decimal>(lineElement, value));
+                        list.Add(new Tuple<IChartLineElement, decimal>(element, value));
                     }
                 }
+
+                // Remove unused elements
+                var unusedElements = new List<IChartElement>();
+                while (elementId < area.Elements.Count)
+                {
+                    IChartElement element = area.Elements[elementId++];
+                    if (element is IChartIndicatorElement) continue; // Keep indicators
+                    unusedElements.Add(element);
+                }
+                unusedElements.ForEach(m => _chart.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     RemoveElement(area, m));
             }
 
+            // Remove unused areas if not containing indicators
+            var unusedAreas = new List<IChartArea>();
+            while (areaId < _chart.Areas.Count)
+            {
+                IChartArea area = _chart.Areas[areaId++];
+                if (!HasIndicatorElement(area))
+                {
+                    unusedAreas.Add(area);
+                }
+            }
+            unusedAreas.ForEach(m => _chart.RemoveArea(m));
+
             // Draw all equity curves in time order, moment by moment
-            foreach (KeyValuePair<DateTimeOffset, List<Tuple<ChartLineElement, decimal>>> moment in points.OrderBy(m => m.Key))
+            foreach (KeyValuePair<DateTimeOffset, List<Tuple<IChartLineElement, decimal>>> moment in points.OrderBy(m => m.Key))
             {
                 DateTimeOffset time = moment.Key;
                 ChartDrawData chartData = new();
                 IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(time);
-                foreach (KeyValuePair<ChartLineElement, decimal> curve in curves)
+                foreach (KeyValuePair<IChartLineElement, decimal> curve in curves)
                 {
-                    ChartLineElement lineElement = curve.Key;
+                    IChartLineElement lineElement = curve.Key;
                     decimal value = curve.Value;
 
                     // Use actual point it available
-                    Tuple<ChartLineElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
+                    Tuple<IChartLineElement, decimal> pair = moment.Value.Find(m => m.Item1.Equals(curve.Key));
                     if (pair != default)
                     {
                         value = pair.Item2;
@@ -306,52 +464,84 @@ namespace Algoloop.Wpf
                     chartGroup.Add(lineElement, value);
                 }
 
-                _chart.IsInteracted = false;
                 _chart.Draw(chartData);
             }
 
-            // Draw Candles
-            foreach (IChartViewModel chart in _combobox.Items)
+            // Draw SymbolSeries
+            areaId = 0;
+            bool doIndicators = true;
+            foreach (IChartViewModel iChart in _combobox.Items)
             {
-                if (!chart.IsVisible) continue;
-                if (chart.SubChart >= _chart.Areas.Count) continue;
-                IChartArea area = _chart.Areas[chart.SubChart];
-                if (chart is StockChartViewModel stockChart)
+                if (areaId >= _chart.Areas.Count) break;
+                if (!iChart.IsVisible) continue;
+                if (iChart is not SymbolChartViewModel chart) continue;
+                IChartArea area = _chart.Areas[areaId++];
+                while (HasIndicatorElement(area))
                 {
-                    RedrawChart(area, stockChart);
+                    Debug.Assert(areaId < _chart.Areas.Count, "No area found");
+                    area = _chart.Areas[areaId++];
                 }
+
+                RedrawChart(area, chart.Symbol, doIndicators);
+                doIndicators = false;
             }
 
             _chart.IsAutoRange = false; // Allow user to adjust range
+            _inRedraw = false;
         }
 
-        private void RedrawChart(IChartArea candlesArea, StockChartViewModel model)
+        private static bool HasIndicatorElement(IChartArea area)
         {
-            Candle first = model.Candles.FirstOrDefault();
-            if (first == default) return;
-            CandleSeries series;
-            if (first is TimeFrameCandle tf)
+            foreach (IChartElement element in area.Elements)
             {
-                series = new CandleSeries(typeof(TimeFrameCandle), tf.Security, tf.TimeFrame);
+                if (element is IChartIndicatorElement) return true;
+            }
+
+            return false;
+        }
+
+        private void RedrawChart(IChartArea area, SymbolViewModel symbol, bool doIndicators)
+        {
+            StockSharp.BusinessEntities.Security security = symbol.Model.ToSecurity();
+            _symbols[security.Id] = symbol;
+            _securityProvider.Add(security);
+            IChartCandleElement element;
+            if (area.Elements.Count < 1)
+            {
+                element = _chart.CreateCandleElement();
+                element.Update(symbol.Model);
+                element.YAxisId = area.YAxises.First().Id;
+                CandleSeries series = new CandleSeries(
+                    typeof(TimeFrameCandle),
+                    security,
+                    symbol.Market.SelectedResolution.ToTimeSpan());
+                _chart.AddElement(area, element, series);
             }
             else
             {
-                throw new NotImplementedException("Candle subtype not implemented");
+                element = area.Elements[0] as IChartCandleElement;
+                element.Update(symbol.Model);
             }
 
-            var candleElement = new ChartCandleElement
-            {
-                DrawStyle = model.Style,
-                UpBorderColor = model.Color,
-                DownBorderColor = model.Color
-            };
-            _chart.AddElement(candlesArea, candleElement, series);
+            // Process Candles
             var chartData = new ChartDrawData();
-            foreach (Candle candle in model.Candles)
+            foreach (Candle candle in symbol.History().ToCandles())
             {
                 IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
-                chartGroup.Add(candleElement, candle);
+                chartGroup.Add(element, candle);
+                if (!doIndicators) continue;
+                foreach ((IChartIndicatorElement indicatorElement, IIndicator indicator) in _indicators.CachedPairs)
+                {
+                    chartGroup.Add(indicatorElement, indicator.Process(candle));
+
+                    // Adjust axes
+                    IChartArea indicatorArea = indicatorElement.ChartArea;
+                    indicatorElement.YAxisId = indicatorArea.YAxises.First().Id;
+                    indicatorArea.YAxises.RemoveRange(indicatorArea.YAxises.Skip(1));
+                    indicatorArea.Title = indicatorElement.FullTitle;
+                }
             }
+
             _chart.Draw(chartData);
         }
     }

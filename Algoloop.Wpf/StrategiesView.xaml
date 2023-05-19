@@ -1,4 +1,4 @@
-<UserControl
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <UserControl
     x:Class="Algoloop.Wpf.StrategiesView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -6,7 +6,6 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:view="clr-namespace:Algoloop.Wpf"
     xmlns:viewsupport="clr-namespace:Algoloop.Wpf.Internal"
     xmlns:vm="clr-namespace:Algoloop.ViewModel;assembly=Algoloop.ViewModel"
@@ -28,7 +27,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="{Binding Source={StaticResource settings}, Path=StrategyViewSplitter, Mode=TwoWay, Converter={viewsupport:Int32FromGridLengthConverter}}" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
         </Grid.ColumnDefinitions>
         <GridSplitter
             Grid.Column="1"
@@ -131,7 +130,7 @@
                     </ContextMenu>
                 </TreeView.ContextMenu>
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectedItemChanged">
+                    <i:EventTrigger EventName="MouseUp">
                         <i:InvokeCommandAction Command="{Binding SelectedChangedCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>

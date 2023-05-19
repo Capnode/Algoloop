@@ -14,9 +14,16 @@
 
 namespace Algoloop.ViewModel
 {
-    public interface IChartViewModel
+    public class SymbolChartViewModel : IChartViewModel
     {
-        string Title { get; }
-        bool IsVisible { get; set; }
+        public SymbolChartViewModel(SymbolViewModel symbol, bool isVisible)
+        {
+            Symbol = symbol;
+            IsVisible = isVisible;
+        }
+
+        public string Title => Symbol.Model.Name;
+        public bool IsVisible { get; set; }
+        public SymbolViewModel Symbol { get; }
     }
 }
