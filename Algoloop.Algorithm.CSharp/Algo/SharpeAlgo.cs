@@ -88,6 +88,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Free cash flow margin% (R12 min)")]
         private readonly string _freeCashFlowMargin = null;
 
+        [Parameter("Return on equity% (R12 min)")]
+        private readonly string _returnOnEquity = null;
+
         [Parameter("PE ratio (R12 min)")]
         private readonly string _peRatio = null;
 
@@ -145,6 +148,7 @@ namespace Algoloop.Algorithm.CSharp
                     netMargin: _netMargin,
                     netMarginTrend: _netMarginTrend,
                     freeCashFlowMargin: _freeCashFlowMargin,
+                    returnOnEquity: _returnOnEquity,
                     peRatio: _peRatio,
                     epRatio: _epRatio),
                 (symbol) => new SharpeSignal(period)));

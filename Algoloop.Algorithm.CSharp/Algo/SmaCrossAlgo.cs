@@ -124,6 +124,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Free cash flow margin trend% (R12 min)")]
         private readonly string _freeCashFlowMarginTrend = null;
 
+        [Parameter("Return on equity% (R12 min)")]
+        private readonly string _returnOnEquity = null;
+
         [Parameter("PE ratio (R12 min)")]
         private readonly string _peRatio = null;
 
@@ -210,6 +213,7 @@ namespace Algoloop.Algorithm.CSharp
                     netMarginTrend: _netMarginTrend,
                     freeCashFlowMargin: _freeCashFlowMargin,
                     freeCashFlowMarginTrend: _freeCashFlowMarginTrend,
+                    returnOnEquity: _returnOnEquity,
                     peRatio: _peRatio,
                     epRatio: _epRatio,
                     psRatio: _psRatio,

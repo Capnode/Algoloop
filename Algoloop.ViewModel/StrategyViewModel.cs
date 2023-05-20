@@ -680,7 +680,7 @@ namespace Algoloop.ViewModel
 
                     ParameterModel parameterModel = Model
                         .Parameters
-                        .FirstOrDefault(m => m.Name.Equals(parameterName, StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefault(m => m.Name.Equals(parameterName, StringComparison.Ordinal));
                     parameterModel ??= new ParameterModel() { Name = parameterName };
 
                     var parameterViewModel = new ParameterViewModel(parameterModel);

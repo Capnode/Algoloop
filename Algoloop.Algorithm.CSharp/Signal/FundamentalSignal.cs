@@ -41,6 +41,7 @@ namespace Algoloop.Algorithm.CSharp
         private readonly decimal? _netMarginTrend;
         private readonly decimal? _freeCashFlowMargin;
         private readonly decimal? _freeCashFlowMarginTrend;
+        private readonly decimal? _returnOnEquity;
         private readonly decimal? _peRatio;
         private readonly decimal? _epRatio;
         private readonly decimal? _psRatio;
@@ -63,6 +64,7 @@ namespace Algoloop.Algorithm.CSharp
             string netMarginTrend = null,
             string freeCashFlowMargin = null,
             string freeCashFlowMarginTrend = null,
+            string returnOnEquity = null,
             string peRatio = null,
             string epRatio = null,
             string psRatio = null,
@@ -277,6 +279,22 @@ namespace Algoloop.Algorithm.CSharp
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(returnOnEquity))
+            {
+                if (decimal.TryParse(returnOnEquity, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
+                {
+                    _returnOnEquity = value / 100;
+                }
+                else if (returnOnEquity.Equals("USE", StringComparison.OrdinalIgnoreCase))
+                {
+                    _returnOnEquity = decimal.MinValue;
+                }
+                else if (!returnOnEquity.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+                {
+                    algorithm.Log($"{symbol} parameter '{nameof(returnOnEquity)}' has invalid value: {returnOnEquity}");
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(peRatio))
             {
                 if (decimal.TryParse(peRatio, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal value))
@@ -446,6 +464,11 @@ namespace Algoloop.Algorithm.CSharp
                 freeCashFlowMarginTrend = Trend(freeCashFlowMargin, FreeCashFlowMargin(prev));
             }
 
+            // Calculate return on equity
+            decimal netIncome = fine.FinancialStatements.IncomeStatement.NetIncome.TwelveMonths;
+            decimal equity = fine.FinancialStatements.BalanceSheet.TotalEquity.TwelveMonths;
+            decimal returnOnEquity = equity > 0 ? netIncome / equity : decimal.MinValue;
+
             //            _algorithm.Log($"netMargin {fine.OperationRatios.NetMargin.OneYear} {netMarginTrend} freeCashFlowMargin {freeCashFlowMargin} {freeCashFlowMarginTrend}");
             // Check limits
             if (marketCap < (_marketCap ?? decimal.MinValue)
@@ -461,6 +484,7 @@ namespace Algoloop.Algorithm.CSharp
             || netMarginTrend < (_netMarginTrend ?? decimal.MinValue)
             || freeCashFlowMargin < (_freeCashFlowMargin ?? decimal.MinValue)
             || freeCashFlowMarginTrend < (_freeCashFlowMarginTrend ?? decimal.MinValue)
+            || returnOnEquity < (_returnOnEquity ?? decimal.MinValue)
             || fine.ValuationRatios.PERatio < (_peRatio ?? decimal.MinValue)
             || epRatio < (_epRatio ?? decimal.MinValue)
             || fine.ValuationRatios.PSRatio < (_psRatio ?? decimal.MinValue)
@@ -534,6 +558,11 @@ namespace Algoloop.Algorithm.CSharp
             if (_freeCashFlowMarginTrend.Equals(decimal.MinValue))
             {
                 score = Aggregate(score, freeCashFlowMarginTrend);
+            }
+
+            if (_returnOnEquity.Equals(decimal.MinValue))
+            {
+                score = Aggregate(score, returnOnEquity);
             }
 
             if (_peRatio.Equals(decimal.MinValue))
