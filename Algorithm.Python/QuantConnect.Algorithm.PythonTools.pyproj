@@ -12,6 +12,7 @@
     <OutputPath>.</OutputPath>
     <Name>QuantConnect.Algorithm.PythonTools</Name>
     <RootNamespace>QuantConnect.Algorithm.PythonTools</RootNamespace>
+    <ResolveNuGetPackages>false</ResolveNuGetPackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
