@@ -64,6 +64,12 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Daily turnover period")]
         private readonly string _turnoverPeriod = "0";
 
+        [Parameter("Revenue growth% (R12 min)")]
+        private readonly string _revenueGrowth = null;
+
+        [Parameter("Revenue trend% (R12 min)")]
+        private readonly string _revenueTrend = null;
+
         [Parameter("Net income (R12 min)")]
         private readonly string _netIncome = null;
 
@@ -72,12 +78,6 @@ namespace Algoloop.Algorithm.CSharp
 
         [Parameter("Net income growth% (R12 min)")]
         private readonly string _netIncomeGrowth = null;
-
-        [Parameter("Revenue growth% (R12 min)")]
-        private readonly string _revenueGrowth = null;
-
-        [Parameter("Revenue trend% (R12 min)")]
-        private readonly string _revenueTrend = null;
 
         [Parameter("Net margin% (R12 min)")]
         private readonly string _netMargin = null;
