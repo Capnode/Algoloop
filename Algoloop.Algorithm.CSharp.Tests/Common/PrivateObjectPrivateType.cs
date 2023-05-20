@@ -109,11 +109,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 catch (TargetInvocationException e)
                 {
                     Debug.Assert(e.InnerException != null, "Inner exception should not be null.");
-                    if (e.InnerException != null)
-                    {
-                        throw e.InnerException;
-                    }
-
+                    if (e.InnerException != null) throw e.InnerException;
                     throw;
                 }
             }
@@ -367,11 +363,8 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                     member = this.GetGenericMethodFromCache(name, parameterTypes, typeArguments, bindingFlags);
                 }
 
-                if (member == null)
-                {
-                    throw new ArgumentException(
-                        string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
-                }
+                if (member == null) throw new ArgumentException(
+                    string.Format(CultureInfo.CurrentCulture, "The member specified ({0}) could not be found. You might need to regenerate your private accessor, or the member may be private and defined on a base class. If the latter is true, you need to pass the type that defines the member into PrivateObject's constructor.", name));
 
                 try
                 {
@@ -388,11 +381,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 catch (TargetInvocationException e)
                 {
                     Debug.Assert(e.InnerException != null, "Inner exception should not be null.");
-                    if (e.InnerException != null)
-                    {
-                        throw e.InnerException;
-                    }
-
+                    if (e.InnerException != null) throw e.InnerException;
                     throw;
                 }
             }
@@ -659,11 +648,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         /// <param name="access"> access string</param>
         private static void ValidateAccessString(string access)
         {
-            if (access.Length == 0)
-            {
-                throw new ArgumentException("Access string has invalid syntax.");
-            }
-
+            if (access.Length == 0) throw new ArgumentException("Access string has invalid syntax.");
             string[] arr = access.Split('.');
             foreach (string str in arr)
             {
@@ -694,11 +679,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             catch (TargetInvocationException e)
             {
                 Debug.Assert(e.InnerException != null, "Inner exception should not be null.");
-                if (e.InnerException != null)
-                {
-                    throw e.InnerException;
-                }
-
+                if (e.InnerException != null) throw e.InnerException;
                 throw;
             }
         }
@@ -758,11 +739,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 for (int i = 0; i < finalCandidates.Length; i++)
                 {
                     MethodInfo methodInfo = finalCandidates[i];
-
-                    if (!RuntimeTypeHelper.CompareMethodSigAndName(methodInfo, finalCandidates[0]))
-                    {
-                        throw new AmbiguousMatchException();
-                    }
+                    if (!RuntimeTypeHelper.CompareMethodSigAndName(methodInfo, finalCandidates[0])) throw new AmbiguousMatchException();
                 }
 
                 // All the methods have the exact same name and sig so return the most derived one.
@@ -791,20 +768,14 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             {
                 bool paramMatch = true;
                 Type[] genericArgs = candidate.GetGenericArguments();
-                if (genericArgs.Length != typeArguments.Length)
-                {
-                    continue;
-                }
+                if (genericArgs.Length != typeArguments.Length) continue;
 
                 // Since we can't just get the correct MethodInfo from Reflection,
                 // we will just match the number of parameters, their order, and their type
                 var methodCandidate = candidate;
                 ParameterInfo[] candidateParams = methodCandidate.GetParameters();
 
-                if (candidateParams.Length != parameterTypes.Length)
-                {
-                    continue;
-                }
+                if (candidateParams.Length != parameterTypes.Length) continue;
 
                 // Exact binding
                 if ((bindingFlags & BindingFlags.ExactBinding) != 0)
@@ -1037,11 +1008,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 catch (TargetInvocationException e)
                 {
                     Debug.Assert(e.InnerException != null, "Inner Exception should not be null.");
-                    if (e.InnerException != null)
-                    {
-                        throw e.InnerException;
-                    }
-
+                    if (e.InnerException != null) throw e.InnerException;
                     throw;
                 }
             }
@@ -1318,11 +1285,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             catch (TargetInvocationException e)
             {
                 Debug.Assert(e.InnerException != null, "Inner Exception should not be null.");
-                if (e.InnerException != null)
-                {
-                    throw e.InnerException;
-                }
-
+                if (e.InnerException != null) throw e.InnerException;
                 throw;
             }
         }
@@ -1437,10 +1400,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
         /// <returns>Matching method. Null if none matches.</returns>
         internal static MethodBase SelectMethod(MethodBase[] match, Type[] types)
         {
-            if (match == null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
+            if (match == null) throw new ArgumentNullException(nameof(match));
 
             int i;
             int j;
@@ -1466,39 +1426,22 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             for (i = 0; i < match.Length; i++)
             {
                 ParameterInfo[] par = match[i].GetParameters();
-                if (par.Length != types.Length)
-                {
-                    continue;
-                }
-
+                if (par.Length != types.Length) continue;
                 for (j = 0; j < types.Length; j++)
                 {
                     Type pCls = par[j].ParameterType;
 
                     if (pCls.ContainsGenericParameters)
                     {
-                        if (pCls.IsArray != types[j].IsArray)
-                        {
-                            break;
-                        }
+                        if (pCls.IsArray != types[j].IsArray) break;
                     }
                     else
                     {
-                        if (pCls == types[j])
-                        {
-                            continue;
-                        }
-
-                        if (pCls == typeof(object))
-                        {
-                            continue;
-                        }
+                        if (pCls == types[j]) continue;
+                        if (pCls == typeof(object)) continue;
                         else
                         {
-                            if (!pCls.IsAssignableFrom(types[j]))
-                            {
-                                break;
-                            }
+                            if (!pCls.IsAssignableFrom(types[j])) break;
                         }
                     }
                 }
@@ -1545,11 +1488,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                 }
             }
 
-            if (ambig)
-            {
-                throw new AmbiguousMatchException();
-            }
-
+            if (ambig) throw new AmbiguousMatchException();
             return match[currentMin];
         }
 
@@ -1656,11 +1595,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
 
             for (int i = 0; i < types.Length; i++)
             {
-                if (args != null && args[i] == Type.Missing)
-                {
-                    continue;
-                }
-
+                if (args != null && args[i] == Type.Missing) continue;
                 Type c1, c2;
 
                 // If a param array is present, then either
@@ -1691,16 +1626,8 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
                     c2 = p2[paramOrder2[i]].ParameterType;
                 }
 
-                if (c1 == c2)
-                {
-                    continue;
-                }
-
-                if (c1.ContainsGenericParameters || c2.ContainsGenericParameters)
-                {
-                    continue;
-                }
-
+                if (c1 == c2) continue;
+                if (c1.ContainsGenericParameters || c2.ContainsGenericParameters) continue;
                 switch (FindMostSpecificType(c1, c2, types[i]))
                 {
                     case 0:

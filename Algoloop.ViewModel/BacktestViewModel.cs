@@ -669,7 +669,9 @@ namespace Algoloop.ViewModel
                     || order.Status.Equals(OrderStatus.None)
                     || order.Status.Equals(OrderStatus.New)
                     || order.Status.Equals(OrderStatus.Invalid))
+                {
                     continue;
+                }
 
                 HoldingViewModel holding = Holdings.FirstOrDefault(
                     m => m.Symbol.Equals(order.Symbol));

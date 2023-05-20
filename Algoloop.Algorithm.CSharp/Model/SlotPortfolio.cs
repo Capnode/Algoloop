@@ -105,8 +105,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         // Create list of PortfolioTarget objects from Insights
         public override IEnumerable<IPortfolioTarget> CreateTargets(QCAlgorithm algorithm, Insight[] insights)
         {
-            if (algorithm.IsWarmingUp)
-                return Enumerable.Empty<IPortfolioTarget>();
+            if (algorithm.IsWarmingUp) return Enumerable.Empty<IPortfolioTarget>();
 
             // Initialize ?
             if (_initialCapital == 0)
@@ -132,8 +131,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             foreach (Insight insight in insights)
             {
                 Insight obsolete = _insights.FirstOrDefault(m => m.Symbol.Equals(insight.Symbol));
-                if (obsolete == null)
-                    continue;
+                if (obsolete == null) continue;
                 _insights.Remove(obsolete);
             }
 
@@ -321,17 +319,12 @@ namespace Algoloop.Algorithm.CSharp.Model
         private decimal ProcessRoc(QCAlgorithm algorithm)
         {
             // Both TrackerRoc and BenchmarkRoc must be updated
-            if (_trackerRoc == null || _benchmarkRoc == null)
-                return 1;
-
-            if (!_trackerRoc.IsReady || !_benchmarkRoc.IsReady)
-                return 1;
+            if (_trackerRoc == null || _benchmarkRoc == null) return 1;
+            if (!_trackerRoc.IsReady || !_benchmarkRoc.IsReady) return 1;
 
             decimal diff = _trackerRoc - _benchmarkRoc;
             algorithm.Plot(TrackerChart, $"Tracker({_trackerRoc.Period}) - {_indexName}({_benchmarkRoc.Period})", diff);
-            if (diff >= 0)
-                return 1;
-
+            if (diff >= 0) return 1;
             return _stoplossSizing;
         }
 

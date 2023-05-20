@@ -176,26 +176,10 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private static int Compare(Insight x, Insight y)
         {
-            if (x == null)
-            {
-                return 1;
-            }
-
-            if (y == null)
-            {
-                return -1;
-            }
-
-            if (x.Magnitude > y.Magnitude)
-            {
-                return -1;
-            }
-
-            if (x.Magnitude < y.Magnitude)
-            {
-                return 1;
-            }
-
+            if (x == null) return 1;
+            if (y == null) return -1;
+            if (x.Magnitude > y.Magnitude) return -1;
+            if (x.Magnitude < y.Magnitude) return 1;
             return 0;
         }
 

@@ -139,8 +139,7 @@ namespace Algoloop.Algorithm.CSharp
 
         private void BarHandler(QuoteBar quote)
         {
-            if (!IsMarketOpen(_symbol))
-                return;
+            if (!IsMarketOpen(_symbol)) return;
 
             //Log(string.Format(
             //    CultureInfo.InvariantCulture,

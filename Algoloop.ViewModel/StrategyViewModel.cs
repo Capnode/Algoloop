@@ -829,9 +829,7 @@ namespace Algoloop.ViewModel
                 list.Sort();
                 foreach (string algorithm in list)
                 {
-                    if (algorithm.Equals(Model.AlgorithmName, StringComparison.OrdinalIgnoreCase))
-                        continue; // Skip this algorithm
-
+                    if (algorithm.Equals(Model.AlgorithmName, StringComparison.OrdinalIgnoreCase)) continue; // Skip this algorithm
                     var strategyModel = new StrategyModel(Model)
                     {
                         AlgorithmName = algorithm,

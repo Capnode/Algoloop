@@ -45,8 +45,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             Log.Trace($">{GetType().Name}:Login {provider.Provider}");
             int uid = Config.GetInt("job-user-id", 0);
             string token = Config.Get("api-access-token", string.Empty);
-            if (uid == 0 || string.IsNullOrEmpty(token))
-                throw new ApplicationException("A valid QuantConnect subscription is required for access");
+            if (uid == 0 || string.IsNullOrEmpty(token)) throw new ApplicationException("A valid QuantConnect subscription is required for access");
 
             base.Login(provider);
             Environment environment = provider.Access == ProviderModel.AccessType.Real ?

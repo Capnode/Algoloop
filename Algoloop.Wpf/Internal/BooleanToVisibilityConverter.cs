@@ -23,11 +23,7 @@ namespace Algoloop.Wpf.Internal
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
-            {
-                throw new NullReferenceException();
-            }
-
+            if (value == null) throw new NullReferenceException();
             bool visible = false;
             if (value is bool boolVal)
             {
@@ -42,14 +38,8 @@ namespace Algoloop.Wpf.Internal
                 visible = floatVal > 0;
             }
 
-            if (visible)
-            {
-                return Visibility.Visible;
-            }
-            else
-            {
-                return Visibility.Collapsed;
-            }
+            if (visible) return Visibility.Visible;
+            return Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -54,8 +54,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
 
                 foreach (var ticker in tickers)
                 {
-                    if (!DukascopyDataDownloader.HasSymbol(ticker))
-                        throw new ArgumentException("The ticker " + ticker + " is not available.");
+                    if (!DukascopyDataDownloader.HasSymbol(ticker)) throw new ArgumentException("The ticker " + ticker + " is not available.");
                 }
 
                 foreach (var ticker in tickers)

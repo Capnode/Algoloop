@@ -278,11 +278,7 @@ namespace Algoloop.ViewModel
                     file.FullName, jsonFile, out Ionic.Zip.ZipFile zipFile))
                 using (zipFile)
                 {
-                    if (resultStream == null)
-                    {
-                        continue;
-                    }
-
+                    if (resultStream == null) continue;
                     using JsonReader reader = new JsonTextReader(resultStream);
                     var serializer = new JsonSerializer();
                     FineFundamental fine =

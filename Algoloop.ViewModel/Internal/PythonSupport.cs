@@ -37,8 +37,7 @@ namespace Algoloop.ViewModel.Internal
 
             foreach (string folder in paths)
             {
-                if (!Directory.Exists(folder))
-                    continue;
+                if (!Directory.Exists(folder)) continue;
 
                 var dlls = Directory.EnumerateFiles(folder, PythonPattern);
                 foreach (var dll in dlls)
@@ -46,9 +45,7 @@ namespace Algoloop.ViewModel.Internal
                     // Skip python3.dll
                     var info = new FileInfo(dll);
                     string name = info.Name;
-                    if (name.Length < PythonPattern.Length)
-                        continue;
-
+                    if (name.Length < PythonPattern.Length) continue;
                     environment[PythonnetPyDll] = dll;
                     Log.Trace($"Env[{PythonnetPyDll}] = {dll}");
                     environment[PythonHome] = folder;

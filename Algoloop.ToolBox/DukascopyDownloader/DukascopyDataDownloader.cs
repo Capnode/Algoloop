@@ -73,14 +73,11 @@ namespace Algoloop.ToolBox.DukascopyDownloader
                 yield break;
             }
 
-            if (!DukascopySymbolMapper.IsKnownLeanSymbol(symbol))
-                throw new ArgumentException("Invalid symbol requested: " + symbol.Value);
+            if (!DukascopySymbolMapper.IsKnownLeanSymbol(symbol)) throw new ArgumentException("Invalid symbol requested: " + symbol.Value);
+            if (symbol.ID.SecurityType != SecurityType.Forex && symbol.ID.SecurityType != SecurityType.Cfd) throw
+                    new NotSupportedException("SecurityType not available: " + symbol.ID.SecurityType);
 
-            if (symbol.ID.SecurityType != SecurityType.Forex && symbol.ID.SecurityType != SecurityType.Cfd)
-                throw new NotSupportedException("SecurityType not available: " + symbol.ID.SecurityType);
-
-            if (endUtc < startUtc)
-                throw new ArgumentException("The end date must be greater or equal to the start date.");
+            if (endUtc < startUtc) throw new ArgumentException("The end date must be greater or equal to the start date.");
 
             // set the starting date
             DateTime date = startUtc;
@@ -151,10 +148,7 @@ namespace Algoloop.ToolBox.DukascopyDownloader
                             Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
                             continue;
                         }
-                        else if (response.StatusCode == HttpStatusCode.NotFound)
-                        {
-                            break;
-                        }
+                        else if (response.StatusCode == HttpStatusCode.NotFound) break;
                         throw;
                     }
                     if (bytes != null && bytes.Length > 0)
@@ -223,14 +217,12 @@ namespace Algoloop.ToolBox.DukascopyDownloader
             newInStream.Seek(0, 0);
             MemoryStream newOutStream = new();
             byte[] properties2 = new byte[5];
-            if (newInStream.Read(properties2, 0, 5) != 5)
-                throw (new Exception("input .lzma is too short"));
+            if (newInStream.Read(properties2, 0, 5) != 5) throw (new Exception("input .lzma is too short"));
             long outSize = 0;
             for (int i = 0; i < 8; i++)
             {
                 int v = newInStream.ReadByte();
-                if (v < 0)
-                    throw (new Exception("Can't Read 1"));
+                if (v < 0) throw (new Exception("Can't Read 1"));
                 outSize |= ((long)(byte)v) << (8 * i);
             }
             decoder.SetDecoderProperties(properties2);

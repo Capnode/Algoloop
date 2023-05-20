@@ -48,6 +48,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 return fill;
             }
+
             //Get the range of prices in the last bar:
             var prices = GetPrices(asset, order.Direction);
             var pricesEndTime = prices.EndTime.ConvertToUtc(asset.Exchange.TimeZone);
@@ -103,6 +104,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     return false;
                 }
             }
+
             return true;
         }
     }

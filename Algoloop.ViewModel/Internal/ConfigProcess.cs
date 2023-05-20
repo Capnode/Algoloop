@@ -188,10 +188,7 @@ namespace Algoloop.ViewModel.Internal
                     postProcess(folder);
                 }
             }
-            else
-            {
-                throw new ApplicationException("Can not stop process");
-            }
+            else throw new ApplicationException("Can not stop process");
         }
 
         protected virtual void Dispose(bool disposing)

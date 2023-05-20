@@ -161,16 +161,17 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         public string GetBrokerageSymbol(Symbol symbol)
         {
             if (symbol == null || string.IsNullOrWhiteSpace(symbol.Value))
+            {
                 throw new ArgumentException("Invalid symbol: " + (symbol == null ? "null" : symbol.ToString()));
+            }
 
             if (symbol.ID.SecurityType != SecurityType.Forex && symbol.ID.SecurityType != SecurityType.Cfd)
+            {
                 throw new ArgumentException("Invalid security type: " + symbol.ID.SecurityType);
+            }
 
             var brokerageSymbol = ConvertLeanSymbolToDukascopySymbol(symbol.Value);
-
-            if (!IsKnownBrokerageSymbol(brokerageSymbol))
-                throw new ArgumentException("Unknown symbol: " + symbol.Value);
-
+            if (!IsKnownBrokerageSymbol(brokerageSymbol)) throw new ArgumentException("Unknown symbol: " + symbol.Value);
             return brokerageSymbol;
         }
 
@@ -186,18 +187,10 @@ namespace Algoloop.ToolBox.DukascopyDownloader
         /// <returns>A new Lean Symbol instance</returns>
         public Symbol GetLeanSymbol(string brokerageSymbol, SecurityType securityType, string market, DateTime expirationDate = default, decimal strike = 0, OptionRight optionRight = 0)
         {
-            if (string.IsNullOrWhiteSpace(brokerageSymbol))
-                throw new ArgumentException("Invalid Dukascopy symbol: " + brokerageSymbol);
-
-            if (!IsKnownBrokerageSymbol(brokerageSymbol))
-                throw new ArgumentException("Unknown Dukascopy symbol: " + brokerageSymbol);
-
-            if (securityType != SecurityType.Forex && securityType != SecurityType.Cfd)
-                throw new ArgumentException("Invalid security type: " + securityType);
-
-            if (market != Market.Dukascopy)
-                throw new ArgumentException("Invalid market: " + market);
-
+            if (string.IsNullOrWhiteSpace(brokerageSymbol)) throw new ArgumentException("Invalid Dukascopy symbol: " + brokerageSymbol);
+            if (!IsKnownBrokerageSymbol(brokerageSymbol)) throw new ArgumentException("Unknown Dukascopy symbol: " + brokerageSymbol);
+            if (securityType != SecurityType.Forex && securityType != SecurityType.Cfd) throw new ArgumentException("Invalid security type: " + securityType);
+            if (market != Market.Dukascopy) throw new ArgumentException("Invalid market: " + market);
             return Symbol.Create(ConvertDukascopySymbolToLeanSymbol(brokerageSymbol), GetBrokerageSecurityType(brokerageSymbol), Market.Dukascopy);
         }
 

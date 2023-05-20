@@ -63,8 +63,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 Security security = algorithm.Securities[target.Symbol];
                 decimal holdings = security.Holdings.Quantity;
                 decimal quantity = target.Quantity - holdings;
-                if (quantity == 0)
-                    continue;
+                if (quantity == 0) continue;
 
                 if (quantity < 0 || holdings != 0)
                 {
