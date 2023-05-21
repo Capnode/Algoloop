@@ -456,14 +456,20 @@ namespace Algoloop.ToolBox.BorsdataDownloader
 
         private static void UpdateFineFundamental(IList<FineFundamental> fundamentals, FineFundamental fine)
         {
-            FineFundamental updated = fundamentals.FirstOrDefault(m => m.FinancialStatements.PeriodEndingDate.Equals(fine.FinancialStatements.PeriodEndingDate));
-            if (updated == default)
+            FineFundamental actual = fundamentals.FirstOrDefault(m => m.FinancialStatements.PeriodEndingDate.Equals(fine.FinancialStatements.PeriodEndingDate));
+            if (actual == default)
             {
                 fundamentals.Add(fine);
             }
             else
             {
-                updated.UpdateValues(fine);
+                // Annual report override
+                if (actual.FinancialStatements.PeriodType == Annual ||  fine.FinancialStatements.PeriodType == Annual)
+                {
+                    fine.FinancialStatements.PeriodType = Annual;
+                }
+
+                actual.UpdateValues(fine);
             }
         }
 
