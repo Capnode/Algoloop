@@ -346,7 +346,7 @@ namespace Algoloop.Wpf
                     {
                         if (++areaId < _chart.Areas.Count)
                         {
-                            area = _chart.Areas[++areaId];
+                            area = _chart.Areas[areaId];
                         }
                         else
                         {
