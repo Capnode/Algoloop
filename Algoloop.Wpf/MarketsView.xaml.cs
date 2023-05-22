@@ -32,6 +32,7 @@ namespace Algoloop.Wpf
         private readonly Dictionary<TextBlock, double> _cellValue = new();
         private readonly Storyboard _greenBlink = new();
         private readonly Storyboard _redBlink = new();
+        private bool _isMouseDown;
 
         public MarketsView()
         {
@@ -93,6 +94,7 @@ namespace Algoloop.Wpf
 
         private void TreeView_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
+            _isMouseDown = false;
             if (sender is TreeView tree
                 && FindAnchestor<TreeViewItem>((DependencyObject)e.OriginalSource) is TreeViewItem treeViewItem
                 && treeViewItem.DataContext is SymbolViewModel
@@ -154,6 +156,40 @@ namespace Algoloop.Wpf
             }
             while (current != null);
             return null;
+        }
+
+        private void TreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseLeftButtonDown(e);
+            _isMouseDown = true;
+        }
+
+        private void TreeView_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            base.OnMouseLeftButtonUp(e);
+            _isMouseDown = false;
+            if (sender is not TreeView treeView) return;
+            if (DataContext is not MarketsViewModel viewModel) return;
+            if (!viewModel.SelectedChangedCommand.CanExecute(treeView.SelectedItem)) return;
+            viewModel.SelectedChangedCommand.Execute(treeView.SelectedItem);
+
+            //var item = ((DependencyObject)e.OriginalSource);
+            //while (item != null && !(item is TreeViewItem))
+            //    item = VisualTreeHelper.GetParent(item);
+            //var tvi = item as TreeViewItem;
+            //if (tvi != null)
+            //{
+            //    tvi.IsSelected = true;
+            //}
+        }
+
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (_isMouseDown) return;
+            if (sender is not TreeView treeView) return;
+            if (DataContext is not MarketsViewModel viewModel) return;
+            if (!viewModel.SelectedChangedCommand.CanExecute(treeView.SelectedItem)) return;
+            viewModel.SelectedChangedCommand.Execute(treeView.SelectedItem);
         }
     }
 }

@@ -130,7 +130,7 @@
                     </ContextMenu>
                 </TreeView.ContextMenu>
                 <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseUp">
+                    <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction Command="{Binding SelectedChangedCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
@@ -219,7 +219,7 @@
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type vm:BacktestViewModel}">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Command="{Binding ActiveCommand}" IsChecked="{Binding Active}" />
+                            <CheckBox IsTabStop="False" Command="{Binding ActiveCommand}" IsChecked="{Binding Active}" />
                             <TextBlock Text="{Binding Model.Name}" />
                             <StackPanel.ContextMenu>
                                 <ContextMenu>
@@ -342,7 +342,7 @@
                                         <ListBox.Resources>
                                             <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <CheckBox IsChecked="{Binding Model.Active}" />
+                                                    <CheckBox IsTabStop="False" IsChecked="{Binding Model.Active}" />
                                                     <TextBox BorderThickness="0" Text="{Binding Model.Name, Mode=TwoWay}" />
                                                 </StackPanel>
                                             </DataTemplate>

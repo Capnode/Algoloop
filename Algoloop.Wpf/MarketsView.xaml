@@ -72,6 +72,9 @@
                 AllowDrop="False"
                 DragOver="TreeView_DragOver"
                 Drop="TreeView_Drop"
+                PreviewMouseLeftButtonDown="TreeView_PreviewMouseLeftButtonDown"
+                MouseLeftButtonUp="TreeView_MouseLeftButtonUp"
+                SelectedItemChanged="TreeView_SelectedItemChanged"
                 MouseMove="TreeView_MouseMove"
                 ItemsSource="{Binding Markets}">
                 <TreeView.ContextMenu>
@@ -86,15 +89,10 @@
                         </MenuItem>
                     </ContextMenu>
                 </TreeView.ContextMenu>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="MouseUp">
-                        <i:InvokeCommandAction Command="{Binding SelectedChangedCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding Lists}">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox Command="{Binding ActiveCommand}" IsChecked="{Binding Active}" />
+                            <CheckBox IsTabStop="False" Command="{Binding ActiveCommand}" IsChecked="{Binding Active}"/>
                             <TextBlock>
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{} {0} ({1})">
