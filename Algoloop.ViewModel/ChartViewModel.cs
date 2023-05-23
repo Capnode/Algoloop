@@ -18,6 +18,8 @@ namespace Algoloop.ViewModel
 {
     public class ChartViewModel : ViewModelBase, IChartViewModel
     {
+        private bool _isVisible;
+
         public ChartViewModel(Chart chart, bool isVisible)
         {
             Chart = chart;
@@ -25,7 +27,13 @@ namespace Algoloop.ViewModel
         }
 
         public string Title => Chart.Name;
-        public bool IsVisible { get; set; }
+
+        public bool IsVisible
+        {
+            get => _isVisible;
+            set => SetProperty(ref _isVisible, value);
+        }
+
         public Chart Chart { get; }
     }
 }

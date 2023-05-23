@@ -14,8 +14,10 @@
 
 namespace Algoloop.ViewModel
 {
-    public class SymbolChartViewModel : IChartViewModel
+    public class SymbolChartViewModel : ViewModelBase, IChartViewModel
     {
+        private bool _isVisible;
+
         public SymbolChartViewModel(SymbolViewModel symbol, bool isVisible)
         {
             Symbol = symbol;
@@ -23,7 +25,13 @@ namespace Algoloop.ViewModel
         }
 
         public string Title => Symbol.Model.Name;
-        public bool IsVisible { get; set; }
+
+        public bool IsVisible
+        {
+            get => _isVisible;
+            set => SetProperty(ref _isVisible, value);
+        }
+
         public SymbolViewModel Symbol { get; }
     }
 }

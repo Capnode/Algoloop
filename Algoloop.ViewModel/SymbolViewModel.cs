@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -36,6 +35,8 @@ namespace Algoloop.ViewModel
     {
         public enum ReportPeriod { Year, R12, Quarter };
 
+        private const string Comparison = "Comparison";
+        private const string Vs = "{0} / {1}";
         private const decimal Million = 1e6m;
         private const string Annual = "Annual";
         private const string PeriodEndDate = "End date";
@@ -72,6 +73,9 @@ namespace Algoloop.ViewModel
         private const string PeRatio = "PE Ratio";
         private const string PsRatio = "PS Ratio";
 
+        private readonly IChartViewModel _candleChart;
+        private readonly ChartViewModel _comparisonChart;
+        private readonly IList<SymbolViewModel> _references = new List<SymbolViewModel>();
         private readonly ITreeViewModel _parent;
         private SyncObservableCollection<IChartViewModel> _charts = new();
         private ObservableCollection<DataGridColumn> _periodColumns = new();
@@ -84,6 +88,11 @@ namespace Algoloop.ViewModel
             _parent = parent;
             Market = _parent as MarketViewModel;
             Model = model;
+
+            _candleChart = new SymbolChartViewModel(this, true);
+            _comparisonChart = new ChartViewModel(new Chart(Comparison), false);
+            _charts.Add(_candleChart);
+            _charts.Add(_comparisonChart);
 
             DeleteCommand = new RelayCommand(() => { }, () => false);
             StartCommand = new RelayCommand(() => { }, () => false);
@@ -194,19 +203,89 @@ namespace Algoloop.ViewModel
             return leanDataReader.Parse();
         }
 
+        public void Add(SymbolViewModel source)
+        {
+            _references.Add(source);
+            _comparisonChart.IsVisible = true;
+            BuildComparisonChart();
+            var temp = Charts;
+            Charts = null;
+            Charts = temp;
+        }
+
+        private Series ComparisonSeries(SymbolViewModel source)
+        {
+            string name = string.Format(Vs, Model.Name, source.Model.Name);
+            var series = new Series(name, SeriesType.Line);
+            IEnumerable<BaseData> series1 = History();
+            IEnumerable<BaseData> series2 = source.History();
+            IEnumerator<BaseData> iter1 = series1.GetEnumerator();
+            IEnumerator<BaseData> iter2 = series2.GetEnumerator();
+            bool is1 = iter1.MoveNext();
+            bool is2 = iter2.MoveNext();
+            decimal value0 = 0;
+            while (is1 || is2)
+            {
+                BaseData data1 = iter1.Current;
+                BaseData data2 = iter2.Current;
+                if (is1 && (data1.Time < data2.Time))
+                {
+                    is1 = iter1.MoveNext();
+                    continue;
+                }
+
+                if (is2 && (data1.Time > data2.Time))
+                {
+                    is2 = iter2.MoveNext();
+                    continue;
+                }
+
+                if (is1 && is2 && (data1.Time == data2.Time))
+                {
+                    is1 = iter1.MoveNext();
+                    is2 = iter2.MoveNext();
+                    if (data2.Value == 0) continue;
+                    decimal value = data1.Value / data2.Value;
+                    if (value0 == 0)
+                    {
+                        value0 = value;
+                    }
+                    series.AddPoint(data1.Time.ToLocalTime(), value / value0);
+                }
+            }
+
+            return series;
+        }
+
         private void DoLoadData()
         {
             try
             {
                 IsBusy = true;
-                Charts.Clear();
-                var chart = new SymbolChartViewModel(this, true);
-                Charts.Add(chart);
+                BuildComparisonChart();
                 LoadFundamentals();
             }
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        private void BuildComparisonChart()
+        {
+            _comparisonChart.Chart.Series.Clear();
+            if (_comparisonChart.IsVisible)
+            {
+                _comparisonChart.IsVisible = _references.Any();
+                foreach (SymbolViewModel reference in _references)
+                {
+                    Series series = ComparisonSeries(reference);
+                    _comparisonChart.Chart.AddSeries(series);
+                }
+            }
+            else
+            {
+                _references.Clear();
             }
         }
 

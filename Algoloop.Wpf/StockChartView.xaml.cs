@@ -138,7 +138,8 @@ namespace Algoloop.Wpf
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            List<IChartViewModel> charts = e.NewItems?.Cast<IChartViewModel>().ToList();
+            if (sender is not Collection<IChartViewModel> collection) return;
+            List<IChartViewModel> charts = collection.ToList();
             ItemsSourceChanged(charts);
         }
 
@@ -246,15 +247,10 @@ namespace Algoloop.Wpf
         private void OnDrop(object sender, DragEventArgs e)
         {
             if (sender is not ChartPanel panel) return;
-            if (e.Data.GetData(typeof(SymbolViewModel)) is not SymbolViewModel symbol) return;
-            var charts = new List<IChartViewModel>();
-            foreach (IChartViewModel iChart in _combobox.Items)
-            {
-                charts.Add(iChart);
-            }
-
-            charts.Add(new SymbolChartViewModel(symbol, true));
-            ItemsSourceChanged(charts);
+            if (e.Data.GetData(typeof(SymbolViewModel)) is not SymbolViewModel source) return;
+            if (_combobox.Items.Count < 1) return;
+            if (_combobox.Items[0] is not SymbolChartViewModel target) return;
+            target.Symbol.Add(source);
             e.Handled = true;
         }
 
