@@ -177,7 +177,7 @@ namespace Algoloop.Wpf
                 _chart.FillIndicators();
                 byte[] bytes = Encoding.Default.GetBytes(Settings);
                 SettingsStorage storage = bytes.Deserialize<SettingsStorage>();
-                _chart.Load(storage);
+                _chart.LoadIfNotNull(storage);
             }
             catch (Exception)
             {
