@@ -491,12 +491,7 @@ namespace QuantConnect.Algorithm
         [DocumentationAttribute(Universes)]
         public Universe AddUniverse(Type dataType, SecurityType securityType, string name, Resolution resolution, string market, UniverseSettings universeSettings, PyObject pySelector)
         {
-            var marketHoursDbEntry = MarketHoursDatabase.GetEntry(market, name, securityType);
-            var dataTimeZone = marketHoursDbEntry.DataTimeZone;
-            var exchangeTimeZone = marketHoursDbEntry.ExchangeHours.TimeZone;
-            var symbol = QuantConnect.Symbol.Create(name, securityType, market, baseDataType: dataType);
-            var config = new SubscriptionDataConfig(dataType, symbol, resolution, dataTimeZone, exchangeTimeZone, false, false, true, true, isFilteredSubscription: false);
-
+            var config = GetCustomUniverseConfiguration(dataType, name, resolution, market);
             var selector = pySelector.ConvertToDelegate<Func<IEnumerable<IBaseData>, object>>();
 
             return AddUniverse(new FuncUniverse(config, universeSettings, baseDatas =>
@@ -576,41 +571,42 @@ namespace QuantConnect.Algorithm
         [DocumentationAttribute(ConsolidatingData)]
         public void RegisterIndicator(Symbol symbol, PyObject indicator, PyObject pyObject, PyObject selector = null)
         {
-            try
+            // First check if this is just a regular IDataConsolidator
+            IDataConsolidator dataConsolidator;
+            if (pyObject.TryConvert(out dataConsolidator))
             {
-                // First check if this is just a regular IDataConsolidator
-                IDataConsolidator dataConsolidator;
-                if (!pyObject.TryConvert(out dataConsolidator))
-                {
-                    // If not then try and wrap it as a custom Python consolidator
-                    dataConsolidator = new DataConsolidatorPythonWrapper(pyObject);
-                }
                 RegisterIndicator(symbol, indicator, dataConsolidator, selector);
                 return;
             }
+
+            try
+            {
+                dataConsolidator = new DataConsolidatorPythonWrapper(pyObject);
+            }
             catch
             {
-
-            }
-
-            // Finally, since above didn't work, just try it as a timespan
-            // Issue #4668 Fix
-            using (Py.GIL())
-            {
-                try
+                // Finally, since above didn't work, just try it as a timespan
+                // Issue #4668 Fix
+                using (Py.GIL())
                 {
-                    // tryConvert does not work for timespan
-                    TimeSpan? timeSpan = pyObject.As<TimeSpan>();
-                    if (timeSpan != default(TimeSpan))
+                    try
                     {
-                        RegisterIndicator(symbol, indicator, timeSpan, selector);
+                        // tryConvert does not work for timespan
+                        TimeSpan? timeSpan = pyObject.As<TimeSpan>();
+                        if (timeSpan != default(TimeSpan))
+                        {
+                            RegisterIndicator(symbol, indicator, timeSpan, selector);
+                            return;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ArgumentException("Invalid third argument, should be either a valid consolidator or timedelta object. The following exception was thrown: ", e);
                     }
                 }
-                catch
-                {
-                    throw new ArgumentException("Invalid third argument, should be either a valid consolidator or timedelta object");
-                }
             }
+
+            RegisterIndicator(symbol, indicator, dataConsolidator, selector);
         }
 
         /// <summary>

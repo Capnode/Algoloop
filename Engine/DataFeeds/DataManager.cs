@@ -507,8 +507,19 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             uint contractDepthOffset = 0
             )
         {
-            var dataTypes = subscriptionDataTypes ??
-                LookupSubscriptionConfigDataTypes(symbol.SecurityType, resolution ?? Resolution.Minute, symbol.IsCanonical());
+            var dataTypes = subscriptionDataTypes;
+            if(dataTypes == null)
+            {
+                if (symbol.SecurityType == SecurityType.Base && SecurityIdentifier.TryGetCustomDataTypeInstance(symbol.ID.Symbol, out var type))
+                {
+                    // we've detected custom data request if we find a type let's use it
+                    dataTypes = new List<Tuple<Type, TickType>> { new Tuple<Type, TickType>(type, TickType.Trade) };
+                }
+                else
+                {
+                    dataTypes = LookupSubscriptionConfigDataTypes(symbol.SecurityType, resolution ?? Resolution.Minute, symbol.IsCanonical());
+                }
+            }
 
             if (!dataTypes.Any())
             {
@@ -639,12 +650,12 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// Gets a list of all registered <see cref="SubscriptionDataConfig"/> for a given <see cref="Symbol"/>
         /// </summary>
         /// <remarks>Will not return internal subscriptions by default</remarks>
-        public List<SubscriptionDataConfig> GetSubscriptionDataConfigs(Symbol symbol, bool includeInternalConfigs = false)
+        public List<SubscriptionDataConfig> GetSubscriptionDataConfigs(Symbol symbol = null, bool includeInternalConfigs = false)
         {
             lock (_subscriptionManagerSubscriptions)
             {
                 return _subscriptionManagerSubscriptions.Keys.Where(config => (includeInternalConfigs || !config.IsInternalFeed)
-                                                                && config.Symbol.ID == symbol.ID).ToList();
+                                                                && (symbol == null || config.Symbol.ID == symbol.ID)).ToList();
             }
         }
 
