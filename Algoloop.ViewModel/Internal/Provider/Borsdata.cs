@@ -120,10 +120,14 @@ namespace Algoloop.ViewModel.Internal.Provider
                 if (!symbol.Active) continue;
 
                 // Add symbol to lists
-                string country = symbol.Properties[Country].ToString();
+                if (!symbol.Properties.TryGetValue(Country, out object value)) continue;
+                string country = value as string;
+                if (string.IsNullOrEmpty(country)) continue;
                 listsChanged |= AddSymbolToList(market, symbol, country);
 
-                string marketPlace = symbol.Properties[MarkerPlace].ToString();
+                if (!symbol.Properties.TryGetValue(MarkerPlace, out value)) continue;
+                string marketPlace = value as string;
+                if (string.IsNullOrEmpty(marketPlace)) continue;
                 listsChanged |= AddSymbolToList(market, symbol, $"{marketPlace} {country}");
             }
 

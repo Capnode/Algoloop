@@ -178,6 +178,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 
                 // Add symbol to list
                 string listName = symbol.Security.ToString();
+                if (string.IsNullOrEmpty(listName)) continue;
                 listChanged |= AddSymbolToList(market, symbol, listName);
             }
 
