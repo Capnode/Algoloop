@@ -177,20 +177,8 @@ namespace Algoloop.ViewModel.Internal.Provider
                 if (!symbol.Active) continue;
 
                 // Add symbol to list
-                string security = symbol.Security.ToString();
-                ListModel list = market.Lists.FirstOrDefault(m => m.Id != null && m.Id.Equals(security));
-                if (list == null)
-                {
-                    list = new ListModel(security);
-                    market.Lists.Add(list);
-                    listChanged = true;
-                }
-
-                if (!list.Symbols.Contains(symbol))
-                {
-                    list.Symbols.Add(item);
-                    listChanged = true;
-                }
+                string listName = symbol.Security.ToString();
+                listChanged |= AddSymbolToList(market, symbol, listName);
             }
 
             // Remove discared symbols
@@ -217,6 +205,26 @@ namespace Algoloop.ViewModel.Internal.Provider
             {
                 update?.Invoke(market.Lists);
             }
+        }
+
+        protected static bool AddSymbolToList(ProviderModel market, SymbolModel symbol, string listName)
+        {
+            bool listChanged = false;
+            ListModel list = market.Lists.FirstOrDefault(m => m.Id != null && m.Id.Equals(listName));
+            if (list == null)
+            {
+                list = new ListModel(listName);
+                market.Lists.Add(list);
+                listChanged = true;
+            }
+
+            if (!list.Symbols.Contains(symbol))
+            {
+                list.Symbols.Add(symbol);
+                listChanged = true;
+            }
+
+            return listChanged;
         }
     }
 }
