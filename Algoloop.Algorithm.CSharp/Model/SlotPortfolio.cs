@@ -117,7 +117,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (insights == null)
             {
                 _trackerPortfolio.CreateTargets(algorithm, null);
-                LogInsights(algorithm, _insights.OrderByDescending(m => m.Magnitude));
+                LogInsights(algorithm, _insights);
                 if (_logTrades)
                 {
                     LogTrades(algorithm);
@@ -126,17 +126,19 @@ namespace Algoloop.Algorithm.CSharp.Model
                 return null;
             }
 
-            // Remove obsolete insights
+            // Remove expired insights
             _insights.RemoveExpiredInsights(algorithm.UtcTime);
+
+            // Add new insights, do not replace existing
             foreach (Insight insight in insights)
             {
-                Insight obsolete = _insights.FirstOrDefault(m => m.Symbol.Equals(insight.Symbol));
-                if (obsolete == null) continue;
-                _insights.Remove(obsolete);
+                if (!_insights.Any(m => m.Symbol.Equals(insight.Symbol)))
+                {
+                    _insights.Add(insight);
+                }
             }
 
-            // Merge insight lists and sort decending by magnitude
-            _insights.AddRange(insights);
+            // Sort insights decending by magnitude
             insights = _insights
                 .OrderByDescending(m => m.Magnitude)
                 .ThenBy(m => m.Symbol.ID.Symbol)
@@ -351,7 +353,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         {
             int i = 0;
             algorithm.Log("Insight toplist:");
-            foreach (Insight insight in insights)
+            foreach (Insight insight in insights.OrderByDescending(m => m.Magnitude))
             {
                 string expired = insight.IsExpired(algorithm.UtcTime) ? "Expired" : String.Empty;
                 algorithm.Log($"Insight {++i} {insight.Symbol} {insight.Magnitude:0.########} {insight.Direction} {expired}".ToStringInvariant());
