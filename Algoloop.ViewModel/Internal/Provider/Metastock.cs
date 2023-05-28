@@ -17,11 +17,15 @@ using Algoloop.ToolBox.MetastockConverter;
 using QuantConnect;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class Metastock : ProviderBase
     {
+        private const string MarketPlace = "Marketplace";
+
         public override void GetUpdate(ProviderModel market, Action<object> update)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
@@ -50,6 +54,86 @@ namespace Algoloop.ViewModel.Internal.Provider
             RunProcess("Algoloop.ToolBox.exe", args, config);
             market.LastDate = utsNow.ToLocalTime();
             market.Active = false;
+        }
+
+        protected static new void UpdateSymbols(
+            ProviderModel market,
+            IEnumerable<SymbolModel> actual,
+            Action<object> update,
+            bool addSymbols = true)
+        {
+            Contract.Requires(market != null, nameof(market));
+            Contract.Requires(actual != null, nameof(actual));
+
+            // Collect list of obsolete symbols
+            bool symbolsChanged = false;
+            bool listsChanged = false;
+            List<SymbolModel> obsoleteSymbols = market.Symbols.ToList();
+            foreach (SymbolModel item in actual)
+            {
+                // Add or update symbol
+                SymbolModel symbol = market.Symbols.FirstOrDefault(x => x.Id.Equals(item.Id, StringComparison.OrdinalIgnoreCase)
+                    && (x.Market.Equals(item.Market, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(x.Market))
+                    && (x.Security.Equals(item.Security) || x.Security.Equals(SecurityType.Base)));
+                if (symbol == default)
+                {
+                    symbol = item;
+                    symbolsChanged = true;
+                    if (addSymbols)
+                    {
+                        market.Symbols.Add(symbol);
+                    }
+                }
+                else if (!symbol.Equals(item))
+                {
+                    // Update properties
+                    symbol.Name = item.Name;
+                    symbol.Market = item.Market;
+                    symbol.Security = item.Security;
+                    symbol.Properties = item.Properties;
+                    symbolsChanged = true;
+                    obsoleteSymbols.Remove(symbol);
+                }
+                else
+                {
+                    obsoleteSymbols.Remove(symbol);
+                    symbol = item;
+                }
+
+                // Skip adding to list if not active
+                if (!symbol.Active) continue;
+
+                // Add symbol to lists
+                if (!symbol.Properties.TryGetValue(MarketPlace, out object value)) continue;
+                string country = value as string;
+                if (string.IsNullOrEmpty(country)) continue;
+                listsChanged |= AddSymbolToList(market, symbol, country);
+            }
+
+            // Remove obsolete symbols
+            foreach (SymbolModel old in obsoleteSymbols)
+            {
+                market.Symbols.Remove(old);
+                foreach (ListModel list in market.Lists)
+                {
+                    if (list.Symbols.Remove(old))
+                    {
+                        listsChanged = true;
+                    }
+                }
+            }
+
+            // Update symbols
+            if (symbolsChanged)
+            {
+                update?.Invoke(market.Symbols);
+            }
+
+            // Update lists
+            if (listsChanged)
+            {
+                update?.Invoke(market.Lists);
+            }
         }
     }
 }

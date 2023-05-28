@@ -27,7 +27,7 @@ namespace Algoloop.ViewModel.Internal.Provider
     internal class Borsdata : ProviderBase
     {
         private const string Country = "Country";
-        private const string MarkerPlace = "Marketplace";
+        private const string MarketPlace = "Marketplace";
 
         public override void GetUpdate(ProviderModel market, Action<object> update)
         {
@@ -125,7 +125,7 @@ namespace Algoloop.ViewModel.Internal.Provider
                 if (string.IsNullOrEmpty(country)) continue;
                 listsChanged |= AddSymbolToList(market, symbol, country);
 
-                if (!symbol.Properties.TryGetValue(MarkerPlace, out value)) continue;
+                if (!symbol.Properties.TryGetValue(MarketPlace, out value)) continue;
                 string marketPlace = value as string;
                 if (string.IsNullOrEmpty(marketPlace)) continue;
                 listsChanged |= AddSymbolToList(market, symbol, $"{marketPlace} {country}");
