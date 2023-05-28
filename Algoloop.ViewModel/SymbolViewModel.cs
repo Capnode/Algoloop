@@ -224,23 +224,23 @@ namespace Algoloop.ViewModel
             bool is1 = iter1.MoveNext();
             bool is2 = iter2.MoveNext();
             decimal value0 = 0;
-            while (is1 || is2)
+            while (is1 && is2)
             {
                 BaseData data1 = iter1.Current;
                 BaseData data2 = iter2.Current;
-                if (is1 && (data1.Time < data2.Time))
+                if (data1.Time < data2.Time)
                 {
                     is1 = iter1.MoveNext();
                     continue;
                 }
 
-                if (is2 && (data1.Time > data2.Time))
+                if (data1.Time > data2.Time)
                 {
                     is2 = iter2.MoveNext();
                     continue;
                 }
 
-                if (is1 && is2 && (data1.Time == data2.Time))
+                if (data1.Time == data2.Time)
                 {
                     is1 = iter1.MoveNext();
                     is2 = iter2.MoveNext();
