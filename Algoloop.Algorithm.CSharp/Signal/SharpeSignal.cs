@@ -15,7 +15,6 @@
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
-using System;
 
 namespace Algoloop.Algorithm.CSharp.Model
 {
@@ -27,12 +26,18 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         public SharpeSignal(int period)
         {
-            _roc = new RateOfChange(period);
-            _std = new StandardDeviation(period - 1);
+            if (period > 0)
+            {
+                _roc = new RateOfChange(period);
+                _std = new StandardDeviation(period - 1);
+            }
         }
 
         public float Update(QCAlgorithm algorithm, BaseData bar)
         {
+            if (_roc == null) return float.NaN;
+            if (_std == null) return float.NaN;
+
             decimal close = bar.Price;
             _roc.Update(bar.Time, close);
             if (_last != null)
