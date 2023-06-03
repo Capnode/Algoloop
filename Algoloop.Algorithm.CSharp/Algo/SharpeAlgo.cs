@@ -58,6 +58,15 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
+        [Parameter("Tracker sma stoploss period1")]
+        private readonly string _trackerPeriod1 = "0";
+
+        [Parameter("Tracker sma stoploss period2")]
+        private readonly string _trackerPeriod2 = "0";
+
+        [Parameter("Stoploss sizing")]
+        private readonly string _stoplossSizing = "1";
+        
         [Parameter("Market capitalization (M min)")]
         private readonly string _marketCap = null;
 
@@ -112,6 +121,9 @@ namespace Algoloop.Algorithm.CSharp
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
+            int trackerPeriod1 = int.Parse(_trackerPeriod1, CultureInfo.InvariantCulture);
+            int trackerPeriod2 = int.Parse(_trackerPeriod2, CultureInfo.InvariantCulture);
+            decimal stoplossSizing = decimal.Parse(_stoplossSizing, CultureInfo.InvariantCulture);
 
             List<Symbol> symbols = _symbols
                 .Split(';')
@@ -123,7 +135,13 @@ namespace Algoloop.Algorithm.CSharp
             MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
             SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance));
+            SetPortfolioConstruction(new SlotPortfolio(
+                slots: slots,
+                reinvest: reinvest,
+                rebalance: rebalance,
+                trackerPeriod1: trackerPeriod1 >= 0 ? trackerPeriod1 : period,
+                trackerPeriod2: trackerPeriod2 >= 0 ? trackerPeriod2 : period,
+                stoplossSizing: stoplossSizing));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));

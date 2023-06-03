@@ -26,7 +26,6 @@ namespace Algoloop.Algorithm.CSharp.Model
     // Portfolio construction scaffolding class; basic method args.
     public class SlotPortfolio : PortfolioConstructionModel
     {
-        private const int RocPeriod = 250;
         private const string TrackerChart = "Tracker";
 
         private readonly bool _logTargets = false;
@@ -38,15 +37,8 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly decimal _rebalance;
         private readonly decimal _stoplossSizing;
         private readonly InsightCollection _insights = new();
-        private readonly Maximum _trackerHigh;
-        private readonly Minimum _trackerLow;
-        private readonly RateOfChange _trackerRoc;
-        private readonly RateOfChange _benchmarkRoc;
-        private readonly RateOfChange _portfolioRoc;
         private readonly SimpleMovingAverage _trackerSma1;
         private readonly SimpleMovingAverage _trackerSma2;
-        private readonly SimpleMovingAverage _benchmarkSma1;
-        private readonly SimpleMovingAverage _benchmarkSma2;
         private TrackerPortfolio _trackerPortfolio;
         private decimal _initialCapital = 0;
         private decimal _portfolioValue0 = 0;
@@ -55,35 +47,19 @@ namespace Algoloop.Algorithm.CSharp.Model
         private decimal _sizingFactor = 1;
         private decimal _leverage = 1;
         private string _indexName = "Index";
-        private decimal _benchmarkIndex;
-        private decimal _trackerIndex;
 
         public SlotPortfolio(
             int slots,
             bool reinvest,
             float rebalance = 0,
-            int rangePeriod = 0,
             int trackerPeriod1 = 0,
             int trackerPeriod2 = 0,
-            int indexPeriod1 = 0,
-            int indexPeriod2 = 0,
             decimal stoplossSizing = 1)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
             _stoplossSizing = stoplossSizing;
-            if (rangePeriod> 0)
-            {
-                _trackerHigh = new Maximum($"Tracker High({rangePeriod})", rangePeriod);
-                _trackerLow = new Minimum($"Tracker Low({rangePeriod})", rangePeriod);
-            }
-            if (RocPeriod > 0)
-            {
-                _trackerRoc = new RateOfChange(RocPeriod);
-                _benchmarkRoc = new RateOfChange(RocPeriod);
-                _portfolioRoc = new RateOfChange(RocPeriod);
-            }
             if (trackerPeriod1 > 0)
             {
                 _trackerSma1 = new SimpleMovingAverage($"Tracker SMA({trackerPeriod1})", trackerPeriod1);
@@ -91,14 +67,6 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (trackerPeriod2 > 0 && trackerPeriod2 > trackerPeriod1)
             {
                 _trackerSma2 = new SimpleMovingAverage($"Tracker SMA({trackerPeriod2})", trackerPeriod2);
-            }
-            if (indexPeriod1 > 0)
-            {
-                _benchmarkSma1 = new SimpleMovingAverage($"{_indexName} SMA({indexPeriod1})", indexPeriod1);
-            }
-            if (indexPeriod2 > 0 && indexPeriod2 > indexPeriod1)
-            {
-                _benchmarkSma2 = new SimpleMovingAverage($"{_indexName} SMA({indexPeriod2})", indexPeriod2);
             }
         }
 
@@ -152,21 +120,50 @@ namespace Algoloop.Algorithm.CSharp.Model
                 LogInsights(algorithm, insights);
             }
 
-            // Plot portfolio, tracker and benchmark index
-            decimal trackerValue = _trackerPortfolio.GetEquity(algorithm);
-            decimal benchmarkValue = algorithm.Benchmark.Evaluate(algorithm.Time);
+            // Plot portfolio
             decimal portfolioValue = algorithm.Portfolio.TotalPortfolioValue;
-            decimal trackerSizingFactor = ProcessTracker(algorithm, trackerValue);
-            decimal indexSizingFactor = ProcessBenchmark(algorithm, benchmarkValue);
-            ProcessPortfolio(algorithm, portfolioValue);
-            ProcessRoc(algorithm);
-            if (_benchmarkIndex > 0)
+            decimal portfolioIndex = portfolioValue / _portfolioValue0;
+            algorithm.Plot(TrackerChart, "Tracker Portfolio", portfolioIndex);
+
+            decimal trackerValue = _trackerPortfolio.GetEquity(algorithm);
+            decimal trackerIndex = trackerValue / _trackerValue0;
+            algorithm.Plot(TrackerChart, "Tracker", trackerIndex);
+            _trackerSma1?.Update(algorithm.Time, trackerIndex);
+            _trackerSma2?.Update(algorithm.Time, trackerIndex);
+
+            decimal sizingFactor = 1;
+            if (_trackerSma1 != null && _trackerSma1.IsReady)
             {
-                algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", _trackerIndex / _benchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma1.Period})", _trackerSma1);
+                sizingFactor = trackerIndex >= _trackerSma1 ? 1 : _stoplossSizing;
+            }
+            if (_trackerSma2 != null && _trackerSma2.IsReady)
+            {
+                algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma2.Period})", _trackerSma2);
+                sizingFactor = trackerIndex >= _trackerSma2 ? 1 : _stoplossSizing;
+            }
+            if (_trackerSma1 != null && _trackerSma2 != null)
+            {
+                if (_trackerSma1.IsReady && _trackerSma2.IsReady)
+                {
+                    sizingFactor = _trackerSma1 >= _trackerSma2 ? 1 : _stoplossSizing;
+                }
+                else
+                {
+                    sizingFactor = 1;
+                }
+            }
+
+            // Plot tracker and benchmark index
+            decimal benchmarkValue = algorithm.Benchmark.Evaluate(algorithm.Time);
+            decimal benchmarkIndex = benchmarkValue / _benchmarkValue0;
+            if (benchmarkIndex > 0)
+            {
+                algorithm.Plot(TrackerChart, $"Tracker {_indexName}", benchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerIndex / benchmarkIndex);
             }
 
             // Determine leverage
-            decimal sizingFactor = trackerSizingFactor * indexSizingFactor;
             if (sizingFactor != _sizingFactor)
             {
                 _leverage = sizingFactor * portfolioValue / trackerValue;
@@ -196,138 +193,6 @@ namespace Algoloop.Algorithm.CSharp.Model
             {
                 _indexName = sec.Security.Symbol.ID.Symbol;
             }
-        }
-
-        private void ProcessPortfolio(QCAlgorithm algorithm, decimal portfolioValue)
-        {
-            decimal portfolioIndex = portfolioValue / _portfolioValue0;
-            algorithm.Plot(TrackerChart, "Tracker Portfolio", portfolioIndex);
-            _portfolioRoc?.Update(algorithm.Time, portfolioIndex);
-        }
-
-        private decimal ProcessTracker(QCAlgorithm algorithm, decimal trackerValue)
-        {
-            _trackerIndex = trackerValue / _trackerValue0;
-            algorithm.Plot(TrackerChart, "Tracker", _trackerIndex);
-            _trackerRoc?.Update(algorithm.Time, _trackerIndex);
-            _trackerSma1?.Update(algorithm.Time, _trackerIndex);
-            _trackerSma2?.Update(algorithm.Time, _trackerIndex);
-
-            decimal sizingFactor = 1;
-            if (_trackerLow != null && _trackerLow.IsReady)
-            {
-                algorithm.Plot(TrackerChart, "TrackerLow", _trackerLow);
-                if (_trackerIndex < _trackerLow)
-                {
-                    sizingFactor = _stoplossSizing;
-                }
-                else
-                {
-                    sizingFactor = _sizingFactor; // Current sizing factor
-                }
-            }
-            if (_trackerHigh != null && _trackerHigh.IsReady)
-            {
-                algorithm.Plot(TrackerChart, "TrackerHigh", _trackerHigh);
-                if (_trackerIndex > _trackerHigh)
-                {
-                    sizingFactor = 1;
-                }
-                else
-                {
-                    sizingFactor = _sizingFactor; // Current sizing factor
-                }
-            }
-
-            if (_trackerSma1 != null && _trackerSma1.IsReady)
-            {
-                algorithm.Plot(TrackerChart, "TrackerSMA1", _trackerSma1);
-                sizingFactor = _trackerIndex >= _trackerSma1 ? 1 : _stoplossSizing;
-            }
-            if (_trackerSma2 != null && _trackerSma2.IsReady)
-            {
-                algorithm.Plot(TrackerChart, "TrackerSMA2", _trackerSma2);
-                sizingFactor = _trackerIndex >= _trackerSma2 ? 1 : _stoplossSizing;
-            }
-            if (_trackerSma1 != null && _trackerSma2 != null)
-            {
-                if (_trackerSma1.IsReady && _trackerSma2.IsReady)
-                {
-                    sizingFactor = _trackerSma1 >= _trackerSma2 ? 1 : _stoplossSizing;
-                }
-                else
-                {
-                    sizingFactor = 1;
-                }
-            }
-
-            _trackerHigh?.Update(algorithm.Time, _trackerIndex);
-            _trackerLow?.Update(algorithm.Time, _trackerIndex);
-            return sizingFactor;
-        }
-
-        private decimal ProcessBenchmark(QCAlgorithm algorithm, decimal benchmarkValue)
-        {
-            decimal sizingFactor = 1;
-            if (_benchmarkValue0 == 0) return sizingFactor;
-
-            // Plot benchmark index 
-            _benchmarkIndex = benchmarkValue / _benchmarkValue0;
-            algorithm.Plot(TrackerChart, $"Tracker {_indexName}", _benchmarkIndex);
-            _benchmarkRoc?.Update(algorithm.Time, benchmarkValue);
-            _benchmarkSma1?.Update(algorithm.Time, _benchmarkIndex);
-            _benchmarkSma2?.Update(algorithm.Time, _benchmarkIndex);
-
-            if (_benchmarkSma1 != null)
-            {
-                if (_benchmarkSma1.IsReady)
-                {
-                    algorithm.Plot(TrackerChart, "IndexSMA1", _benchmarkSma1);
-                }
-            }
-            if (_benchmarkSma2 != null)
-            {
-                if (_benchmarkSma2.IsReady)
-                {
-                    algorithm.Plot(TrackerChart, "IndexSMA2", _benchmarkSma2);
-                }
-            }
-
-            if (_benchmarkSma1 != null && _benchmarkSma2 != null)
-            {
-                if (_benchmarkSma1.IsReady && _benchmarkSma2.IsReady)
-                {
-                    sizingFactor = _benchmarkSma1 >= _benchmarkSma2 ? 1 : _stoplossSizing;
-                }
-            }
-            else if (_benchmarkSma1 != null)
-            {
-                if (_benchmarkSma1.IsReady)
-                {
-                    sizingFactor = _benchmarkIndex >= _benchmarkSma1 ? 1 : _stoplossSizing;
-                }
-            }
-            else if (_benchmarkSma2 != null)
-            {
-                if (_benchmarkSma2.IsReady)
-                {
-                    sizingFactor = _benchmarkIndex >= _benchmarkSma2 ? 1 : _stoplossSizing;
-                }
-            }
-
-            return sizingFactor;
-        }
-
-        private decimal ProcessRoc(QCAlgorithm algorithm)
-        {
-            // Both TrackerRoc and BenchmarkRoc must be updated
-            if (_trackerRoc == null || _benchmarkRoc == null) return 1;
-            if (!_trackerRoc.IsReady || !_benchmarkRoc.IsReady) return 1;
-
-            decimal diff = _trackerRoc - _benchmarkRoc;
-            algorithm.Plot(TrackerChart, $"Tracker({_trackerRoc.Period}) - {_indexName}({_benchmarkRoc.Period})", diff);
-            if (diff >= 0) return 1;
-            return _stoplossSizing;
         }
 
         private void LogTrades(QCAlgorithm algorithm)

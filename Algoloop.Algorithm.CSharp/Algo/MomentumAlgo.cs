@@ -64,9 +64,6 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Tracker stoploss period")]
         private readonly string _trackerPeriod = "0";
 
-        [Parameter("Benchmark stoploss period")]
-        private readonly string _benchmarkPeriod = "0";
-
         [Parameter("Stoploss sizing")]
         private readonly string _stoplossSizing = "1";
 
@@ -95,7 +92,6 @@ namespace Algoloop.Algorithm.CSharp
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
             int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
             int trackerPeriod = int.Parse(_trackerPeriod, CultureInfo.InvariantCulture);
-            int benchmarkPeriod = int.Parse(_benchmarkPeriod, CultureInfo.InvariantCulture);
             decimal stoplossSizing = decimal.Parse(_stoplossSizing, CultureInfo.InvariantCulture);
 
             List<Symbol> symbols = _symbols
@@ -113,7 +109,6 @@ namespace Algoloop.Algorithm.CSharp
                 reinvest: reinvest,
                 rebalance: rebalance,
                 trackerPeriod1: trackerPeriod,
-                indexPeriod1: benchmarkPeriod,
                 stoplossSizing: stoplossSizing));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
