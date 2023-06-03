@@ -13,86 +13,77 @@
  * limitations under the License.
 */
 
-using System;
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using QuantConnect.Securities;
-using QuantConnect.Data.Market;
 using System.Collections.Generic;
-using QuantConnect.Securities.Future;
+using QuantConnect.Orders;
+using QuantConnect.Util;
+using System;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Continuous Futures Regression algorithm asserting bug fix for GH issue #6840
+    /// Simple regression algorithm asserting certain order fields update properly when a
+    /// split in the data happens
     /// </summary>
-    public class ContinuousFuturesDailyRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class SplitEquityRegressionAlgorithm: QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private SymbolChangedEvent _symbolChangedEvent;
-        private Future _continuousContract;
-        private decimal _previousFactor;
+        private Symbol _aapl;
+        private List<OrderTicket> _tickets = new();
 
-        /// <summary>
-        /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
-        /// </summary>
         public override void Initialize()
         {
-            SetStartDate(2013, 10, 08);
-            SetEndDate(2013, 12, 25);
+            SetStartDate(2014, 6, 5);
+            SetEndDate(2014, 6, 11);
+            SetCash(100000);
 
-            _continuousContract = AddFuture(Futures.Indices.SP500EMini,
-                dataNormalizationMode: DataNormalizationMode.ForwardPanamaCanal,
-                dataMappingMode: DataMappingMode.LastTradingDay,
-                contractDepthOffset: 0,
-                resolution: Resolution.Daily
-            );
+            _aapl = AddEquity("AAPL", Resolution.Hour, dataNormalizationMode: DataNormalizationMode.Raw).Symbol;
         }
 
-        /// <summary>
-        /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
-        /// </summary>
-        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
-        public override void OnData(Slice data)
+        public override void OnData(Slice slice)
         {
-            foreach (var changedEvent in data.SymbolChangedEvents.Values)
+            if (Transactions.GetOrders().IsNullOrEmpty())
             {
-                if (changedEvent.Symbol == _continuousContract.Symbol)
-                {
-                    _symbolChangedEvent = changedEvent;
-                    Log($"{Time} - SymbolChanged event: {changedEvent}. New expiration {_continuousContract.Mapped.ID.Date}");
-                }
+                _tickets.Add(LimitIfTouchedOrder(_aapl, 10, 10, 10));
+                _tickets.Add(LimitOrder(_aapl, 10, 5));
+                _tickets.Add(StopLimitOrder(_aapl, 10, 15, 15));
             }
-
-            if (!data.Bars.TryGetValue(_continuousContract.Symbol, out var continuousBar))
-            {
-                return;
-            }
-
-            var mappedBar = Securities[_continuousContract.Mapped].Cache.GetData<TradeBar>();
-            if (mappedBar == null || continuousBar.EndTime != mappedBar.EndTime)
-            {
-                return;
-            }
-            var priceFactor = continuousBar.Close - mappedBar.Close;
-            Debug($"{Time} - Price factor {priceFactor}");
-
-            if(_symbolChangedEvent != null)
-            {
-                if(_previousFactor == priceFactor)
-                {
-                    throw new Exception($"Price factor did not change after symbol changed! {Time} {priceFactor}");
-                }
-
-                Quit("We asserted what we wanted");
-            }
-            _previousFactor = priceFactor;
         }
 
         public override void OnEndOfAlgorithm()
         {
-            if (_symbolChangedEvent == null)
+            foreach (var ticket in _tickets)
             {
-                throw new Exception("Unexpected a symbol changed event but got none!");
+                if (ticket.Quantity != 69.0m)
+                {
+                    throw new Exception($"The Quantity of order with ID: {ticket.OrderId} should be 69, but was {ticket.Quantity}");
+                }
+                switch (ticket.OrderType)
+                {
+                    case OrderType.LimitIfTouched:
+                        if (ticket.Get(OrderField.TriggerPrice) != 1.43m)
+                        {
+                            throw new Exception($"Order with ID: {ticket.OrderId} should have a Trigger Price equal to 1.43, but was {ticket.Get(OrderField.TriggerPrice)}");
+                        }
+
+                        if (ticket.Get(OrderField.LimitPrice) != 1.43m)
+                        {
+                            throw new Exception($"Order with ID: {ticket.OrderId} should have a Limit Price equal to 1.43, but was {ticket.Get(OrderField.LimitPrice)}");
+                        }
+                        break;
+                    case OrderType.Limit:
+                        if (ticket.Get(OrderField.LimitPrice) != 0.7143m)
+                        {
+                            throw new Exception($"Order with ID: {ticket.OrderId} should have a Limit Price equal to 0.7143, but was {ticket.Get(OrderField.LimitPrice)}");
+                        }
+                        break;
+                    case OrderType.StopLimit:
+                        if (ticket.Get(OrderField.StopPrice) != 2.14m)
+                        {
+                            throw new Exception($"Order with ID: {ticket.OrderId} should have a Stop Price equal to 2.14, but was {ticket.Get(OrderField.StopPrice)}");
+                        }
+                        break;
+                }
             }
         }
 
@@ -109,7 +100,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 1363;
+        public long DataPoints => 80;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -137,14 +128,14 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-4.63"},
-            {"Tracking Error", "0.088"},
+            {"Information Ratio", "-2.491"},
+            {"Tracking Error", "0.042"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
             {"Lowest Capacity Asset", ""},
             {"Portfolio Turnover", "0%"},
-            {"OrderListHash", "d41d8cd98f00b204e9800998ecf8427e"}
+            {"OrderListHash", "fb7383d38257493fe4f3427e781d9a34"}
         };
     }
 }

@@ -1321,13 +1321,15 @@ namespace QuantConnect.Algorithm
         }
 
         /// <summary>
-        /// Sets the account currency cash symbol this algorithm is to manage.
+        /// Sets the account currency cash symbol this algorithm is to manage, as well as
+        /// the starting cash in this currency if given
         /// </summary>
         /// <remarks>Has to be called during <see cref="Initialize"/> before
         /// calling <see cref="SetCash(decimal)"/> or adding any <see cref="Security"/></remarks>
         /// <param name="accountCurrency">The account currency cash symbol to set</param>
+        /// <param name="startingCash">The account currency starting cash to set</param>
         [DocumentationAttribute(SecuritiesAndPortfolio)]
-        public void SetAccountCurrency(string accountCurrency)
+        public void SetAccountCurrency(string accountCurrency, decimal? startingCash = null)
         {
             if (_locked)
             {
@@ -1335,9 +1337,16 @@ namespace QuantConnect.Algorithm
                     "Cannot change AccountCurrency after algorithm initialized.");
             }
 
-            Debug($"Changing account currency from {AccountCurrency} to {accountCurrency}...");
+            if (startingCash == null)
+            {
+                Debug($"Changing account currency from {AccountCurrency} to {accountCurrency}...");
+            }
+            else
+            {
+                Debug($"Changing account currency from {AccountCurrency} to {accountCurrency}, with a starting cash of {startingCash}...");
+            }
 
-            Portfolio.SetAccountCurrency(accountCurrency);
+            Portfolio.SetAccountCurrency(accountCurrency, startingCash);
         }
 
         /// <summary>

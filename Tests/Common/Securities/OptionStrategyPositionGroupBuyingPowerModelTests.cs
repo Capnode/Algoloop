@@ -77,9 +77,9 @@ namespace QuantConnect.Tests.Common.Securities
             new TestCaseData(OptionStrategyDefinitions.CoveredCall, 20, (1000000 / 18500 + 1) - 20, false), // 20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.CoveredCall, 20, -20, true), // 20 to 0
             new TestCaseData(OptionStrategyDefinitions.CoveredCall, 20, -(1000000 / 3000) - 20, true), // 20 to max short
-            new TestCaseData(OptionStrategyDefinitions.CoveredCall, 20, -(1000000 / 3000 + 1) - 20, false).Explicit(),  // 20 to max short + 1
+            new TestCaseData(OptionStrategyDefinitions.CoveredCall, 20, -(1000000 / 3000 + 1) - 20, false),  // 20 to max short + 1
             new TestCaseData(OptionStrategyDefinitions.CoveredCall, -20, (1000000 / 18500) - -20, true),   // -20 to max long
-            new TestCaseData(OptionStrategyDefinitions.CoveredCall, -20, (1000000 / 18500 + 1) - -20, false).Explicit(),   // -20 to max long + 1
+            new TestCaseData(OptionStrategyDefinitions.CoveredCall, -20, (1000000 / 18500 + 1) - -20, false),   // -20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.CoveredCall, -20, 20, true), // -20 to 0
             new TestCaseData(OptionStrategyDefinitions.CoveredCall, -20, -(1000000 / 3000) - -20, true),    // -20 to max short
             new TestCaseData(OptionStrategyDefinitions.CoveredCall, -20, -(1000000 / 3000 + 1) - -20, false),  // -20 to max short + 1
@@ -92,9 +92,9 @@ namespace QuantConnect.Tests.Common.Securities
             new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, 20, (1000000 / 3000 + 1) - 20, false), // 20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, 20, -20, true), // 20 to 0
             new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, 20, -(1000000 / 18500) - 20, true), // 20 to max short
-            new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, 20, -(1000000 / 18500 + 1) - 20, false).Explicit(),  // 20 to max short + 1
+            new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, 20, -(1000000 / 18500 + 1) - 20, false),  // 20 to max short + 1
             new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, -20, (1000000 / 3000) - -20, true),   // -20 to max long
-            new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, -20, (1000000 / 3000 + 1) - -20, false).Explicit(),   // -20 to max long + 1
+            new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, -20, (1000000 / 3000 + 1) - -20, false),   // -20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, -20, 20, true), // -20 to 0
             new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, -20, -(1000000 / 18500) - -20, true),    // -20 to max short
             new TestCaseData(OptionStrategyDefinitions.ProtectiveCall, -20, -(1000000 / 18500 + 1) - -20, false),  // -20 to max short + 1
@@ -107,9 +107,9 @@ namespace QuantConnect.Tests.Common.Securities
             new TestCaseData(OptionStrategyDefinitions.CoveredPut, 20, (1000000 / 10250 + 1) - 20, false), // 20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.CoveredPut, 20, -20, true), // 20 to 0
             new TestCaseData(OptionStrategyDefinitions.CoveredPut, 20, -(1000000 / 10250) - 20, true), // 20 to max short
-            new TestCaseData(OptionStrategyDefinitions.CoveredPut, 20, -(1000000 / 10250 + 1) - 20, false).Explicit(),  // 20 to max short + 1
+            new TestCaseData(OptionStrategyDefinitions.CoveredPut, 20, -(1000000 / 10250 + 1) - 20, false),  // 20 to max short + 1
             new TestCaseData(OptionStrategyDefinitions.CoveredPut, -20, (1000000 / 10250) - -20, true),   // -20 to max long
-            new TestCaseData(OptionStrategyDefinitions.CoveredPut, -20, (1000000 / 10250 + 1) - -20, false).Explicit(),   // -20 to max long + 1
+            new TestCaseData(OptionStrategyDefinitions.CoveredPut, -20, (1000000 / 10250 + 1) - -20, false),   // -20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.CoveredPut, -20, 20, true), // -20 to 0
             new TestCaseData(OptionStrategyDefinitions.CoveredPut, -20, -(1000000 / 10250) - -20, true),    // -20 to max short
             new TestCaseData(OptionStrategyDefinitions.CoveredPut, -20, -(1000000 / 10250 + 1) - -20, false),  // -20 to max short + 1
@@ -122,9 +122,9 @@ namespace QuantConnect.Tests.Common.Securities
             new TestCaseData(OptionStrategyDefinitions.ProtectivePut, 20, (1000000 / 10250 + 1) - 20, false), // 20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.ProtectivePut, 20, -20, true), // 20 to 0
             new TestCaseData(OptionStrategyDefinitions.ProtectivePut, 20, -(1000000 / 10250) - 20, true), // 20 to max short
-            new TestCaseData(OptionStrategyDefinitions.ProtectivePut, 20, -(1000000 / 10250 + 1) - 20, false).Explicit(),  // 20 to max short + 1
+            new TestCaseData(OptionStrategyDefinitions.ProtectivePut, 20, -(1000000 / 10250 + 1) - 20, false),  // 20 to max short + 1
             new TestCaseData(OptionStrategyDefinitions.ProtectivePut, -20, (1000000 / 10250) - -20, true),   // -20 to max long
-            new TestCaseData(OptionStrategyDefinitions.ProtectivePut, -20, (1000000 / 10250 + 1) - -20, false).Explicit(),   // -20 to max long + 1
+            new TestCaseData(OptionStrategyDefinitions.ProtectivePut, -20, (1000000 / 10250 + 1) - -20, false),   // -20 to max long + 1
             new TestCaseData(OptionStrategyDefinitions.ProtectivePut, -20, 20, true), // -20 to 0
             new TestCaseData(OptionStrategyDefinitions.ProtectivePut, -20, -(1000000 / 10250) - -20, true),    // -20 to max short
             new TestCaseData(OptionStrategyDefinitions.ProtectivePut, -20, -(1000000 / 10250 + 1) - -20, false),  // -20 to max short + 1
@@ -394,7 +394,7 @@ namespace QuantConnect.Tests.Common.Securities
             var initialPositionGroup = SetUpOptionStrategy(optionStrategy, initialPositionQuantity);
 
             var orders = GetPositionGroupOrders(initialPositionGroup, initialPositionQuantity != 0 ? initialPositionQuantity : 1, orderQuantity);
-            var ordersPositionGroup = _portfolio.Positions.CreatePositionGroup(orders);
+            Assert.IsTrue(_portfolio.Positions.TryCreatePositionGroup(orders, out var ordersPositionGroup));
 
             var result = ordersPositionGroup.BuyingPowerModel.HasSufficientBuyingPowerForOrder(
                 new HasSufficientPositionGroupBuyingPowerForOrderParameters(_portfolio, ordersPositionGroup, orders));
@@ -435,7 +435,7 @@ namespace QuantConnect.Tests.Common.Securities
             for (var strategyQuantity = Math.Abs(initialHoldingsQuantity); strategyQuantity > -30; strategyQuantity--)
             {
                 var orders = GetStrategyOrders(strategyQuantity);
-                var positionGroup = _portfolio.Positions.CreatePositionGroup(orders);
+                Assert.IsTrue(_portfolio.Positions.TryCreatePositionGroup(orders, out var positionGroup));
                 var buyingPowerModel = positionGroup.BuyingPowerModel;
 
                 var maintenanceMargin = buyingPowerModel.GetMaintenanceMargin(
@@ -511,7 +511,7 @@ namespace QuantConnect.Tests.Common.Securities
             var quantity = -initialHoldingsQuantity / 2;
             var orders = GetStrategyOrders(quantity);
 
-            var positionGroup = _portfolio.Positions.CreatePositionGroup(orders);
+            Assert.IsTrue(_portfolio.Positions.TryCreatePositionGroup(orders, out var positionGroup));
 
             var hasSufficientBuyingPowerResult = positionGroup.BuyingPowerModel.HasSufficientBuyingPowerForOrder(
                 new HasSufficientPositionGroupBuyingPowerForOrderParameters(_portfolio, positionGroup, orders));
@@ -533,7 +533,7 @@ namespace QuantConnect.Tests.Common.Securities
             initialHoldingsQuantity = -absQuantity;
 
             SetUpOptionStrategy(initialHoldingsQuantity);
-            var positionGroup = _portfolio.PositionGroups.Single();
+            var positionGroup = _portfolio.Positions.Groups.Single();
 
             var expectedQuantity = initialHoldingsQuantity - finalPositionQuantity;
             var usedMargin = _portfolio.TotalMarginUsed;
@@ -1788,9 +1788,9 @@ namespace QuantConnect.Tests.Common.Securities
             _callOption.Holdings.SetHoldings(1m, initialHoldingsQuantity);
             _putOption.Holdings.SetHoldings(1m, initialHoldingsQuantity);
 
-            Assert.AreEqual(1, _portfolio.PositionGroups.Count);
+            Assert.AreEqual(1, _portfolio.Positions.Groups.Count);
 
-            var positionGroup = _portfolio.PositionGroups.First();
+            var positionGroup = _portfolio.Positions.Groups.First();
             Assert.AreEqual(initialHoldingsQuantity < 0 ? OptionStrategyDefinitions.ShortStraddle.Name : OptionStrategyDefinitions.Straddle.Name,
                 positionGroup.BuyingPowerModel.ToString());
 
@@ -1835,7 +1835,7 @@ namespace QuantConnect.Tests.Common.Securities
                     var security = _algorithm.Securities[position.Symbol];
                     security.Holdings.SetHoldings(0, 0);
                 }
-                Assert.AreEqual(0, _portfolio.PositionGroups.Count);
+                Assert.AreEqual(0, _portfolio.Positions.Groups.Count);
 
                 return group;
             }
@@ -2153,7 +2153,7 @@ namespace QuantConnect.Tests.Common.Securities
                 longCallOption.Holdings.SetHoldings(longCallOption.Price, initialHoldingsQuantity);
             }
 
-            var positionGroup = _portfolio.PositionGroups.Single();
+            var positionGroup = _portfolio.Positions.Groups.Single();
             Assert.AreEqual(expectedPositionGroupBPMStrategy, positionGroup.BuyingPowerModel.ToString());
 
             if (updateCashbook)

@@ -11,68 +11,49 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
 */
 
 using System;
-using System.Linq;
-using QuantConnect.Interfaces;
-using QuantConnect.Securities;
+using QuantConnect.Orders;
 using System.Collections.Generic;
-using QuantConnect.Data.UniverseSelection;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Regression algorithm reproducing GH issue #6829 where the default future chain selection would let some contracts through
+    /// Regression algorithm asserting the behavior of the default position group Not allowing us to fill a combo order above our margin available
     /// </summary>
-    public class DefaultFutureChainRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
+    public class DefaultMarginComboOrderRegressionAlgorithm : NullMarginComboOrderRegressionAlgorithm
     {
-        /// <summary>
-        /// Initialize your algorithm and add desired assets.
-        /// </summary>
-        public override void Initialize()
+        protected override void OverrideMarginModels()
         {
-            SetStartDate(2013, 10, 08);
-            SetEndDate(2013, 12, 10);
-
-            AddFuture(Futures.Metals.Gold);
+            // we use the default
         }
 
-        public override void OnSecuritiesChanged(SecurityChanges changes)
+        protected override void AssertState(OrderTicket ticket, int expectedGroupCount, int expectedMarginUsed)
         {
-            foreach (var addedSecurity in changes.AddedSecurities.Where(added => !added.Symbol.IsCanonical()))
+            if (ticket.Status != OrderStatus.Invalid)
             {
-                // With no future chain filters specified, it should return no contracts in security changes event.
-                // The canonical continuous future will get mapped and emit symbol changed events, while it's current mapped security is an internal feed
-                throw new Exception($"We expect no non canonical security to be added: {addedSecurity.Symbol}");
+                throw new Exception($"Unexpected order status {ticket.Status} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
+            }
+            if (Portfolio.Positions.Groups.Count != 0)
+            {
+                throw new Exception($"Unexpected position group count {Portfolio.Positions.Groups.Count} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
+            }
+            if (Portfolio.TotalMarginUsed != 0)
+            {
+                throw new Exception($"Unexpected margin used {Portfolio.TotalMarginUsed} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
             }
         }
 
         /// <summary>
-        /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
-        /// </summary>
-        public bool CanRunLocally { get; } = true;
-
-        /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
-
-        /// <summary>
-        /// Data Points count of all timeslices of algorithm
-        /// </summary>
-        public long DataPoints => 446412;
-
-        /// <summary>
-        /// Data Points count of the algorithm history
-        /// </summary>
-        public int AlgorithmHistoryDataPoints => 0;
+        public override Language[] Languages { get; } = { Language.CSharp };
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Trades", "0"},
             {"Average Win", "0%"},
@@ -90,14 +71,14 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-5.145"},
-            {"Tracking Error", "0.083"},
+            {"Information Ratio", "0"},
+            {"Tracking Error", "0"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
             {"Lowest Capacity Asset", ""},
             {"Portfolio Turnover", "0%"},
-            {"OrderListHash", "d41d8cd98f00b204e9800998ecf8427e"}
+            {"OrderListHash", "71db757e317ae4499311f712048a937b"}
         };
     }
 }
