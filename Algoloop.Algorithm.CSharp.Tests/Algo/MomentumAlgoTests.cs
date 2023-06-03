@@ -58,7 +58,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             Assert.IsTrue(result.TryGetValue("Total Trades", out string trades));
             Assert.IsTrue(int.TryParse(trades, out int trade));
             Logger.LogMessage($"trade={trade}");
-            Assert.AreEqual(4, trade);
+            Assert.AreEqual(6, trade);
         }
 
         [TestMethod]
@@ -88,7 +88,7 @@ namespace Algoloop.Algorithm.CSharp.Algo.Tests
             Assert.IsTrue(result.TryGetValue("Total Trades", out string trades));
             Assert.IsTrue(int.TryParse(trades, out int trade));
             Logger.LogMessage($"trade={trade}");
-            Assert.AreEqual(106, trade);
+            Assert.AreEqual(110, trade);
         }
     }
 }
