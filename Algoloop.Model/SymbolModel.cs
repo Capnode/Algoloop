@@ -15,6 +15,7 @@
 using QuantConnect;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
@@ -82,6 +83,9 @@ namespace Algoloop.Model
 
         [DataMember]
         public SecurityType Security { get; set; }
+
+        [DataMember]
+        public Collection<string> ReferenceSymbols { get; } = new();
 
         [DataMember]
         public IDictionary<string, object> Properties

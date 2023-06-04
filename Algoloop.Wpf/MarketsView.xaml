@@ -575,6 +575,22 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </xctk:DateTimePicker>
+                                    <Separator />
+                                    <ComboBox
+                                        MinWidth="180"
+                                        DisplayMemberPath="DisplayName"
+                                        ToolTip="Reference symbols: Drag symbol from list to add symbol"
+                                        AllowDrop="True"
+                                        Drop="Reference_Drop"
+                                        SelectedItem="{Binding SelectedReferenceSymbol}"
+                                        ItemsSource="{Binding ReferenceSymbols}">
+                                    </ComboBox>
+                                    <Button Command="{Binding SelectedItem.DeleteCommand}" ToolTip="Delete reference symbol">
+                                        <Image
+                                            Width="16"
+                                            Height="16"
+                                            Source="/Resources/Delete.png" />
+                                    </Button>
                                 </ToolBar>
                                 <view:StockChartView
                                     ItemsSource="{Binding Charts}"

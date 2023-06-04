@@ -103,22 +103,6 @@ namespace Algoloop.ViewModel
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
 
-        public bool IsBusy
-        {
-            get => _parent.IsBusy;
-            set
-            {
-                _parent.IsBusy = value;
-                RaiseCommands();
-            }
-        }
-
-        public ITreeViewModel SelectedItem
-        {
-            get => _parent.SelectedItem;
-            set => _parent.SelectedItem = value;
-        }
-
         public RelayCommand<IList> CheckAllCommand { get; }
         public RelayCommand AddSymbolCommand { get; }
         public RelayCommand<IList> RemoveSymbolsCommand { get; }
@@ -143,6 +127,22 @@ namespace Algoloop.ViewModel
         public SyncObservableCollection<Trade> ClosedTrades { get; } = new SyncObservableCollection<Trade>();
 
         public string DataFolder => _settings.DataFolder;
+
+        public bool IsBusy
+        {
+            get => _parent.IsBusy;
+            set
+            {
+                _parent.IsBusy = value;
+                RaiseCommands();
+            }
+        }
+
+        public ITreeViewModel SelectedItem
+        {
+            get => _parent.SelectedItem;
+            set => _parent.SelectedItem = value;
+        }
 
         public IList SelectedItems
         {
@@ -240,6 +240,7 @@ namespace Algoloop.ViewModel
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
+                symbol.DataToModel();
                 Model.Symbols.Add(symbol.Model);
             }
 
@@ -277,6 +278,19 @@ namespace Algoloop.ViewModel
             }
 
             ReloadAccount();
+        }
+
+
+        internal SymbolViewModel FindSymbol(string symbolName)
+        {
+            SymbolViewModel symbol = Symbols.FirstOrDefault(m => m.Model.Name == symbolName);
+            if (symbol != null) return symbol;
+            return null;
+        }
+
+        internal SymbolViewModel FindSymbol(string marketName, string symbolName)
+        {
+            return _parent.FindSymbol(marketName, symbolName);
         }
 
         private void ReloadAccount()

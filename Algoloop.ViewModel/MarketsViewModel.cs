@@ -99,6 +99,18 @@ namespace Algoloop.ViewModel
             File.Move(tempFile, backupFile, true);
         }
 
+        internal SymbolViewModel FindSymbol(string marketName, string symbolName)
+        {
+            foreach (MarketViewModel market in Markets)
+            {
+                if (market.Model.Provider != marketName) continue;
+                var symbol = market.FindSymbol(symbolName);
+                if (symbol != null) return symbol;
+            }
+
+            return null;
+        }
+
         private bool ReadFile(string fileName)
         {
             Log.Trace($"Reading {fileName}");

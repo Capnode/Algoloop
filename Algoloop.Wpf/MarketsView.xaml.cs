@@ -144,6 +144,15 @@ namespace Algoloop.Wpf
             }
         }
 
+        private void Reference_Drop(object sender, DragEventArgs e)
+        {
+            if (sender is not ComboBox && e.Data.GetDataPresent(typeof(SymbolViewModel))) return;
+            if (DataContext is not MarketsViewModel markets) return;
+            if (markets.SelectedItem is not SymbolViewModel symbol) return;
+            if (e.Data.GetData(typeof(SymbolViewModel)) is not SymbolViewModel reference) return;
+            symbol.AddReferenceSymbol(reference);
+        }
+
         private static T FindAnchestor<T>(DependencyObject current) where T : DependencyObject
         {
             do

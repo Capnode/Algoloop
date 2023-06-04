@@ -247,10 +247,10 @@ namespace Algoloop.Wpf
         private void OnDrop(object sender, DragEventArgs e)
         {
             if (sender is not ChartPanel panel) return;
-            if (e.Data.GetData(typeof(SymbolViewModel)) is not SymbolViewModel source) return;
+            if (e.Data.GetData(typeof(SymbolViewModel)) is not SymbolViewModel reference) return;
             if (_combobox.Items.Count < 1) return;
             if (_combobox.Items[0] is not SymbolChartViewModel target) return;
-            target.Symbol.Add(source);
+            target.Symbol.AddReferenceSymbol(reference);
             e.Handled = true;
         }
 
@@ -412,6 +412,7 @@ namespace Algoloop.Wpf
                             list = new List<Tuple<IChartLineElement, decimal>>();
                             points.Add(time, list);
                         }
+
                         list.Add(new Tuple<IChartLineElement, decimal>(element, value));
                     }
                 }
@@ -424,6 +425,7 @@ namespace Algoloop.Wpf
                     if (element is IChartIndicatorElement) continue; // Keep indicators
                     unusedElements.Add(element);
                 }
+
                 unusedElements.ForEach(m => _chart.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     RemoveElement(area, m));
             }
 

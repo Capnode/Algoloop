@@ -35,7 +35,7 @@ namespace Algoloop.ViewModel
     {
         public enum ReportPeriod { Year, R12, Quarter };
 
-        private const string Comparison = "Comparison";
+        private const string Reference = "Reference";
         private const string Vs = "{0} / {1}";
         private const decimal Million = 1e6m;
         private const string Annual = "Annual";
@@ -74,11 +74,12 @@ namespace Algoloop.ViewModel
         private const string PsRatio = "PS Ratio";
 
         private readonly IChartViewModel _candleChart;
-        private readonly ChartViewModel _comparisonChart;
-        private readonly IList<SymbolViewModel> _references = new List<SymbolViewModel>();
+        private readonly ChartViewModel _referenceChart;
         private readonly ITreeViewModel _parent;
         private SyncObservableCollection<IChartViewModel> _charts = new();
         private ObservableCollection<DataGridColumn> _periodColumns = new();
+        private ObservableCollection<SymbolViewModel> _referenceSymbols;
+        private SymbolViewModel _selectedRreferenceSymbol;
         private decimal _ask;
         private decimal _bid;
         private decimal _price;
@@ -90,11 +91,11 @@ namespace Algoloop.ViewModel
             Model = model;
 
             _candleChart = new SymbolChartViewModel(this, true);
-            _comparisonChart = new ChartViewModel(new Chart(Comparison), false);
+            _referenceChart = new ChartViewModel(new Chart(Reference), false);
             _charts.Add(_candleChart);
-            _charts.Add(_comparisonChart);
+            _charts.Add(_referenceChart);
 
-            DeleteCommand = new RelayCommand(() => { }, () => false);
+            DeleteCommand = new RelayCommand(() => DeleteReferenceSymbol(SelectedReferenceSymbol), () => SelectedReferenceSymbol != null);
             StartCommand = new RelayCommand(() => { }, () => false);
             StopCommand = new RelayCommand(() => { }, () => false);
             UpdateCommand = new RelayCommand(
@@ -102,6 +103,16 @@ namespace Algoloop.ViewModel
                 () => !IsBusy && Market != null);
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }
+
+        public RelayCommand DeleteCommand { get; }
+        public RelayCommand StartCommand { get; }
+        public RelayCommand StopCommand { get; }
+        public RelayCommand UpdateCommand { get; }
+        public SymbolModel Model { get; }
+        public MarketViewModel Market { get; }
+        public string DisplayName => $"{Model.Market}:{Model.Name}";
+        public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; }
+            = new SyncObservableCollection<ExDataGridRow>();
 
         public decimal Ask
         {
@@ -134,16 +145,6 @@ namespace Algoloop.ViewModel
             set => _parent.SelectedItem = value;
         }
 
-        public RelayCommand DeleteCommand { get; }
-        public RelayCommand StartCommand { get; }
-        public RelayCommand StopCommand { get; }
-        public RelayCommand UpdateCommand { get; }
-        public SymbolModel Model { get; }
-        public MarketViewModel Market { get; }
-
-        public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; }
-            = new SyncObservableCollection<ExDataGridRow>();
-
         public bool Active
         {
             get => Model.Active;
@@ -171,6 +172,22 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _periodColumns, value);
         }
 
+        public ObservableCollection<SymbolViewModel> ReferenceSymbols
+        {
+            get => _referenceSymbols;
+            set => SetProperty(ref _referenceSymbols, value);
+        }
+
+        public SymbolViewModel SelectedReferenceSymbol
+        {
+            get => _selectedRreferenceSymbol;
+            set
+            {
+                SetProperty(ref _selectedRreferenceSymbol, value);
+                DeleteCommand.NotifyCanExecuteChanged();
+            }
+        }
+
         public void Refresh()
         {
             if (Market != null)
@@ -195,6 +212,16 @@ namespace Algoloop.ViewModel
             OnPropertyChanged(nameof(Model));
         }
 
+        public void DataToModel()
+        {
+            Model.ReferenceSymbols.Clear();
+            if (ReferenceSymbols == null) return;
+            foreach (SymbolViewModel reference in ReferenceSymbols)
+            {
+                Model.ReferenceSymbols.Add(reference.DisplayName);
+            }
+        }
+
         public IEnumerable<BaseData> History()
         {
             string filename = PriceFilePath(Market, Model, Market.SelectedResolution, Market.Date);
@@ -203,22 +230,38 @@ namespace Algoloop.ViewModel
             return leanDataReader.Parse();
         }
 
-        public void Add(SymbolViewModel source)
+        public void AddReferenceSymbol(SymbolViewModel reference)
         {
-            _references.Add(source);
-            _comparisonChart.IsVisible = true;
-            BuildComparisonChart();
+            ReferenceSymbols.Add(reference);
+            SelectedReferenceSymbol = reference;
+            _referenceChart.IsVisible = true;
+
+            BuildReferenceChart();
             var temp = Charts;
             Charts = null;
             Charts = temp;
         }
 
-        private Series ComparisonSeries(SymbolViewModel source)
+        private void DeleteReferenceSymbol(SymbolViewModel reference)
         {
-            string name = string.Format(Vs, Model.Name, source.Model.Name);
+            ReferenceSymbols.Remove(reference);
+            if (ReferenceSymbols.Any())
+            {
+                SelectedReferenceSymbol = ReferenceSymbols.First();
+            }
+
+            BuildReferenceChart();
+            var temp = Charts;
+            Charts = null;
+            Charts = temp;
+        }
+
+        private Series ReferenceSeries(SymbolViewModel reference)
+        {
+            string name = string.Format(Vs, Model.Name, reference.Model.Name);
             var series = new Series(name, SeriesType.Line);
             IEnumerable<BaseData> series1 = History();
-            IEnumerable<BaseData> series2 = source.History();
+            IEnumerable<BaseData> series2 = reference.History();
             IEnumerator<BaseData> iter1 = series1.GetEnumerator();
             IEnumerator<BaseData> iter2 = series2.GetEnumerator();
             bool is1 = iter1.MoveNext();
@@ -250,6 +293,7 @@ namespace Algoloop.ViewModel
                     {
                         value0 = value;
                     }
+
                     series.AddPoint(data1.Time.ToLocalTime(), value / value0);
                 }
             }
@@ -262,7 +306,13 @@ namespace Algoloop.ViewModel
             try
             {
                 IsBusy = true;
-                BuildComparisonChart();
+                if (ReferenceSymbols == null)
+                {
+                    ReferenceSymbols = CreateReferenceSymbols();
+                    SelectedReferenceSymbol = ReferenceSymbols.FirstOrDefault();
+                }
+
+                BuildReferenceChart();
                 LoadFundamentals();
             }
             finally
@@ -271,22 +321,31 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private void BuildComparisonChart()
+        private ObservableCollection<SymbolViewModel> CreateReferenceSymbols()
         {
-            _comparisonChart.Chart.Series.Clear();
-            if (_comparisonChart.IsVisible)
+            var referenceSymbols = new ObservableCollection<SymbolViewModel>();
+            foreach (string reference in Model.ReferenceSymbols)
             {
-                _comparisonChart.IsVisible = _references.Any();
-                foreach (SymbolViewModel reference in _references)
-                {
-                    Series series = ComparisonSeries(reference);
-                    _comparisonChart.Chart.AddSeries(series);
-                }
+                string[] list = reference.Split(":");
+                if (list.Length < 2) continue;
+                SymbolViewModel symbol = Market.FindSymbol(list[0], list[1]);
+                if (symbol == null) continue;
+                referenceSymbols.Add(symbol);
             }
-            else
+
+            return referenceSymbols;
+        }
+
+        private void BuildReferenceChart()
+        {
+            _referenceChart.Chart.Series.Clear();
+            foreach (SymbolViewModel reference in ReferenceSymbols)
             {
-                _references.Clear();
+                Series series = ReferenceSeries(reference);
+                _referenceChart.Chart.AddSeries(series);
             }
+
+            _referenceChart.IsVisible = ReferenceSymbols.Any();
         }
 
         private static string PriceFilePath(
