@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using Algoloop.ViewModel.Internal.Lean;
+using Algoloop.ViewModel.Properties;
 using Capnode.Wpf.DataGrid;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
@@ -78,8 +79,8 @@ namespace Algoloop.ViewModel
         private readonly ITreeViewModel _parent;
         private SyncObservableCollection<IChartViewModel> _charts = new();
         private ObservableCollection<DataGridColumn> _periodColumns = new();
-        private ObservableCollection<SymbolViewModel> _referenceSymbols;
-        private SymbolViewModel _selectedRreferenceSymbol;
+        private ObservableCollection<ReferenceSymbolViewModel> _referenceSymbols;
+        private ReferenceSymbolViewModel _selectedRreferenceSymbol;
         private decimal _ask;
         private decimal _bid;
         private decimal _price;
@@ -110,7 +111,6 @@ namespace Algoloop.ViewModel
         public RelayCommand UpdateCommand { get; }
         public SymbolModel Model { get; }
         public MarketViewModel Market { get; }
-        public string DisplayName => $"{Model.Market}:{Model.Name}";
         public SyncObservableCollection<ExDataGridRow> FundamentalRows { get; }
             = new SyncObservableCollection<ExDataGridRow>();
 
@@ -172,13 +172,13 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _periodColumns, value);
         }
 
-        public ObservableCollection<SymbolViewModel> ReferenceSymbols
+        public ObservableCollection<ReferenceSymbolViewModel> ReferenceSymbols
         {
             get => _referenceSymbols;
             set => SetProperty(ref _referenceSymbols, value);
         }
 
-        public SymbolViewModel SelectedReferenceSymbol
+        public ReferenceSymbolViewModel SelectedReferenceSymbol
         {
             get => _selectedRreferenceSymbol;
             set
@@ -216,19 +216,31 @@ namespace Algoloop.ViewModel
         {
             Model.ReferenceSymbols.Clear();
             if (ReferenceSymbols == null) return;
-            foreach (SymbolViewModel reference in ReferenceSymbols)
+            foreach (ReferenceSymbolViewModel reference in ReferenceSymbols)
             {
-                Model.ReferenceSymbols.Add(reference.DisplayName);
+                Model.ReferenceSymbols.Add(reference.Model);
             }
         }
 
         public IEnumerable<BaseData> History()
         {
-            return History(Market.SelectedResolution, Market.Date);
+            return History(Market.ChartResolution, Market.ChartDate);
         }
 
-        public void AddReferenceSymbol(SymbolViewModel reference)
+        public void AddReferenceSymbol(SymbolViewModel symbol)
         {
+            if (ReferenceSymbols.Any(m => m.Model.Name.Equals(symbol.Model.Name)))
+            {
+                string message = string.Format(
+                    CultureInfo.InvariantCulture,
+                    Resources.ReferenceSymbolExist,
+                    symbol.Model.Name);
+                Messenger.Send(new NotificationMessage(message), 0);
+                return;
+            }
+
+            var model = new ReferenceSymbolModel(symbol.Model.Market, symbol.Model.Name);
+            var reference = new ReferenceSymbolViewModel(model, symbol);
             ReferenceSymbols.Add(reference);
             SelectedReferenceSymbol = reference;
             _referenceChart.IsVisible = true;
@@ -247,7 +259,7 @@ namespace Algoloop.ViewModel
             return leanDataReader.Parse().Where(m => m.Time >= date);
         }
 
-        private void DeleteReferenceSymbol(SymbolViewModel reference)
+        private void DeleteReferenceSymbol(ReferenceSymbolViewModel reference)
         {
             ReferenceSymbols.Remove(reference);
             if (ReferenceSymbols.Any())
@@ -261,13 +273,13 @@ namespace Algoloop.ViewModel
             Charts = temp;
         }
 
-        private Series ReferenceSeries(SymbolViewModel reference)
+        private Series ReferenceSeries(ReferenceSymbolViewModel reference)
         {
             string name = string.Format(Vs, Model.Name, reference.Model.Name);
             var series = new Series(name, SeriesType.Line);
-            IEnumerable<BaseData> series1 = History(Market.SelectedResolution, Market.Date);
+            IEnumerable<BaseData> series1 = History(Market.ChartResolution, Market.ChartDate);
             if (series1 == null) return series;
-            IEnumerable<BaseData> series2 = reference.History(Market.SelectedResolution, Market.Date);
+            IEnumerable<BaseData> series2 = reference.Symbol.History(Market.ChartResolution, Market.ChartDate);
             if (series2 == null) return series;
             IEnumerator<BaseData> iter1 = series1.GetEnumerator();
             IEnumerator<BaseData> iter2 = series2.GetEnumerator();
@@ -332,16 +344,15 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private ObservableCollection<SymbolViewModel> CreateReferenceSymbols()
+        private ObservableCollection<ReferenceSymbolViewModel> CreateReferenceSymbols()
         {
-            var referenceSymbols = new ObservableCollection<SymbolViewModel>();
-            foreach (string reference in Model.ReferenceSymbols)
+            var referenceSymbols = new ObservableCollection<ReferenceSymbolViewModel>();
+            foreach (ReferenceSymbolModel model in Model.ReferenceSymbols)
             {
-                string[] list = reference.Split(":");
-                if (list.Length < 2) continue;
-                SymbolViewModel symbol = Market.FindSymbol(list[0], list[1]);
+                SymbolViewModel symbol = Market.FindSymbol(model.Market, model.Name);
                 if (symbol == null) continue;
-                referenceSymbols.Add(symbol);
+                var reference = new ReferenceSymbolViewModel(model, symbol);
+                referenceSymbols.Add(reference);
             }
 
             return referenceSymbols;
@@ -350,7 +361,7 @@ namespace Algoloop.ViewModel
         private void BuildReferenceChart()
         {
             _referenceChart.Chart.Series.Clear();
-            foreach (SymbolViewModel reference in ReferenceSymbols)
+            foreach (ReferenceSymbolViewModel reference in ReferenceSymbols)
             {
                 Series series = ReferenceSeries(reference);
                 if (series == null) continue;

@@ -175,13 +175,13 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _model, value);
         }
 
-        public Resolution SelectedResolution
+        public Resolution ChartResolution
         {
             get => _selectedResolution;
             set => SetProperty(ref _selectedResolution, value);
         }
 
-        public DateTime Date
+        public DateTime ChartDate
         {
             get => _date;
             set => SetProperty(ref _date, value);
@@ -237,6 +237,9 @@ namespace Algoloop.ViewModel
         internal void DataToModel()
         {
             Model.Active = Active;
+            Model.ChartResolution = ChartResolution;
+            Model.ChartDate = ChartDate;
+
             Model.Symbols.Clear();
             foreach (SymbolViewModel symbol in Symbols)
             {
@@ -255,6 +258,9 @@ namespace Algoloop.ViewModel
         internal void DataFromModel()
         {
             Active = Model.Active;
+            ChartResolution = Model.ChartResolution;
+            ChartDate = Model.ChartDate;
+
             UpdateColumns();
             SymbolsFromModel();
 

@@ -514,7 +514,7 @@ namespace Algoloop.Wpf
                 CandleSeries series = new CandleSeries(
                     typeof(TimeFrameCandle),
                     security,
-                    symbol.Market.SelectedResolution.ToTimeSpan());
+                    symbol.Market.ChartResolution.ToTimeSpan());
                 _chart.AddElement(area, element, series);
             }
             else

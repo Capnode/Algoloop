@@ -85,7 +85,7 @@ namespace Algoloop.Model
         public SecurityType Security { get; set; }
 
         [DataMember]
-        public Collection<string> ReferenceSymbols { get; } = new();
+        public Collection<ReferenceSymbolModel> ReferenceSymbols { get; } = new();
 
         [DataMember]
         public IDictionary<string, object> Properties

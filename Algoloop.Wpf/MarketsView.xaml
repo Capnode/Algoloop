@@ -555,7 +555,7 @@
                                     <ComboBox
                                         MinWidth="120"
                                         ItemsSource="{Binding Market.ResolutionList}"
-                                        SelectedValue="{Binding Market.SelectedResolution, Mode=TwoWay}">
+                                        SelectedValue="{Binding Market.ChartResolution, Mode=TwoWay}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="SelectionChanged">
                                                 <i:InvokeCommandAction Command="{Binding UpdateCommand}" />
@@ -568,7 +568,7 @@
                                         BorderThickness="0"
                                         Format="ShortDate"
                                         TimePickerVisibility="Collapsed"
-                                        Value="{Binding Market.Date}">
+                                        Value="{Binding Market.ChartDate}">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="ValueChanged">
                                                 <i:InvokeCommandAction Command="{Binding UpdateCommand}" />

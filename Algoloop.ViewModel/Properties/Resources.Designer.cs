@@ -151,6 +151,15 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reference symbol {0} already exist.
+        /// </summary>
+        internal static string ReferenceSymbolExist {
+            get {
+                return ResourceManager.GetString("ReferenceSymbolExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selected: {0}.
         /// </summary>
         internal static string SelectedCount {

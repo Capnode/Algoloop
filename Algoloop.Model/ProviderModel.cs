@@ -150,6 +150,16 @@ namespace Algoloop.Model
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]
+        public Resolution ChartResolution { get; set; } = Resolution.Daily;
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
+        public DateTime ChartDate { get; set; } = DateTime.MinValue;
+
+        [Browsable(false)]
+        [ReadOnly(false)]
+        [DataMember]
         public Collection<SymbolModel> Symbols { get; } = new Collection<SymbolModel>();
 
         [Browsable(false)]
