@@ -266,7 +266,8 @@ namespace Algoloop.Wpf
 
             // Process Candles
             var chartData = new ChartDrawData();
-            foreach (Candle candle in symbol.History().ToCandles())
+            IEnumerable<Candle> list = symbol.History()?.ToCandles() ?? Enumerable.Empty<Candle>();
+            foreach (Candle candle in list)
             {
                 IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
                 chartGroup.Add(element, candle);
@@ -296,7 +297,8 @@ namespace Algoloop.Wpf
 
             // Process Candles
             IChartDrawData chartData = _chart.CreateData();
-            foreach (Candle candle in symbol.History().ToCandles())
+            IEnumerable<Candle> list = symbol.History()?.ToCandles() ?? Enumerable.Empty<Candle>();
+            foreach (Candle candle in list)
             {
                 chartData.Group(candle.OpenTime).Add(element, indicator.Process(candle));
             }
@@ -523,7 +525,8 @@ namespace Algoloop.Wpf
 
             // Process Candles
             var chartData = new ChartDrawData();
-            foreach (Candle candle in symbol.History().ToCandles())
+            IEnumerable<Candle> candles = symbol.History()?.ToCandles() ?? Enumerable.Empty<Candle>();
+            foreach (Candle candle in candles)
             {
                 IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
                 chartGroup.Add(element, candle);

@@ -224,10 +224,7 @@ namespace Algoloop.ViewModel
 
         public IEnumerable<BaseData> History()
         {
-            string filename = PriceFilePath(Market, Model, Market.SelectedResolution, Market.Date);
-            if (!File.Exists(filename)) return null;
-            var leanDataReader = new LeanDataReader(filename);
-            return leanDataReader.Parse();
+            return History(Market.SelectedResolution, Market.Date);
         }
 
         public void AddReferenceSymbol(SymbolViewModel reference)
@@ -240,6 +237,14 @@ namespace Algoloop.ViewModel
             var temp = Charts;
             Charts = null;
             Charts = temp;
+        }
+
+        private IEnumerable<BaseData> History(Resolution resolution, DateTime date)
+        {
+            string filename = PriceFilePath(Market, Model, resolution, date);
+            if (!File.Exists(filename)) return null;
+            var leanDataReader = new LeanDataReader(filename);
+            return leanDataReader.Parse().Where(m => m.Time >= date);
         }
 
         private void DeleteReferenceSymbol(SymbolViewModel reference)
@@ -260,8 +265,10 @@ namespace Algoloop.ViewModel
         {
             string name = string.Format(Vs, Model.Name, reference.Model.Name);
             var series = new Series(name, SeriesType.Line);
-            IEnumerable<BaseData> series1 = History();
-            IEnumerable<BaseData> series2 = reference.History();
+            IEnumerable<BaseData> series1 = History(Market.SelectedResolution, Market.Date);
+            if (series1 == null) return series;
+            IEnumerable<BaseData> series2 = reference.History(Market.SelectedResolution, Market.Date);
+            if (series2 == null) return series;
             IEnumerator<BaseData> iter1 = series1.GetEnumerator();
             IEnumerator<BaseData> iter2 = series2.GetEnumerator();
             bool is1 = iter1.MoveNext();
@@ -314,6 +321,10 @@ namespace Algoloop.ViewModel
 
                 BuildReferenceChart();
                 LoadFundamentals();
+
+                var temp = Charts;
+                Charts = null;
+                Charts = temp;
             }
             finally
             {
@@ -342,6 +353,7 @@ namespace Algoloop.ViewModel
             foreach (SymbolViewModel reference in ReferenceSymbols)
             {
                 Series series = ReferenceSeries(reference);
+                if (series == null) continue;
                 _referenceChart.Chart.AddSeries(series);
             }
 
