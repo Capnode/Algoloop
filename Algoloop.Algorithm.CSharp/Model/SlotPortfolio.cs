@@ -138,7 +138,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma1.Period})", _trackerSma1);
                 sizingFactor = trackerIndex >= _trackerSma1 ? TradeSizing : StoplossSizing;
             }
-            if (_trackerSma1 == null && _trackerSma2 != null && _trackerSma2.IsReady)
+            if (_trackerSma2 != null && _trackerSma2.IsReady)
             {
                 algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma2.Period})", _trackerSma2);
                 sizingFactor = _trackerSma2 >= trackerSma2 ? TradeSizing : StoplossSizing;
