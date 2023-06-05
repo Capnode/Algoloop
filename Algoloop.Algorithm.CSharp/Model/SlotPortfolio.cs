@@ -127,6 +127,8 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal trackerValue = _trackerPortfolio.GetEquity(algorithm);
             decimal trackerIndex = trackerValue / _trackerValue0;
             algorithm.Plot(TrackerChart, "Tracker", trackerIndex);
+
+            decimal trackerSma2 = _trackerSma2 ?? 0m;
             _trackerSma1?.Update(algorithm.Time, trackerIndex);
             _trackerSma2?.Update(algorithm.Time, trackerIndex);
 
@@ -136,10 +138,10 @@ namespace Algoloop.Algorithm.CSharp.Model
                 algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma1.Period})", _trackerSma1);
                 sizingFactor = trackerIndex >= _trackerSma1 ? TradeSizing : StoplossSizing;
             }
-            if (_trackerSma2 != null && _trackerSma2.IsReady)
+            if (_trackerSma1 == null && _trackerSma2 != null && _trackerSma2.IsReady)
             {
                 algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma2.Period})", _trackerSma2);
-                sizingFactor = trackerIndex >= _trackerSma2 ? TradeSizing : StoplossSizing;
+                sizingFactor = _trackerSma2 >= trackerSma2 ? TradeSizing : StoplossSizing;
             }
             if (_trackerSma1 != null && _trackerSma2 != null)
             {
