@@ -168,7 +168,6 @@ namespace Algoloop.Wpf
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (_isLoaded) return;
-            _isLoaded = true;
             Window window = Window.GetWindow(this);
             window.Closing += OnUnloaded;
 
@@ -178,6 +177,7 @@ namespace Algoloop.Wpf
                 byte[] bytes = Encoding.Default.GetBytes(Settings);
                 SettingsStorage storage = bytes.Deserialize<SettingsStorage>();
                 _chart.LoadIfNotNull(storage);
+                _isLoaded = true;
             }
             catch (Exception)
             {
@@ -260,64 +260,23 @@ namespace Algoloop.Wpf
             Debug.WriteLine($"OnSubscribeCandleElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"})");
             if (candles.Security == null) return;
             _securityProvider.Add(candles.Security);
-            if (!_symbols.TryGetValue(candles.Security.Id, out SymbolViewModel symbol)) return;
-            _chart.Reset(_chart.Elements);
-            element.Update(symbol.Model);
-
-            // Process Candles
-            var chartData = new ChartDrawData();
-            IEnumerable<Candle> list = symbol.History()?.ToCandles() ?? Enumerable.Empty<Candle>();
-            foreach (Candle candle in list)
-            {
-                IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
-                chartGroup.Add(element, candle);
-            }
-
-//            _chart.Reset(new[] { element });
-            _chart.Draw(chartData);
+            if (!_isLoaded) return;
+            RedrawCharts();
         }
 
         private void OnSubscribeIndicatorElement(IChartIndicatorElement element, CandleSeries candles, IIndicator indicator)
         {
+            if (_inRedraw) return;
             Debug.WriteLine($"OnSubscribeIndicatorElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"}, {indicator.Name ?? "-"})");
-            var oldReset = _chart.DisableIndicatorReset;
-            try
-            {
-                _chart.DisableIndicatorReset = true;
-                indicator.Reset();
-            }
-            finally
-            {
-                _chart.DisableIndicatorReset = oldReset;
-            }
-
             _indicators[element] = indicator;
-            if (candles.Security == null ) return;
-            if (!_symbols.TryGetValue(candles.Security.Id, out SymbolViewModel symbol)) return;
-
-            // Process Candles
-            IChartDrawData chartData = _chart.CreateData();
-            IEnumerable<Candle> list = symbol.History()?.ToCandles() ?? Enumerable.Empty<Candle>();
-            foreach (Candle candle in list)
-            {
-                chartData.Group(candle.OpenTime).Add(element, indicator.Process(candle));
-            }
-
-            // Adjust axes
-            IChartArea area = element.ChartArea;
-            element.YAxisId = area.YAxises.First().Id;
-            area.YAxises.RemoveRange(area.YAxises.Skip(1));
-            area.Title = element.FullTitle;
-
-            // Draw
-            _chart.Reset(new[] { element });
-            _chart.Draw(chartData);
+            if (!_isLoaded) return;
+            RedrawCharts();
         }
 
         private void OnUnSubscribeElement(IChartElement element)
         {
+            if (_inRedraw) return;
             Debug.WriteLine($"OnUnSubscribeElement({element.FullTitle ?? "-"})");
-            _chart.Reset(new[] { element });
             if (element is IChartIndicatorElement indElem)
             {
                 _indicators.Remove(indElem);
@@ -326,6 +285,7 @@ namespace Algoloop.Wpf
 
         private void RedrawCharts()
         {
+            Debug.WriteLine($"RedrawCharts()");
             _inRedraw = true;
             _chart.IsAutoRange = true;
             _chart.Reset(_chart.Elements);
@@ -340,7 +300,7 @@ namespace Algoloop.Wpf
                 if (areaId < _chart.Areas.Count)
                 {
                     area = _chart.Areas[areaId];
-                    while (HasIndicatorElement(area))
+                    while (HasIOnlyIndicatorElement(area))
                     {
                         if (++areaId < _chart.Areas.Count)
                         {
@@ -436,7 +396,7 @@ namespace Algoloop.Wpf
             while (areaId < _chart.Areas.Count)
             {
                 IChartArea area = _chart.Areas[areaId++];
-                if (!HasIndicatorElement(area))
+                if (!HasIOnlyIndicatorElement(area))
                 {
                     unusedAreas.Add(area);
                 }
@@ -476,7 +436,7 @@ namespace Algoloop.Wpf
                 if (!iChart.IsVisible) continue;
                 if (iChart is not SymbolChartViewModel chart) continue;
                 IChartArea area = _chart.Areas[areaId++];
-                while (HasIndicatorElement(area))
+                while (HasIOnlyIndicatorElement(area))
                 {
                     Debug.Assert(areaId < _chart.Areas.Count, "No area found");
                     area = _chart.Areas[areaId++];
@@ -490,14 +450,16 @@ namespace Algoloop.Wpf
             _inRedraw = false;
         }
 
-        private static bool HasIndicatorElement(IChartArea area)
+        private static bool HasIOnlyIndicatorElement(IChartArea area)
         {
+            bool indicator = false;
             foreach (IChartElement element in area.Elements)
             {
-                if (element is IChartIndicatorElement) return true;
+                if (element is not IChartIndicatorElement) return false;
+                indicator = true;
             }
 
-            return false;
+            return indicator;
         }
 
         private void RedrawChart(IChartArea area, SymbolViewModel symbol, bool doIndicators)
@@ -524,6 +486,11 @@ namespace Algoloop.Wpf
             }
 
             // Process Candles
+            foreach ((IChartIndicatorElement indicatorElement, IIndicator indicator) in _indicators.CachedPairs)
+            {
+                indicator.Reset();
+            }
+
             var chartData = new ChartDrawData();
             IEnumerable<Candle> candles = symbol.History()?.ToCandles() ?? Enumerable.Empty<Candle>();
             foreach (Candle candle in candles)
