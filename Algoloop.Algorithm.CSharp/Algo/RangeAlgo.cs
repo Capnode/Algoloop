@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Capnode AB
+ * Copyright 2023 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ using System.Globalization;
 
 namespace Algoloop.Algorithm.CSharp
 {
-    public class SharpeAlgo : QCAlgorithm
+    public class RangeAlgo : QCAlgorithm
     {
         [Parameter("symbols")]
         private readonly string _symbols = null;
@@ -169,7 +169,7 @@ namespace Algoloop.Algorithm.CSharp
                     returnOnEquity: _returnOnEquity,
                     peRatio: _peRatio,
                     epRatio: _epRatio),
-                (symbol) => new SharpeSignal(period)));
+                (symbol) => new RangeSignal(this, symbol, resolution, period)));
         }
 
         public override void OnEndOfAlgorithm()

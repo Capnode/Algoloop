@@ -38,6 +38,8 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
         private readonly InsightCollection _insights = new();
+        private readonly Maximum _trackerHigh;
+        private readonly Minimum _trackerLow;
         private readonly SimpleMovingAverage _trackerSma1;
         private readonly SimpleMovingAverage _trackerSma2;
         private TrackerPortfolio _trackerPortfolio;
@@ -45,7 +47,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         private decimal _portfolioValue0 = 0;
         private decimal _trackerValue0 = 0;
         private decimal _benchmarkValue0 = 0;
-        private decimal _sizingFactor = 1;
+        private decimal _sizingFactor = TradeSizing;
         private decimal _leverage = 1;
         private string _indexName = "Index";
 
@@ -53,12 +55,18 @@ namespace Algoloop.Algorithm.CSharp.Model
             int slots,
             bool reinvest,
             float rebalance = 0,
+            int rangePeriod = 0,
             int trackerPeriod1 = 0,
             int trackerPeriod2 = 0)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
+            if (rangePeriod > 0)
+            {
+                _trackerHigh = new Maximum($"Tracker High({rangePeriod})", rangePeriod);
+                _trackerLow = new Minimum($"Tracker Low({rangePeriod})", rangePeriod);
+            }
             if (trackerPeriod1 > 0)
             {
                 _trackerSma1 = new SimpleMovingAverage($"Tracker SMA({trackerPeriod1})", trackerPeriod1);
@@ -128,11 +136,11 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal trackerIndex = trackerValue / _trackerValue0;
             algorithm.Plot(TrackerChart, "Tracker", trackerIndex);
 
+            // SMA stoploss
             decimal trackerSma2 = _trackerSma2 ?? 0m;
             _trackerSma1?.Update(algorithm.Time, trackerIndex);
             _trackerSma2?.Update(algorithm.Time, trackerIndex);
-
-            decimal sizingFactor = TradeSizing;
+            decimal sizingFactor = _sizingFactor;
             if (_trackerSma1 != null && _trackerSma1.IsReady)
             {
                 algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma1.Period})", _trackerSma1);
@@ -154,6 +162,26 @@ namespace Algoloop.Algorithm.CSharp.Model
                     sizingFactor = TradeSizing;
                 }
             }
+
+            // Range stoploss
+            if (_trackerHigh != null && _trackerHigh.IsReady)
+            {
+                algorithm.Plot(TrackerChart, $"Tracker High({_trackerHigh.Period})", _trackerHigh);
+                if (trackerIndex > _trackerHigh)
+                {
+                    sizingFactor = 1;
+                }
+            }
+            if (_trackerLow != null && _trackerLow.IsReady)
+            {
+                algorithm.Plot(TrackerChart, $"Tracker Low({_trackerLow.Period})", _trackerLow);
+                if (trackerIndex < _trackerLow)
+                {
+                    sizingFactor = StoplossSizing;
+                }
+            }
+            _trackerHigh?.Update(algorithm.Time, trackerIndex);
+            _trackerLow?.Update(algorithm.Time, trackerIndex);
 
             // Plot tracker and benchmark index
             decimal benchmarkValue = algorithm.Benchmark.Evaluate(algorithm.Time);

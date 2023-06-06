@@ -285,7 +285,6 @@ namespace Algoloop.Wpf
 
         private void RedrawCharts()
         {
-            Debug.WriteLine($"RedrawCharts()");
             _inRedraw = true;
             _chart.IsAutoRange = true;
             _chart.Reset(_chart.Elements);

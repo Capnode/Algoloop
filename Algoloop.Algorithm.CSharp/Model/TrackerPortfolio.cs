@@ -144,7 +144,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 _trades.Add(trade);
                 if (_logOrder)
                 {
-                    algorithm.Log($"{algorithm.Time:d} Sell {trade.Symbol} {trade.Quantity} @ {trade.ExitPrice} cash={_cash:0.00}");
+                    algorithm.Log($"{algorithm.Time:d} Sell {trade.Symbol} {trade.Quantity} @ {trade.ExitPrice}");
                 }
             }
 
@@ -188,7 +188,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                             if (!_holdings.Remove(trade)) throw new ApplicationException($"Can not remove {order.Symbol}");
                             if (_logOrder)
                             {
-                                algorithm.Log($"{trade.ExitTime:d} Sell {trade.Symbol} {trade.Quantity} @ {price} cash={_cash:0.00}");
+                                algorithm.Log($"{trade.ExitTime:d} Sell {trade.Symbol} {trade.Quantity} @ {price}");
                             }
                         }
                         else // Rebalance down
@@ -204,7 +204,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                                 ExitPrice = price,
                             };
                             _trades.Add(sellTrade);
-                             algorithm.Log($"{sellTrade.ExitTime:d} Sell rebalance {sellTrade.Symbol} {sellTrade.Quantity} @ {price} cash={_cash:0.00}");
+                             algorithm.Log($"{sellTrade.ExitTime:d} Sell rebalance {sellTrade.Symbol} {sellTrade.Quantity} @ {price}");
                         }
                     }
                 }
@@ -228,7 +228,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                             _holdings.Add(trade);
                             if (_logOrder)
                             {
-                                algorithm.Log($"{trade.EntryTime:d} Buy {trade.Symbol} {trade.Quantity} @ {price} cash={_cash:0.00}");
+                                algorithm.Log($"{trade.EntryTime:d} Buy {trade.Symbol} {trade.Quantity} @ {price}");
                             }
                         }
                         else // Rebalance up
@@ -236,7 +236,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                             value += trade.Quantity * trade.EntryPrice;
                             trade.Quantity += order.Quantity;
                             trade.EntryPrice = value / trade.Quantity;
-                            algorithm.Log($"{algorithm.Time:d} Buy rebalance {order.Symbol} {order.Quantity} @ {price} cash={_cash:0.00}");
+                            algorithm.Log($"{algorithm.Time:d} Buy rebalance {order.Symbol} {order.Quantity} @ {price}");
                         }
                     }
                 }

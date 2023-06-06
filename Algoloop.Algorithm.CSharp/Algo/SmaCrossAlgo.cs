@@ -67,6 +67,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Tracker sma stoploss period2")]
         private readonly string _trackerPeriod2 = "0";
 
+        [Parameter("Tracker range stoploss period")]
+        private readonly string _rangePeriod = "0";
+
         [Parameter("Daily turnover (min)")]
         private readonly string _turnover = "0";
 
@@ -143,6 +146,7 @@ namespace Algoloop.Algorithm.CSharp
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
             long turnover = long.Parse(_turnover, CultureInfo.InvariantCulture);
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
+            int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
             int trackerPeriod1 = int.Parse(_trackerPeriod1, CultureInfo.InvariantCulture);
@@ -162,7 +166,8 @@ namespace Algoloop.Algorithm.CSharp
                 reinvest: reinvest,
                 rebalance: rebalance,
                 trackerPeriod1: trackerPeriod1 >= 0 ? trackerPeriod1 : period1,
-                trackerPeriod2: trackerPeriod2 >= 0 ? trackerPeriod2 : period2));
+                trackerPeriod2: trackerPeriod2 >= 0 ? trackerPeriod2 : period2,
+                rangePeriod: rangePeriod));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
