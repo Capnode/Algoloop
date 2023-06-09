@@ -37,7 +37,6 @@ namespace Algoloop.ViewModel
         public enum ReportPeriod { Year, R12, Quarter };
 
         private const string Reference = "Reference";
-        private const string Vs = "{0} / {1}";
         private const decimal Million = 1e6m;
         private const string Annual = "Annual";
         private const string PeriodEndDate = "End date";
@@ -227,36 +226,31 @@ namespace Algoloop.ViewModel
             return History(Market.ChartResolution, Market.ChartDate);
         }
 
+        public IEnumerable<BaseData> History(Resolution resolution, DateTime date)
+        {
+            string filename = PriceFilePath(Market, Model, resolution, date);
+            if (!File.Exists(filename)) return null;
+            var leanDataReader = new LeanDataReader(filename);
+            return leanDataReader.Parse().Where(m => m.Time >= date);
+        }
+
         public void AddReferenceSymbol(SymbolViewModel symbol)
         {
-            if (ReferenceSymbols.Any(m => m.Model.Name.Equals(symbol.Model.Name)))
-            {
-                string message = string.Format(
-                    CultureInfo.InvariantCulture,
-                    Resources.ReferenceSymbolExist,
-                    symbol.Model.Name);
-                Messenger.Send(new NotificationMessage(message), 0);
-                return;
-            }
+            string message = string.Format(
+                CultureInfo.InvariantCulture,
+                Resources.ReferenceSymbolAdded,
+                symbol.Model.Name);
+            Messenger.Send(new NotificationMessage(message), 0);
 
             var model = new ReferenceSymbolModel(symbol.Model.Market, symbol.Model.Name);
             var reference = new ReferenceSymbolViewModel(model, symbol);
             ReferenceSymbols.Add(reference);
             SelectedReferenceSymbol = reference;
             _referenceChart.IsVisible = true;
-
             BuildReferenceChart();
             var temp = Charts;
             Charts = null;
             Charts = temp;
-        }
-
-        private IEnumerable<BaseData> History(Resolution resolution, DateTime date)
-        {
-            string filename = PriceFilePath(Market, Model, resolution, date);
-            if (!File.Exists(filename)) return null;
-            var leanDataReader = new LeanDataReader(filename);
-            return leanDataReader.Parse().Where(m => m.Time >= date);
         }
 
         private void DeleteReferenceSymbol(ReferenceSymbolViewModel reference)
@@ -271,53 +265,6 @@ namespace Algoloop.ViewModel
             var temp = Charts;
             Charts = null;
             Charts = temp;
-        }
-
-        private Series ReferenceSeries(ReferenceSymbolViewModel reference)
-        {
-            string name = string.Format(Vs, Model.Name, reference.Model.Name);
-            var series = new Series(name, SeriesType.Line);
-            IEnumerable<BaseData> series1 = History(Market.ChartResolution, Market.ChartDate);
-            if (series1 == null) return series;
-            IEnumerable<BaseData> series2 = reference.Symbol.History(Market.ChartResolution, Market.ChartDate);
-            if (series2 == null) return series;
-            IEnumerator<BaseData> iter1 = series1.GetEnumerator();
-            IEnumerator<BaseData> iter2 = series2.GetEnumerator();
-            bool is1 = iter1.MoveNext();
-            bool is2 = iter2.MoveNext();
-            decimal value0 = 0;
-            while (is1 && is2)
-            {
-                BaseData data1 = iter1.Current;
-                BaseData data2 = iter2.Current;
-                if (data1.Time < data2.Time)
-                {
-                    is1 = iter1.MoveNext();
-                    continue;
-                }
-
-                if (data1.Time > data2.Time)
-                {
-                    is2 = iter2.MoveNext();
-                    continue;
-                }
-
-                if (data1.Time == data2.Time)
-                {
-                    is1 = iter1.MoveNext();
-                    is2 = iter2.MoveNext();
-                    if (data2.Value == 0) continue;
-                    decimal value = data1.Value / data2.Value;
-                    if (value0 == 0)
-                    {
-                        value0 = value;
-                    }
-
-                    series.AddPoint(data1.Time.ToLocalTime(), value / value0);
-                }
-            }
-
-            return series;
         }
 
         private void DoLoadData()
@@ -363,8 +310,19 @@ namespace Algoloop.ViewModel
             _referenceChart.Chart.Series.Clear();
             foreach (ReferenceSymbolViewModel reference in ReferenceSymbols)
             {
-                Series series = ReferenceSeries(reference);
+                Series series = reference.ChartSeries(this);
                 if (series == null) continue;
+
+                // Create unique series name
+                int index = 0;
+                string name = series.Name;
+                while (_referenceChart.Chart.Series.Any(m => m.Key.Equals(name)))
+                {
+                    index++;
+                    name = $"{series.Name} ({index})";
+                }
+
+                series.Name = name;
                 _referenceChart.Chart.AddSeries(series);
             }
 

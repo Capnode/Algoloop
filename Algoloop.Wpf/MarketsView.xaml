@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     xmlns:view="clr-namespace:Algoloop.Wpf"
-    xmlns:viewsupport="clr-namespace:Algoloop.Wpf.Internal"
+    xmlns:internal="clr-namespace:Algoloop.Wpf.Internal"
+    xmlns:model="clr-namespace:Algoloop.Model;assembly=Algoloop.Model"
     xmlns:vm="clr-namespace:Algoloop.ViewModel;assembly=Algoloop.ViewModel"
     xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
@@ -25,12 +26,12 @@
     </UserControl.Resources>
 
     <UserControl.Cursor>
-        <Binding Converter="{viewsupport:BusyMouseConverter}" Path="IsBusy" />
+        <Binding Converter="{internal:BusyMouseConverter}" Path="IsBusy" />
     </UserControl.Cursor>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="{Binding Source={StaticResource settings}, Path=MarketViewSplitter, Mode=TwoWay, Converter={viewsupport:Int32FromGridLengthConverter}}" />
+            <ColumnDefinition Width="{Binding Source={StaticResource settings}, Path=MarketViewSplitter, Mode=TwoWay, Converter={internal:Int32FromGridLengthConverter}}" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <GridSplitter
@@ -178,7 +179,7 @@
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:MarketViewModel}">
                     <TabControl>
-                        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Instruments ({0}), FallbackValue=Instruments}">
+                        <TabItem Header="{Binding Symbols.Count, Converter={internal:StringFormatConverter}, ConverterParameter=Instruments ({0}), FallbackValue=Instruments}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
@@ -187,7 +188,7 @@
                                         ItemsSource="{Binding Accounts}"
                                         SelectedValue="{Binding SelectedAccount, Mode=TwoWay}"
                                         ToolTip="Selected account"
-                                        Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}" />
+                                        Visibility="{Binding Accounts.Count, Converter={internal:BooleanToVisibilityConverter}}" />
                                     <Grid>
                                         <CheckBox
                                             VerticalAlignment="Center"
@@ -256,7 +257,7 @@
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="{Binding Balances.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}" Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                        <TabItem Header="{Binding Balances.Count, Converter={internal:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}" Visibility="{Binding Accounts.Count, Converter={internal:BooleanToVisibilityConverter}}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
@@ -291,7 +292,7 @@
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="{Binding Orders.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}" Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                        <TabItem Header="{Binding Orders.Count, Converter={internal:StringFormatConverter}, ConverterParameter=Orders ({0}), FallbackValue=Orders}" Visibility="{Binding Accounts.Count, Converter={internal:BooleanToVisibilityConverter}}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
@@ -349,7 +350,7 @@
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="{Binding Positions.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}" Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                        <TabItem Header="{Binding Positions.Count, Converter={internal:StringFormatConverter}, ConverterParameter=Positions ({0}), FallbackValue=Positions}" Visibility="{Binding Accounts.Count, Converter={internal:BooleanToVisibilityConverter}}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
@@ -405,7 +406,7 @@
                                 </wpf:ExDataGrid>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="{Binding ClosedTrades.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}" Visibility="{Binding Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                        <TabItem Header="{Binding ClosedTrades.Count, Converter={internal:StringFormatConverter}, ConverterParameter=Trades ({0}), FallbackValue=Trades}" Visibility="{Binding Accounts.Count, Converter={internal:BooleanToVisibilityConverter}}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
@@ -475,7 +476,7 @@
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:ListViewModel}">
                     <TabControl>
-                        <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
+                        <TabItem Header="{Binding Symbols.Count, Converter={internal:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}">
                             <DockPanel>
                                 <ToolBar DockPanel.Dock="Top">
                                     <ComboBox
@@ -484,7 +485,7 @@
                                         ItemsSource="{Binding Market.Accounts}"
                                         SelectedValue="{Binding Market.SelectedAccount, Mode=TwoWay}"
                                         ToolTip="Selected account"
-                                        Visibility="{Binding Market.Accounts.Count, Converter={viewsupport:BooleanToVisibilityConverter}}" />
+                                        Visibility="{Binding Market.Accounts.Count, Converter={internal:BooleanToVisibilityConverter}}" />
                                     <ComboBox
                                         Name="combobox"
                                         MinWidth="120"
@@ -575,7 +576,19 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </xctk:DateTimePicker>
-                                    <Separator />
+                                    <Separator/>
+                                    <ComboBox
+                                        MinWidth="100"
+                                        ToolTip="Operation on reference symbol"
+                                        SelectedItem="{Binding SelectedReferenceSymbol.Model.Operation}"
+                                        ItemsSource="{Binding Source={internal:EnumBindingSource {x:Type model:Operator}}}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction Command="{Binding UpdateCommand}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                    <Separator Width="8" Visibility="Hidden"/>
                                     <ComboBox
                                         MinWidth="180"
                                         DisplayMemberPath="DisplayName"

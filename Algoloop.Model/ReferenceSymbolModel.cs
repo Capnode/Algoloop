@@ -17,6 +17,8 @@ using System.Runtime.Serialization;
 
 namespace Algoloop.Model
 {
+    public enum Operator { None, Versus, Multiply, Divide, Plus, Minus };
+
     [Serializable]
     [DataContract]
     public class ReferenceSymbolModel : ModelBase
@@ -29,17 +31,7 @@ namespace Algoloop.Model
         {
             Market = market;
             Name = name;
-        }
-
-        /// <summary>
-        /// Operator to handle database upgrade
-        /// </summary>
-        /// <param name="symbol"></param>
-        public static implicit operator ReferenceSymbolModel(string symbol)
-        {
-            var list = symbol.Split(":");
-            if (list.Length < 2) return null;
-            return new ReferenceSymbolModel(list[0], list[1]);
+            Operation = Operator.Versus;
         }
 
         [DataMember]
@@ -48,5 +40,7 @@ namespace Algoloop.Model
         [DataMember]
         public string Name { get; set; }
 
+        [DataMember]
+        public Operator Operation { get; set; }
     }
 }

@@ -147,8 +147,8 @@
   <data name="NoSymbolSelected" xml:space="preserve">
     <value>No symbol selected!</value>
   </data>
-  <data name="ReferenceSymbolExist" xml:space="preserve">
-    <value>Reference symbol {0} already exist</value>
+  <data name="ReferenceSymbolAdded" xml:space="preserve">
+    <value>Reference symbol {0} added</value>
   </data>
   <data name="SelectedCount" xml:space="preserve">
     <value>Selected: {0}</value>
