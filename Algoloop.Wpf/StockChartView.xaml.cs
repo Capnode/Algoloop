@@ -69,8 +69,6 @@ namespace Algoloop.Wpf
             Loaded += OnLoaded;
 
             _chart.Name = "Chart";
-//            _chart.IsInteracted = true;
-//            _chart.IsAutoRange = false;
             _chart.IsAutoScroll = true;
             _chart.MinimumRange = MinBars;
             _chart.ShowOverview = true;
@@ -116,8 +114,6 @@ namespace Algoloop.Wpf
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             StockChartView chart = d as StockChartView;
-            Debug.Assert(chart != null);
-
             if (e.OldValue != null)
             {
                 // Unsubscribe from CollectionChanged on the old collection
@@ -196,52 +192,52 @@ namespace Algoloop.Wpf
 
         private void OnSettingsChanged()
         {
-            Debug.WriteLine($"OnSettingsChanged()");
+            //Debug.WriteLine($"OnSettingsChanged()");
         }
 
         private void OnAnnotationSelected(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
         {
-            Debug.WriteLine($"OnAnnotationSelected()");
+            //Debug.WriteLine($"OnAnnotationSelected()");
         }
 
         private void OnAnnotationDeleted(IChartAnnotation obj)
         {
-            Debug.WriteLine($"OnAnnotationDeleted()");
+            //Debug.WriteLine($"OnAnnotationDeleted()");
         }
 
         private void OnAnnotationModified(IChartAnnotation arg1, ChartDrawData.AnnotationData arg2)
         {
-            Debug.WriteLine($"OnAnnotationModified()");
+            //Debug.WriteLine($"OnAnnotationModified()");
         }
 
         private void OnAnnotationCreated(IChartAnnotation obj)
         {
-            Debug.WriteLine($"OnAnnotationCreated()");
+            //Debug.WriteLine($"OnAnnotationCreated()");
         }
 
         private void OnRegisterOrder(IChartArea arg1, StockSharp.BusinessEntities.Order arg2)
         {
-            Debug.WriteLine($"OnRegisterOrder()");
+            //Debug.WriteLine($"OnRegisterOrder()");
         }
 
         private void OnMoveOrder(StockSharp.BusinessEntities.Order arg1, decimal arg2)
         {
-            Debug.WriteLine($"OnMoveOrder()");
+            //Debug.WriteLine($"OnMoveOrder()");
         }
 
         private void OnCancelOrder(StockSharp.BusinessEntities.Order obj)
         {
-            Debug.WriteLine($"OnCancelOrder()");
+            //Debug.WriteLine($"OnCancelOrder()");
         }
 
         private void OnSubscribeTradeElement(IChartTradeElement arg1, StockSharp.BusinessEntities.Security arg2)
         {
-            Debug.WriteLine($"OnSubscribeTradeElement()");
+            //Debug.WriteLine($"OnSubscribeTradeElement()");
         }
 
         private void OnSubscribeOrderElement(IChartOrderElement arg1, StockSharp.BusinessEntities.Security arg2)
         {
-            Debug.WriteLine($"OnSubscribeOrderElement()");
+            //Debug.WriteLine($"OnSubscribeOrderElement()");
         }
 
         private void OnDrop(object sender, DragEventArgs e)
@@ -257,7 +253,7 @@ namespace Algoloop.Wpf
         private void OnSubscribeCandleElement(IChartCandleElement element, CandleSeries candles)
         {
             if (_inRedraw) return;
-            Debug.WriteLine($"OnSubscribeCandleElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"})");
+            //Debug.WriteLine($"OnSubscribeCandleElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"})");
             if (candles.Security == null) return;
             _securityProvider.Add(candles.Security);
             if (!_isLoaded) return;
@@ -267,7 +263,7 @@ namespace Algoloop.Wpf
         private void OnSubscribeIndicatorElement(IChartIndicatorElement element, CandleSeries candles, IIndicator indicator)
         {
             if (_inRedraw) return;
-            Debug.WriteLine($"OnSubscribeIndicatorElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"}, {indicator.Name ?? "-"})");
+            //Debug.WriteLine($"OnSubscribeIndicatorElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"}, {indicator.Name ?? "-"})");
             _indicators[element] = indicator;
             if (!_isLoaded) return;
             RedrawCharts();
@@ -276,7 +272,7 @@ namespace Algoloop.Wpf
         private void OnUnSubscribeElement(IChartElement element)
         {
             if (_inRedraw) return;
-            Debug.WriteLine($"OnUnSubscribeElement({element.FullTitle ?? "-"})");
+            //Debug.WriteLine($"OnUnSubscribeElement({element.FullTitle ?? "-"})");
             if (element is IChartIndicatorElement indElem)
             {
                 _indicators.Remove(indElem);
