@@ -86,32 +86,39 @@ namespace QuantConnect.Algorithm.CSharp
 
         private void TestQuantityForDeltaBuyingPowerForPositionGroup(IPositionGroup positionGroup, Security security)
         {
-            var usedMargin = Portfolio.TotalMarginUsed;
             var absQuantity = Math.Abs(positionGroup.Quantity);
-            var marginPerNakedShortUnit = usedMargin / absQuantity;
+            var initialMarginPerUnit = positionGroup.BuyingPowerModel.GetInitialMarginRequirement(Portfolio, positionGroup) / absQuantity;
 
             for (var expectedQuantity = 1; expectedQuantity <= absQuantity; expectedQuantity++)
             {
                 // Test going in the same direction (longer or shorter):
                 // positive delta and expected quantity, to increment the position towards the current side
-                var deltaBuyingPower = marginPerNakedShortUnit * expectedQuantity * 1.05m;
-                PerfomQuantityCalculations(positionGroup, security, expectedQuantity, deltaBuyingPower);
+                var deltaBuyingPower = initialMarginPerUnit * expectedQuantity * 1.05m;
+                // Adjust the delta buying power:
+                // GetMaximumLotsForDeltaBuyingPower will add the delta buying power to the maintenance margin and used that as a target margin,
+                // but then GetMaximumLotsForTargetBuyingPower will work with initial margin requirement so we make sure the resulting quantity
+                // can be ordered. In order to match this, we need to adjust the delta buying power by the difference between the initial margin
+                // requirement  and maintenance margin.
+                PerfomQuantityCalculations(positionGroup, security, expectedQuantity, deltaBuyingPower, increasing: true);
 
                 // Test going towards the opposite side until liquidated:
                 // negative delta and expected quantity to reduce the position
-                deltaBuyingPower = -marginPerNakedShortUnit * expectedQuantity * 0.95m;
-                PerfomQuantityCalculations(positionGroup, security, -expectedQuantity, deltaBuyingPower);
+                deltaBuyingPower = -initialMarginPerUnit * expectedQuantity * 0.95m;
+                PerfomQuantityCalculations(positionGroup, security, -expectedQuantity, deltaBuyingPower, increasing: false);
             }
         }
 
         private void PerfomQuantityCalculations(IPositionGroup positionGroup, Security security, int expectedQuantity,
-            decimal deltaBuyingPower)
+            decimal deltaBuyingPower, bool increasing)
         {
-            // We use the custom TestPositionGroupBuyingPowerModel class here because the default buying power model for position groups is the
-            // OptionStrategyPositionGroupBuyingPowerModel, which does not support single-leg positions yet.
-            var positionQuantityForDeltaWithPositionGroupBuyingPowerModel = new TestPositionGroupBuyingPowerModel()
-                .GetMaximumLotsForDeltaBuyingPower(new GetMaximumLotsForDeltaBuyingPowerParameters(Portfolio, positionGroup, deltaBuyingPower,
-                    minimumOrderMarginPortfolioPercentage: 0)).NumberOfLots;
+            var absQuantity = Math.Abs(positionGroup.Quantity);
+            var initialMarginPerUnit = positionGroup.BuyingPowerModel.GetInitialMarginRequirement(Portfolio, positionGroup) / absQuantity;
+            var maintenanceMarginPerUnit = positionGroup.BuyingPowerModel.GetMaintenanceMargin(Portfolio, positionGroup) / absQuantity;
+            var deltaBuyingPowerAdjustment = (initialMarginPerUnit - maintenanceMarginPerUnit) * absQuantity;
+
+            var positionQuantityForDeltaWithPositionGroupBuyingPowerModel = positionGroup.BuyingPowerModel
+                .GetMaximumLotsForDeltaBuyingPower(new GetMaximumLotsForDeltaBuyingPowerParameters(Portfolio, positionGroup,
+                    deltaBuyingPower + deltaBuyingPowerAdjustment, minimumOrderMarginPortfolioPercentage: 0)).NumberOfLots;
 
             Debug($"Expected quantity: {expectedQuantity}  --  Actual: {positionQuantityForDeltaWithPositionGroupBuyingPowerModel}");
 
@@ -121,71 +128,26 @@ namespace QuantConnect.Algorithm.CSharp
                     positionQuantityForDeltaWithPositionGroupBuyingPowerModel}");
             }
 
-            var signedDeltaBuyingPower = positionGroup.Positions.Single().Quantity < 0 ? -deltaBuyingPower : deltaBuyingPower;
+            var position = positionGroup.Positions.Single();
+            var sign = (increasing ? +1 : -1) * Math.Sign(position.Quantity);
+            var signedDeltaBuyingPower = sign * Math.Abs(deltaBuyingPower);
             var positionQuantityForDeltaWithSecurityPositionGroupBuyingPowerModel = new SecurityPositionGroupBuyingPowerModel()
-                .GetMaximumLotsForDeltaBuyingPower(new GetMaximumLotsForDeltaBuyingPowerParameters(Portfolio, positionGroup, signedDeltaBuyingPower,
-                    minimumOrderMarginPortfolioPercentage: 0)).NumberOfLots;
+                .GetMaximumLotsForDeltaBuyingPower(new GetMaximumLotsForDeltaBuyingPowerParameters(Portfolio, positionGroup,
+                    signedDeltaBuyingPower + deltaBuyingPowerAdjustment, minimumOrderMarginPortfolioPercentage: 0)).NumberOfLots;
 
             var positionQuantityForDeltaWithSecurityBuyingPowerModel = security.BuyingPowerModel.GetMaximumOrderQuantityForDeltaBuyingPower(
-                new GetMaximumOrderQuantityForDeltaBuyingPowerParameters(Portfolio, security, signedDeltaBuyingPower,
+                new GetMaximumOrderQuantityForDeltaBuyingPowerParameters(Portfolio, security, signedDeltaBuyingPower + deltaBuyingPowerAdjustment,
                     minimumOrderMarginPortfolioPercentage: 0)).Quantity;
 
-            var expectedSingleSecurityModelsQuantity = signedDeltaBuyingPower < 0 ? -Math.Abs(expectedQuantity) : Math.Abs(expectedQuantity);
+            var expectedSingleSecurityModelsQuantity = sign * Math.Abs(expectedQuantity);
 
             if (positionQuantityForDeltaWithSecurityPositionGroupBuyingPowerModel != expectedSingleSecurityModelsQuantity ||
                 positionQuantityForDeltaWithSecurityBuyingPowerModel != expectedSingleSecurityModelsQuantity)
             {
                 throw new Exception($@"Expected order quantity for delta buying power calls from default buying power models to return {
-                    expectedSingleSecurityModelsQuantity}. Results were:\n" +
-                    $"    SecurityPositionGroupBuyingPowerModel: {positionQuantityForDeltaWithSecurityPositionGroupBuyingPowerModel}\n" +
-                    $"    BuyingPowerModel: {positionQuantityForDeltaWithSecurityBuyingPowerModel}\n");
-            }
-        }
-
-        private class TestPositionGroupBuyingPowerModel : PositionGroupBuyingPowerModel
-        {
-            public override InitialMargin GetInitialMarginRequiredForOrder(PositionGroupInitialMarginForOrderParameters parameters)
-            {
-                var initialMarginRequirement = 0m;
-                foreach (var position in parameters.PositionGroup)
-                {
-                    var security = parameters.Portfolio.Securities[position.Symbol];
-                    initialMarginRequirement += security.BuyingPowerModel.GetInitialMarginRequiredForOrder(
-                        new InitialMarginRequiredForOrderParameters(parameters.Portfolio.CashBook, security, parameters.Order)
-                    );
-                }
-
-                return initialMarginRequirement;
-            }
-
-            public override InitialMargin GetInitialMarginRequirement(PositionGroupInitialMarginParameters parameters)
-            {
-                var initialMarginRequirement = 0m;
-                foreach (var position in parameters.PositionGroup)
-                {
-                    var security = parameters.Portfolio.Securities[position.Symbol];
-                    initialMarginRequirement += security.BuyingPowerModel.GetInitialMarginRequirement(
-                        security, position.Quantity
-                    );
-                }
-
-                return initialMarginRequirement;
-            }
-
-            public override MaintenanceMargin GetMaintenanceMargin(PositionGroupMaintenanceMarginParameters parameters)
-            {
-                var buyingPower = 0m;
-                foreach (var position in parameters.PositionGroup)
-                {
-                    var security = parameters.Portfolio.Securities[position.Symbol];
-                    var result = security.BuyingPowerModel.GetMaintenanceMargin(
-                        MaintenanceMarginParameters.ForQuantityAtCurrentPrice(security, position.Quantity)
-                    );
-
-                    buyingPower += result;
-                }
-
-                return buyingPower;
+                    expectedSingleSecurityModelsQuantity}. Results were:" +
+                    $"    \nSecurityPositionGroupBuyingPowerModel: {positionQuantityForDeltaWithSecurityPositionGroupBuyingPowerModel}" +
+                    $"    \nBuyingPowerModel: {positionQuantityForDeltaWithSecurityBuyingPowerModel}\n");
             }
         }
 
