@@ -67,6 +67,9 @@
     <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20181114.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\equity\usa\daily\spy.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\forex\dukascopy\hour\eurusd.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
