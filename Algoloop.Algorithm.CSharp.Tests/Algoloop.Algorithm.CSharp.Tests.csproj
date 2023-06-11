@@ -67,12 +67,6 @@
     <None Update="Data\equity\borsdata\fundamental\fine\abb.st\20181114.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Data\equity\borsdata\map_files\TextFile1.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\equity\usa\map_files\TextFile1.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Data\forex\dukascopy\hour\eurusd.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -81,5 +75,9 @@
     <None Include="..\Data\symbol-properties\symbol-properties-database.csv" Link="Data\symbol-properties\symbol-properties-database.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\equity\borsdata\map_files\" />
+    <Folder Include="Data\equity\usa\map_files\" />
   </ItemGroup>
 </Project>
