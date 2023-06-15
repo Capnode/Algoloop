@@ -343,6 +343,8 @@
                                             <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
                                                 <StackPanel Orientation="Horizontal">
                                                     <CheckBox IsTabStop="False" IsChecked="{Binding Model.Active}" />
+                                                    <TextBox BorderThickness="0" Text="{Binding Model.Id, Mode=TwoWay}" Width="100" />
+                                                    <Separator/>
                                                     <TextBox BorderThickness="0" Text="{Binding Model.Name, Mode=TwoWay}" />
                                                 </StackPanel>
                                             </DataTemplate>
