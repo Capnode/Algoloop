@@ -185,9 +185,9 @@ namespace Algoloop.Algorithm.CSharp.Model
 
             // Plot tracker and benchmark index
             decimal benchmarkValue = algorithm.Benchmark.Evaluate(algorithm.Time);
-            decimal benchmarkIndex = benchmarkValue / _benchmarkValue0;
-            if (benchmarkIndex > 0)
+            if (benchmarkValue > 0 && _benchmarkValue0 > 0)
             {
+                decimal benchmarkIndex = benchmarkValue / _benchmarkValue0;
                 algorithm.Plot(TrackerChart, $"Tracker {_indexName}", benchmarkIndex);
                 algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerIndex / benchmarkIndex);
             }
