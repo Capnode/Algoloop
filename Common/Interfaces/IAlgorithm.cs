@@ -30,6 +30,7 @@ using QuantConnect.Securities.Option;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Alphas.Analysis;
+using QuantConnect.Statistics;
 
 namespace QuantConnect.Interfaces
 {
@@ -119,6 +120,14 @@ namespace QuantConnect.Interfaces
         /// Gets the brokerage model used to emulate a real brokerage
         /// </summary>
         IBrokerageModel BrokerageModel
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the brokerage name.
+        /// </summary>
+        BrokerageName BrokerageName
         {
             get;
         }
@@ -286,6 +295,14 @@ namespace QuantConnect.Interfaces
         /// Customizable dynamic statistics displayed during live trading:
         /// </summary>
         ConcurrentDictionary<string, string> RuntimeStatistics
+        {
+            get;
+        }
+
+        /// <summary>
+        /// The current algorithm statistics for the running algorithm.
+        /// </summary>
+        StatisticsResults Statistics
         {
             get;
         }
@@ -786,5 +803,11 @@ namespace QuantConnect.Interfaces
         /// <param name="symbol">The symbol to get the ticker for</param>
         /// <returns>The mapped ticker for a symbol</returns>
         string Ticker(Symbol symbol);
+
+        /// <summary>
+        /// Sets the statistics service instance to be used by the algorithm
+        /// </summary>
+        /// <param name="statisticsService">The statistics service instance</param>
+        void SetStatisticsService(IStatisticsService statisticsService);
     }
 }

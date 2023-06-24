@@ -35,6 +35,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using QuantConnect.Storage;
 using QuantConnect.Algorithm.Framework.Alphas.Analysis;
+using QuantConnect.Statistics;
 
 namespace QuantConnect.AlgorithmFactory.Python.Wrappers
 {
@@ -180,6 +181,11 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
         /// Gets the brokerage model used to emulate a real brokerage
         /// </summary>
         public IBrokerageModel BrokerageModel => _baseAlgorithm.BrokerageModel;
+
+        /// <summary>
+        /// Gets the brokerage name.
+        /// </summary>
+        public BrokerageName BrokerageName => _baseAlgorithm.BrokerageName;
 
         /// <summary>
         /// Debug messages from the strategy:
@@ -450,6 +456,17 @@ namespace QuantConnect.AlgorithmFactory.Python.Wrappers
         /// Gets the insight manager
         /// </summary>
         public InsightManager Insights => _baseAlgorithm.Insights;
+
+        /// <summary>
+        /// Sets the statistics service instance to be used by the algorithm
+        /// </summary>
+        /// <param name="statisticsService">The statistics service instance</param>
+        public void SetStatisticsService(IStatisticsService statisticsService) => _baseAlgorithm.SetStatisticsService(statisticsService);
+
+        /// <summary>
+        /// The current statistics for the running algorithm.
+        /// </summary>
+        public StatisticsResults Statistics => _baseAlgorithm.Statistics;
 
         /// <summary>
         /// Set a required SecurityType-symbol and resolution for algorithm

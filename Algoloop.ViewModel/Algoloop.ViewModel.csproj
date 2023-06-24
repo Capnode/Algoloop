@@ -480,9 +480,6 @@
     <Content Include="..\Algorithm.Python\CoveredAndProtectivePutStrategiesAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CoveredAndProtectivePutStrategiesAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Algorithm.Python\CrunchDAOPortfolioSignalExportDemonstrationAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CrunchDAOPortfolioSignalExportDemonstrationAlgorithm.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Algorithm.Python\CrunchDAOSignalExportDemonstrationAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CrunchDAOSignalExportDemonstrationAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

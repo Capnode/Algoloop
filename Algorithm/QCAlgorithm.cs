@@ -78,6 +78,7 @@ namespace QuantConnect.Algorithm
         const string SecuritiesAndPortfolio = "Securities and Portfolio";
         const string TradingAndOrders = "Trading and Orders";
         const string Universes = "Universes";
+        const string StatisticsTag = "Statistics";
         #endregion
 
         private readonly TimeKeeper _timeKeeper;
@@ -92,6 +93,8 @@ namespace QuantConnect.Algorithm
         private ConcurrentQueue<string> _debugMessages = new ConcurrentQueue<string>();
         private ConcurrentQueue<string> _logMessages = new ConcurrentQueue<string>();
         private ConcurrentQueue<string> _errorMessages = new ConcurrentQueue<string>();
+        private IStatisticsService _statisticsService;
+        private IBrokerageModel _brokerageModel;
 
         //Error tracking to avoid message flooding:
         private string _previousDebugMessage = "";
@@ -183,7 +186,7 @@ namespace QuantConnect.Algorithm
             // initialize the trade builder
             TradeBuilder = new TradeBuilder(FillGroupingMethod.FillToFill, FillMatchingMethod.FIFO);
 
-            SecurityInitializer = new BrokerageModelSecurityInitializer(new DefaultBrokerageModel(AccountType.Margin), SecuritySeeder.Null);
+            SecurityInitializer = new BrokerageModelSecurityInitializer(BrokerageModel, SecuritySeeder.Null);
 
             CandlestickPatterns = new CandlestickPatterns(this);
 
@@ -285,6 +288,31 @@ namespace QuantConnect.Algorithm
         /// </summary>
         [DocumentationAttribute(Modeling)]
         public IBrokerageModel BrokerageModel
+        {
+            get
+            {
+                return _brokerageModel;
+            }
+            private set
+            {
+                _brokerageModel = value;
+                try
+                {
+                    BrokerageName = Brokerages.BrokerageModel.GetBrokerageName(_brokerageModel);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    // The brokerage model might be a custom one which has not a corresponding BrokerageName
+                    BrokerageName = BrokerageName.Default;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the brokerage name.
+        /// </summary>
+        [DocumentationAttribute(Modeling)]
+        public BrokerageName BrokerageName
         {
             get;
             private set;
@@ -576,6 +604,18 @@ namespace QuantConnect.Algorithm
         [DocumentationAttribute(HandlingData)]
         [DocumentationAttribute(MachineLearning)]
         public ObjectStore ObjectStore { get; private set; }
+
+        /// <summary>
+        /// The current statistics for the running algorithm.
+        /// </summary>
+        [DocumentationAttribute(StatisticsTag)]
+        public StatisticsResults Statistics
+        {
+            get
+            {
+                return _statisticsService?.StatisticsResults() ?? new StatisticsResults();
+            }
+        }
 
         /// <summary>
         /// Initialise the data and resolution required, as well as the cash and start-end dates for your algorithm. All algorithms must initialized.
@@ -3066,6 +3106,18 @@ namespace QuantConnect.Algorithm
             // startDate is set relative to the algorithm's timezone.
             _startDate = _start.Date;
             _endDate = QuantConnect.Time.EndOfTime;
+        }
+
+        /// <summary>
+        /// Sets the statistics service instance to be used by the algorithm
+        /// </summary>
+        /// <param name="statisticsService">The statistics service instance</param>
+        public void SetStatisticsService(IStatisticsService statisticsService)
+        {
+            if (_statisticsService == null)
+            {
+                _statisticsService = statisticsService;
+            }
         }
     }
 }
