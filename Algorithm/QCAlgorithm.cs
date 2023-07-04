@@ -89,6 +89,8 @@ namespace QuantConnect.Algorithm
         private DateTime _endDate;     //Default end to yesterday
         private bool _locked;
         private bool _liveMode;
+        private AlgorithmMode _algorithmMode;
+        private DeploymentTarget _deploymentTarget;
         private string _algorithmId = "";
         private ConcurrentQueue<string> _debugMessages = new ConcurrentQueue<string>();
         private ConcurrentQueue<string> _logMessages = new ConcurrentQueue<string>();
@@ -151,6 +153,12 @@ namespace QuantConnect.Algorithm
             _localTimeKeeper = _timeKeeper.GetLocalTimeKeeper(TimeZones.NewYork);
             //Initialise End Date:
             SetEndDate(DateTime.UtcNow.ConvertFromUtc(TimeZone));
+
+            // Set default algorithm mode as backtesting
+            _algorithmMode = AlgorithmMode.Backtesting;
+
+            // Set default deployment target as local
+            _deploymentTarget = DeploymentTarget.LocalPlatform;
 
             _securityDefinitionSymbolResolver = SecurityDefinitionSymbolResolver.GetInstance();
 
@@ -531,6 +539,28 @@ namespace QuantConnect.Algorithm
             get
             {
                 return _liveMode;
+            }
+        }
+
+        /// <summary>
+        /// Algorithm running mode.
+        /// </summary>
+        public AlgorithmMode AlgorithmMode
+        {
+            get
+            {
+                return _algorithmMode;
+            }
+        }
+
+        /// <summary>
+        /// Deployment target, either local or cloud.
+        /// </summary>
+        public DeploymentTarget DeploymentTarget
+        {
+            get
+            {
+                return _deploymentTarget;
             }
         }
 
@@ -1621,7 +1651,33 @@ namespace QuantConnect.Algorithm
                 if (live)
                 {
                     SetLiveModeStartDate();
+                    _algorithmMode = AlgorithmMode.Live;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Sets the algorithm running mode
+        /// </summary>
+        /// <param name="algorithmMode">Algorithm mode</param>
+        public void SetAlgorithmMode(AlgorithmMode algorithmMode)
+        {
+            if (!_locked)
+            {
+                _algorithmMode = algorithmMode;
+                SetLiveMode(_algorithmMode == AlgorithmMode.Live);
+            }
+        }
+
+        /// <summary>
+        /// Sets the algorithm deployment target
+        /// </summary>
+        /// <param name="deploymentTarget">Deployment target</param>
+        public void SetDeploymentTarget(DeploymentTarget deploymentTarget)
+        {
+            if (!_locked)
+            {
+                _deploymentTarget = deploymentTarget;
             }
         }
 
