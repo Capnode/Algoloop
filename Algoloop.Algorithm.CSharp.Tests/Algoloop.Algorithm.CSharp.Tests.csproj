@@ -79,8 +79,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Data\equity\borsdata\map_files\" />
-    <Folder Include="Data\equity\usa\map_files\" />
-  </ItemGroup>
 </Project>
