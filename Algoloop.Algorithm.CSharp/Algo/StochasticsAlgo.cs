@@ -139,8 +139,8 @@ namespace Algoloop.Algorithm.CSharp
                 slots: slots,
                 reinvest: reinvest,
                 rebalance: rebalance,
-                trackerPeriod1: trackerPeriod1 >= 0 ? trackerPeriod1 : period,
-                trackerPeriod2: trackerPeriod2 >= 0 ? trackerPeriod2 : period,
+                smaPeriod1: trackerPeriod1 >= 0 ? trackerPeriod1 : period,
+                smaPeriod2: trackerPeriod2 >= 0 ? trackerPeriod2 : period,
                 rangePeriod : rangePeriod));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());

@@ -67,6 +67,9 @@ namespace Algoloop.Algorithm.CSharp
         [Parameter("Tracker range stoploss period")]
         private readonly string _rangePeriod = "0";
 
+        [Parameter("Stoploss sizing")]
+        private readonly string _stoplossSizing = "0";
+
         [Parameter("Market capitalization (M min)")]
         private readonly string _marketCap = null;
 
@@ -124,6 +127,7 @@ namespace Algoloop.Algorithm.CSharp
             int trackerPeriod1 = int.Parse(_trackerPeriod1, CultureInfo.InvariantCulture);
             int trackerPeriod2 = int.Parse(_trackerPeriod2, CultureInfo.InvariantCulture);
             int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
+            decimal stoplossSizing = decimal.Parse(_stoplossSizing, CultureInfo.InvariantCulture);
 
             List<Symbol> symbols = _symbols
                 .Split(';')
@@ -139,9 +143,10 @@ namespace Algoloop.Algorithm.CSharp
                 slots: slots,
                 reinvest: reinvest,
                 rebalance: rebalance,
-                trackerPeriod1: trackerPeriod1 >= 0 ? trackerPeriod1 : period,
-                trackerPeriod2: trackerPeriod2 >= 0 ? trackerPeriod2 : period,
-                rangePeriod : rangePeriod));
+                stoplossSizing: stoplossSizing,
+                smaPeriod1: trackerPeriod1 >= 0 ? trackerPeriod1 : period,
+                smaPeriod2: trackerPeriod2 >= 0 ? trackerPeriod2 : period,
+                rangePeriod: rangePeriod));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));

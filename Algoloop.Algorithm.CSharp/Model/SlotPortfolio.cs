@@ -26,9 +26,8 @@ namespace Algoloop.Algorithm.CSharp.Model
     // Portfolio construction scaffolding class; basic method args.
     public class SlotPortfolio : PortfolioConstructionModel
     {
-        private const decimal TradeSizing = 1m;
-        private const decimal StoplossSizing = 0m;
         private const string TrackerChart = "Tracker";
+        private const decimal TradeSizing = 1m;
 
         private readonly bool _logTargets = false;
         private readonly bool _logTrades = false;
@@ -42,7 +41,9 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly Minimum _trackerLow;
         private readonly SimpleMovingAverage _trackerSma1;
         private readonly SimpleMovingAverage _trackerSma2;
+
         private TrackerPortfolio _trackerPortfolio;
+        private decimal _stoplossSizing = 0m;
         private decimal _initialCapital = 0;
         private decimal _portfolioValue0 = 0;
         private decimal _trackerValue0 = 0;
@@ -55,25 +56,27 @@ namespace Algoloop.Algorithm.CSharp.Model
             int slots,
             bool reinvest,
             float rebalance = 0,
+            decimal stoplossSizing = 0m,
             int rangePeriod = 0,
-            int trackerPeriod1 = 0,
-            int trackerPeriod2 = 0)
+            int smaPeriod1 = 0,
+            int smaPeriod2 = 0)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
+            _stoplossSizing = stoplossSizing;
             if (rangePeriod > 0)
             {
                 _trackerHigh = new Maximum($"Tracker High({rangePeriod})", rangePeriod);
                 _trackerLow = new Minimum($"Tracker Low({rangePeriod})", rangePeriod);
             }
-            if (trackerPeriod1 > 0)
+            if (smaPeriod1 > 0)
             {
-                _trackerSma1 = new SimpleMovingAverage($"Tracker SMA({trackerPeriod1})", trackerPeriod1);
+                _trackerSma1 = new SimpleMovingAverage($"Tracker SMA({smaPeriod1})", smaPeriod1);
             }
-            if (trackerPeriod2 > 0 && trackerPeriod2 > trackerPeriod1)
+            if (smaPeriod2 > 0 && smaPeriod2 > smaPeriod1)
             {
-                _trackerSma2 = new SimpleMovingAverage($"Tracker SMA({trackerPeriod2})", trackerPeriod2);
+                _trackerSma2 = new SimpleMovingAverage($"Tracker SMA({smaPeriod2})", smaPeriod2);
             }
         }
 
@@ -144,18 +147,18 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (_trackerSma1 != null && _trackerSma1.IsReady)
             {
                 algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma1.Period})", _trackerSma1);
-                sizingFactor = trackerIndex >= _trackerSma1 ? TradeSizing : StoplossSizing;
+                sizingFactor = trackerIndex >= _trackerSma1 ? TradeSizing : _stoplossSizing;
             }
             if (_trackerSma2 != null && _trackerSma2.IsReady)
             {
                 algorithm.Plot(TrackerChart, $"Tracker SMA({_trackerSma2.Period})", _trackerSma2);
-                sizingFactor = _trackerSma2 >= trackerSma2 ? TradeSizing : StoplossSizing;
+                sizingFactor = _trackerSma2 >= trackerSma2 ? TradeSizing : _stoplossSizing;
             }
             if (_trackerSma1 != null && _trackerSma2 != null)
             {
                 if (_trackerSma1.IsReady && _trackerSma2.IsReady)
                 {
-                    sizingFactor = _trackerSma1 >= _trackerSma2 ? TradeSizing : StoplossSizing;
+                    sizingFactor = _trackerSma1 >= _trackerSma2 ? TradeSizing : _stoplossSizing;
                 }
                 else
                 {
@@ -177,7 +180,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 algorithm.Plot(TrackerChart, $"Tracker Low({_trackerLow.Period})", _trackerLow);
                 if (trackerIndex < _trackerLow)
                 {
-                    sizingFactor = StoplossSizing;
+                    sizingFactor = _stoplossSizing;
                 }
             }
             _trackerHigh?.Update(algorithm.Time, trackerIndex);
