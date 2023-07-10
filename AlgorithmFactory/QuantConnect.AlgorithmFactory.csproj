@@ -28,6 +28,7 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="McMaster.NETCore.Plugins" Version="1.4.0" />
     <PackageReference Include="QuantConnect.pythonnet" Version="2.0.20" />
     <PackageReference Include="NodaTime" Version="3.0.5" />
   </ItemGroup>

@@ -28,6 +28,7 @@ using QuantConnect.AlgorithmFactory.Python.Wrappers;
 using QuantConnect.Configuration;
 using QuantConnect.Python;
 using QuantConnect.Util;
+using McMaster.NETCore.Plugins;
 
 namespace QuantConnect.AlgorithmFactory
 {
@@ -214,7 +215,9 @@ logging.captureWarnings(True)"
             {
                 //Load the assembly:
                 Log.Trace("Loader.TryCreateILAlgorithm(): Loading only the algorithm assembly");
-                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                // Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                using PluginLoader loader = PluginLoader.CreateFromAssemblyFile(assemblyPath, sharedTypes: new[] { AlgorithmInterfaceType });
+                Assembly assembly = loader.LoadDefaultAssembly();
                 if (assembly == null)
                 {
                     errorMessage = "Assembly is null.";
