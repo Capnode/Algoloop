@@ -56,6 +56,7 @@ namespace Algoloop.ViewModel
         private ListViewModel _selectedList;
         private IList _selectedItems;
         private bool _active;
+        private bool _isMLAlgorithm;
 
         public StrategyViewModel(ITreeViewModel parent, StrategyModel model, MarketsModel markets, SettingModel settings)
         {
@@ -240,6 +241,12 @@ namespace Algoloop.ViewModel
         {
             get => _isExpanded;
             set => SetProperty(ref _isExpanded, value);
+        }
+
+        public bool IsMLAlgorithm
+        {
+            get => _isMLAlgorithm;
+            set => SetProperty(ref _isMLAlgorithm, value);
         }
 
         public SymbolViewModel SelectedSymbol
@@ -492,7 +499,7 @@ namespace Algoloop.ViewModel
                 await BacktestManager.Wait().ConfigureAwait(true);
                 if (!Active) break;
                 count++;
-                var backtestModel = new BacktestModel(model.AlgorithmName, model);
+                var backtestModel = new BacktestModel(model.AlgorithmName, model, vm.IsMLAlgorithm);
                 Log.Trace($"Strategy {backtestModel.AlgorithmName} {backtestModel.Name} {count}({total})");
                 var backtest = new BacktestViewModel(vm, backtestModel, _markets, _settings);
                 vm.Backtests.Add(backtest);
@@ -669,10 +676,12 @@ namespace Algoloop.ViewModel
                 IEnumerable<Type> type = assembly
                     .GetTypes()
                     .Where(m => m.Name.Equals(Model.AlgorithmName, StringComparison.OrdinalIgnoreCase));
-                if (!type.Any()) return;
 
+                Type algorithm = type.FirstOrDefault();
+                if (algorithm == null) return;
+                IsMLAlgorithm = typeof(IMLAlgorithm).IsAssignableFrom(algorithm);
                 Parameters.Clear();
-                foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
+                foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(algorithm))
                 {
                     string parameterName = parameter.Key;
                     string parameterType = parameter.Value;

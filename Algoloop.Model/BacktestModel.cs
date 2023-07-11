@@ -42,7 +42,7 @@ namespace Algoloop.Model
             Parameters = new Collection<ParameterModel>();
         }
 
-        public BacktestModel(string name, StrategyModel strategy)
+        public BacktestModel(string name, StrategyModel strategy, bool isMLAlgorithm)
         {
             if (strategy == null) throw new ArgumentNullException(nameof(strategy));
             Name = name;
@@ -60,6 +60,7 @@ namespace Algoloop.Model
             Resolution = strategy.Resolution;
             InitialCapital = strategy.InitialCapital;
             PcntCapitalPerPosition = strategy.PcntCapitalPerPosition;
+            IsMLAlgorithm = isMLAlgorithm;
 
             // Clone symbols
             Symbols = new Collection<SymbolModel>(strategy.Symbols.Select(m => new SymbolModel(m)).ToList());
@@ -211,6 +212,11 @@ namespace Algoloop.Model
         [Browsable(false)]
         [DataMember]
         public bool Active { get; set; } = true;
+
+        [ReadOnly(true)]
+        [Browsable(false)]
+        [DataMember]
+        public bool IsMLAlgorithm { get; set; } = false;
 
         [ReadOnly(true)]
         [Browsable(false)]

@@ -421,6 +421,9 @@
                                     </DataGrid.RowStyle>
                                 </wpf:ExDataGrid>
                             </TabItem>
+                            <TabItem Header="Machine Learning"
+                                     Visibility="{Binding IsMLAlgorithm, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                            </TabItem>
                             <TabItem Header="{Binding Backtests.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Backtests ({0}), FallbackValue=Backtests}">
                                 <DockPanel>
                                     <ToolBar DockPanel.Dock="Top" ToolBarTray.IsLocked="True">
