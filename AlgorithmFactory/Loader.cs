@@ -216,6 +216,11 @@ logging.captureWarnings(True)"
                 //Load the assembly:
                 Log.Trace("Loader.TryCreateILAlgorithm(): Loading only the algorithm assembly");
                 // Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                if (!Path.IsPathRooted(assemblyPath))
+                {
+                    assemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, assemblyPath);
+                }
+
                 using PluginLoader loader = PluginLoader.CreateFromAssemblyFile(assemblyPath, sharedTypes: new[] { AlgorithmInterfaceType });
                 Assembly assembly = loader.LoadDefaultAssembly();
                 if (assembly == null)
