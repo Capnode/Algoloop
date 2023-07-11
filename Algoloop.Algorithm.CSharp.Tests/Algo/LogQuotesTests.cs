@@ -19,8 +19,9 @@ using System.Linq;
 using System.Globalization;
 using QuantConnect;
 using QuantConnect.Logging;
+using Algoloop.Algorithm.CSharp.Tests.Common;
 
-namespace Algoloop.Algorithm.CSharp.Algo.Tests
+namespace Algoloop.Algorithm.CSharp.Tests.Algo
 {
     [TestClass()]
     public class LogQuotesTests

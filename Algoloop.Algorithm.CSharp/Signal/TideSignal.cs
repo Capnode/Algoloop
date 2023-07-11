@@ -12,12 +12,13 @@
  * limitations under the License.
  */
 
+using Algoloop.Algorithm.CSharp.Model;
 using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Data;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Signal
 {
     internal class TideSignal : ISignal
     {

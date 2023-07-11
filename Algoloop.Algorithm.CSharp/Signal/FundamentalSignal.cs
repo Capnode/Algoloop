@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Algorithm.CSharp.Model;
 using Ionic.Zip;
 using Newtonsoft.Json;
 using QuantConnect;
@@ -21,7 +22,7 @@ using QuantConnect.Data.Fundamental;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Signal
 {
     internal class FundamentalSignal : ISignal
     {

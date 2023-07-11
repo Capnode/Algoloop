@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Algoloop.Algorithm.CSharp.Model;
 using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
@@ -21,7 +22,7 @@ using QuantConnect.Indicators;
 using System;
 using System.Linq;
 
-namespace Algoloop.Algorithm.CSharp.Model
+namespace Algoloop.Algorithm.CSharp.Signal
 {
     public class BreakoutTimeframeSignal : ISignal, IDisposable
     {

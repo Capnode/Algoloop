@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Algorithm.CSharp.Model;
+using Algoloop.Algorithm.CSharp.Signal;
 using QuantConnect;
 using QuantConnect.Algorithm;
 using QuantConnect.Algorithm.Framework.Alphas;
@@ -24,7 +25,7 @@ using QuantConnect.Parameters;
 using QuantConnect.Securities;
 using System.Globalization;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Algo
 {
     public class LinearAlgo : QCAlgorithm
     {

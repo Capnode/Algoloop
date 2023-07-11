@@ -12,11 +12,12 @@
  * limitations under the License.
  */
 
+using Algoloop.Algorithm.CSharp.Model;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Signal
 {
     internal class VolatilitySignal : ISignal
     {

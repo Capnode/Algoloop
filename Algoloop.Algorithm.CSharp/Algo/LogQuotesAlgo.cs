@@ -19,7 +19,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Parameters;
 using System.Globalization;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Algo
 {
     public class LogQuotesAlgo : QCAlgorithm
     {

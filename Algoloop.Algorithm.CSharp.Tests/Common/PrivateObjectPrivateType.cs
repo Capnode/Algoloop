@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 
-namespace Algoloop.Algorithm.CSharp.Algo.Tests
+namespace Algoloop.Algorithm.CSharp.Tests.Common
 {
     /// <summary>
     /// This class represents the live NON public INTERNAL object in the system

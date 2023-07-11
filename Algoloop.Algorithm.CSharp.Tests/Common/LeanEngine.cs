@@ -31,7 +31,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using static QuantConnect.Tests.AlgorithmRunner;
 
-namespace Algoloop.Algorithm.CSharp.Algo.Tests
+namespace Algoloop.Algorithm.CSharp.Tests.Common
 {
     public static class TestEngine
     {

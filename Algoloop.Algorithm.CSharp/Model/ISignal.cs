@@ -15,7 +15,7 @@
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Model
 {
     public interface ISignal
     {

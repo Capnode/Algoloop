@@ -24,7 +24,7 @@ using QuantConnect.Parameters;
 using QuantConnect.Securities;
 using System.Globalization;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Algo
 {
     public class BuyAndHoldAlgo : QCAlgorithm
     {

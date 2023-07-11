@@ -12,11 +12,12 @@
  * limitations under the License.
  */
 
+using Algoloop.Algorithm.CSharp.Model;
 using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 
-namespace Algoloop.Algorithm.CSharp
+namespace Algoloop.Algorithm.CSharp.Signal
 {
     internal class ImpulseSignal : ISignal
     {

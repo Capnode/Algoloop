@@ -12,9 +12,11 @@
  * limitations under the License.
  */
 
+using QuantConnect.Orders;
+using QuantConnect.Orders.Fees;
 using QuantConnect.Securities;
 
-namespace QuantConnect.Orders.Fees
+namespace Algoloop.Algorithm.CSharp.Model
 {
     /// <summary>
     /// Provides an order fee model that returns a percentage order fee.
