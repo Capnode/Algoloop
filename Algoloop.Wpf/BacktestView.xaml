@@ -75,9 +75,6 @@
                     </DataGrid.Columns>
                 </wpf:ExDataGrid>
             </TabItem>
-            <TabItem Header="Machine Learning"
-                     Visibility="{Binding Model.IsMLAlgorithm, Converter={viewsupport:BooleanToVisibilityConverter}}">
-            </TabItem>
             <TabItem Header="{Binding Holdings.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Holdings ({0}), FallbackValue=Holdings}">
                 <wpf:ExDataGrid
                     AutoGenerateColumns="False"
