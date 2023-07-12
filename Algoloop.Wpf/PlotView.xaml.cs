@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Capnode AB
+ * Copyright 2023 Capnode AB
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace Algoloop.Wpf
     /// 
     /// StockShart doc: https://doc.stocksharp.com/topics/StockSharpAbout.html
     /// </summary>
-    public partial class StockChartView : UserControl
+    public partial class PlotView : UserControl
     {
         private const int MaxElementsInArea = 10;
         private const int MinBars = int.MaxValue;
@@ -49,12 +49,12 @@ namespace Algoloop.Wpf
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
             "ItemsSource",
             typeof(ObservableCollection<IChartViewModel>),
-            typeof(StockChartView),
+            typeof(PlotView),
             new PropertyMetadata(null, new PropertyChangedCallback(OnItemsSourceChanged)));
         public static readonly DependencyProperty SettingsProperty = DependencyProperty.Register(
             "Settings",
             typeof(string),
-            typeof(StockChartView),
+            typeof(PlotView),
             new FrameworkPropertyMetadata { BindsTwoWayByDefault = true, DefaultUpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged });
 
         private bool _isLoaded = false;
@@ -63,7 +63,7 @@ namespace Algoloop.Wpf
         private readonly CollectionSecurityProvider _securityProvider = new();
         private readonly IDictionary<string, SymbolViewModel> _symbols = new Dictionary<string, SymbolViewModel>();
 
-        public StockChartView()
+        public PlotView()
         {
             InitializeComponent();
             Loaded += OnLoaded;
@@ -113,7 +113,7 @@ namespace Algoloop.Wpf
 
         private static void OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            StockChartView chart = d as StockChartView;
+            PlotView chart = d as PlotView;
             if (e.OldValue != null)
             {
                 // Unsubscribe from CollectionChanged on the old collection
@@ -328,6 +328,11 @@ namespace Algoloop.Wpf
                             area = new ChartArea();
                             _chart.AddArea(area);
                         }
+                    }
+
+                    if (area.Title == iChart.Title)
+                    {
+                        iChart.IsVisible = true;
                     }
                 }
                 else

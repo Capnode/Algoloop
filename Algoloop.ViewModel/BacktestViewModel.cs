@@ -1024,7 +1024,7 @@ namespace Algoloop.ViewModel
         {
             SyncObservableCollection<IChartViewModel> workCharts = Charts;
             Debug.Assert(workCharts.Count == 0);
-            foreach (Chart chart in result.Charts.Values)
+            foreach (Chart chart in result.Charts.Values.OrderBy(m => m.Name))
             {
                 var chartViewModel = new ChartViewModel(chart, false);
                 workCharts.Add(chartViewModel);
