@@ -18,9 +18,7 @@
                 <DataTemplate>
                     <CheckBox
                         Content="{Binding Title}"
-                        IsChecked="{Binding Path=IsVisible, Mode=TwoWay}"
-                        Tag="{RelativeSource FindAncestor,
-                                             AncestorType={x:Type ComboBox}}" />
+                        IsChecked="{Binding Path=IsVisible}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>

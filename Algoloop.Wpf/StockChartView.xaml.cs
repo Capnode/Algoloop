@@ -14,6 +14,7 @@
 
 using Algoloop.ViewModel;
 using Algoloop.ViewModel.Internal.Lean;
+using Algoloop.Wpf.Internal;
 using Ecng.Collections;
 using Ecng.Serialization;
 using QuantConnect;
@@ -145,7 +146,7 @@ namespace Algoloop.Wpf
             if (charts == null) return;
             foreach (IChartViewModel chart in charts)
             {
-                _combobox.Items.Add(chart);
+                _combobox.Items.Add(new ChartItemViewModel(chart));
             }
 
             _combobox.SelectedIndex = 0;
@@ -186,20 +187,21 @@ namespace Algoloop.Wpf
 
         private void SetVisibleCharts()
         {
-            if (_chart.Areas.Count == 0) return;
-            foreach (IChartViewModel chart in _combobox.Items)
+            bool visible = _chart.Areas.Count == 0; // Make first visible if no charts
+            foreach (ChartItemViewModel item in _combobox.Items)
             {
-                bool visible = false;
-                for (int i = 0; i < _chart.Areas.Count; i++)
+                visible |= item.Chart.IsVisible;
+                for (int i = 0; !visible && i < _chart.Areas.Count; i++)
                 {
-                    if (_chart.Areas[i].Title.Equals(chart.Title))
+                    string title = _chart.Areas[i].Title;
+                    if (item.Chart.Title.Equals(title))
                     {
                         visible = true;
-                        break;
                     }
                 }
 
-                chart.IsVisible = visible;
+                item.IsVisible = visible;
+                visible = false;
             }
         }
 
@@ -265,9 +267,13 @@ namespace Algoloop.Wpf
         {
             if (sender is not ChartPanel panel) return;
             if (e.Data.GetData(typeof(SymbolViewModel)) is not SymbolViewModel reference) return;
-            if (_combobox.Items.Count < 1) return;
-            if (_combobox.Items[0] is not SymbolChartViewModel target) return;
-            target.Symbol.AddReferenceSymbol(reference);
+            foreach (ChartItemViewModel item in _combobox.Items)
+            {
+                if (item.Chart is not SymbolChartViewModel target) break;
+                target.Symbol.AddReferenceSymbol(reference);
+                break;
+            }
+
             e.Handled = true;
         }
 
@@ -310,9 +316,9 @@ namespace Algoloop.Wpf
             Dictionary<IChartLineElement, decimal> curves = new();
             Dictionary<DateTimeOffset, List<Tuple<IChartLineElement, decimal>>> points = new();
             int areaId = 0;
-            foreach (IChartViewModel iChart in _combobox.Items)
+            foreach (ChartItemViewModel item in _combobox.Items)
             {
-                if (!iChart.IsVisible) continue;
+                if (!item.IsVisible) continue;
                 IChartArea area;
                 if (areaId < _chart.Areas.Count)
                 {
@@ -337,8 +343,8 @@ namespace Algoloop.Wpf
                 }
 
                 areaId++;
-                area.Title = iChart.Title;
-                if (iChart is not ChartViewModel chart) continue;
+                area.Title = item.Chart.Title;
+                if (item.Chart is not ChartViewModel chart) continue;
 
                 int seriesAreaId = 0;
                 int elementId = 0;
@@ -355,7 +361,7 @@ namespace Algoloop.Wpf
                         }
 
                         area = _chart.Areas[areaId++];
-                        area.Title = iChart.Title + seriesAreaId.ToString();
+                        area.Title = item.Chart.Title + seriesAreaId.ToString();
                     }
 
                     IChartLineElement element;
@@ -440,11 +446,11 @@ namespace Algoloop.Wpf
             // Draw SymbolSeries
             areaId = 0;
             bool doIndicators = true;
-            foreach (IChartViewModel iChart in _combobox.Items)
+            foreach (ChartItemViewModel item in _combobox.Items)
             {
                 if (areaId >= _chart.Areas.Count) break;
-                if (!iChart.IsVisible) continue;
-                if (iChart is not SymbolChartViewModel chart) continue;
+                if (!item.IsVisible) continue;
+                if (item.Chart is not SymbolChartViewModel chart) continue;
                 IChartArea area = _chart.Areas[areaId++];
                 while (HasIOnlyIndicatorElement(area))
                 {

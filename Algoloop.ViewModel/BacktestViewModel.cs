@@ -1034,7 +1034,6 @@ namespace Algoloop.ViewModel
             ChartViewModel equityChart = workCharts.FirstOrDefault(m => m.Title.Equals(StrategyEquity)) as ChartViewModel;
             if (equityChart != null)
             {
-                equityChart.IsVisible = true;
                 Series series = Profit(result);
                 equityChart.Chart.AddSeries(series);
                 if (workCharts.Remove(equityChart))

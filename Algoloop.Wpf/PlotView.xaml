@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sx="http://schemas.stocksharp.com/xaml"
+    xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
     d:DesignHeight="300"
     d:DesignWidth="640"
     mc:Ignorable="d">
@@ -18,11 +18,21 @@
                 <DataTemplate>
                     <CheckBox
                         Content="{Binding Title}"
-                        IsChecked="{Binding Path=IsVisible, Mode=TwoWay}"
-                        Tag="{RelativeSource FindAncestor, AncestorType={x:Type ComboBox}}" />
+                        IsChecked="{Binding Path=IsVisible}" />
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <sx:ChartPanel x:Name="_chart" />
+        <ItemsControl Name="_chart">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <oxy:PlotView Model="{Binding}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </DockPanel>
 </UserControl>

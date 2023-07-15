@@ -240,11 +240,11 @@
                     ItemsSource="{Binding Charts}"
                     Settings="{Binding Source={StaticResource settings}, Path=BacktestViewChartSettings}"/>
             </TabItem>
-            <!--<TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Plot ({0}), FallbackValue=Plot}">
+            <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Plot ({0}), FallbackValue=Plot}">
                 <view:PlotView
                     ItemsSource="{Binding Charts}"
                     Settings="{Binding Source={StaticResource settings}, Path=BacktestViewPlotSettings}"/>
-            </TabItem>-->
+            </TabItem>
             <TabItem Header="{Binding BacktestSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Details ({0}), FallbackValue=Details}">
                 <wpf:ExDataGrid
                     AutoGenerateColumns="True"

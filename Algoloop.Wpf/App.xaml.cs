@@ -14,7 +14,6 @@
 
 using Algoloop.Model;
 using Algoloop.ViewModel;
-using DevExpress.Xpf.Core;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
