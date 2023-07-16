@@ -18,10 +18,11 @@ using QuantConnect;
 using System.Drawing;
 using System;
 using OxyPlot.Axes;
+using System.Windows.Automation;
 
 namespace Algoloop.Wpf.Internal
 {
-    internal static class OxyPlot
+    internal static class OxyPlotExtensions
     {
         private static Func<object, DataPoint> DataPointNumber = item =>  new DataPoint(((ChartPoint)item).x, (double)((ChartPoint)item).y);
         private static Func<object, DataPoint> DataPointTime = item => new DataPoint(DateTimeAxis.ToDouble(Time.UnixTimeStampToDateTime(((ChartPoint)item).x).ToLocalTime()), (double)((ChartPoint)item).y);
@@ -89,7 +90,12 @@ namespace Algoloop.Wpf.Internal
 
         private static OxyColor ToColor(Color color)
         {
-            return OxyColor.FromRgb(color.R, color.G, color.B);
+            if (color.IsEmpty)
+            {
+                return OxyColors.Automatic;
+            }
+
+            return OxyColor.FromArgb(color.A, color.R, color.G, color.B);
         }
 
         private static MarkerType ToMarkerType(ScatterMarkerSymbol marker)

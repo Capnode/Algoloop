@@ -119,7 +119,7 @@ namespace Algoloop.Wpf
                 if (iChart is not ChartViewModel chart) continue;
                 foreach (QuantConnect.Series series in chart.Chart.Series.Values)
                 {
-                    IChartBandElement curveElement = _chart.CreateCurve(series.Name, ViewModel.Internal.Lean.StockSharp.ToMediaColor(series.Color), ChartIndicatorDrawStyles.Line);
+                    IChartBandElement curveElement = _chart.CreateCurve(series.Name, ViewModel.Internal.Lean.StockSharpExtensions.ToMediaColor(series.Color), ChartIndicatorDrawStyles.Line);
                     foreach (EquityData equityData in series.ToEquityData())
                     {
                         decimal value = equityData.Value;

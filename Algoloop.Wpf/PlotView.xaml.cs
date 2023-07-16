@@ -177,6 +177,8 @@ namespace Algoloop.Wpf
                 if (!item.IsVisible) continue;
                 if (item.Chart is not ChartViewModel chart) continue;
                 var model = new PlotModel { Title = chart.Title };
+
+                // Series
                 bool isTime = false;
                 foreach (QuantConnect.Series qcSeries in chart.Chart.Series.Values)
                 {
@@ -193,6 +195,7 @@ namespace Algoloop.Wpf
                     model.Series.Add(series);
                 }
 
+                // Legend
                 var legend = new Legend
                 {
                     LegendBackground = OxyColor.FromArgb(200, 255, 255, 255),
@@ -201,6 +204,7 @@ namespace Algoloop.Wpf
                     LegendPosition = LegendPosition.BottomLeft,
                 };   
                 model.Legends.Add(legend);
+
                 Models.Add(model);
             }
         }

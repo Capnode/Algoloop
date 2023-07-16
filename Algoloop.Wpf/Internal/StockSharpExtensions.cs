@@ -28,7 +28,7 @@ using System.Linq;
 
 namespace Algoloop.ViewModel.Internal.Lean
 {
-    internal static class StockSharp
+    internal static class StockSharpExtensions
     {
         public static Candle ToCandle(BaseData data, Security security = default)
         {
@@ -176,7 +176,12 @@ namespace Algoloop.ViewModel.Internal.Lean
 
         public static System.Windows.Media.Color ToMediaColor(Color color)
         {
-            return System.Windows.Media.Color.FromRgb(color.R, color.G, color.B);
+            if (color.IsEmpty)
+            {
+                return System.Windows.Media.Colors.Black;
+            }
+
+            return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
         public static Color ToRGB(Color color)
