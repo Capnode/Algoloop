@@ -31,7 +31,16 @@ using System.Windows.Data;
 namespace Algoloop.Wpf
 {
     /// <summary>
+    /// Pan                 Right mouse button
+    /// Zoom                Mouse wheel
+    /// Zoom by rectangle   Ctrl+Right mouse button, Middle mouse button
+    /// Reset               Ctrl+Right mouse button double-click, Middle mouse button double-click
+    /// Show ‘tracker’      Left mouse button
+    /// Reset axes          ‘A’, Home
+    /// Copy code           Ctrl+Alt+C
+    /// Copy properties     Ctrl+Alt+R
     /// 
+    /// You can zoom/pan/reset a single axis by positioning the mouse cursor over the axis before starting the zoom/pan.
     /// </summary>
     public partial class PlotView : UserControl
     {
@@ -201,7 +210,7 @@ namespace Algoloop.Wpf
                     LegendBackground = OxyColor.FromArgb(200, 255, 255, 255),
                     LegendBorder = OxyColors.Black,
                     LegendPlacement = LegendPlacement.Inside,
-                    LegendPosition = LegendPosition.BottomLeft,
+                    LegendPosition = LegendPosition.TopLeft,
                 };   
                 model.Legends.Add(legend);
 

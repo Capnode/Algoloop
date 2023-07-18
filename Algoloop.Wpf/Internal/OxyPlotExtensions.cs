@@ -66,7 +66,8 @@ namespace Algoloop.Wpf.Internal
                     return new ScatterSeries
                     {
                         Title = title,
-                        MarkerType = ToMarkerType(qcSeries.ScatterMarkerSymbol),
+                        MarkerType = ToMarkerType(qcSeries.ScatterMarkerSymbol, MarkerType.Circle),
+                        MarkerFill = ToColor(qcSeries.Color),
                         Mapping = isTimeSeries ? ScatterPointTime : ScatterPointNumber,
                         ItemsSource = qcSeries.Values,
                     };
@@ -98,17 +99,17 @@ namespace Algoloop.Wpf.Internal
             return OxyColor.FromArgb(color.A, color.R, color.G, color.B);
         }
 
-        private static MarkerType ToMarkerType(ScatterMarkerSymbol marker)
+        private static MarkerType ToMarkerType(ScatterMarkerSymbol marker, MarkerType none  = MarkerType.None)
         {
             switch (marker)
             {
                 case ScatterMarkerSymbol.Square: return MarkerType.Square;
                 case ScatterMarkerSymbol.Circle: return MarkerType.Circle;
                 case ScatterMarkerSymbol.Diamond: return MarkerType.Diamond;
-                case ScatterMarkerSymbol.None: return MarkerType.None;
                 case ScatterMarkerSymbol.Triangle: return MarkerType.Triangle;
-                case ScatterMarkerSymbol.TriangleDown: return MarkerType.Custom;
-                default: return MarkerType.None;
+                case ScatterMarkerSymbol.TriangleDown: return MarkerType.Triangle;
+                case ScatterMarkerSymbol.None:
+                default: return none;
             }
         }
     }
