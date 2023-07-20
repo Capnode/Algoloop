@@ -62,12 +62,6 @@ namespace Algoloop.Algorithm.CSharp.Algo
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
-        [Parameter("Tracker sma stoploss period1")]
-        private readonly string _smaPeriod1 = "0";
-
-        [Parameter("Tracker sma stoploss period2")]
-        private readonly string _smaPeriod2 = "0";
-
         [Parameter("Daily turnover (min)")]
         private readonly string _turnover = "0";
 
@@ -92,8 +86,6 @@ namespace Algoloop.Algorithm.CSharp.Algo
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
-            int smaPeriod1 = int.Parse(_smaPeriod1, CultureInfo.InvariantCulture);
-            int smaPeriod2 = int.Parse(_smaPeriod2, CultureInfo.InvariantCulture);
             List<Symbol> symbols = _symbols
                 .Split(';')
                 .Select(x => QuantConnect.Symbol.Create(x, SecurityType.Equity, _market))
@@ -107,9 +99,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             SetPortfolioConstruction(new SlotPortfolio(
                 slots: slots,
                 reinvest: reinvest,
-                rebalance: rebalance,
-                smaPeriod1: smaPeriod1 >= 0 ? smaPeriod1 : period1,
-                smaPeriod2: smaPeriod2 >= 0 ? smaPeriod2 : period2));
+                rebalance: rebalance));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
