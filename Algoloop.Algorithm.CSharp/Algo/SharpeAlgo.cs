@@ -29,6 +29,8 @@ namespace Algoloop.Algorithm.CSharp.Algo
 {
     public class SharpeAlgo : QCAlgorithm
     {
+        private const int TurnoverPeriod = 21;
+
         [Parameter("symbols")]
         private readonly string _symbols = null;
 
@@ -61,6 +63,9 @@ namespace Algoloop.Algorithm.CSharp.Algo
 
         [Parameter("Tracker range stoploss period")]
         private readonly string _rangePeriod = "0";
+
+        [Parameter("Daily turnover (min)")]
+        private readonly string _turnover = "0";
 
         [Parameter("Market capitalization (M min)")]
         private readonly string _marketCap = null;
@@ -116,6 +121,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
+            int turnover = int.Parse(_turnover, CultureInfo.InvariantCulture);
             int rangePeriod = int.Parse(_rangePeriod, CultureInfo.InvariantCulture);
 
             List<Symbol> symbols = _symbols
@@ -144,6 +150,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             });
             SetWarmUp((int)(1.1 * period), Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
+                (symbol) => new TurnoverSignal(TurnoverPeriod, turnover),
                 (symbol) => new FundamentalSignal(
                     this,
                     symbol,
