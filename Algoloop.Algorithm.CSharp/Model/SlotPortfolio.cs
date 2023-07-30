@@ -36,35 +36,34 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
         private readonly InsightCollection _insights = new();
-        private readonly Minimum _trackerLow;
+        private readonly SimpleMovingAverage _sma;
 
-        private TrackerPortfolio _trackerPortfolio;
-        private DateTime _resetTime = DateTime.MinValue;
+        private Tracker _tracker;
         private decimal _initialCapital = 0;
         private decimal _portfolioValue0 = 0;
         private decimal _trackerValue0 = 0;
         private decimal _benchmarkValue0 = 0;
-        private decimal _scale = 1;
         private string _indexName = "Index";
 
         public SlotPortfolio(
             int slots,
             bool reinvest,
             float rebalance = 0,
-            int rangePeriod = 0)
+            int smaPeriod = 0)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
-            if (rangePeriod > 0)
+            if (smaPeriod > 0)
             {
-                _trackerLow = new Minimum($"Tracker Low({rangePeriod})", rangePeriod);
+                _sma = new SimpleMovingAverage($"SMA({smaPeriod})", smaPeriod);
             }
         }
 
         // Create list of PortfolioTarget objects from Insights
         public override IEnumerable<IPortfolioTarget> CreateTargets(QCAlgorithm algorithm, Insight[] insights)
         {
+            var time = algorithm.Time;
             if (algorithm.IsWarmingUp) return Enumerable.Empty<IPortfolioTarget>();
 
             // Initialize ?
@@ -76,7 +75,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             // End of algorithm ?
             if (insights == null)
             {
-                _trackerPortfolio.CreateTargets(algorithm, null);
+                _tracker.CreateTargets(algorithm, null);
                 LogInsights(algorithm, _insights);
                 if (_logTrades)
                 {
@@ -103,7 +102,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 .OrderByDescending(m => m.Magnitude)
                 .ThenBy(m => m.Symbol.ID.Symbol)
                 .ToArray();
-            _trackerPortfolio.CreateTargets(algorithm, insights);
+            IEnumerable<IPortfolioTarget> targets = _tracker.CreateTargets(algorithm, insights);
             Symbol[] symbols = _insights.Select(m => m.Symbol).ToArray();
             _insights.Clear(symbols);
             _insights.AddRange(insights); // Add in random order
@@ -117,21 +116,19 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal portfolioIndex = portfolioValue / _portfolioValue0;
             algorithm.Plot(TrackerChart, "Tracker Portfolio", portfolioIndex);
 
-            decimal trackerValue = _trackerPortfolio.GetEquity(algorithm);
+            decimal trackerValue = _tracker.GetEquity(algorithm);
             decimal trackerIndex = trackerValue / _trackerValue0;
             algorithm.Plot(TrackerChart, "Tracker", trackerIndex);
 
-            // Range stoploss
-            if (_trackerLow != null && _trackerLow.IsReady)
+            // SMA stoploss
+            _sma?.Update(algorithm.Time, trackerIndex);
+            if (_sma != null && _sma.IsReady)
             {
-                algorithm.Plot(TrackerChart, $"Tracker Low({_trackerLow.Period})", _trackerLow);
-                if (trackerIndex < _trackerLow)
-                {
-                    _resetTime = algorithm.Time;
-                    _scale = portfolioValue / trackerValue;
-                }
+                algorithm.Plot(TrackerChart, $"SMA({_sma.Period})", _sma);
+                decimal scale = trackerIndex < _sma ? 0 : portfolioValue / trackerValue;
+                algorithm.Plot(TrackerChart, $"Tracker Scale", scale);
+                _tracker.Scale = scale;
             }
-            _trackerLow?.Update(algorithm.Time, trackerIndex);
 
             // Plot tracker and benchmark index
             decimal benchmarkValue = algorithm.Benchmark.Evaluate(algorithm.Time);
@@ -142,8 +139,6 @@ namespace Algoloop.Algorithm.CSharp.Model
                 algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerIndex / benchmarkIndex);
             }
 
-            // Get targets
-            var targets = _trackerPortfolio.GetTargets(_scale, _resetTime);
             if (_logTargets)
             {
                 LogTargets(algorithm, targets);
@@ -156,8 +151,8 @@ namespace Algoloop.Algorithm.CSharp.Model
         {
             // Save initial capital for future use
             _initialCapital = algorithm.Portfolio.Cash;
-            _trackerPortfolio = new TrackerPortfolio(_initialCapital, _slots, _reinvest, _rebalance);
-            _trackerValue0 = _trackerPortfolio.GetEquity(algorithm);
+            _tracker = new Tracker(_initialCapital, _slots, _reinvest, _rebalance);
+            _trackerValue0 = _tracker.GetEquity(algorithm);
             _portfolioValue0 = algorithm.Portfolio.TotalPortfolioValue;
             _benchmarkValue0 = algorithm.Benchmark.Evaluate(algorithm.Time);
             if (algorithm.Benchmark is SecurityBenchmark sec)
