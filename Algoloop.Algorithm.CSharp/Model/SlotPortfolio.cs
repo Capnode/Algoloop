@@ -114,7 +114,7 @@ namespace Algoloop.Algorithm.CSharp.Model
             // Plot portfolio
             decimal portfolioValue = algorithm.Portfolio.TotalPortfolioValue;
             decimal portfolioIndex = portfolioValue / _portfolioValue0;
-            algorithm.Plot(TrackerChart, "Tracker Portfolio", portfolioIndex);
+            algorithm.Plot(TrackerChart, "Portfolio", portfolioIndex);
 
             decimal trackerValue = _tracker.GetEquity(algorithm);
             decimal trackerIndex = trackerValue / _trackerValue0;
@@ -124,9 +124,9 @@ namespace Algoloop.Algorithm.CSharp.Model
             _sma?.Update(algorithm.Time, trackerIndex);
             if (_sma != null && _sma.IsReady)
             {
-                algorithm.Plot(TrackerChart, $"SMA({_sma.Period})", _sma);
+                algorithm.Plot(TrackerChart, $"Tracker SMA({_sma.Period})", _sma);
                 decimal scale = trackerIndex < _sma ? 0 : portfolioValue / trackerValue;
-                algorithm.Plot(TrackerChart, $"Tracker Scale", scale);
+                algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
                 _tracker.Scale = scale;
             }
 
@@ -135,8 +135,8 @@ namespace Algoloop.Algorithm.CSharp.Model
             if (benchmarkValue > 0 && _benchmarkValue0 > 0)
             {
                 decimal benchmarkIndex = benchmarkValue / _benchmarkValue0;
-                algorithm.Plot(TrackerChart, $"Tracker {_indexName}", benchmarkIndex);
-                algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerIndex / benchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Benchmark {_indexName}", benchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Portfolio / {_indexName}", portfolioIndex / benchmarkIndex);
             }
 
             if (_logTargets)
