@@ -144,6 +144,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 LogTargets(algorithm, targets);
             }
 
+            algorithm.Plot(TrackerChart, "Portfolio targets", targets.Count(m => m.Quantity != 0));
             return targets;
         }
 
