@@ -14,6 +14,7 @@
 
 using Algoloop.ViewModel;
 using Algoloop.ViewModel.Internal.Lean;
+using QuantConnect;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
 using System;
@@ -117,9 +118,9 @@ namespace Algoloop.Wpf
             foreach (IChartViewModel iChart in _combobox.Items)
             {
                 if (iChart is not ChartViewModel chart) continue;
-                foreach (QuantConnect.Series series in chart.Chart.Series.Values)
+                foreach (BaseSeries series in chart.Chart.Series.Values)
                 {
-                    IChartBandElement curveElement = _chart.CreateCurve(series.Name, ViewModel.Internal.Lean.StockSharpExtensions.ToMediaColor(series.Color), ChartIndicatorDrawStyles.Line);
+                    IChartBandElement curveElement = _chart.CreateCurve(series.Name, System.Windows.Media.Colors.Black, ChartIndicatorDrawStyles.Line);
                     foreach (EquityData equityData in series.ToEquityData())
                     {
                         decimal value = equityData.Value;

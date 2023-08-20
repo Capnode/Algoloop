@@ -129,13 +129,13 @@ namespace Algoloop.ViewModel.Internal.Lean
             return element;
         }
 
-        public static IChartElement Update(this IChartElement element, Series series)
+        public static IChartElement Update(this IChartElement element, BaseSeries series)
         {
             if (element is IChartLineElement lineElement)
             {
                 lineElement.FullTitle = series.Name;
                 lineElement.Style = ToStyle(series.SeriesType);
-                lineElement.Color = ToRGB(series.Color);
+                lineElement.Color = ToRGB(series);
                 lineElement.AntiAliasing = false;
                 lineElement.IsLegend = true;
                 lineElement.ShowAxisMarker = true;
@@ -146,8 +146,8 @@ namespace Algoloop.ViewModel.Internal.Lean
             {
                 candleElement.FullTitle = series.Name;
                 candleElement.DrawStyle = ToCandleDrawStyle(series.SeriesType);
-                candleElement.UpBorderColor = ToRGB(series.Color);
-                candleElement.DownBorderColor = ToRGB(series.Color);
+                candleElement.UpBorderColor = ToRGB(series);
+                candleElement.DownBorderColor = ToRGB(series);
                 candleElement.AntiAliasing = false;
                 candleElement.IsLegend = true;
                 candleElement.ShowAxisMarker = true;
@@ -184,21 +184,43 @@ namespace Algoloop.ViewModel.Internal.Lean
             return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
         }
 
-        public static Color ToRGB(Color color)
+        private static Color ToRGB(BaseSeries baseSeries)
         {
-            return Color.FromArgb(color.R, color.G, color.B);
+            if ( baseSeries is Series series)
+            {
+                return Color.FromArgb(series.Color.R, series.Color.G, series.Color.B);
+            }
+
+            return Color.Black;
         }
 
-        public static IEnumerable<EquityData> ToEquityData(this Series series)
+        public static IEnumerable<EquityData> ToEquityData(this BaseSeries series)
         {
-            IEnumerable<EquityData> list = series.Values.Select(m =>
-                new EquityData
-                {
-                    Time = Time.UnixTimeStampToDateTime(m.x).ToLocalTime(),
-                    Value = RoundLarge(m.y)
-                });
+            return series.Values.Select(m => ToEquityData(m));
+        }
 
-            return list;
+        private static EquityData ToEquityData(ISeriesPoint point)
+        {
+            if (point is Candlestick candlestick)
+            {
+                return new EquityData
+                {
+                    Time = candlestick.Time.ToLocalTime(),
+                    Value = RoundLarge(candlestick.Close)
+                };
+            }
+
+            if (point is ChartPoint chartPoint)
+            {
+
+                return new EquityData
+                {
+                    Time = Time.UnixTimeStampToDateTime(chartPoint.x).ToLocalTime(),
+                    Value = RoundLarge(chartPoint.y)
+                };
+            }
+
+            return null;
         }
 
         public static Security ToSecurity(this SymbolModel symbolModel)

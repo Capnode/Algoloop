@@ -18,6 +18,7 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Legends;
 using OxyPlot.Series;
+using QuantConnect;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -189,17 +190,19 @@ namespace Algoloop.Wpf
 
                 // Series
                 bool isTime = false;
-                foreach (QuantConnect.Series qcSeries in chart.Chart.Series.Values)
+                foreach (BaseSeries baseSeries in chart.Chart.Series.Values)
                 {
-                    if (qcSeries.Values.Count == 0) continue;
-                    if (!isTime && qcSeries.Values[0].x > AssumeTime)
+                    if (baseSeries.Values.Count == 0) continue;
+                    ISeriesPoint first = baseSeries.Values[0];
+                    if (first is not ChartPoint point) continue;
+                    if (!isTime && point.x > AssumeTime)
                     {
                         isTime = true;
                         var xAxis = new DateTimeAxis();
                         model.Axes.Add(xAxis);
                     }
 
-                    ItemsSeries series = qcSeries.CreateSeries(isTime);
+                    ItemsSeries series = baseSeries.CreateSeries(isTime);
                     if (series == null) continue;
                     model.Series.Add(series);
                 }

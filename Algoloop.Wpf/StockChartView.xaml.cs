@@ -348,7 +348,7 @@ namespace Algoloop.Wpf
 
                 int seriesAreaId = 0;
                 int elementId = 0;
-                foreach (Series series in chart.Chart.Series.Values)
+                foreach (BaseSeries series in chart.Chart.Series.Values)
                 {
                     if (elementId >= MaxElementsInArea)
                     {

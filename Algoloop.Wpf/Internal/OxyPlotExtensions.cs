@@ -18,70 +18,69 @@ using QuantConnect;
 using System.Drawing;
 using System;
 using OxyPlot.Axes;
-using System.Windows.Automation;
 
 namespace Algoloop.Wpf.Internal
 {
     internal static class OxyPlotExtensions
     {
-        private static Func<object, DataPoint> DataPointNumber = item =>  new DataPoint(((ChartPoint)item).x, (double)((ChartPoint)item).y);
+        private static Func<object, DataPoint> DataPointNumber = item => new DataPoint(((ChartPoint)item).x, (double)((ChartPoint)item).y);
         private static Func<object, DataPoint> DataPointTime = item => new DataPoint(DateTimeAxis.ToDouble(Time.UnixTimeStampToDateTime(((ChartPoint)item).x).ToLocalTime()), (double)((ChartPoint)item).y);
         private static Func<object, ScatterPoint> ScatterPointNumber = item => new ScatterPoint(((ChartPoint)item).x, (double)((ChartPoint)item).y);
         private static Func<object, ScatterPoint> ScatterPointTime = item => new ScatterPoint(DateTimeAxis.ToDouble(Time.UnixTimeStampToDateTime(((ChartPoint)item).x).ToLocalTime()), (double)((ChartPoint)item).y);
 
 
-        public static ItemsSeries CreateSeries(this QuantConnect.Series qcSeries, bool isTimeSeries)
+        public static ItemsSeries CreateSeries(this BaseSeries series, bool isTimeSeries)
         {
-            string title = string.IsNullOrEmpty(qcSeries.Unit) ? qcSeries.Name : $"{qcSeries.Name} ({qcSeries.Unit})";
-            switch (qcSeries.SeriesType)
+            string title = string.IsNullOrEmpty(series.Unit) ? series.Name : $"{series.Name} ({series.Unit})";
+            switch (series.SeriesType)
             {
                 case SeriesType.Line:
                 case SeriesType.Treemap:
                     return new LineSeries
                     {
                         Title = title,
-                        MarkerType = ToMarkerType(qcSeries.ScatterMarkerSymbol),
-                        Color = ToColor(qcSeries.Color),
+                        MarkerType = ToMarkerType(series),
+                        Color = ToColor(series),
                         LineStyle = LineStyle.Solid,
                         Mapping = isTimeSeries ? DataPointTime : DataPointNumber,
-                        ItemsSource = qcSeries.Values,
+                        ItemsSource = series.Values,
                     };
                 case SeriesType.Candle:
                     return new AreaSeries
                     {
                         Title = title,
-                        MarkerType = ToMarkerType(qcSeries.ScatterMarkerSymbol),
-                        Color = ToColor(qcSeries.Color),
+                        MarkerType = ToMarkerType(series),
+                        Color = ToColor(series),
                         LineStyle = LineStyle.Solid,
                         Mapping = isTimeSeries ? DataPointTime : DataPointNumber,
-                        ItemsSource = qcSeries.Values,
+                        ItemsSource = series.Values,
                     };
                 case SeriesType.Pie:
                     return new PieSeries
                     {
                         Title = title,
-                        ItemsSource = qcSeries.Values,
+                        ItemsSource = series.Values,
                     };
                 case SeriesType.Scatter:
                     return new ScatterSeries
                     {
                         Title = title,
-                        MarkerType = ToMarkerType(qcSeries.ScatterMarkerSymbol, MarkerType.Circle),
-                        MarkerFill = ToColor(qcSeries.Color),
+                        MarkerType = ToMarkerType(series, MarkerType.Circle),
+                        MarkerFill = ToColor(series),
                         Mapping = isTimeSeries ? ScatterPointTime : ScatterPointNumber,
-                        ItemsSource = qcSeries.Values,
+                        ItemsSource = series.Values,
                     };
                 case SeriesType.Bar:
                     return new LinearBarSeries
                     {
                         Title = title,
-                        FillColor = ToColor(qcSeries.Color),
+                        FillColor = ToColor(series),
                         StrokeThickness = 1,
                         StrokeColor = OxyColor.FromArgb(255, 76, 175, 80),
                         NegativeFillColor = OxyColor.FromArgb(69, 191, 54, 12),
                         NegativeStrokeColor = OxyColor.FromArgb(255, 191, 54, 12),
                         Mapping = isTimeSeries ? DataPointTime : DataPointNumber,
-                        ItemsSource = qcSeries.Values,
+                        ItemsSource = series.Values,
                     };
                 case SeriesType.Flag:
                 case SeriesType.StackedArea:
@@ -89,28 +88,39 @@ namespace Algoloop.Wpf.Internal
             }
         }
 
-        private static OxyColor ToColor(Color color)
+        private static OxyColor ToColor(BaseSeries baseSeries)
         {
-            if (color.IsEmpty)
+            if (baseSeries is QuantConnect.Series series)
             {
-                return OxyColors.Automatic;
+                Color color = series.Color;
+                if (color.IsEmpty)
+                {
+                    return OxyColors.Automatic;
+                }
+
+                return OxyColor.FromArgb(color.A, color.R, color.G, color.B);
             }
 
-            return OxyColor.FromArgb(color.A, color.R, color.G, color.B);
+            return OxyColors.Automatic;
         }
 
-        private static MarkerType ToMarkerType(ScatterMarkerSymbol marker, MarkerType none  = MarkerType.None)
+        private static MarkerType ToMarkerType(BaseSeries baseSeries, MarkerType none = MarkerType.None)
         {
-            switch (marker)
+            if (baseSeries is QuantConnect.Series series)
             {
-                case ScatterMarkerSymbol.Square: return MarkerType.Square;
-                case ScatterMarkerSymbol.Circle: return MarkerType.Circle;
-                case ScatterMarkerSymbol.Diamond: return MarkerType.Diamond;
-                case ScatterMarkerSymbol.Triangle: return MarkerType.Triangle;
-                case ScatterMarkerSymbol.TriangleDown: return MarkerType.Triangle;
-                case ScatterMarkerSymbol.None:
-                default: return none;
+                switch (series.ScatterMarkerSymbol)
+                {
+                    case ScatterMarkerSymbol.Square: return MarkerType.Square;
+                    case ScatterMarkerSymbol.Circle: return MarkerType.Circle;
+                    case ScatterMarkerSymbol.Diamond: return MarkerType.Diamond;
+                    case ScatterMarkerSymbol.Triangle: return MarkerType.Triangle;
+                    case ScatterMarkerSymbol.TriangleDown: return MarkerType.Triangle;
+                    case ScatterMarkerSymbol.None:
+                    default: return none;
+                }
             }
+
+            return none;
         }
     }
 }

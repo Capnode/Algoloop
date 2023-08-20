@@ -109,7 +109,7 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_chartpoint_idealProfit()
         {
-            List<ChartPoint> trades = new()
+            List<ISeriesPoint> trades = new()
             {
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 11000 },
@@ -124,7 +124,7 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_chartpoint_idealLoss()
         {
-            List<ChartPoint> trades = new()
+            List<ISeriesPoint> trades = new()
             {
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 9000 },
@@ -139,7 +139,7 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_chartpoint_breakeven()
         {
-            List<ChartPoint> trades = new()
+            List<ISeriesPoint> trades = new()
             {
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 9000 },
@@ -154,7 +154,7 @@ namespace Algoloop.Tests.ViewModel
         [TestMethod()]
         public void CalculateScore_chartpoint_profit()
         {
-            List<ChartPoint> trades = new()
+            List<ISeriesPoint> trades = new()
             {
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
                 new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 11000 },

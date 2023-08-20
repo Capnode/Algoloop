@@ -429,23 +429,23 @@ namespace Algoloop.ViewModel
             return Scale(score);
         }
 
-        internal static double CalculateScore(IList<ChartPoint> series)
+        internal static double CalculateScore(IEnumerable<ISeriesPoint> series)
         {
-            int count = series.Count;
+            int count = series.Count();
             if (count < 2)
             {
                 return 0;
             }
 
-            decimal first = series.First().y;
-            decimal last = series.Last().y;
-            decimal netProfit = last - first;
+            if (series.First() is not Candlestick first) return 0;
+            if (series.Last() is not Candlestick last) return 0;
+            decimal netProfit = last.Close - first.Close;
             decimal avg = netProfit / (count - 1);
-            decimal ideal = first;
+            decimal ideal = first.Close;
             decimal error = 0;
-            foreach (ChartPoint trade in series)
+            foreach (Candlestick trade in series)
             {
-                decimal diff = trade.y - ideal;
+                decimal diff = trade.Close - ideal;
                 error += Math.Abs(diff);
                 ideal += avg;
             }
@@ -455,21 +455,21 @@ namespace Algoloop.ViewModel
             return Scale(score);
         }
 
-        internal static double CalculateAthScore(IList<ChartPoint> series)
+        internal static double CalculateAthScore(IEnumerable<ISeriesPoint> series)
         {
             decimal ath = decimal.MinValue;
             int days = 0;
             int athDays = 0;
-            foreach (ChartPoint trade in series)
+            foreach (Candlestick trade in series)
             {
-                if (trade.y > ath)
+                if (trade.Close > ath)
                 {
                     if (ath != decimal.MinValue)
                     {
                         athDays++;
                     }
 
-                    ath = trade.y;
+                    ath = trade.Close;
                 }
 
                 days++;
@@ -585,11 +585,11 @@ namespace Algoloop.ViewModel
                 m => m.Key.Equals(StrategyEquity, StringComparison.OrdinalIgnoreCase));
             if (chart.Equals(default(KeyValuePair<string, QuantConnect.Chart>))) return;
 
-            KeyValuePair<string, Series> equity = chart.Value.Series.FirstOrDefault(
+            KeyValuePair<string, BaseSeries> equity = chart.Value.Series.FirstOrDefault(
                 m => m.Key.Equals("Equity", StringComparison.OrdinalIgnoreCase));
             if (equity.Equals(default(KeyValuePair<string, Series>))) return;
 
-            List<ChartPoint> series = equity.Value.Values;
+            IList<ISeriesPoint> series = equity.Value.Values;
             double score = CalculateScore(series);
             statistics.Add("Score", ((decimal)score).RoundToSignificantDigits(4));
 
