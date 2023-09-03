@@ -137,6 +137,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 decimal benchmarkIndex = benchmarkValue / _benchmarkValue0;
                 algorithm.Plot(TrackerChart, $"Benchmark {_indexName}", benchmarkIndex);
                 algorithm.Plot(TrackerChart, $"Portfolio / {_indexName}", portfolioIndex / benchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerIndex / benchmarkIndex);
             }
 
             if (_logTargets)

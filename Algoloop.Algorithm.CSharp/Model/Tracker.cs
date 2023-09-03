@@ -77,7 +77,10 @@ namespace Algoloop.Algorithm.CSharp.Model
             AddNotInList(algorithm, toplist);
 
             // Rebalance portfolio
-            RebalanceInList(algorithm, toplist);
+            if (Scale > 0)
+            {
+                RebalanceInList(algorithm, toplist);
+            }
 
             //algorithm.Log($"{algorithm.Time:d} slots={_holdings.Count} cash={_cash:0.00} reserved={_reserved:0.00}");
 
