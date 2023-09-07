@@ -120,24 +120,38 @@ namespace Algoloop.Algorithm.CSharp.Model
             decimal trackerIndex = trackerValue / _trackerValue0;
             algorithm.Plot(TrackerChart, "Tracker", trackerIndex);
 
-            // SMA stoploss
-            _sma?.Update(algorithm.Time, trackerIndex);
-            if (_sma != null && _sma.IsReady)
-            {
-                algorithm.Plot(TrackerChart, $"Tracker SMA({_sma.Period})", _sma);
-                decimal scale = trackerIndex < _sma ? 0 : portfolioValue / trackerValue;
-                algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
-                _tracker.Scale = scale;
-            }
-
             // Plot tracker and benchmark index
             decimal benchmarkValue = algorithm.Benchmark.Evaluate(algorithm.Time);
             if (benchmarkValue > 0 && _benchmarkValue0 > 0)
             {
                 decimal benchmarkIndex = benchmarkValue / _benchmarkValue0;
+                decimal portfolioBenchmarkIndex = portfolioIndex / benchmarkIndex;
+                decimal trackerBenchmarkIndex = trackerIndex / benchmarkIndex;
                 algorithm.Plot(TrackerChart, $"Benchmark {_indexName}", benchmarkIndex);
-                algorithm.Plot(TrackerChart, $"Portfolio / {_indexName}", portfolioIndex / benchmarkIndex);
-                algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerIndex / benchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Portfolio / {_indexName}", portfolioBenchmarkIndex);
+                algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerBenchmarkIndex);
+
+                // SMA stoploss on Tracker / Benchmark
+                _sma?.Update(algorithm.Time, trackerBenchmarkIndex);
+                if (_sma != null && _sma.IsReady)
+                {
+                    algorithm.Plot(TrackerChart, $"Tracker  / {_indexName} SMA({_sma.Period})", _sma);
+                    decimal scale = trackerBenchmarkIndex < _sma ? 0 : portfolioValue / trackerValue;
+                    algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
+                    _tracker.Scale = scale;
+                }
+            }
+            else
+            {
+                // SMA stoploss on Tracker
+                _sma?.Update(algorithm.Time, trackerIndex);
+                if (_sma != null && _sma.IsReady)
+                {
+                    algorithm.Plot(TrackerChart, $"Tracker SMA({_sma.Period})", _sma);
+                    decimal scale = trackerIndex < _sma ? 0 : portfolioValue / trackerValue;
+                    algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
+                    _tracker.Scale = scale;
+                }
             }
 
             if (_logTargets)
