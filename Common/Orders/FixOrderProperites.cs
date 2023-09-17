@@ -13,27 +13,31 @@
  * limitations under the License.
 */
 
-namespace QuantConnect.Algorithm.Framework.Portfolio
+namespace QuantConnect.Orders
 {
     /// <summary>
-    /// Represents a portfolio target. This may be a percentage of total portfolio value
-    /// or it may be a fixed number of shares.
+    /// FIX (Financial Information Exchange) order properties
     /// </summary>
-    public interface IPortfolioTarget
+    public class FixOrderProperites: OrderProperties
     {
         /// <summary>
-        /// Gets the symbol of this target
+        /// Instruction for order handling on Broker floor
         /// </summary>
-        Symbol Symbol { get; }
+        public char? HandleInstruction { get; set; }
 
         /// <summary>
-        /// Gets the quantity of this symbol the algorithm should hold
+        /// Automated execution order, private, no broker intervention
         /// </summary>
-        decimal Quantity { get; }
+        public const char AutomatedExecutionOrderPrivate = '1';
 
         /// <summary>
-        /// Portfolio target tag with additional information
+        /// Automated execution order, public, broker, intervention OK
         /// </summary>
-        string Tag { get; }
+        public const char AutomatedExecutionOrderPublic = '2';
+
+        /// <summary>
+        /// Staged order, broker intervention required
+        /// </summary>
+        public const char ManualOrder = '3';
     }
 }

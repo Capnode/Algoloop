@@ -12,28 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
-namespace QuantConnect.Algorithm.Framework.Portfolio
+    
+namespace QuantConnect.Orders
 {
     /// <summary>
-    /// Represents a portfolio target. This may be a percentage of total portfolio value
-    /// or it may be a fixed number of shares.
+    /// Trading Technologies order properties
     /// </summary>
-    public interface IPortfolioTarget
+    public class TradingTechnologiesOrderProperties : FixOrderProperites
     {
-        /// <summary>
-        /// Gets the symbol of this target
-        /// </summary>
-        Symbol Symbol { get; }
-
-        /// <summary>
-        /// Gets the quantity of this symbol the algorithm should hold
-        /// </summary>
-        decimal Quantity { get; }
-
-        /// <summary>
-        /// Portfolio target tag with additional information
-        /// </summary>
-        string Tag { get; }
     }
 }
