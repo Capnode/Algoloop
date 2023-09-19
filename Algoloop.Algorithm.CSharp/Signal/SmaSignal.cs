@@ -42,9 +42,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             if (!_sma.IsReady) return 0;
             return decimal.Compare(bar.Price, _sma);
         }
-
-        public void Done()
-        {
-        }
     }
 }

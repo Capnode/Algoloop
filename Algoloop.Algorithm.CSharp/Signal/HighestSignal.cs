@@ -59,10 +59,6 @@ namespace Algoloop.Algorithm.CSharp.Signal
 
             return (float)(tradeBar.Close / highest);
         }
-
-        public void Done()
-        {
-        }
     }
 }
 

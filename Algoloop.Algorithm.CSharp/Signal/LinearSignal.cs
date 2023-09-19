@@ -49,9 +49,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             float score = loss != 0 ? count * netProfit / loss : 0;
             return score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

@@ -53,9 +53,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             float score = totalSum != 0 ? deltaSum / totalSum : 0;
             return score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

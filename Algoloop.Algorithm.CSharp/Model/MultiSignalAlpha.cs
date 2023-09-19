@@ -163,17 +163,6 @@ namespace Algoloop.Algorithm.CSharp.Model
             }
         }
 
-        public void OnEndOfAlgorithm()
-        {
-            foreach (ISignal[] signals in _signals.Values)
-            {
-                foreach (ISignal signal in signals)
-                {
-                    signal.Done();
-                }
-            }
-        }
-
         private static int Compare(Insight x, Insight y)
         {
             if (x == null) return 1;

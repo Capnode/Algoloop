@@ -62,9 +62,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             decimal volumeBalance = sum / absSum;
             return (float)Math.Max(0, volumeBalance);
         }
-
-        public void Done()
-        {
-        }
     }
 }

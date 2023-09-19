@@ -68,9 +68,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             _lower = (float)(decimal)_lowerLine;
             return _score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

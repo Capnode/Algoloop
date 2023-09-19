@@ -54,10 +54,6 @@ namespace Algoloop.Algorithm.CSharp.Signal
             //algorithm.Log($"{bar.Time:u} {bar.Symbol.ID.Symbol} _fastEma={_fastEma} _slowEma={_slowEma}");
             return _fastEma > _slowEma ? 1 : 0;
         }
-
-        public void Done()
-        {
-        }
     }
 }
 

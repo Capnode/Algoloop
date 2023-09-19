@@ -40,9 +40,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             float roc = (float)(decimal)_roc;
             return roc >= 0 ? 1 : 0;
         }
-
-        public void Done()
-        {
-        }
     }
 }

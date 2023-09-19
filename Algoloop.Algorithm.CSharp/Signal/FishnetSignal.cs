@@ -52,10 +52,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
 
             return score > 0.5 * _period ? 1 : 0;
         }
-
-        public void Done()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

@@ -44,9 +44,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             double score = walk != 0 ? sum / walk : 0;
             return (float)score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

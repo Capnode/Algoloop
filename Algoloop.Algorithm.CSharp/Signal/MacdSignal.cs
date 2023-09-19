@@ -55,9 +55,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
 
             return _macd > _macd.Signal ? 1 : 0;
         }
-
-        public void Done()
-        {
-        }
     }
 }

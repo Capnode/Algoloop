@@ -75,10 +75,6 @@ namespace Algoloop.Algorithm.CSharp.Signal
             return _score;
         }
 
-        public void Done()
-        {
-        }
-
         public void Dispose()
         {
             Dispose(true);

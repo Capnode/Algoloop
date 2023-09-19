@@ -92,10 +92,6 @@ namespace Algoloop.Algorithm.CSharp.Signal
 
             return index < _trackerLow ? 0 : (float)index;
         }
-
-        public void Done()
-        {
-        }
     }
 }
 

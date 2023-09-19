@@ -114,10 +114,6 @@ namespace Algoloop.Algorithm.CSharp.Signal
             //if (highpoints.Length > 1 && highpoints[0].Price < highpoints[1].Price) return 0;
             //return 1;
         }
-
-        public void Done()
-        {
-        }
     }
 }
 

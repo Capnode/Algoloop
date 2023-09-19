@@ -53,9 +53,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
 
             return score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

@@ -52,10 +52,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             float score = variance != 0 ? mean / variance : 0;
             return score;
         }
-
-        public void Done()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

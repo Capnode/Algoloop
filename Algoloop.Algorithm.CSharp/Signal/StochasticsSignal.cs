@@ -40,9 +40,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             decimal score = _sto.StochK.Current.Value;
             return (float)score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

@@ -34,9 +34,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             _last = tradeBar;
             return diff > 0 ? (float)diff : 0;
         }
-
-        public void Done()
-        {
-        }
     }
 }

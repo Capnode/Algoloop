@@ -30,9 +30,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             algorithm.Plot($"{bar.Symbol.ID.Symbol} VSA", vsa);
             return 1;
         }
-
-        public void Done()
-        {
-        }
     }
 }

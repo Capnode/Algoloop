@@ -50,9 +50,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             int count = _window.Count(m => m >= _turnover);
             return count > _period / 2 ? 1 : 0;
         }
-
-        public void Done()
-        {
-        }
     }
 }

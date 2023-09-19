@@ -617,9 +617,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             if (score < 0 && value < 0) return -score * (float)value;
             return 0;
         }
-
-        public void Done()
-        {
-        }
     }
 }

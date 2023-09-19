@@ -57,9 +57,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             float score = annualizedStd != 0 ? annualizedReturn / annualizedStd : 0;
             return score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

@@ -20,6 +20,5 @@ namespace Algoloop.Algorithm.CSharp.Model
     public interface ISignal
     {
         float Update(QCAlgorithm algorithm, BaseData bar);
-        void Done();
     }
 }

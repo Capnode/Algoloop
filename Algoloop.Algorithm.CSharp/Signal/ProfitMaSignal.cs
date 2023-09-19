@@ -42,9 +42,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             float score = profit / last;
             return score;
         }
-
-        public void Done()
-        {
-        }
     }
 }

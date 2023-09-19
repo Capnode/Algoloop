@@ -69,9 +69,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
 
             return 0;
         }
-
-        public void Done()
-        {
-        }
     }
 }

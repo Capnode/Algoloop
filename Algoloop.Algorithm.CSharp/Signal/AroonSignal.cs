@@ -34,9 +34,5 @@ namespace Algoloop.Algorithm.CSharp.Signal
             if (!_aroon.IsReady) return 0;
             return decimal.Compare(_aroon.AroonUp, _aroon.AroonDown);
         }
-
-        public void Done()
-        {
-        }
     }
 }
