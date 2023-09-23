@@ -58,7 +58,7 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.1938.49" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.2" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.160" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.161" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
