@@ -11,56 +11,85 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
 
-using QuantConnect.Securities;
-
+using System;
+using System.Linq;
 using System.Collections.Generic;
+
+using QuantConnect.Data;
+using QuantConnect.Interfaces;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Algorithm asserting that when setting custom models for canonical index options, a one-time warning is sent
-    /// informing the user that the contracts models are different (not the custom ones).
+    /// Reproduces https://github.com/QuantConnect/Lean/issues/7451, making sure no additional subscriptions are added for an index
+    /// after manually adding both the underlying and an option contract, with slightly different configurations like the fill forward value.
     /// </summary>
-    public class IndexOptionModelsConsistencyRegressionAlgorithm : OptionModelsConsistencyRegressionAlgorithm
+    public class DuplicatedIndexOptionSubscriptionRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        protected override Security InitializeAlgorithm()
+        public override void Initialize()
         {
             SetStartDate(2021, 1, 4);
-            SetEndDate(2021, 1, 5);
+            SetEndDate(2021, 1, 4);
+            SetCash(1000000);
 
-            var index = AddIndex("SPX", Resolution.Minute);
-            var option = AddIndexOption(index.Symbol, "SPX", Resolution.Minute);
-            option.SetFilter((x) => x.Strikes(-5, 5).Expiration(0, 360));
+            var spx = AddIndex("SPX", Resolution.Minute, fillForward: false).Symbol;
 
-            return option;
+            if (SubscriptionManager.Subscriptions.Single().Symbol != spx)
+            {
+                throw new Exception($"Expected a single subscription to exist ({spx})");
+            }
+
+            var spxOption = QuantConnect.Symbol.CreateOption(
+                spx,
+                Market.USA,
+                OptionStyle.European,
+                OptionRight.Call,
+                3200m,
+                new DateTime(2021, 1, 15));
+
+            AddIndexOptionContract(spxOption, Resolution.Minute);
+
+            if (SubscriptionManager.Subscriptions.Count() < 2)
+            {
+                throw new Exception("Expected subscriptions for the added index option contract");
+            }
+
+            if (SubscriptionManager.Subscriptions.Count(x => x.Symbol == spx) != 1)
+            {
+                throw new Exception("Expected a single subscription for the underlying index security");
+            }
+
+            // Quit early, we already tested what we wanted
+            Quit();
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
-        public override bool CanRunLocally => true;
+        public virtual bool CanRunLocally { get; } = true;
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual Language[] Languages { get; } = { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 19224;
+        public virtual long DataPoints => 0;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public override int AlgorithmHistoryDataPoints => 0;
+        public virtual int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public virtual Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Trades", "0"},
             {"Average Win", "0%"},

@@ -1963,6 +1963,7 @@ namespace QuantConnect.Algorithm
         /// <param name="leverage">The requested leverage for the </param>
         /// <returns>The new option security instance</returns>
         /// <exception cref="KeyNotFoundException"></exception>
+        [DocumentationAttribute(AddingData)]
         public Option AddOption(Symbol underlying, string targetOption, Resolution? resolution = null,
             string market = null, bool fillForward = true, decimal leverage = Security.NullLeverage)
         {
@@ -2185,7 +2186,9 @@ namespace QuantConnect.Algorithm
             var underlying = symbol.Underlying;
             Security underlyingSecurity;
             List<SubscriptionDataConfig> underlyingConfigs;
-            if (!Securities.TryGetValue(underlying, out underlyingSecurity) || !underlyingSecurity.IsTradable)
+            if (!Securities.TryGetValue(underlying, out underlyingSecurity) ||
+                // The underlying might have been removed, let's see if there's already a subscription for it
+                (!underlyingSecurity.IsTradable && SubscriptionManager.SubscriptionDataConfigService.GetSubscriptionDataConfigs(underlying).Count == 0))
             {
                 underlyingSecurity = AddSecurity(underlying, resolution, fillForward, leverage, extendedMarketHours);
                 underlyingConfigs = SubscriptionManager.SubscriptionDataConfigService

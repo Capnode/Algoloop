@@ -13,54 +13,90 @@
  * limitations under the License.
 */
 
-using QuantConnect.Securities;
-
+using System;
 using System.Collections.Generic;
+using QuantConnect.Data.Market;
+using QuantConnect.Interfaces;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Algorithm asserting that when setting custom models for canonical index options, a one-time warning is sent
-    /// informing the user that the contracts models are different (not the custom ones).
+    /// This algorithm asserts we can consolidate Tick data with different tick types
     /// </summary>
-    public class IndexOptionModelsConsistencyRegressionAlgorithm : OptionModelsConsistencyRegressionAlgorithm
+    public class ConsolidateDifferentTickTypesRegressionAlgorithm: QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        protected override Security InitializeAlgorithm()
+        private bool _thereIsAtLeastOneQuoteTick;
+        private bool _thereIsAtLeastOneTradeTick;
+
+        public override void Initialize()
         {
-            SetStartDate(2021, 1, 4);
-            SetEndDate(2021, 1, 5);
+            SetStartDate(2013, 10, 06);
+            SetEndDate(2013, 10, 07);
+            SetCash(1000000);
 
-            var index = AddIndex("SPX", Resolution.Minute);
-            var option = AddIndexOption(index.Symbol, "SPX", Resolution.Minute);
-            option.SetFilter((x) => x.Strikes(-5, 5).Expiration(0, 360));
+            var equity = AddEquity("SPY", Resolution.Tick, Market.USA);
+            var quoteConsolidator = Consolidate(equity.Symbol, Resolution.Tick, TickType.Quote, (Tick tick) => OnQuoteTick(tick));
+            _thereIsAtLeastOneQuoteTick = false;
 
-            return option;
+            var tradeConsolidator = Consolidate(equity.Symbol, Resolution.Tick, TickType.Trade, (Tick tick) => OnTradeTick(tick));
+            _thereIsAtLeastOneTradeTick = false;
+        }
+
+        public void OnQuoteTick(Tick tick)
+        {
+            _thereIsAtLeastOneQuoteTick = true;
+            if (tick.TickType != TickType.Quote)
+            {
+                throw new Exception($"The type of the tick should be Quote, but was {tick.TickType}");
+            }
+        }
+
+        public void OnTradeTick(Tick tick)
+        {
+            _thereIsAtLeastOneTradeTick = true;
+            if (tick.TickType != TickType.Trade)
+            {
+                throw new Exception($"The type of the tick should be Trade, but was {tick.TickType}");
+            }
+        }
+
+        public override void OnEndOfAlgorithm()
+        {
+            if (!_thereIsAtLeastOneQuoteTick)
+            {
+                throw new Exception($"There should have been at least one tick in OnQuoteTick() method, but there wasn't");
+            }
+
+            if (!_thereIsAtLeastOneTradeTick)
+            {
+                throw new Exception($"There should have been at least one tick in OnTradeTick() method, but there wasn't");
+            }
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
-        public override bool CanRunLocally => true;
+        public bool CanRunLocally { get; } = true;
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 19224;
+        public long DataPoints => 2857175;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public override int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Trades", "0"},
             {"Average Win", "0%"},

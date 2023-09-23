@@ -67,6 +67,7 @@ namespace QuantConnect
             Tuple.Create(FTX, 34),
             Tuple.Create(FTXUS, 35),
             Tuple.Create(BinanceUS, 36),
+            Tuple.Create(Bybit, 37),
 
             Tuple.Create(Borsdata, 256),
             Tuple.Create(Metastock, 257),
@@ -237,6 +238,11 @@ namespace QuantConnect
         public const string BinanceUS = "binanceus";
 
         /// <summary>
+        /// <summary>
+        /// Bybit
+        /// </summary>
+        public const string Bybit = "bybit";
+
         /// Borsdata
         /// </summary>
         public const string Borsdata = "borsdata";

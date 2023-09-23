@@ -13,54 +13,72 @@
  * limitations under the License.
 */
 
-using QuantConnect.Securities;
-
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using QuantConnect.Data.UniverseSelection;
+using QuantConnect.Interfaces;
 
 namespace QuantConnect.Algorithm.CSharp
 {
     /// <summary>
-    /// Algorithm asserting that when setting custom models for canonical index options, a one-time warning is sent
-    /// informing the user that the contracts models are different (not the custom ones).
+    /// Asserts that algorithms can be universe-only, that is, universe selection is performed even if the ETF security is not explicitly added.
+    /// Reproduces https://github.com/QuantConnect/Lean/issues/7473
     /// </summary>
-    public class IndexOptionModelsConsistencyRegressionAlgorithm : OptionModelsConsistencyRegressionAlgorithm
+    public class UniverseOnlyRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        protected override Security InitializeAlgorithm()
+        private bool _selectionDone;
+
+        public override void Initialize()
         {
-            SetStartDate(2021, 1, 4);
-            SetEndDate(2021, 1, 5);
+            SetStartDate(2020, 12, 1);
+            SetEndDate(2020, 12, 12);
+            SetCash(100000);
 
-            var index = AddIndex("SPX", Resolution.Minute);
-            var option = AddIndexOption(index.Symbol, "SPX", Resolution.Minute);
-            option.SetFilter((x) => x.Strikes(-5, 5).Expiration(0, 360));
+            UniverseSettings.Resolution = Resolution.Daily;
 
-            return option;
+            // Add universe without a security added
+            AddUniverse(Universe.ETF("GDVD", UniverseSettings, FilterUniverse));
+        }
+
+        public override void OnEndOfAlgorithm()
+        {
+            if (!_selectionDone)
+            {
+                throw new Exception("Universe selection was not performed");
+            }
+        }
+
+        private IEnumerable<Symbol> FilterUniverse(IEnumerable<ETFConstituentData> constituents)
+        {
+            _selectionDone = true;
+            return constituents.Select(x => x.Symbol);
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
-        public override bool CanRunLocally => true;
+        public bool CanRunLocally { get; } = true;
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 19224;
+        public long DataPoints => 118;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public override int AlgorithmHistoryDataPoints => 0;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Trades", "0"},
             {"Average Win", "0%"},
@@ -78,8 +96,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0"},
             {"Annual Standard Deviation", "0"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "0"},
-            {"Tracking Error", "0"},
+            {"Information Ratio", "-0.311"},
+            {"Tracking Error", "0.07"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},

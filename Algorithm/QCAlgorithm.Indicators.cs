@@ -2376,6 +2376,8 @@ namespace QuantConnect.Algorithm
         /// Will deregister an indicator and it's associated consolidator instance so they stop receiving data updates
         /// </summary>
         /// <param name="indicator">The indicator instance to deregister</param>
+        [DocumentationAttribute(ConsolidatingData)]
+        [DocumentationAttribute(Indicators)]
         public void DeregisterIndicator(IndicatorBase indicator)
         {
             foreach (var consolidator in indicator.Consolidators)
@@ -2805,7 +2807,7 @@ namespace QuantConnect.Algorithm
             // create requested consolidator
             var consolidator = CreateConsolidator(period, subscription.Type, subscription.TickType);
 
-            AddConsolidator(symbol, consolidator, handler);
+            AddConsolidator(symbol, consolidator, handler, tickType);
             return consolidator;
         }
 
@@ -2882,7 +2884,7 @@ namespace QuantConnect.Algorithm
         /// if not will throw <see cref="ArgumentException"/>
         /// </summary>
         [DocumentationAttribute(ConsolidatingData)]
-        private void AddConsolidator<T>(Symbol symbol, IDataConsolidator consolidator, Action<T> handler)
+        private void AddConsolidator<T>(Symbol symbol, IDataConsolidator consolidator, Action<T> handler, TickType? tickType = null)
         {
             if (!typeof(T).IsAssignableFrom(consolidator.OutputType))
             {
@@ -2902,7 +2904,7 @@ namespace QuantConnect.Algorithm
             consolidator.DataConsolidated += (sender, consolidated) => handler((T)consolidated);
 
             // register the consolidator for automatic updates via SubscriptionManager
-            SubscriptionManager.AddConsolidator(symbol, consolidator);
+            SubscriptionManager.AddConsolidator(symbol, consolidator, tickType);
         }
 
         [DocumentationAttribute(ConsolidatingData)]
