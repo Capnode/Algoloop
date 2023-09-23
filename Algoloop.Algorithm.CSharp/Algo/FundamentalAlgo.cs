@@ -56,6 +56,9 @@ namespace Algoloop.Algorithm.CSharp.Algo
         [Parameter("Rebalance trigger (min)")]
         private readonly string _rebalance = "0";
 
+        [Parameter("Tracker sma stoploss period")]
+        private readonly string _smaPeriod = "0";
+        
         [Parameter("Daily turnover (min)")]
         private readonly string _turnover = "0";
 
@@ -132,6 +135,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
+            int smaPeriod = int.Parse(_smaPeriod, CultureInfo.InvariantCulture);
             List<Symbol> symbols = _symbols
                 .Split(';')
                 .Select(x => QuantConnect.Symbol.Create(x, securityType, _market))
@@ -142,7 +146,11 @@ namespace Algoloop.Algorithm.CSharp.Algo
             MarketHoursDatabase.Entry entry = MarketHoursDatabase.GetEntry(_market, (string)null, securityType);
             SetTimeZone(entry.DataTimeZone);
             SetUniverseSelection(new ManualUniverseSelectionModel(symbols));
-            SetPortfolioConstruction(new SlotPortfolio(slots, reinvest, rebalance));
+            SetPortfolioConstruction(new SlotPortfolio(
+                slots: slots,
+                reinvest: reinvest,
+                rebalance: rebalance,
+                smaPeriod: smaPeriod));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));
