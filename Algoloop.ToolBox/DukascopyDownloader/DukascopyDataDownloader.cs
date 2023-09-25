@@ -17,7 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
+using System.Net.Http;
+using System.Threading;
 using QuantConnect;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
@@ -131,25 +132,19 @@ namespace Algoloop.ToolBox.DukascopyDownloader
                           $"{date.Year.ToStringInvariant("D4")}/{(date.Month - 1).ToStringInvariant("D2")}/" +
                           $"{date.Day.ToStringInvariant("D2")}/{hour.ToStringInvariant("D2")}h_ticks.bi5";
 
-                using var client = new WebClient();
+                using var client = new HttpClient();
                 while (true)
                 {
                     byte[] bytes = null;
                     try
                     {
-                        bytes = client.DownloadData(url);
+                        bytes = client.GetByteArrayAsync(url).Result;
                     }
-                    catch (WebException webEx)
+                    catch (Exception ex)
                     {
-                        var response = (HttpWebResponse)webEx.Response;
-                        if (response == default) throw;
-                        if (response.StatusCode >= HttpStatusCode.InternalServerError)
-                        {
-                            Log.Trace($"{webEx.GetType()}: {url} {webEx.Message}");
-                            continue;
-                        }
-                        else if (response.StatusCode == HttpStatusCode.NotFound) break;
-                        throw;
+                        Log.Trace($"{ex.GetType()}: {url} {ex.Message}");
+                        Thread.Sleep(60000);
+                        continue;
                     }
                     if (bytes != null && bytes.Length > 0)
                     {
