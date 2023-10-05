@@ -34,6 +34,7 @@ namespace Algoloop.ViewModel
     {
         private bool _isBusy;
         private string _statusMessage;
+        private bool _initialized;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -88,6 +89,8 @@ namespace Algoloop.ViewModel
 
         public void SaveConfig()
         {
+            if (!_initialized) return;
+
             IsBusy = true;
             try
             {
@@ -229,6 +232,8 @@ namespace Algoloop.ViewModel
                 // Completed
                 Messenger.Send(new NotificationMessage(
                     Resources.LoadingConfigurationCompleted), 0);
+
+                _initialized = true;
             }
             catch (Exception ex)
             {
