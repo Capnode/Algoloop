@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
@@ -44,7 +45,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             "NL25EUR", "US30USD", "SPX500USD", "NAS100USD"
         };
 
-        public override void GetUpdate(ProviderModel market, Action<object> update)
+        public override void GetUpdate(ProviderModel market, Action<object> update, CancellationToken cancel)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             IList<string> symbols = market.Symbols.Where(x => x.Active).Select(m => m.Id).ToList();
@@ -79,7 +80,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             };
 
             DateTime now = DateTime.UtcNow;
-            RunProcess("Algoloop.ToolBox.exe", args, config);
+            RunProcess("Algoloop.ToolBox.exe", args, config, cancel);
             if (toDate > now)
             {
                 market.Active = false;

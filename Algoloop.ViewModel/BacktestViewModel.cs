@@ -25,7 +25,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -38,6 +37,8 @@ using Algoloop.ViewModel.Properties;
 using Algoloop.ViewModel.Internal.Lean;
 using CommunityToolkit.Mvvm.Input;
 using QuantConnect.Util;
+using System.Threading;
+using Capnode.Wpf.DataGrid;
 
 namespace Algoloop.ViewModel
 {
@@ -56,22 +57,24 @@ namespace Algoloop.ViewModel
         private readonly SettingModel _settings;
         private static readonly object _mutex = new();
 
-        private BacktestModel _model;
-        private bool _isSelected;
-        private bool _isExpanded;
-        private SyncObservableCollection<IChartViewModel> _charts = new();
-        private IDictionary<string, decimal?> _statistics;
-        private string _port;
-        private IList _selectedItems;
         private SyncObservableCollection<SymbolViewModel> _symbols = new();
         private SyncObservableCollection<ParameterViewModel> _parameters = new();
         private SyncObservableCollection<TradeViewModel> _trades = new();
         private SyncObservableCollection<BacktestSymbolViewModel> _backtestSymbols = new();
         private SyncObservableCollection<OrderViewModel> _orders = new();
         private SyncObservableCollection<HoldingViewModel> _holdings = new();
-        private bool _loaded;
-        private string _logs;
+        private SyncObservableCollection<IChartViewModel> _charts = new();
         private readonly LeanLauncher _leanLauncher = new();
+        private BacktestModel _model;
+        private IDictionary<string, decimal?> _statistics;
+        private bool _isSelected;
+        private bool _isExpanded;
+        private bool _loaded;
+        private bool _active;
+        private string _port;
+        private IList _selectedItems;
+        private string _logs;
+        private CancellationTokenSource _cancel;
 
         public BacktestViewModel(StrategyViewModel parent, BacktestModel model, MarketsModel markets, SettingModel settings)
         {
@@ -81,16 +84,16 @@ namespace Algoloop.ViewModel
             _settings = settings;
 
             ActiveCommand = new RelayCommand(
-                () => DoActiveCommand(Model.Active),
+                async () => await DoActiveCommandAsync(Active).ConfigureAwait(false),
                 () => !IsBusy);
             StartCommand = new RelayCommand(
-                () => DoStartCommand(),
+                async () => await DoStartCommandAsync().ConfigureAwait(false),
                 () => !IsBusy && !Active);
             StopCommand = new RelayCommand(
-                () => DoStopCommand(),
+                async () => await DoStopCommandAsync().ConfigureAwait(false),
                 () => !IsBusy && Active);
             DeleteCommand = new RelayCommand(
-                () => DoDeleteBacktest(),
+                async () => await DoDeleteBacktestAsync().ConfigureAwait(false),
                 () => !IsBusy && !Active);
             UseParametersCommand = new RelayCommand(
                 () => DoUseParameters(),
@@ -230,18 +233,16 @@ namespace Algoloop.ViewModel
             set => SetProperty(ref _isExpanded, value);
         }
 
+        /// <summary>
+        /// Actual state of backtest
+        /// </summary>
         public bool Active
         {
-            get => Model.Active;
+            get => _active;
             set
             {
-                Model.Active = value;
-                OnPropertyChanged();
-
-                StartCommand.NotifyCanExecuteChanged();
-                StopCommand.NotifyCanExecuteChanged();
-                DeleteCommand.NotifyCanExecuteChanged();
-                ExportSymbolsCommand.NotifyCanExecuteChanged();
+                SetProperty(ref _active, value);
+                RaiseCommands();
             }
         }
 
@@ -249,6 +250,17 @@ namespace Algoloop.ViewModel
         {
             get => _port;
             set => SetProperty(ref _port, value);
+        }
+
+        public static string ToMessage(CompletionStatus status)
+        {
+            switch (status)
+            {
+                case CompletionStatus.Success: return Resources.StrategyCompleted;
+                case CompletionStatus.Error: return Resources.StrategyFailed;
+                case CompletionStatus.Abort: return Resources.StrategyAborted;
+                default: return string.Empty;
+            }
         }
 
         public void Dispose()
@@ -275,14 +287,14 @@ namespace Algoloop.ViewModel
             return Model.Name;
         }
 
-        public void DoDeleteBacktest()
+        public async Task DoDeleteBacktestAsync()
         {
             var charts = Charts;
             charts.Clear();
             Charts = null;
             Charts = charts;
 
-            _parent?.DeleteBacktest(this);
+            await _parent?.DeleteBacktestAsync(this);
         }
 
         public int CompareTo(object obj)
@@ -304,16 +316,9 @@ namespace Algoloop.ViewModel
 
         internal async Task StartBacktestAsync()
         {
-            Debug.Assert(Active);
-            ClearRunData();
-
             // Account must not be null
             if (Model.Account == null)
             {
-                UiThread(() =>
-                {
-                    Active = false;
-                });
                 Log.Error($"Strategy {Model.Name}: Account is not defined!", true);
                 return;
             }
@@ -330,9 +335,10 @@ namespace Algoloop.ViewModel
                 StrategyViewModel.AddPath(folder);
             }
 
+            Active = true;
             BacktestModel model = Model;
-            await Task.Run(() => _leanLauncher.Run(model, account, _settings, exeFolder))
-                .ConfigureAwait(false);
+            _cancel = new CancellationTokenSource();
+            await Task.Run(() => StrategyLoop()).ConfigureAwait(false);
 
             // Split result and logs to separate files
             if (model.Status.Equals(CompletionStatus.Success)
@@ -349,16 +355,69 @@ namespace Algoloop.ViewModel
             {
                 Active = false;
                 DataFromModel();
+                ExDataGridColumns.AddPropertyColumns(
+                    _parent.BacktestColumns, model.Statistics, "Statistics");
             });
         }
 
-        internal void StopBacktest()
+        internal async Task<bool> StopBacktestAsync(bool notify = true)
         {
-            if (Active)
+            if (!Model.Active) return true;
+
+            if (notify)
             {
-                Active = false;
-                _leanLauncher.Abort();
+                Messenger.Send(new NotificationMessage(Resources.StrategyAborting), 0);
             }
+
+            _cancel?.Cancel();
+
+            int loop = 200;
+            while (Model.Active && --loop > 0)
+            {
+                await Task.Delay(100).ConfigureAwait(false);
+            }
+
+            if (Model.Active)
+            {
+                if (notify)
+                {
+                    Messenger.Send(new NotificationMessage(Resources.StrategyAbortFailed), 0);
+                }
+
+                return false;
+            }
+
+            if (notify)
+            {
+                Messenger.Send(new NotificationMessage(Resources.StrategyAborted), 0);
+            }
+
+            return true;
+        }
+
+        private void RaiseCommands()
+        {
+            StartCommand.NotifyCanExecuteChanged();
+            StopCommand.NotifyCanExecuteChanged();
+            DeleteCommand.NotifyCanExecuteChanged();
+            ExportSymbolsCommand.NotifyCanExecuteChanged();
+        }
+
+        private void StrategyLoop()
+        {
+            // Find account
+            AccountModel account = _markets.FindAccount(Model.Account);
+
+            // Set search path if not base directory
+            string folder = Path.GetDirectoryName(MainService.FullExePath(Model.AlgorithmLocation));
+            string exeFolder = MainService.GetProgramFolder();
+            if (!string.IsNullOrEmpty(folder)
+                && !exeFolder.Equals(folder, StringComparison.OrdinalIgnoreCase))
+            {
+                StrategyViewModel.AddPath(folder);
+            }
+
+            _leanLauncher.Run(Model, account, _settings, exeFolder, _cancel.Token);
         }
 
         internal void DataFromModel()
@@ -875,61 +934,39 @@ namespace Algoloop.ViewModel
             }
         }
 
-        private async void DoActiveCommand(bool value)
+        private async Task DoStartCommandAsync()
+        {
+            Active = true;
+            await StartSingleBacktestAsync().ConfigureAwait(false);
+        }
+
+        private async Task DoStopCommandAsync()
+        {
+            IsBusy = true;
+            Active = false;
+            await StopBacktestAsync().ConfigureAwait(true);
+            IsBusy = false;
+        }
+
+
+        private async Task DoActiveCommandAsync(bool value)
         {
             if (value)
             {
-                // No IsBusy
-                await StartSingleBacktestAsync();
+                await StartSingleBacktestAsync().ConfigureAwait(false);
+                return;
             }
-            else
-            {
-                try
-                {
-                    IsBusy = true;
-                    _leanLauncher.Abort();
-                }
-                finally
-                {
-                    IsBusy = false;
-                }
-            }
-        }
 
-        private async void DoStartCommand()
-        {
-            // No IsBusy
-            Active = true;
-            await StartSingleBacktestAsync();
+            IsBusy = true;
+            await StopBacktestAsync().ConfigureAwait(true);
+            IsBusy = false;
         }
 
         private async Task StartSingleBacktestAsync()
         {
             await StartBacktestAsync().ConfigureAwait(false);
-            string message = string.Empty;
-            switch (Model.Status)
-            {
-                case CompletionStatus.Error:
-                    message = Resources.StrategyAborted;
-                    break;
-                case CompletionStatus.Success:
-                    message = Resources.StrategyCompleted;
-                    break;
-            }
+            string message = ToMessage(Model.Status);
             Messenger.Send(new NotificationMessage(message), 0);
-        }
-
-        private void DoStopCommand()
-        {
-            try
-            {
-                IsBusy = true;
-                StopBacktest();
-            }
-            finally
-            {
-                IsBusy = false;
-            }
         }
 
         private void DoExportSymbols(IList symbols)

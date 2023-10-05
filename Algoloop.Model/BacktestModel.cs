@@ -32,7 +32,7 @@ namespace Algoloop.Model
     [DataContract]
     public class BacktestModel : ModelBase
     {
-        public enum CompletionStatus { None, Success, Error } ;
+        public enum CompletionStatus { None, Success, Abort, Error } ;
 
         private string _account;
 
@@ -210,7 +210,7 @@ namespace Algoloop.Model
         [ReadOnly(true)]
         [Browsable(false)]
         [DataMember]
-        public bool Active { get; set; } = true;
+        public bool Active { get; set; }
 
         [ReadOnly(true)]
         [Browsable(false)]

@@ -16,10 +16,10 @@ using Algoloop.Brokerages.Fxcm;
 using Algoloop.Model;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
@@ -42,7 +42,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             _api.Logout().Wait();
         }
 
-        public override void GetUpdate(ProviderModel provider, Action<object> update)
+        public override void GetUpdate(ProviderModel provider, Action<object> update, CancellationToken cancel)
         {
             //Log.Trace($">{GetType().Name}:GetUpdate");
             DateTime now = DateTime.UtcNow;

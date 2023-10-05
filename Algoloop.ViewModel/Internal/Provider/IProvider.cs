@@ -14,6 +14,7 @@
 
 using Algoloop.Model;
 using System;
+using System.Threading;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
@@ -21,6 +22,6 @@ namespace Algoloop.ViewModel.Internal.Provider
     {
         void Login(ProviderModel provider);
         void Logout();
-        void GetUpdate(ProviderModel provider, Action<object> update);
+        void GetUpdate(ProviderModel provider, Action<object> update, CancellationToken cancel);
     }
 }

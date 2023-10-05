@@ -129,6 +129,15 @@
   <data name="LoadingConfigurationCompleted" xml:space="preserve">
     <value>Loading configuration completed</value>
   </data>
+  <data name="MarketAborted" xml:space="preserve">
+    <value>Market {0} aborted</value>
+  </data>
+  <data name="MarketAbortFailed" xml:space="preserve">
+    <value>Market {0} abort failed</value>
+  </data>
+  <data name="MarketAborting" xml:space="preserve">
+    <value>Market {0} aborting</value>
+  </data>
   <data name="MarketCompleted" xml:space="preserve">
     <value>Market {0} completed</value>
   </data>
@@ -159,8 +168,17 @@
   <data name="StrategyAborted" xml:space="preserve">
     <value>Strategy aborted</value>
   </data>
+  <data name="StrategyAbortFailed" xml:space="preserve">
+    <value>Strategy abort failed</value>
+  </data>
+  <data name="StrategyAborting" xml:space="preserve">
+    <value>Strategy aborting</value>
+  </data>
   <data name="StrategyCompleted" xml:space="preserve">
     <value>Strategy completed</value>
+  </data>
+  <data name="StrategyFailed" xml:space="preserve">
+    <value>Strategy failed</value>
   </data>
   <data name="StrategyStarted" xml:space="preserve">
     <value>Strategy started with {0} backtest(s)</value>

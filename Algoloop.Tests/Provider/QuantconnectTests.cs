@@ -21,6 +21,7 @@ using QuantConnect.Logging;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.Tests.Provider
 {
@@ -64,7 +65,7 @@ namespace Algoloop.Tests.Provider
 
             // Act
             // Just update symbol list
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             // Assert
             Assert.IsFalse(market.Active);
@@ -93,7 +94,7 @@ namespace Algoloop.Tests.Provider
 
             // Act
             // Dwonload symbol and update list
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             // Assert
             Assert.IsFalse(market.Active);

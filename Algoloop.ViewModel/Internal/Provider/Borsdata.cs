@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
@@ -29,7 +30,7 @@ namespace Algoloop.ViewModel.Internal.Provider
         private const string Country = "Country";
         private const string MarketPlace = "Marketplace";
 
-        public override void GetUpdate(ProviderModel market, Action<object> update)
+        public override void GetUpdate(ProviderModel market, Action<object> update, CancellationToken cancel)
         {
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (!market.Resolution.Equals(Resolution.Daily)) throw new ArgumentException(nameof(market.Resolution));
@@ -67,7 +68,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             };
 
             // Download active symbols
-            RunProcess("Algoloop.ToolBox.exe", args, config);
+            RunProcess("Algoloop.ToolBox.exe", args, config, cancel);
             market.LastDate = utsNow.ToLocalTime();
             market.Active = false;
         }

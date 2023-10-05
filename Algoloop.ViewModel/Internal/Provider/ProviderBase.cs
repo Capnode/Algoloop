@@ -17,12 +17,12 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
@@ -45,7 +45,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
         }
 
-        public virtual void GetUpdate(ProviderModel market, Action<object> update)
+        public virtual void GetUpdate(ProviderModel market, Action<object> update, CancellationToken cancel)
         {
         }
 
@@ -71,7 +71,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             System.GC.SuppressFinalize(this);
         }
 
-        internal void RunProcess(string cmd, string[] args, IDictionary<string, string> configs)
+        internal void RunProcess(string cmd, string[] args, IDictionary<string, string> configs, CancellationToken cancel)
         {
             bool ok = true;
             _process = new ConfigProcess(
@@ -113,7 +113,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             try
             {
                 _process.Start();
-                _process.WaitForExit();
+                _process.WaitForExit(cancel);
                 if (!ok) throw new ApplicationException("See logs for details");
             }
             finally

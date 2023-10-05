@@ -19,6 +19,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using Algoloop.Model;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -31,7 +32,7 @@ namespace Algoloop.ViewModel.Internal.Provider
         private const string Security = "Security";
         private const string Zip = ".zip";
 
-        public override void GetUpdate(ProviderModel provider, Action<object> update)
+        public override void GetUpdate(ProviderModel provider, Action<object> update, CancellationToken cancel)
         {
             Contract.Requires(provider != null);
             var uri = new Uri($"https://github.com/QuantConnect/Lean/archive/refs/tags/{Version}.zip");

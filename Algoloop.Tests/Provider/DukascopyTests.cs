@@ -21,6 +21,7 @@ using QuantConnect.Logging;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.Tests.Provider
 {
@@ -84,7 +85,7 @@ namespace Algoloop.Tests.Provider
 
             // Just update symbol list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             Assert.IsFalse(market.Active);
             Assert.AreEqual(date, market.LastDate);
@@ -109,7 +110,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(date.AddDays(1), market.LastDate);
@@ -136,7 +137,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(date.AddDays(1), market.LastDate);
@@ -164,7 +165,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(date.AddDays(1), market.LastDate);
@@ -202,7 +203,7 @@ namespace Algoloop.Tests.Provider
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
             Assert.IsNotNull(provider);
 
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
             Assert.IsFalse(market.Active);
             Assert.AreEqual(market.LastDate, date);
             Assert.AreEqual(78, market.Symbols.Count);
@@ -226,7 +227,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             Assert.IsFalse(market.Active);
             Assert.AreEqual(date, market.LastDate);
@@ -251,7 +252,7 @@ namespace Algoloop.Tests.Provider
 
             // Dwonload symbol and update list
             using IProvider provider = ProviderFactory.CreateProvider(market.Provider);
-            provider.GetUpdate(market, null);
+            provider.GetUpdate(market, null, CancellationToken.None);
 
             Assert.IsTrue(market.Active);
             Assert.AreEqual(date, market.LastDate);

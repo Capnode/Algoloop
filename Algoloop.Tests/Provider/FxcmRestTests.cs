@@ -98,7 +98,7 @@ namespace Algoloop.Tests.Provider
                 {
                     accounts = accountList;
                 }
-            });
+            }, CancellationToken.None);
             Thread.Sleep(6000);
             provider.Logout();
 

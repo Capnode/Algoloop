@@ -36,6 +36,7 @@ using Algoloop.ViewModel.Properties;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
 using Algoloop.ViewModel.Internal;
+using static Algoloop.Model.BacktestModel;
 
 namespace Algoloop.ViewModel
 {
@@ -68,7 +69,7 @@ namespace Algoloop.ViewModel
                 () => DoStartCommand(),
                 () => !IsBusy);
             StopCommand = new RelayCommand(
-                () => DoStopCommand(),
+                async () => await DoStopCommandAsync().ConfigureAwait(false),
                 () => !IsBusy);
             CloneCommand = new RelayCommand(
                 () => DoCloneStrategy(),
@@ -86,10 +87,10 @@ namespace Algoloop.ViewModel
                 () => DoDeleteStrategy(),
                 () => !IsBusy);
             DeleteAllBacktestsCommand = new RelayCommand(
-                () => DoDeleteBacktests(null),
+                async () => await DoDeleteBacktestsAsync(null),
                 () => !IsBusy);
             DeleteSelectedBacktestsCommand = new RelayCommand<IList>(
-                m => DoDeleteBacktests(m),
+                async m => await DoDeleteBacktestsAsync(m),
                 _ => !IsBusy);
             UseParametersCommand = new RelayCommand<IList>(
                 m => DoUseParameters(m),
@@ -327,9 +328,9 @@ namespace Algoloop.ViewModel
             }
         }
 
-        internal bool DeleteBacktest(BacktestViewModel backtest)
+        internal async Task<bool> DeleteBacktestAsync(BacktestViewModel backtest)
         {
-            backtest.StopBacktest();
+            await backtest.StopBacktestAsync();
             Debug.Assert(!backtest.Active);
             return Backtests.Remove(backtest);
         }
@@ -371,7 +372,7 @@ namespace Algoloop.ViewModel
             DropDownOpenedCommand.NotifyCanExecuteChanged();
         }
 
-        private void DoDeleteBacktests(IList backtests)
+        private async Task DoDeleteBacktestsAsync(IList backtests)
         {
             try
             {
@@ -382,7 +383,7 @@ namespace Algoloop.ViewModel
 
                 foreach (BacktestViewModel backtest in list)
                 {
-                    DeleteBacktest(backtest);
+                    await DeleteBacktestAsync(backtest);
                 }
 
                 DataToModel();
@@ -487,6 +488,7 @@ namespace Algoloop.ViewModel
             Messenger.Send(new NotificationMessage(message), 0);
 
             var tasks = new List<Task>();
+            CompletionStatus status = CompletionStatus.Success;
             foreach ((StrategyViewModel vm, StrategyModel model) in models)
             {
                 await BacktestManager.Wait().ConfigureAwait(true);
@@ -500,15 +502,20 @@ namespace Algoloop.ViewModel
                     .StartBacktestAsync()
                     .ContinueWith(_ =>
                     {
-                        ExDataGridColumns.AddPropertyColumns(
-                            vm.BacktestColumns, backtest.Statistics, "Statistics");
+                        if (backtestModel.Status > status)
+                        {
+                            status = backtestModel.Status;
+                        }
+
                         BacktestManager.Release();
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                    });
+
                 tasks.Add(task);
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(true);
-            Messenger.Send(new NotificationMessage(Active ? Resources.StrategyCompleted : Resources.StrategyAborted), 0);
+            message = BacktestViewModel.ToMessage(status);
+            Messenger.Send(new NotificationMessage(message), 0);
             Active = false;
         }
 
@@ -526,18 +533,26 @@ namespace Algoloop.ViewModel
             return list;
         }
 
-        private void DoStopCommand()
+        private async Task DoStopCommandAsync()
         {
             try
             {
                 IsBusy = true;
                 Active = false;
 
+                Messenger.Send(new NotificationMessage(Resources.StrategyAborting), 0);
+
                 // Stop running backtests
+                string message = Resources.StrategyAborted;
                 foreach (BacktestViewModel backtest in Backtests)
                 {
-                    backtest.StopBacktest();
+                    if (!await backtest.StopBacktestAsync(false))
+                    {
+                        message = Resources.StrategyAbortFailed;
+                    }
                 }
+
+                Messenger.Send(new NotificationMessage(message), 0);
             }
             finally
             {

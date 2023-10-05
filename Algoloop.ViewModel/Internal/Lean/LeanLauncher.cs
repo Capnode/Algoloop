@@ -25,6 +25,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using static Algoloop.Model.BacktestModel;
 
 namespace Algoloop.ViewModel.Internal.Lean
@@ -56,20 +57,10 @@ namespace Algoloop.ViewModel.Internal.Lean
             GC.SuppressFinalize(this);
         }
 
-        public void Abort()
-        {
-            if (_process != null)
-            {
-                bool stopped = _process.Abort();
-                Debug.Assert(stopped);
-            }
-        }
-
-        public void Run(BacktestModel model, AccountModel account, SettingModel settings, string exeFolder)
+        public void Run(BacktestModel model, AccountModel account, SettingModel settings, string exeFolder, CancellationToken cancel)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             Debug.Assert(model.Status == CompletionStatus.None);
-            if (!model.Active) return;
 
             bool error = false;
             _process = new ConfigProcess(
@@ -98,15 +89,20 @@ namespace Algoloop.ViewModel.Internal.Lean
                 {
                     PythonSupport.SetupPython(_process.Environment, exeFolder);
                 }
+
+                model.Active = true;
                 _process.Start();
-                _process.WaitForExit(int.MaxValue, (folder) => PostProcess(folder, model));
+                _process.WaitForExit(cancel, (folder) => PostProcess(folder, model));
                 model.Status = error ? CompletionStatus.Error : CompletionStatus.Success;
+            }
+            catch (OperationCanceledException)
+            {
+                model.Status = CompletionStatus.Abort;
             }
             catch (Exception ex)
             {
+                Log.Error(ex);
                 model.Status = CompletionStatus.Error;
-                Log.Error($"{ex.GetType()}: {ex.Message}", true);
-
             }
             finally
             {

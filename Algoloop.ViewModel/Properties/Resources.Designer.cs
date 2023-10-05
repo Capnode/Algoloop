@@ -97,6 +97,33 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Market {0} aborted.
+        /// </summary>
+        internal static string MarketAborted {
+            get {
+                return ResourceManager.GetString("MarketAborted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} abort failed.
+        /// </summary>
+        internal static string MarketAbortFailed {
+            get {
+                return ResourceManager.GetString("MarketAbortFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} aborting.
+        /// </summary>
+        internal static string MarketAborting {
+            get {
+                return ResourceManager.GetString("MarketAborting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Market {0} completed.
         /// </summary>
         internal static string MarketCompleted {
@@ -187,11 +214,38 @@ namespace Algoloop.ViewModel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Strategy abort failed.
+        /// </summary>
+        internal static string StrategyAbortFailed {
+            get {
+                return ResourceManager.GetString("StrategyAbortFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy aborting.
+        /// </summary>
+        internal static string StrategyAborting {
+            get {
+                return ResourceManager.GetString("StrategyAborting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Strategy completed.
         /// </summary>
         internal static string StrategyCompleted {
             get {
                 return ResourceManager.GetString("StrategyCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy failed.
+        /// </summary>
+        internal static string StrategyFailed {
+            get {
+                return ResourceManager.GetString("StrategyFailed", resourceCulture);
             }
         }
         

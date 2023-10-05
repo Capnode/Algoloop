@@ -20,6 +20,8 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Algoloop.ViewModel.Internal
 {
@@ -35,8 +37,6 @@ namespace Algoloop.ViewModel.Internal
         private readonly IDictionary<string, string> _config = new Dictionary<string, string>();
         private bool _isDisposed;
         private static readonly object _lock = new();
-        private bool _abort;
-        private bool _started;
 
         [DllImport("kernel32.dll")]
         internal static extern bool GenerateConsoleCtrlEvent(uint dwCtrlEvent, uint dwProcessGroupId);
@@ -104,11 +104,86 @@ namespace Algoloop.ViewModel.Internal
                 serializer.Serialize(file, Config);
             }
 
-            _started = true;
             _process.Start();
             _process.PriorityClass = ProcessPriorityClass.BelowNormal;
             _process.BeginOutputReadLine();
             _process.BeginErrorReadLine();
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        public bool Abort()
+        {
+            // Send Ctrl-C
+            if (AttachConsole((uint)_process.Id))
+            {
+                SetConsoleCtrlHandler(null, true);
+                try
+                {
+                    if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return false;
+                    if (_process.WaitForExit(Timeout)) return true;
+                    Debug.Assert(!_process.HasExited);
+                    _process.Kill();
+                    if (_process.WaitForExit(Timeout)) return true;
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                    return false;
+                }
+                finally
+                {
+                    FreeConsole();
+                    SetConsoleCtrlHandler(null, false);
+                }
+            }
+
+            return _process.HasExited;
+        }
+
+        public void WaitForExit(CancellationToken cancel, Action<string> postProcess = null)
+        {
+            try
+            {
+                _process.WaitForExitAsync(cancel).Wait();
+            }
+            catch (AggregateException aex)
+            {
+                if (aex.InnerException is TaskCanceledException)
+                {
+                    Abort();
+                    cancel.ThrowIfCancellationRequested();
+                }
+
+                throw aex.InnerException;
+            }
+            finally
+            {
+                if (postProcess != null)
+                {
+                    string folder = _process.StartInfo.WorkingDirectory;
+                    postProcess(folder);
+                }
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_isDisposed)
+            {
+                if (disposing)
+                {
+                    _process.Dispose();
+                }
+
+                _isDisposed = true;
+            }
         }
 
         private string CreateWorkFolder()
@@ -133,75 +208,6 @@ namespace Algoloop.ViewModel.Internal
             }
 
             throw new IOException("Can not create more temporary folders");
-        }
-
-        public bool Abort()
-        {
-            if (!_started) return true;
-
-            // Send Ctrl-C
-            if (AttachConsole((uint)_process.Id))
-            {
-                _abort = true;
-                SetConsoleCtrlHandler(null, true);
-                try
-                {
-                    if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) return false;
-                    if (_process.WaitForExit(Timeout)) return true;
-                    Debug.Assert(!_process.HasExited);
-                    _process.Kill();
-                    if (_process.WaitForExit(Timeout)) return true;
-                    return false;
-                }
-                catch (Exception ex)
-                {
-                    Log.Error(ex);
-                    return false;
-                }
-                finally
-                {
-                    FreeConsole();
-                    SetConsoleCtrlHandler(null, false);
-                    _started = false;
-                }
-            }
-
-            return _process.HasExited;
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        public void WaitForExit(int timeout = int.MaxValue, Action<string> postProcess = null)
-        {
-            if (_process.WaitForExit(timeout))
-            {
-                _started = false;
-                if (_abort) throw new ApplicationException("Process aborted");
-                if (postProcess != null)
-                {
-                    string folder = _process.StartInfo.WorkingDirectory;
-                    postProcess(folder);
-                }
-            }
-            else throw new ApplicationException("Can not stop process");
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    _process.Dispose();
-                }
-
-                _isDisposed = true;
-            }
         }
     }
 }

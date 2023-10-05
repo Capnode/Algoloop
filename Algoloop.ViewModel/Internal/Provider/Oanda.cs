@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using Environment = QuantConnect.Brokerages.Oanda.Environment;
 
 namespace Algoloop.ViewModel.Internal.Provider
@@ -65,7 +66,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
         }
 
-        public override void GetUpdate(ProviderModel market, Action<object> update)
+        public override void GetUpdate(ProviderModel market, Action<object> update, CancellationToken cancel)
         {
             if (market == default) throw new ArgumentNullException(nameof(market));
             List<Holding> holdings = _brokerage.GetAccountHoldings();

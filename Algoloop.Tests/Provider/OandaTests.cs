@@ -24,6 +24,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.Tests.Provider
 {
@@ -102,7 +103,7 @@ namespace Algoloop.Tests.Provider
             // Act
             using IProvider provider = ProviderFactory.CreateProvider(_model.Provider);
             provider.Login(_model);
-            provider.GetUpdate(_model, null);
+            provider.GetUpdate(_model, null, CancellationToken.None);
             provider.Logout();
             var symbols = _model.Symbols;
 
@@ -125,7 +126,7 @@ namespace Algoloop.Tests.Provider
             // Act
             using IProvider provider = ProviderFactory.CreateProvider(_model.Provider);
             provider.Login(_model);
-            provider.GetUpdate(_model, null);
+            provider.GetUpdate(_model, null, CancellationToken.None);
             provider.Logout();
 
             // Assert
@@ -145,7 +146,7 @@ namespace Algoloop.Tests.Provider
             // Act
             using IProvider provider = ProviderFactory.CreateProvider(_model.Provider);
             provider.Login(_model);
-            provider.GetUpdate(_model, null);
+            provider.GetUpdate(_model, null, CancellationToken.None);
             SymbolModel symbol = _model.Symbols.FirstOrDefault();
             provider.Logout();
 

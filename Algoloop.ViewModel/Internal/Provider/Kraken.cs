@@ -19,12 +19,13 @@ using QuantConnect.ToolBox.KrakenDownloader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class Kraken : ProviderBase
     {
-        public override void GetUpdate(ProviderModel provider, Action<object> update)
+        public override void GetUpdate(ProviderModel provider, Action<object> update, CancellationToken cancel)
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 

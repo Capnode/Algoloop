@@ -19,12 +19,13 @@ using QuantConnect.ToolBox.IEX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.ViewModel.Internal.Provider
 {
     internal class Iex : ProviderBase
     {
-        public override void GetUpdate(ProviderModel model, Action<object> update)
+        public override void GetUpdate(ProviderModel model, Action<object> update, CancellationToken cancel)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
             

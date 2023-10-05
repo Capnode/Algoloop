@@ -55,6 +55,7 @@ namespace Algoloop.ViewModel
         private static ReportPeriod _selectedReportPeriod;
         private AccountViewModel _selectedAccount;
         private bool _active;
+        private CancellationTokenSource _cancel;
 
         public MarketViewModel(MarketsViewModel marketsViewModel, ProviderModel marketModel, SettingModel settings)
         {
@@ -63,13 +64,13 @@ namespace Algoloop.ViewModel
             _settings = settings;
 
             ActiveCommand = new RelayCommand(
-                async () => await DoActiveCommand(Active).ConfigureAwait(false),
+                async () => await DoActiveCommandAsync(Active).ConfigureAwait(false),
                 () => !IsBusy);
             StartCommand = new RelayCommand(
-                async () => await DoStartCommand().ConfigureAwait(false),
+                async () => await DoStartCommandAsync().ConfigureAwait(false),
                 () => !IsBusy && !Active);
             StopCommand = new RelayCommand(
-                () => DoStopCommand(),
+                async () => await DoStopCommandAsync().ConfigureAwait(false),
                 () => !IsBusy && Active);
             CheckAllCommand = new RelayCommand<IList>(
                 m => DoCheckAll(m),
@@ -286,7 +287,6 @@ namespace Algoloop.ViewModel
             ReloadAccount();
         }
 
-
         internal SymbolViewModel FindSymbol(string symbolName)
         {
             SymbolViewModel symbol = Symbols.FirstOrDefault(m => m.Model.Name == symbolName);
@@ -340,13 +340,31 @@ namespace Algoloop.ViewModel
             DataToModel();
         }
 
-        private async Task DoActiveCommand(bool value)
+        private async Task DoStartCommandAsync()
+        {
+            Active = true;
+            await StartMarketAsync().ConfigureAwait(false);
+        }
+
+        private async Task DoStopCommandAsync()
+        {
+            IsBusy = true;
+            Active = false;
+            await StopMarketAsync().ConfigureAwait(true);
+            IsBusy = false;
+        }
+
+        private async Task DoActiveCommandAsync(bool value)
         {
             if (value)
             {
-                // No IsBusy
                 await StartMarketAsync().ConfigureAwait(false);
+                return;
             }
+
+            IsBusy = true;
+            await StopMarketAsync().ConfigureAwait(true);
+            IsBusy = false;
         }
 
         private void RaiseCommands()
@@ -373,55 +391,101 @@ namespace Algoloop.ViewModel
                 return;
             }
 
-            try
-            {
-                DataToModel();
-                _provider = ProviderFactory.CreateProvider(Model.Provider);
-                if (_provider == null) throw new ApplicationException(
-                    $"Can not create provider {Model.Provider}");
-                Messenger.Send(new NotificationMessage(
-                    string.Format(Resources.MarketStarted, Model.Name)),
-                    0);
-                await Task.Run(() => MarketLoop()).ConfigureAwait(false);
-                IList<string> symbols = Model.Symbols.
-                    Where(x => x.Active).Select(m => m.Id).ToList();
-                if (symbols.Any())
+            DataToModel();
+            _provider = ProviderFactory.CreateProvider(Model.Provider);
+            if (_provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
+            Messenger.Send(new NotificationMessage(string.Format(Resources.MarketStarted, Model.Name)), 0);
+
+            _cancel = new CancellationTokenSource();
+            await Task.Run(() => MarketLoop(), _cancel.Token)
+                .ContinueWith(task =>
                 {
-                    Messenger.Send(new NotificationMessage(
-                        string.Format(Resources.MarketCompleted, Model.Name)),
-                        0);
-                }
-                else
-                {
-                    Messenger.Send(new NotificationMessage(
-                        string.Format(Resources.MarketNoSymbol, Model.Name)),
-                        0);
-                }
+                    if (task.IsFaulted)
+                    {
+                        if (task.Exception.GetType() == typeof(ApplicationException))
+                        {
+                            Messenger.Send(new NotificationMessage(
+                                string.Format(Resources.MarketException, Model.Name, task.Exception.Message)),
+                                0);
+                            return;
+                        }
+
+                        Log.Error(task.Exception);
+                        Messenger.Send(new NotificationMessage(
+                            $"{task.Exception.GetType()}: {task.Exception.Message}"),
+                            0);
+                        return;
+                    }
+
+                    if (task.IsCanceled)
+                    {
+                        Messenger.Send(new NotificationMessage(
+                            string.Format(Resources.MarketAborted, Model.Name)),
+                            0);
+                        return;
+                    }
+
+                    IList<string> symbols = Model.Symbols.
+                        Where(x => x.Active).Select(m => m.Id).ToList();
+                    if (symbols.Any())
+                    {
+                        Messenger.Send(new NotificationMessage(
+                            string.Format(Resources.MarketCompleted, Model.Name)),
+                            0);
+                    }
+                    else
+                    {
+                        Messenger.Send(new NotificationMessage(
+                            string.Format(Resources.MarketNoSymbol, Model.Name)),
+                            0);
+                    }
+                })
+                .ConfigureAwait(false);
+
+            Model.Active = false;
+            _provider?.Dispose();
+            _provider = null;
+
+            UiThread(() =>
+            {
+                Active = false;
+                CleanupViewModel();
+            });
+        }
+
+        private async Task StopMarketAsync()
+        {
+            if (!Model.Active) return;
+
+            Messenger.Send(new NotificationMessage(
+                string.Format(Resources.MarketAborting, Model.Name)),
+                0);
+
+            int loop = 20;
+            while (Model.Active && --loop > 0)
+            {
+                await Task.Delay(100).ConfigureAwait(false);
             }
-            catch (ApplicationException ex)
+
+            _cancel?.Cancel();
+
+            loop = 20;
+            while (Model.Active && --loop > 0)
+            {
+                await Task.Delay(100).ConfigureAwait(false);
+            }
+
+            if (Model.Active)
             {
                 Messenger.Send(new NotificationMessage(
-                    string.Format(Resources.MarketException, Model.Name, ex.Message)),
+                    string.Format(Resources.MarketAbortFailed, Model.Name)),
                     0);
+                return;
             }
-            catch (Exception ex)
-            {
-                Log.Error(ex);
-                Messenger.Send(new NotificationMessage(
-                    $"{ex.GetType()}: {ex.Message}"),
-                    0);
-            }
-            finally
-            {
-                UiThread(() =>
-                {
-                    Model.Active = false;
-                    Active = false;
-                    CleanupViewModel();
-                });
-                _provider?.Dispose();
-                _provider = null;
-            }
+
+            Messenger.Send(new NotificationMessage(
+                string.Format(Resources.MarketAborted, Model.Name)),
+                0);
         }
 
         private void MarketLoop()
@@ -429,7 +493,7 @@ namespace Algoloop.ViewModel
             _provider.Login(Model);
             while (Active && Model.Active)
             {
-                _provider.GetUpdate(Model, OnUpdate);
+                _provider.GetUpdate(Model, OnUpdate, _cancel.Token);
 
                 // Update settings page
                 UiThread(() =>
@@ -692,26 +756,6 @@ namespace Algoloop.ViewModel
                     var vm = new OrderViewModel(order);
                     Orders.Add(vm);
                 }
-            }
-        }
-
-        internal async Task DoStartCommand()
-        {
-            // No IsBusy
-            Active = true;
-            await StartMarketAsync().ConfigureAwait(false);
-        }
-
-        internal void DoStopCommand()
-        {
-            try
-            {
-                IsBusy = true;
-                Active = false;
-            }
-            finally
-            {
-                IsBusy = false;
             }
         }
 

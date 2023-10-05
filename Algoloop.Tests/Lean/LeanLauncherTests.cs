@@ -19,6 +19,7 @@ using QuantConnect;
 using QuantConnect.Logging;
 using System;
 using System.IO;
+using System.Threading;
 using static Algoloop.Model.BacktestModel;
 
 namespace Algoloop.Tests.Lean
@@ -68,7 +69,7 @@ namespace Algoloop.Tests.Lean
             };
 
             using var launcher = new LeanLauncher();
-            launcher.Run(backtest, account, _settings, _exeFolder);
+            launcher.Run(backtest, account, _settings, _exeFolder, CancellationToken.None);
 
             Assert.IsTrue(backtest.Status.Equals(CompletionStatus.Success));
             Assert.IsFalse(backtest.Active);

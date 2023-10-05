@@ -23,6 +23,7 @@ using QuantConnect.Logging;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Algoloop.Tests.Provider
 {
@@ -85,7 +86,7 @@ namespace Algoloop.Tests.Provider
 
             // Act
             using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
-            provider.GetUpdate(_market, null);
+            provider.GetUpdate(_market, null, CancellationToken.None);
             SymbolModel symbol = _market.Symbols.SingleOrDefault();
 
             // Assert
@@ -119,7 +120,7 @@ namespace Algoloop.Tests.Provider
 
             // Act
             using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
-            provider.GetUpdate(_market, null);
+            provider.GetUpdate(_market, null, CancellationToken.None);
 
             // Assert
             Assert.IsNotNull(_market.Symbols);
