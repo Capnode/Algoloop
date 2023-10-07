@@ -464,7 +464,8 @@ namespace QuantConnect.Tests.ToolBox
                         factorFileProvider,
                         null,
                         true,
-                        dataPermissionManager
+                        dataPermissionManager,
+                        null
                     )
                 );
             }
