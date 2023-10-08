@@ -155,7 +155,7 @@ namespace Algoloop.ViewModel.Internal.Provider
 
             var historyProvider = new BrokerageHistoryProvider();
             historyProvider.SetBrokerage(_brokerage);
-            historyProvider.Initialize(new HistoryProviderInitializeParameters(null, null, null, null, null, null, null, false, new DataPermissionManager()));
+            historyProvider.Initialize(new HistoryProviderInitializeParameters(null, null, null, null, null, null, null, false, new DataPermissionManager(), null));
             var requests = new[]
             {
                 new HistoryRequest(fromDate,
