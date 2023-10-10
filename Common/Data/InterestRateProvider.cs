@@ -1,7 +1,8 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- *
+ * Modifications Copyright (C) 2023 Capnode AB
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -145,7 +146,7 @@ namespace QuantConnect.Data
                 return false;
             }
 
-            if (!decimal.TryParse(line[1], out interestRate))
+            if (!decimal.TryParse(line[1], NumberStyles.Number, CultureInfo.InvariantCulture, out interestRate))
             {
                 Log.Error($"Couldn't parse primary credit rate while reading FED primary credit rate file. Line: {csvLine}");
                 return false;
