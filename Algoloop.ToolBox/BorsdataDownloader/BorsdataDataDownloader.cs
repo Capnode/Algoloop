@@ -66,7 +66,7 @@ namespace Algoloop.ToolBox.BorsdataDownloader
                 afterCet = FirstDate;
             }
 
-            // Data is fullly available after 21 CET
+            // Data is fully available after 21 CET
             DateTime after = afterCet.Hour < 21 ? afterCet.AddDays(-1).Date : afterCet.Date;
 
             // Download reports

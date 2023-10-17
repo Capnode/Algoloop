@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using QuantConnect;
@@ -142,6 +143,14 @@ namespace Algoloop.ToolBox.DukascopyDownloader
                     }
                     catch (Exception ex)
                     {
+                        if (ex.InnerException is HttpRequestException rex)
+                        {
+                            if (rex.StatusCode == HttpStatusCode.NotFound)
+                            {
+                                yield break;
+                            }
+                        }
+
                         Log.Trace($"{ex.GetType()}: {url} {ex.Message}");
                         Thread.Sleep(60000);
                         continue;
