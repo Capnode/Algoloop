@@ -41,21 +41,22 @@ namespace Algoloop.Algorithm.CSharp.Signal
             if (_highest == null)
             {
                 if (high > _ath)
+                {
                     _ath = high;
+                }
 
-                if (algorithm.IsWarmingUp || _ath == 0)
-                    return 0;
-
+                if (algorithm.IsWarmingUp || _ath == 0) return 0;
                 return (float)(tradeBar.Close / _ath);
             }
 
             _highest.Update(bar.Time, high);
-            if (algorithm.IsWarmingUp || !_highest.IsReady)
-                return 0;
+            if (algorithm.IsWarmingUp || !_highest.IsReady) return 0;
 
             decimal highest = _highest;
             if (highest == 0)
+            {
                 return 0;
+            }
 
             return (float)(tradeBar.Close / highest);
         }
