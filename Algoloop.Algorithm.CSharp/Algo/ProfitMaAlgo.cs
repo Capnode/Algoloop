@@ -47,9 +47,6 @@ namespace Algoloop.Algorithm.CSharp.Algo
         [Parameter("Period")]
         private readonly string _period = "0";
 
-        [Parameter("Hold")]
-        private readonly string _hold = "1";
-
         [Parameter("Slots")]
         private readonly string _slots = "1";
 
@@ -103,7 +100,6 @@ namespace Algoloop.Algorithm.CSharp.Algo
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
             decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
             int period = int.Parse(_period, CultureInfo.InvariantCulture);
-            int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
             long turnover = long.Parse(_turnover, CultureInfo.InvariantCulture);
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
@@ -131,7 +127,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
                 security.FillModel = new TouchFill();
             });
             SetWarmUp((int)(1.1 * Math.Max(period, turnoverPeriod)), Resolution.Daily);
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, hold, symbols,
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new FundamentalSignal(
                     this,

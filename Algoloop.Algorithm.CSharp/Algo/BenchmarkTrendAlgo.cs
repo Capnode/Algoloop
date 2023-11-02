@@ -89,7 +89,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             });
 
             SetWarmUp((int)(1.1 * period), Resolution.Daily);
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, 1, symbols,
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, symbols,
                 (symbol) => new BenchmarkTrendSignal(period)));
         }
 

@@ -24,12 +24,12 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     public class MultiSignalAlpha : AlphaModel
     {
+        private const int _hold = 1;
         private readonly bool LogSignal = false;
         private readonly bool LogInsights = false;
 
         private readonly InsightDirection _direction;
         private readonly Resolution _resolution;
-        private readonly int _hold;
         private readonly IEnumerable<Symbol> _symbols;
         private readonly Func<Symbol, ISignal>[] _factories;
         private readonly IDictionary<Symbol, ISignal[]> _signals = new Dictionary<Symbol, ISignal[]>();
@@ -38,13 +38,11 @@ namespace Algoloop.Algorithm.CSharp.Model
         public MultiSignalAlpha(
             InsightDirection direction,
             Resolution resolution,
-            int hold,
             IEnumerable<Symbol> symbols,
             params Func<Symbol, ISignal>[] factories)
         {
             _direction = direction;
             _resolution = resolution;
-            _hold = hold;
             _symbols = symbols;
             _factories = factories;
 

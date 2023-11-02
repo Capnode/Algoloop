@@ -51,9 +51,6 @@ namespace Algoloop.Algorithm.CSharp.Algo
         [Parameter("Open")]
         private readonly string _open = "1";
 
-        [Parameter("Hold")]
-        private readonly string _hold = "1";
-
         [Parameter("Slots")]
         private readonly string _slots = "1";
 
@@ -75,7 +72,6 @@ namespace Algoloop.Algorithm.CSharp.Algo
             decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
             int open = int.Parse(_open, CultureInfo.InvariantCulture);
             InsightDirection direction = (InsightDirection)Enum.Parse(typeof(InsightDirection), _direction);
-            int hold = int.Parse(_hold, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
@@ -100,7 +96,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
                 security.FillModel = new TouchFill();
             });
             SetWarmUp((int)(1.1 * backfill), Resolution.Daily);
-            SetAlpha(new MultiSignalAlpha(direction, resolution, hold, symbols,
+            SetAlpha(new MultiSignalAlpha(direction, resolution, symbols,
                 (symbol) => new TideSignal(resolution, direction, open)));
         }
 
