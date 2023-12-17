@@ -55,7 +55,10 @@ namespace Algoloop.Algorithm.CSharp.Algo
 
         [Parameter("Tracker sma stoploss period")]
         private readonly string _smaPeriod = "0";
-        
+
+        [Parameter("Volatility period")]
+        private readonly string _volatilityPeriod = "0";
+
         [Parameter("Daily turnover (min)")]
         private readonly string _turnover = "0";
 
@@ -126,6 +129,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             SecurityType securityType = (SecurityType)Enum.Parse(typeof(SecurityType), _security);
             Resolution resolution = (Resolution)Enum.Parse(typeof(Resolution), _resolution);
             decimal fee = decimal.Parse(_fee, CultureInfo.InvariantCulture);
+            int volatilityPeriod = int.Parse(_volatilityPeriod, CultureInfo.InvariantCulture);
             long turnover = long.Parse(_turnover, CultureInfo.InvariantCulture);
             int turnoverPeriod = int.Parse(_turnoverPeriod, CultureInfo.InvariantCulture);
             int slots = int.Parse(_slots, CultureInfo.InvariantCulture);
@@ -157,7 +161,9 @@ namespace Algoloop.Algorithm.CSharp.Algo
                 security.FillModel = new TouchFill();
             });
             SetWarmUp((int)(1.1 * turnoverPeriod), Resolution.Daily);
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, symbols,
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution,
+                (symbol) => new VolatilitySignal(volatilityPeriod, true),
+                symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new FundamentalSignal(
                     this,

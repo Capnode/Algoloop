@@ -100,7 +100,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
                 security.FillModel = new TouchFill();
             });
             SetWarmUp((int)(1.1 * Math.Max(period, turnoverPeriod)), Resolution.Daily);
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, symbols,
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, null, symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new BreakoutSignal(this, symbol, resolution, period)));
         }

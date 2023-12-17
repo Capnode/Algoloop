@@ -262,11 +262,13 @@ namespace Algoloop.Algorithm.CSharp.Model
         private void AddNotInList(QCAlgorithm algorithm, IEnumerable<Insight> toplist)
         {
             int freeSlots = _slots - _holdings.Count;
+            double? weights = toplist.Sum(m => m.Weight);
+            if (weights == default || weights == 0) return;
             foreach (Insight insight in toplist)
             {
                 if (freeSlots == 0) break;
                 if (_holdings.Any(m => m.Symbol.Equals(insight.Symbol))) continue;
-                decimal size = (_reinvest ? GetEquity(algorithm) : _initialCash) / _slots;
+                decimal size = (_reinvest ? GetEquity(algorithm) : _initialCash) * (decimal)insight.Weight / (decimal)weights;
                 size = Math.Min(size, FreeCash);
                 if (size <= 0) continue;
                 Security security = algorithm.Securities[insight.Symbol];
@@ -290,13 +292,15 @@ namespace Algoloop.Algorithm.CSharp.Model
 
         private void RebalanceInList(QCAlgorithm algorithm, IEnumerable<Insight> toplist)
         {
+            double? weights = toplist.Sum(m => m.Weight);
+            if (weights == default || weights == 0) return;
             foreach (Insight insight in toplist)
             {
                 Trade trade = _holdings.FirstOrDefault(m => m.Symbol.Equals(insight.Symbol));
                 if (trade == null) continue;
 
                 Security security = algorithm.Securities[insight.Symbol];
-                decimal modelSize = (_reinvest ? GetEquity(algorithm) : _initialCash) / _slots;
+                decimal modelSize = (_reinvest ? GetEquity(algorithm) : _initialCash) * (decimal)insight.Weight / (decimal)weights;
                 decimal modelQuantity = decimal.Floor(modelSize / security.Close);
 
                 if (_rebalance > 0 && trade.Quantity <= ((1 - _rebalance) * modelQuantity).SmartRounding())

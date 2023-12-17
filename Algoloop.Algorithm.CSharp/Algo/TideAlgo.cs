@@ -96,7 +96,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
                 security.FillModel = new TouchFill();
             });
             SetWarmUp((int)(1.1 * backfill), Resolution.Daily);
-            SetAlpha(new MultiSignalAlpha(direction, resolution, symbols,
+            SetAlpha(new MultiSignalAlpha(direction, resolution, null, symbols,
                 (symbol) => new TideSignal(resolution, direction, open)));
         }
 

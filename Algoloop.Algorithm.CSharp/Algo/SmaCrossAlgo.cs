@@ -167,7 +167,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             });
             int warmupPeriod = Math.Max(period1, Math.Max(period2, turnoverPeriod));
             SetWarmUp((int)(1.1 * warmupPeriod), Resolution.Daily);
-            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, symbols,
+            SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution, null, symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new SmaCrossSignal(period1, period2),
                 (symbol) => new FundamentalSignal(

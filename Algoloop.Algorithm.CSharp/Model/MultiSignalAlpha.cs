@@ -31,19 +31,23 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly InsightDirection _direction;
         private readonly Resolution _resolution;
         private readonly IEnumerable<Symbol> _symbols;
+        private readonly Func<Symbol, ISignal> _weight;
         private readonly Func<Symbol, ISignal>[] _factories;
+        private readonly IDictionary<Symbol, ISignal[]> _weights = new Dictionary<Symbol, ISignal[]>();
         private readonly IDictionary<Symbol, ISignal[]> _signals = new Dictionary<Symbol, ISignal[]>();
         private readonly IDictionary<Symbol, float> _scores = new Dictionary<Symbol, float>();
 
         public MultiSignalAlpha(
             InsightDirection direction,
             Resolution resolution,
+            Func<Symbol, ISignal> weight,
             IEnumerable<Symbol> symbols,
             params Func<Symbol, ISignal>[] factories)
         {
             _direction = direction;
             _resolution = resolution;
             _symbols = symbols;
+            _weight = weight;
             _factories = factories;
 
             Name = GetType().Name;
@@ -59,6 +63,23 @@ namespace Algoloop.Algorithm.CSharp.Model
                 Symbol symbol = pair.Key;
                 BaseData bar = pair.Value;
                 Debug.Assert(_symbols.Contains(symbol));
+
+                float weight = 1;
+                bool ok = _weights.TryGetValue(symbol, out ISignal[] weights);
+                Debug.Assert(ok);
+                if (!ok) continue;
+                foreach (ISignal symbolData in weights)
+                {
+                    float signal = symbolData.Update(algorithm, bar);
+                    if (LogSignal)
+                    {
+                        algorithm.Log($"Weight {symbol.ID.Symbol} {symbolData.GetType().Name}: {signal}");
+                    }
+
+                    if (float.IsNaN(signal)) continue;
+                    weight = EvaluateSigal(weight, signal);
+                }
+
                 float score = _direction.Equals(InsightDirection.Up) ? 1 : _direction.Equals(InsightDirection.Down) ? -1 : float.NaN;
                 if (bar.IsFillForward)
                 {
@@ -69,7 +90,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                 }
                 else
                 {
-                    bool ok = _signals.TryGetValue(symbol, out ISignal[] signals);
+                    ok = _signals.TryGetValue(symbol, out ISignal[] signals);
                     Debug.Assert(ok);
                     if (!ok) continue;
                     foreach (ISignal symbolData in signals)
@@ -77,26 +98,11 @@ namespace Algoloop.Algorithm.CSharp.Model
                         float signal = symbolData.Update(algorithm, bar);
                         if (LogSignal)
                         {
-                            algorithm.Log($"{symbol.ID.Symbol} {symbolData.GetType().Name}: {signal}");
+                            algorithm.Log($"Score {symbol.ID.Symbol} {symbolData.GetType().Name}: {signal}");
                         }
 
                         if (float.IsNaN(signal)) continue;
-                        if (float.IsNaN(score))
-                        {
-                            score = signal;
-                        }
-                        else if (score < 0 && signal < 0)
-                        {
-                        score = - score * signal;
-                        }
-                        else if (score > 0 && signal > 0)
-                        {
-                            score *= signal;
-                        }
-                        else
-                        {
-                            score = 0;
-                        }
+                        score = EvaluateSigal(score, signal);
                     }
 
                     _scores[symbol] = score;
@@ -116,7 +122,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     direction = InsightDirection.Down;
                 }
 
-                Insight insight = Insight.Price(symbol, closeTimeUtc, direction, Math.Abs(score), null, Name);
+                Insight insight = Insight.Price(symbol, closeTimeUtc, direction, Math.Abs(score), null, Name, weight);
                 insights.Add(insight);
             }
 
@@ -144,6 +150,18 @@ namespace Algoloop.Algorithm.CSharp.Model
                 {
                     if (_symbols.Contains(symbol))
                     {
+                        // Weight signal
+                        if (_weight == default)
+                        {
+                            _weights.Add(symbol, Array.Empty<ISignal>());
+                        }
+                        else
+                        {
+                            ISignal weight = _weight(symbol);
+                            _weights.Add(symbol, new[] { weight });
+                        }
+
+                        // Other signals
                         var list = new List<ISignal>();
                         foreach (var factory in _factories)
                         {
@@ -159,6 +177,26 @@ namespace Algoloop.Algorithm.CSharp.Model
                     }
                 }
             }
+        }
+
+        private static float EvaluateSigal(float score, float signal)
+        {
+            if (float.IsNaN(score))
+            {
+                return signal;
+            }
+
+            if (score < 0 && signal < 0)
+            {
+                return -score * signal;
+            }
+
+            if (score > 0 && signal > 0)
+            {
+                return score * signal;
+            }
+
+            return 0;
         }
 
         private static int Compare(Insight x, Insight y)
