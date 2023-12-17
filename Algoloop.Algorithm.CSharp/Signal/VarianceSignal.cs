@@ -19,12 +19,12 @@ using QuantConnect.Indicators;
 
 namespace Algoloop.Algorithm.CSharp.Signal
 {
-    internal class VolatilitySignal : ISignal
+    internal class VarianceSignal : ISignal
     {
         private readonly RollingWindow<float> _window;
         private BaseData _last;
 
-        public VolatilitySignal(int period)
+        public VarianceSignal(int period)
         {
             _window = new RollingWindow<float>(period - 1);
         }

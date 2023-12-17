@@ -27,7 +27,7 @@ using System.Globalization;
 
 namespace Algoloop.Algorithm.CSharp.Algo
 {
-    public class VolatilityAlgo : QCAlgorithm
+    public class VarianceAlgo : QCAlgorithm
     {
         [Parameter("symbols")]
         private readonly string _symbols = null;
@@ -144,7 +144,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
                     freeCashFlowMargin: _freeCashFlowMargin,
                     peRatio: _peRatio,
                     epRatio: _epRatio),
-                (symbol) => new VolatilitySignal(period)));
+                (symbol) => new VarianceSignal(period)));
         }
 
         public override void OnEndOfAlgorithm()
