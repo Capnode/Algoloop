@@ -257,6 +257,13 @@ namespace Algoloop.Algorithm.CSharp.Model
 
                 AddTarget(trade.Symbol, 0);
             }
+
+            foreach (PortfolioTarget target in _targets.ToList())
+            {
+                if (target.Quantity == 0) continue;
+                if (toplist.Any(m => m.Symbol.Equals(target.Symbol))) continue;
+                RemoveTarget(target.Symbol);
+            }
         }
 
         private void AddNotInList(QCAlgorithm algorithm, IEnumerable<Insight> toplist)
