@@ -56,7 +56,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
         [Parameter("Tracker sma stoploss period")]
         private readonly string _smaPeriod = "0";
 
-        [Parameter("Tracker stoploss reduction")]
+        [Parameter("Tracker sma stoploss sizing")]
         private readonly string _reduction = "0";
 
         [Parameter("Volatility period")]
@@ -167,7 +167,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             });
             SetWarmUp((int)(1.1 * turnoverPeriod), Resolution.Daily);
             SetAlpha(new MultiSignalAlpha(InsightDirection.Up, resolution,
-                (symbol) => new VolatilitySignal(volatilityPeriod, true),
+                (symbol) => new VolatilitySignal(volatilityPeriod),
                 symbols,
                 (symbol) => new TurnoverSignal(turnoverPeriod, turnover),
                 (symbol) => new FundamentalSignal(

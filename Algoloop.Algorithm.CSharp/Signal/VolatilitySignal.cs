@@ -24,14 +24,17 @@ namespace Algoloop.Algorithm.CSharp.Signal
         private readonly StandardDeviation _window;
         private readonly bool _inverse;
 
-        public VolatilitySignal(int period, bool inverse)
+        public VolatilitySignal(int period)
         {
             if (period > 0)
             {
                 _window = new StandardDeviation(period);
             }
-
-            _inverse = inverse;
+            else if (period < 0)
+            {
+                _window = new StandardDeviation(-period);
+                _inverse = true;
+            }
         }
 
         public float Update(QCAlgorithm algorithm, BaseData bar)
