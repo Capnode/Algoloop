@@ -56,6 +56,9 @@ namespace Algoloop.Algorithm.CSharp.Algo
         [Parameter("Tracker sma stoploss period")]
         private readonly string _smaPeriod = "0";
 
+        [Parameter("Tracker stoploss reduction")]
+        private readonly string _reduction = "0";
+
         [Parameter("Volatility period")]
         private readonly string _volatilityPeriod = "0";
 
@@ -136,6 +139,7 @@ namespace Algoloop.Algorithm.CSharp.Algo
             bool reinvest = bool.Parse(_reinvest);
             float rebalance = float.Parse(_rebalance, CultureInfo.InvariantCulture);
             int smaPeriod = int.Parse(_smaPeriod, CultureInfo.InvariantCulture);
+            float reduction = float.Parse(_reduction, CultureInfo.InvariantCulture);
             List<Symbol> symbols = _symbols
                 .Split(';')
                 .Select(x => QuantConnect.Symbol.Create(x, securityType, _market))
@@ -150,7 +154,8 @@ namespace Algoloop.Algorithm.CSharp.Algo
                 slots: slots,
                 reinvest: reinvest,
                 rebalance: rebalance,
-                smaPeriod: smaPeriod));
+                smaPeriod: smaPeriod,
+                reduction: reduction));
             SetExecution(new LimitExecution(slots));
             SetRiskManagement(new NullRiskManagementModel());
             SetBenchmark(QuantConnect.Symbol.Create("OMXSPI.ST", securityType, _market));

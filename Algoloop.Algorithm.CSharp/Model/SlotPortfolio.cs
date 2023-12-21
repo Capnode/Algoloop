@@ -35,6 +35,7 @@ namespace Algoloop.Algorithm.CSharp.Model
         private readonly int _slots;
         private readonly bool _reinvest;
         private readonly decimal _rebalance;
+        private readonly decimal _reduction;
         private readonly InsightCollection _insights = new();
         private readonly SimpleMovingAverage _sma;
 
@@ -49,11 +50,13 @@ namespace Algoloop.Algorithm.CSharp.Model
             int slots,
             bool reinvest,
             float rebalance = 0,
-            int smaPeriod = 0)
+            int smaPeriod = 0,
+            float reduction = 0)
         {
             _slots = slots;
             _reinvest = reinvest;
             _rebalance = (decimal)rebalance;
+            _reduction = (decimal)reduction;
             if (smaPeriod > 0)
             {
                 _sma = new SimpleMovingAverage($"SMA({smaPeriod})", smaPeriod);
@@ -136,7 +139,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 if (_sma != null && _sma.IsReady)
                 {
                     algorithm.Plot(TrackerChart, $"Tracker  / {_indexName} SMA({_sma.Period})", _sma);
-                    decimal scale = trackerBenchmarkIndex < _sma ? 0 : portfolioValue / trackerValue;
+                    decimal maxScale = portfolioValue / trackerValue;
+                    decimal scale = trackerBenchmarkIndex < _sma ? _reduction * maxScale : maxScale;
                     algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
                     _tracker.Scale = scale;
                 }
@@ -148,7 +152,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 if (_sma != null && _sma.IsReady)
                 {
                     algorithm.Plot(TrackerChart, $"Tracker SMA({_sma.Period})", _sma);
-                    decimal scale = trackerIndex < _sma ? 0 : portfolioValue / trackerValue;
+                    decimal maxScale = portfolioValue / trackerValue;
+                    decimal scale = trackerIndex < _sma ? _reduction * maxScale : maxScale;
                     algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
                     _tracker.Scale = scale;
                 }
