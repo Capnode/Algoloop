@@ -45,10 +45,14 @@ namespace Algoloop.Algorithm.CSharp.Signal
                 turnover = (long)(tradebar.Volume * bar.Price);
             }
 
-            _window.Add(turnover);
+            if (turnover > 0)
+            {
+                _window.Add(turnover);
+            }
+
             if (!_window.IsReady) return 0;
             int count = _window.Count(m => m >= _turnover);
-            return count > _period / 2 ? 1 : 0;
+            return count < _period ? 0 : 1;
         }
     }
 }
