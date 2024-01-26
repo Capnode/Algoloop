@@ -138,7 +138,8 @@ namespace Algoloop.ViewModel.Internal.Provider
             Contract.Requires(market != null, nameof(market));
             Contract.Requires(actual != null, nameof(actual));
 
-            // Collect list of obsolete symbols
+            RemoveAllAutoLists(market);
+
             bool symbolsChanged = false;
             bool listChanged = false;
             List<SymbolModel> obsoleteSymbols = market.Symbols.ToList();
@@ -176,10 +177,10 @@ namespace Algoloop.ViewModel.Internal.Provider
                 // Skip adding to list if not active
                 if (!symbol.Active) continue;
 
-                // Add symbol to list
+                // Add symbol to auto list
                 string listName = symbol.Security.ToString();
                 if (string.IsNullOrEmpty(listName)) continue;
-                listChanged |= AddSymbolToList(market, symbol, listName);
+                listChanged |= AddSymbolToAutoList(market, symbol, listName);
             }
 
             // Remove discared symbols
@@ -208,7 +209,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
         }
 
-        protected static bool AddSymbolToList(ProviderModel market, SymbolModel symbol, string listName)
+        protected static bool AddSymbolToAutoList(ProviderModel market, SymbolModel symbol, string listName)
         {
             bool listChanged = false;
             ListModel list = market.Lists.FirstOrDefault(m => m.Id != null && m.Id.Equals(listName));
@@ -219,6 +220,7 @@ namespace Algoloop.ViewModel.Internal.Provider
                 listChanged = true;
             }
 
+            list.Auto = true; // Set auto list flag also if list already exists
             if (!list.Symbols.Contains(symbol))
             {
                 list.Symbols.Add(symbol);
@@ -226,6 +228,15 @@ namespace Algoloop.ViewModel.Internal.Provider
             }
 
             return listChanged;
+        }
+
+        protected static void RemoveAllAutoLists(ProviderModel market)
+        {
+            List<ListModel> lists = market.Lists.Where(m => m.Auto).ToList();
+            foreach (ListModel list in lists)
+            {
+                market.Lists.Remove(list);
+            }
         }
     }
 }

@@ -56,6 +56,13 @@ namespace Algoloop.Model
         [DataMember]
         public string Name { get; set; } = "New list";
 
+        [DisplayName("Auto")]
+        [Description("Auto generated list")]
+        [Browsable(true)]
+        [ReadOnly(true)]
+        [DataMember]
+        public bool Auto { get; set; }
+
         [Browsable(false)]
         [ReadOnly(false)]
         [DataMember]

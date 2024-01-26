@@ -73,7 +73,7 @@ namespace Algoloop.ViewModel.Internal.Provider
             market.Active = false;
         }
 
-        protected static new void UpdateSymbols(
+        internal static new void UpdateSymbols(
             ProviderModel market,
             IEnumerable<SymbolModel> actual,
             Action<object> update,
@@ -82,7 +82,8 @@ namespace Algoloop.ViewModel.Internal.Provider
             Contract.Requires(market != null, nameof(market));
             Contract.Requires(actual != null, nameof(actual));
 
-            // Collect list of obsolete symbols
+            RemoveAllAutoLists(market);
+
             bool symbolsChanged = false;
             bool listsChanged = false;
             List<SymbolModel> obsoleteSymbols = market.Symbols.ToList();
@@ -120,30 +121,12 @@ namespace Algoloop.ViewModel.Internal.Provider
                 // Skip adding to list if not active
                 if (!symbol.Active) continue;
 
-                // Add symbol to lists
-                if (!symbol.Properties.TryGetValue(Country, out object value)) continue;
-                string country = value as string;
-                if (string.IsNullOrEmpty(country)) continue;
-                listsChanged |= AddSymbolToList(market, symbol, country);
-
-                if (!symbol.Properties.TryGetValue(MarketPlace, out value)) continue;
-                string marketPlace = value as string;
-                if (string.IsNullOrEmpty(marketPlace)) continue;
-                listsChanged |= AddSymbolToList(market, symbol, $"{marketPlace} {country}");
+                // Add symbol to auto lists
+                listsChanged |= AddSymbolToAutoLists(market, symbol);
             }
 
             // Remove obsolete symbols
-            foreach (SymbolModel old in obsoleteSymbols)
-            {
-                market.Symbols.Remove(old);
-                foreach (ListModel list in market.Lists)
-                {
-                    if (list.Symbols.Remove(old))
-                    {
-                        listsChanged = true;
-                    }
-                }
-            }
+            listsChanged |= RemoveSymbols(market, obsoleteSymbols);
 
             // Update symbols
             if (symbolsChanged)
@@ -156,6 +139,39 @@ namespace Algoloop.ViewModel.Internal.Provider
             {
                 update?.Invoke(market.Lists);
             }
+        }
+
+        private static bool RemoveSymbols(ProviderModel market, IEnumerable<SymbolModel> symbols)
+        {
+            bool changed = false;
+            foreach (SymbolModel symbol in symbols)
+            {
+                market.Symbols.Remove(symbol);
+                foreach (ListModel list in market.Lists)
+                {
+                    if (list.Symbols.Remove(symbol))
+                    {
+                        changed = true;
+                    }
+                }
+            }
+
+            return changed;
+        }
+
+        private static bool AddSymbolToAutoLists(ProviderModel market, SymbolModel symbol)
+        {
+            bool changed = false;
+            if (!symbol.Properties.TryGetValue(Country, out object value)) return changed;
+            string country = value as string;
+            if (string.IsNullOrEmpty(country)) return changed;
+            changed |= AddSymbolToAutoList(market, symbol, country);
+
+            if (!symbol.Properties.TryGetValue(MarketPlace, out value)) return changed;
+            string marketPlace = value as string;
+            if (string.IsNullOrEmpty(marketPlace)) return changed;
+            changed |= AddSymbolToAutoList(market, symbol, $"{marketPlace} {country}");
+            return changed;
         }
     }
 }

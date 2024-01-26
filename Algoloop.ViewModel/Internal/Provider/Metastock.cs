@@ -66,7 +66,8 @@ namespace Algoloop.ViewModel.Internal.Provider
             Contract.Requires(market != null, nameof(market));
             Contract.Requires(actual != null, nameof(actual));
 
-            // Collect list of obsolete symbols
+            RemoveAllAutoLists(market);
+
             bool symbolsChanged = false;
             bool listsChanged = false;
             List<SymbolModel> obsoleteSymbols = market.Symbols.ToList();
@@ -108,7 +109,7 @@ namespace Algoloop.ViewModel.Internal.Provider
                 if (!symbol.Properties.TryGetValue(MarketPlace, out object value)) continue;
                 string country = value as string;
                 if (string.IsNullOrEmpty(country)) continue;
-                listsChanged |= AddSymbolToList(market, symbol, country);
+                listsChanged |= AddSymbolToAutoList(market, symbol, country);
             }
 
             // Remove obsolete symbols

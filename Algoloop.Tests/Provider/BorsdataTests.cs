@@ -21,6 +21,7 @@ using QuantConnect;
 using QuantConnect.Configuration;
 using QuantConnect.Logging;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -127,6 +128,58 @@ namespace Algoloop.Tests.Provider
             Assert.IsFalse(_market.Active);
             Assert.IsTrue(_market.LastDate == lastDate);
             Assert.IsFalse(File.Exists(Path.Combine(_equityFolder, "daily", "swma.st.zip")));
+        }
+
+
+        [TestMethod]
+        public void UpdateSymbols_ListChange()
+        {
+            // Arrange
+            var symbol = new SymbolModel()
+            {
+                Id = "1",
+                Active = true,
+                Market = Market.Borsdata,
+                Name = "ERICB.ST",
+                Security = SecurityType.Equity,
+                Properties = { { "Country", "Sweden" }, { "Marketplace", "Mid Cap" } },
+            };
+
+            var list = new ListModel("Mid Cap Sweden")
+            {
+                Symbols = { symbol },
+                Auto = true
+            };
+
+            _market.Symbols.Add(symbol);
+            _market.Lists.Add(list);
+
+            var changedSymbol = new SymbolModel()
+            {
+                Id = "1",
+                Active = true,
+                Market = Market.Borsdata,
+                Name = "ERICB.ST",
+                Security = SecurityType.Equity,
+                Properties = { { "Country", "Sweden" }, { "Marketplace", "Large Cap" } },
+            };
+
+            var actual = new List<SymbolModel>() { changedSymbol };
+
+            // Act
+            Algoloop.ViewModel.Internal.Provider.Borsdata.UpdateSymbols(_market, actual, null, false);
+
+            // Assert
+            Assert.AreEqual(1, _market.Symbols.Count);
+            Assert.AreEqual(2, _market.Lists.Count);
+
+            var swedenList = _market.Lists.FirstOrDefault(x => x.Name == "Sweden");
+            Assert.IsNotNull(swedenList);
+            Assert.AreEqual(1, swedenList.Symbols.Count);
+
+            var largeCapList = _market.Lists.FirstOrDefault(x => x.Name == "Large Cap Sweden");
+            Assert.IsNotNull(largeCapList);
+            Assert.AreEqual(1, largeCapList.Symbols.Count);
         }
     }
 }
