@@ -133,30 +133,17 @@ namespace Algoloop.Algorithm.CSharp.Model
                 algorithm.Plot(TrackerChart, $"Benchmark {_indexName}", benchmarkIndex);
                 algorithm.Plot(TrackerChart, $"Portfolio / {_indexName}", portfolioBenchmarkIndex);
                 algorithm.Plot(TrackerChart, $"Tracker / {_indexName}", trackerBenchmarkIndex);
-
-                // SMA stoploss on Tracker / Benchmark
-                _sma?.Update(algorithm.Time, trackerBenchmarkIndex);
-                if (_sma != null && _sma.IsReady)
-                {
-                    algorithm.Plot(TrackerChart, $"Tracker  / {_indexName} SMA({_sma.Period})", _sma);
-                    decimal maxScale = portfolioValue / trackerValue;
-                    decimal scale = trackerBenchmarkIndex < _sma ? _reduction * maxScale : maxScale;
-                    algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
-                    _tracker.Scale = scale;
-                }
             }
-            else
+
+            // SMA stoploss on Tracker
+            _sma?.Update(algorithm.Time, trackerIndex);
+            if (_sma != null && _sma.IsReady)
             {
-                // SMA stoploss on Tracker
-                _sma?.Update(algorithm.Time, trackerIndex);
-                if (_sma != null && _sma.IsReady)
-                {
-                    algorithm.Plot(TrackerChart, $"Tracker SMA({_sma.Period})", _sma);
-                    decimal maxScale = portfolioValue / trackerValue;
-                    decimal scale = trackerIndex < _sma ? _reduction * maxScale : maxScale;
-                    algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
-                    _tracker.Scale = scale;
-                }
+                algorithm.Plot(TrackerChart, $"Tracker SMA({_sma.Period})", _sma);
+                decimal maxScale = portfolioValue / trackerValue;
+                decimal scale = trackerIndex < _sma ? _reduction * maxScale : maxScale;
+                algorithm.Plot(TrackerChart, $"Portfolio Scale", scale);
+                _tracker.Scale = scale;
             }
 
             if (_logTargets)
