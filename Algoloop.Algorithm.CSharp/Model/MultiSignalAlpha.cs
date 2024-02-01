@@ -24,7 +24,7 @@ namespace Algoloop.Algorithm.CSharp.Model
 {
     public class MultiSignalAlpha : AlphaModel
     {
-        private const int _hold = 1;
+        private const int _hold = 0;
         private readonly bool LogSignal = false;
         private readonly bool LogInsights = false;
 
@@ -109,8 +109,8 @@ namespace Algoloop.Algorithm.CSharp.Model
                 }
 
                 if (float.IsNaN(score) || score == 0) continue;
-                TimeSpan period = _resolution.ToTimeSpan().Multiply(_hold).Subtract(TimeSpan.FromTicks(1));
-                DateTime closeTimeUtc = algorithm.UtcTime.Add(period);
+                TimeSpan period = _resolution.ToTimeSpan().Multiply(_hold);
+                DateTime closeTime = algorithm.Time.Add(period);
 
                 InsightDirection direction = InsightDirection.Flat;
                 if (score > 0)
@@ -122,7 +122,7 @@ namespace Algoloop.Algorithm.CSharp.Model
                     direction = InsightDirection.Down;
                 }
 
-                Insight insight = Insight.Price(symbol, closeTimeUtc, direction, Math.Abs(score), null, Name, weight);
+                Insight insight = Insight.Price(symbol, closeTime, direction, Math.Abs(score), null, Name, weight);
                 insights.Add(insight);
             }
 
