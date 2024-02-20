@@ -639,25 +639,25 @@ namespace Algoloop.ViewModel
 
         private void UpdateLists(IEnumerable<ListModel> lists)
         {
-            if (lists.Count() == Lists.Count)
+            var obsoleteLists = Lists.ToList();
+            foreach (var list in lists)
             {
-                using IEnumerator<ListViewModel> iList = Lists.GetEnumerator();
-                foreach (ListModel list in lists)
+                ListViewModel vm = Lists.FirstOrDefault(m => m.Model.Id.Equals(list.Id));
+                if (vm == default)
                 {
-                    if (iList.MoveNext())
-                    {
-                        iList.Current!.Update(list);
-                    }
-                }
-            }
-            else
-            {
-                Lists.Clear();
-                foreach (ListModel list in lists)
-                {
-                    var vm = new ListViewModel(this, list);
+                    vm = new ListViewModel(this, list);
                     Lists.Add(vm);
                 }
+                else
+                {
+                    vm.Update(list);
+                    obsoleteLists.Remove(vm);
+                }
+            }
+
+            foreach (var list in obsoleteLists)
+            {
+                Lists.Remove(list);
             }
         }
 

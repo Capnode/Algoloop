@@ -121,7 +121,7 @@ namespace Algoloop.Model
 
         [Category("Time")]
         [DisplayName("Update")]
-        [Description("Account is updated up to this time. Note: Change only to reload historic data!")]
+        [Description("Account is updated up to this local time. Note: Change only to reload historic data!")]
         [Editor(typeof(DateEditor), typeof(DateEditor))]
         [RefreshProperties(RefreshProperties.All)]
         [Browsable(true)]

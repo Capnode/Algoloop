@@ -32,24 +32,28 @@ namespace Algoloop.ViewModel.Internal.Provider
 
         public override void GetUpdate(ProviderModel market, Action<object> update, CancellationToken cancel)
         {
+            DateTime utsNow = DateTime.UtcNow;
+
             if (market == null) throw new ArgumentNullException(nameof(market));
             if (!market.Resolution.Equals(Resolution.Daily)) throw new ArgumentException(nameof(market.Resolution));
 
             // Update symbol list
-            bool addSymbols = market.Symbols.Count != 1;
             using var downloader = new BorsdataDataDownloader(market.ApiKey);
             IEnumerable<SymbolModel> actual = downloader.GetInstruments();
-            UpdateSymbols(market, actual, update, addSymbols);
+            UpdateSymbols(market, actual, update);
 
             // Setup download parameters
-            IList<string> symbols = market.Symbols.Select(m => m.Id).ToList();
-            if (!symbols.Any())
+            IList<string> symbols = market.Symbols
+                .Where(m => m.Active)
+                .Select(m => m.Id)
+                .ToList();
+
+            if (!symbols.Any() || market.LastDate > utsNow.ToLocalTime())
             {
                 market.Active = false;
                 return;
             }
 
-            DateTime utsNow = DateTime.UtcNow;
             string from = market.LastDate.ToUniversalTime().ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string to = utsNow.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string[] args =
@@ -73,11 +77,10 @@ namespace Algoloop.ViewModel.Internal.Provider
             market.Active = false;
         }
 
-        internal static new void UpdateSymbols(
+        internal static void UpdateSymbols(
             ProviderModel market,
             IEnumerable<SymbolModel> actual,
-            Action<object> update,
-            bool addSymbols = true)
+            Action<object> update)
         {
             Contract.Requires(market != null, nameof(market));
             Contract.Requires(actual != null, nameof(actual));
@@ -97,25 +100,25 @@ namespace Algoloop.ViewModel.Internal.Provider
                 {
                     symbol = item;
                     symbolsChanged = true;
-                    if (addSymbols)
-                    {
-                        market.Symbols.Add(symbol);
-                    }
-                }
-                else if (!symbol.Equals(item))
-                {
-                    // Update properties
-                    symbol.Name = item.Name;
-                    symbol.Market = item.Market;
-                    symbol.Security = item.Security;
-                    symbol.Properties = item.Properties;
-                    symbolsChanged = true;
-                    obsoleteSymbols.Remove(symbol);
+                    market.Symbols.Add(symbol);
                 }
                 else
                 {
-                    obsoleteSymbols.Remove(symbol);
-                    symbol = item;
+                    item.Active = symbol.Active; // Keep active state
+                    if (symbol.Equals(item))
+                    {
+                        obsoleteSymbols.Remove(symbol);
+                    }
+                    else
+                    {
+                        // Update properties
+                        symbol.Name = item.Name;
+                        symbol.Market = item.Market;
+                        symbol.Security = item.Security;
+                        symbol.Properties = item.Properties;
+                        symbolsChanged = true;
+                        obsoleteSymbols.Remove(symbol);
+                    }
                 }
 
                 // Skip adding to list if not active

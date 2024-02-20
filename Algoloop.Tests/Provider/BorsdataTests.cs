@@ -12,6 +12,7 @@
  * limitations under the License.
  */
 
+using Accord.Math;
 using Algoloop.Model;
 using Algoloop.ViewModel.Internal.Provider;
 using AlgoloopTests.TestSupport;
@@ -62,7 +63,6 @@ namespace Algoloop.Tests.Provider
                 Name = "Borsdata",
                 Provider = Market.Borsdata,
                 ApiKey = settings[Market.Borsdata],
-                LastDate = new DateTime(2021, 1, 5),
                 Resolution = Resolution.Daily
             };
         }
@@ -73,25 +73,24 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod]
-        public void GetUpdateOneSymbol()
+        public void GetUpdate_OneSymbol_ExpectSuccess()
         {
             // Arrange
-            DateTime lastDate = _market.LastDate;
-            const string ticker = "INVE-B.ST";
-            var symbol0 = new SymbolModel(ticker, string.Empty, SecurityType.Base)
-            {
-                Active = false,
-                Name = ticker
-            };
-            _market.Symbols.Add(symbol0);
+            using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
+
+            _market.LastDate = DateTime.Today.AddDays(1);
+            provider.GetUpdate(_market, null, CancellationToken.None);
+            _market.Symbols.Apply(m => m.Active = false);
+            var symbol0 = _market.Symbols.Single(m => m.Id == "INVE-B.ST");
+            symbol0.Active = true;
+            _market.LastDate = new DateTime(2021, 1, 5);
+            var lastDate = _market.LastDate;
 
             // Act
-            using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
             provider.GetUpdate(_market, null, CancellationToken.None);
-            SymbolModel symbol = _market.Symbols.SingleOrDefault();
+            SymbolModel symbol = _market.Symbols.Single(m => m.Id == "INVE-B.ST");
 
             // Assert
-            Assert.IsNotNull(symbol);
             Assert.AreSame(symbol0, symbol);
             Assert.IsFalse(_market.Active);
             Assert.IsTrue(_market.LastDate > lastDate);
@@ -107,29 +106,55 @@ namespace Algoloop.Tests.Provider
         }
 
         [TestMethod]
-        public void GetUpdateRemoveObsoleteSymbol()
+        public void GetUpdate_Twice_ExpectListsUnchanged()
         {
-            // Arrange
-            DateTime lastDate = _market.LastDate;
-            const string ticker = "SWMA.ST";
-            var symbol0 = new SymbolModel(ticker, string.Empty, SecurityType.Base)
-            {
-                Active = false,
-                Name = ticker
-            };
-            _market.Symbols.Add(symbol0);
+            // Arrange1
+            DateTime startDate = new DateTime(2021, 1, 5);
+            using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
+
+            _market.LastDate = DateTime.Today.AddDays(1);
+            provider.GetUpdate(_market, null, CancellationToken.None);
+            _market.Symbols.Apply(m => m.Active = false);
+            var symbol0 = _market.Symbols.Single(m => m.Id == "INVE-B.ST");
+            symbol0.Active = true;
+            _market.LastDate = startDate;
+            var lastDate = _market.LastDate;
 
             // Act
+            provider.GetUpdate(_market, null, CancellationToken.None);
+            var lists1 = _market.Lists.ToList();
+            _market.LastDate = startDate;
+            provider.GetUpdate(_market, null, CancellationToken.None);
+            var lists2 = _market.Lists.ToList();
+
+            // Assert
+            var print1 = PrintLists(lists1);
+            var print2 = PrintLists(lists2);
+            Assert.AreEqual(print1, print2);
+        }
+
+        [TestMethod]
+        public void GetUpdate_RemoveObsoleteSymbol()
+        {
+            // Arrange
+            DateTime startDate = new DateTime(2021, 1, 5);
             using IProvider provider = ProviderFactory.CreateProvider(_market.Provider);
+            _market.LastDate = DateTime.Today.AddDays(1);
+            provider.GetUpdate(_market, null, CancellationToken.None);
+            _market.Symbols.Apply(m => m.Active = false);
+            _market.Symbols.Add(new SymbolModel("SWMA.ST", string.Empty, SecurityType.Base));
+            _market.LastDate = startDate;
+
+            // Act
             provider.GetUpdate(_market, null, CancellationToken.None);
 
             // Assert
             Assert.IsNotNull(_market.Symbols);
             Assert.IsFalse(_market.Active);
-            Assert.IsTrue(_market.LastDate == lastDate);
+            Assert.IsTrue(_market.LastDate == startDate);
+            Assert.IsFalse(_market.Symbols.Any(m => m.Id == "SWMA.ST"));
             Assert.IsFalse(File.Exists(Path.Combine(_equityFolder, "daily", "swma.st.zip")));
         }
-
 
         [TestMethod]
         public void UpdateSymbols_ListChange()
@@ -167,7 +192,7 @@ namespace Algoloop.Tests.Provider
             var actual = new List<SymbolModel>() { changedSymbol };
 
             // Act
-            Algoloop.ViewModel.Internal.Provider.Borsdata.UpdateSymbols(_market, actual, null, false);
+            Algoloop.ViewModel.Internal.Provider.Borsdata.UpdateSymbols(_market, actual, null);
 
             // Assert
             Assert.AreEqual(1, _market.Symbols.Count);
@@ -180,6 +205,21 @@ namespace Algoloop.Tests.Provider
             var largeCapList = _market.Lists.FirstOrDefault(x => x.Name == "Large Cap Sweden");
             Assert.IsNotNull(largeCapList);
             Assert.AreEqual(1, largeCapList.Symbols.Count);
+        }
+
+        private string PrintLists(List<ListModel> lists)
+        {
+            var builder = new System.Text.StringBuilder();
+            foreach (var list in lists)
+            {
+                builder.AppendLine(list.Name);
+                foreach (var symbol in list.Symbols)
+                {
+                    builder.AppendLine($"  {symbol.Name}");
+                }
+            }
+
+            return builder.ToString();
         }
     }
 }
