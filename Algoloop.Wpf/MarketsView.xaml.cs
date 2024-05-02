@@ -12,7 +12,7 @@
 * limitations under the License.
 */
 
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Windows;

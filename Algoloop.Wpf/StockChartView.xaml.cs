@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
-using Algoloop.ViewModel.Internal.Lean;
+using Algoloop.Wpf.ViewModels;
+using Algoloop.Wpf.ViewModels.Internal.Lean;
 using Algoloop.Wpf.Internal;
 using Ecng.Collections;
 using Ecng.Serialization;

@@ -14,7 +14,7 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModels;
 
 namespace Algoloop.Wpf.Tests.ViewModel
 {

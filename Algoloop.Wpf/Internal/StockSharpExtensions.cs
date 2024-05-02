@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace Algoloop.ViewModel.Internal.Lean
+namespace Algoloop.Wpf.ViewModels.Internal.Lean
 {
     internal static class StockSharpExtensions
     {

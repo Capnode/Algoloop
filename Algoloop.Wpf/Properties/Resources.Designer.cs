@@ -141,6 +141,24 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application update: {0}.
+        /// </summary>
+        internal static string AppUpdated {
+            get {
+                return ResourceManager.GetString("AppUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application updating {0}%.
+        /// </summary>
+        internal static string AppUpdating {
+            get {
+                return ResourceManager.GetString("AppUpdating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Checklist {
@@ -157,6 +175,15 @@ namespace Algoloop.Wpf.Properties {
             get {
                 object obj = ResourceManager.GetObject("Clone", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration saved.
+        /// </summary>
+        internal static string ConfigurationSaved {
+            get {
+                return ResourceManager.GetString("ConfigurationSaved", resourceCulture);
             }
         }
         
@@ -261,6 +288,78 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loading configuration completed.
+        /// </summary>
+        internal static string LoadingConfigurationCompleted {
+            get {
+                return ResourceManager.GetString("LoadingConfigurationCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} aborted.
+        /// </summary>
+        internal static string MarketAborted {
+            get {
+                return ResourceManager.GetString("MarketAborted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} abort failed.
+        /// </summary>
+        internal static string MarketAbortFailed {
+            get {
+                return ResourceManager.GetString("MarketAbortFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} aborting.
+        /// </summary>
+        internal static string MarketAborting {
+            get {
+                return ResourceManager.GetString("MarketAborting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} completed.
+        /// </summary>
+        internal static string MarketCompleted {
+            get {
+                return ResourceManager.GetString("MarketCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} failed: {1}.
+        /// </summary>
+        internal static string MarketException {
+            get {
+                return ResourceManager.GetString("MarketException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} has no symbol selected.
+        /// </summary>
+        internal static string MarketNoSymbol {
+            get {
+                return ResourceManager.GetString("MarketNoSymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Market {0} started.
+        /// </summary>
+        internal static string MarketStarted {
+            get {
+                return ResourceManager.GetString("MarketStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap MoveDown {
@@ -291,12 +390,39 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No update is available.
+        /// </summary>
+        internal static string NoAppUpdate {
+            get {
+                return ResourceManager.GetString("NoAppUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No symbol selected!.
+        /// </summary>
+        internal static string NoSymbolSelected {
+            get {
+                return ResourceManager.GetString("NoSymbolSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Palette {
             get {
                 object obj = ResourceManager.GetObject("Palette", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reference symbol {0} added.
+        /// </summary>
+        internal static string ReferenceSymbolAdded {
+            get {
+                return ResourceManager.GetString("ReferenceSymbolAdded", resourceCulture);
             }
         }
         
@@ -331,6 +457,24 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Selected: {0}.
+        /// </summary>
+        internal static string SelectedCount {
+            get {
+                return ResourceManager.GetString("SelectedCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings read failed. See logs for details.
+        /// </summary>
+        internal static string SettingsReadFailed {
+            get {
+                return ResourceManager.GetString("SettingsReadFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap SortTextDown {
@@ -347,6 +491,60 @@ namespace Algoloop.Wpf.Properties {
             get {
                 object obj = ResourceManager.GetObject("Stop", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy aborted.
+        /// </summary>
+        internal static string StrategyAborted {
+            get {
+                return ResourceManager.GetString("StrategyAborted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy abort failed.
+        /// </summary>
+        internal static string StrategyAbortFailed {
+            get {
+                return ResourceManager.GetString("StrategyAbortFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy aborting.
+        /// </summary>
+        internal static string StrategyAborting {
+            get {
+                return ResourceManager.GetString("StrategyAborting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy completed.
+        /// </summary>
+        internal static string StrategyCompleted {
+            get {
+                return ResourceManager.GetString("StrategyCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy failed.
+        /// </summary>
+        internal static string StrategyFailed {
+            get {
+                return ResourceManager.GetString("StrategyFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Strategy started with {0} backtest(s).
+        /// </summary>
+        internal static string StrategyStarted {
+            get {
+                return ResourceManager.GetString("StrategyStarted", resourceCulture);
             }
         }
         

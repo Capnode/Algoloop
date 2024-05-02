@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

@@ -13,7 +13,7 @@
  */
 
 using Algoloop.Model;
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect.Logging;
 

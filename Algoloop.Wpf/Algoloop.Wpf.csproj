@@ -13,6 +13,12 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="VuewModels\**" />
+    <EmbeddedResource Remove="VuewModels\**" />
+    <None Remove="VuewModels\**" />
+    <Page Remove="VuewModels\**" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Resources\Palette.png" />
   </ItemGroup>
   <ItemGroup>
@@ -50,11 +56,20 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
+    <ProjectReference Include="..\Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj" />
+    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
+    <ProjectReference Include="..\Algoloop.ToolBox\Algoloop.ToolBox.csproj" />
+    <ProjectReference Include="..\Algoloop\Algoloop.csproj" />
+    <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
+    <ProjectReference Include="..\Capnode.Wpf\Capnode.Wpf.csproj" />
+    <ProjectReference Include="..\Launcher\QuantConnect.Lean.Launcher.csproj" />
+    <ProjectReference Include="..\Research\QuantConnect.Research.csproj" />
+    <ProjectReference Include="..\ToolBox\QuantConnect.ToolBox.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2478.35" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.2" />

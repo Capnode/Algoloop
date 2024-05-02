@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
-using Algoloop.ViewModel.Internal.Lean;
+using Algoloop.Wpf.ViewModels;
+using Algoloop.Wpf.ViewModels.Internal.Lean;
 using QuantConnect;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Logging;

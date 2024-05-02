@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModels;
 using Algoloop.Wpf.Internal;
 using OxyPlot;
 using OxyPlot.Axes;

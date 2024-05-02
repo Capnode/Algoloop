@@ -19,9 +19,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Algoloop.ViewModel\Algoloop.ViewModel.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="MSTest.TestFramework">
@@ -117,6 +114,12 @@
     <None Include="..\Data\symbol-properties\symbol-properties-database.csv" Link="TestData\symbol-properties\symbol-properties-database.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
+    <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
+    <ProjectReference Include="..\Algoloop.ToolBox\Algoloop.ToolBox.csproj" />
+    <ProjectReference Include="..\Algoloop.Wpf\Algoloop.Wpf.csproj" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

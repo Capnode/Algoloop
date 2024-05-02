@@ -142,11 +142,20 @@
   <data name="AlgoloopSplash" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\algoloopsplash.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="AppUpdated" xml:space="preserve">
+    <value>Application update: {0}</value>
+  </data>
+  <data name="AppUpdating" xml:space="preserve">
+    <value>Application updating {0}%</value>
+  </data>
   <data name="Checklist" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Checklist.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Clone" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Clone.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ConfigurationSaved" xml:space="preserve">
+    <value>Configuration saved</value>
   </data>
   <data name="Delete" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -178,6 +187,30 @@
   <data name="Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Info.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="LoadingConfigurationCompleted" xml:space="preserve">
+    <value>Loading configuration completed</value>
+  </data>
+  <data name="MarketAborted" xml:space="preserve">
+    <value>Market {0} aborted</value>
+  </data>
+  <data name="MarketAbortFailed" xml:space="preserve">
+    <value>Market {0} abort failed</value>
+  </data>
+  <data name="MarketAborting" xml:space="preserve">
+    <value>Market {0} aborting</value>
+  </data>
+  <data name="MarketCompleted" xml:space="preserve">
+    <value>Market {0} completed</value>
+  </data>
+  <data name="MarketException" xml:space="preserve">
+    <value>Market {0} failed: {1}</value>
+  </data>
+  <data name="MarketNoSymbol" xml:space="preserve">
+    <value>Market {0} has no symbol selected</value>
+  </data>
+  <data name="MarketStarted" xml:space="preserve">
+    <value>Market {0} started</value>
+  </data>
   <data name="MoveDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MoveDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -187,8 +220,17 @@
   <data name="New" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\New.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="NoAppUpdate" xml:space="preserve">
+    <value>No update is available</value>
+  </data>
+  <data name="NoSymbolSelected" xml:space="preserve">
+    <value>No symbol selected!</value>
+  </data>
   <data name="Palette" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Palette.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ReferenceSymbolAdded" xml:space="preserve">
+    <value>Reference symbol {0} added</value>
   </data>
   <data name="Refresh" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Refresh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -199,11 +241,35 @@
   <data name="Save" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Save.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="SelectedCount" xml:space="preserve">
+    <value>Selected: {0}</value>
+  </data>
+  <data name="SettingsReadFailed" xml:space="preserve">
+    <value>Settings read failed. See logs for details</value>
+  </data>
   <data name="SortTextDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SortTextDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Stop" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Stop.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="StrategyAborted" xml:space="preserve">
+    <value>Strategy aborted</value>
+  </data>
+  <data name="StrategyAbortFailed" xml:space="preserve">
+    <value>Strategy abort failed</value>
+  </data>
+  <data name="StrategyAborting" xml:space="preserve">
+    <value>Strategy aborting</value>
+  </data>
+  <data name="StrategyCompleted" xml:space="preserve">
+    <value>Strategy completed</value>
+  </data>
+  <data name="StrategyFailed" xml:space="preserve">
+    <value>Strategy failed</value>
+  </data>
+  <data name="StrategyStarted" xml:space="preserve">
+    <value>Strategy started with {0} backtest(s)</value>
   </data>
   <data name="Tools" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Tools.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

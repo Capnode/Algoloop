@@ -10,7 +10,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <vm:ViewModelLocator
-                xmlns:vm="clr-namespace:Algoloop.ViewModel;assembly=Algoloop.ViewModel"
+                xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModels"
                 x:Key="Locator"
                 d:IsDataSource="True" />
         </ResourceDictionary>

@@ -14,7 +14,7 @@
 
 using Accord.Math;
 using Algoloop.Model;
-using Algoloop.ViewModel.Internal.Provider;
+using Algoloop.Wpf.ViewModels.Internal.Provider;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -192,7 +192,7 @@ namespace Algoloop.Wpf.Tests.Provider
             var actual = new List<SymbolModel>() { changedSymbol };
 
             // Act
-            Algoloop.ViewModel.Internal.Provider.Borsdata.UpdateSymbols(_market, actual, null);
+            Algoloop.Wpf.ViewModels.Internal.Provider.Borsdata.UpdateSymbols(_market, actual, null);
 
             // Assert
             Assert.AreEqual(1, _market.Symbols.Count);

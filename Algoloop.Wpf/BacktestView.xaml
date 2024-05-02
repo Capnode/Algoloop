@@ -7,7 +7,7 @@
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     xmlns:view="clr-namespace:Algoloop.Wpf"
     xmlns:viewsupport="clr-namespace:Algoloop.Wpf.Internal"
-    xmlns:vm="clr-namespace:Algoloop.ViewModel;assembly=Algoloop.ViewModel"
+    xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModels"
     xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
     d:DesignHeight="450"

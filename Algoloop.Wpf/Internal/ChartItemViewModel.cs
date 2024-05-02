@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ViewModel;
+using Algoloop.Wpf.ViewModels;
 
 namespace Algoloop.Wpf.Internal
 {
