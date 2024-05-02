@@ -27,7 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using static Algoloop.Model.ProviderModel;
 
-namespace Algoloop.Tests.Brokerages
+namespace Algoloop.Wpf.Tests.Brokerages
 {
     [TestClass, TestCategory("LocalTest")]
     public class FxcmTests : IDisposable

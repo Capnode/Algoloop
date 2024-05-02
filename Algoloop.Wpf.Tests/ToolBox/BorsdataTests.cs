@@ -30,7 +30,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
-namespace Algoloop.Tests.ToolBox
+namespace Algoloop.Wpf.Tests.ToolBox
 {
     [TestClass, TestCategory("LocalTest")]
     public class BorsdataTests

@@ -17,7 +17,7 @@ using Algoloop.ViewModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect.Logging;
 
-namespace Algoloop.Tests.ViewModel
+namespace Algoloop.Wpf.Tests.ViewModel
 {
     [TestClass()]
     public class StrategyViewModelTests

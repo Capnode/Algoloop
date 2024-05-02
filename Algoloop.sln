@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Brokerages", "Algoloop.Brokerages\Algoloop.Brokerages.csproj", "{3BC71AF6-C753-44EF-9F5B-408E9667A6A2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Tests", "Algoloop.Tests\Algoloop.Tests.csproj", "{B2F29D1E-750D-4471-BD2A-F3BF60978197}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Wpf.Tests", "Algoloop.Wpf.Tests\Algoloop.Wpf.Tests.csproj", "{B2F29D1E-750D-4471-BD2A-F3BF60978197}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Wpf", "Algoloop.Wpf\Algoloop.Wpf.csproj", "{E8CD4583-5676-4F49-8C6A-8F2E2EF7DAEF}"
 EndProject

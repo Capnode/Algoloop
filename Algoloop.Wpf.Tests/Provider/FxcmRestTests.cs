@@ -27,7 +27,7 @@ using System.Linq;
 using System.Threading;
 using static Algoloop.Model.ProviderModel;
 
-namespace Algoloop.Tests.Provider
+namespace Algoloop.Wpf.Tests.Provider
 {
     [TestClass, TestCategory("LocalTest")]
     public class FxcmTests

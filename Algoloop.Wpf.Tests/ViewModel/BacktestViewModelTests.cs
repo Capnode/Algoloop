@@ -20,7 +20,7 @@ using QuantConnect.Statistics;
 using System;
 using System.Collections.Generic;
 
-namespace Algoloop.Tests.ViewModel
+namespace Algoloop.Wpf.Tests.ViewModel
 {
     [TestClass()]
     public class BacktestViewModelTests

@@ -21,7 +21,7 @@ using QuantConnect.Logging;
 using System.Diagnostics;
 using System.IO;
 
-namespace Algoloop.Tests.ToolBox
+namespace Algoloop.Wpf.Tests.ToolBox
 {
     [TestClass]
     public class MetastockConverterTests

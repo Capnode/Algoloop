@@ -23,7 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 
-namespace Algoloop.Tests.Provider
+namespace Algoloop.Wpf.Tests.Provider
 {
     [TestClass()]
     public class QuantconnectTests

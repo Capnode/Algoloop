@@ -16,7 +16,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
 using Algoloop.ViewModel;
 
-namespace Algoloop.Tests.ViewModel
+namespace Algoloop.Wpf.Tests.ViewModel
 {
     [TestClass()]
     public class ResearchViewModelTests

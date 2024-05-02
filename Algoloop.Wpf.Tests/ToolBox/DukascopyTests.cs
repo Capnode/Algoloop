@@ -19,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Configuration;
+using QuantConnect.Data.Auxiliary;
 using QuantConnect.Logging;
 using System;
 using System.Collections.Generic;
@@ -26,10 +27,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
-namespace Algoloop.Tests.ToolBox
+namespace Algoloop.Wpf.Tests.ToolBox
 {
     [TestClass, TestCategory("LocalTest")]
-    public class OandaTests
+    public class DukascopyTests
     {
         private const string DataFolder = "Data";
         private const string TestData = "TestData";
@@ -64,15 +65,7 @@ namespace Algoloop.Tests.ToolBox
             MainService.CopyDirectory(
                 Path.Combine(TestData, SymbolProperties),
                 Path.Combine(DataFolder, SymbolProperties));
-            _forexFolder = Path.Combine(DataFolder, SecurityType.Forex.SecurityTypeToLower(), Market.Oanda);
-
-            // Settings
-            IConfigurationRoot settings = TestConfig.Create();
-            Config.Set("job-user-id", int.Parse(settings["job-user-id"]));
-            Config.Set("api-access-token", settings["api-access-token"]);
-            Config.Set("oanda-environment", settings["oanda-environment"]);
-            Config.Set("oanda-access-token", settings["oanda-access-token"]);
-            Config.Set("oanda-account-id", settings["oanda-account-id"]);
+            _forexFolder = Path.Combine(DataFolder, SecurityType.Forex.SecurityTypeToLower(), Market.Dukascopy);
         }
 
         [TestCleanup]
@@ -84,6 +77,11 @@ namespace Algoloop.Tests.ToolBox
         public void Download_one_symbol()
         {
             // Arrange
+            string datafile = Path.Combine(
+                _forexFolder,
+                nameof(Resolution.Daily),
+                "EURUSD.zip");
+            
             var tickers = new List<string> { "EURUSD" };
             var utcStart = new DateTime(2019, 05, 01, 0, 0, 0, DateTimeKind.Utc);
             var start = utcStart.ToLocalTime();
@@ -92,7 +90,7 @@ namespace Algoloop.Tests.ToolBox
             string to = end.ToString("yyyyMMdd-HH:mm:ss", CultureInfo.InvariantCulture);
             string[] args =
             {
-                "--app=OandaDownloader",
+                "--app=DukascopyDownloader",
                 $"--from-date={from}",
                 $"--to-date={to}",
                 $"--resolution=Daily",
@@ -103,11 +101,6 @@ namespace Algoloop.Tests.ToolBox
             Program.Main(args);
 
             // Assert
-            string datafile = Path.Combine(
-                _forexFolder,
-                nameof(Resolution.Daily),
-                "EURUSD.zip");
-
             Assert.IsTrue(File.Exists(datafile));
         }
     }

@@ -22,7 +22,7 @@ using System.IO;
 using System.Threading;
 using static Algoloop.Model.BacktestModel;
 
-namespace Algoloop.Tests.Lean
+namespace Algoloop.Wpf.Tests.Lean
 {
     [TestClass()]
     public class LeanLauncherTests
