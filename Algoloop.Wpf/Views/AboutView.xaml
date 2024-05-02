@@ -1,0 +1,45 @@
+<Window
+    x:Class="Algoloop.Wpf.Views.AboutView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="{Binding Title}"
+    Width="400"
+    Margin="40"
+    VerticalAlignment="Top"
+    DataContext="{Binding Source={StaticResource Locator}, Path=AboutViewModel}"
+    ResizeMode="NoResize"
+    ShowInTaskbar="False"
+    SizeToContent="Height">
+
+    <StackPanel Margin="8">
+        <Image Height="84" Source="/Resources/AlgoloopSplash.png" />
+        <Label
+            HorizontalAlignment="Center"
+            Content="{Binding ProductName}"
+            FontSize="32"
+            FontWeight="Bold" />
+        <Label Content="{Binding Version}" FontWeight="Bold" />
+        <Label Content="{Binding Copyright}" />
+        <Label Content="{Binding Message}" />
+        <TextBox
+            Margin="10"
+            Background="LightGray"
+            IsReadOnly="True"
+            Text="{Binding Description, Mode=OneWay}"
+            TextWrapping="Wrap" />
+        <Label Content="Credit" FontWeight="Bold" />
+        <TextBox
+            Margin="10"
+            Background="LightGray"
+            IsReadOnly="True"
+            Text="{Binding Credit, Mode=OneWay}"
+            TextWrapping="Wrap" />
+        <Button
+            MinWidth="60"
+            Margin="10"
+            HorizontalAlignment="Center"
+            Click="OkClick"
+            Content="OK"
+            IsDefault="True" />
+    </StackPanel>
+</Window>

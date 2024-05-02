@@ -6,7 +6,7 @@
     xmlns:d1p1="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d1p1:Ignorable="d"
     DispatcherUnhandledException="DispatcherUnhandledExceptionHandler"
-    StartupUri="MainWindow.xaml">
+    StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <vm:ViewModelLocator

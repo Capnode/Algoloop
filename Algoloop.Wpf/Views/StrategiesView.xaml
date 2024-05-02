@@ -1,0 +1,502 @@
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <UserControl
+    x:Class="Algoloop.Wpf.Views.StrategiesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
+    xmlns:view="clr-namespace:Algoloop.Wpf.Views"
+    xmlns:viewsupport="clr-namespace:Algoloop.Wpf.Views.Internal"
+    xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModels"
+    xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
+    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    DataContext="{Binding Source={StaticResource Locator}, Path=StrategiesViewModel}"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="settings" ObjectInstance="{x:Static properties:Settings.Default}" />
+    </UserControl.Resources>
+
+    <UserControl.Cursor>
+        <Binding Converter="{viewsupport:BusyMouseConverter}" Path="IsBusy" />
+    </UserControl.Cursor>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Source={StaticResource settings}, Path=StrategyViewSplitter, Mode=TwoWay, Converter={viewsupport:Int32FromGridLengthConverter}}" />
+            <ColumnDefinition Width="*" />                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+        </Grid.ColumnDefinitions>
+        <GridSplitter
+            Grid.Column="1"
+            Width="5"
+            Height="Auto"
+            Margin="0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Stretch" />
+        <DockPanel>
+            <ToolBar DockPanel.Dock="Top" ToolBarTray.IsLocked="True">
+                <Button Command="{Binding AddCommand}" ToolTip="Add strategy">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/Add.png" />
+                </Button>
+                <Button Command="{Binding SelectedItem.DeleteCommand}" ToolTip="Delete">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/Delete.png" />
+                </Button>
+                <Button Command="{Binding SelectedItem.StartCommand}" ToolTip="Start strategy">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/Run.png" />
+                </Button>
+                <Button Command="{Binding SelectedItem.StopCommand}" ToolTip="Stop strategy">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/Stop.png" />
+                </Button>
+                <Button Command="{Binding ImportCommand}" ToolTip="Import strategies">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/Import.png" />
+                </Button>
+                <Button Command="{Binding SelectedItem.ExportCommand}" ToolTip="Export strategy">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/Export.png" />
+                </Button>
+                <Button Command="{Binding SelectedItem.CloneCommand}" ToolTip="Clone strategy">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/Clone.png" />
+                </Button>
+                <Button Command="{Binding SelectedItem.CloneAlgorithmCommand}" ToolTip="Clone strategy by algorithm">
+                    <Image
+                        Width="16"
+                        Height="16"
+                        Source="/Resources/AddList.png" />
+                </Button>
+            </ToolBar>
+            <TreeView
+                Grid.Column="0"
+                AllowDrop="True"
+                BorderThickness="0"
+                DragOver="TreeView_DragOver"
+                Drop="TreeView_Drop"
+                ItemsSource="{Binding Strategies}"
+                MouseMove="TreeView_MouseMove">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Command="{Binding AddCommand}" Header="Add Strategy">
+                            <MenuItem.Icon>
+                                <Image
+                                    Width="16"
+                                    Height="16"
+                                    Source="/Resources/Add.png" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="{Binding ImportCommand}" Header="Import Strategies...">
+                            <MenuItem.Icon>
+                                <Image
+                                    Width="16"
+                                    Height="16"
+                                    Source="/Resources/Import.png" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="{Binding ExportCommand}" Header="Export Strategies...">
+                            <MenuItem.Icon>
+                                <Image
+                                    Width="16"
+                                    Height="16"
+                                    Source="/Resources/Export.png" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:InvokeCommandAction Command="{Binding SelectedChangedCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type vm:StrategyViewModel}">
+                        <HierarchicalDataTemplate.ItemsSource>
+                            <MultiBinding>
+                                <MultiBinding.Converter>
+                                    <viewsupport:CompositeCollectionConverter />
+                                </MultiBinding.Converter>
+                                <Binding Path="Backtests" />
+                                <Binding Path="Strategies" />
+                            </MultiBinding>
+                        </HierarchicalDataTemplate.ItemsSource>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{viewsupport:StringSumConverter}" ConverterParameter="{}{0} ({1})">
+                                        <Binding Path="DisplayName" />
+                                        <Binding Path="Backtests.Count" />
+                                        <Binding Path="Strategies.Count" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Command="{Binding StartCommand}" Header="Start strategy">
+                                            <MenuItem.Icon>
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    Source="/Resources/Run.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Command="{Binding StopCommand}" Header="Stop strategy">
+                                            <MenuItem.Icon>
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    Source="/Resources/Stop.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Command="{Binding CloneCommand}" Header="Clone strategy">
+                                            <MenuItem.Icon>
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    Source="/Resources/Clone.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Command="{Binding DeleteCommand}" Header="Delete Strategy">
+                                            <MenuItem.Icon>
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    Source="/Resources/Delete.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Command="{Binding DeleteAllBacktestsCommand}" Header="Delete Backtests">
+                                            <MenuItem.Icon>
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    Source="/Resources/Delete.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Command="{Binding ExportCommand}" Header="Export Strategy...">
+                                            <MenuItem.Icon>
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    Source="/Resources/Export.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Command="{Binding CloneAlgorithmCommand}" Header="Clone strategy by algorithm">
+                                            <MenuItem.Icon>
+                                                <Image
+                                                    Width="16"
+                                                    Height="16"
+                                                    Source="/Resources/AddList.png" />
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                            </TextBlock>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type vm:BacktestViewModel}">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsTabStop="False" Command="{Binding ActiveCommand}" IsChecked="{Binding Active}" />
+                            <TextBlock Text="{Binding Model.Name}" />
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Command="{Binding DeleteCommand}" Header="Delete Backtest">
+                                        <MenuItem.Icon>
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources/Delete.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Command="{Binding UseParametersCommand}" Header="Use Parameters">
+                                        <MenuItem.Icon>
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources/Clone.png" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+        </DockPanel>
+        <ContentControl
+            Grid.Column="1"
+            Margin="7,0,0,0"
+            Content="{Binding SelectedItem}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type vm:StrategyViewModel}">
+                    <DockPanel>
+                        <TabControl>
+                            <TabItem Header="Configuration">
+                                <xctk:PropertyGrid
+                                    SelectedObject="{Binding Model}"
+                                    ShowAdvancedOptions="False"
+                                    ShowSearchBox="False"
+                                    ShowSortOptions="False"
+                                    ShowSummary="True"
+                                    ShowTitle="False" />
+                            </TabItem>
+                            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}"
+                                     Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                                <DockPanel>
+                                    <ToolBar DockPanel.Dock="Top">
+                                        <ComboBox
+                                            MinWidth="120"
+                                            DisplayMemberPath="DisplayName"
+                                            ItemsSource="{Binding Lists}"
+                                            SelectedValue="{Binding SelectedList, Mode=TwoWay}">
+                                            <i:Interaction.Triggers>
+                                                <i:EventTrigger EventName="DropDownOpened">
+                                                    <i:InvokeCommandAction Command="{Binding DropDownOpenedCommand}" />
+                                                </i:EventTrigger>
+                                            </i:Interaction.Triggers>
+                                        </ComboBox>
+                                        <Button Command="{Binding AddSymbolCommand}" ToolTip="Add symbol">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources\Add.png" />
+                                        </Button>
+                                        <Button
+                                            Command="{Binding DeleteSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=symbolListbox, Path=SelectedItems}"
+                                            ToolTip="Delete symbols">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources\Delete.png" />
+                                        </Button>
+                                        <Button Command="{Binding ImportSymbolsCommand}" ToolTip="Import symbol list...">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources\Import.png" />
+                                        </Button>
+                                        <Button
+                                            Command="{Binding ExportSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=symbolListbox, Path=SelectedItems}"
+                                            ToolTip="Export symbol list...">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources\Export.png" />
+                                        </Button>
+                                        <Button
+                                            Command="{Binding MoveUpSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=symbolListbox, Path=SelectedItems}"
+                                            ToolTip="Move symbols up">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources\MoveUp.png" />
+                                        </Button>
+                                        <Button
+                                            Command="{Binding MoveDownSymbolsCommand}"
+                                            CommandParameter="{Binding ElementName=symbolListbox, Path=SelectedItems}"
+                                            ToolTip="Move symbols down">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources\MoveDown.png" />
+                                        </Button>
+                                        <Button Command="{Binding SortSymbolsCommand}" ToolTip="Sort symbols by name">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources\SortTextDown.png" />
+                                        </Button>
+                                    </ToolBar>
+                                    <ListBox
+                                        Name="symbolListbox"
+                                        DockPanel.Dock="Bottom"
+                                        ItemsSource="{Binding Symbols}"
+                                        SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                        SelectionMode="Extended">
+                                        <ListBox.Resources>
+                                            <DataTemplate DataType="{x:Type vm:SymbolViewModel}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox IsTabStop="False" IsChecked="{Binding Model.Active}" />
+                                                    <TextBox BorderThickness="0" Text="{Binding Model.Id, Mode=TwoWay}" Width="100" />
+                                                    <Separator/>
+                                                    <TextBox BorderThickness="0" Text="{Binding Model.Name, Mode=TwoWay}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.Resources>
+                                    </ListBox>
+                                </DockPanel>
+                            </TabItem>
+                            <TabItem Header="{Binding Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}"
+                                     Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
+                                <wpf:ExDataGrid
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    AutoGenerateColumns="False"
+                                    CanUserFilter="True"
+                                    CanUserFreeze="False"
+                                    CanUserGroup="False"
+                                    CanUserReorderColumns="False"
+                                    CanUserSelectDistinct="True"
+                                    ExItemsSource="{Binding Parameters}"
+                                    ExSelectedItems="{Binding SelectedItems}"
+                                    FrozenColumnCount="1"
+                                    GridLinesVisibility="None"
+                                    IsReadOnly="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn
+                                            Binding="{Binding Model.Name}"
+                                            Header="Name"
+                                            IsReadOnly="True" />
+                                        <DataGridCheckBoxColumn
+                                            Binding="{Binding Model.UseValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Header="Use"
+                                            IsReadOnly="False" />
+                                        <DataGridTextColumn
+                                            Binding="{Binding Model.Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Header="Value"
+                                            IsReadOnly="False" />
+                                        <DataGridCheckBoxColumn
+                                            Binding="{Binding Model.UseRange, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Header="Use range"
+                                            IsReadOnly="False" />
+                                        <DataGridTextColumn
+                                            Binding="{Binding Model.Range, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Header="Range"
+                                            IsReadOnly="False" />
+                                    </DataGrid.Columns>
+                                    <DataGrid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Command="{Binding AddParameterCommand}" Header="Add Parameter">
+                                                <MenuItem.Icon>
+                                                    <Image
+                                                        Width="16"
+                                                        Height="16"
+                                                        Source="/Resources/Add.png" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </DataGrid.ContextMenu>
+                                    <DataGrid.Resources>
+                                        <ContextMenu x:Key="RowMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <MenuItem Command="{Binding DeleteParameterCommand}" Header="Delete Parameter">
+                                                <MenuItem.Icon>
+                                                    <Image
+                                                        Width="16"
+                                                        Height="16"
+                                                        Source="/Resources/Delete.png" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </DataGrid.Resources>
+                                    <DataGrid.RowStyle>
+                                        <Style TargetType="DataGridRow">
+                                            <Setter Property="ContextMenu" Value="{StaticResource RowMenu}" />
+                                        </Style>
+                                    </DataGrid.RowStyle>
+                                </wpf:ExDataGrid>
+                            </TabItem>
+                            <TabItem Header="{Binding Backtests.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Backtests ({0}), FallbackValue=Backtests}">
+                                <DockPanel>
+                                    <ToolBar DockPanel.Dock="Top" ToolBarTray.IsLocked="True">
+                                        <Button ToolTip="Delete backtests"
+                                                Command="{Binding SelectedItem.DeleteSelectedBacktestsCommand}"
+                                                CommandParameter="{Binding ElementName=backtestDataGrid, Path=SelectedItems}">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources/Delete.png" />
+                                        </Button>
+                                        <Button ToolTip="Export backtests"
+                                                Command="{Binding SelectedItem.ExportSelectedBacktestsCommand}"
+                                                CommandParameter="{Binding ElementName=backtestDataGrid, Path=SelectedItems}">
+                                            <Image
+                                                Width="16"
+                                                Height="16"
+                                                Source="/Resources/Export.png" />
+                                        </Button>
+                                    </ToolBar>
+                                    <wpf:ExDataGrid
+                                        x:Name="backtestDataGrid"
+                                        AutoGenerateColumns="False"
+                                        CanUserFilter="True"
+                                        CanUserFreeze="False"
+                                        CanUserGroup="False"
+                                        CanUserReorderColumns="True"
+                                        CanUserSelectDistinct="True"
+                                        ExColumns="{Binding BacktestColumns}"
+                                        ExColumnsInfo="{Binding Source={StaticResource settings}, Path=BacktestsColumnsInfo}"
+                                        ExItemsSource="{Binding Backtests}"
+                                        ExSelectedItems="{Binding SelectedItems}"
+                                        FrozenColumnCount="2"
+                                        GridLinesVisibility="None"
+                                        SelectedValue="{Binding SelectedBacktest, Mode=TwoWay}">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseDoubleClick">
+                                                <i:InvokeCommandAction Command="{Binding BacktestDoubleClickCommand}" CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                        <DataGrid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem
+                                                    Command="{Binding DeleteSelectedBacktestsCommand}"
+                                                    CommandParameter="{Binding Path=PlacementTarget.SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}"
+                                                    Header="Delete Backtests">
+                                                    <MenuItem.Icon>
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            Source="/Resources/Delete.png" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                                <MenuItem
+                                                    Command="{Binding UseParametersCommand}"
+                                                    CommandParameter="{Binding Path=PlacementTarget.SelectedItems, RelativeSource={RelativeSource Mode=FindAncestor, AncestorLevel=1, AncestorType={x:Type ContextMenu}}}"
+                                                    Header="Use Parameters">
+                                                    <MenuItem.Icon>
+                                                        <Image
+                                                            Width="16"
+                                                            Height="16"
+                                                            Source="/Resources/Clone.png" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </ContextMenu>
+                                        </DataGrid.ContextMenu>
+                                    </wpf:ExDataGrid>
+                                </DockPanel>
+                            </TabItem>
+                        </TabControl>
+                    </DockPanel>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:BacktestViewModel}">
+                    <view:BacktestView />
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+    </Grid>
+</UserControl>
