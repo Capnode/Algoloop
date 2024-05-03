@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
-using Algoloop.ToolBox.BorsdataDownloader;
+using Algoloop.Wpf.Model;
+using Algoloop.Wpf.ToolBox.BorsdataDownloader;
 using QuantConnect;
 using QuantConnect.Securities;
 using System;
@@ -72,7 +72,7 @@ namespace Algoloop.Wpf.ViewModels.Internal.Provider
             };
 
             // Download active symbols
-            RunProcess("Algoloop.ToolBox.exe", args, config, cancel);
+            RunProcess("Algoloop.Wpf.ToolBox.exe", args, config, cancel);
             market.LastDate = utsNow.ToLocalTime();
             market.Active = false;
         }

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Algoloop.Wpf.ViewModels.Internal.Provider;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;

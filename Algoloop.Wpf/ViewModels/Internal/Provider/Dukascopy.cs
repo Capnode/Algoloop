@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using QuantConnect;
 using QuantConnect.Logging;
 using QuantConnect.Securities;
@@ -80,7 +80,7 @@ namespace Algoloop.Wpf.ViewModels.Internal.Provider
             };
 
             DateTime now = DateTime.UtcNow;
-            RunProcess("Algoloop.ToolBox.exe", args, config, cancel);
+            RunProcess("Algoloop.Wpf.ToolBox.exe", args, config, cancel);
             if (toDate > now)
             {
                 market.Active = false;

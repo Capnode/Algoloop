@@ -8,7 +8,7 @@
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     xmlns:view="clr-namespace:Algoloop.Wpf.Views"
     xmlns:internal="clr-namespace:Algoloop.Wpf.Views.Internal"
-    xmlns:model="clr-namespace:Algoloop.Model;assembly=Algoloop.Model"
+    xmlns:model="clr-namespace:Algoloop.Wpf.Model;assembly=Algoloop.Wpf.Model"
     xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModels"
     xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"

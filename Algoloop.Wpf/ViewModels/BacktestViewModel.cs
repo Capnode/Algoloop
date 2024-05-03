@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Ionic.Zip;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -31,7 +31,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
-using static Algoloop.Model.BacktestModel;
+using static Algoloop.Wpf.Model.BacktestModel;
 using Algoloop.Wpf.ViewModels.Internal;
 using Algoloop.Wpf.ViewModels.Internal.Lean;
 using CommunityToolkit.Mvvm.Input;

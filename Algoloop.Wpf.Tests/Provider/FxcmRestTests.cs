@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Algoloop.Wpf.ViewModels.Internal.Provider;
 using AlgoloopTests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using static Algoloop.Model.ProviderModel;
+using static Algoloop.Wpf.Model.ProviderModel;
 
 namespace Algoloop.Wpf.Tests.Provider
 {

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.ToolBox;
+using Algoloop.Wpf.ToolBox;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
 using QuantConnect.Configuration;

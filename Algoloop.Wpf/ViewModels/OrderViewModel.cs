@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using QuantConnect.Orders;
 using QuantConnect.Orders.TimeInForces;
 using System;

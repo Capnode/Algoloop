@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Algoloop.Wpf.ViewModels;
 using Algoloop.Wpf.Properties;
 using QuantConnect.Configuration;

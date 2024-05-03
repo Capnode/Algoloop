@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using QuantConnect;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;

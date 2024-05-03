@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using NodaTime;
 using QuantConnect;
 using QuantConnect.Brokerages.Oanda;

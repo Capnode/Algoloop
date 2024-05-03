@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
-using Algoloop.ToolBox;
+using Algoloop.Wpf.Model;
+using Algoloop.Wpf.ToolBox;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

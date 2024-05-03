@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Newtonsoft.Json;
 using QuantConnect;
 using QuantConnect.Logging;
@@ -26,7 +26,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using static Algoloop.Model.BacktestModel;
+using static Algoloop.Wpf.Model.BacktestModel;
 
 namespace Algoloop.Wpf.ViewModels.Internal.Lean
 {

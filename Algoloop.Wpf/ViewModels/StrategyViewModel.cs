@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Capnode.Wpf.DataGrid;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -35,7 +35,7 @@ using System.Diagnostics.Contracts;
 using QuantConnect;
 using CommunityToolkit.Mvvm.Input;
 using Algoloop.Wpf.ViewModels.Internal;
-using static Algoloop.Model.BacktestModel;
+using static Algoloop.Wpf.Model.BacktestModel;
 using Algoloop.Wpf.Properties;
 
 namespace Algoloop.Wpf.ViewModels

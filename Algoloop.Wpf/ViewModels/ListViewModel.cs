@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Algoloop.Wpf.Properties;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;

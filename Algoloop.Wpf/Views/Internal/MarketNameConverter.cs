@@ -12,7 +12,7 @@
  * limitations under the License.
 */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using System.Collections.Generic;
 using System.ComponentModel;

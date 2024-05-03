@@ -20,7 +20,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using QuantConnect;
 using QuantConnect.Logging;
 

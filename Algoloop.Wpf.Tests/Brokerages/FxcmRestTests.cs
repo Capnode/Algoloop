@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.Fxcm;
-using Algoloop.Model;
+using Algoloop.Wpf.Brokerages.Fxcm;
+using Algoloop.Wpf.Model;
 using AlgoloopTests.TestSupport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -25,7 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static Algoloop.Model.ProviderModel;
+using static Algoloop.Wpf.Model.ProviderModel;
 
 namespace Algoloop.Wpf.Tests.Brokerages
 {

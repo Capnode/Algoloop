@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Brokerages", "Algoloop.Brokerages\Algoloop.Brokerages.csproj", "{3BC71AF6-C753-44EF-9F5B-408E9667A6A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Wpf.Brokerages", "Algoloop.Wpf.Brokerages\Algoloop.Wpf.Brokerages.csproj", "{3BC71AF6-C753-44EF-9F5B-408E9667A6A2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Wpf.Tests", "Algoloop.Wpf.Tests\Algoloop.Wpf.Tests.csproj", "{B2F29D1E-750D-4471-BD2A-F3BF60978197}"
 EndProject
@@ -58,11 +58,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.Tests", "Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuantConnect.ToolBox", "ToolBox\QuantConnect.ToolBox.csproj", "{733B4916-5395-405F-8178-32F29D8298A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Model", "Algoloop.Model\Algoloop.Model.csproj", "{8B2C72B2-69D0-4146-B200-30EEAC55DFE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Wpf.Model", "Algoloop.Wpf.Model\Algoloop.Wpf.Model.csproj", "{8B2C72B2-69D0-4146-B200-30EEAC55DFE7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Algorithm.CSharp", "Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj", "{FEEDA758-03C9-42ED-9AC7-3C8AC2B74CC2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.ToolBox", "Algoloop.ToolBox\Algoloop.ToolBox.csproj", "{7F2727D6-9405-4D51-9DF0-BDFAB9B4D5B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Wpf.ToolBox", "Algoloop.Wpf.ToolBox\Algoloop.Wpf.ToolBox.csproj", "{7F2727D6-9405-4D51-9DF0-BDFAB9B4D5B8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Algoloop.Algorithm.CSharp.Tests", "Algoloop.Algorithm.CSharp.Tests\Algoloop.Algorithm.CSharp.Tests.csproj", "{DC70C6FB-5898-4C97-AA7F-F4B67E575AA2}"
 EndProject

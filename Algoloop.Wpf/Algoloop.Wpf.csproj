@@ -57,8 +57,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Algoloop.Algorithm.CSharp\Algoloop.Algorithm.CSharp.csproj" />
-    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
-    <ProjectReference Include="..\Algoloop.ToolBox\Algoloop.ToolBox.csproj" />
+    <ProjectReference Include="..\Algoloop.Wpf.Brokerages\Algoloop.Wpf.Brokerages.csproj" />
+    <ProjectReference Include="..\Algoloop.Wpf.ToolBox\Algoloop.Wpf.ToolBox.csproj" />
     <ProjectReference Include="..\Algoloop\Algoloop.csproj" />
     <ProjectReference Include="..\Algorithm.CSharp\QuantConnect.Algorithm.CSharp.csproj" />
     <ProjectReference Include="..\Capnode.Wpf\Capnode.Wpf.csproj" />

@@ -116,9 +116,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Algoloop.Brokerages\Algoloop.Brokerages.csproj" />
-    <ProjectReference Include="..\Algoloop.Model\Algoloop.Model.csproj" />
-    <ProjectReference Include="..\Algoloop.ToolBox\Algoloop.ToolBox.csproj" />
+    <ProjectReference Include="..\Algoloop.Wpf.Brokerages\Algoloop.Wpf.Brokerages.csproj" />
+    <ProjectReference Include="..\Algoloop.Wpf.Model\Algoloop.Wpf.Model.csproj" />
+    <ProjectReference Include="..\Algoloop.Wpf.ToolBox\Algoloop.Wpf.ToolBox.csproj" />
     <ProjectReference Include="..\Algoloop.Wpf\Algoloop.Wpf.csproj" />
   </ItemGroup>
   <Choose>

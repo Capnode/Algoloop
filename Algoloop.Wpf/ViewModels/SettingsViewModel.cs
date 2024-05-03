@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using QuantConnect.Logging;

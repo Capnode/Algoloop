@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-using Algoloop.Model;
+using Algoloop.Wpf.Model;
 using Algoloop.Wpf.ViewModels.Internal.Lean;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantConnect;
@@ -20,7 +20,7 @@ using QuantConnect.Logging;
 using System;
 using System.IO;
 using System.Threading;
-using static Algoloop.Model.BacktestModel;
+using static Algoloop.Wpf.Model.BacktestModel;
 
 namespace Algoloop.Wpf.Tests.Lean
 {

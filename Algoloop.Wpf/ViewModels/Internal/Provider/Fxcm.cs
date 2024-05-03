@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-using Algoloop.Brokerages.Fxcm;
-using Algoloop.Model;
+using Algoloop.Wpf.Brokerages.Fxcm;
+using Algoloop.Wpf.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
