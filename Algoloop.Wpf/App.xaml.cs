@@ -57,6 +57,32 @@ namespace Algoloop.Wpf
                 new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
         }
 
+
+        public static void LogError(Exception ex, string message = null)
+        {
+            if (string.IsNullOrEmpty(message))
+            {
+                Log.Error($"{ex.GetType()}: {ex.Message}", true);
+            }
+            else
+            {
+                Log.Error($"{message} {ex.GetType()}: {ex.Message}", true);
+            }
+
+            if (ex.InnerException != null)
+            {
+                LogError(ex.InnerException, message);
+            }
+
+            if (ex is ReflectionTypeLoadException rex)
+            {
+                foreach (Exception exception in rex.LoaderExceptions)
+                {
+                    LogError(exception, message);
+                }
+            }
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -72,7 +98,7 @@ namespace Algoloop.Wpf
             AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionHandler;
             TaskScheduler.UnobservedTaskException += UnobservedTaskExceptionHandler;
 
-            Algoloop.Wpf.Properties.Settings.Default.Reload();
+            Wpf.Properties.Settings.Default.Reload();
 
             // Prevent going to sleep mode
             _ = SetThreadExecutionState(EsContinous | EsSystemRequired);
@@ -93,48 +119,39 @@ namespace Algoloop.Wpf
 
         private void UnobservedTaskExceptionHandler(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            var message = nameof(UnobservedTaskExceptionHandler);
             e?.SetObserved(); // Prevents the Program from terminating.
 
             if (e.Exception != null && e.Exception is Exception tuex)
             {
-                message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, tuex.Message);
-                Log.Error(tuex, message);
+                LogError(tuex, nameof(UnobservedTaskExceptionHandler));
             }
             else if (sender is Exception ex)
             {
-                message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, ex.Message);
-                Log.Error(ex, message);
+                LogError(ex, nameof(UnobservedTaskExceptionHandler));
             }
         }
 
         private void UnhandledExceptionHandler(object sender, UnhandledExceptionEventArgs e)
         {
-            var message = nameof(UnhandledExceptionHandler);
             if (e.ExceptionObject != null && e.ExceptionObject is Exception uex)
             {
-                message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, uex.Message);
-                Log.Error(uex, message);
+                LogError(uex, nameof(UnhandledExceptionHandler));
             }
             else if (sender is Exception ex)
             {
-                message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, ex.Message);
-                Log.Error(ex, message);
+                Log.Error(ex, nameof(UnhandledExceptionHandler));
             }
         }
 
         private void DispatcherUnhandledExceptionHandler(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            var message = nameof(DispatcherUnhandledExceptionHandler);
             if (e.Exception != null && e.Exception is Exception uex)
             {
-                message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, uex.Message);
-                Log.Error(uex, message);
+                LogError(uex, nameof(DispatcherUnhandledExceptionHandler));
             }
             else if (sender is Exception ex)
             {
-                message = string.Format(CultureInfo.InvariantCulture, "{0} Exception: {1}", message, ex.Message);
-                Log.Error(ex, message);
+                LogError(ex, nameof(DispatcherUnhandledExceptionHandler));
             }
         }
     }

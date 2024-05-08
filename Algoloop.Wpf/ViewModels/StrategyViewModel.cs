@@ -500,11 +500,19 @@ namespace Algoloop.Wpf.ViewModels
                 vm.Backtests.Add(backtest);
                 Task task = backtest
                     .StartBacktestAsync()
-                    .ContinueWith(_ =>
+                    .ContinueWith(task =>
                     {
                         if (backtestModel.Status > status)
                         {
                             status = backtestModel.Status;
+                        }
+
+                        message = BacktestViewModel.ToMessage(status);
+                        if (task.IsFaulted)
+                        {
+                            var ex = task.Exception.InnerException ?? task.Exception;
+                            message = $"{ex.GetType()}: {ex.Message}";
+                            App.LogError(task.Exception);
                         }
 
                         BacktestManager.Release();
@@ -514,7 +522,6 @@ namespace Algoloop.Wpf.ViewModels
             }
 
             await Task.WhenAll(tasks).ConfigureAwait(true);
-            message = BacktestViewModel.ToMessage(status);
             Messenger.Send(new NotificationMessage(message), 0);
             Active = false;
         }
@@ -675,8 +682,19 @@ namespace Algoloop.Wpf.ViewModels
         {
             if (string.IsNullOrEmpty(Model.AlgorithmName)) return;
             if (Model.AlgorithmLanguage.Equals(Language.Python)) return;
+            Parameters.Clear();
             string assemblyPath = MainService.FullExePath(Model.AlgorithmLocation);
-            if (string.IsNullOrEmpty(assemblyPath)) return;
+            if (string.IsNullOrEmpty(assemblyPath))
+            {
+                foreach (var parameter in Model.Parameters)
+                {
+                    if (_exclude.Contains(parameter.Name)) continue;
+                    var parameterViewModel = new ParameterViewModel(parameter);
+                    Parameters.Add(parameterViewModel);
+                }
+
+                return;
+            }
 
             try
             {
@@ -686,7 +704,6 @@ namespace Algoloop.Wpf.ViewModels
                     .Where(m => m.Name.Equals(Model.AlgorithmName, StringComparison.OrdinalIgnoreCase));
                 if (!type.Any()) return;
 
-                Parameters.Clear();
                 foreach (KeyValuePair<string, string> parameter in ParameterAttribute.GetParametersFromType(type.First()))
                 {
                     string parameterName = parameter.Key;

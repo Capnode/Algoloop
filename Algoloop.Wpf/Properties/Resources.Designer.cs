@@ -540,6 +540,15 @@ namespace Algoloop.Wpf.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Strategy file &apos;{0}&apos; not found.
+        /// </summary>
+        internal static string StrategyNotFound {
+            get {
+                return ResourceManager.GetString("StrategyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Strategy started with {0} backtest(s).
         /// </summary>
         internal static string StrategyStarted {

@@ -392,28 +392,15 @@ namespace Algoloop.Wpf.ViewModels
             }
 
             DataToModel();
-            _provider = ProviderFactory.CreateProvider(Model.Provider);
-            if (_provider == null) throw new ApplicationException($"Can not create provider {Model.Provider}");
-            Messenger.Send(new NotificationMessage(string.Format(Resources.MarketStarted, Model.Name)), 0);
-
             _cancel = new CancellationTokenSource();
             await Task.Run(() => MarketLoop(), _cancel.Token)
                 .ContinueWith(task =>
                 {
                     if (task.IsFaulted)
                     {
-                        if (task.Exception.GetType() == typeof(ApplicationException))
-                        {
-                            Messenger.Send(new NotificationMessage(
-                                string.Format(Resources.MarketException, Model.Name, task.Exception.Message)),
-                                0);
-                            return;
-                        }
-
-                        Log.Error(task.Exception);
-                        Messenger.Send(new NotificationMessage(
-                            $"{task.Exception.GetType()}: {task.Exception.Message}"),
-                            0);
+                        var ex = task.Exception.InnerException ?? task.Exception;
+                        Messenger.Send(new NotificationMessage($"{ex.GetType()}: {ex.Message}"), 0);
+                        App.LogError(task.Exception);
                         return;
                     }
 
@@ -490,6 +477,8 @@ namespace Algoloop.Wpf.ViewModels
 
         private void MarketLoop()
         {
+            _provider = ProviderFactory.CreateProvider(Model.Provider);
+            Messenger.Send(new NotificationMessage(string.Format(Resources.MarketStarted, Model.Name)), 0);
             _provider.Login(Model);
             while (Active && Model.Active)
             {
