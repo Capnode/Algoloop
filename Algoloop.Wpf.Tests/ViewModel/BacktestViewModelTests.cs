@@ -111,10 +111,10 @@ namespace Algoloop.Wpf.Tests.ViewModel
         {
             List<ISeriesPoint> trades = new()
             {
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 11000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 12000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 13000 },
+                new Candlestick{ Time = new DateTime(2018, 01, 01), Close = 10000},
+                new Candlestick{ Time = new DateTime(2018, 03, 01), Close = 11000 },
+                new Candlestick{ Time = new DateTime(2018, 05, 01), Close = 12000 },
+                new Candlestick{ Time = new DateTime(2019, 01, 01), Close = 13000 },
             };
 
             double score = BacktestViewModel.CalculateScore(trades);
@@ -126,10 +126,10 @@ namespace Algoloop.Wpf.Tests.ViewModel
         {
             List<ISeriesPoint> trades = new()
             {
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 9000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 8000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 7000 },
+                new Candlestick{ Time = new DateTime(2018, 01, 01), Close = 10000},
+                new Candlestick{ Time = new DateTime(2018, 03, 01), Close = 9000},
+                new Candlestick{ Time = new DateTime(2018, 05, 01), Close = 8000 },
+                new Candlestick{ Time = new DateTime(2019, 01, 01), Close = 7000 },
             };
 
             double score = BacktestViewModel.CalculateScore(trades);
@@ -141,10 +141,10 @@ namespace Algoloop.Wpf.Tests.ViewModel
         {
             List<ISeriesPoint> trades = new()
             {
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 9000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 8000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 10000 },
+                new Candlestick{ Time = new DateTime(2018,01,01), Close = 10000 },
+                new Candlestick{ Time = new DateTime(2018,03,01), Close = 9000 },
+                new Candlestick{ Time = new DateTime(2018,05,01), Close = 8000 },
+                new Candlestick{ Time = new DateTime(2019,01,01), Close = 10000 },
             };
 
             double score = BacktestViewModel.CalculateScore(trades);
@@ -156,10 +156,10 @@ namespace Algoloop.Wpf.Tests.ViewModel
         {
             List<ISeriesPoint> trades = new()
             {
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,01,01)), y = 10000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,03,01)), y = 11000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2018,05,01)), y = 13000 },
-                new ChartPoint{ x = (long)Time.DateTimeToUnixTimeStamp(new DateTime(2019,01,01)), y = 16000 },
+                new Candlestick{ Time = new DateTime(2018, 01, 01), Close = 10000},
+                new Candlestick{ Time = new DateTime(2018, 03, 01), Close = 11000 },
+                new Candlestick{ Time = new DateTime(2018, 05, 01), Close = 13000 },
+                new Candlestick{ Time = new DateTime(2019, 01, 01), Close = 16000 },
             };
 
             double score = BacktestViewModel.CalculateScore(trades);
