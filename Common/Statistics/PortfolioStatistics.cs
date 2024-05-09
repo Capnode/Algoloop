@@ -16,8 +16,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
 using Newtonsoft.Json;
+using QLNet;
 using QuantConnect.Data;
 using QuantConnect.Util;
 
@@ -28,8 +30,6 @@ namespace QuantConnect.Statistics
     /// </summary>
     public class PortfolioStatistics
     {
-        private static Lazy<InterestRateProvider> _interestRateProvider = new Lazy<InterestRateProvider>();
-
         /// <summary>
         /// The average rate of return for winning trades
         /// </summary>
@@ -70,6 +70,18 @@ namespace QuantConnect.Statistics
         public decimal Expectancy { get; set; }
 
         /// <summary>
+        /// Initial Equity Total Value
+        /// </summary>
+        [JsonConverter(typeof(JsonRoundingConverter))]
+        public decimal StartEquity { get; set; }
+
+        /// <summary>
+        /// Final Equity Total Value
+        /// </summary>
+        [JsonConverter(typeof(JsonRoundingConverter))]
+        public decimal EndEquity { get; set; }
+
+        /// <summary>
         /// Annual compounded returns statistic based on the final-starting capital and years.
         /// </summary>
         /// <remarks>Also known as Compound Annual Growth Rate (CAGR)</remarks>
@@ -102,6 +114,13 @@ namespace QuantConnect.Statistics
         /// <remarks>See https://www.quantconnect.com/forum/discussion/6483/probabilistic-sharpe-ratio/p1</remarks>
         [JsonConverter(typeof(JsonRoundingConverter))]
         public decimal ProbabilisticSharpeRatio { get; set; }
+
+        /// <summary>
+        /// Sortino ratio with respect to risk free rate: measures excess of return per unit of downside risk.
+        /// </summary>
+        /// <remarks>With risk defined as the algorithm's volatility</remarks>
+        [JsonConverter(typeof(JsonRoundingConverter))]
+        public decimal SortinoRatio { get; set; }
 
         /// <summary>
         /// Algorithm "Alpha" statistic - abnormal returns over the risk free rate and the relationshio (beta) with the benchmark returns.
@@ -154,6 +173,20 @@ namespace QuantConnect.Statistics
         public decimal PortfolioTurnover { get; set; }
 
         /// <summary>
+        /// The 1-day VaR for the portfolio, using the Variance-covariance approach.
+        /// Assumes a 99% confidence level, 1 year lookback period, and that the returns are normally distributed.
+        /// </summary>
+        [JsonConverter(typeof(JsonRoundingConverter))]
+        public decimal ValueAtRisk99 { get; set; }
+
+        /// <summary>
+        /// The 1-day VaR for the portfolio, using the Variance-covariance approach.
+        /// Assumes a 95% confidence level, 1 year lookback period, and that the returns are normally distributed.
+        /// </summary>
+        [JsonConverter(typeof(JsonRoundingConverter))]
+        public decimal ValueAtRisk95 { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PortfolioStatistics"/> class
         /// </summary>
         /// <param name="profitLoss">Trade record of profits and losses</param>
@@ -162,6 +195,7 @@ namespace QuantConnect.Statistics
         /// <param name="listPerformance">The list of algorithm performance values</param>
         /// <param name="listBenchmark">The list of benchmark values</param>
         /// <param name="startingCapital">The algorithm starting capital</param>
+        /// <param name="riskFreeInterestRateModel">The risk free interest rate model to use</param>
         /// <param name="tradingDaysPerYear">The number of trading days per year</param>
         /// <param name="winCount">
         /// The number of wins, including ITM options with profitLoss less than 0.
@@ -175,10 +209,14 @@ namespace QuantConnect.Statistics
             List<double> listPerformance,
             List<double> listBenchmark,
             decimal startingCapital,
-            int tradingDaysPerYear = 252,
+            IRiskFreeInterestRateModel riskFreeInterestRateModel,
+            int tradingDaysPerYear,
             int? winCount = null,
             int? lossCount = null)
         {
+            StartEquity = startingCapital;
+            EndEquity = equity.LastOrDefault().Value;
+
             if (portfolioTurnover.Count > 0)
             {
                 PortfolioTurnover = portfolioTurnover.Select(kvp => kvp.Value).Average();
@@ -242,14 +280,17 @@ namespace QuantConnect.Statistics
 
             Drawdown = DrawdownPercent(equity, 3);
 
-            AnnualVariance = GetAnnualVariance(listPerformance, tradingDaysPerYear);
+            AnnualVariance = Statistics.AnnualVariance(listPerformance, tradingDaysPerYear).SafeDecimalCast();
             AnnualStandardDeviation = (decimal) Math.Sqrt((double) AnnualVariance);
 
             var benchmarkAnnualPerformance = GetAnnualPerformance(listBenchmark, tradingDaysPerYear);
             var annualPerformance = GetAnnualPerformance(listPerformance, tradingDaysPerYear);
 
-            var riskFreeRate = GetAverageRiskFreeRate(equity.Select(x => x.Key));
-            SharpeRatio = AnnualStandardDeviation == 0 ? 0 : (annualPerformance - riskFreeRate) / AnnualStandardDeviation;
+            var riskFreeRate = riskFreeInterestRateModel.GetAverageRiskFreeRate(equity.Select(x => x.Key));
+            SharpeRatio = AnnualStandardDeviation == 0 ? 0 : Statistics.SharpeRatio(annualPerformance, AnnualStandardDeviation, riskFreeRate);
+
+            var annualDownsideDeviation = Statistics.AnnualDownsideStandardDeviation(listPerformance, tradingDaysPerYear).SafeDecimalCast();
+            SortinoRatio = annualDownsideDeviation == 0 ? 0 : Statistics.SharpeRatio(annualPerformance, annualDownsideDeviation, riskFreeRate);
 
             var benchmarkVariance = listBenchmark.Variance();
             Beta = benchmarkVariance.IsNaNOrZero() ? 0 : (decimal) (listPerformance.Covariance(listBenchmark) / benchmarkVariance);
@@ -263,8 +304,11 @@ namespace QuantConnect.Statistics
             TreynorRatio = Beta == 0 ? 0 : (annualPerformance - riskFreeRate) / Beta;
 
             // deannualize a 1 sharpe ratio
-            var benchmarkSharpeRatio = 1.0d / Math.Sqrt(252);
+            var benchmarkSharpeRatio = 1.0d / Math.Sqrt(tradingDaysPerYear);
             ProbabilisticSharpeRatio = Statistics.ProbabilisticSharpeRatio(listPerformance, benchmarkSharpeRatio).SafeDecimalCast();
+            
+            ValueAtRisk99 = GetValueAtRisk(listPerformance, tradingDaysPerYear, 0.99d);
+            ValueAtRisk95 = GetValueAtRisk(listPerformance, tradingDaysPerYear, 0.95d);
         }
 
         /// <summary>
@@ -272,27 +316,6 @@ namespace QuantConnect.Statistics
         /// </summary>
         public PortfolioStatistics()
         {
-        }
-
-        /// <summary>
-        /// Gets the average risk free annual return rate
-        /// </summary>
-        /// <param name="startDate">Start date to calculate the average</param>
-        /// <param name="endDate">End date to calculate the average</param>
-        public static decimal GetRiskFreeRate(DateTime startDate, DateTime endDate)
-        {
-            return GetAverageRiskFreeRate(Time.EachDay(startDate, endDate));
-        }
-
-        /// <summary>
-        /// Gets the average Risk Free Rate from the interest rate of the given dates
-        /// </summary>
-        /// <param name="dates">Collection of dates from which the interest rates will be computed
-        /// and then the average of them</param>
-        public static decimal GetAverageRiskFreeRate(IEnumerable<DateTime> dates)
-        {
-            var interestRates = dates.Select(x => _interestRateProvider.Value.GetInterestRate(x)).DefaultIfEmpty(0);
-            return interestRates.Average();
         }
 
         /// <summary>
@@ -324,22 +347,22 @@ namespace QuantConnect.Statistics
         /// <param name="tradingDaysPerYear">Trading days per year for the assets in portfolio</param>
         /// <remarks>May be inaccurate for forex algorithms with more trading days in a year</remarks>
         /// <returns>Double annual performance percentage</returns>
-        private static decimal GetAnnualPerformance(List<double> performance, int tradingDaysPerYear = 252)
+        private static decimal GetAnnualPerformance(List<double> performance, int tradingDaysPerYear)
         {
             return Statistics.AnnualPerformance(performance, tradingDaysPerYear).SafeDecimalCast();
         }
 
-        /// <summary>
-        /// Annualized variance statistic calculation using the daily performance variance and trading days per year.
-        /// </summary>
-        /// <param name="performance"></param>
-        /// <param name="tradingDaysPerYear"></param>
-        /// <remarks>Invokes the variance extension in the MathNet Statistics class</remarks>
-        /// <returns>Annual variance value</returns>
-        private static decimal GetAnnualVariance(List<double> performance, int tradingDaysPerYear = 252)
+        private static decimal GetValueAtRisk(
+            List<double> performance,
+            int lookbackPeriodDays,
+            double confidenceLevel,
+            int rounding = 3)
         {
-            var variance = performance.Variance();
-            return variance.IsNaNOrZero() ? 0 : (decimal)variance * tradingDaysPerYear;
+            var periodPerformance = performance.TakeLast(lookbackPeriodDays);
+            var mean = periodPerformance.Mean();
+            var standardDeviation = periodPerformance.StandardDeviation();
+            var valueAtRisk = (decimal)Normal.InvCDF(mean, standardDeviation, 1 - confidenceLevel);
+            return Math.Round(valueAtRisk, rounding);
         }
     }
 }

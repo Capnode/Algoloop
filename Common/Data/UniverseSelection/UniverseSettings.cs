@@ -14,6 +14,7 @@
 */
 
 using System;
+using QuantConnect.Scheduling;
 using System.Collections.Generic;
 
 namespace QuantConnect.Data.UniverseSelection
@@ -37,6 +38,12 @@ namespace QuantConnect.Data.UniverseSelection
         /// True to fill data forward, false otherwise
         /// </summary>
         public bool FillForward;
+
+        /// <summary>
+        /// If configured, will be used to determine universe selection schedule and filter or skip selection data
+        /// that does not fit the schedule
+        /// </summary>
+        public Schedule Schedule;
 
         /// <summary>
         /// True to allow extended market hours data, false otherwise
@@ -75,6 +82,11 @@ namespace QuantConnect.Data.UniverseSelection
         public List<Tuple<Type, TickType>> SubscriptionDataTypes;
 
         /// <summary>
+        /// True if universe selection can run asynchronous
+        /// </summary>
+        public bool? Asynchronous;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="UniverseSettings"/> class
         /// </summary>
         /// <param name="resolution">The resolution</param>
@@ -86,8 +98,10 @@ namespace QuantConnect.Data.UniverseSelection
         /// <param name="dataMappingMode">The contract mapping mode to use for the security</param>
         /// <param name="contractDepthOffset">The continuous contract desired offset from the current front month.
         /// For example, 0 (default) will use the front month, 1 will use the back month contract</param>
+        /// <param name="asynchronous">True if universe selection can run asynchronous</param>
+        /// <param name="selectionDateRule">If provided, will be used to determine universe selection schedule</param>
         public UniverseSettings(Resolution resolution, decimal leverage, bool fillForward, bool extendedMarketHours, TimeSpan minimumTimeInUniverse, DataNormalizationMode dataNormalizationMode = DataNormalizationMode.Adjusted,
-            DataMappingMode dataMappingMode = DataMappingMode.OpenInterest, int contractDepthOffset = 0)
+            DataMappingMode dataMappingMode = DataMappingMode.OpenInterest, int contractDepthOffset = 0, bool? asynchronous = null, IDateRule selectionDateRule = null)
         {
             Resolution = resolution;
             Leverage = leverage;
@@ -97,6 +111,12 @@ namespace QuantConnect.Data.UniverseSelection
             ExtendedMarketHours = extendedMarketHours;
             MinimumTimeInUniverse = minimumTimeInUniverse;
             DataNormalizationMode = dataNormalizationMode;
+            Asynchronous = asynchronous;
+            Schedule = new Schedule();
+            if (selectionDateRule != null)
+            {
+                Schedule.On(selectionDateRule);
+            }
         }
 
         /// <summary>
@@ -113,6 +133,8 @@ namespace QuantConnect.Data.UniverseSelection
             MinimumTimeInUniverse = universeSettings.MinimumTimeInUniverse;
             DataNormalizationMode = universeSettings.DataNormalizationMode;
             SubscriptionDataTypes = universeSettings.SubscriptionDataTypes;
+            Asynchronous = universeSettings.Asynchronous;
+            Schedule = universeSettings.Schedule.Clone();
         }
     }
 }

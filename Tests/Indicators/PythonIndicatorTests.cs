@@ -29,6 +29,12 @@ using QuantConnect.Data.Market;
 namespace QuantConnect.Tests.Indicators
 {
     [TestFixture]
+    public class PythonIndicatorTestsSnakeCase : PythonIndicatorTests
+    {
+        protected override bool SnakeCase => true;
+    }
+
+    [TestFixture]
     public class PythonIndicatorTests : CommonIndicatorTests<IBaseData>
     {
         [SetUp]
@@ -37,29 +43,31 @@ namespace QuantConnect.Tests.Indicators
             SymbolCache.Clear();
         }
 
-        private static PyObject CreatePythonIndicator(int period = 14)
+        protected virtual bool SnakeCase => false;
+
+        private PyObject CreatePythonIndicator(int period = 14)
         {
             using (Py.GIL())
             {
                 var module = PyModule.FromString(
                     Guid.NewGuid().ToString(),
-                    @"
+                    $@"
 from AlgorithmImports import *
 from collections import deque
 
 class CustomSimpleMovingAverage(PythonIndicator):
     def __init__(self, name, period):
-        self.Name = name
-        self.Value = 0
-        self.Period = period
-        self.WarmUpPeriod = period
+        self.{(SnakeCase ? "name" : "Name")} = name
+        self.{(SnakeCase ? "value" : "Value")} = 0
+        self.{(SnakeCase ? "period" : "Period")} = period
+        self.{(SnakeCase ? "warm_up_period" : "WarmUpPeriod")} = period
         self.queue = deque(maxlen=period)
 
     # Update method is mandatory
-    def Update(self, input):
+    def {(SnakeCase ? "update" : "Update")}(self, input):
         self.queue.appendleft(input.Value)
         count = len(self.queue)
-        self.Value = np.sum(self.queue) / count
+        self.{(SnakeCase ? "value" : "Value")} = np.sum(self.queue) / count
         return count == self.queue.maxlen
 "
                 );
@@ -235,16 +243,20 @@ class BadCustomIndicator(PythonIndicator):
                     "timeDelta = timedelta(days=2)\n" +
                     "class CustomIndicator(PythonIndicator):\n" +
                     "   def __init__(self):\n" +
-                    "       self.Value = 0\n" +
-                    "   def Update(self, input):\n" +
-                    "       self.Value = input.Value\n" +
+                    "       self.value = 0\n" +
+                    "   def update(self, input):\n" +
+                    "       self.value = input.value\n" +
                     "       return True\n" +
                     "class CustomConsolidator(PythonConsolidator):\n" +
                     "   def __init__(self):\n" +
-                    "       self.InputType = QuoteBar\n" +
-                    "       self.OutputType = QuoteBar\n" +
-                    "       self.Consolidated = None\n" +
-                    "       self.WorkingData = None\n"
+                    "       self.input_type = QuoteBar\n" +
+                    "       self.output_type = QuoteBar\n" +
+                    "       self.consolidated = None\n" +
+                    "       self.working_data = None\n" +
+                    "   def update(self, data):\n" +
+                    "       pass\n" +
+                    "   def scan(self, time):\n" +
+                    "       pass\n"
                 );
 
                 //Get our variables from Python
@@ -289,16 +301,20 @@ class BadCustomIndicator(PythonIndicator):
                     "consolidator = QuoteBarConsolidator(timedelta(days = 5)) \n" +
                     "class CustomIndicator(PythonIndicator):\n" +
                     "   def __init__(self):\n" +
-                    "       self.Value = 0\n" +
-                    "   def Update(self, input):\n" +
-                    "       self.Value = input.Value\n" +
+                    "       self.value = 0\n" +
+                    "   def update(self, input):\n" +
+                    "       self.value = input.value\n" +
                     "       return True\n" +
                     "class CustomConsolidator(PythonConsolidator):\n" +
                     "   def __init__(self):\n" +
-                    "       self.InputType = QuoteBar\n" +
-                    "       self.OutputType = QuoteBar\n" +
-                    "       self.Consolidated = None\n" +
-                    "       self.WorkingData = None\n" +
+                    "       self.input_type = QuoteBar\n" +
+                    "       self.output_type = QuoteBar\n" +
+                    "       self.consolidated = None\n" +
+                    "       self.working_data = None\n" +
+                    "   def update(self, data):\n" +
+                    "       pass\n" +
+                    "   def scan(self, time):\n" +
+                    "       pass\n" +
                     "class InvalidConsolidator:\n" +
                     "   pass\n"
                 );
@@ -403,15 +419,18 @@ class CustomSimpleMovingAverage(PythonIndicator):
             using (Py.GIL())
             {
                 using dynamic customSma = CreatePythonIndicator(period);
+                var wrapper = new PythonIndicator(customSma);
 
                 for (int i = 0; i < data.Length; i++)
                 {
                     var datum = data[i];
                     seen.Add(datum);
 
-                    customSma.Update(new IndicatorDataPoint(start.AddSeconds(i), datum));
+                    wrapper.Update(new IndicatorDataPoint(start.AddSeconds(i), datum));
 
-                    Assert.AreEqual(Enumerable.Reverse(seen).Take(period).Average(), (decimal)customSma.Value);
+                    var value = SnakeCase ? (decimal)customSma.value : (decimal)customSma.Value;
+
+                    Assert.AreEqual(Enumerable.Reverse(seen).Take(period).Average(), value);
                 }
             }
         }
@@ -446,15 +465,15 @@ class CustomSimpleMovingAverage(PythonIndicator):
                         Assert.IsTrue((bool)customSma.IsReady);
                     }
 
+                    var value = SnakeCase ? (decimal)customSma.value : (decimal)customSma.Value;
                     if (i < period - 1)
                     {
-                        Assert.AreEqual(0m, (decimal)customSma.Value);
+                        Assert.AreEqual(0m, value);
                     }
                     else
                     {
                         seen.Add(sma.Current.Value);
-                        var value = (decimal)customSma.Value;
-                        Assert.AreEqual(Enumerable.Reverse(seen).Take(period).Average(), (decimal)customSma.Value);
+                        Assert.AreEqual(Enumerable.Reverse(seen).Take(period).Average(), value);
                     }
                 }
             }

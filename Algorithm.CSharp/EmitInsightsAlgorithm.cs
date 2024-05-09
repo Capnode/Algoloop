@@ -117,14 +117,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "4"},
+            {"Total Orders", "6"},
             {"Average Win", "0.94%"},
             {"Average Loss", "-0.98%"},
             {"Compounding Annual Return", "-47.257%"},
             {"Drawdown", "1.200%"},
             {"Expectancy", "-0.021"},
+            {"Start Equity", "100000"},
+            {"End Equity", "99127.48"},
             {"Net Profit", "-0.873%"},
             {"Sharpe Ratio", "-2.432"},
+            {"Sortino Ratio", "-26.344"},
             {"Probabilistic Sharpe Ratio", "33.387%"},
             {"Loss Rate", "50%"},
             {"Win Rate", "50%"},
@@ -140,7 +143,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$640000000.00"},
             {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
             {"Portfolio Turnover", "100.44%"},
-            {"OrderListHash", "de18d7406b7b5126fcb974f9d283aca0"}
+            {"OrderListHash", "32a8e55f26c040495123e0bc93b35ba7"}
         };
     }
 }

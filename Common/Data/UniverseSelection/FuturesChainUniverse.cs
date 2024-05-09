@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using QuantConnect.Data.Market;
 using QuantConnect.Interfaces;
 using QuantConnect.Securities;
 using QuantConnect.Securities.Future;
@@ -29,8 +28,22 @@ namespace QuantConnect.Data.UniverseSelection
     /// </summary>
     public class FuturesChainUniverse : Universe
     {
-        private readonly UniverseSettings _universeSettings;
         private DateTime _cacheDate;
+
+        /// <summary>
+        /// True if this universe filter can run async in the data stack
+        /// </summary>
+        public override bool Asynchronous
+        {
+            get
+            {
+                if (UniverseSettings.Asynchronous.HasValue)
+                {
+                    return UniverseSettings.Asynchronous.Value;
+                }
+                return Future.ContractFilter.Asynchronous;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FuturesChainUniverse"/> class
@@ -42,7 +55,7 @@ namespace QuantConnect.Data.UniverseSelection
             : base(future.SubscriptionDataConfig)
         {
             Future = future;
-            _universeSettings = new UniverseSettings(universeSettings) { DataNormalizationMode = DataNormalizationMode.Raw };
+            UniverseSettings = universeSettings;
         }
 
         /// <summary>
@@ -55,7 +68,14 @@ namespace QuantConnect.Data.UniverseSelection
         /// </summary>
         public override UniverseSettings UniverseSettings
         {
-            get { return _universeSettings; }
+            set
+            {
+                if (value != null)
+                {
+                    // make sure data mode is raw
+                    base.UniverseSettings = new UniverseSettings(value) { DataNormalizationMode = DataNormalizationMode.Raw };
+                }
+            }
         }
 
         /// <summary>
@@ -67,7 +87,7 @@ namespace QuantConnect.Data.UniverseSelection
         public override IEnumerable<Symbol> SelectSymbols(DateTime utcTime, BaseDataCollection data)
         {
             // date change detection needs to be done in exchange time zone
-            var localEndTime = data.EndTime.ConvertFromUtc(Future.Exchange.TimeZone);
+            var localEndTime = utcTime.ConvertFromUtc(Future.Exchange.TimeZone);
             var exchangeDate = localEndTime.Date;
             if (_cacheDate == exchangeDate)
             {
@@ -76,12 +96,7 @@ namespace QuantConnect.Data.UniverseSelection
 
             var availableContracts = data.Data.Select(x => x.Symbol);
             var results = Future.ContractFilter.Filter(new FutureFilterUniverse(availableContracts, localEndTime));
-
-            // if results are not dynamic, we cache them and won't call filtering till the end of the day
-            if (!results.IsDynamic)
-            {
-                _cacheDate = exchangeDate;
-            }
+            _cacheDate = exchangeDate;
 
             return results;
         }

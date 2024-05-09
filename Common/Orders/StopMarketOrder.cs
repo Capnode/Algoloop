@@ -14,6 +14,7 @@
 */
 
 using System;
+using Newtonsoft.Json;
 using QuantConnect.Interfaces;
 using QuantConnect.Securities;
 
@@ -27,6 +28,7 @@ namespace QuantConnect.Orders
         /// <summary>
         /// Stop price for this stop market order.
         /// </summary>
+        [JsonProperty(PropertyName = "stopPrice")]
         public decimal StopPrice { get; internal set; }
 
         /// <summary>
@@ -57,12 +59,15 @@ namespace QuantConnect.Orders
             : base(symbol, quantity, time, tag, properties)
         {
             StopPrice = stopPrice;
+        }
 
-            if (string.IsNullOrEmpty(tag))
-            {
-                //Default tag values to display stop price in GUI.
-                Tag = Messages.StopMarketOrder.Tag(this);
-            }
+        /// <summary>
+        /// Gets the default tag for this order
+        /// </summary>
+        /// <returns>The default tag</returns>
+        public override string GetDefaultTag()
+        {
+            return Messages.StopMarketOrder.Tag(this);
         }
 
         /// <summary>
@@ -74,13 +79,13 @@ namespace QuantConnect.Orders
             // selling, so higher price will be used
             if (Quantity < 0)
             {
-                return Quantity*Math.Max(StopPrice, security.Price);
+                return Quantity * Math.Max(StopPrice, security.Price);
             }
 
             // buying, so lower price will be used
             if (Quantity > 0)
             {
-                return Quantity*Math.Min(StopPrice, security.Price);
+                return Quantity * Math.Min(StopPrice, security.Price);
             }
 
             return 0m;
@@ -117,7 +122,7 @@ namespace QuantConnect.Orders
         /// <returns>A copy of this order</returns>
         public override Order Clone()
         {
-            var order = new StopMarketOrder {StopPrice = StopPrice};
+            var order = new StopMarketOrder { StopPrice = StopPrice };
             CopyTo(order);
             return order;
         }

@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using QuantConnect.Algorithm.Framework.Alphas;
+using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
 using QuantConnect.Interfaces;
@@ -57,8 +58,8 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
         /// </summary>
-        /// <param name="data">TradeBars IDictionary object with your stock data</param>
-        public void OnData(TradeBars data)
+        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
+        public override void OnData(Slice data)
         {
             // wait for our indicator to be ready
             if (!_macd.IsReady) return;
@@ -107,7 +108,10 @@ namespace QuantConnect.Algorithm.CSharp
 
             // plot both lines
             Plot("MACD", _macd, _macd.Signal);
-            Plot(_symbol, "Open", data[_symbol].Open);
+            if (data.Bars.ContainsKey(_symbol))
+            {
+                Plot(_symbol, "Open", data[_symbol].Open);
+            }
             Plot(_symbol, _macd.Fast, _macd.Slow);
         }
 
@@ -136,14 +140,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "85"},
+            {"Total Orders", "85"},
             {"Average Win", "4.85%"},
             {"Average Loss", "-4.22%"},
             {"Compounding Annual Return", "-3.119%"},
             {"Drawdown", "52.900%"},
             {"Expectancy", "-0.053"},
+            {"Start Equity", "100000"},
+            {"End Equity", "70553.97"},
             {"Net Profit", "-29.446%"},
             {"Sharpe Ratio", "-0.223"},
+            {"Sortino Ratio", "-0.243"},
             {"Probabilistic Sharpe Ratio", "0.001%"},
             {"Loss Rate", "56%"},
             {"Win Rate", "44%"},
@@ -159,7 +166,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$1200000000.00"},
             {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
             {"Portfolio Turnover", "4.23%"},
-            {"OrderListHash", "f42ded0d7bc246cd22daa075d3e27bcf"}
+            {"OrderListHash", "1291b6615d6301b487f409a5e0ea475d"}
         };
     }
 }

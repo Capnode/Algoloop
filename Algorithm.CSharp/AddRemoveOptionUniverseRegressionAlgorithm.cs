@@ -79,7 +79,7 @@ namespace QuantConnect.Algorithm.CSharp
                 // things like manually added, auto added, internal, and any other boolean state we need to track against a single security)
                 throw new Exception("The underlying equity data should NEVER be removed in this algorithm because it was manually added");
             }
-            if (_expectedSecurities.AreDifferent(Securities.Keys.ToHashSet()))
+            if (_expectedSecurities.AreDifferent(Securities.Total.Select(x => x.Symbol).ToHashSet()))
             {
                 var expected = string.Join(Environment.NewLine, _expectedSecurities.OrderBy(s => s.ToString()));
                 var actual = string.Join(Environment.NewLine, Securities.Keys.OrderBy(s => s.ToString()));
@@ -116,7 +116,7 @@ namespace QuantConnect.Algorithm.CSharp
                     }
                     // find first put above market price
                     return u.IncludeWeeklys()
-                        .Strikes(+1, +1)
+                        .Strikes(+1, +3)
                         .Expiration(TimeSpan.Zero, TimeSpan.FromDays(1))
                         .Contracts(c => c.Where(s => s.ID.OptionRight == OptionRight.Put));
                 });
@@ -141,16 +141,6 @@ namespace QuantConnect.Algorithm.CSharp
 
         public override void OnSecuritiesChanged(SecurityChanges changes)
         {
-            if (changes.AddedSecurities.Count > 1)
-            {
-                // added event fired for underlying since it was added to the option chain universe
-                if (changes.AddedSecurities.All(s => s.Symbol != Underlying))
-                {
-                    var securities = string.Join(Environment.NewLine, changes.AddedSecurities.Select(s => s.Symbol));
-                    throw new Exception($"This algorithm intends to add a single security at a time but added: {changes.AddedSecurities.Count}{Environment.NewLine}{securities}");
-                }
-            }
-
             if (changes.AddedSecurities.Any())
             {
                 foreach (var added in changes.AddedSecurities)
@@ -213,7 +203,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 200618;
+        public long DataPoints => 200807;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -225,14 +215,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "6"},
+            {"Total Orders", "6"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "99079"},
             {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -245,10 +238,10 @@ namespace QuantConnect.Algorithm.CSharp
             {"Tracking Error", "0"},
             {"Treynor Ratio", "0"},
             {"Total Fees", "$6.00"},
-            {"Estimated Strategy Capacity", "$2000.00"},
+            {"Estimated Strategy Capacity", "$3000.00"},
             {"Lowest Capacity Asset", "GOOCV 305RBR0BSWIX2|GOOCV VP83T1ZUHROL"},
-            {"Portfolio Turnover", "1.19%"},
-            {"OrderListHash", "550a99c482106defd8ba15f48183768e"}
+            {"Portfolio Turnover", "1.49%"},
+            {"OrderListHash", "bd115ec8bb7734b1561d6a6cc6c00039"}
         };
     }
 }

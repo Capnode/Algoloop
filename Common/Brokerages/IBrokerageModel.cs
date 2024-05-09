@@ -175,7 +175,7 @@ namespace QuantConnect.Brokerages
         /// Gets the shortable provider
         /// </summary>
         /// <returns>Shortable provider</returns>
-        IShortableProvider GetShortableProvider();
+        IShortableProvider GetShortableProvider(Security security);
     }
 
     /// <summary>
@@ -227,14 +227,17 @@ namespace QuantConnect.Brokerages
                 case BrokerageName.GDAX:
                     return new GDAXBrokerageModel(accountType);
 
+                case BrokerageName.Coinbase:
+                    return new CoinbaseBrokerageModel(accountType);
+
                 case BrokerageName.AlphaStreams:
                     return new AlphaStreamsBrokerageModel(accountType);
 
                 case BrokerageName.Zerodha:
                     return new ZerodhaBrokerageModel(accountType);
 
-                case BrokerageName.Atreyu:
-                    return new AtreyuBrokerageModel(accountType);
+                case BrokerageName.Axos:
+                    return new AxosClearingBrokerageModel(accountType);
 
                 case BrokerageName.TradingTechnologies:
                     return new TradingTechnologiesBrokerageModel(accountType);
@@ -253,18 +256,21 @@ namespace QuantConnect.Brokerages
 
                 case BrokerageName.FTXUS:
                     return new FTXUSBrokerageModel(accountType);
-                
+
                 case BrokerageName.Wolverine:
                     return new WolverineBrokerageModel(accountType);
 
                 case BrokerageName.TDAmeritrade:
                     return new TDAmeritradeBrokerageModel(accountType);
 
-                case BrokerageName.RBI: 
+                case BrokerageName.RBI:
                     return new RBIBrokerageModel(accountType);
-                
+
                 case BrokerageName.Bybit:
                     return new BybitBrokerageModel(accountType);
+
+                case BrokerageName.Eze:
+                    return new EzeBrokerageModel(accountType);
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(brokerage), brokerage, null);
@@ -312,14 +318,17 @@ namespace QuantConnect.Brokerages
                 case GDAXBrokerageModel _:
                     return BrokerageName.GDAX;
 
+                case CoinbaseBrokerageModel _:
+                    return BrokerageName.Coinbase;
+
                 case AlphaStreamsBrokerageModel _:
                     return BrokerageName.AlphaStreams;
 
                 case ZerodhaBrokerageModel _:
                     return BrokerageName.Zerodha;
 
-                case AtreyuBrokerageModel _:
-                    return BrokerageName.Atreyu;
+                case AxosClearingBrokerageModel _:
+                    return BrokerageName.Axos;
 
                 case TradingTechnologiesBrokerageModel _:
                     return BrokerageName.TradingTechnologies;
@@ -350,6 +359,9 @@ namespace QuantConnect.Brokerages
 
                 case BybitBrokerageModel _:
                     return BrokerageName.Bybit;
+
+                case EzeBrokerageModel _:
+                    return BrokerageName.Eze;
 
                 case DefaultBrokerageModel _:
                     return BrokerageName.Default;

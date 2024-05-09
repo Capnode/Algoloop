@@ -126,7 +126,7 @@ namespace Algoloop.Wpf.Views
             if (_isLoaded)
             {
                 SetVisibleCharts();
-                RedrawCharts();
+                SafeRedrawCharts();
             }
         }
 
@@ -142,7 +142,7 @@ namespace Algoloop.Wpf.Views
             }
 
             Settings = string.Join(Separator, settings);
-            RedrawCharts();
+            SafeRedrawCharts();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -152,7 +152,7 @@ namespace Algoloop.Wpf.Views
             window.Closing += OnUnloaded;
             _isLoaded = true;
             SetVisibleCharts();
-            RedrawCharts();
+            SafeRedrawCharts();
         }
 
         private void OnUnloaded(object sender, CancelEventArgs e)
@@ -178,6 +178,18 @@ namespace Algoloop.Wpf.Views
                 visible = false; 
             }
         }
+
+        private void SafeRedrawCharts()
+        {
+            try
+            {
+                RedrawCharts();
+            }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
+            }
+        }   
 
         private void RedrawCharts()
         {

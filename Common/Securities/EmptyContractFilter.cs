@@ -27,6 +27,11 @@ namespace QuantConnect.Securities
     public class EmptyContractFilter : IDerivativeSecurityFilter
     {
         /// <summary>
+        /// True if this universe filter can run async in the data stack
+        /// </summary>
+        public bool Asynchronous { get; set; } = true;
+
+        /// <summary>
         /// Filters the input set of symbols represented by the universe
         /// </summary>
         /// <param name="universe">derivative symbols universe used in filtering</param>
@@ -38,7 +43,6 @@ namespace QuantConnect.Securities
 
         private class NoneIDerivativeSecurityFilterUniverse : IDerivativeSecurityFilterUniverse
         {
-            public bool IsDynamic => false;
             public DateTime LocalTime => default;
 
             public IEnumerator<Symbol> GetEnumerator()

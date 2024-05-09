@@ -387,7 +387,7 @@ namespace QuantConnect.Securities
         }
 
         /// <summary>
-        /// Alias for HoldStock. Check if we have and holdings.
+        /// Alias for HoldStock. Check if we have any holdings.
         /// </summary>
         /// <seealso cref="HoldStock"/>
         public bool Invested => HoldStock;
@@ -511,7 +511,7 @@ namespace QuantConnect.Securities
         {
             get
             {
-                return Securities.Values.Sum(security => security.Holdings.TotalFees);
+                return Securities.Total.Sum(security => security.Holdings.TotalFees);
             }
         }
 
@@ -522,7 +522,7 @@ namespace QuantConnect.Securities
         {
             get
             {
-                return Securities.Values.Sum(security => security.Holdings.Profit);
+                return Securities.Total.Sum(security => security.Holdings.Profit);
             }
         }
 
@@ -533,7 +533,7 @@ namespace QuantConnect.Securities
         {
             get
             {
-                return Securities.Values.Sum(security => security.Holdings.NetProfit);
+                return Securities.Total.Sum(security => security.Holdings.NetProfit);
             }
         }
 
@@ -544,7 +544,7 @@ namespace QuantConnect.Securities
         {
             get
             {
-                return Securities.Values.Sum(security => security.Holdings.TotalSaleVolume);
+                return Securities.Total.Sum(security => security.Holdings.TotalSaleVolume);
             }
         }
 
@@ -815,26 +815,9 @@ namespace QuantConnect.Securities
                 _baseCurrencyCash.AddAmount(leftOver * split.ReferencePrice * split.SplitFactor);
                 return;
             }
-            next.Value *= split.SplitFactor;
 
-            // make sure to modify open/high/low as well for tradebar data types
-            var tradeBar = next as TradeBar;
-            if (tradeBar != null)
-            {
-                tradeBar.Open *= split.SplitFactor;
-                tradeBar.High *= split.SplitFactor;
-                tradeBar.Low *= split.SplitFactor;
-            }
-
-            // make sure to modify bid/ask as well for tradebar data types
-            var tick = next as Tick;
-            if (tick != null)
-            {
-                tick.AskPrice *= split.SplitFactor;
-                tick.BidPrice *= split.SplitFactor;
-            }
-
-            security.SetMarketPrice(next);
+            security.ApplySplit(split);
+            // The data price should have been adjusted already
             _baseCurrencyCash.AddAmount(leftOver * next.Price);
 
             // security price updated

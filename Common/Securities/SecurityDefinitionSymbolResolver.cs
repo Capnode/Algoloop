@@ -47,13 +47,11 @@ namespace QuantConnect.Securities
         /// <param name="securitiesDefinitionKey">Location to read the securities definition data from</param>
         private SecurityDefinitionSymbolResolver(IDataProvider dataProvider = null, string securitiesDefinitionKey = null)
         {
-            _securitiesDefinitionKey = securitiesDefinitionKey ?? Path.Combine(Globals.DataFolder, "symbol-properties", "security-database.csv");
+            _securitiesDefinitionKey = securitiesDefinitionKey ?? Path.Combine(Globals.GetDataFolderPath("symbol-properties"), "security-database.csv");
 
-            _dataProvider = dataProvider ??
-                Composer.Instance.GetExportedValueByTypeName<IDataProvider>(
-                    Config.Get("data-provider", "QuantConnect.Lean.Engine.DataFeeds.DefaultDataProvider"));
+            _dataProvider = dataProvider ?? Composer.Instance.GetPart<IDataProvider>();
 
-            _mapFileProvider = Composer.Instance.GetExportedValueByTypeName<IMapFileProvider>(Config.Get("map-file-provider", "LocalDiskMapFileProvider"));
+            _mapFileProvider = Composer.Instance.GetPart<IMapFileProvider>();
             _mapFileProvider.Initialize(_dataProvider);
         }
 
@@ -187,6 +185,41 @@ namespace QuantConnect.Securities
         public string ISIN(Symbol symbol)
         {
             return SymbolToSecurityDefinition(symbol)?.ISIN;
+        }
+
+        /// <summary>
+        /// Get's the CIK value associated with the given <see cref="Symbol"/>
+        /// </summary>
+        /// <param name="symbol">The Lean <see cref="Symbol"/></param>
+        /// <returns>The Central Index Key number (CIK) corresponding to the given Lean <see cref="Symbol"/> if any, else null</returns>
+        public int? CIK(Symbol symbol)
+        {
+            return SymbolToSecurityDefinition(symbol)?.CIK;
+        }
+
+        /// <summary>
+        /// Converts CIK into a Lean <see cref="Symbol"/> array
+        /// </summary>
+        /// <param name="cik">
+        /// The Central Index Key (CIK) of a company
+        /// </param>
+        /// <param name="tradingDate">
+        /// The date that the stock was trading at with the CIK provided. This is used
+        /// to get the ticker of the symbol on this date.
+        /// </param>
+        /// <returns>The Lean Symbols corresponding to the CIK on the trading date provided</returns>
+        public Symbol[] CIK(int cik, DateTime tradingDate)
+        {
+            if (cik == 0)
+            {
+                return Array.Empty<Symbol>();
+            }
+
+            return GetSecurityDefinitions()
+                .Where(x => x.CIK != null && x.CIK == cik)
+                .Select(securityDefinition => SecurityDefinitionToSymbol(securityDefinition, tradingDate))
+                .Where(x => x != null)
+                .ToArray();
         }
 
         /// <summary>

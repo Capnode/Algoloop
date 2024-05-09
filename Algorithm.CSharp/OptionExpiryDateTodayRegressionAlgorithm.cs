@@ -40,7 +40,7 @@ namespace QuantConnect.Algorithm.CSharp
             var option = AddOption("AAPL", Resolution.Minute);
             option.SetFilter((universeFilter) =>
             {
-                return universeFilter.IncludeWeeklys().Strikes(-1, 1).Expiration(0, 10);
+                return universeFilter.IncludeWeeklys().Strikes(-2, +2).Expiration(0, 10);
             });
             option.PriceModel = OptionPriceModels.BaroneAdesiWhaley();
             _optionSymbol = option.Symbol;
@@ -107,7 +107,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 8626717;
+        public long DataPoints => 8605047;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -119,14 +119,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "0"},
+            {"Total Orders", "0"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100000"},
             {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},

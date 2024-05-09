@@ -27,13 +27,11 @@ namespace QuantConnect.Packets
         /// <summary>
         /// Packet type defined by a string enum
         /// </summary>
-        [JsonProperty(PropertyName = "eType")]
         public PacketType Type { get; set; } = PacketType.None;
 
         /// <summary>
         /// User unique specific channel endpoint to send the packets
         /// </summary>
-        [JsonProperty(PropertyName = "sChannel")]
         public virtual string Channel { get; set; } = "";
 
         /// <summary>
@@ -187,5 +185,11 @@ namespace QuantConnect.Packets
 
         /// Language model chat response
         LanguageModelChatResponse,
+
+        /// Algorithm name update
+        AlgorithmNameUpdate,
+
+        /// Algorithm tags update
+        AlgorithmTagsUpdate,
     }
 }

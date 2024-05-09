@@ -46,7 +46,12 @@ namespace QuantConnect
             /// <summary>
             /// Short expiration year
             /// </summary>
-            public int ExpirationYearShort { get; set;  }
+            public int ExpirationYearShort { get; set; }
+
+            /// <summary>
+            /// Short expiration year digits
+            /// </summary>
+            public int ExpirationYearShortLength { get; set; }
 
             /// <summary>
             /// Expiration month
@@ -133,6 +138,7 @@ namespace QuantConnect
             {
                 Underlying = underlyingString,
                 ExpirationYearShort = expirationYearShort,
+                ExpirationYearShortLength = expirationYearString.Length,
                 ExpirationMonth = expirationMonth,
                 ExpirationDay = expirationDay
             };
@@ -146,7 +152,6 @@ namespace QuantConnect
         /// <returns>The future symbol or null if failed</returns>
         public static Symbol ParseFutureSymbol(string ticker, int? futureYear = null)
         {
-            var disambiguatedFutureYear = futureYear ?? TodayUtc.Year;
             var parsed = ParseFutureTicker(ticker);
             if (parsed == null)
             {
@@ -154,9 +159,8 @@ namespace QuantConnect
             }
 
             var underlying = parsed.Underlying;
-            var expirationYearShort = parsed.ExpirationYearShort;
             var expirationMonth = parsed.ExpirationMonth;
-            var expirationYear = GetExpirationYear(expirationYearShort, disambiguatedFutureYear);
+            var expirationYear = GetExpirationYear(futureYear, parsed);
 
             if (!SymbolPropertiesDatabase.FromDataFolder().TryGetMarket(underlying, SecurityType.Future, out var market))
             {
@@ -323,6 +327,19 @@ namespace QuantConnect
         /// <returns>Symbol object for the specified OSI option ticker string</returns>
         public static Symbol ParseOptionTickerOSI(string ticker, SecurityType securityType = SecurityType.Option, string market = Market.USA)
         {
+            return ParseOptionTickerOSI(ticker, securityType, OptionStyle.American, market);
+        }
+
+        /// <summary>
+        /// Parses the specified OSI options ticker into a Symbol object
+        /// </summary>
+        /// <param name="ticker">The OSI compliant option ticker string</param>
+        /// <param name="securityType">The security type</param>
+        /// <param name="market">The associated market</param>
+        /// <param name="optionStyle">The option style</param>
+        /// <returns>Symbol object for the specified OSI option ticker string</returns>
+        public static Symbol ParseOptionTickerOSI(string ticker, SecurityType securityType, OptionStyle optionStyle, string market)
+        {
             var optionTicker = ticker.Substring(0, 6).Trim();
             var expiration = DateTime.ParseExact(ticker.Substring(6, 6), DateFormat.SixCharacter, null);
             OptionRight right;
@@ -354,7 +371,7 @@ namespace QuantConnect
             {
                 throw new NotImplementedException($"ParseOptionTickerOSI(): {Messages.SymbolRepresentation.SecurityTypeNotImplemented(securityType)}");
             }
-            var sid = SecurityIdentifier.GenerateOption(expiration, underlyingSid, optionTicker, market, strike, right, OptionStyle.American);
+            var sid = SecurityIdentifier.GenerateOption(expiration, underlyingSid, optionTicker, market, strike, right, optionStyle);
             return new Symbol(sid, ticker, new Symbol(underlyingSid, underlyingSid.Symbol));
         }
 
@@ -369,7 +386,7 @@ namespace QuantConnect
         {
             var letter = _optionSymbology.Where(x => x.Value.Item2 == symbol.ID.OptionRight && x.Value.Item1 == symbol.ID.Date.Month).Select(x => x.Key).Single();
             var twoYearDigit = symbol.ID.Date.ToString("yy");
-            return $"{SecurityIdentifier.Ticker(symbol.Underlying, symbol.ID.Date)}{twoYearDigit}{symbol.ID.Date.Day:00}{letter}{symbol.ID.StrikePrice}";
+            return $"{SecurityIdentifier.Ticker(symbol.Underlying, symbol.ID.Date)}{twoYearDigit}{symbol.ID.Date.Day:00}{letter}{symbol.ID.StrikePrice.ToStringInvariant()}";
         }
 
         /// <summary>
@@ -395,8 +412,8 @@ namespace QuantConnect
             var underlying = ticker.Substring(0, optionTypeDelimiter - 4);
 
             // if we cannot parse strike price, we ignore this contract, but log the information.
-            decimal strikePrice;
-            if (!Decimal.TryParse(strikePriceString, out strikePrice))
+            Decimal strikePrice;
+            if (!Decimal.TryParse(strikePriceString, NumberStyles.Any, CultureInfo.InvariantCulture, out strikePrice))
             {
                 return null;
             }
@@ -464,15 +481,39 @@ namespace QuantConnect
 
         private static IReadOnlyDictionary<int, string> _futuresMonthLookup = _futuresMonthCodeLookup.ToDictionary(kv => kv.Value, kv => kv.Key);
 
-        private static int GetExpirationYear(int year, int futureYear)
+        /// <summary>
+        /// Get the expiration year from short year (two-digit integer).
+        /// Examples: NQZ23 and NQZ3 for Dec 2023
+        /// </summary>
+        /// <param name="futureYear">Clarifies the year for the current future</param>
+        /// <param name="shortYear">Year in 2 digits format (23 represents 2023)</param>
+        /// <returns>Tickers from live trading may not provide the four-digit year.</returns>
+        private static int GetExpirationYear(int? futureYear, FutureTickerProperties parsed)
         {
-            var baseNum = 2000;
-            while (baseNum + year < futureYear)
+            if(futureYear.HasValue)
             {
-                baseNum += 10;
+                var referenceYear = 1900 + parsed.ExpirationYearShort;
+                while(referenceYear < futureYear.Value)
+                {
+                    referenceYear += 10;
+                }
+
+                return referenceYear;
             }
 
-            return baseNum + year;
+            var currentYear = DateTime.UtcNow.Year;
+            if (parsed.ExpirationYearShortLength > 1)
+            {
+                // we are given a double digit year
+                return 2000 + parsed.ExpirationYearShort;
+            }
+
+            var baseYear = ((int)Math.Round(currentYear / 10.0)) * 10 + parsed.ExpirationYearShort;
+            while (baseYear < currentYear)
+            {
+                baseYear += 10;
+            }
+            return baseYear;
         }
     }
 }

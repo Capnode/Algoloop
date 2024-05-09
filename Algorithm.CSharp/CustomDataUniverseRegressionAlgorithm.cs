@@ -33,9 +33,7 @@ namespace QuantConnect.Algorithm.CSharp
             new DateTime(2014, 03, 26, 0, 0, 0),
             new DateTime(2014, 03, 27, 0, 0, 0),
             new DateTime(2014, 03, 28, 0, 0, 0),
-            new DateTime(2014, 03, 29, 0, 0, 0),
-            new DateTime(2014, 03, 30, 0, 0, 0),
-            new DateTime(2014, 03, 31, 0, 0, 0)
+            new DateTime(2014, 03, 29, 0, 0, 0)
         });
 
         /// <summary>
@@ -56,7 +54,7 @@ namespace QuantConnect.Algorithm.CSharp
                 {
                     throw new Exception($"Unexpected selection time {Time} expected {expectedTime}");
                 }
-                return coarse.OrderByDescending(x => x.DollarVolume)
+                return coarse.OfType<CoarseFundamental>().OrderByDescending(x => x.DollarVolume)
                     .SelectMany(x => new[] {
                         x.Symbol,
                         QuantConnect.Symbol.CreateBase(typeof(CustomData), x.Symbol)})
@@ -107,7 +105,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 42611;
+        public long DataPoints => 42633;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -119,14 +117,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "7"},
+            {"Total Orders", "7"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "-65.130%"},
             {"Drawdown", "2.900%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "97717.31"},
             {"Net Profit", "-2.283%"},
             {"Sharpe Ratio", "-4.298"},
+            {"Sortino Ratio", "-4.067"},
             {"Probabilistic Sharpe Ratio", "5.388%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -142,7 +143,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$430000000.00"},
             {"Lowest Capacity Asset", "NB R735QTJ8XC9X"},
             {"Portfolio Turnover", "12.54%"},
-            {"OrderListHash", "c9e692926d2798b28f78192fb69f0a29"}
+            {"OrderListHash", "fae1a7c34d640dfa020330f24378bcf7"}
         };
     }
 }

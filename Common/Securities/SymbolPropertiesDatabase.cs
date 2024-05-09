@@ -214,8 +214,7 @@ namespace QuantConnect.Securities
             {
                 if (_dataFolderSymbolPropertiesDatabase == null)
                 {
-                    var directory = Path.Combine(Globals.DataFolder, "symbol-properties");
-                    _dataFolderSymbolPropertiesDatabase = new SymbolPropertiesDatabase(Path.Combine(directory, "symbol-properties-database.csv"));
+                    _dataFolderSymbolPropertiesDatabase = new SymbolPropertiesDatabase(Path.Combine(Globals.GetDataFolderPath("symbol-properties"), "symbol-properties-database.csv"));
                 }
             }
             return _dataFolderSymbolPropertiesDatabase;
@@ -277,7 +276,8 @@ namespace QuantConnect.Securities
                 lotSize: csv[7].ToDecimal(),
                 marketTicker: HasValidValue(csv, 8) ? csv[8] : string.Empty,
                 minimumOrderSize: HasValidValue(csv, 9) ? csv[9].ToDecimal() : null,
-                priceMagnifier: HasValidValue(csv, 10) ? csv[10].ToDecimal() : 1);
+                priceMagnifier: HasValidValue(csv, 10) ? csv[10].ToDecimal() : 1,
+                strikeMultiplier: HasValidValue(csv, 11) ? csv[11].ToDecimal() : 1);
         }
 
         private static bool HasValidValue(string[] array, uint position)

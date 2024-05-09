@@ -96,7 +96,7 @@ namespace QuantConnect.Algorithm.CSharp
                 Debug($"\nStatistics after fill:\n\t{statisticsStr}");
 
                 // Access a single statistic
-                Log($"Total trades so far: {statistics[PerformanceMetrics.TotalTrades]}");
+                Log($"Total trades so far: {statistics[PerformanceMetrics.TotalOrders]}");
                 Log($"Sharpe Ratio: {statistics[PerformanceMetrics.SharpeRatio]}");
 
                 // --------
@@ -198,14 +198,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "93"},
+            {"Total Orders", "94"},
             {"Average Win", "0.09%"},
             {"Average Loss", "-0.03%"},
             {"Compounding Annual Return", "18.903%"},
             {"Drawdown", "0.800%"},
             {"Expectancy", "0.135"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100221.61"},
             {"Net Profit", "0.222%"},
             {"Sharpe Ratio", "6.406"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "69.072%"},
             {"Loss Rate", "70%"},
             {"Win Rate", "30%"},
@@ -223,7 +226,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Portfolio Turnover", "549.26%"},
             {"Most Traded Security Trade Count", "63"},
             {"Most Traded Security", "IBM"},
-            {"OrderListHash", "8eba5008b53540153317baffe4083c6d"}
+            {"OrderListHash", "8dd77e35338a81410a5b68dc8345f402"}
         };
     }
 }

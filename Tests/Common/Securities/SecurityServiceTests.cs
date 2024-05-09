@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -39,7 +39,7 @@ namespace QuantConnect.Tests.Common.Securities
         public void Setup()
         {
             SymbolCache.Clear();
-            _subscriptionManager = new SubscriptionManager();
+            _subscriptionManager = new SubscriptionManager(NullTimeKeeper.Instance);
             var dataManager = new DataManagerStub();
             _subscriptionManager.SetDataManager(dataManager);
             _marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
@@ -48,7 +48,7 @@ namespace QuantConnect.Tests.Common.Securities
 
         [TestCase("EURUSD", SecurityType.Forex, Market.FXCM)]
         [TestCase("EURUSD", SecurityType.Forex, Market.Oanda)]
-        [TestCase("BTCUSD", SecurityType.Crypto, Market.GDAX)]
+        [TestCase("BTCUSD", SecurityType.Crypto, Market.Coinbase)]
         public void CanCreate_ForexOrCrypto_WithCorrectSubscriptions(string ticker, SecurityType type, string market)
         {
             var symbol = Symbol.Create(ticker, type, market);
@@ -119,7 +119,7 @@ namespace QuantConnect.Tests.Common.Securities
         [Test]
         public void ThrowOnCreateCryptoNotDescribedInCSV()
         {
-            var symbol = Symbol.Create("ABCDEFG", SecurityType.Crypto, Market.GDAX);
+            var symbol = Symbol.Create("ABCDEFG", SecurityType.Crypto, Market.Coinbase);
 
             Assert.Throws<ArgumentException>(() =>
             {

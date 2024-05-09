@@ -17,27 +17,17 @@ Each tool requires a different set of parameters, the only **required argument i
 
 Help information is available using the '--help' parameter.
 
-Example: --app=YahooDownloader --tickers=SPY,AAPL --resolution=Daily --from-date=yyyyMMdd-HH:mm:ss --to-date=yyyyMMdd-HH:mm:ss
+Example: --app=RandomDataGenerator --tickers=SPY,AAPL --resolution=Daily --from-date=yyyyMMdd-HH:mm:ss --to-date=yyyyMMdd-HH:mm:ss
 
 #### Available downloaders
 
 - **'--app='**
 	- GDAXDownloader or GDAXDL
-	- CryptoiqDownloader or CDL
-	- DukascopyDownloader or DDL
-	- FxcmDownloader or FDL
-	- FxcmVolumeDownload or FVDL
 	- IBDownloader or IBDL
-	- KrakenDownloader or KDL
-	- OandaDownloader or ODL
-	- QuandlBitfinexDownloader or QBDL
-	- YahooDownloader or YDL
-	- IEXDownloader or IEXDL
 	- BitfinexDownloader or BFXDL
-	- PolygonDownloader or PDL
 - **'--from-date=yyyyMMdd-HH:mm:ss'** required
-- **'--tickers=SPY,AAPL,etc'** required, except for QuandlBitfinexDownloader (QBDL)
-- **'--resolution=Tick/Second/Minute/Hour/Daily/All'** required, except for QuandlBitfinexDownloader (QBDL), CryptoiqDownloader (CDL). **Case sensitive. Not all downloaders support all resolutions**, send empty for more information.
+- **'--tickers=SPY,AAPL,etc'** required
+- **'--resolution=Tick/Second/Minute/Hour/Daily/All'** required. **Case sensitive. Not all downloaders support all resolutions**, send empty for more information.
 - **'--to-date=yyyyMMdd-HH:mm:ss'** optional. If not provided 'DateTime.UtcNow' will be used
 
 #### Available Converters
@@ -47,20 +37,10 @@ Example: --app=YahooDownloader --tickers=SPY,AAPL --resolution=Daily --from-date
 		- **'--date=yyyyMMdd'** reference date.
 	- AlgoSeekOptionsConverter or ASOC
 		- **'--date=yyyyMMdd'** reference date.
-	- CoinApiDataConverter or CADC
-		- **'--source-dir='** path to the raw CoinAPI data.
-	- IVolatilityEquityConverter or IVEC
-		- **'--source-dir='** source archived IVolatility data.
-		- **'--source-meta-dir='** source archived IVolatility meta data.
-		- **'--destination-dir='** directory where Lean Data is located "Lean/Data".
-		- **'--resolution=Minute/Hour/Daily'** resolution of your IVolatility data. Case insensitive.
 	- KaikoDataConverter or KDC
 		- **'--market='** the exchange the data represents.
 		- **'--tick-type=Quote/Trade'** the tick type being processed. Case insensitive.
 		- **'--source-dir='** path to the raw Kaiko data.
-	- NseMarketDataConverter or NMDC
-		- **'--source-dir='** source directory of unzipped NSE data.
-		- **'--destination-dir='** directory where Lean Data is located "Lean/Data".
 	- QuantQuoteConverter or QQC
 		- **'--source-dir='** directory where your QuantQuote order is extracted.
 		- **'--destination-dir='** directory where Lean Data is located "Lean/Data".

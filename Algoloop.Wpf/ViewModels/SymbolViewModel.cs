@@ -285,6 +285,11 @@ namespace Algoloop.Wpf.ViewModels
                 Charts = null;
                 Charts = temp;
             }
+            catch (Exception ex)
+            {
+                Messenger.Send(new NotificationMessage(ex.Message), 0);
+                Debug.WriteLine(ex.Message);
+            }
             finally
             {
                 IsBusy = false;
@@ -607,10 +612,10 @@ namespace Algoloop.Wpf.ViewModels
             SetFundamentals(SharesOutstanding, period, sharesOutstanding);
         }
 
-        private static decimal Round(decimal value, decimal multiplier, int decimals)
+        private static decimal Round(double value, decimal multiplier, int decimals)
         {
-            if (value.Equals(decimal.MinValue)) return decimal.MinValue;
-            return decimal.Round(value * multiplier, decimals);
+            if (value.Equals(double.MinValue)) return decimal.MinValue;
+            return decimal.Round((decimal)value * multiplier, decimals);
         }
     }
 }

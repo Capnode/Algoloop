@@ -49,7 +49,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data arriving here will now be filtered.
         /// </summary>
         /// <param name="data">Ticks data array</param>
-        public void OnData(Ticks data)
+        public override void OnData(Slice data)
         {
             if (!data.ContainsKey("SPY")) return;
             var spyTickList = data["SPY"];
@@ -91,14 +91,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "1"},
+            {"Total Orders", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "25000"},
+            {"End Equity", "25003.46"},
             {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -114,7 +117,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$0"},
             {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
             {"Portfolio Turnover", "99.58%"},
-            {"OrderListHash", "87c2f29010a7825906e4955d5b5d28df"}
+            {"OrderListHash", "21ca432fd48d13ca3ee65ee494e035db"}
         };
     }
 

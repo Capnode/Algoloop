@@ -72,10 +72,28 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (slice.ContainsKey(_customSymbol))
             {
+                // passing symbol
                 var customData = slice.Get<ExampleCustomData>(_customSymbol);
                 if (customData.Price == 0)
                 {
                     throw new Exception("Custom data price was not expected to be zero");
+                }
+                var customData2 = CurrentSlice.Get<ExampleCustomData>(_customSymbol);
+                if (customData2.Price == 0)
+                {
+                    throw new Exception("Custom data 2 price was not expected to be zero");
+                }
+
+                // accessing by symbol
+                customData = slice.Get<ExampleCustomData>()[_customSymbol];
+                if (customData.Price == 0)
+                {
+                    throw new Exception("Custom data price was not expected to be zero, index access");
+                }
+                customData2 = CurrentSlice.Get<ExampleCustomData>()[_customSymbol];
+                if (customData2.Price == 0)
+                {
+                    throw new Exception("Custom data 2 price was not expected to be zero, index access");
                 }
 
                 _receivedData.Add(customData);
@@ -186,14 +204,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public virtual Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "0"},
+            {"Total Orders", "0"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100000"},
             {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},

@@ -14,6 +14,7 @@
 */
 
 using NUnit.Framework;
+using QuantConnect.Statistics;
 using System.Collections.Generic;
 
 namespace QuantConnect.Tests.Common
@@ -26,7 +27,7 @@ namespace QuantConnect.Tests.Common
         {
             var parameter = new RegressionTests.AlgorithmStatisticsTestParameters("PythonDictionaryFeatureRegressionAlgorithm",
                 new Dictionary<string, string> {
-                    {"Total Trades", "3"},
+                    {PerformanceMetrics.TotalOrders, "3"},
                     {"Average Win", "0%"},
                     {"Average Loss", "0%"},
                     {"Compounding Annual Return", "349.409%"},
@@ -46,7 +47,7 @@ namespace QuantConnect.Tests.Common
                     {"Tracking Error", "0.073"},
                     {"Treynor Ratio", "2.433"},
                     {"Total Fees", "$0.00"},
-                    {"OrderListHash", "d303a19fe5a40b59ee99535985833000"}
+                    {"OrderListHash", "a91c50e19b6b9ee19007be4555029779"}
                 },
                 Language.Python,
                 AlgorithmStatus.Completed);

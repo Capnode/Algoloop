@@ -13,7 +13,7 @@
  * limitations under the License.
 */
 
-using QuantConnect.Securities;
+using QuantConnect.Data;
 using System;
 using System.Collections.Generic;
 
@@ -51,6 +51,8 @@ namespace QuantConnect.Statistics
         /// <param name="startingCapital">The algorithm starting capital</param>
         /// <param name="winningTransactions">Number of winning transactions</param>
         /// <param name="losingTransactions">Number of losing transactions</param>
+        /// <param name="riskFreeInterestRateModel">The risk free interest rate model to use</param>
+        /// <param name="tradingDaysPerYear">The number of trading days per year</param>
         public AlgorithmPerformance(
             List<Trade> trades,
             SortedDictionary<DateTime, decimal> profitLoss,
@@ -60,12 +62,14 @@ namespace QuantConnect.Statistics
             List<double> listBenchmark,
             decimal startingCapital,
             int winningTransactions,
-            int losingTransactions)
+            int losingTransactions,
+            IRiskFreeInterestRateModel riskFreeInterestRateModel,
+            int tradingDaysPerYear)
         {
 
             TradeStatistics = new TradeStatistics(trades);
             PortfolioStatistics = new PortfolioStatistics(profitLoss, equity, portfolioTurnover, listPerformance, listBenchmark, startingCapital,
-                winCount: winningTransactions, lossCount: losingTransactions);
+                riskFreeInterestRateModel, tradingDaysPerYear, winningTransactions, losingTransactions);
             ClosedTrades = trades;
         }
 

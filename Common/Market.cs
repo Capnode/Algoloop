@@ -68,11 +68,8 @@ namespace QuantConnect
             Tuple.Create(FTXUS, 35),
             Tuple.Create(BinanceUS, 36),
             Tuple.Create(Bybit, 37),
-
-            Tuple.Create(Borsdata, 256),
-            Tuple.Create(Metastock, 257),
-            Tuple.Create(Avanza, 258),
-            Tuple.Create(QuantConnect, 259),
+            Tuple.Create(Coinbase, 38),
+            Tuple.Create(InteractiveBrokers, 39),
         };
 
         static Market()
@@ -175,7 +172,8 @@ namespace QuantConnect
         /// <summary>
         /// GDAX
         /// </summary>
-        public const string GDAX = "gdax";
+        [Obsolete("The GDAX constant is deprecated. Please use Coinbase instead.")]
+        public const string GDAX = Coinbase;
 
         /// <summary>
         /// Kraken
@@ -243,24 +241,20 @@ namespace QuantConnect
         /// </summary>
         public const string Bybit = "bybit";
 
-        /// Borsdata
-        /// </summary>
-        public const string Borsdata = "borsdata";
-
         /// <summary>
-        /// Metastock
-        /// </summary>
-        public const string Metastock = "metastock";
-
-        /// <summary>
-        /// Avanza
-        /// </summary>
-        public const string Avanza = "avanza";
-
-        /// <summary>
-        /// Avanza
+        /// QuantConnect
         /// </summary>
         public const string QuantConnect = "quantconnect";
+
+        /// <summary>
+        /// Coinbase
+        /// </summary>
+        public const string Coinbase = "coinbase";
+
+        /// <summary>
+        /// InteractiveBrokers market
+        /// </summary>
+        public const string InteractiveBrokers = "interactivebrokers";
 
         /// <summary>
         /// Adds the specified market to the map of available markets with the specified identifier.

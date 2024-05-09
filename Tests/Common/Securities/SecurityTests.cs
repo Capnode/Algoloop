@@ -28,6 +28,7 @@ using QuantConnect.Securities.Option;
 using QuantConnect.Indicators;
 using Microsoft.CSharp.RuntimeBinder;
 using Python.Runtime;
+using QuantConnect.Statistics;
 
 namespace QuantConnect.Tests.Common.Securities
 {
@@ -73,7 +74,7 @@ namespace QuantConnect.Tests.Common.Securities
             Assert.IsNotNull(security.PortfolioModel);
             Assert.IsInstanceOf<InteractiveBrokersFeeModel>(security.FeeModel);
             Assert.IsNotNull(security.SlippageModel);
-            Assert.IsInstanceOf<ConstantSlippageModel>(security.SlippageModel);
+            Assert.IsInstanceOf<NullSlippageModel>(security.SlippageModel);
             Assert.IsNotNull(security.SettlementModel);
             Assert.IsInstanceOf<ImmediateSettlementModel>(security.SettlementModel);
             Assert.IsNotNull(security.BuyingPowerModel);
@@ -569,7 +570,7 @@ def AccessPythonProperty(security: Security) -> str:
         {
             var parameter = new RegressionTests.AlgorithmStatisticsTestParameters("SecurityDynamicPropertyPythonClassAlgorithm",
                 new Dictionary<string, string> {
-                    {"Total Trades", "0"},
+                    {PerformanceMetrics.TotalOrders, "0"},
                     {"Average Win", "0%"},
                     {"Average Loss", "0%"},
                     {"Compounding Annual Return", "0%"},

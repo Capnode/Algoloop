@@ -27,12 +27,12 @@ using QuantConnect.Brokerages;
 using QuantConnect.Configuration;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
-using QuantConnect.Lean.Engine.TransactionHandlers;
 using QuantConnect.Logging;
 using QuantConnect.Notifications;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
 using QuantConnect.Securities;
+using QuantConnect.Securities.Positions;
 using QuantConnect.Statistics;
 using QuantConnect.Util;
 
@@ -56,7 +56,12 @@ namespace QuantConnect.Lean.Engine.Results
         private DateTime _nextInsightStoreUpdate;
         private DateTime _currentUtcDate;
 
-        private TimeSpan _storeInsightPeriod;
+        private readonly TimeSpan _storeInsightPeriod;
+
+        private DateTime _nextPortfolioMarginUpdate;
+        private DateTime _previousPortfolioMarginUpdate;
+        private readonly TimeSpan _samplePortfolioPeriod;
+        private readonly Chart _intradayPortfolioState = new(PortfolioMarginKey);
 
         /// <summary>
         /// The earliest time of next dump to the status file
@@ -77,6 +82,7 @@ namespace QuantConnect.Lean.Engine.Results
         private DateTime _lastChartSampleLogicCheck;
         private readonly Dictionary<string, SecurityExchangeHours> _exchangeHours;
 
+
         /// <summary>
         /// Creates a new instance
         /// </summary>
@@ -86,7 +92,7 @@ namespace QuantConnect.Lean.Engine.Results
             _cancellationTokenSource = new CancellationTokenSource();
             ResamplePeriod = TimeSpan.FromSeconds(2);
             NotificationPeriod = TimeSpan.FromSeconds(1);
-            _storeInsightPeriod = TimeSpan.FromMinutes(10);
+            _samplePortfolioPeriod = _storeInsightPeriod = TimeSpan.FromMinutes(10);
             _streamedChartLimit = Config.GetInt("streamed-chart-limit", 12);
             _streamedChartGroupSize = Config.GetInt("streamed-chart-group-size", 3);
 
@@ -97,17 +103,17 @@ namespace QuantConnect.Lean.Engine.Results
         /// <summary>
         /// Initialize the result handler with this result packet.
         /// </summary>
-        /// <param name="job">Algorithm job packet for this result handler</param>
-        /// <param name="messagingHandler">The handler responsible for communicating messages to listeners</param>
-        /// <param name="api">The api instance used for handling logs</param>
-        /// <param name="transactionHandler">The transaction handler used to get the algorithms Orders information</param>
-        public override void Initialize(AlgorithmNodePacket job, IMessagingHandler messagingHandler, IApi api, ITransactionHandler transactionHandler)
+        /// <param name="parameters">DTO parameters class to initialize a result handler</param>
+        public override void Initialize(ResultHandlerInitializeParameters parameters)
         {
-            _api = api;
-            _job = (LiveNodePacket)job;
+            _api = parameters.Api;
+            _job = (LiveNodePacket)parameters.Job;
             if (_job == null) throw new Exception("LiveResultHandler.Constructor(): Submitted Job type invalid.");
-            _currentUtcDate = DateTime.UtcNow.Date;
-            base.Initialize(job, messagingHandler, api, transactionHandler);
+            var utcNow = DateTime.UtcNow;
+            _currentUtcDate = utcNow.Date;
+
+            _nextPortfolioMarginUpdate = utcNow.RoundDown(_samplePortfolioPeriod).Add(_samplePortfolioPeriod);
+            base.Initialize(parameters);
         }
 
         /// <summary>
@@ -202,6 +208,11 @@ namespace QuantConnect.Lean.Engine.Results
                             {
                                 performanceCharts[chart.Key] = chart.Value.Clone();
                             }
+
+                            if (chartUpdates.Name == PortfolioMarginKey)
+                            {
+                                PortfolioMarginChart.RemoveSinglePointSeries(chartUpdates);
+                            }
                         }
                     }
                     Log.Debug("LiveTradingResultHandler.Update(): End build delta charts");
@@ -283,7 +294,7 @@ namespace QuantConnect.Lean.Engine.Results
                                 Algorithm.Portfolio.TotalPortfolioValue,
                                 GetNetReturn(),
                                 Algorithm.Portfolio.TotalSaleVolume,
-                                TransactionHandler.OrdersCount, 0);
+                                TotalTradesCount(), 0);
                         }
                         catch (Exception err)
                         {
@@ -387,7 +398,7 @@ namespace QuantConnect.Lean.Engine.Results
             var filename = $"{AlgorithmId}-{utcTime:yyyy-MM-dd}-order-events.json";
             var path = GetResultsPath(filename);
 
-            var data = JsonConvert.SerializeObject(orderEvents, Formatting.None);
+            var data = JsonConvert.SerializeObject(orderEvents, Formatting.None, SerializerSettings);
 
             File.WriteAllText(path, data);
         }
@@ -424,7 +435,12 @@ namespace QuantConnect.Lean.Engine.Results
 
                 // sample the entire charts with a 12 hours resolution
                 var dailySampler = new SeriesSampler(TimeSpan.FromHours(12));
-                chartComplete = dailySampler.SampleCharts(chartComplete, Time.BeginningOfTime, Time.EndOfTime);
+                chartComplete = dailySampler.SampleCharts(chartComplete, Time.Start, Time.EndOfTime);
+
+                if (chartComplete.TryGetValue(PortfolioMarginKey, out var marginChart))
+                {
+                    PortfolioMarginChart.RemoveSinglePointSeries(marginChart);
+                }
 
                 var result = new LiveResult(new LiveResultParameters(chartComplete,
                     new Dictionary<int, Order>(TransactionHandler.Orders),
@@ -509,7 +525,7 @@ namespace QuantConnect.Lean.Engine.Results
             // only send order and order event packet if there is actually any update
             if (deltaOrders.Count > 0 || deltaOrderEvents.Count > 0)
             {
-                result= result.Concat(new []{ new LiveResultPacket(_job, new LiveResult { Orders = deltaOrders, OrderEvents = deltaOrderEvents }) });
+                result = result.Concat(new[] { new LiveResultPacket(_job, new LiveResult { Orders = deltaOrders, OrderEvents = deltaOrderEvents }) });
             }
 
             return result;
@@ -653,7 +669,7 @@ namespace QuantConnect.Lean.Engine.Results
         /// </summary>
         /// <param name="updates">Chart updates since the last request.</param>
         /// <seealso cref="Sample(string,string,int,SeriesType,ISeriesPoint,string)"/>
-        protected void SampleRange(List<Chart> updates)
+        protected void SampleRange(IEnumerable<Chart> updates)
         {
             Log.Debug("LiveTradingResultHandler.SampleRange(): Begin sampling");
             lock (ChartLock)
@@ -724,6 +740,10 @@ namespace QuantConnect.Lean.Engine.Results
             Console.SetError(error);
 
             UpdateAlgorithmStatus();
+
+            // Wire algorithm name and tags updates
+            algorithm.NameUpdated += (sender, name) => AlgorithmNameUpdated(name);
+            algorithm.TagsUpdated += (sender, tags) => AlgorithmTagsUpdated(tags);
         }
 
 
@@ -795,7 +815,7 @@ namespace QuantConnect.Lean.Engine.Results
                     result = new LiveResultPacket(_job,
                         new LiveResult(new LiveResultParameters(charts, orders, profitLoss, new Dictionary<string, Holding>(),
                             Algorithm.Portfolio.CashBook, statisticsResults.Summary, runtime, GetOrderEventsToStore(),
-                            algorithmConfiguration: AlgorithmConfiguration.Create(Algorithm), state: endState)));
+                            algorithmConfiguration: AlgorithmConfiguration.Create(Algorithm, null), state: endState)));
                 }
                 else
                 {
@@ -887,17 +907,25 @@ namespace QuantConnect.Lean.Engine.Results
                     var minuteCharts = minuteSampler.SampleCharts(live.Results.Charts, start, stop);
 
                     // swap out our charts with the sampled data
+                    minuteCharts.Remove(PortfolioMarginKey);
                     live.Results.Charts = minuteCharts;
                     SaveResults(CreateKey("minute"), live.Results);
 
                     // 10 minute resolution data, save today
                     var tenminuteSampler = new SeriesSampler(TimeSpan.FromMinutes(10));
                     var tenminuteCharts = tenminuteSampler.SampleCharts(live.Results.Charts, start, stop);
+                    lock (_intradayPortfolioState)
+                    {
+                        var clone = _intradayPortfolioState.Clone();
+                        PortfolioMarginChart.RemoveSinglePointSeries(clone);
+                        tenminuteCharts[PortfolioMarginKey] = clone;
+                    }
 
                     live.Results.Charts = tenminuteCharts;
                     SaveResults(CreateKey("10minute"), live.Results);
 
                     // high resolution data, we only want to save an hour
+                    highResolutionCharts.Remove(PortfolioMarginKey);
                     live.Results.Charts = highResolutionCharts;
                     start = DateTime.UtcNow.RoundDown(TimeSpan.FromHours(1));
                     stop = DateTime.UtcNow.RoundUp(TimeSpan.FromHours(1));
@@ -1042,6 +1070,27 @@ namespace QuantConnect.Lean.Engine.Results
 
             // Update the equity bar
             UpdateAlgorithmEquity();
+
+            if (time > _nextPortfolioMarginUpdate || forceProcess)
+            {
+                _nextPortfolioMarginUpdate = time.RoundDown(_samplePortfolioPeriod).Add(_samplePortfolioPeriod);
+
+                var newState = PortfolioState.Create(Algorithm.Portfolio, time, GetPortfolioValue());
+                lock (_intradayPortfolioState)
+                {
+                    if (_previousPortfolioMarginUpdate.Date != time.Date)
+                    {
+                        // we crossed into a new day
+                        _previousPortfolioMarginUpdate = time.Date;
+                        _intradayPortfolioState.Series.Clear();
+                    }
+
+                    if (newState != null)
+                    {
+                        PortfolioMarginChart.AddSample(_intradayPortfolioState, newState, MapFileProvider, time);
+                    }
+                }
+            }
 
             if (time > _nextSample || forceProcess)
             {
@@ -1282,6 +1331,24 @@ namespace QuantConnect.Lean.Engine.Results
         public void SetSummaryStatistic(string name, string value)
         {
             SummaryStatistic(name, value);
+        }
+
+        /// <summary>
+        /// Handles updates to the algorithm's name
+        /// </summary>
+        /// <param name="name">The new name</param>
+        public virtual void AlgorithmNameUpdated(string name)
+        {
+            Messages.Enqueue(new AlgorithmNameUpdatePacket(AlgorithmId, name));
+        }
+
+        /// <summary>
+        /// Handles updates to the algorithm's tags
+        /// </summary>
+        /// <param name="tags">The new tags</param>
+        public virtual void AlgorithmTagsUpdated(HashSet<string> tags)
+        {
+            Messages.Enqueue(new AlgorithmTagsUpdatePacket(AlgorithmId, tags));
         }
     }
 }

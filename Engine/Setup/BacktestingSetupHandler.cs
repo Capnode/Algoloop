@@ -90,7 +90,7 @@ namespace QuantConnect.Lean.Engine.Setup
             IAlgorithm algorithm;
 
             var debugNode = algorithmNodePacket as BacktestNodePacket;
-            var debugging = debugNode != null && debugNode.IsDebugging || Config.GetBool("debugging", false);
+            var debugging = debugNode != null && debugNode.Debugging || Config.GetBool("debugging", false);
 
             if (debugging && !BaseSetupHandler.InitializeDebugging(algorithmNodePacket, WorkerThread))
             {
@@ -98,7 +98,7 @@ namespace QuantConnect.Lean.Engine.Setup
             }
 
             // Limit load times to 90 seconds and force the assembly to have exactly one derived type
-            var loader = new Loader(debugging, algorithmNodePacket.Language, BaseSetupHandler.AlgorithmCreationTimeout, names => names.SingleOrAlgorithmTypeName(Config.Get("algorithm-type-name")), WorkerThread);
+            var loader = new Loader(debugging, algorithmNodePacket.Language, BaseSetupHandler.AlgorithmCreationTimeout, names => names.SingleOrAlgorithmTypeName(Config.Get("algorithm-type-name", algorithmNodePacket.AlgorithmId)), WorkerThread);
             var complete = loader.TryCreateAlgorithmInstanceWithIsolator(assemblyPath, algorithmNodePacket.RamAllocation, out algorithm, out error);
             if (!complete) throw new AlgorithmSetupException($"During the algorithm initialization, the following exception has occurred: {error}");
 
@@ -112,7 +112,7 @@ namespace QuantConnect.Lean.Engine.Setup
         /// <param name="uninitializedAlgorithm">The algorithm instance before Initialize has been called</param>
         /// <param name="factory">The brokerage factory</param>
         /// <returns>The brokerage instance, or throws if error creating instance</returns>
-        public IBrokerage CreateBrokerage(AlgorithmNodePacket algorithmNodePacket, IAlgorithm uninitializedAlgorithm, out IBrokerageFactory factory)
+        public virtual IBrokerage CreateBrokerage(AlgorithmNodePacket algorithmNodePacket, IAlgorithm uninitializedAlgorithm, out IBrokerageFactory factory)
         {
             factory = new BacktestingBrokerageFactory();
             return new BacktestingBrokerage(uninitializedAlgorithm);
@@ -142,7 +142,7 @@ namespace QuantConnect.Lean.Engine.Setup
                 return false;
             }
 
-            algorithm.Name = job.GetAlgorithmName();
+            algorithm.Name = job.Name;
 
             //Make sure the algorithm start date ok.
             if (job.PeriodStart == default(DateTime))
@@ -191,8 +191,25 @@ namespace QuantConnect.Lean.Engine.Setup
                         algorithm.SetEndDate(job.PeriodFinish.Value);
                     }
 
+                    if(job.OutOfSampleMaxEndDate.HasValue)
+                    {
+                        if(algorithm.EndDate > job.OutOfSampleMaxEndDate.Value)
+                        {
+                            Log.Trace($"BacktestingSetupHandler.Setup(): setting end date to {job.OutOfSampleMaxEndDate.Value:yyyyMMdd}");
+                            algorithm.SetEndDate(job.OutOfSampleMaxEndDate.Value);
+
+                            if (algorithm.StartDate > algorithm.EndDate)
+                            {
+                                algorithm.SetStartDate(algorithm.EndDate);
+                            }
+                        }
+                    }
+
                     // after we call initialize
                     BaseSetupHandler.LoadBacktestJobCashAmount(algorithm, job);
+
+                    // after algorithm was initialized, should set trading days per year for our great portfolio statistics
+                    BaseSetupHandler.SetBrokerageTradingDayPerYear(algorithm);
 
                     // finalize initialization
                     algorithm.PostInitialize();

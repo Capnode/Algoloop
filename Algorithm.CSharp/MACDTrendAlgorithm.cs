@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
 using QuantConnect.Interfaces;
@@ -51,7 +52,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
         /// </summary>
         /// <param name="data">TradeBars IDictionary object with your stock data</param>
-        public void OnData(TradeBars data)
+        public override void OnData(Slice data)
         {
             // only once per day
             if (_previous.Date == Time.Date) return;
@@ -77,7 +78,10 @@ namespace QuantConnect.Algorithm.CSharp
 
             // plot both lines
             Plot("MACD", _macd, _macd.Signal);
-            Plot(_symbol, "Open", data[_symbol].Open);
+            if (data.Bars.ContainsKey(_symbol))
+            {
+                Plot(_symbol, "Open", data[_symbol].Open);
+            }
             Plot(_symbol, _macd.Fast, _macd.Slow);
 
             _previous = Time;
@@ -108,14 +112,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "84"},
+            {"Total Orders", "84"},
             {"Average Win", "4.78%"},
             {"Average Loss", "-4.16%"},
             {"Compounding Annual Return", "2.952%"},
             {"Drawdown", "34.900%"},
             {"Expectancy", "0.228"},
+            {"Start Equity", "100000"},
+            {"End Equity", "137751.04"},
             {"Net Profit", "37.751%"},
             {"Sharpe Ratio", "0.029"},
+            {"Sortino Ratio", "0.022"},
             {"Probabilistic Sharpe Ratio", "0.141%"},
             {"Loss Rate", "43%"},
             {"Win Rate", "57%"},
@@ -131,7 +138,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$600000000.00"},
             {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
             {"Portfolio Turnover", "2.09%"},
-            {"OrderListHash", "c481781e8b0d9bba955230bcbae1337c"}
+            {"OrderListHash", "5fc591bfab47e7be63bf1009b46d13d5"}
         };
     }
 }

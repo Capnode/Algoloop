@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -87,7 +87,7 @@ namespace QuantConnect.Report
             if (_algorithmConfiguration != null)
             {
                 SetAccountCurrency(_algorithmConfiguration.AccountCurrency);
-                SetBrokerageModel(_algorithmConfiguration.BrokerageName, _algorithmConfiguration.AccountType);
+                SetBrokerageModel(_algorithmConfiguration.Brokerage, _algorithmConfiguration.AccountType);
             }
 
             SetCash(_startingCash);

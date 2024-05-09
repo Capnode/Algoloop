@@ -13,12 +13,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="VuewModels\**" />
-    <EmbeddedResource Remove="VuewModels\**" />
-    <None Remove="VuewModels\**" />
-    <Page Remove="VuewModels\**" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="Resources\Palette.png" />
   </ItemGroup>
   <ItemGroup>

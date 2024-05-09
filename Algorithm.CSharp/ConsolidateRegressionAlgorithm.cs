@@ -33,6 +33,7 @@ namespace QuantConnect.Algorithm.CSharp
         private List<int> _consolidationCounts;
         private List<SimpleMovingAverage> _smas;
         private List<DateTime> _lastSmaUpdates;
+        private int _expectedConsolidations;
         private int _customDataConsolidator;
         private Symbol _symbol;
 
@@ -46,7 +47,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             var SP500 = QuantConnect.Symbol.Create(Futures.Indices.SP500EMini, SecurityType.Future, Market.CME);
             _symbol = FutureChainProvider.GetFutureContractList(SP500, StartDate).First();
-            AddFutureContract(_symbol);
+            var security = AddFutureContract(_symbol);
 
             _consolidationCounts = Enumerable.Repeat(0, 9).ToList();
             _smas = _consolidationCounts.Select(_ => new SimpleMovingAverage(10)).ToList();
@@ -86,6 +87,12 @@ namespace QuantConnect.Algorithm.CSharp
             Consolidate(_symbol, TimeSpan.FromDays(1), null, (Action<BaseData>)(bar => UpdateBar(bar, 7)));
 
             Consolidate(_symbol, TimeSpan.FromDays(1), (Action<BaseData>)(bar => UpdateBar(bar, 8)));
+
+            _expectedConsolidations = QuantConnect.Time.EachTradeableDayInTimeZone(security.Exchange.Hours,
+                StartDate,
+                EndDate,
+                security.Exchange.TimeZone,
+                false).Count();
         }
         private void UpdateBar(BaseData tradeBar, int position)
         {
@@ -112,18 +119,16 @@ namespace QuantConnect.Algorithm.CSharp
 
         public override void OnEndOfAlgorithm()
         {
-            var expectedConsolidations = 8;
-
-            if (_consolidationCounts.Any(i => i != expectedConsolidations) || _customDataConsolidator == 0)
+            if (_consolidationCounts.Any(i => i != _expectedConsolidations) || _customDataConsolidator == 0)
             {
                 throw new Exception("Unexpected consolidation count");
             }
 
             for (var i = 0; i < _smas.Count; i++)
             {
-                if (_smas[i].Samples != expectedConsolidations)
+                if (_smas[i].Samples != _expectedConsolidations)
                 {
-                    throw new Exception($"Expected {expectedConsolidations} samples in each SMA but found {_smas[i].Samples} in SMA in index {i}");
+                    throw new Exception($"Expected {_expectedConsolidations} samples in each SMA but found {_smas[i].Samples} in SMA in index {i}");
                 }
 
                 if (_smas[i].Current.Time != _lastSmaUpdates[i])
@@ -170,14 +175,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "1"},
+            {"Total Orders", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "6636.699%"},
             {"Drawdown", "15.900%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "116177.7"},
             {"Net Profit", "16.178%"},
             {"Sharpe Ratio", "640.313"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "99.824%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -193,7 +201,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$210000000.00"},
             {"Lowest Capacity Asset", "ES VMKLFZIH2MTD"},
             {"Portfolio Turnover", "81.19%"},
-            {"OrderListHash", "dd38e7b94027d20942a5aa9ac31a9a7f"}
+            {"OrderListHash", "dfd9a280d3c6470b305c03e0b72c234e"}
         };
     }
 }

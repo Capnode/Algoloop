@@ -22,6 +22,8 @@ using QuantConnect.Benchmarks;
 using QuantConnect.Brokerages;
 using QuantConnect.Scheduling;
 using QuantConnect.Securities;
+using QuantConnect.Statistics;
+using QuantConnect.Data.Market;
 using QuantConnect.Notifications;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
@@ -30,7 +32,6 @@ using QuantConnect.Securities.Option;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Algorithm.Framework.Alphas;
 using QuantConnect.Algorithm.Framework.Alphas.Analysis;
-using QuantConnect.Statistics;
 
 namespace QuantConnect.Interfaces
 {
@@ -133,6 +134,14 @@ namespace QuantConnect.Interfaces
         }
 
         /// <summary>
+        /// Gets the risk free interest rate model used to get the interest rates
+        /// </summary>
+        IRiskFreeInterestRateModel RiskFreeInterestRateModel
+        {
+            get;
+        }
+
+        /// <summary>
         /// Gets the brokerage message handler used to decide what to do
         /// with each message sent from the brokerage
         /// </summary>
@@ -187,12 +196,30 @@ namespace QuantConnect.Interfaces
         /// <summary>
         /// Public name for the algorithm.
         /// </summary>
-        /// <remarks>Not currently used but preserved for API integrity</remarks>
         string Name
         {
             get;
             set;
         }
+
+        /// <summary>
+        /// A list of tags associated with the algorithm or the backtest, useful for categorization
+        /// </summary>
+        HashSet<string> Tags
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Event fired algorithm's name is changed
+        /// </summary>
+        event AlgorithmEvent<string> NameUpdated;
+
+        /// <summary>
+        /// Event fired when the tag collection is updated
+        /// </summary>
+        event AlgorithmEvent<HashSet<string>> TagsUpdated;
 
         /// <summary>
         /// Current date/time in the algorithm's local time zone
@@ -446,12 +473,24 @@ namespace QuantConnect.Interfaces
         void SetParameters(Dictionary<string, string> parameters);
 
         /// <summary>
-        /// Checks if the provided asset is shortable at the brokerage
+        /// Determines if the Symbol is shortable at the brokerage
         /// </summary>
-        /// <param name="symbol">Symbol to check if it is shortable</param>
-        /// <param name="quantity">Order quantity to check if shortable</param>
-        /// <returns></returns>
-        bool Shortable(Symbol symbol, decimal quantity);
+        /// <param name="symbol">Symbol to check if shortable</param>
+        /// <param name="shortQuantity">Order's quantity to check if it is currently shortable, taking into account current holdings and open orders</param>
+        /// <param name="updateOrderId">Optionally the id of the order being updated. When updating an order
+        /// we want to ignore it's submitted short quantity and use the new provided quantity to determine if we
+        /// can perform the update</param>
+        /// <returns>True if the symbol can be shorted by the requested quantity</returns>
+        bool Shortable(Symbol symbol, decimal shortQuantity, int? updateOrderId = null);
+
+        /// <summary>
+        /// Gets the quantity shortable for the given asset
+        /// </summary>
+        /// <returns>
+        /// Quantity shortable for the given asset. Zero if not
+        /// shortable, or a number greater than zero if shortable.
+        /// </returns>
+        long ShortableQuantity(Symbol symbol);
 
         /// <summary>
         /// Sets the brokerage model used to resolve transaction models, settlement models,
@@ -472,6 +511,30 @@ namespace QuantConnect.Interfaces
         /// </summary>
         /// <param name="slice">The current data slice</param>
         void OnFrameworkData(Slice slice);
+
+        /// <summary>
+        /// Event handler to be called when there's been a split event
+        /// </summary>
+        /// <param name="splits">The current time slice splits</param>
+        void OnSplits(Splits splits);
+
+        /// <summary>
+        /// Event handler to be called when there's been a dividend event
+        /// </summary>
+        /// <param name="dividends">The current time slice dividends</param>
+        void OnDividends(Dividends dividends);
+
+        /// <summary>
+        /// Event handler to be called when there's been a delistings event
+        /// </summary>
+        /// <param name="delistings">The current time slice delistings</param>
+        void OnDelistings(Delistings delistings);
+
+        /// <summary>
+        /// Event handler to be called when there's been a symbol changed event
+        /// </summary>
+        /// <param name="symbolsChanged">The current time slice symbol changed events</param>
+        void OnSymbolChangedEvents(SymbolChangedEvents symbolsChanged);
 
         /// <summary>
         /// Event fired each time that we add/remove securities from the data feed
@@ -622,7 +685,7 @@ namespace QuantConnect.Interfaces
         /// </summary>
         /// <param name="clearChartData"></param>
         /// <returns>List of Chart Updates</returns>
-        List<Chart> GetChartUpdates(bool clearChartData = false);
+        IEnumerable<Chart> GetChartUpdates(bool clearChartData = false);
 
         /// <summary>
         /// Set a required SecurityType-symbol and resolution for algorithm
@@ -837,5 +900,23 @@ namespace QuantConnect.Interfaces
         /// </summary>
         /// <param name="statisticsService">The statistics service instance</param>
         void SetStatisticsService(IStatisticsService statisticsService);
+
+        /// <summary>
+        /// Sets name to the currently running backtest
+        /// </summary>
+        /// <param name="name">The name for the backtest</param>
+        void SetName(string name);
+
+        /// <summary>
+        /// Adds a tag to the algorithm
+        /// </summary>
+        /// <param name="tag">The tag to add</param>
+        void AddTag(string tag);
+
+        /// <summary>
+        /// Sets the tags for the algorithm
+        /// </summary>
+        /// <param name="tags">The tags</param>
+        void SetTags(HashSet<string> tags);
     }
 }

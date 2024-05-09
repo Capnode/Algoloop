@@ -27,7 +27,7 @@ namespace QuantConnect.Algorithm.CSharp
     /// </summary>
     public class ETFConstituentUniverseFilterFunctionRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private Dictionary<Symbol, ETFConstituentData> _etfConstituentData = new Dictionary<Symbol, ETFConstituentData>();
+        private Dictionary<Symbol, ETFConstituentUniverse> _etfConstituentData = new Dictionary<Symbol, ETFConstituentUniverse>();
         
         private Symbol _aapl;
         private Symbol _spy;
@@ -61,7 +61,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <param name="constituents">Constituents of the ETF universe added above</param>
         /// <returns>Constituent Symbols to add to algorithm</returns>
         /// <exception cref="ArgumentException">Constituents collection was not structured as expected</exception>
-        private IEnumerable<Symbol> FilterETFs(IEnumerable<ETFConstituentData> constituents)
+        private IEnumerable<Symbol> FilterETFs(IEnumerable<ETFConstituentUniverse> constituents)
         {
             var constituentsData = constituents.ToList();
             _etfConstituentData = constituentsData.ToDictionary(x => x.Symbol, x => x);
@@ -159,13 +159,13 @@ namespace QuantConnect.Algorithm.CSharp
         /// <exception cref="Exception">An expected event didn't happen</exception>
         public override void OnEndOfAlgorithm()
         {
-            if (_rebalanceCount != 1)
+            if (_rebalanceCount != 2)
             {
-                throw new Exception($"Expected 1 rebalance, instead rebalanced: {_rebalanceCount}");
+                throw new Exception($"Expected 2 rebalances, instead rebalanced: {_rebalanceCount}");
             }
-            if (_rebalanceAssetCount != 4)
+            if (_rebalanceAssetCount != 8)
             {
-                throw new Exception($"Invested in {_rebalanceAssetCount} assets (expected 4)");
+                throw new Exception($"Invested in {_rebalanceAssetCount} assets (expected 8)");
             }
             if (!_filtered)
             {
@@ -194,7 +194,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 2191;
+        public long DataPoints => 2722;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -206,15 +206,18 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "4"},
+            {"Total Orders", "4"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
-            {"Compounding Annual Return", "2.118%"},
+            {"Compounding Annual Return", "1.989%"},
             {"Drawdown", "0.600%"},
             {"Expectancy", "0"},
-            {"Net Profit", "0.343%"},
-            {"Sharpe Ratio", "0.856"},
-            {"Probabilistic Sharpe Ratio", "50.428%"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100322.52"},
+            {"Net Profit", "0.323%"},
+            {"Sharpe Ratio", "0.838"},
+            {"Sortino Ratio", "1.122"},
+            {"Probabilistic Sharpe Ratio", "50.081%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
@@ -222,14 +225,14 @@ namespace QuantConnect.Algorithm.CSharp
             {"Beta", "0.098"},
             {"Annual Standard Deviation", "0.014"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-0.611"},
+            {"Information Ratio", "-0.614"},
             {"Tracking Error", "0.096"},
-            {"Treynor Ratio", "0.125"},
+            {"Treynor Ratio", "0.123"},
             {"Total Fees", "$4.00"},
-            {"Estimated Strategy Capacity", "$100000000.00"},
+            {"Estimated Strategy Capacity", "$130000000.00"},
             {"Lowest Capacity Asset", "AIG R735QTJ8XC9X"},
             {"Portfolio Turnover", "0.13%"},
-            {"OrderListHash", "12bc2f33ccf788ffb2c0a57a68199485"}
+            {"OrderListHash", "0c0cb7214d49cee63fc08115f62fe357"}
         };
     }
 }

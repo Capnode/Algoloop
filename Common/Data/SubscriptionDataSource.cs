@@ -51,6 +51,15 @@ namespace QuantConnect.Data
         /// Initializes a new instance of the <see cref="SubscriptionDataSource"/> class.
         /// </summary>
         /// <param name="source">The subscription's data source location</param>
+        public SubscriptionDataSource(string source)
+            : this(source, GetDefaultSubscriptionTransportMedium(source), FileFormat.Csv)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SubscriptionDataSource"/> class.
+        /// </summary>
+        /// <param name="source">The subscription's data source location</param>
         /// <param name="transportMedium">The transport medium to be used to retrieve the subscription's data from the source</param>
         public SubscriptionDataSource(string source, SubscriptionTransportMedium transportMedium)
             : this(source, transportMedium, FileFormat.Csv)
@@ -162,6 +171,19 @@ namespace QuantConnect.Data
         public override string ToString()
         {
             return Invariant($"{TransportMedium}: {Format} {Source}");
+        }
+
+        /// <summary>
+        /// Gets the default transport medium for the specified source
+        /// </summary>
+        private static SubscriptionTransportMedium GetDefaultSubscriptionTransportMedium(string source)
+        {
+            if (source.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                source.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                return SubscriptionTransportMedium.RemoteFile;
+            }
+            return SubscriptionTransportMedium.LocalFile;
         }
     }
 }

@@ -29,21 +29,24 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 12151;
+        public override long DataPoints => 13091;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public override Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "16"},
+            {"Total Orders", "16"},
             {"Average Win", "0.01%"},
             {"Average Loss", "-0.02%"},
             {"Compounding Annual Return", "-0.111%"},
             {"Drawdown", "0.100%"},
             {"Expectancy", "-0.678"},
+            {"Start Equity", "10000000"},
+            {"End Equity", "9988860.24"},
             {"Net Profit", "-0.111%"},
             {"Sharpe Ratio", "-10.266"},
+            {"Sortino Ratio", "-0.941"},
             {"Probabilistic Sharpe Ratio", "0.000%"},
             {"Loss Rate", "80%"},
             {"Win Rate", "20%"},
@@ -59,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$2400000.00"},
             {"Lowest Capacity Asset", "DC V5E8PHPRCHJ8|DC V5E8P9SH0U0X"},
             {"Portfolio Turnover", "0.00%"},
-            {"OrderListHash", "19ecd0218cb70c5d7fefcb5741a7d82b"}
+            {"OrderListHash", "9521f1fae55a3ffab939592b9ae04855"}
         };
     }
 }

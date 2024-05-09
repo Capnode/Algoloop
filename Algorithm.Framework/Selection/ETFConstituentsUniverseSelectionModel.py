@@ -18,26 +18,33 @@ class ETFConstituentsUniverseSelectionModel(UniverseSelectionModel):
     '''Universe selection model that selects the constituents of an ETF.'''
 
     def __init__(self,
-                 etfSymbol, 
-                 universeSettings = None, 
-                 universeFilterFunc = None):
+                 etf_symbol,
+                 universe_settings = None,
+                 universe_filter_func = None):
         '''Initializes a new instance of the ETFConstituentsUniverseSelectionModel class
         Args:
             etfSymbol: Symbol of the ETF to get constituents for
             universeSettings: Universe settings
             universeFilterFunc: Function to filter universe results'''
-        self.etf_symbol = etfSymbol
-        self.universe_settings = universeSettings
-        self.universe_filter_function = universeFilterFunc
+        if type(etf_symbol) is str:
+            symbol = SymbolCache.try_get_symbol(etf_symbol, None)
+            if symbol[0] and symbol[1].security_type == SecurityType.EQUITY:
+                self.etf_symbol = symbol[1]
+            else:
+                self.etf_symbol = Symbol.create(etf_symbol, SecurityType.EQUITY, Market.USA)
+        else:
+            self.etf_symbol = etf_symbol
+        self.universe_settings = universe_settings
+        self.universe_filter_function = universe_filter_func
 
         self.universe = None
 
-    def CreateUniverses(self, algorithm: QCAlgorithm) -> List[Universe]:
+    def create_universes(self, algorithm: QCAlgorithm) -> list[Universe]:
         '''Creates a new ETF constituents universe using this class's selection function
         Args:
             algorithm: The algorithm instance to create universes for
         Returns:
             The universe defined by this model'''
         if self.universe is None:
-            self.universe = algorithm.Universe.ETF(self.etf_symbol, self.universe_settings, self.universe_filter_function)           
+            self.universe = algorithm.universe.etf(self.etf_symbol, self.universe_settings, self.universe_filter_function)
         return [self.universe]

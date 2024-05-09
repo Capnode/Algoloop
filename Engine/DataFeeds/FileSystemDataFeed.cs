@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QuantConnect.Data;
 using QuantConnect.Data.Auxiliary;
+using QuantConnect.Data.Fundamental;
 using QuantConnect.Data.Market;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
@@ -164,6 +165,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 enumerator = CreateEnumerator(request);
             }
 
+            enumerator = AddScheduleWrapper(request, enumerator, null);
+
             if (request.IsUniverseSubscription && request.Universe is UserDefinedUniverse)
             {
                 // for user defined universe we do not use a worker task, since calls to AddData can happen in any moment
@@ -195,7 +198,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     return factory.CreateEnumerator(request, _dataProvider);
                 }
             }
-            else if (request.Configuration.Type == typeof(CoarseFundamental))
+            else if (request.Configuration.Type == typeof(FundamentalUniverse))
             {
                 factory = new BaseDataCollectionSubscriptionEnumeratorFactory(_algorithm.ObjectStore);
             }
@@ -216,6 +219,21 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             // define our data enumerator
             var enumerator = factory.CreateEnumerator(request, _dataProvider);
             return enumerator;
+        }
+
+        protected IEnumerator<BaseData> AddScheduleWrapper(SubscriptionRequest request, IEnumerator<BaseData> underlying, ITimeProvider timeProvider)
+        {
+            if (!request.IsUniverseSubscription || !request.Universe.UniverseSettings.Schedule.Initialized)
+            {
+                return underlying;
+            }
+
+            var schedule = request.Universe.UniverseSettings.Schedule.Get(request.StartTimeLocal, request.EndTimeLocal);
+            if (schedule != null)
+            {
+                return new ScheduledEnumerator(underlying, schedule, timeProvider, request.Configuration.ExchangeTimeZone, request.StartTimeLocal);
+            }
+            return underlying;
         }
 
         /// <summary>

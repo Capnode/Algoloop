@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using QuantConnect.Optimizer.Objectives;
-using QuantConnect.Optimizer.Parameters;
 
 namespace QuantConnect.Api
 {
@@ -27,45 +26,51 @@ namespace QuantConnect.Api
     public class Optimization : BaseOptimization
     {
         /// <summary>
+        /// Snapshot ID of this optimization
+        /// </summary>
+        public int? SnapshotId { get; set; }
+
+        /// <summary>
+        /// Statistic to be optimized
+        /// </summary>
+        public string OptimizationTarget { get; set; }
+
+        /// <summary>
+        /// List with grid charts representing the grid layout
+        /// </summary>
+        public List<GridChart> GridLayout { get; set; }
+
+        /// <summary>
         /// Runtime banner/updating statistics for the optimization
         /// </summary>
-        [JsonProperty(PropertyName = "runtimeStatistics", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IDictionary<string, string> RuntimeStatistics { get; set; }
 
         /// <summary>
         /// Optimization constraints
         /// </summary>
-        [JsonProperty(PropertyName = "constraints", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IReadOnlyList<Constraint> Constraints { get; set; }
-
-        /// <summary>
-        /// Optimization parameters
-        /// </summary>
-        [JsonProperty(PropertyName = "parameters", NullValueHandling = NullValueHandling.Ignore)]
-        public HashSet<OptimizationParameter> Parameters { get; set; }
 
         /// <summary>
         /// Number of parallel nodes for optimization
         /// </summary>
-        [JsonProperty(PropertyName = "parallelNodes")]
         public int ParallelNodes { get; set; }
 
         /// <summary>
         /// Optimization constraints
         /// </summary>
-        [JsonProperty(PropertyName = "backtests", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IDictionary<string, OptimizationBacktest> Backtests { get; set; }
 
         /// <summary>
         /// Optimization strategy
         /// </summary>
-        [JsonProperty(PropertyName = "strategy")]
         public string Strategy { get; set; }
         
         /// <summary>
         /// Optimization requested date and time
         /// </summary>
-        [JsonProperty(PropertyName = "requested")]
         public DateTime Requested { get; set; }
     }
 
@@ -77,7 +82,6 @@ namespace QuantConnect.Api
         /// <summary>
         /// Optimization object
         /// </summary>
-        [JsonProperty(PropertyName = "optimization")]
         public Optimization Optimization { get; set; }
     }
 
@@ -89,7 +93,6 @@ namespace QuantConnect.Api
         /// <summary>
         /// Collection of summarized optimization objects
         /// </summary>
-        [JsonProperty(PropertyName = "optimizations")]
         public List<BaseOptimization> Optimizations { get; set; }
     }
 }

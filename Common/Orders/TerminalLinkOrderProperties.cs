@@ -35,6 +35,11 @@ namespace QuantConnect.Orders
         public string HandlingInstruction { get; set; }
 
         /// <summary>
+        /// The execution instruction field
+        /// </summary>
+        public string ExecutionInstruction { get; set; }
+
+        /// <summary>
         /// Custom user order notes 1
         /// </summary>
         public string CustomNotes1 { get; set; }
@@ -74,6 +79,17 @@ namespace QuantConnect.Orders
         /// Strategy parameters must be appended in the correct order as expected by EMSX.
         /// </summary>
         public StrategyParameters Strategy { get; set; }
+
+        /// <summary>
+        /// Whether to automatically include the position side in the order direction (buy-to-open, sell-to-close, etc.) instead of the default (buy, sell)
+        /// </summary>
+        public bool AutomaticPositionSides { get; set; }
+
+        /// <summary>
+        /// Can optionally specify the position side in the order direction (buy-to-open, sell-to-close, etc.) instead of the default (buy, sell)
+        /// </summary>
+        /// <remarks>Has precedence over <see cref="AutomaticPositionSides"/></remarks>
+        public OrderPosition? PositionSide { get; set; }
 
         /// <summary>
         /// Models an EMSX order strategy parameter

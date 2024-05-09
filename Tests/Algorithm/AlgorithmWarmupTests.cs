@@ -31,6 +31,7 @@ using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Lean.Engine.HistoricalData;
 using QuantConnect.Util;
+using QuantConnect.Statistics;
 
 namespace QuantConnect.Tests.Algorithm
 {
@@ -79,7 +80,7 @@ namespace QuantConnect.Tests.Algorithm
             }
 
             AlgorithmRunner.RunLocalBacktest(nameof(TestWarmupAlgorithm),
-                new Dictionary<string, string> { { "Total Trades", "1" } },
+                new Dictionary<string, string> { { PerformanceMetrics.TotalOrders, "1" } },
                 Language.CSharp,
                 AlgorithmStatus.Completed,
                 setupHandler: "TestSetupHandler");
@@ -154,12 +155,11 @@ namespace QuantConnect.Tests.Algorithm
             {
                 HistoryProvider = new SubscriptionDataReaderHistoryProvider()
             };
-            var zipCacheProvider = new ZipDataCacheProvider(TestGlobals.DataProvider);
             algo.HistoryProvider.Initialize(new HistoryProviderInitializeParameters(
                 null,
                 null,
                 TestGlobals.DataProvider,
-                zipCacheProvider,
+                TestGlobals.DataCacheProvider,
                 TestGlobals.MapFileProvider,
                 TestGlobals.FactorFileProvider,
                 null,
@@ -192,8 +192,6 @@ namespace QuantConnect.Tests.Algorithm
                 Assert.IsTrue(atrIsReady.IsTrue());
                 Assert.IsTrue(vwapiIsReady.IsTrue());
             }
-
-            zipCacheProvider.DisposeSafely();
         }
 
         [TestCase(false)]
@@ -328,19 +326,19 @@ from AlgorithmImports import *
 from QuantConnect.Tests.Engine.DataFeeds import *
 
 class TestAlgo(AlgorithmStub):
-    def Initialize(self):
-        self.DataFeed.ShouldThrow = False
+    def initialize(self):
+        self.data_feed.should_throw = False
 
-        self.SetStartDate(2013, 10, 1)
-        self.AddEquity(""AAPL"")
-        self.SetWarmUp(60)
+        self.set_start_date(2013, 10, 1)
+        self.add_equity(""AAPL"")
+        self.set_warm_up(60)
 ").GetAttr("TestAlgo").Invoke();
 
-                algo.Initialize();
-                algo.PostInitialize();
+                algo.initialize();
+                algo.post_initialize();
 
                 // the last trading hour of the previous day
-                Assert.AreEqual(new DateTime(2013, 09, 30, 15, 0, 0), (DateTime)algo.Time);
+                Assert.AreEqual(new DateTime(2013, 09, 30, 15, 0, 0), (DateTime)algo.time);
             }
         }
 
@@ -356,27 +354,27 @@ from AlgorithmImports import *
 from QuantConnect.Tests.Engine.DataFeeds import *
 
 class TestAlgo(AlgorithmStub):
-    def __init__(self, passThrough):
-        self.passThrough = passThrough
+    def __init__(self, pass_through):
+        self.pass_through = pass_through
 
-    def Initialize(self):
-        self.DataFeed.ShouldThrow = False
+    def initialize(self):
+        self.data_feed.should_throw = False
 
-        self.SetStartDate(2013, 10, 1)
-        self.AddEquity(""AAPL"")
-        self.SetWarmUp(10)
-        if self.passThrough:
-            self.Settings.WarmUpResolution = Resolution.Daily
+        self.set_start_date(2013, 10, 1)
+        self.add_equity(""AAPL"")
+        self.set_warm_up(10)
+        if self.pass_through:
+            self.settings.warm_up_resolution = Resolution.DAILY
         else:
-            self.Settings.WarmupResolution = Resolution.Daily
+            self.settings.warmup_resolution = Resolution.DAILY
 ").GetAttr("TestAlgo").Invoke(passThrough.ToPython());
 
-                algo.Initialize();
-                algo.PostInitialize();
+                algo.initialize();
+                algo.post_initialize();
 
-                Assert.AreEqual(passThrough, (bool)algo.passThrough);
+                Assert.AreEqual(passThrough, (bool)algo.pass_through);
                 // 10 daily bars including 2 weekends
-                Assert.AreEqual(new DateTime(2013, 09, 17), (DateTime)algo.Time);
+                Assert.AreEqual(new DateTime(2013, 09, 17), (DateTime)algo.time);
             }
         }
 

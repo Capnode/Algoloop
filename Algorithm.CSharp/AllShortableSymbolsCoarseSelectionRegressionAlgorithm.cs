@@ -107,20 +107,18 @@ namespace QuantConnect.Algorithm.CSharp
                 return;
             }
 
-            foreach (var symbol in ActiveSecurities.Keys.OrderBy(symbol => symbol))
+            foreach (var (symbol, security) in ActiveSecurities.Where(kvp => !kvp.Value.Invested).OrderBy(kvp => kvp.Key))
             {
-                if (!Portfolio.ContainsKey(symbol) || !Portfolio[symbol].Invested)
+                var shortableQuantity = security.ShortableProvider.ShortableQuantity(symbol, Time);
+                if (shortableQuantity == null)
                 {
-                    if (!Shortable(symbol))
-                    {
-                        throw new Exception($"Expected {symbol} to be shortable on {Time:yyyy-MM-dd}");
-                    }
-
-                    // Buy at least once into all Symbols. Since daily data will always use
-                    // MOO orders, it makes the testing of liquidating buying into Symbols difficult.
-                    MarketOrder(symbol, -(decimal)ShortableQuantity(symbol));
-                    _lastTradeDate = Time.Date;
+                    throw new Exception($"Expected {symbol} to be shortable on {Time:yyyy-MM-dd}");
                 }
+
+                // Buy at least once into all Symbols. Since daily data will always use
+                // MOO orders, it makes the testing of liquidating buying into Symbols difficult.
+                MarketOrder(symbol, -(decimal)shortableQuantity);
+                _lastTradeDate = Time.Date;
             }
         }
 
@@ -171,13 +169,16 @@ namespace QuantConnect.Algorithm.CSharp
         {
             public AllShortableSymbolsRegressionAlgorithmBrokerageModel() : base()
             {
-                ShortableProvider = new RegressionTestShortableProvider();
+            }
+            public override IShortableProvider GetShortableProvider(Security security)
+            {
+                return new RegressionTestShortableProvider();
             }
         }
 
         private class RegressionTestShortableProvider : LocalDiskShortableProvider
         {
-            public RegressionTestShortableProvider() : base(SecurityType.Equity, "testbrokerage", Market.USA)
+            public RegressionTestShortableProvider() : base("testbrokerage")
             {
             }
 
@@ -188,6 +189,7 @@ namespace QuantConnect.Algorithm.CSharp
             /// <returns>Symbol/quantity shortable as a Dictionary. Returns null if no entry data exists for this date or brokerage</returns>
             public Dictionary<Symbol, long> AllShortableSymbols(DateTime localTime)
             {
+                var shortableDataDirectory = Path.Combine(Globals.DataFolder, SecurityType.Equity.SecurityTypeToLower(), Market.USA, "shortable", Brokerage);
                 var allSymbols = new Dictionary<Symbol, long>();
 
                 // Check backwards up to one week to see if we can source a previous file.
@@ -195,7 +197,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var i = 0;
                 while (i <= 7)
                 {
-                    var shortableListFile = Path.Combine(ShortableDataDirectory.FullName, "dates", $"{localTime.AddDays(-i):yyyyMMdd}.csv");
+                    var shortableListFile = Path.Combine(shortableDataDirectory, "dates", $"{localTime.AddDays(-i):yyyyMMdd}.csv");
 
                     foreach (var line in DataProvider.ReadLines(shortableListFile))
                     {
@@ -231,7 +233,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp};
+        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -248,14 +250,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "5"},
+            {"Total Orders", "5"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "19.147%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "10000000"},
+            {"End Equity", "10019217.27"},
             {"Net Profit", "0.192%"},
             {"Sharpe Ratio", "221.176"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -271,7 +276,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$2600000.00"},
             {"Lowest Capacity Asset", "GOOCV VP83T1ZUHROL"},
             {"Portfolio Turnover", "10.61%"},
-            {"OrderListHash", "0069f402ffcd2d91b9018b81badfab81"}
+            {"OrderListHash", "854d4ba6a4ae39f9be2f9a10c8544fe5"}
         };
     }
 }

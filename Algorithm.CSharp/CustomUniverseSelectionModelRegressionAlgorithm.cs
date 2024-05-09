@@ -54,19 +54,15 @@ namespace QuantConnect.Algorithm.CSharp
         private class CustomUniverseSelectionModel : FundamentalUniverseSelectionModel
         {
             private bool _selected;
-            public CustomUniverseSelectionModel(): base(true, null)
+            public CustomUniverseSelectionModel(): base()
             {
             }
-            public override IEnumerable<Symbol> SelectCoarse(QCAlgorithm algorithm, IEnumerable<CoarseFundamental> coarse)
-            {
-                return new[] { QuantConnect.Symbol.Create("AAPL", SecurityType.Equity, Market.USA) };
-            }
-            public override IEnumerable<Symbol> SelectFine(QCAlgorithm algorithm, IEnumerable<FineFundamental> fine)
+            public override IEnumerable<Symbol> Select(QCAlgorithm algorithm, IEnumerable<Fundamental> fundamental)
             {
                 if (!_selected)
                 {
                     _selected = true;
-                    return fine.Select(x => x.Symbol);
+                    return new[] { QuantConnect.Symbol.Create("AAPL", SecurityType.Equity, Market.USA) };
                 }
                 return Data.UniverseSelection.Universe.Unchanged;
             }
@@ -85,7 +81,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 7208;
+        public long DataPoints => 78062;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -97,14 +93,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "1"},
+            {"Total Orders", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "-7.765%"},
             {"Drawdown", "0.400%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "99668.37"},
             {"Net Profit", "-0.332%"},
             {"Sharpe Ratio", "-5.972"},
+            {"Sortino Ratio", "-7.125"},
             {"Probabilistic Sharpe Ratio", "5.408%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -120,7 +119,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$1600000000.00"},
             {"Lowest Capacity Asset", "AAPL R735QTJ8XC9X"},
             {"Portfolio Turnover", "0.67%"},
-            {"OrderListHash", "9b40745cd4c47eb3f442071c2a841821"}
+            {"OrderListHash", "d0880701c833c9b8521d634b7e1edf4d"}
         };
     }
 }

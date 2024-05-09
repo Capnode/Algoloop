@@ -183,6 +183,11 @@ namespace Algoloop.Wpf.ViewModels
                 vm?.Refresh();
                 SelectedItem = vm;
             }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
+                Messenger.Send(new NotificationMessage(ex.Message), 0);
+            }
             finally
             {
                 _doSelectedChangedPending = false;

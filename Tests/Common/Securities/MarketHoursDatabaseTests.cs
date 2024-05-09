@@ -141,10 +141,7 @@ namespace QuantConnect.Tests.Common.Securities
             Assert.AreEqual(isHoliday, holidays.Contains(holidayDate));
         }
 
-        [TestCase("ES", Market.CME, "1/16/2012", true)]
         [TestCase("2YY", Market.CBOT, "4/7/2023", true)]
-        [TestCase("MYM", Market.CBOT, "4/7/2023", true)]
-        [TestCase("YM", Market.CBOT, "4/7/2023", true)]
         [TestCase("TN", Market.CBOT, "4/7/2023", true)]
         [TestCase("6A", Market.CME, "4/7/2023", true)]
         [TestCase("6Z", Market.CME, "4/7/2023", true)]
@@ -176,8 +173,6 @@ namespace QuantConnect.Tests.Common.Securities
         }
 
         [TestCase("2YY", Market.CBOT, true)]
-        [TestCase("MYM", Market.CBOT, true)]
-        [TestCase("YM", Market.CBOT, true)]
         [TestCase("TN", Market.CBOT, true)]
         [TestCase("6A", Market.CME, true)]
         [TestCase("6Z", Market.CME, true)]
@@ -205,6 +200,27 @@ namespace QuantConnect.Tests.Common.Securities
 
             Assert.AreEqual(isEarlyClose, earlyCloses.Keys.Contains(goodFriday));
             Assert.AreEqual(!isEarlyClose, holidays.Contains(goodFriday));
+        }
+
+        [TestCase("ES", Market.CME)]
+        [TestCase("30Y", Market.CBOT)]
+        [TestCase("M6B", Market.CME)]
+        [TestCase("BTC", Market.CME)]
+        [TestCase("ABT", Market.NYMEX)]
+        [TestCase("AUP", Market.COMEX)]
+        public void EarlyClosesResumesAgainIfLateOpen(string futureTicker, string market)
+        {
+            var provider = MarketHoursDatabase.FromDataFolder();
+            var ticker = OptionSymbol.MapToUnderlying(futureTicker, SecurityType.Future);
+            var future = Symbol.Create(ticker, SecurityType.Future, market);
+
+            var futureEntry = provider.GetEntry(market, ticker, future.SecurityType);
+            var earlyCloseDate = DateTime.Parse("9/4/2023", CultureInfo.InvariantCulture);
+            var earlyCloseHour = futureEntry.ExchangeHours.EarlyCloses[earlyCloseDate];
+            var lateOpenHour = futureEntry.ExchangeHours.LateOpens[earlyCloseDate];
+
+            Assert.AreEqual(earlyCloseHour, futureEntry.ExchangeHours.GetMarketHours(earlyCloseDate).GetMarketClose(new TimeSpan(0, 0, 0), true));
+            Assert.AreEqual(lateOpenHour, futureEntry.ExchangeHours.GetMarketHours(earlyCloseDate).GetMarketOpen(earlyCloseHour, true));
         }
 
         [Test]
@@ -305,6 +321,27 @@ namespace QuantConnect.Tests.Common.Securities
             }
         }
 
+        [TestCase("SPX")]
+        [TestCase("NDX")]
+        [TestCase("VIX")]
+        public void USIndexOptionsResolveToUnderlyingEarlyCloses(string optionTicker)
+        {
+            var provider = MarketHoursDatabase.FromDataFolder();
+            var underlyingTicker = OptionSymbol.MapToUnderlying(optionTicker, SecurityType.Index);
+            var underlying = Symbol.Create(underlyingTicker, SecurityType.Index, Market.USA);
+            var option = Symbol.CreateOption(
+                underlying,
+                Market.USA,
+                default,
+                default,
+                default,
+                SecurityIdentifier.DefaultDate);
+
+            var underlyingEntry = provider.GetEntry(Market.USA, underlying, underlying.SecurityType);
+            var optionEntry = provider.GetEntry(Market.USA, option, option.SecurityType);
+            Assert.AreEqual(underlyingEntry.ExchangeHours.EarlyCloses, optionEntry.ExchangeHours.EarlyCloses);
+        }
+
         [TestCase("GC", Market.COMEX, "OG")]
         [TestCase("SI", Market.COMEX, "SO")]
         [TestCase("HG", Market.COMEX, "HXE")]
@@ -345,6 +382,22 @@ namespace QuantConnect.Tests.Common.Securities
             // Fetch the entry to ensure we can access it with the ticker
             var fetchedEntry = database.GetEntry(Market.USA, ticker, SecurityType.Base);
             Assert.AreSame(entry, fetchedEntry);
+        }
+
+        [TestCase("UWU", SecurityType.Base)]
+        [TestCase("SPX", SecurityType.Index)]
+        public void CustomEntriesAreNotLostWhenReset(string ticker, SecurityType securityType)
+        {
+            var database = MarketHoursDatabase.FromDataFolder();
+            var hours = SecurityExchangeHours.AlwaysOpen(TimeZones.Chicago);
+            var entry = database.SetEntry(Market.USA, ticker, securityType, hours);
+
+            MarketHoursDatabase.Entry returnedEntry;
+            Assert.IsTrue(database.TryGetEntry(Market.USA, ticker, securityType, out returnedEntry));
+            Assert.AreEqual(returnedEntry, entry);
+            Assert.DoesNotThrow(() => database.ReloadEntries());
+            Assert.IsTrue(database.TryGetEntry(Market.USA, ticker, securityType, out returnedEntry));
+            Assert.AreEqual(returnedEntry, entry);
         }
 
         private static MarketHoursDatabase GetMarketHoursDatabase(string file)

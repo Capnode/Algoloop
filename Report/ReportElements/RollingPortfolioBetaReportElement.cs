@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -13,9 +13,12 @@
  * limitations under the License.
 */
 
+using System;
 using System.Linq;
 using Python.Runtime;
 using QuantConnect.Packets;
+using System.Collections.Generic;
+using QuantConnect.Lean.Engine.Results;
 
 namespace QuantConnect.Report.ReportElements
 {
@@ -25,18 +28,25 @@ namespace QuantConnect.Report.ReportElements
         private BacktestResult _backtest;
 
         /// <summary>
+        /// The number of trading days per year to get better result of statistics
+        /// </summary>
+        private int _tradingDaysPerYear;
+
+        /// <summary>
         /// Create a new plot of the rolling portfolio beta to equities
         /// </summary>
         /// <param name="name">Name of the widget</param>
         /// <param name="key">Location of injection</param>
         /// <param name="backtest">Backtest result object</param>
         /// <param name="live">Live result object</param>
-        public RollingPortfolioBetaReportElement(string name, string key, BacktestResult backtest, LiveResult live)
+        /// <param name="tradingDaysPerYear">The number of trading days per year to get better result of statistics</param>
+        public RollingPortfolioBetaReportElement(string name, string key, BacktestResult backtest, LiveResult live, int tradingDaysPerYear)
         {
             _live = live;
             _backtest = backtest;
             Name = name;
             Key = key;
+            _tradingDaysPerYear = tradingDaysPerYear;
         }
 
         /// <summary>
@@ -44,9 +54,9 @@ namespace QuantConnect.Report.ReportElements
         /// </summary>
         public override string Render()
         {
-            var backtestPoints = ResultsUtil.EquityPoints(_backtest, "Daily Performance");
+            var backtestPoints = GetReturnSeries(_backtest);
             var backtestBenchmarkPoints = ResultsUtil.BenchmarkPoints(_backtest);
-            var livePoints = ResultsUtil.EquityPoints(_live, "Daily Performance");
+            var livePoints = GetReturnSeries(_live);
             var liveBenchmarkPoints = ResultsUtil.BenchmarkPoints(_live);
 
             var base64 = "";
@@ -56,7 +66,7 @@ namespace QuantConnect.Report.ReportElements
                 var liveList = new PyList();
 
                 var backtestRollingBetaSixMonths = Rolling.Beta(backtestPoints, backtestBenchmarkPoints, windowSize: 22 * 6);
-                var backtestRollingBetaTwelveMonths = Rolling.Beta(backtestPoints, backtestBenchmarkPoints, windowSize: 252);
+                var backtestRollingBetaTwelveMonths = Rolling.Beta(backtestPoints, backtestBenchmarkPoints, windowSize: _tradingDaysPerYear);
 
                 backtestList.Append(backtestRollingBetaSixMonths.Keys.ToList().ToPython());
                 backtestList.Append(backtestRollingBetaSixMonths.Values.ToList().ToPython());
@@ -64,7 +74,7 @@ namespace QuantConnect.Report.ReportElements
                 backtestList.Append(backtestRollingBetaTwelveMonths.Values.ToList().ToPython());
 
                 var liveRollingBetaSixMonths = Rolling.Beta(livePoints, liveBenchmarkPoints, windowSize: 22 * 6);
-                var liveRollingBetaTwelveMonths = Rolling.Beta(livePoints, liveBenchmarkPoints, windowSize: 252);
+                var liveRollingBetaTwelveMonths = Rolling.Beta(livePoints, liveBenchmarkPoints, windowSize: _tradingDaysPerYear);
 
                 liveList.Append(liveRollingBetaSixMonths.Keys.ToList().ToPython());
                 liveList.Append(liveRollingBetaSixMonths.Values.ToList().ToPython());
@@ -75,6 +85,17 @@ namespace QuantConnect.Report.ReportElements
             }
 
             return base64;
+        }
+
+        private static SortedList<DateTime, double> GetReturnSeries(Result leanResult)
+        {
+            var returnSeries = ResultsUtil.EquityPoints(leanResult, BaseResultsHandler.ReturnKey);
+            if (returnSeries == null || returnSeries.Count == 0)
+            {
+                // for backwards compatibility
+                returnSeries = ResultsUtil.EquityPoints(leanResult, "Daily Performance");
+            }
+            return returnSeries;
         }
     }
 }

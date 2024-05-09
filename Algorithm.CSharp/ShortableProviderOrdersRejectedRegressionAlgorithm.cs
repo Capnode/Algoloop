@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using QuantConnect.Brokerages;
 using QuantConnect.Data;
 using QuantConnect.Securities;
 using QuantConnect.Data.Shortable;
@@ -57,8 +56,15 @@ namespace QuantConnect.Algorithm.CSharp
             if (!_initialize)
             {
                 HandleOrder(LimitOrder(_spy.Symbol, -1001, 10000m)); // Should be canceled, exceeds the max shortable quantity
-                HandleOrder(LimitOrder(_spy.Symbol, -1000, 10000m)); // Allowed, orders at or below 1000 should be accepted
+                var orderTicket = LimitOrder(_spy.Symbol, -1000, 10000m);
+                HandleOrder(orderTicket); // Allowed, orders at or below 1000 should be accepted
                 HandleOrder(LimitOrder(_spy.Symbol, -10, 0.01m)); // Should be canceled, the total quantity we would be short would exceed the max shortable quantity.
+
+                var response = orderTicket.UpdateQuantity(-999); // should be allowed, we are reducing the quantity we want to short
+                if(!response.IsSuccess)
+                {
+                    throw new Exception("Order update should of succeeded!");
+                }
                 _initialize = true;
                 return;
             }
@@ -152,7 +158,7 @@ namespace QuantConnect.Algorithm.CSharp
 
         private class RegressionTestShortableProvider : LocalDiskShortableProvider
         {
-            public RegressionTestShortableProvider() : base(SecurityType.Equity, "testbrokerage", Market.USA)
+            public RegressionTestShortableProvider() : base("testbrokerage")
             {
             }
         }
@@ -182,14 +188,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "2"},
+            {"Total Orders", "6"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "-1.623%"},
             {"Drawdown", "0.100%"},
             {"Expectancy", "0"},
+            {"Start Equity", "10000000"},
+            {"End Equity", "9996563.97"},
             {"Net Profit", "-0.034%"},
             {"Sharpe Ratio", "-3.52"},
+            {"Sortino Ratio", "-3.476"},
             {"Probabilistic Sharpe Ratio", "33.979%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -205,7 +214,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$99000000.00"},
             {"Lowest Capacity Asset", "AIG R735QTJ8XC9X"},
             {"Portfolio Turnover", "0.23%"},
-            {"OrderListHash", "3ac2d7a61f71c1345eb569e30cc2834c"}
+            {"OrderListHash", "6d92f0811c31864dfaaccd9eb2edac52"}
         };
     }
 }

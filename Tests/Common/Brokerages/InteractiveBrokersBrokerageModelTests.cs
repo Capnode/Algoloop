@@ -27,6 +27,8 @@ using QuantConnect.Securities;
 using QuantConnect.Data;
 using QuantConnect.Securities.Option;
 using QuantConnect.Securities.Forex;
+using QuantConnect.Tests.Engine.DataFeeds;
+using QuantConnect.Securities.Cfd;
 
 namespace QuantConnect.Tests.Common.Brokerages
 {
@@ -69,6 +71,78 @@ namespace QuantConnect.Tests.Common.Brokerages
                 Assert.AreEqual("OrderSizeLimit", message.Code);
                 StringAssert.Contains("minimum and maximum limits for the allowable order size are", message.Message);
             }
+        }
+
+        [TestCase("SPY", SecurityType.Option)]
+        [TestCase("SPX", SecurityType.IndexOption)]
+        [TestCase("ES", SecurityType.FutureOption)]
+        public void CannotSubmitMOCOrdersForOptions(string ticker, SecurityType securityType)
+        {
+            var algo = new AlgorithmStub();
+            var security = algo.AddSecurity(securityType, ticker);
+            if (securityType == SecurityType.FutureOption)
+            {
+                var underlyingFuture = Symbol.CreateFuture(
+                QuantConnect.Securities.Futures.Indices.SP500EMini,
+                Market.CME,
+                new DateTime(2021, 3, 19));
+
+                var futureOption = Symbol.CreateOption(underlyingFuture,
+                    Market.CME,
+                    OptionStyle.American,
+                    OptionRight.Call,
+                    2550m,
+                    new DateTime(2021, 3, 19));
+
+                security = new QuantConnect.Securities.FutureOption.FutureOption(
+                    futureOption,
+                    MarketHoursDatabase.FromDataFolder().GetExchangeHours(Market.CME, futureOption, futureOption.SecurityType),
+                    new Cash("USD", 100000m, 1m),
+                    new OptionSymbolProperties(string.Empty, "USD", 1m, 0.01m, 1m),
+                    new CashBook(),
+                    new RegisteredSecurityDataTypesProvider(),
+                    new SecurityCache(),
+                    null);
+            }
+
+            var order = new MarketOnCloseOrder(security.Symbol, 1, DateTime.UtcNow);
+            var result = _interactiveBrokersBrokerageModel.CanSubmitOrder(security, order, out var message);
+            Assert.IsFalse(result);
+            var expectedMessage = "The InteractiveBrokersBrokerageModel does not support MarketOnClose order type. Only supports [Market,MarketOnOpen,Limit,StopMarket,StopLimit,TrailingStop,LimitIfTouched,ComboMarket,ComboLimit,ComboLegLimit,OptionExercise]";
+            Assert.AreEqual(expectedMessage, message.Message);
+        }
+
+        [TestCase(AccountType.Cash, 1)]
+        [TestCase(AccountType.Margin, 10)]
+        public void GetsCorrectLeverageForCfds(AccountType accounType, decimal expectedLeverage)
+        {
+            var brokerageModel = new InteractiveBrokersBrokerageModel(accounType);
+            var security = new Cfd(Symbols.DE10YBEUR,
+                SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork),
+                new Cash("USD", 0, 0),
+                SymbolProperties.GetDefault("USD"),
+                ErrorCurrencyConverter.Instance,
+                RegisteredSecurityDataTypesProvider.Null,
+                new SecurityCache());
+
+            Assert.AreEqual(expectedLeverage, brokerageModel.GetLeverage(security));
+        }
+
+        [Test]
+        public void CanSubmitCfdOrder()
+        {
+            var security = new Cfd(Symbols.DE10YBEUR,
+                SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork),
+                new Cash("USD", 0, 0),
+                SymbolProperties.GetDefault("USD"),
+                ErrorCurrencyConverter.Instance,
+                RegisteredSecurityDataTypesProvider.Null,
+                new SecurityCache());
+            var order = new MarketOrder(security.Symbol, 1, new DateTime(2023, 1, 20));
+
+            var canSubmit = _interactiveBrokersBrokerageModel.CanSubmitOrder(security, order, out var message);
+
+            Assert.IsTrue(canSubmit);
         }
 
         private static List<Security> GetUnsupportedOptions()

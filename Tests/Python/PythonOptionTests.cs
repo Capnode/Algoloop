@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using Python.Runtime;
 using QuantConnect.Algorithm;
+using QuantConnect.Statistics;
 using QuantConnect.Tests.Engine.DataFeeds;
 
 namespace QuantConnect.Tests.Python
@@ -76,7 +77,7 @@ namespace QuantConnect.Tests.Python
         {
             var parameter = new RegressionTests.AlgorithmStatisticsTestParameters("FilterUniverseRegressionAlgorithm",
                 new Dictionary<string, string> {
-                    {"Total Trades", "2"},
+                    {PerformanceMetrics.TotalOrders, "2"},
                     {"Average Win", "0%"},
                     {"Average Loss", "-0.02%"},
                     {"Compounding Annual Return", "-1.629%"},
@@ -96,7 +97,7 @@ namespace QuantConnect.Tests.Python
                     {"Tracking Error", "0"},
                     {"Treynor Ratio", "0"},
                     {"Total Fees", "$1.00"},
-                    {"OrderListHash", "15d59ea72c0f1becb767a61a82f2241f"}
+                    {"OrderListHash", "133c6a56631cf3d8a089c3095a25ee81"}
                     },
                     Language.Python,
                     AlgorithmStatus.Completed);

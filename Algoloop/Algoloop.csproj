@@ -24,22 +24,6 @@
       <Link>Content\ProgramData\equity\usa\daily\spy.zip</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140228.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\aapl\20140228.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140331.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\appl\20140331.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140424.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\aapl\20140424.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Data\equity\usa\fundamental\fine\aapl\20140429.zip">
-      <Link>Content\ProgramData\equity\usa\fundamental\fine\aapl\20140429.zip</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Data\equity\usa\hour\aapl.zip">
       <Link>Content\ProgramData\equity\usa\hour\aapl.zip</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -117,11 +101,6 @@
     <Content Include="..\LICENSE" Link="Content\ProgramData\LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Content\ProgramData\Algorithm.Python\Alphas\" />
-    <Folder Include="Content\ProgramData\Algorithm.Python\Benchmark\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -246,9 +225,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\BasicTemplateAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateAlgorithm.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\BasicTemplateAtreyuAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateAtreyuAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\BasicTemplateCfdAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateCfdAlgorithm.py">
@@ -1113,9 +1089,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\TwoLegCurrencyConversionRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\TwoLegCurrencyConversionRegressionAlgorithm.py">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\Algorithm.Python\UncorrelatedUniverseSelectionFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\UncorrelatedUniverseSelectionFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\UniverseSelectionDefinitionsAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\UniverseSelectionDefinitionsAlgorithm.py">

@@ -24,6 +24,7 @@ using QuantConnect.Orders.OptionExercise;
 using QuantConnect.Orders.Slippage;
 using QuantConnect.Python;
 using QuantConnect.Securities.Interfaces;
+using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
 
@@ -70,7 +71,7 @@ namespace QuantConnect.Securities.Option
                 new OptionPortfolioModel(),
                 new ImmediateFillModel(),
                 new InteractiveBrokersFeeModel(),
-                new ConstantSlippageModel(0),
+                NullSlippageModel.Instance,
                 new ImmediateSettlementModel(),
                 Securities.VolatilityModel.Null,
                 new OptionMarginModel(),
@@ -112,7 +113,7 @@ namespace QuantConnect.Securities.Option
                new OptionPortfolioModel(),
                new ImmediateFillModel(),
                new InteractiveBrokersFeeModel(),
-               new ConstantSlippageModel(0),
+               NullSlippageModel.Instance,
                new ImmediateSettlementModel(),
                Securities.VolatilityModel.Null,
                new OptionMarginModel(),
@@ -188,6 +189,7 @@ namespace QuantConnect.Securities.Option
             SetFilter(-1, 1, TimeSpan.Zero, TimeSpan.FromDays(35));
             Underlying = underlying;
             OptionAssignmentModel = new DefaultOptionAssignmentModel();
+            ScaledStrikePrice = StrikePrice * SymbolProperties.StrikeMultiplier;
         }
 
         // save off a strongly typed version of symbol properties
@@ -207,6 +209,15 @@ namespace QuantConnect.Securities.Option
         /// Gets the strike price
         /// </summary>
         public decimal StrikePrice => Symbol.ID.StrikePrice;
+
+        /// <summary>
+        /// Gets the strike price multiplied by the strike multiplier
+        /// </summary>
+        public decimal ScaledStrikePrice
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Gets the expiration date
@@ -328,7 +339,7 @@ namespace QuantConnect.Securities.Option
         /// </summary>
         public decimal GetIntrinsicValue(decimal underlyingPrice)
         {
-            return Math.Max(0.0m, GetPayOff(underlyingPrice));
+            return OptionPayoff.GetIntrinsicValue(underlyingPrice, ScaledStrikePrice, Right);
         }
 
         /// <summary>
@@ -338,7 +349,7 @@ namespace QuantConnect.Securities.Option
         /// <returns></returns>
         public decimal GetPayOff(decimal underlyingPrice)
         {
-            return Right == OptionRight.Call ? underlyingPrice - StrikePrice : StrikePrice - underlyingPrice;
+            return OptionPayoff.GetPayOff(underlyingPrice, ScaledStrikePrice, Right);
         }
 
         /// <summary>
@@ -348,7 +359,7 @@ namespace QuantConnect.Securities.Option
         /// <returns></returns>
         public decimal OutOfTheMoneyAmount(decimal underlyingPrice)
         {
-            return Math.Max(0, Right == OptionRight.Call ? StrikePrice - underlyingPrice : underlyingPrice - StrikePrice);
+            return Math.Max(0, Right == OptionRight.Call ? ScaledStrikePrice - underlyingPrice : underlyingPrice - ScaledStrikePrice);
         }
 
         /// <summary>
@@ -523,7 +534,7 @@ namespace QuantConnect.Securities.Option
         /// over market price</param>
         public void SetFilter(int minStrike, int maxStrike)
         {
-            SetFilter(universe => universe.Strikes(minStrike, maxStrike));
+            SetFilterImp(universe => universe.Strikes(minStrike, maxStrike));
         }
 
         /// <summary>
@@ -536,7 +547,7 @@ namespace QuantConnect.Securities.Option
         /// would exclude contracts expiring in more than 10 days</param>
         public void SetFilter(TimeSpan minExpiry, TimeSpan maxExpiry)
         {
-            SetFilter(universe => universe.Expiration(minExpiry, maxExpiry));
+            SetFilterImp(universe => universe.Expiration(minExpiry, maxExpiry));
         }
 
         /// <summary>
@@ -555,7 +566,7 @@ namespace QuantConnect.Securities.Option
         /// would exclude contracts expiring in more than 10 days</param>
         public void SetFilter(int minStrike, int maxStrike, TimeSpan minExpiry, TimeSpan maxExpiry)
         {
-            SetFilter(universe => universe
+            SetFilterImp(universe => universe
                 .Strikes(minStrike, maxStrike)
                 .Expiration(minExpiry, maxExpiry));
         }
@@ -576,7 +587,7 @@ namespace QuantConnect.Securities.Option
         /// would exclude contracts expiring in more than 10 days</param>
         public void SetFilter(int minStrike, int maxStrike, int minExpiryDays, int maxExpiryDays)
         {
-            SetFilter(universe => universe
+            SetFilterImp(universe => universe
                 .Strikes(minStrike, maxStrike)
                 .Expiration(minExpiryDays, maxExpiryDays));
         }
@@ -593,6 +604,7 @@ namespace QuantConnect.Securities.Option
                 var result = universeFunc(optionUniverse);
                 return result.ApplyTypesFilter();
             });
+            ContractFilter.Asynchronous = false;
         }
 
         /// <summary>
@@ -631,6 +643,7 @@ namespace QuantConnect.Securities.Option
                 }
                 return optionUniverse.ApplyTypesFilter();
             });
+            ContractFilter.Asynchronous = false;
         }
 
         /// <summary>
@@ -644,6 +657,16 @@ namespace QuantConnect.Securities.Option
             }
 
             base.SetDataNormalizationMode(mode);
+        }
+
+        private void SetFilterImp(Func<OptionFilterUniverse, OptionFilterUniverse> universeFunc)
+        {
+            ContractFilter = new FuncSecurityDerivativeFilter(universe =>
+            {
+                var optionUniverse = universe as OptionFilterUniverse;
+                var result = universeFunc(optionUniverse);
+                return result.ApplyTypesFilter();
+            });
         }
     }
 }

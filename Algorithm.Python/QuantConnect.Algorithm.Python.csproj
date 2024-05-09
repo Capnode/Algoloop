@@ -39,9 +39,10 @@
     <Compile Include="..\Common\Properties\SharedAssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="QuantConnect.pythonnet" Version="2.0.23" />
+    <PackageReference Include="QuantConnect.pythonnet" Version="2.0.36" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="FundamentalUniverseSelectionAlgorithm.py" />
     <Content Include="AccumulativeInsightPortfolioRegressionAlgorithm.py" />
     <Content Include="CustomDataTypeHistoryAlgorithm.py" />
     <Content Include="CorrectConsolidatedBarTypeForTickTypesAlgorithm.py" />
@@ -239,7 +240,6 @@
     <None Include="StandardDeviationExecutionModelRegressionAlgorithm.py" />
     <None Include="TimeInForceAlgorithm.py" />
     <None Include="TrailingStopRiskFrameworkRegressionAlgorithm.py" />
-    <None Include="UncorrelatedUniverseSelectionFrameworkAlgorithm.py" />
     <None Include="UniverseSelectionRegressionAlgorithm.py" />
     <None Include="UpdateOrderRegressionAlgorithm.py" />
     <None Include="UserDefinedUniverseAlgorithm.py" />

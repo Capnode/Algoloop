@@ -19,6 +19,7 @@ using System;
 using QuantConnect.Statistics;
 using System.Collections.Generic;
 using System.Linq;
+using QuantConnect.Data;
 
 namespace QuantConnect.Report
 {
@@ -27,6 +28,8 @@ namespace QuantConnect.Report
     /// </summary>
     public static class Rolling
     {
+        private static readonly IRiskFreeInterestRateModel _interestRateProvider = new InterestRateProvider();
+
         /// <summary>
         /// Calculate the rolling beta with the given window size (in days)
         /// </summary>
@@ -73,10 +76,11 @@ namespace QuantConnect.Report
         /// </summary>
         /// <param name="equityCurve">Equity curve to calculate rolling sharpe for</param>
         /// <param name="months">Number of months to calculate the rolling period for</param>
+        /// <param name="tradingDayPerYear">The number of trading days per year to increase result of Annual statistics</param>
         /// <returns>Rolling sharpe ratio</returns>
-        public static Series<DateTime, double> Sharpe(Series<DateTime, double> equityCurve, int months)
+        public static Series<DateTime, double> Sharpe(Series<DateTime, double> equityCurve, int months, int tradingDayPerYear)
         {
-            var riskFreeRate = (double)PortfolioStatistics.GetAverageRiskFreeRate(equityCurve.Keys);
+            var riskFreeRate = (double)_interestRateProvider.GetAverageRiskFreeRate(equityCurve.Keys);
             if (equityCurve.IsEmpty)
             {
                 return equityCurve;
@@ -100,7 +104,7 @@ namespace QuantConnect.Report
                 rollingSharpeData.Add(
                     new KeyValuePair<DateTime, double>(
                         date,
-                        Statistics.Statistics.SharpeRatio(algoPerformanceLookback.Values.ToList(), riskFreeRate)
+                        Statistics.Statistics.SharpeRatio(algoPerformanceLookback.Values.ToList(), riskFreeRate, tradingDayPerYear)
                     )
                 );
             }

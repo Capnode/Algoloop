@@ -14,7 +14,7 @@
 */
 
 using System;
-
+using Newtonsoft.Json;
 using QuantConnect.Interfaces;
 using QuantConnect.Securities;
 
@@ -36,16 +36,19 @@ namespace QuantConnect.Orders
         /// <summary>
         /// The price which, when touched, will trigger the setting of a limit order at <see cref="LimitPrice"/>.
         /// </summary>
+        [JsonProperty(PropertyName = "triggerPrice")]
         public decimal TriggerPrice { get; internal set; }
 
         /// <summary>
         /// The price at which to set the limit order following <see cref="TriggerPrice"/> being touched.
         /// </summary>
+        [JsonProperty(PropertyName = "limitPrice")]
         public decimal LimitPrice { get; internal set; }
 
         /// <summary>
         /// Whether or not the <see cref="TriggerPrice"/> has been touched.
         /// </summary>
+        [JsonProperty(PropertyName = "triggerTouched")]
         public bool TriggerTouched { get; internal set; }
 
         /// <summary>
@@ -71,11 +74,6 @@ namespace QuantConnect.Orders
         {
             TriggerPrice = (decimal) triggerPrice;
             LimitPrice = limitPrice;
-            if (string.IsNullOrEmpty(tag))
-            {
-                //Default tag values to display trigger price in GUI.
-                Tag = Messages.LimitIfTouchedOrder.Tag(this);
-            }
         }
 
         /// <summary>
@@ -83,6 +81,15 @@ namespace QuantConnect.Orders
         /// </summary>
         public LimitIfTouchedOrder()
         {
+        }
+
+        /// <summary>
+        /// Gets the default tag for this order
+        /// </summary>
+        /// <returns>The default tag</returns>
+        public override string GetDefaultTag()
+        {
+            return Messages.LimitIfTouchedOrder.Tag(this);
         }
 
         /// <summary>

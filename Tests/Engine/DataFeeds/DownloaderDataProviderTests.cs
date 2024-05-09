@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 using QuantConnect.Securities;
 using QuantConnect.Data.Market;
 using System.Collections.Generic;
-using QuantConnect.Lean.Engine.DataFeeds;
+using DataFeed = QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Data.Custom.IconicTypes;
 
 namespace QuantConnect.Tests.Engine.DataFeeds
@@ -38,7 +38,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
         {
             Log.DebuggingEnabled = true;
             var downloader = new DataDownloaderTest();
-            using var dataProvider = new DownloaderDataProvider(downloader);
+            using var dataProvider = new DataFeed.DownloaderDataProvider(downloader);
 
             var date = new DateTime(2000, 3, 17);
             var dataSymbol = Symbol.Create("TEST", SecurityType.Equity, Market.USA);
@@ -101,14 +101,14 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             var data = QuantConnect.Compression.Unzip(actualPath).Single();
 
             // the data was merged
-            Assert.AreEqual(85, data.Value.Count);
+            Assert.AreEqual(66, data.Value.Count);
         }
 
         [Test]
         public void CustomDataRequest()
         {
             var downloader = new DataDownloaderTest();
-            using var dataProvider = new DownloaderDataProvider(downloader);
+            using var dataProvider = new DataFeed.DownloaderDataProvider(downloader);
 
             var customData = Symbol.CreateBase(typeof(LinkedData), Symbols.SPY, Market.USA);
             var date = new DateTime(2023, 3, 17);
@@ -128,6 +128,11 @@ namespace QuantConnect.Tests.Engine.DataFeeds
         [TestCase(Resolution.Minute, SecurityType.Option)]
         [TestCase(Resolution.Second, SecurityType.Option)]
         [TestCase(Resolution.Tick, SecurityType.Option)]
+        [TestCase(Resolution.Daily, SecurityType.IndexOption)]
+        [TestCase(Resolution.Hour, SecurityType.IndexOption)]
+        [TestCase(Resolution.Minute, SecurityType.IndexOption)]
+        [TestCase(Resolution.Second, SecurityType.IndexOption)]
+        [TestCase(Resolution.Tick, SecurityType.IndexOption)]
         [TestCase(Resolution.Daily, SecurityType.Crypto)]
         [TestCase(Resolution.Hour, SecurityType.Crypto)]
         [TestCase(Resolution.Minute, SecurityType.Crypto)]
@@ -146,11 +151,12 @@ namespace QuantConnect.Tests.Engine.DataFeeds
         public void CorrectArguments(Resolution resolution, SecurityType securityType)
         {
             var downloader = new DataDownloaderTest();
-            using var dataProvider = new DownloaderDataProvider(downloader);
+            using var dataProvider = new DataFeed.DownloaderDataProvider(downloader);
 
             Symbol symbol = null;
             Symbol expectedSymbol = null;
             var expectedLowResolutionStart = new DateTime(1998, 1, 2);
+            var expectedLowResolutionEndUtc = DateTime.UtcNow.Date.AddDays(-1);
             if (securityType == SecurityType.Equity)
             {
                 symbol = expectedSymbol = Symbols.AAPL;
@@ -158,6 +164,11 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             else if (securityType == SecurityType.Option)
             {
                 symbol = Symbols.SPY_C_192_Feb19_2016;
+                expectedSymbol = symbol.Canonical;
+            }
+            else if (securityType == SecurityType.IndexOption)
+            {
+                symbol = Symbol.CreateOption(Symbols.SPX, Symbols.SPX.ID.Market, OptionStyle.European, OptionRight.Call, 38000m, new DateTime(2021, 01, 15));
                 expectedSymbol = symbol.Canonical;
             }
             else if (securityType == SecurityType.Crypto)
@@ -177,6 +188,16 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             }
 
             var date = new DateTime(2023, 3, 17);
+            var timezone = MarketHoursDatabase.FromDataFolder().GetDataTimeZone(symbol.ID.Market, symbol, symbol.SecurityType);
+
+            // For options and index option in hour or daily resolution, the whole year is downloaded
+            if (resolution > Resolution.Minute && (securityType == SecurityType.Option || securityType == SecurityType.IndexOption))
+            {
+                var expectedStartUtc = new DateTime(date.Year, 1, 1);
+                expectedLowResolutionStart = expectedStartUtc.ConvertFromUtc(timezone);
+                expectedLowResolutionEndUtc = expectedStartUtc.AddYears(1);
+            }
+
             var path = LeanData.GenerateZipFilePath(Globals.DataFolder + "fake", symbol, date, resolution, TickType.Trade);
             Assert.IsNull(dataProvider.Fetch(path));
 
@@ -186,8 +207,6 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             Assert.AreEqual(resolution, arguments.Resolution);
             if (resolution < Resolution.Hour)
             {
-                var mhdb = MarketHoursDatabase.FromDataFolder();
-                var timezone = mhdb.GetDataTimeZone(symbol.ID.Market, symbol, symbol.SecurityType);
                 // 1 day
                 Assert.AreEqual(date.ConvertToUtc(timezone), arguments.StartUtc);
                 Assert.AreEqual(date.AddDays(1).ConvertToUtc(timezone), arguments.EndUtc);
@@ -195,8 +214,8 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             else
             {
                 // the whole history
-                Assert.AreEqual(expectedLowResolutionStart, arguments.StartUtc);
-                Assert.AreEqual(DateTime.UtcNow.Date.AddDays(-1), arguments.EndUtc);
+                Assert.AreEqual(expectedLowResolutionStart.ConvertToUtc(timezone), arguments.StartUtc);
+                Assert.AreEqual(expectedLowResolutionEndUtc, arguments.EndUtc);
             }
         }
 

@@ -31,13 +31,17 @@ namespace QuantConnect.Tests.Common
             Assert.AreEqual(expected, result);
         }
 
-        [Test]
-        public void ParseOptionTickerOSI()
+        [TestCase("SPXW  230111C02400000", SecurityType.IndexOption, OptionStyle.European, "SPXW", "SPX")]
+        [TestCase("SPY   230111C02400000", SecurityType.Option, OptionStyle.American, "SPY", "SPY")]
+        public void ParseOptionTickerOSI(string optionStr, SecurityType securityType, OptionStyle optionStyle,
+            string expectedTargetOptionTicker, string expectedUnderlyingTicker)
         {
-            var result = SymbolRepresentation.ParseOptionTickerOSI("SPXW  230111C02400000", SecurityType.IndexOption);
+            var result = SymbolRepresentation.ParseOptionTickerOSI(optionStr, securityType, optionStyle, Market.USA);
 
-            Assert.AreEqual("SPXW", result.ID.Symbol);
-            Assert.AreEqual("SPX", result.Underlying.ID.Symbol);
+            Assert.AreEqual(expectedTargetOptionTicker, result.ID.Symbol);
+            Assert.AreEqual(expectedUnderlyingTicker, result.Underlying.ID.Symbol);
+            Assert.AreEqual(securityType, result.ID.SecurityType);
+            Assert.AreEqual(optionStyle, result.ID.OptionStyle);
         }
 
         [Test]
@@ -46,36 +50,6 @@ namespace QuantConnect.Tests.Common
             const string expected = @"ABCDEF 060318C00047500";
             var symbol = SymbolRepresentation.GenerateOptionTickerOSI("ABCDEF", OptionRight.Call, 47.50m, new DateTime(2006, 03, 18));
             Assert.AreEqual(expected, symbol);
-        }
-
-        [Test]
-        public void ParseOptionIQFeedTicker()
-        {
-            // ticker contains two digits year of expiration
-            var result = SymbolRepresentation.ParseOptionTickerIQFeed("MSFT1615D30");
-
-            Assert.AreEqual(result.Underlying, "MSFT");
-            Assert.AreEqual(result.OptionRight, OptionRight.Call);
-            Assert.AreEqual(result.OptionStrike, 30m);
-            Assert.AreEqual(result.ExpirationDate, new DateTime(2016, 4, 15));
-        }
-
-        [TestCase("MSFT1615D30.5", "MSFT", OptionRight.Call, "30.5", "20160415")]
-        [TestCase("GOOG1415D30.5", "GOOG", OptionRight.Call, "30.5", "20140415")]
-        [TestCase("GOOCV1415C30.5", "GOOCV", OptionRight.Call, "30.5", "20140315")]
-        public void IQFeedTickerRoundTrip(string encodedOption, string underlying, OptionRight optionRight, decimal strike, string expiration)
-        {
-            var parsedOption = SymbolRepresentation.ParseOptionTickerIQFeed(encodedOption);
-
-            Assert.AreEqual(underlying, parsedOption.Underlying);
-            Assert.AreEqual(optionRight, parsedOption.OptionRight);
-            Assert.AreEqual(strike, parsedOption.OptionStrike);
-            Assert.AreEqual(Time.ParseDate(expiration), parsedOption.ExpirationDate);
-
-            var option = Symbol.CreateOption(parsedOption.Underlying, Market.USA, OptionStyle.American, parsedOption.OptionRight, parsedOption.OptionStrike, parsedOption.ExpirationDate);
-            var result = SymbolRepresentation.GenerateOptionTicker(option);
-
-            Assert.AreEqual(encodedOption, result);
         }
 
         [Test]
@@ -211,12 +185,63 @@ namespace QuantConnect.Tests.Common
             Assert.AreEqual(expectedValue, result);
         }
 
-        [TestCase("VXZ2")]
-        public void GenerateFutureSymbolFromTickerMissingDecadeInfo(string ticker)
+        [TestCase("CLU0", 2008, "2010-08-20")]
+        [TestCase("CLU1", 2008, "2011-08-22")]
+        [TestCase("CLU2", 2008, "2012-08-21")]
+        [TestCase("CLU8", 2008, "2008-08-20")]
+        [TestCase("CLU9", 2008, "2009-08-20")]
+        public void GenerateFutureSymbolFromTickerKnownYearSingleDigit(string ticker, int futureYear, DateTime expectedExpiration)
         {
-            var result = SymbolRepresentation.ParseFutureSymbol(ticker, 2012);
+            var result = SymbolRepresentation.ParseFutureSymbol(ticker, futureYear);
+            Assert.AreEqual(expectedExpiration, result.ID.Date.Date);
+        }
 
-            Assert.AreEqual(new DateTime(2012, 12, 19), result.ID.Date.Date);
+        [TestCase("CLU20", 2020, "2020-08-20")]
+        [TestCase("CLU21", 2020, "2021-08-20")]
+        [TestCase("CLU22", 2020, "2022-08-22")]
+        [TestCase("CLU28", 2020, "2028-08-22")]
+        [TestCase("CLU29", 2020, "2029-08-21")]
+        public void GenerateFutureSymbolFromTickerUnknownYearSingleDigit(string ticker, int futureYear, DateTime expectedExpiration)
+        {
+            var result = SymbolRepresentation.ParseFutureSymbol(ticker, futureYear);
+            Assert.AreEqual(expectedExpiration, result.ID.Date.Date);
+        }
+
+        [TestCase("CLU20", "2020-08-20")]
+        [TestCase("CLU21", "2021-08-20")]
+        [TestCase("CLU22", "2022-08-22")]
+        [TestCase("CLU28", "2028-08-22")]
+        [TestCase("CLU29", "2029-08-21")]
+        public void GenerateFutureSymbolFromTickerUnknownYearSingleDigit(string ticker, DateTime expectedExpiration)
+        {
+            var result = SymbolRepresentation.ParseFutureSymbol(ticker);
+            Assert.AreEqual(expectedExpiration, result.ID.Date.Date);
+        }
+
+        [TestCase("CLU0", "2030-08-20")]
+        [TestCase("CLU1", "2031-08-20")]
+        [TestCase("CLU2", "2032-08-20")]
+        [TestCase("CLU8", "2028-08-22")]
+        [TestCase("CLU9", "2029-08-21")]
+        public void GenerateFutureSymbolFromTickerUnknownYearDoubleDigit(string ticker, DateTime expectedExpiration)
+        {
+            var result = SymbolRepresentation.ParseFutureSymbol(ticker);
+            Assert.AreEqual(expectedExpiration, result.ID.Date.Date);
+        }
+
+        [TestCase("NQZ23")]
+        public void GenerateFutureSymbolFromTickerUnknownYear(string ticker)
+        {
+            var result = SymbolRepresentation.ParseFutureSymbol(ticker);
+            // When the future year is not provided, we have an ambiguous case (1923 or 2023) and default 2000
+            Assert.AreEqual(new DateTime(2023, 12, 15), result.ID.Date.Date);
+        }
+
+        [TestCase("NQZ99")]
+        public void GenerateFutureSymbolFromTickerExpiringBefore2000(string ticker)
+        {
+            var result = SymbolRepresentation.ParseFutureSymbol(ticker, 1999);
+            Assert.AreEqual(new DateTime(1999, 12, 17), result.ID.Date.Date);
         }
     }
 }

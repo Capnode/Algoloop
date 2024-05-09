@@ -78,6 +78,7 @@ namespace QuantConnect.Configuration
                 new CommandLineOption("factor-file-provider", CommandOptionType.SingleValue),
                 new CommandLineOption("data-provider", CommandOptionType.SingleValue),
                 new CommandLineOption("alpha-handler", CommandOptionType.SingleValue),
+                new CommandLineOption("history-provider", CommandOptionType.SingleValue),
 
                 // limits on number of symbols to allow
                 new CommandLineOption("symbol-minute-limit", CommandOptionType.SingleValue),
@@ -94,6 +95,7 @@ namespace QuantConnect.Configuration
                 // To get your api access token go to quantconnect.com/account
                 new CommandLineOption("job-user-id", CommandOptionType.SingleValue),
                 new CommandLineOption("api-access-token", CommandOptionType.SingleValue),
+                new CommandLineOption("job-organization-id", CommandOptionType.SingleValue),
 
                 // live data configuration
                 new CommandLineOption("live-data-url", CommandOptionType.SingleValue),
@@ -129,16 +131,11 @@ namespace QuantConnect.Configuration
                 new CommandLineOption("fxcm-password", CommandOptionType.SingleValue),
                 new CommandLineOption("fxcm-account-id", CommandOptionType.SingleValue),
 
-                // iqfeed configuration
-                new CommandLineOption("iqfeed-username", CommandOptionType.SingleValue),
-                new CommandLineOption("iqfeed-password", CommandOptionType.SingleValue),
-                new CommandLineOption("iqfeed-productName", CommandOptionType.SingleValue),
-                new CommandLineOption("iqfeed-version", CommandOptionType.SingleValue),
-
-                // gdax configuration
-                new CommandLineOption("gdax-api-secret", CommandOptionType.SingleValue),
-                new CommandLineOption("gdax-api-key", CommandOptionType.SingleValue),
-                new CommandLineOption("gdax-passphrase", CommandOptionType.SingleValue),
+                // coinbase configuration
+                new CommandLineOption("coinbase-rest-api", CommandOptionType.SingleValue),
+                new CommandLineOption("coinbase-url", CommandOptionType.SingleValue),
+                new CommandLineOption("coinbase-api-key", CommandOptionType.SingleValue),
+                new CommandLineOption("coinbase-api-secret", CommandOptionType.SingleValue),
 
                 // Required to access data from Quandl
                 // To get your access token go to https://www.quandl.com/account/api

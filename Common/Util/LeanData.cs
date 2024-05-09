@@ -945,7 +945,8 @@ namespace QuantConnect.Util
                 }
             }
 
-            return string.Join(",", args);
+            var argsFormatted = args.Select(x => Convert.ToString(x, CultureInfo.InvariantCulture));
+            return string.Join(",", argsFormatted);
         }
 
         /// <summary>
@@ -1185,17 +1186,22 @@ namespace QuantConnect.Util
                 {
                     // Gather components used to create the security
                     market = info[startIndex + 1];
-                    ticker = info[startIndex + 3];
-                    
-                    // Remove the ticktype from the ticker (Only exists in Crypto and Future data but causes no issues)
-                    ticker = ticker.Split('_').First();
+                    var components = info[startIndex + 3].Split('_');
 
-                    // If resolution is Daily or Hour, we do not need to set the date
+                    // Remove the ticktype from the ticker (Only exists in Crypto and Future data but causes no issues)
+                    ticker = components[0];
+
                     if (resolution < Resolution.Hour)
                     {
                         // Future options are special and have the following format Market/Resolution/Ticker/FutureExpiry/Date
                         var dateIndex = securityType == SecurityType.FutureOption ? startIndex + 5 : startIndex + 4;
                         date = Parse.DateTimeExact(info[dateIndex].Substring(0, 8), DateFormat.EightCharacter);
+                    }
+                    // If resolution is Daily or Hour for options and index options, we can only get the year from the path
+                    else if (securityType == SecurityType.Option || securityType == SecurityType.IndexOption)
+                    {
+                        var year = int.Parse(components[1], CultureInfo.InvariantCulture);
+                        date = new DateTime(year, 01, 01);
                     }
                 }
 
@@ -1222,9 +1228,9 @@ namespace QuantConnect.Util
                     Type dataType = null;
                     if (isUniverses && info[startIndex + 3].Equals("etf", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        dataType = typeof(ETFConstituentData);
+                        dataType = typeof(ETFConstituentUniverse);
                     }
-                    symbol = Symbol.Create(ticker, securityType, market, baseDataType: dataType);
+                    symbol = CreateSymbol(ticker, securityType, market, dataType, date);
                 }
 
             }
@@ -1235,6 +1241,37 @@ namespace QuantConnect.Util
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Creates a new Symbol based on parsed data path information.
+        /// </summary>
+        /// <param name="ticker">The parsed ticker symbol.</param>
+        /// <param name="securityType">The parsed type of security.</param>
+        /// <param name="market">The parsed market or exchange.</param>
+        /// <param name="dataType">Optional type used for generating the base data SID (applicable only for SecurityType.Base).</param>
+        /// <param name="mappingResolveDate">The date used in path parsing to create the correct symbol.</param>
+        /// <returns>A unique security identifier.</returns>
+        /// <example>
+        /// <code>
+        /// path: equity/usa/minute/spwr/20071223_trade.zip
+        /// ticker: spwr
+        /// securityType: equity
+        /// market: usa
+        /// mappingResolveDate: 2007/12/23
+        /// </code>
+        /// </example>
+        private static Symbol CreateSymbol(string ticker, SecurityType securityType, string market, Type dataType, DateTime mappingResolveDate = default)
+        {
+            if (mappingResolveDate != default && (securityType == SecurityType.Equity || securityType == SecurityType.Option))
+            {
+                var symbol = new Symbol(SecurityIdentifier.GenerateEquity(ticker, market, mappingResolveDate: mappingResolveDate), ticker);
+                return securityType == SecurityType.Option ? Symbol.CreateCanonicalOption(symbol) : symbol;
+            }
+            else
+            {
+                return Symbol.Create(ticker, securityType, market, baseDataType: dataType);
+            }
         }
 
         private static List<string> SplitDataPath(string fileName)
@@ -1277,7 +1314,7 @@ namespace QuantConnect.Util
         {
             return Aggregate(new QuoteBarConsolidator(resolution), bars, symbol);
         }
-        
+
          /// <summary>
          /// Aggregates a list of ticks at the requested resolution
          /// </summary>

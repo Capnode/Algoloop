@@ -106,6 +106,8 @@ namespace QuantConnect.Tests.ToolBox
         [TestCase(false)]
         public void Mapping(bool mapSymbol)
         {
+            LeanDataWriter.MapFileProvider = new Lazy<IMapFileProvider>(TestGlobals.MapFileProvider);
+
             // asset got mapped on 20080929 to SPWRA
             var symbol = Symbol.Create("SPWR", SecurityType.Equity, Market.USA);
             var leanDataWriter = new LeanDataWriter(Resolution.Daily, symbol, _dataDirectory, TickType.Trade, mapSymbol: mapSymbol);
@@ -221,6 +223,47 @@ namespace QuantConnect.Tests.ToolBox
 
             var leanDataWriter = new LeanDataWriter(Resolution.Tick, _equity, _dataDirectory);
             leanDataWriter.Write(GetTicks(_equity));
+
+            Assert.IsTrue(File.Exists(filePath));
+            Assert.IsFalse(File.Exists(filePath + ".tmp"));
+
+            var data = QuantConnect.Compression.Unzip(filePath);
+
+            Assert.AreEqual(data.First().Value.Count(), 3);
+        }
+
+        [TestCase("CON")]
+        [TestCase("PRN")]
+        [TestCase("AUX")]
+        [TestCase("NUL")]
+        [TestCase("COM0")]
+        [TestCase("COM1")]
+        [TestCase("COM2")]
+        [TestCase("COM3")]
+        [TestCase("COM4")]
+        [TestCase("COM5")]
+        [TestCase("COM6")]
+        [TestCase("COM7")]
+        [TestCase("COM8")]
+        [TestCase("COM9")]
+        [TestCase("LPT0")]
+        [TestCase("LPT1")]
+        [TestCase("LPT2")]
+        [TestCase("LPT3")]
+        [TestCase("LPT4")]
+        [TestCase("LPT5")]
+        [TestCase("LPT6")]
+        [TestCase("LPT7")]
+        [TestCase("LPT8")]
+        [TestCase("LPT9")]
+        [Platform("Win", Reason = "The paths in these testcases are only forbidden in Windows OS")]
+        public void LeanDataWriterHandlesWindowsInvalidNames(string ticker)
+        {
+            var symbol = Symbol.Create(ticker, SecurityType.Equity, Market.USA);
+            var filePath = FileExtension.ToNormalizedPath(LeanData.GenerateZipFilePath(_dataDirectory, symbol, _date, Resolution.Tick, TickType.Trade));
+
+            var leanDataWriter = new LeanDataWriter(Resolution.Tick, symbol, _dataDirectory);
+            leanDataWriter.Write(GetTicks(symbol));
 
             Assert.IsTrue(File.Exists(filePath));
             Assert.IsFalse(File.Exists(filePath + ".tmp"));
@@ -421,7 +464,7 @@ namespace QuantConnect.Tests.ToolBox
             {
                 case SecurityType.Equity: // SPY; Daily/Hourly/Minute/Second/Tick
                     return new DateTime(2013, 10, 7);
-                case SecurityType.Crypto: // GDAX BTCUSD Daily/Minute/Second
+                case SecurityType.Crypto: // Coinbase (deprecated: GDAX) BTCUSD Daily/Minute/Second
                     if (resolution == Resolution.Hour || resolution == Resolution.Tick)
                     {
                         throw new ArgumentException($"GDAX BTC Crypto does not have data for this resolution {resolution}");
@@ -439,14 +482,12 @@ namespace QuantConnect.Tests.ToolBox
         /// </summary>
         internal class LocalHistoryBrokerage : NullBrokerage
         {
-            private readonly IDataCacheProvider _dataCacheProvider;
             private readonly IHistoryProvider _historyProvider;
 
             public LocalHistoryBrokerage()
             {
                 var mapFileProvider = TestGlobals.MapFileProvider;
                 var dataProvider = TestGlobals.DataProvider;
-                _dataCacheProvider = new ZipDataCacheProvider(dataProvider);
                 var factorFileProvider = TestGlobals.FactorFileProvider;
                 var dataPermissionManager = new DataPermissionManager();
 
@@ -459,7 +500,7 @@ namespace QuantConnect.Tests.ToolBox
                         null,
                         null,
                         dataProvider,
-                        _dataCacheProvider,
+                        TestGlobals.DataCacheProvider,
                         mapFileProvider,
                         factorFileProvider,
                         null,
@@ -485,11 +526,6 @@ namespace QuantConnect.Tests.ToolBox
                     default:
                         throw new NotImplementedException("Only support Trade & Quote bars");
                 }
-            }
-
-            public override void Dispose()
-            {
-                _dataCacheProvider.Dispose();
             }
         }
     }

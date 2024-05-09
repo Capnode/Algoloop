@@ -19,7 +19,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using QuantConnect.Data.Custom.IconicTypes;
+using QuantConnect.Data.Fundamental;
 using QuantConnect.Data.Market;
+using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Python;
 
 namespace QuantConnect.Data
@@ -358,8 +360,19 @@ namespace QuantConnect.Data
         /// Gets the data of the specified type.
         /// </summary>
         /// <remarks>Supports both C# and Python use cases</remarks>
-        protected static dynamic GetImpl(Type type, Slice instance)
+        protected dynamic GetImpl(Type type, Slice instance)
         {
+            if (type == typeof(Fundamentals))
+            {
+                // backwards compatibility for users doing a get of Fundamentals type
+                type = typeof(FundamentalUniverse);
+            }
+            else if (type == typeof(ETFConstituentData))
+            {
+                // backwards compatibility for users doing a get of ETFConstituentData type
+                type = typeof(ETFConstituentUniverse);
+            }
+
             if (instance._dataByType == null)
             {
                 // for performance we only really create this collection if someone used it
@@ -374,6 +387,7 @@ namespace QuantConnect.Data
                 {
                     var dataDictionaryCache = GenericDataDictionary.Get(type, isPythonData: false);
                     dictionary = Activator.CreateInstance(dataDictionaryCache.GenericType);
+                    ((dynamic)dictionary).Time = Time;
 
                     foreach (var data in instance.Ticks)
                     {
@@ -430,6 +444,7 @@ namespace QuantConnect.Data
 
                     var dataDictionaryCache = GenericDataDictionary.Get(type, isPythonData);
                     dictionary = Activator.CreateInstance(dataDictionaryCache.GenericType);
+                    ((dynamic)dictionary).Time = Time;
 
                     foreach (var data in instance._data.Value.Values)
                     {

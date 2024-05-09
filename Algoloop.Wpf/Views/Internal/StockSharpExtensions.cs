@@ -206,7 +206,7 @@ namespace Algoloop.Wpf.ViewModels.Views.Internal.Lean
                 return new EquityData
                 {
                     Time = candlestick.Time.ToLocalTime(),
-                    Value = RoundLarge(candlestick.Close)
+                    Value = RoundLarge(candlestick.Close ?? 0)
                 };
             }
 
@@ -216,7 +216,7 @@ namespace Algoloop.Wpf.ViewModels.Views.Internal.Lean
                 return new EquityData
                 {
                     Time = Time.UnixTimeStampToDateTime(chartPoint.x).ToLocalTime(),
-                    Value = RoundLarge(chartPoint.y)
+                    Value = RoundLarge(chartPoint.y ?? 0)
                 };
             }
 

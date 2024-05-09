@@ -14,10 +14,6 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
 
 using Moq;
 using NUnit.Framework;
@@ -26,7 +22,6 @@ using QuantConnect.Algorithm;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
-using QuantConnect.Interfaces;
 using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Lean.Engine.HistoricalData;
 using QuantConnect.Tests.Engine.DataFeeds;
@@ -37,6 +32,7 @@ namespace QuantConnect.Tests.Algorithm
     public class AlgorithmIndicatorsTests
     {
         private QCAlgorithm _algorithm;
+        private Symbol _option;
 
         [SetUp]
         public void Setup()
@@ -45,14 +41,15 @@ namespace QuantConnect.Tests.Algorithm
             _algorithm.SubscriptionManager.SetDataManager(new DataManagerStub(_algorithm));
 
             var historyProvider = new SubscriptionDataReaderHistoryProvider();
-            using var cacheProvider = new ZipDataCacheProvider(TestGlobals.DataProvider);
             historyProvider.Initialize(new HistoryProviderInitializeParameters(null, null,
-                TestGlobals.DataProvider, cacheProvider, TestGlobals.MapFileProvider, TestGlobals.FactorFileProvider,
+                TestGlobals.DataProvider, TestGlobals.DataCacheProvider, TestGlobals.MapFileProvider, TestGlobals.FactorFileProvider,
                 null, true, new DataPermissionManager(), _algorithm.ObjectStore));
             _algorithm.SetHistoryProvider(historyProvider);
 
             _algorithm.SetDateTime(new DateTime(2013, 10, 11, 15, 0, 0));
             _algorithm.AddEquity("SPY");
+            _option = Symbol.CreateOption("SPY", Market.USA, OptionStyle.American, OptionRight.Call, 450m, new DateTime(2023, 9, 1));
+            _algorithm.AddOptionContract(_option);
             _algorithm.EnableAutomaticIndicatorWarmUp = true;
         }
 
@@ -66,6 +63,33 @@ namespace QuantConnect.Tests.Algorithm
 
             Assert.IsTrue(indicator.IsReady);
             mockSelector.Verify(_ => _(It.IsAny<IBaseData>()), Times.Exactly(indicator.WarmUpPeriod));
+        }
+
+        [Test]
+        public void SharpeRatioIndicatorUsesAlgorithmsRiskFreeRateModelSetAfterIndicatorRegistration()
+        {
+            // Register indicator
+            var sharpeRatio = _algorithm.SR(Symbols.SPY, 10);
+
+            // Setup risk free rate model
+            var interestRateProviderMock = new Mock<IRiskFreeInterestRateModel>();
+            var reference = new DateTime(2023, 11, 21, 10, 0, 0);
+            interestRateProviderMock.Setup(x => x.GetInterestRate(reference)).Verifiable();
+
+            // Update indicator
+            sharpeRatio.Update(new IndicatorDataPoint(Symbols.SPY, reference, 300m));
+
+            // Our interest rate provider shouldn't have been called yet since it's hasn't been set to the algorithm
+            interestRateProviderMock.Verify(x => x.GetInterestRate(reference), Times.Never);
+
+            // Set the interest rate provider to the algorithm
+            _algorithm.SetRiskFreeInterestRateModel(interestRateProviderMock.Object);
+
+            // Update indicator
+            sharpeRatio.Update(new IndicatorDataPoint(Symbols.SPY, reference, 300m));
+
+            // Our interest rate provider should have been called once
+            interestRateProviderMock.Verify(x => x.GetInterestRate(reference), Times.Once);
         }
     }
 }

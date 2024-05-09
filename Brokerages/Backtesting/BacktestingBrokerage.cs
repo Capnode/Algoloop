@@ -26,7 +26,6 @@ using QuantConnect.Orders.Fills;
 using QuantConnect.Orders.Fees;
 using QuantConnect.Securities;
 using QuantConnect.Securities.Option;
-using QuantConnect.Securities.Positions;
 using QuantConnect.Util;
 
 namespace QuantConnect.Brokerages.Backtesting
@@ -467,12 +466,12 @@ namespace QuantConnect.Brokerages.Backtesting
                     var result = option.OptionAssignmentModel.GetAssignment(new OptionAssignmentParameters(option));
                     if (result != null && result.Quantity != 0)
                     {
-                        var request = new SubmitOrderRequest(OrderType.OptionExercise, option.Type, option.Symbol, Math.Abs(result.Quantity), 0m, 0m, 0m, Algorithm.UtcTime, result.Tag);
                         if (!_pendingOptionAssignments.Add(option.Symbol))
                         {
                             throw new InvalidOperationException($"Duplicate option exercise order request for symbol {option.Symbol}. Please contact support");
                         }
-                        Algorithm.Transactions.ProcessRequest(request);
+
+                        OnOptionNotification(new OptionNotificationEventArgs(option.Symbol, 0, result.Tag));
                     }
                 }
             }
@@ -546,10 +545,6 @@ namespace QuantConnect.Brokerages.Backtesting
                     // Any other type of delisting
                     OnDelistingNotification(new DelistingNotificationEventArgs(delisting.Symbol));
                 }
-
-                // don't allow users to open a new position once we sent the liquidation order
-                security.IsTradable = false;
-                security.IsDelisted = true;
 
                 // the subscription are getting removed from the data feed because they end
                 // remove security from all universes

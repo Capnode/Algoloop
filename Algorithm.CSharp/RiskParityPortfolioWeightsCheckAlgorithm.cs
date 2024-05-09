@@ -99,21 +99,24 @@ namespace QuantConnect.DataLibrary.Tests
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 509;
+        public int AlgorithmHistoryDataPoints => 519;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "31"},
+            {"Total Orders", "31"},
             {"Average Win", "0.01%"},
             {"Average Loss", "-0.01%"},
             {"Compounding Annual Return", "5.011%"},
             {"Drawdown", "4.900%"},
             {"Expectancy", "-0.273"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100509.82"},
             {"Net Profit", "0.510%"},
             {"Sharpe Ratio", "0.265"},
+            {"Sortino Ratio", "0.371"},
             {"Probabilistic Sharpe Ratio", "39.108%"},
             {"Loss Rate", "58%"},
             {"Win Rate", "42%"},
@@ -129,7 +132,7 @@ namespace QuantConnect.DataLibrary.Tests
             {"Estimated Strategy Capacity", "$1300000000.00"},
             {"Lowest Capacity Asset", "AAPL R735QTJ8XC9X"},
             {"Portfolio Turnover", "3.08%"},
-            {"OrderListHash", "5b1ab4af56b31b9b1517f020b4cdeb34"}
+            {"OrderListHash", "2766e0ba2ed0419a2db5240b41494390"}
         };
 
     }

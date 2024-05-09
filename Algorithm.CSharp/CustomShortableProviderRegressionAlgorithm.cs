@@ -62,10 +62,24 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 throw new Exception($"Quantity of order {_orderId} should be -1001, but was {orderQuantity}");
             }
+            var feeRate = _spy.ShortableProvider.FeeRate(_spy.Symbol, Time);
+            if (feeRate != 0.0025m)
+            {
+                throw new Exception($"Fee rate should be 0.0025, but was {feeRate}");
+            }
+            var rebateRate = _spy.ShortableProvider.RebateRate(_spy.Symbol, Time);
+            if (rebateRate != 0.0507m)
+            {
+                throw new Exception($"Fee rate should be 0.0507, but was {rebateRate}");
+            }
         }
 
         private class CustomSPYShortableProvider : IShortableProvider
         {
+            public decimal FeeRate(Symbol symbol, DateTime localTime) => 0.0025m;
+
+            public decimal RebateRate(Symbol symbol, DateTime localTime) => 0.0507m;
+
             public long? ShortableQuantity(Symbol symbol, DateTime localTime)
             {
                 if (localTime < new DateTime(2013, 10, 5))
@@ -104,14 +118,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "0"},
+            {"Total Orders", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "10000000"},
+            {"End Equity", "10000000"},
             {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -127,7 +144,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$0"},
             {"Lowest Capacity Asset", ""},
             {"Portfolio Turnover", "0%"},
-            {"OrderListHash", "f3552fd04615002c13875b1604a29b6e"}
+            {"OrderListHash", "65ce55aaad2f4a722858d84995fb7030"}
         };
     }
 }

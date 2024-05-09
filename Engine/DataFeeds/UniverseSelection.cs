@@ -17,12 +17,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using QuantConnect.Benchmarks;
 using QuantConnect.Data;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
-using QuantConnect.Lean.Engine.DataFeeds.Enumerators.Factories;
 using QuantConnect.Logging;
 using QuantConnect.Securities;
 using QuantConnect.Util;
@@ -114,7 +112,9 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             IEnumerable<Symbol> selectSymbolsResult;
 
             // check if this universe must be filtered with fine fundamental data
-            var fineFiltered = universe as FineFundamentalFilteredUniverse;
+            Universe fineFiltered = (universe as FineFundamentalFilteredUniverse)?.FineFundamentalUniverse;
+            fineFiltered ??= (universe as FundamentalFilteredUniverse)?.FundamentalUniverse;
+
             if (fineFiltered != null
                 // if the universe has been disposed we don't perform selection. This us handled bellow by 'Universe.PerformSelection'
                 // but in this case we directly call 'SelectSymbols' because we want to perform fine selection even if coarse returns the same
@@ -129,113 +129,50 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                     // prepare a BaseDataCollection of FineFundamental instances
                     var fineCollection = new BaseDataCollection();
 
-                    // Create a dictionary of CoarseFundamental keyed by Symbol that also has FineFundamental
-                    // Coarse raw data has SID collision on: CRHCY R735QTJ8XC9X
-                    var allCoarse = universeData.Data.OfType<CoarseFundamental>();
-                    var coarseData = allCoarse.Where(c => c.HasFundamentalData)
-                        .DistinctBy(c => c.Symbol)
-                        .ToDictionary(c => c.Symbol);
-
-                    // Remove selected symbols that does not have fine fundamental data
-                    var anyDoesNotHaveFundamentalData = false;
-                    // only pre filter selected symbols if there actually is any coarse data. This way we can support custom universe filtered by fine fundamental data
-                    // which do not use coarse data as underlying, in which case it could happen that we try to load fine fundamental data that is missing, but no problem,
-                    // 'FineFundamentalSubscriptionEnumeratorFactory' won't emit it
-                    if (allCoarse.Any())
+                    // if the input is already fundamental data we just need to filter it and pass it through
+                    var hasFundamentalData = universeData.Data.Count > 0 && universeData.Data[0] is Fundamental;
+                    if(hasFundamentalData)
                     {
-                        selectSymbolsResult = selectSymbolsResult
-                            .Where(
-                                symbol =>
-                                {
-                                    var result = coarseData.ContainsKey(symbol);
-                                    anyDoesNotHaveFundamentalData |= !result;
-                                    return result;
-                                }
-                            );
-                    }
+                        // Remove selected symbols that does not have fine fundamental data
+                        var anyDoesNotHaveFundamentalData = false;
 
-                    if (!_anyDoesNotHaveFundamentalDataWarningLogged && anyDoesNotHaveFundamentalData)
-                    {
-                        _algorithm.Debug("Note: Your coarse selection filter was updated to exclude symbols without fine fundamental data. Make sure your coarse filter excludes symbols where HasFundamental is false.");
-                        _anyDoesNotHaveFundamentalDataWarningLogged = true;
-                    }
-
-                    // use all available threads, the entire system is waiting for this to complete
-                    var options = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
-                    Parallel.ForEach(selectSymbolsResult, options, symbol =>
-                    {
-                        var config = FineFundamentalUniverse.CreateConfiguration(symbol);
-                        var security = _securityService.CreateSecurity(symbol,
-                            config,
-                            addToSymbolCache: false);
-
-                        var localStartTime = dateTimeUtc.ConvertFromUtc(config.ExchangeTimeZone).AddDays(-1);
-                        var factory = new FineFundamentalSubscriptionEnumeratorFactory(_algorithm.LiveMode, _algorithm.ObjectStore,
-                            x => new[] { localStartTime });
-                        var request = new SubscriptionRequest(true, universe, security, new SubscriptionDataConfig(config), localStartTime, localStartTime);
-                        using (var enumerator = factory.CreateEnumerator(request, _dataProvider))
-                        {
-                            if (enumerator.MoveNext())
+                        // only pre filter selected symbols if there actually is any fundamental data. This way we can support custom universe filtered by fine fundamental data
+                        // which do not use coarse data as underlying, in which case it could happen that we try to load fine fundamental data that is missing, but no problem,
+                        // 'FineFundamentalSubscriptionEnumeratorFactory' won't emit it
+                        var set = selectSymbolsResult.ToHashSet();
+                        fineCollection.Data.AddRange(universeData.Data.OfType<Fundamental>().Where(fundamental => {
+                            // we remove to we distict by symbol
+                            if (set.Remove(fundamental.Symbol))
                             {
-                                lock (fineCollection.Data)
+                                if (!fundamental.HasFundamentalData)
                                 {
-                                    fineCollection.Add(enumerator.Current);
+                                    anyDoesNotHaveFundamentalData = true;
+                                    return false;
                                 }
+                                return true;
                             }
+                            return false;
+                        }));
+
+                        if (!_anyDoesNotHaveFundamentalDataWarningLogged && anyDoesNotHaveFundamentalData)
+                        {
+                            _algorithm.Debug("Note: Your coarse selection filter was updated to exclude symbols without fine fundamental data. Make sure your coarse filter excludes symbols where HasFundamental is false.");
+                            _anyDoesNotHaveFundamentalDataWarningLogged = true;
                         }
-                    });
-
-                    // WARNING -- HACK ATTACK -- WARNING
-                    // Fine universes are considered special due to their chaining behavior.
-                    // As such, we need a means of piping the fine data read in here back to the data feed
-                    // so that it can be properly emitted via a TimeSlice.Create call. There isn't a mechanism
-                    // in place for this function to return such data. The following lines are tightly coupled
-                    // to the universeData dictionaries in SubscriptionSynchronizer and LiveTradingDataFeed and
-                    // rely on reference semantics to work.
-
-                    universeData.Data = new List<BaseData>();
-                    foreach (var fine in fineCollection.Data.OfType<FineFundamental>())
+                    }
+                    else
                     {
-                        var fundamentals = new Fundamentals
+                        // we need to load the fundamental data
+                        var currentTime = dateTimeUtc.ConvertFromUtc(TimeZones.NewYork);
+                        foreach (var symbol in selectSymbolsResult)
                         {
-                            Symbol = fine.Symbol,
-                            Time = fine.Time,
-                            EndTime = fine.EndTime,
-                            DataType = fine.DataType,
-                            AssetClassification = fine.AssetClassification,
-                            CompanyProfile = fine.CompanyProfile,
-                            CompanyReference = fine.CompanyReference,
-                            EarningReports = fine.EarningReports,
-                            EarningRatios = fine.EarningRatios,
-                            FinancialStatements = fine.FinancialStatements,
-                            OperationRatios = fine.OperationRatios,
-                            SecurityReference = fine.SecurityReference,
-                            ValuationRatios = fine.ValuationRatios,
-                            Market = fine.Symbol.ID.Market
-                        };
-
-                        CoarseFundamental coarse;
-                        if (coarseData.TryGetValue(fine.Symbol, out coarse))
-                        {
-                            // the only time the coarse data won't exist is if the selection function
-                            // doesn't use the data provided, and instead returns a constant list of
-                            // symbols -- coupled with a potential hole in the data
-                            fundamentals.Value = coarse.Value;
-                            fundamentals.Volume = coarse.Volume;
-                            fundamentals.DollarVolume = coarse.DollarVolume;
-                            fundamentals.HasFundamentalData = coarse.HasFundamentalData;
-
-                            // set the fine fundamental price property to yesterday's closing price
-                            fine.Value = coarse.Value;
+                            fineCollection.Data.Add(new Fundamental(currentTime, symbol));
                         }
-
-                        universeData.Add(fundamentals);
                     }
 
-                    // END -- HACK ATTACK -- END
-
+                    universeData.Data = fineCollection.Data;
                     // perform the fine fundamental universe selection
-                    selectSymbolsResult = fineFiltered.FineFundamentalUniverse.PerformSelection(dateTimeUtc, fineCollection);
+                    selectSymbolsResult = fineFiltered.PerformSelection(dateTimeUtc, fineCollection);
                 }
             }
             else
@@ -244,13 +181,16 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 selectSymbolsResult = universe.PerformSelection(dateTimeUtc, universeData);
             }
 
-            // materialize the enumerable into a set for processing
-            var selections = selectSymbolsResult.ToHashSet();
+            if (!ReferenceEquals(selectSymbolsResult, Universe.Unchanged))
+            {
+                // materialize the enumerable into a set for processing
+                universe.Selected = selectSymbolsResult.ToHashSet();
+            }
 
             // first check for no pending removals, even if the universe selection
             // didn't change we might need to remove a security because a position was closed
             RemoveSecurityFromUniverse(
-                _pendingRemovalsManager.CheckPendingRemovals(selections, universe),
+                _pendingRemovalsManager.CheckPendingRemovals(universe.Selected, universe),
                 dateTimeUtc,
                 algorithmEndDateUtc);
 
@@ -265,12 +205,16 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             {
                 var security = member.Security;
                 // if we've selected this subscription again, keep it
-                if (selections.Contains(security.Symbol)) continue;
+                if (universe.Selected.Contains(security.Symbol)) continue;
 
                 // don't remove if the universe wants to keep him in
                 if (!universe.CanRemoveMember(dateTimeUtc, security)) continue;
 
-                _securityChangesConstructor.Remove(member.Security, member.IsInternal);
+                if (!member.Security.IsDelisted)
+                {
+                    // TODO: here we are not checking if other universes have this security still selected
+                    _securityChangesConstructor.Remove(member.Security, member.IsInternal);
+                }
 
                 RemoveSecurityFromUniverse(_pendingRemovalsManager.TryRemoveMember(security, universe),
                     dateTimeUtc,
@@ -289,7 +233,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             }
 
             // find new selections and add them to the algorithm
-            foreach (var symbol in selections)
+            foreach (var symbol in universe.Selected)
             {
                 if (universe.Securities.ContainsKey(symbol))
                 {
@@ -471,6 +415,25 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             _currencySubscriptionDataConfigManager.EnsureCurrencySubscriptionDataConfigs(securityChanges, _algorithm.BrokerageModel);
         }
 
+        public SecurityChanges HandleDelisting(BaseData data, bool isInternalFeed)
+        {
+            if (_algorithm.Securities.TryGetValue(data.Symbol, out var security))
+            {
+                // don't allow users to open a new position once delisted
+                security.IsDelisted = true;
+                security.IsTradable = false;
+
+                if (_algorithm.Securities.Remove(data.Symbol))
+                {
+                    _securityChangesConstructor.Remove(security, isInternalFeed);
+
+                    return _securityChangesConstructor.Flush();
+                }
+            }
+
+            return SecurityChanges.None;
+        }
+
         private void RemoveSecurityFromUniverse(
             List<PendingRemovalsManager.RemovedMember> removedMembers,
             DateTime dateTimeUtc,
@@ -488,6 +451,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 // safe to remove the member from the universe
                 universe.RemoveMember(dateTimeUtc, member);
 
+                var isActive = _algorithm.UniverseManager.ActiveSecurities.ContainsKey(member.Symbol);
                 foreach (var subscription in universe.GetSubscriptionRequests(member, dateTimeUtc, algorithmEndDateUtc,
                                                                               _algorithm.SubscriptionManager.SubscriptionDataConfigService))
                 {
@@ -496,7 +460,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                         _internalSubscriptionManager.RemovedSubscriptionRequest(subscription);
 
                         // if not used by any universe
-                        if (!_algorithm.UniverseManager.ActiveSecurities.ContainsKey(subscription.Configuration.Symbol))
+                        if (!isActive)
                         {
                             member.IsTradable = false;
                             // We need to mark this security as untradeable while it has no data subscription
@@ -504,6 +468,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                             // so we can make direct edits to the security here.
                             // We only clear the cache once the subscription is removed from the data stack
                             member.Cache.Reset();
+
+                            _algorithm.Securities.Remove(member.Symbol);
                         }
                     }
                 }

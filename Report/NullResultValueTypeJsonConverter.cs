@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -49,7 +50,7 @@ namespace QuantConnect.Report
         /// <returns>Always true</returns>
         public override bool CanConvert(Type objectType)
         {
-            return true;
+            return objectType.IsAssignableTo(typeof(T));
         }
 
         /// <summary>
@@ -64,24 +65,40 @@ namespace QuantConnect.Report
                 return null;
             }
 
-            foreach (JProperty property in token["Charts"].Children())
+            foreach (JProperty property in GetProperty(token, "Charts").Children())
             {
-                foreach (JProperty seriesProperty in property.Value["Series"])
+                foreach (JProperty seriesProperty in GetProperty(property.Value, "Series"))
                 {
                     var newValues = new List<JToken>();
-                    foreach (var entry in seriesProperty.Value["Values"])
+                    foreach (var entry in GetProperty(seriesProperty.Value, "Values"))
                     {
                         if (entry is JObject jobj &&
                             (jobj["x"] == null || jobj["x"].Value<long?>() == null ||
                              jobj["y"] == null || jobj["y"].Value<decimal?>() == null))
                         {
+                            // null chart point
+                            continue;
+                        }
+
+                        if (entry is JArray jArray && jArray.Any(jToken => jToken.Type == JTokenType.Null))
+                        {
+                            // null candlestick
                             continue;
                         }
 
                         newValues.Add(entry);
                     }
 
-                    token["Charts"][property.Name]["Series"][seriesProperty.Name]["Values"] = JArray.FromObject(newValues);
+                    var chart = GetProperty(token, "Charts")[property.Name];
+                    var series = GetProperty(chart, "Series")[seriesProperty.Name];
+                    if (series["Values"] != null)
+                    {
+                        series["Values"] = JArray.FromObject(newValues);
+                    }
+                    else if (series["values"] != null)
+                    {
+                        series["values"] = JArray.FromObject(newValues);
+                    }
                 }
             }
 
@@ -97,6 +114,11 @@ namespace QuantConnect.Report
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
+        }
+
+        private static JToken GetProperty(JToken jToken, string name)
+        {
+            return jToken[name] ?? jToken[name.ToLower()];
         }
     }
 }

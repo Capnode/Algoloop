@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -21,29 +21,34 @@ namespace QuantConnect.Python
     /// <summary>
     /// Provides a wrapper for <see cref="IBrokerageMessageHandler"/> implementations written in python
     /// </summary>
-    public class BrokerageMessageHandlerPythonWrapper : IBrokerageMessageHandler
+    public class BrokerageMessageHandlerPythonWrapper : BasePythonWrapper<IBrokerageMessageHandler>, IBrokerageMessageHandler
     {
-        private readonly dynamic _model;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BrokerageMessageHandlerPythonWrapper"/> class
         /// </summary>
         /// <param name="model">The python implementation of <see cref="IBrokerageMessageHandler"/></param>
         public BrokerageMessageHandlerPythonWrapper(PyObject model)
+            : base(model)
         {
-            _model = model.ValidateImplementationOf<IBrokerageMessageHandler>();
         }
 
         /// <summary>
         /// Handles the message
         /// </summary>
         /// <param name="message">The message to be handled</param>
-        public void Handle(BrokerageMessageEvent message)
+        public void HandleMessage(BrokerageMessageEvent message)
         {
-            using (Py.GIL())
-            {
-                _model.Handle(message);
-            }
+            InvokeMethod(nameof(HandleMessage), message);
+        }
+
+        /// <summary>
+        /// Handles a new order placed manually in the brokerage side
+        /// </summary>
+        /// <param name="eventArgs">The new order event</param>
+        /// <returns>Whether the order should be added to the transaction handler</returns>
+        public bool HandleOrder(NewBrokerageOrderNotificationEventArgs eventArgs)
+        {
+            return InvokeMethod<bool>(nameof(HandleOrder), eventArgs);
         }
     }
 }

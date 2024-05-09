@@ -36,7 +36,12 @@ namespace QuantConnect.Data
     public class LeanDataWriter
     {
         private static KeyStringSynchronizer _keySynchronizer = new();
-        private static readonly Lazy<IMapFileProvider> MapFileProvider = new(
+
+        /// <summary>
+        /// The map file provider instance to use
+        /// </summary>
+        /// <remarks>Public for testing</remarks>
+        public static Lazy<IMapFileProvider> MapFileProvider { get; set; } = new(
             Composer.Instance.GetExportedValueByTypeName<IMapFileProvider>(Config.Get("map-file-provider", "LocalDiskMapFileProvider"), forceTypeNameOnExisting: false)
         );
 
@@ -239,15 +244,20 @@ namespace QuantConnect.Data
                     _tickType
                 );
 
-                var history = brokerage.GetHistory(historyRequest)
+                var history = brokerage.GetHistory(historyRequest)?
                     .Select(
                         x =>
                         {
                             // Convert to date timezone before we write it
                             x.Time = x.Time.ConvertTo(exchangeHours.TimeZone, dataTimeZone);
                             return x;
-                        })
+                        })?
                     .ToList();
+
+                if (history == null)
+                {
+                    continue;
+                }
 
                 // Generate a writer for this data and write it
                 var writer = new LeanDataWriter(_resolution, symbol, _dataDirectory, _tickType);
@@ -295,6 +305,7 @@ namespace QuantConnect.Data
         /// a sorted dictionary of DateTimes and strings. </remarks>
         private void WriteFile(string filePath, List<TimedLine> data, Symbol symbol)
         {
+            filePath = FileExtension.ToNormalizedPath(filePath);
             if (data == null || data.Count == 0)
             {
                 return;

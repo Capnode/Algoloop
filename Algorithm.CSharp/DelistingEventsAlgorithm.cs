@@ -20,6 +20,7 @@ using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Orders;
 using QuantConnect.Interfaces;
+using QuantConnect.Data.UniverseSelection;
 
 namespace QuantConnect.Algorithm.CSharp
 {
@@ -34,6 +35,7 @@ namespace QuantConnect.Algorithm.CSharp
     {
         private bool _receivedDelistedWarningEvent;
         private bool _receivedDelistedEvent;
+        private int _receivedSecurityChangesEvent;
         private int _dataCount;
 
         /// <summary>
@@ -109,6 +111,17 @@ namespace QuantConnect.Algorithm.CSharp
             Debug($"OnOrderEvent(OrderEvent): {Time}: {orderEvent}");
         }
 
+        public override void OnSecuritiesChanged(SecurityChanges changes)
+        {
+            foreach (var removedSecurity in changes.RemovedSecurities)
+            {
+                if (removedSecurity.Symbol.Value == "AAA.1")
+                {
+                    _receivedSecurityChangesEvent++;
+                }
+            }
+        }
+
         public override void OnEndOfAlgorithm()
         {
             if (!_receivedDelistedEvent)
@@ -122,6 +135,10 @@ namespace QuantConnect.Algorithm.CSharp
             if (_dataCount != 13)
             {
                 throw new Exception($"Unexpected data count {_dataCount}. Expected 13");
+            }
+            if (_receivedSecurityChangesEvent != 1)
+            {
+                throw new Exception($"Did not receive expected security changes removal! Got {_receivedSecurityChangesEvent}");
             }
         }
 
@@ -150,14 +167,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "2"},
+            {"Total Orders", "2"},
             {"Average Win", "0%"},
             {"Average Loss", "-5.58%"},
             {"Compounding Annual Return", "-87.694%"},
             {"Drawdown", "5.600%"},
             {"Expectancy", "-1"},
+            {"Start Equity", "100000"},
+            {"End Equity", "94421.6"},
             {"Net Profit", "-5.578%"},
             {"Sharpe Ratio", "-5.122"},
+            {"Sortino Ratio", "-6.562"},
             {"Probabilistic Sharpe Ratio", "0.008%"},
             {"Loss Rate", "100%"},
             {"Win Rate", "0%"},
@@ -173,7 +193,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$65000.00"},
             {"Lowest Capacity Asset", "AAA SEVKGI6HF885"},
             {"Portfolio Turnover", "20.16%"},
-            {"OrderListHash", "2d66947eafcca81ba9a2cd3bb351eee2"}
+            {"OrderListHash", "e956792307b884e3c46e95b29c1563f6"}
         };
     }
 }

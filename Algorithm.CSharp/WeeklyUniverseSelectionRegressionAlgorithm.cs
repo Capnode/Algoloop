@@ -15,6 +15,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using QuantConnect.Data;
 using QuantConnect.Data.Market;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
@@ -48,7 +49,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
         /// </summary>
         /// <param name="data">TradeBars dictionary object keyed by symbol containing the stock data</param>
-        public void OnData(TradeBars data)
+        public override void OnData(Slice data)
         {
             if (_changes == SecurityChanges.None) return;
 
@@ -108,14 +109,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "8"},
+            {"Total Orders", "8"},
             {"Average Win", "0.64%"},
             {"Average Loss", "-0.53%"},
             {"Compounding Annual Return", "-10.774%"},
             {"Drawdown", "2.200%"},
             {"Expectancy", "-0.448"},
+            {"Start Equity", "100000"},
+            {"End Equity", "99046.76"},
             {"Net Profit", "-0.953%"},
             {"Sharpe Ratio", "-1.559"},
+            {"Sortino Ratio", "-1.723"},
             {"Probabilistic Sharpe Ratio", "19.083%"},
             {"Loss Rate", "75%"},
             {"Win Rate", "25%"},
@@ -131,7 +135,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$5600000.00"},
             {"Lowest Capacity Asset", "IBM R735QTJ8XC9X"},
             {"Portfolio Turnover", "25.73%"},
-            {"OrderListHash", "6fa5d38d1fe8f7f7dc72a7e3190b9975"}
+            {"OrderListHash", "be43a1fcf446160ac42b8838a9f8c10a"}
         };
     }
 }

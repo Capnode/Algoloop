@@ -18,6 +18,7 @@ using QuantConnect.Data.Market;
 using QuantConnect.Indicators;
 using QuantConnect.Parameters;
 using QuantConnect.Interfaces;
+using QuantConnect.Data;
 
 namespace QuantConnect.Algorithm.CSharp
 {
@@ -52,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
             Slow = EMA("SPY", SlowPeriod);
         }
 
-        public void OnData(TradeBars data)
+        public override void OnData(Slice data)
         {
             // wait for our indicators to ready
             if (!Fast.IsReady || !Slow.IsReady) return;
@@ -92,14 +93,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "1"},
+            {"Total Orders", "1"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "286.047%"},
             {"Drawdown", "0.300%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "101742.04"},
             {"Net Profit", "1.742%"},
             {"Sharpe Ratio", "23.023"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
@@ -115,7 +119,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$48000000.00"},
             {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
             {"Portfolio Turnover", "19.72%"},
-            {"OrderListHash", "d54f031ece393c8b3fc653ca3e6259f8"}
+            {"OrderListHash", "1fd15c0ef2042df5cd6e6d590000318e"}
         };
     }
 }

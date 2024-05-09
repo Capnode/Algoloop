@@ -148,11 +148,11 @@ namespace QuantConnect.Util
                     }
                 }
             );
-            _exportedTypes.AddRange(exportedTypes);
+            _exportedTypes = new List<Type>(exportedTypes);
         }
 
         private CompositionContainer _compositionContainer;
-        private readonly List<Type> _exportedTypes = new List<Type>();
+        private readonly IReadOnlyList<Type> _exportedTypes;
         private readonly Task<List<ComposablePartDefinition>> _composableParts;
         private readonly object _exportedValuesLockObject = new object();
         private readonly Dictionary<Type, IEnumerable> _exportedValues = new Dictionary<Type, IEnumerable>();
@@ -182,14 +182,14 @@ namespace QuantConnect.Util
             lock (_exportedValuesLockObject)
             {
                 IEnumerable values;
-                if (_exportedValues.TryGetValue(typeof (T), out values))
+                if (_exportedValues.TryGetValue(typeof(T), out values))
                 {
-                    ((IList<T>) values).Add(instance);
+                    ((IList<T>)values).Add(instance);
                 }
                 else
                 {
-                    values = new List<T> {instance};
-                    _exportedValues[typeof (T)] = values;
+                    values = new List<T> { instance };
+                    _exportedValues[typeof(T)] = values;
                 }
             }
         }
@@ -200,12 +200,21 @@ namespace QuantConnect.Util
         /// <typeparam name="T">The contract type</typeparam>
         public T GetPart<T>()
         {
+            return GetPart<T>(null);
+        }
+
+        /// <summary>
+        /// Gets the first type T instance if any
+        /// </summary>
+        /// <typeparam name="T">The contract type</typeparam>
+        public T GetPart<T>(Func<T, bool> filter)
+        {
             lock (_exportedValuesLockObject)
             {
                 IEnumerable values;
                 if (_exportedValues.TryGetValue(typeof(T), out values))
                 {
-                    return ((IList<T>)values).FirstOrDefault();
+                    return ((IList<T>)values).Where(x => filter == null || filter(x)).FirstOrDefault();
                 }
                 return default(T);
             }
@@ -246,11 +255,11 @@ namespace QuantConnect.Util
         {
             try
             {
+                T instance = null;
+                IEnumerable values;
+                var type = typeof(T);
                 lock (_exportedValuesLockObject)
                 {
-                    T instance = null;
-                    IEnumerable values;
-                    var type = typeof(T);
                     if (_exportedValues.TryGetValue(type, out values))
                     {
                         // if we've already loaded this part, then just return the same one
@@ -260,59 +269,62 @@ namespace QuantConnect.Util
                             return instance;
                         }
                     }
+                }
 
-                    var typeT = _exportedTypes.Where(type1 =>
+                var typeT = _exportedTypes.Where(type1 =>
+                    {
+                        try
+                        {
+                            return type.IsAssignableFrom(type1) && type1.MatchesTypeName(typeName);
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                    })
+                .FirstOrDefault();
+
+                if (typeT != null)
+                {
+                    instance = (T)Activator.CreateInstance(typeT);
+                }
+
+                if (instance == null)
+                {
+                    // we want to get the requested part without instantiating each one of that type
+                    var selectedPart = _composableParts.Result
+                        .Where(x =>
                             {
                                 try
                                 {
-                                    return type.IsAssignableFrom(type1) && type1.MatchesTypeName(typeName);
+                                    var xType = ReflectionModelServices.GetPartType(x).Value;
+                                    return type.IsAssignableFrom(xType) && xType.MatchesTypeName(typeName);
                                 }
                                 catch
                                 {
                                     return false;
                                 }
-                            })
+                            }
+                        )
                         .FirstOrDefault();
 
-                    if (typeT != null)
+                    if (selectedPart == null)
                     {
-                        instance = (T)Activator.CreateInstance(typeT);
+                        throw new ArgumentException(
+                            $"Unable to locate any exports matching the requested typeName: {typeName}", nameof(typeName));
                     }
 
-                    if(instance == null)
-                    {
-                        // we want to get the requested part without instantiating each one of that type
-                        var selectedPart = _composableParts.Result
-                            .Where(x =>
-                                {
-                                    try
-                                    {
-                                        var xType =  ReflectionModelServices.GetPartType(x).Value;
-                                        return type.IsAssignableFrom(xType) && xType.MatchesTypeName(typeName);
-                                    }
-                                    catch
-                                    {
-                                        return false;
-                                    }
-                                }
-                            )
-                            .FirstOrDefault();
+                    var exportDefinition =
+                        selectedPart.ExportDefinitions.First(
+                            x => x.ContractName == AttributedModelServices.GetContractName(type));
+                    instance = (T)selectedPart.CreatePart().GetExportedValue(exportDefinition);
+                }
 
-                        if (selectedPart == null)
-                        {
-                            throw new ArgumentException(
-                                $"Unable to locate any exports matching the requested typeName: {typeName}", nameof(typeName));
-                        }
+                var exportedParts = instance.GetType().GetInterfaces()
+                    .Where(interfaceType => interfaceType.GetCustomAttribute<InheritedExportAttribute>() != null);
 
-                        var exportDefinition =
-                            selectedPart.ExportDefinitions.First(
-                                x => x.ContractName == AttributedModelServices.GetContractName(type));
-                        instance = (T)selectedPart.CreatePart().GetExportedValue(exportDefinition);
-                    }
-
-                    var exportedParts = instance.GetType().GetInterfaces()
-                        .Where(interfaceType => interfaceType.GetCustomAttribute<InheritedExportAttribute>() != null);
-
+                lock (_exportedValuesLockObject)
+                {
                     foreach (var export in exportedParts)
                     {
                         var exportList = _exportedValues.SingleOrDefault(kvp => kvp.Key == export).Value;
@@ -356,7 +368,7 @@ namespace QuantConnect.Util
                 lock (_exportedValuesLockObject)
                 {
                     IEnumerable values;
-                    if (_exportedValues.TryGetValue(typeof (T), out values))
+                    if (_exportedValues.TryGetValue(typeof(T), out values))
                     {
                         return values.OfType<T>();
                     }
@@ -366,7 +378,7 @@ namespace QuantConnect.Util
                         _composableParts.Wait();
                     }
                     values = _compositionContainer.GetExportedValues<T>().ToList();
-                    _exportedValues[typeof (T)] = values;
+                    _exportedValues[typeof(T)] = values;
                     return values.OfType<T>();
                 }
             }
@@ -386,7 +398,7 @@ namespace QuantConnect.Util
         /// </summary>
         public void Reset()
         {
-            lock(_exportedValuesLockObject)
+            lock (_exportedValuesLockObject)
             {
                 _exportedValues.Clear();
             }

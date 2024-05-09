@@ -84,7 +84,7 @@ namespace QuantConnect.Statistics
         /// <param name="tradingDaysPerYear">Trading days per year for the assets in portfolio</param>
         /// <remarks>May be unaccurate for forex algorithms with more trading days in a year</remarks>
         /// <returns>Double annual performance percentage</returns>
-        public static double AnnualPerformance(List<double> performance, double tradingDaysPerYear = 252)
+        public static double AnnualPerformance(List<double> performance, double tradingDaysPerYear)
         {
             return Math.Pow((performance.Average() + 1), tradingDaysPerYear) - 1;
         }
@@ -96,9 +96,10 @@ namespace QuantConnect.Statistics
         /// <param name="tradingDaysPerYear"></param>
         /// <remarks>Invokes the variance extension in the MathNet Statistics class</remarks>
         /// <returns>Annual variance value</returns>
-        public static double AnnualVariance(List<double> performance, double tradingDaysPerYear = 252)
+        public static double AnnualVariance(List<double> performance, double tradingDaysPerYear)
         {
-            return (performance.Variance())*tradingDaysPerYear;
+            var variance = performance.Variance();
+            return variance.IsNaNOrZero() ? 0 : variance * tradingDaysPerYear;
         }
 
         /// <summary>
@@ -111,9 +112,34 @@ namespace QuantConnect.Statistics
         ///     Feasibly the trading days per year can be fetched from the dictionary of performance which includes the date-times to get the range; if is more than 1 year data.
         /// </remarks>
         /// <returns>Value for annual standard deviation</returns>
-        public static double AnnualStandardDeviation(List<double> performance, double tradingDaysPerYear = 252)
+        public static double AnnualStandardDeviation(List<double> performance, double tradingDaysPerYear)
         {
-            return Math.Sqrt(performance.Variance() * tradingDaysPerYear);
+            return Math.Sqrt(AnnualVariance(performance, tradingDaysPerYear));
+        }
+
+        /// <summary>
+        /// Annualized variance statistic calculation using the daily performance variance and trading days per year.
+        /// </summary>
+        /// <param name="performance"></param>
+        /// <param name="tradingDaysPerYear"></param>
+        /// <param name="minimumAcceptableReturn">Minimum acceptable return</param>
+        /// <remarks>Invokes the variance extension in the MathNet Statistics class</remarks>
+        /// <returns>Annual variance value</returns>
+        public static double AnnualDownsideVariance(List<double> performance, double tradingDaysPerYear, double minimumAcceptableReturn = 0)
+        {
+            return AnnualVariance(performance.Where(ret => ret < minimumAcceptableReturn).ToList(), tradingDaysPerYear);
+        }
+
+        /// <summary>
+        /// Annualized downside standard deviation
+        /// </summary>
+        /// <param name="performance">Collection of double values for daily performance</param>
+        /// <param name="tradingDaysPerYear">Number of trading days for the assets in portfolio to get annualize standard deviation.</param>
+        /// <param name="minimumAcceptableReturn">Minimum acceptable return</param>
+        /// <returns>Value for annual downside standard deviation</returns>
+        public static double AnnualDownsideStandardDeviation(List<double> performance, double tradingDaysPerYear, double minimumAcceptableReturn = 0)
+        {
+            return Math.Sqrt(AnnualDownsideVariance(performance, tradingDaysPerYear, minimumAcceptableReturn));
         }
 
         /// <summary>
@@ -124,7 +150,7 @@ namespace QuantConnect.Statistics
         /// <param name="benchmarkPerformance">Double collection of benchmark daily performance values</param>
         /// <param name="tradingDaysPerYear">Number of trading days per year</param>
         /// <returns>Value for tracking error</returns>
-        public static double TrackingError(List<double> algoPerformance, List<double> benchmarkPerformance, double tradingDaysPerYear = 252)
+        public static double TrackingError(List<double> algoPerformance, List<double> benchmarkPerformance, double tradingDaysPerYear)
         {
             // Un-equal lengths will blow up other statistics, but this will handle the case here
             if (algoPerformance.Count() != benchmarkPerformance.Count())
@@ -145,12 +171,53 @@ namespace QuantConnect.Statistics
         /// Sharpe ratio with respect to risk free rate: measures excess of return per unit of risk.
         /// </summary>
         /// <remarks>With risk defined as the algorithm's volatility</remarks>
-        /// <param name="algoPerformance">Collection of double values for the algorithm daily performance</param>
-        /// <param name="riskFreeRate"></param>
+        /// <param name="averagePerformance">Average daily performance</param>
+        /// <param name="standardDeviation">Standard deviation of the daily performance</param>
+        /// <param name="riskFreeRate">The risk free rate</param>
         /// <returns>Value for sharpe ratio</returns>
-        public static double SharpeRatio(List<double> algoPerformance, double riskFreeRate)
+        public static double SharpeRatio(double averagePerformance, double standardDeviation, double riskFreeRate)
         {
-            return (AnnualPerformance(algoPerformance) - riskFreeRate) / (AnnualStandardDeviation(algoPerformance));
+            return standardDeviation == 0 ? 0 : (averagePerformance - riskFreeRate) / standardDeviation;
+        }
+
+        /// <summary>
+        /// Sharpe ratio with respect to risk free rate: measures excess of return per unit of risk.
+        /// </summary>
+        /// <remarks>With risk defined as the algorithm's volatility</remarks>
+        /// <param name="averagePerformance">Average daily performance</param>
+        /// <param name="standardDeviation">Standard deviation of the daily performance</param>
+        /// <param name="riskFreeRate">The risk free rate</param>
+        /// <returns>Value for sharpe ratio</returns>
+        public static decimal SharpeRatio(decimal averagePerformance, decimal standardDeviation, decimal riskFreeRate)
+        {
+            return SharpeRatio((double)averagePerformance, (double)standardDeviation, (double)riskFreeRate).SafeDecimalCast();
+        }
+
+        /// <summary>
+        /// Sharpe ratio with respect to risk free rate: measures excess of return per unit of risk.
+        /// </summary>
+        /// <remarks>With risk defined as the algorithm's volatility</remarks>
+        /// <param name="algoPerformance">Collection of double values for the algorithm daily performance</param>
+        /// <param name="riskFreeRate">The risk free rate</param>
+        /// <param name="tradingDaysPerYear">Trading days per year for the assets in portfolio</param>
+        /// <returns>Value for sharpe ratio</returns>
+        public static double SharpeRatio(List<double> algoPerformance, double riskFreeRate, double tradingDaysPerYear)
+        {
+            return SharpeRatio(AnnualPerformance(algoPerformance, tradingDaysPerYear), AnnualStandardDeviation(algoPerformance, tradingDaysPerYear), riskFreeRate);
+        }
+
+        /// <summary>
+        /// Sortino ratio with respect to risk free rate: measures excess of return per unit of downside risk.
+        /// </summary>
+        /// <remarks>With risk defined as the algorithm's volatility</remarks>
+        /// <param name="algoPerformance">Collection of double values for the algorithm daily performance</param>
+        /// <param name="riskFreeRate">The risk free rate</param>
+        /// <param name="tradingDaysPerYear">Trading days per year for the assets in portfolio</param>
+        /// <param name="minimumAcceptableReturn">Minimum acceptable return for Sortino ratio calculation</param>
+        /// <returns>Value for Sortino ratio</returns>
+        public static double SortinoRatio(List<double> algoPerformance, double riskFreeRate, double tradingDaysPerYear, double minimumAcceptableReturn = 0)
+        {
+            return SharpeRatio(AnnualPerformance(algoPerformance, tradingDaysPerYear), AnnualDownsideStandardDeviation(algoPerformance, tradingDaysPerYear, minimumAcceptableReturn), riskFreeRate);
         }
 
         /// <summary>

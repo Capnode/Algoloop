@@ -334,7 +334,7 @@ namespace QuantConnect.Securities
                 new SecurityPortfolioModel(),
                 new ImmediateFillModel(),
                 new InteractiveBrokersFeeModel(),
-                new ConstantSlippageModel(0),
+                NullSlippageModel.Instance,
                 new ImmediateSettlementModel(),
                 Securities.VolatilityModel.Null,
                 new SecurityMarginModel(),
@@ -366,7 +366,7 @@ namespace QuantConnect.Securities
                 new SecurityPortfolioModel(),
                 new ImmediateFillModel(),
                 new InteractiveBrokersFeeModel(),
-                new ConstantSlippageModel(0),
+                NullSlippageModel.Instance,
                 new ImmediateSettlementModel(),
                 Securities.VolatilityModel.Null,
                 new SecurityMarginModel(),
@@ -430,7 +430,7 @@ namespace QuantConnect.Securities
             MarginInterestRateModel = marginInterestRateModel;
             Holdings = new SecurityHolding(this, currencyConverter);
             Data = new DynamicSecurityData(registeredTypesProvider, Cache);
-            ShortableProvider = new NullShortableProvider();
+            ShortableProvider = NullShortableProvider.Instance;
 
             UpdateSubscriptionProperties();
         }
@@ -569,31 +569,11 @@ namespace QuantConnect.Securities
         /// <summary>
         /// Gets the fundamental data associated with the security if there is any, otherwise null.
         /// </summary>
-        public Fundamentals Fundamentals
+        public Fundamental Fundamentals
         {
             get
             {
-                if (Cache.GetData<Fundamentals>() != null)
-                {
-                    return Cache.GetData<Fundamentals>();
-                }
-
-                var coarse = Cache.GetData<CoarseFundamental>();
-                if (coarse == null)
-                {
-                    return null;
-                }
-
-                return new Fundamentals
-                {
-                    Symbol = Symbol,
-                    Value = coarse.Value,
-                    EndTime = coarse.EndTime,
-                    DollarVolume = coarse.DollarVolume,
-                    DataType = coarse.DataType,
-                    Market = coarse.Market,
-                    Volume = coarse.Volume
-                };
+                return new Fundamental(LocalTime, Symbol);
             }
         }
 
@@ -611,13 +591,7 @@ namespace QuantConnect.Securities
         public virtual void SetLocalTimeKeeper(LocalTimeKeeper localTimeKeeper)
         {
             _localTimeKeeper = localTimeKeeper;
-            Exchange.SetLocalDateTimeFrontier(localTimeKeeper.LocalTime);
-
-            _localTimeKeeper.TimeUpdated += (sender, args) =>
-            {
-                //Update the Exchange/Timer:
-                Exchange.SetLocalDateTimeFrontier(args.Time);
-            };
+            Exchange.SetLocalDateTimeFrontierProvider(localTimeKeeper);
         }
 
         /// <summary>
@@ -744,6 +718,24 @@ namespace QuantConnect.Securities
         public void SetFillModel(PyObject fillModel)
         {
             FillModel = new FillModelPythonWrapper(fillModel);
+        }
+
+        /// <summary>
+        /// Sets the settlement model
+        /// </summary>
+        /// <param name="settlementModel"> Model that represents a settlement model</param>
+        public void SetSettlementModel(ISettlementModel settlementModel)
+        {
+            SettlementModel = settlementModel;
+        }
+
+        /// <summary>
+        /// Sets the settlement model
+        /// </summary>
+        /// <param name="settlementModel">Model that represents a settlement model</param>
+        public void SetSettlementModel(PyObject settlementModel)
+        {
+            SettlementModel = new SettlementModelPythonWrapper(settlementModel);
         }
 
         /// <summary>
@@ -1143,6 +1135,15 @@ namespace QuantConnect.Securities
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Applies the split to the security
+        /// </summary>
+        internal void ApplySplit(Split split)
+        {
+            Cache.ApplySplit(split);
+            UpdateMarketPrice(Cache.GetData());
         }
     }
 }

@@ -193,12 +193,6 @@ namespace Algoloop.Wpf.Model
                     apiKey = true;
                     accountId = true;
                     break;
-                case Market.Metastock:
-                    sourceFolder = true;
-                    break;
-                case Market.Borsdata:
-                    apiKey = true;
-                    break;
             }
 
             SetBrowsable(nameof(Access), access);

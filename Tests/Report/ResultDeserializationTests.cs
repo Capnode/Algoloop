@@ -147,10 +147,11 @@ namespace QuantConnect.Tests.Report
         'OrderIds': [1, 2, 3]
     }
 }}";
-        [Test]
-        public void ValidBacktestResultDefaultSerializer()
+        [TestCase("charts")]
+        [TestCase("Charts")]
+        public void ValidBacktestResultDefaultSerializer(string chartKey)
         {
-            var result = JsonConvert.DeserializeObject<BacktestResponseWrapper>(ValidBacktestResultJson2).Backtest;
+            var result = JsonConvert.DeserializeObject<BacktestResponseWrapper>(ValidBacktestResultJson2.Replace("charts", chartKey, StringComparison.InvariantCulture)).Backtest;
 
             Assert.AreEqual(7, result.Charts.Count);
             Assert.IsTrue(result.Charts.Where(x => x.Key == "Drawdown").All(kvp => !kvp.Value.IsEmpty()));
@@ -189,6 +190,9 @@ namespace QuantConnect.Tests.Report
             Assert.IsTrue(withConverterPoints.All(kvp => kvp.Value > 0));
             Assert.AreEqual(4, withConverterPoints.Count);
 
+            Assert.AreEqual(1, noConverterPoints.Count(kvp => !kvp.Value.HasValue));
+            Assert.AreEqual(5, noConverterPoints.Count);
+
             var convertedSerialized = JsonConvert.SerializeObject(deWithConverter);
             var roundtripDeserialization = JsonConvert.DeserializeObject<BacktestResult>(convertedSerialized);
 
@@ -213,10 +217,42 @@ namespace QuantConnect.Tests.Report
             Assert.IsTrue(withConverterPoints.All(kvp => kvp.Value > 0));
             Assert.AreEqual(4, withConverterPoints.Count);
 
+            Assert.AreEqual(1, noConverterPoints.Count(kvp => !kvp.Value.HasValue));
+            Assert.AreEqual(5, noConverterPoints.Count);
+
             var convertedSerialized = JsonConvert.SerializeObject(deWithConverter);
             var roundtripDeserialization = JsonConvert.DeserializeObject<LiveResult>(convertedSerialized);
 
             Assert.IsTrue(withConverterPoints.SequenceEqual(GetChartPoints(roundtripDeserialization).ToList()));
+        }
+
+        [Test]
+        public void NullCandleStickPoint_IsSkipped()
+        {
+            var converter = new NullResultValueTypeJsonConverter<LiveResult>();
+            var settings = new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            };
+
+            var nullCandlestick = "{\"Charts\":{\"Strategy Equity\":{\"Name\":\"Strategy Equity\",\"ChartType\":0,\"Series\":{\"Equity\":{\"Name\":\"Equity\",\"Values\":[[1695991900,null,null,null,null],[1695992500,10000000,10000000,10000000,10000000]],\"SeriesType\":2,\"Index\":2,\"Unit\":\"\"}}}}}";
+            var deWithoutConverter = JsonConvert.DeserializeObject<LiveResult>(nullCandlestick, settings);
+            var deWithConverter = JsonConvert.DeserializeObject<LiveResult>(nullCandlestick, converter);
+
+            var noConverterPoints = deWithoutConverter.Charts["Strategy Equity"].Series["Equity"].Values.Cast<Candlestick>().ToList();
+            var withConverterPoints = deWithConverter.Charts["Strategy Equity"].Series["Equity"].Values.Cast<Candlestick>().ToList();
+
+            Assert.IsTrue(withConverterPoints.All(kvp => kvp.Close > 0));
+            Assert.AreEqual(1, withConverterPoints.Count);
+
+            Assert.AreEqual(1, noConverterPoints.Count(kvp => !kvp.Close.HasValue));
+            Assert.AreEqual(2, noConverterPoints.Count);
+
+            var convertedSerialized = JsonConvert.SerializeObject(deWithConverter);
+            var roundtripDeserialization = JsonConvert.DeserializeObject<LiveResult>(convertedSerialized);
+            var roundTripCandlestick = roundtripDeserialization.Charts["Strategy Equity"].Series["Equity"].Values.Cast<Candlestick>();
+
+            Assert.IsTrue(withConverterPoints.Select(x => x.Close).SequenceEqual(roundTripCandlestick.Select(x => x.Close)));
         }
 
         [Test]
@@ -415,9 +451,9 @@ parameters-->", @"<!--crisis(\r|\n)*((\r|\n|.)*?)crisis-->")]
             Assert.IsNull(matching);
         }
 
-        public IEnumerable<KeyValuePair<long, decimal>> GetChartPoints(Result result)
+        public IEnumerable<KeyValuePair<long, decimal?>> GetChartPoints(Result result)
         {
-            return result.Charts["Equity"].Series["Performance"].Values.Cast<ChartPoint>().Select(point => new KeyValuePair<long, decimal>(point.x, point.y));
+            return result.Charts["Equity"].Series["Performance"].Values.Cast<ChartPoint>().Select(point => new KeyValuePair<long, decimal?>(point.x, point.y));
         }
 
         private const string htmlExampleCode = @"            <div class=""page"" style=""{{$CSS-CRISIS-PAGE-STYLE}}"">

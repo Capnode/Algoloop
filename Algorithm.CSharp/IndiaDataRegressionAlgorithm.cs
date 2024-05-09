@@ -56,7 +56,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// Raises the data event.
         /// </summary>
         /// <param name="data">Data.</param>
-        public void OnData(Dividends data)
+        public override void OnDividends(Dividends data)
         {
             if (data.ContainsKey(_splitAndDividendSymbol))
             {
@@ -73,7 +73,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// Raises the data event.
         /// </summary>
         /// <param name="data">Data.</param>
-        public void OnData(Splits data)
+        public override void OnSplits(Splits data)
         {
             if (data.ContainsKey(_splitAndDividendSymbol))
             {
@@ -96,11 +96,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Checks the symbol change event
         /// </summary>
-        public override void OnData(Slice slice)
+        public override void OnSymbolChangedEvents(SymbolChangedEvents symbolChanged)
         {
-            if (slice.SymbolChangedEvents.ContainsKey(_mappingSymbol))
+            if (symbolChanged.ContainsKey(_mappingSymbol))
             {
-                var mappingEvent = slice.SymbolChangedEvents.Single(x => x.Key.SecurityType == SecurityType.Equity).Value;
+                var mappingEvent = symbolChanged.Single(x => x.Key.SecurityType == SecurityType.Equity).Value;
                 Log($"{Time} - Ticker changed from: {mappingEvent.OldSymbol} to {mappingEvent.NewSymbol}");
                 if (Time.Date == new DateTime(1999, 01, 01))
                 {
@@ -165,14 +165,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "0"},
+            {"Total Orders", "0"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100000"},
             {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},

@@ -24,17 +24,38 @@ namespace QuantConnect.Data.Shortable
     /// <summary>
     /// Python wrapper for custom shortable providers
     /// </summary>
-    public class ShortableProviderPythonWrapper : IShortableProvider
+    public class ShortableProviderPythonWrapper : BasePythonWrapper<IShortableProvider>, IShortableProvider
     {
-        private readonly dynamic _shortableProvider;
-
         /// <summary>
         /// Creates a new instance
         /// </summary>
         /// <param name="shortableProvider">The python custom shortable provider</param>
         public ShortableProviderPythonWrapper(PyObject shortableProvider)
+            : base(shortableProvider)
         {
-            _shortableProvider = shortableProvider.ValidateImplementationOf<IShortableProvider>();
+        }
+
+        /// <summary>
+        /// Gets the fee rate for the Symbol at the given date.
+        /// </summary>
+        /// <param name="symbol">Symbol to lookup fee rate</param>
+        /// <param name="localTime">Time of the algorithm</param>
+        /// <returns>zero indicating that it is does have borrowing costs</returns>
+        public decimal FeeRate(Symbol symbol, DateTime localTime)
+        {
+            return InvokeMethod<decimal>(nameof(FeeRate), symbol, localTime);
+        }
+
+        /// <summary>
+        /// Gets the Fed funds or other currency-relevant benchmark rate minus the interest rate charged on borrowed shares for a given asset.
+        /// E.g.: Interest rate - borrow fee rate = borrow rebate rate: 5.32% - 0.25% = 5.07%.
+        /// </summary>
+        /// <param name="symbol">Symbol to lookup rebate rate</param>
+        /// <param name="localTime">Time of the algorithm</param>
+        /// <returns>zero indicating that it is does have borrowing costs</returns>
+        public decimal RebateRate(Symbol symbol, DateTime localTime)
+        {
+            return InvokeMethod<decimal>(nameof(RebateRate), symbol, localTime);
         }
 
         /// <summary>
@@ -45,10 +66,7 @@ namespace QuantConnect.Data.Shortable
         /// <returns>The quantity shortable for the given Symbol as a positive number. Null if the Symbol is shortable without restrictions.</returns>
         public long? ShortableQuantity(Symbol symbol, DateTime localTime)
         {
-            using (Py.GIL())
-            {
-                return (_shortableProvider.ShortableQuantity(symbol, localTime) as PyObject).GetAndDispose<long?>();
-            }
+            return InvokeMethod<long?>(nameof(ShortableQuantity), symbol, localTime);
         }
     }
 }

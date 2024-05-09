@@ -14,11 +14,11 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
+using System.Drawing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace QuantConnect.Util
 {
@@ -27,6 +27,8 @@ namespace QuantConnect.Util
     /// </summary>
     public class SeriesJsonConverter : JsonConverter
     {
+        private ColorJsonConverter _colorJsonConverter = new ();
+
         /// <summary>
         /// Write Series to Json
         /// </summary>
@@ -43,47 +45,61 @@ namespace QuantConnect.Util
 
             writer.WriteStartObject();
 
-            writer.WritePropertyName("Name");
+            writer.WritePropertyName("name");
             writer.WriteValue(baseSeries.Name);
-            writer.WritePropertyName("Unit");
+            writer.WritePropertyName("unit");
             writer.WriteValue(baseSeries.Unit);
-            writer.WritePropertyName("Index");
+            writer.WritePropertyName("index");
             writer.WriteValue(baseSeries.Index);
-            writer.WritePropertyName("SeriesType");
+            writer.WritePropertyName("seriesType");
             writer.WriteValue(baseSeries.SeriesType);
+
+            if (baseSeries.ZIndex.HasValue)
+            {
+                writer.WritePropertyName("zIndex");
+                writer.WriteValue(baseSeries.ZIndex.Value);
+            }
+
+            if (baseSeries.IndexName != null)
+            {
+                writer.WritePropertyName("indexName");
+                writer.WriteValue(baseSeries.IndexName);
+            }
+
+            if (baseSeries.Tooltip != null)
+            {
+                writer.WritePropertyName("tooltip");
+                writer.WriteValue(baseSeries.Tooltip);
+            }
 
             switch (value)
             {
                 case Series series:
-                    List<ChartPoint> values;
+                    var values = series.Values;
                     if (series.SeriesType == SeriesType.Pie)
                     {
-                        values = new List<ChartPoint>();
+                        values = new List<ISeriesPoint>();
                         var dataPoint = series.ConsolidateChartPoints();
                         if (dataPoint != null)
                         {
                             values.Add(dataPoint);
                         }
                     }
-                    else
-                    {
-                        values = series.Values.Cast<ChartPoint>().ToList();
-                    }
 
                     // have to add the converter we want to use, else will use default
-                    serializer.Converters.Add(new ColorJsonConverter());
+                    serializer.Converters.Add(_colorJsonConverter);
 
-                    writer.WritePropertyName("Values");
+                    writer.WritePropertyName("values");
                     serializer.Serialize(writer, values);
-                    writer.WritePropertyName("Color");
+                    writer.WritePropertyName("color");
                     serializer.Serialize(writer, series.Color);
-                    writer.WritePropertyName("ScatterMarkerSymbol");
+                    writer.WritePropertyName("scatterMarkerSymbol");
                     serializer.Serialize(writer, series.ScatterMarkerSymbol);
                     break;
 
-                case CandlestickSeries candlestickSeries:
-                    writer.WritePropertyName("Values");
-                    serializer.Serialize(writer, candlestickSeries.Values.Cast<Candlestick>().ToList(), typeof(Candlestick));
+                default:
+                    writer.WritePropertyName("values");
+                    serializer.Serialize(writer, (value as BaseSeries).Values);
                     break;
             }
 
@@ -97,11 +113,15 @@ namespace QuantConnect.Util
         {
             var jObject = JObject.Load(reader);
 
-            var name = jObject["Name"].Value<string>();
-            var unit = jObject["Unit"].Value<string>();
-            var index = jObject["Index"].Value<int>();
-            var seriesType = (SeriesType)jObject["SeriesType"].Value<int>();
-            var values = (JArray)jObject["Values"];
+            var name = (jObject["Name"] ?? jObject["name"]).Value<string>();
+            var unit = (jObject["Unit"] ?? jObject["unit"]).Value<string>();
+            var index = (jObject["Index"] ?? jObject["index"]).Value<int>();
+            var seriesType = (SeriesType)(jObject["SeriesType"] ?? jObject["seriesType"]).Value<int>();
+            var values = (JArray)(jObject["Values"] ?? jObject["values"]);
+
+            var zindex = jObject.TryGetPropertyValue<int?>("ZIndex") ?? jObject.TryGetPropertyValue<int?>("zIndex");
+            var indexName = jObject.TryGetPropertyValue<string>("IndexName") ?? jObject.TryGetPropertyValue<string>("indexName");
+            var tooltip = jObject.TryGetPropertyValue<string>("Tooltip") ?? jObject.TryGetPropertyValue<string>("tooltip");
 
             if (seriesType == SeriesType.Candle)
             {
@@ -110,21 +130,36 @@ namespace QuantConnect.Util
                     Name = name,
                     Unit = unit,
                     Index = index,
+                    ZIndex = zindex,
+                    Tooltip = tooltip,
+                    IndexName = indexName,
                     SeriesType = seriesType,
                     Values = values.ToObject<List<Candlestick>>(serializer).Where(x => x != null).Cast<ISeriesPoint>().ToList()
                 };
             }
 
-            return new Series()
+            var result = new Series()
             {
                 Name = name,
                 Unit = unit,
                 Index = index,
+                ZIndex = zindex,
+                Tooltip = tooltip,
+                IndexName = indexName,
                 SeriesType = seriesType,
-                Color = jObject["Color"].ToObject<Color>(serializer),
-                ScatterMarkerSymbol = jObject["ScatterMarkerSymbol"].ToObject<ScatterMarkerSymbol>(serializer),
-                Values = values.ToObject<List<ChartPoint>>(serializer).Where(x => x != null).Cast<ISeriesPoint>().ToList()
+                Color = (jObject["Color"] ?? jObject["color"])?.ToObject<Color>(serializer) ?? Color.Empty,
+                ScatterMarkerSymbol = (jObject["ScatterMarkerSymbol"] ?? jObject["scatterMarkerSymbol"])?.ToObject<ScatterMarkerSymbol>(serializer) ?? ScatterMarkerSymbol.None
             };
+
+            if (seriesType == SeriesType.Scatter)
+            {
+                result.Values = values.ToObject<List<ScatterChartPoint>>(serializer).Where(x => x != null).Cast<ISeriesPoint>().ToList();
+            }
+            else
+            {
+                result.Values = values.ToObject<List<ChartPoint>>(serializer).Where(x => x != null).Cast<ISeriesPoint>().ToList();
+            }
+            return result;
         }
 
         /// <summary>
@@ -136,10 +171,5 @@ namespace QuantConnect.Util
         {
             return typeof(BaseSeries).IsAssignableFrom(objectType);
         }
-
-        /// <summary>
-        /// This converter wont be used to read JSON. Will throw exception if manually called.
-        /// </summary>
-        public override bool CanRead => true;
     }
 }

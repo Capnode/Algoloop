@@ -1,4 +1,4 @@
-﻿/*
+/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -18,45 +18,60 @@ using Newtonsoft.Json;
 
 namespace QuantConnect.Api
 {
-    /// <summary>
-    /// Live algorithm instance result from the QuantConnect Rest API.
-    /// </summary>
-    public class LiveAlgorithm : RestResponse
+    public class BaseLiveAlgorithm : RestResponse
     {
         /// <summary>
         /// Project id for the live instance
         /// </summary>
-        [JsonProperty(PropertyName = "projectId")]
         public int ProjectId { get; set; }
 
         /// <summary>
         /// Unique live algorithm deployment identifier (similar to a backtest id).
         /// </summary>
-        [JsonProperty(PropertyName = "deployId")]
         public string DeployId { get; set; }
+    }
 
+    public class CreateLiveAlgorithmResponse : BaseLiveAlgorithm
+    {
+        /// <summary>
+        /// The version of the Lean used to run the algorithm
+        /// </summary>
+        public int VersionId { get; set; }
+
+        /// <summary>
+        /// Id of the node that will run the algorithm
+        /// </summary>
+        public string Source { get; set; }
+
+        /// <summary>
+        /// HTTP status response code
+        /// </summary>
+        public string ResponseCode { get; set; }
+    }
+
+    /// <summary>
+    /// Response from List Live Algorithms request to QuantConnect Rest API.
+    /// </summary>
+    public class LiveAlgorithmSummary : BaseLiveAlgorithm
+    {
         /// <summary>
         /// Algorithm status: running, stopped or runtime error.
         /// </summary>
-        [JsonProperty(PropertyName = "status")]
         public AlgorithmStatus Status { get; set; }
 
         /// <summary>
         /// Datetime the algorithm was launched in UTC.
         /// </summary>
-        [JsonProperty(PropertyName = "launched")]
         public DateTime Launched { get; set; }
 
         /// <summary>
         /// Datetime the algorithm was stopped in UTC, null if its still running.
         /// </summary>
-        [JsonProperty(PropertyName = "stopped")]
         public DateTime? Stopped { get; set; }
 
         /// <summary>
         /// Brokerage
         /// </summary>
-        [JsonProperty(PropertyName = "brokerage")]
         public string Brokerage { get; set; }
 
         /// <summary>
@@ -65,13 +80,11 @@ namespace QuantConnect.Api
         /// <remarks>
         /// Data limitations mean we can only stream one chart at a time to the consumer. See which chart you're watching here.
         /// </remarks>
-        [JsonProperty(PropertyName = "subscription")]
         public string Subscription { get; set; }
 
         /// <summary>
         /// Live algorithm error message from a crash or algorithm runtime error.
         /// </summary>
-        [JsonProperty(PropertyName = "error")]
         public string Error { get; set; }
     }
 
@@ -84,6 +97,6 @@ namespace QuantConnect.Api
         /// Algorithm list matching the requested status.
         /// </summary>
         [JsonProperty(PropertyName = "live")]
-        public List<LiveAlgorithm> Algorithms { get; set; }
+        public List<LiveAlgorithmSummary> Algorithms { get; set; }
     }
 }

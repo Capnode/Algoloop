@@ -154,13 +154,13 @@ namespace Algoloop.Wpf.Views
             if (_isLoaded)
             {
                 SetVisibleCharts();
-                RedrawCharts();
+                SafeRedrawCharts();
             }
         }
 
         private void Combobox_DropDownClosed(object sender, EventArgs e)
         {
-            RedrawCharts();
+            SafeRedrawCharts();
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -178,11 +178,12 @@ namespace Algoloop.Wpf.Views
                 SetVisibleCharts();
                 _isLoaded = true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                App.LogError(ex);
             }
 
-            RedrawCharts();
+            SafeRedrawCharts();
         }
 
         private void SetVisibleCharts()
@@ -284,7 +285,7 @@ namespace Algoloop.Wpf.Views
             if (candles.Security == null) return;
             _securityProvider.Add(candles.Security);
             if (!_isLoaded) return;
-            RedrawCharts();
+            SafeRedrawCharts();
         }
 
         private void OnSubscribeIndicatorElement(IChartIndicatorElement element, CandleSeries candles, IIndicator indicator)
@@ -293,7 +294,7 @@ namespace Algoloop.Wpf.Views
             //Debug.WriteLine($"OnSubscribeIndicatorElement({element.FullTitle ?? "-"}, {candles.Security?.Id ?? "-"}, {indicator.Name ?? "-"})");
             _indicators[element] = indicator;
             if (!_isLoaded) return;
-            RedrawCharts();
+            SafeRedrawCharts();
         }
 
         private void OnUnSubscribeElement(IChartElement element)
@@ -303,6 +304,18 @@ namespace Algoloop.Wpf.Views
             if (element is IChartIndicatorElement indElem)
             {
                 _indicators.Remove(indElem);
+            }
+        }
+
+        private void SafeRedrawCharts()
+        {
+            try
+            {
+                RedrawCharts();
+            }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
             }
         }
 

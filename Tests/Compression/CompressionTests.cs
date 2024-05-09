@@ -13,6 +13,7 @@
  * limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -189,6 +190,26 @@ namespace QuantConnect.Tests.Compression
         }
 
         [Test]
+        public void ZipUnzipDataToFile()
+        {
+            var data = new Dictionary<string, string>
+            {
+                {"Ł", "The key is unicode"},
+                {"2", "something"}
+            };
+
+            var fileName = Guid.NewGuid().ToString();
+            var compressed = QuantConnect.Compression.ZipData(fileName, data);
+
+            Assert.IsTrue(compressed);
+
+            using var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var result = QuantConnect.Compression.UnzipDataAsync(fileStream).Result;
+
+            CollectionAssert.AreEqual(data.OrderBy(kv => kv.Key).ToList(), result.OrderBy(kv => kv.Key).ToList());
+        }
+
+        [Test]
         public void UnzipDataSupportsEncoding()
         {
             var data = new Dictionary<string, string>
@@ -200,6 +221,30 @@ namespace QuantConnect.Tests.Compression
             var bytes = encoding.GetBytes(JsonConvert.SerializeObject(data));
             var compressed = QuantConnect.Compression.ZipBytes(bytes, "entry.json");
             var decompressed = QuantConnect.Compression.UnzipData(compressed, encoding);
+            var redata = JsonConvert.DeserializeObject<Dictionary<string, string>>(
+                decompressed.Single().Value
+            );
+
+            var expected = data.Single();
+            var actual = redata.Single();
+            Assert.AreEqual(expected.Key, actual.Key);
+            Assert.AreEqual(expected.Value, actual.Value);
+        }
+
+        [Test]
+        public void UnzipDataStream()
+        {
+            var data = new Dictionary<string, string>
+            {
+                {"Ł", "The key is unicode"}
+            };
+
+            var encoding = Encoding.UTF8;
+            var bytes = encoding.GetBytes(JsonConvert.SerializeObject(data));
+            var compressed = QuantConnect.Compression.ZipBytes(bytes, "entry.json");
+
+            using var stream = new MemoryStream(compressed);
+            var decompressed = QuantConnect.Compression.UnzipDataAsync(stream, encoding).Result;
             var redata = JsonConvert.DeserializeObject<Dictionary<string, string>>(
                 decompressed.Single().Value
             );

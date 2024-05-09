@@ -53,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
             _mi = new MassIndex("MassIndex", 9, 25);
             _wasi = new WilderAccumulativeSwingIndex("WilderAccumulativeSwingIndex", 8);
             _wsi = new WilderSwingIndex("WilderSwingIndex", 8);
-            _b = new Beta("Beta", 3, "AIG", "SPY");
+            _b = new Beta("Beta", "AIG", "SPY", 3);
             _indicators = new List<IIndicator>() { _mi, _wasi, _wsi, _b };
         }
 
@@ -110,14 +110,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "0"},
+            {"Total Orders", "0"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "0%"},
             {"Drawdown", "0%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100000"},
             {"Net Profit", "0%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},

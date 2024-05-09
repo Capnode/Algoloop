@@ -78,7 +78,7 @@ namespace QuantConnect.Tests.API
             var dataLink = ApiClient.ReadDataLink(path, TestOrganization);
 
             Assert.IsTrue(dataLink.Success);
-            Assert.IsFalse(dataLink.Url.IsNullOrEmpty());
+            Assert.IsFalse(dataLink.Link.IsNullOrEmpty());
         }
 
         /// <summary>
@@ -86,8 +86,7 @@ namespace QuantConnect.Tests.API
         /// </summary>
         /// <param name="filePath"></param>
         [TestCase("forex/oanda/daily/eurusd.zip")]
-        [TestCase("crypto/gdax/daily/btcusd_quote.zip")]
-        [TestCase("\\index\\usa\\minute\\spx")]
+        [TestCase("crypto/coinbase/daily/btcusd_quote.zip")]
         public void GetPrices(string filePath)
         {
             if (_pricesCache == null)
@@ -100,7 +99,7 @@ namespace QuantConnect.Tests.API
 
             // Get the price
             int price = _pricesCache.GetPrice(filePath);
-            Assert.IsTrue(price != 0);
+            Assert.AreNotEqual(price, -1);
         }
 
         /// <summary>
@@ -130,7 +129,7 @@ namespace QuantConnect.Tests.API
         /// <param name="directory"></param>
         [TestCase("alternative/sec/aapl/")]
         [TestCase("cfd/oanda/daily/")]
-        [TestCase("crypto/gdax/minute/btcusd/")]
+        [TestCase("crypto/coinbase/minute/btcusd/")]
         [TestCase("equity/usa/shortable/")]
         [TestCase("forex/oanda/minute/eurusd/")]
         [TestCase("forex\\oanda\\minute\\eurusd\\")] //Windows path case

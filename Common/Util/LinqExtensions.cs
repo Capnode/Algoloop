@@ -103,18 +103,6 @@ namespace QuantConnect.Util
         }
 
         /// <summary>
-        /// Produces the set difference of two sequences by using the default equality comparer to compare values.
-        /// </summary>
-        /// <typeparam name="T">The type of the elements of the input sequences.</typeparam>
-        /// <param name="enumerable">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> whose elements that are not also in <paramref name="set"/> will be returned.</param>
-        /// <param name="set">An <see cref="T:System.Collections.Generic.IEnumerable`1"/> whose elements that also occur in the first sequence will cause those elements to be removed from the returned sequence.</param>
-        /// <returns>A sequence that contains the set difference of the elements of two sequences.</returns>
-        public static IEnumerable<T> Except<T>(this IEnumerable<T> enumerable, ISet<T> set)
-        {
-            return enumerable.Where(item => !set.Contains(item));
-        }
-
-        /// <summary>
         /// Returns true if the specified enumerable is null or has no elements
         /// </summary>
         /// <typeparam name="T">The enumerable's item type</typeparam>
@@ -309,7 +297,11 @@ namespace QuantConnect.Util
         /// <returns>True if there are any differences between the two sets, false otherwise</returns>
         public static bool AreDifferent<T>(this ISet<T> left, ISet<T> right)
         {
-            return left.Except(right).Any() || right.Except(left).Any();
+            if(ReferenceEquals(left, right))
+            {
+                return false;
+            }
+            return !left.SetEquals(right);
         }
 
         /// <summary>

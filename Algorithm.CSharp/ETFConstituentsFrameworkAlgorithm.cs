@@ -44,7 +44,7 @@ namespace QuantConnect.Algorithm.CSharp
             SetPortfolioConstruction(new EqualWeightingPortfolioConstructionModel());
         }
 
-        private IEnumerable<Symbol> ETFConstituentsFilter(IEnumerable<ETFConstituentData> constituents)
+        private protected IEnumerable<Symbol> ETFConstituentsFilter(IEnumerable<ETFConstituentUniverse> constituents)
         {
             // Get the 10 securities with the largest weight in the index
             return constituents.OrderByDescending(c => c.Weight).Take(8).Select(c => c.Symbol);
@@ -63,7 +63,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 565;
+        public long DataPoints => 1072;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -75,30 +75,33 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "7"},
-            {"Average Win", "0%"},
+            {"Total Orders", "9"},
+            {"Average Win", "0.01%"},
             {"Average Loss", "0%"},
-            {"Compounding Annual Return", "61.105%"},
+            {"Compounding Annual Return", "250.805%"},
             {"Drawdown", "0.900%"},
             {"Expectancy", "0"},
-            {"Net Profit", "0.919%"},
-            {"Sharpe Ratio", "4.7"},
-            {"Probabilistic Sharpe Ratio", "67.449%"},
+            {"Start Equity", "100000"},
+            {"End Equity", "102436.17"},
+            {"Net Profit", "2.436%"},
+            {"Sharpe Ratio", "3.837"},
+            {"Sortino Ratio", "10.614"},
+            {"Probabilistic Sharpe Ratio", "63.620%"},
             {"Loss Rate", "0%"},
-            {"Win Rate", "0%"},
+            {"Win Rate", "100%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "0.618"},
-            {"Beta", "-0.348"},
-            {"Annual Standard Deviation", "0.1"},
-            {"Annual Variance", "0.01"},
-            {"Information Ratio", "0.41"},
-            {"Tracking Error", "0.127"},
-            {"Treynor Ratio", "-1.358"},
-            {"Total Fees", "$7.02"},
-            {"Estimated Strategy Capacity", "$350000000.00"},
+            {"Alpha", "0.5"},
+            {"Beta", "-0.357"},
+            {"Annual Standard Deviation", "0.091"},
+            {"Annual Variance", "0.008"},
+            {"Information Ratio", "-0.581"},
+            {"Tracking Error", "0.12"},
+            {"Treynor Ratio", "-0.981"},
+            {"Total Fees", "$9.05"},
+            {"Estimated Strategy Capacity", "$400000000.00"},
             {"Lowest Capacity Asset", "GOOCV VP83T1ZUHROL"},
-            {"Portfolio Turnover", "13.71%"},
-            {"OrderListHash", "5ce5eff3201fdcd77365a2c8b5911e36"}
+            {"Portfolio Turnover", "14.29%"},
+            {"OrderListHash", "a11cb12dabe993c7989036e299f3f028"}
         };
     }
 }

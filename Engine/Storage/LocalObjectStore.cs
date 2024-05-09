@@ -62,7 +62,6 @@ namespace QuantConnect.Lean.Engine.Storage
         private volatile bool _dirty;
 
         private Timer _persistenceTimer;
-        private readonly string _storageRoot = DefaultObjectStore;
         private Regex _pathRegex = new (@"^\.?[a-zA-Z0-9\\/_#\-\$= ]+\.?[a-zA-Z0-9]*$", RegexOptions.Compiled);
         private readonly ConcurrentDictionary<string, ObjectStoreEntry> _storage = new();
         private readonly object _persistLock = new object();
@@ -91,7 +90,7 @@ namespace QuantConnect.Lean.Engine.Storage
         /// <param name="controls">The job controls instance</param>
         public virtual void Initialize(int userId, int projectId, string userToken, Controls controls)
         {
-            AlgorithmStorageRoot = _storageRoot;
+            AlgorithmStorageRoot = StorageRoot();
 
             // create the root path if it does not exist
             var directoryInfo = FileHandler.CreateDirectory(AlgorithmStorageRoot);
@@ -105,6 +104,14 @@ namespace QuantConnect.Lean.Engine.Storage
             }
 
             Log.Trace($"LocalObjectStore.Initialize(): Storage Root: {directoryInfo.FullName}. StorageFileCount {controls.StorageFileCount}. StorageLimit {BytesToMb(controls.StorageLimit)}MB");
+        }
+
+        /// <summary>
+        /// Storage root path
+        /// </summary>
+        protected virtual string StorageRoot()
+        {
+            return DefaultObjectStore;
         }
 
         /// <summary>
@@ -373,8 +380,15 @@ namespace QuantConnect.Lean.Engine.Storage
             var filePath = PathForKey(path);
             if (FileHandler.Exists(filePath))
             {
-                FileHandler.Delete(filePath);
-                return true;
+                try
+                {
+                    FileHandler.Delete(filePath);
+                    return true;
+                }
+                catch
+                {
+                    // This try sentence is to prevent a race condition with the Delete within the PersisData() method
+                }
             }
 
             return wasInCache;
@@ -523,12 +537,25 @@ namespace QuantConnect.Lean.Engine.Storage
 
                         // clear the dirty flag
                         kvp.Value.SetClean();
+
+                        // This kvp could have been deleted by the Delete() method
+                        if (!_storage.Contains(kvp))
+                        {
+                            try
+                            {
+                                FileHandler.Delete(filePath);
+                            }
+                            catch
+                            {
+                                // This try sentence is to prevent a race condition with the Delete() method
+                            }
+                        }
                     }
                 }
 
                 return true;
             }
-            catch (Exception err) 
+            catch (Exception err)
             {
                 Log.Error(err, "LocalObjectStore.PersistData()");
                 OnErrorRaised(err);

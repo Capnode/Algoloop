@@ -44,7 +44,8 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 // Entry short $2 below
                 var stopPrice = orderEvent.FillPrice - 2;
-                Debug($"Enter short at {orderEvent.FillPrice} set STOPLOSS at {stopPrice:C}");
+                var currencySymbol = Currencies.GetCurrencySymbol(order.PriceCurrency);
+                Debug($"Enter short at {orderEvent.FillPrice} set STOPLOSS at {currencySymbol}{stopPrice}");
                 StopMarketOrder(order.Symbol, -order.Quantity, stopPrice, "StopLoss");
             }
         }
@@ -84,14 +85,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "2"},
+            {"Total Orders", "2"},
             {"Average Win", "0%"},
             {"Average Loss", "0.00%"},
             {"Compounding Annual Return", "-0.359%"},
             {"Drawdown", "0.000%"},
             {"Expectancy", "-1"},
+            {"Start Equity", "100000"},
+            {"End Equity", "99995.41"},
             {"Net Profit", "-0.005%"},
             {"Sharpe Ratio", "0"},
+            {"Sortino Ratio", "0"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "100%"},
             {"Win Rate", "0%"},
@@ -107,7 +111,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$18000000.00"},
             {"Lowest Capacity Asset", "SPY R735QTJ8XC9X"},
             {"Portfolio Turnover", "5.79%"},
-            {"OrderListHash", "1ec025ef7aa0d11969f2b01304009bd0"}
+            {"OrderListHash", "4113054204a032b871734430f2fbdcb5"}
         };
     }
 }

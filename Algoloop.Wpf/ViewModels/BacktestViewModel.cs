@@ -499,13 +499,13 @@ namespace Algoloop.Wpf.ViewModels
 
             if (series.First() is not Candlestick first) return 0;
             if (series.Last() is not Candlestick last) return 0;
-            decimal netProfit = last.Close - first.Close;
+            decimal netProfit = last.Close ?? 0 - first.Close ?? 0;
             decimal avg = netProfit / (count - 1);
-            decimal ideal = first.Close;
+            decimal ideal = first.Close ?? 0;
             decimal error = 0;
             foreach (Candlestick trade in series)
             {
-                decimal diff = trade.Close - ideal;
+                decimal diff = trade.Close ?? 0 - ideal;
                 error += Math.Abs(diff);
                 ideal += avg;
             }
@@ -529,7 +529,7 @@ namespace Algoloop.Wpf.ViewModels
                         athDays++;
                     }
 
-                    ath = trade.Close;
+                    ath = trade.Close ?? 0;
                 }
 
                 days++;

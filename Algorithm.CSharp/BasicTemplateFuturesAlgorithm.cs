@@ -151,7 +151,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 75401;
+        public long DataPoints => 75403;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -163,14 +163,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "2700"},
+            {"Total Orders", "2700"},
             {"Average Win", "0.00%"},
             {"Average Loss", "0.00%"},
             {"Compounding Annual Return", "-99.777%"},
             {"Drawdown", "4.400%"},
             {"Expectancy", "-0.724"},
+            {"Start Equity", "1000000"},
+            {"End Equity", "955700.5"},
             {"Net Profit", "-4.430%"},
             {"Sharpe Ratio", "-31.63"},
+            {"Sortino Ratio", "-31.63"},
             {"Probabilistic Sharpe Ratio", "0%"},
             {"Loss Rate", "83%"},
             {"Win Rate", "17%"},
@@ -186,7 +189,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$14000.00"},
             {"Lowest Capacity Asset", "GC VOFJUCDY9XNH"},
             {"Portfolio Turnover", "9912.69%"},
-            {"OrderListHash", "8f92e1528c6477a156449fd1e86527e7"}
+            {"OrderListHash", "6e0f767a46a54365287801295cf7bb75"}
         };
     }
 }

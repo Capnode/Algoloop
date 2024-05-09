@@ -30,7 +30,7 @@ namespace QuantConnect.Algorithm.CSharp
     /// </summary>
     public class ETFConstituentUniverseFrameworkRegressionAlgorithm : QCAlgorithm, IRegressionAlgorithmDefinition
     {
-        private List<ETFConstituentData> ConstituentData = new List<ETFConstituentData>();
+        private List<ETFConstituentUniverse> ConstituentData = new List<ETFConstituentUniverse>();
         
         /// <summary>
         /// Initializes the algorithm, setting up the framework classes and ETF constituent universe settings
@@ -53,7 +53,20 @@ namespace QuantConnect.Algorithm.CSharp
 
         protected virtual void AddUniverseWrapper(Symbol symbol)
         {
-            AddUniverse(Universe.ETF(symbol, UniverseSettings, FilterETFConstituents));
+            var universe = AddUniverse(Universe.ETF(symbol, UniverseSettings, FilterETFConstituents));
+
+            var historicalData = History(universe, 1).ToList();
+            if (historicalData.Count != 1)
+            {
+                throw new Exception($"Unexpected history count {historicalData.Count}! Expected 1");
+            }
+            foreach (var universeDataCollection in historicalData)
+            {
+                if (universeDataCollection.Data.Count < 200)
+                {
+                    throw new Exception($"Unexpected universe DataCollection count {universeDataCollection.Data.Count}! Expected > 200");
+                }
+            }
         }
 
         /// <summary>
@@ -61,7 +74,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         /// <param name="constituents">ETF constituents</param>
         /// <returns>ETF constituent Symbols that we want to include in the algorithm</returns>
-        public IEnumerable<Symbol> FilterETFConstituents(IEnumerable<ETFConstituentData> constituents)
+        public IEnumerable<Symbol> FilterETFConstituents(IEnumerable<ETFConstituentUniverse> constituents)
         {
             var constituentData = constituents
                 .Where(x => (x.Weight ?? 0m) >= 0.001m)
@@ -205,42 +218,45 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 1905;
+        public long DataPoints => 2436;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 0;
+        public virtual int AlgorithmHistoryDataPoints => 1;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "3"},
+            {"Total Orders", "3"},
             {"Average Win", "0%"},
             {"Average Loss", "0%"},
-            {"Compounding Annual Return", "3.252%"},
-            {"Drawdown", "0.800%"},
+            {"Compounding Annual Return", "3.006%"},
+            {"Drawdown", "0.700%"},
             {"Expectancy", "0"},
-            {"Net Profit", "0.525%"},
-            {"Sharpe Ratio", "1.118"},
-            {"Probabilistic Sharpe Ratio", "54.664%"},
+            {"Start Equity", "100000"},
+            {"End Equity", "100485.34"},
+            {"Net Profit", "0.485%"},
+            {"Sharpe Ratio", "1.055"},
+            {"Sortino Ratio", "1.53"},
+            {"Probabilistic Sharpe Ratio", "53.609%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "0%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "0.013"},
-            {"Beta", "0.1"},
-            {"Annual Standard Deviation", "0.018"},
+            {"Alpha", "0.012"},
+            {"Beta", "0.096"},
+            {"Annual Standard Deviation", "0.017"},
             {"Annual Variance", "0"},
-            {"Information Ratio", "-0.526"},
+            {"Information Ratio", "-0.544"},
             {"Tracking Error", "0.096"},
-            {"Treynor Ratio", "0.203"},
+            {"Treynor Ratio", "0.191"},
             {"Total Fees", "$3.00"},
-            {"Estimated Strategy Capacity", "$1200000000.00"},
+            {"Estimated Strategy Capacity", "$1400000000.00"},
             {"Lowest Capacity Asset", "IBM R735QTJ8XC9X"},
             {"Portfolio Turnover", "0.12%"},
-            {"OrderListHash", "281a09be91a563ff3892a1acfa3e233a"}
+            {"OrderListHash", "2b2f7874b8056f64f08974ad50aae71d"}
         };
     }
 }

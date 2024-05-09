@@ -23,7 +23,6 @@ using QuantConnect.Packets;
 using QuantConnect.Interfaces;
 using QuantConnect.Scheduling;
 using QuantConnect.Securities;
-using System.Collections.Generic;
 using QuantConnect.Configuration;
 using QuantConnect.Lean.Engine.Results;
 
@@ -36,7 +35,20 @@ namespace QuantConnect.Lean.Engine.RealTime
     {
         private Thread _realTimeThread;
         private CancellationTokenSource _cancellationTokenSource = new();
-        private static MarketHoursDatabase _marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
+        private readonly bool _forceExchangeAlwaysOpen = Config.GetBool("force-exchange-always-open");
+
+        /// <summary>
+        /// Gets the current market hours database instance
+        /// </summary>
+        protected MarketHoursDatabase MarketHoursDatabase { get; set; } = MarketHoursDatabase.FromDataFolder();
+
+        /// <summary>
+        /// Gets the time provider
+        /// </summary>
+        /// <remarks>
+        /// This should be fixed to RealTimeHandler, but made a protected property for testing purposes
+        /// </remarks>
+        protected virtual ITimeProvider TimeProvider { get; } = RealTimeProvider.Instance;
 
         /// <summary>
         /// Boolean flag indicating thread state.
@@ -50,7 +62,7 @@ namespace QuantConnect.Lean.Engine.RealTime
         {
             base.Setup(algorithm, job, resultHandler, api, isolatorLimitProvider);
 
-            var todayInAlgorithmTimeZone = DateTime.UtcNow.ConvertFromUtc(Algorithm.TimeZone).Date;
+            var todayInAlgorithmTimeZone = TimeProvider.GetUtcNow().ConvertFromUtc(Algorithm.TimeZone).Date;
 
             // refresh the market hours for today explicitly, and then set up an event to refresh them each day at midnight
             RefreshMarketHoursToday(todayInAlgorithmTimeZone);
@@ -86,7 +98,7 @@ namespace QuantConnect.Lean.Engine.RealTime
             // continue thread until cancellation is requested
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
-                var time = DateTime.UtcNow;
+                var time = TimeProvider.GetUtcNow();
 
                 // pause until the next second
                 var nextSecond = time.RoundUp(TimeSpan.FromSeconds(1));
@@ -113,20 +125,21 @@ namespace QuantConnect.Lean.Engine.RealTime
         }
 
         /// <summary>
-        /// Refresh the Today variable holding the market hours information
+        /// Refresh the market hours for each security in the given date
         /// </summary>
-        private void RefreshMarketHoursToday(DateTime date)
+        /// <remarks>Each time this method is called, the MarketHoursDatabase is reset</remarks>
+        protected void RefreshMarketHoursToday(DateTime date)
         {
             date = date.Date;
+            ResetMarketHoursDatabase();
 
             // update market hours for each security
             foreach (var kvp in Algorithm.Securities)
             {
                 var security = kvp.Value;
+                UpdateMarketHours(security);
 
-                var marketHours = MarketToday(date, security.Symbol);
-                security.Exchange.SetMarketHours(marketHours, date.DayOfWeek);
-                var localMarketHours = security.Exchange.Hours.MarketHours[date.DayOfWeek];
+                var localMarketHours = security.Exchange.Hours.GetMarketHours(date);
                 Log.Trace($"LiveTradingRealTimeHandler.RefreshMarketHoursToday({security.Type}): Market hours set: Symbol: {security.Symbol} {localMarketHours} ({security.Exchange.Hours.TimeZone})");
             }
         }
@@ -175,21 +188,27 @@ namespace QuantConnect.Lean.Engine.RealTime
         }
 
         /// <summary>
-        /// Get the calendar open hours for the date.
+        /// Updates the market hours for the specified security.
         /// </summary>
-        private IEnumerable<MarketHoursSegment> MarketToday(DateTime time, Symbol symbol)
+        /// <remarks>This is done after a MHDB refresh</remarks>
+        protected virtual void UpdateMarketHours(Security security)
         {
-            if (Config.GetBool("force-exchange-always-open"))
-            {
-                yield return MarketHoursSegment.OpenAllDay();
-                yield break;
-            }
+            var hours = _forceExchangeAlwaysOpen
+                ? SecurityExchangeHours.AlwaysOpen(security.Exchange.TimeZone)
+                : MarketHoursDatabase.GetExchangeHours(security.Symbol.ID.Market, security.Symbol, security.Symbol.ID.SecurityType);
 
-            var hours = _marketHoursDatabase.GetExchangeHours(symbol.ID.Market, symbol, symbol.ID.SecurityType);
-            foreach (var segment in hours.MarketHours[time.DayOfWeek].Segments)
-            {
-                yield return segment;
-            }
+            // Use Update method to avoid replacing the reference
+            security.Exchange.Hours.Update(hours);
+        }
+
+        /// <summary>
+        /// Resets the market hours database, forcing a reload when reused.
+        /// Called in tests where multiple algorithms are run sequentially,
+        /// and we need to guarantee that every test starts with the same environment.
+        /// </summary>
+        protected virtual void ResetMarketHoursDatabase()
+        {
+            MarketHoursDatabase.ReloadEntries();
         }
     }
 }

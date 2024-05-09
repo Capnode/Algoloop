@@ -51,7 +51,7 @@ namespace Algoloop.Wpf.Views
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
             _isLoaded = true;
-            RedrawCharts();
+            SafeRedrawCharts();
         }
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
@@ -100,14 +100,27 @@ namespace Algoloop.Wpf.Views
             _combobox.Visibility = _combobox.Items.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
             if (_isLoaded)
             {
-                RedrawCharts();
+                SafeRedrawCharts();
             }
         }
 
         private void Combobox_DropDownClosed(object sender, EventArgs e)
         {
-            RedrawCharts();
+            SafeRedrawCharts();
         }
+
+        private void SafeRedrawCharts()
+        {
+            try
+            {
+                RedrawCharts();
+            }
+            catch (Exception ex)
+            {
+                App.LogError(ex);
+            }
+        }
+
 
         private void RedrawCharts()
         {

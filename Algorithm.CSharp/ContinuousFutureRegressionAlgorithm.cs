@@ -149,10 +149,10 @@ namespace QuantConnect.Algorithm.CSharp
                 throw new Exception($"Unexpected symbol changed events: {_mappings.Count}, was expecting {expectedMappingCounts}");
             }
 
-            var securities = Securities.Values.Where(sec => !sec.IsTradable && !sec.Symbol.IsCanonical() && sec.Symbol.SecurityType == SecurityType.Future).ToList();
+            var securities = Securities.Total.Where(sec => !sec.IsTradable && !sec.Symbol.IsCanonical() && sec.Symbol.SecurityType == SecurityType.Future).ToList();
             if (securities.Count != 1)
             {
-                throw new Exception("We should have a non tradable future contract security!");
+                throw new Exception($"We should have a single non tradable future contract security! found: {securities.Count}");
             }
         }
 
@@ -169,7 +169,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 703956;
+        public long DataPoints => 713395;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -181,14 +181,17 @@ namespace QuantConnect.Algorithm.CSharp
         /// </summary>
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
-            {"Total Trades", "3"},
+            {"Total Orders", "3"},
             {"Average Win", "1.50%"},
             {"Average Loss", "0%"},
             {"Compounding Annual Return", "3.337%"},
             {"Drawdown", "1.600%"},
             {"Expectancy", "0"},
+            {"Start Equity", "100000"},
+            {"End Equity", "101666.4"},
             {"Net Profit", "1.666%"},
             {"Sharpe Ratio", "0.594"},
+            {"Sortino Ratio", "0.198"},
             {"Probabilistic Sharpe Ratio", "44.801%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "100%"},
@@ -204,7 +207,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$8000000000.00"},
             {"Lowest Capacity Asset", "ES VMKLFZIH2MTD"},
             {"Portfolio Turnover", "1.39%"},
-            {"OrderListHash", "daf9c9ec97f1590f5a049600599e3b83"}
+            {"OrderListHash", "40c1137e0bc83b2bc920495af119c8fc"}
         };
     }
 }

@@ -358,6 +358,15 @@ namespace QuantConnect.Tests.Common.Data
             Assert.AreEqual(1, slice2.Ticks.Count);
         }
 
+        [TestCase(null)]
+        [TestCase("")]
+        public void AccessingTicksParsedSaleConditinoDoesNotThrow(string saleCondition)
+        {
+            var tick1 = new Tick(_dataTime, Symbols.SPY, 1.1m, 2.1m) { TickType = TickType.Trade };
+            tick1.SaleCondition = saleCondition;
+            Assert.DoesNotThrow(() => tick1.ParsedSaleCondition.ToString());
+        }
+
         [Test]
         public void MergeOptionsAndFuturesChain()
         {
@@ -461,36 +470,39 @@ def Test(slice, symbol):
             }
         }
 
-        [Test]
-        public void PythonGetPythonCustomData()
+        [TestCase("reader", "get_source", "get")]
+        [TestCase("Reader", "GetSource", "get")]
+        [TestCase("reader", "get_source", "Get")]
+        [TestCase("Reader", "GetSource", "Get")]
+        public void PythonGetPythonCustomData(string reader, string getSource, string get)
         {
             using (Py.GIL())
             {
                 dynamic testModule = PyModule.FromString("testModule",
-                    @"
+                    $@"
 
 from AlgorithmImports import *
 
 class CustomDataTest(PythonData):
-    def Reader(self, config, line, date, isLiveMode):
+    def {reader}(self, config, line, date, isLiveMode):
         result = CustomDataTest()
         result.Symbol = config.Symbol
         result.Value = 10
         return result
-    def GetSource(config, date, isLiveMode):
+    def {getSource}(config, date, isLiveMode):
         return None
 
 class CustomDataTest2(PythonData):
-    def Reader(self, config, line, date, isLiveMode):
+    def {reader}(self, config, line, date, isLiveMode):
         result = CustomDataTest2()
         result.Symbol = config.Symbol
         result.Value = 11
         return result
-    def GetSource(config, date, isLiveMode):
+    def {getSource}(config, date, isLiveMode):
         return None
 
 def Test(slice):
-    data = slice.Get(CustomDataTest)
+    data = slice.{get}(CustomDataTest)
     return data");
                 var test = testModule.GetAttr("Test");
 
