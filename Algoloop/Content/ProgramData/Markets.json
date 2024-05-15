@@ -3,55 +3,70 @@
   "Markets": [
     {
       "Name": "QuantConnect",
-      "Provider": "quantconnect",
+      "Provider": "usa",
       "SourceFolder": null,
       "Access": 0,
       "Login": "",
       "Password": "",
       "ApiKey": "",
       "AccountId": "",
-      "LastDate": "2020-01-12T00:00:00+01:00",
+      "LastDate": "2024-05-15T00:00:00+02:00",
       "Resolution": 4,
       "Active": false,
       "DefaultAccountId": null,
+      "ChartResolution": 4,
+      "ChartDate": "0001-01-01T00:00:00",
       "Symbols": [
+        {
+          "Id": "aaa",
+          "Active": true,
+          "Name": "aaa",
+          "Market": "usa",
+          "Security": 1,
+          "ReferenceSymbols": [],
+          "Properties": {
+            "Security": 1
+          }
+        },
         {
           "Id": "aapl",
           "Active": true,
           "Name": "aapl",
           "Market": "usa",
-          "Security": 1,
-          "Properties": {}
-        },
-        {
-          "Id": "spy",
-          "Active": true,
-          "Name": "spy",
-          "Market": "usa",
-          "Security": 1,
-          "Properties": {}
+          "Security": 2,
+          "ReferenceSymbols": [],
+          "Properties": {
+            "Security": 2
+          }
         }
       ],
       "Lists": [
         {
-          "Id": null,
-          "Name": "Stocks",
+          "Id": "Equity",
+          "Name": "Equity",
+          "Auto": true,
           "Symbols": [
+            {
+              "Id": "aaa",
+              "Active": true,
+              "Name": "aaa",
+              "Market": "usa",
+              "Security": 1,
+              "ReferenceSymbols": [],
+              "Properties": {
+                "Security": 1
+              }
+            },
             {
               "Id": "aapl",
               "Active": true,
               "Name": "aapl",
               "Market": "usa",
-              "Security": 1,
-              "Properties": {}
-            },
-            {
-              "Id": "spy",
-              "Active": true,
-              "Name": "spy",
-              "Market": "usa",
-              "Security": 1,
-              "Properties": {}
+              "Security": 2,
+              "ReferenceSymbols": [],
+              "Properties": {
+                "Security": 2
+              }
             }
           ]
         }

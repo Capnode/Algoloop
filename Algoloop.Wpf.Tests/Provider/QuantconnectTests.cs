@@ -70,7 +70,7 @@ namespace Algoloop.Wpf.Tests.Provider
             // Assert
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate == date);
-            Assert.AreEqual(101, market.Symbols.Count);
+            Assert.AreEqual(110, market.Symbols.Count);
             Assert.AreEqual(market.Symbols.Count, market.Symbols.Where(m => m.Active).Count());
         }
 
@@ -99,7 +99,7 @@ namespace Algoloop.Wpf.Tests.Provider
             // Assert
             Assert.IsFalse(market.Active);
             Assert.IsTrue(market.LastDate > date);
-            Assert.AreEqual(101, market.Symbols.Count);
+            Assert.AreEqual(110, market.Symbols.Count);
             Assert.AreEqual(market.Symbols.Count - 1, market.Symbols.Where(m => m.Active).Count());
         }
     }

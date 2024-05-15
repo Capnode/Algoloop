@@ -32,7 +32,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_idealProfit()
+        public void CalculateScore_TradeViewModel_idealProfit()
         {
             var trades = new List<TradeViewModel>
             {
@@ -47,7 +47,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_idealLoss()
+        public void CalculateScore_TradeViewModel_idealLoss()
         {
             var trades = new List<TradeViewModel>
             {
@@ -62,7 +62,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_breakeven()
+        public void CalculateScore_TradeViewModel_breakeven()
         {
             var trades = new List<TradeViewModel>
             {
@@ -77,7 +77,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_profit()
+        public void CalculateScore_TradeViewModel_profit()
         {
             var trades = new List<TradeViewModel>
             {
@@ -92,7 +92,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_loss()
+        public void CalculateScore_TradeViewModel_loss()
         {
             var trades = new List<TradeViewModel>
             {
@@ -107,7 +107,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_chartpoint_idealProfit()
+        public void CalculateScore_Candlestick_idealProfit()
         {
             List<ISeriesPoint> trades = new()
             {
@@ -122,7 +122,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_chartpoint_idealLoss()
+        public void CalculateScore_Candlestick_idealLoss()
         {
             List<ISeriesPoint> trades = new()
             {
@@ -137,7 +137,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_chartpoint_breakeven()
+        public void CalculateScore_Candlestick_breakeven()
         {
             List<ISeriesPoint> trades = new()
             {
@@ -152,7 +152,7 @@ namespace Algoloop.Wpf.Tests.ViewModel
         }
 
         [TestMethod()]
-        public void CalculateScore_chartpoint_profit()
+        public void CalculateScore_Candlestick_profit()
         {
             List<ISeriesPoint> trades = new()
             {

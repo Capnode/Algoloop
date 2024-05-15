@@ -83,5 +83,11 @@ namespace Algoloop.Wpf.Model
             var a = obj as ListModel;
             return string.Compare(Name, a?.Name, StringComparison.OrdinalIgnoreCase);
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not ListModel other) return false;
+            return (Id ?? Name) == (other.Id ?? other.Name);
+        }
     }
 }

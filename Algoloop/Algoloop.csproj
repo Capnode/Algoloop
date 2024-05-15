@@ -96,6 +96,10 @@
       <Link>Content\ProgramData\symbol-properties\symbol-properties-database.csv</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Data\alternative\interest-rate\usa\interest-rate.csv">
+      <Link>Content\ProgramData\alternative\interest-rate\usa\interest-rate.csv</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\LICENSE" Link="Content\ProgramData\LICENSE">
@@ -209,7 +213,19 @@
     <Content Include="..\Algorithm.Python\AddUniverseSelectionModelAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\AddUniverseSelectionModelAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\AlgorithmModeAndDeploymentTargetAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\AlgorithmModeAndDeploymentTargetAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AllShortableSymbolsCoarseSelectionRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\AllShortableSymbolsCoarseSelectionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AsynchronousUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\AsynchronousUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\AutoRegressiveIntegratedMovingAverageRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\AutoRegressiveIntegratedMovingAverageRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\AuxiliaryDataHandlersRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\AuxiliaryDataHandlersRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\BaseFrameworkRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BaseFrameworkRegressionAlgorithm.py">
@@ -225,6 +241,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\BasicTemplateAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateAxosAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateAxosAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\BasicTemplateCfdAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateCfdAlgorithm.py">
@@ -350,6 +369,9 @@
     <Content Include="..\Algorithm.Python\BasicTemplateSPXWeeklyIndexOptionsAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateSPXWeeklyIndexOptionsAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\BasicTemplateTradableIndexAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BasicTemplateTradableIndexAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\BlackLittermanPortfolioOptimizationFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BlackLittermanPortfolioOptimizationFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -362,10 +384,28 @@
     <Content Include="..\Algorithm.Python\BubbleAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BubbleAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\BybitCryptoFuturesRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BybitCryptoFuturesRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BybitCryptoRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BybitCryptoRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\BybitCustomDataCryptoRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\BybitCustomDataCryptoRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\CapmAlphaRankingFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CapmAlphaRankingFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\ClassicRangeConsolidatorAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ClassicRangeConsolidatorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ClassicRangeConsolidatorWithTickAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ClassicRangeConsolidatorWithTickAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\ClassicRenkoConsolidatorAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ClassicRenkoConsolidatorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CoarseFineAsyncUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CoarseFineAsyncUniverseRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CoarseFineFundamentalComboAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CoarseFineFundamentalComboAlgorithm.py">
@@ -386,6 +426,9 @@
     <Content Include="..\Algorithm.Python\Collective2SignalExportDemonstrationAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\Collective2SignalExportDemonstrationAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\ComboOrdersFillModelAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ComboOrdersFillModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\ComboOrderTicketDemoAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ComboOrderTicketDemoAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -401,6 +444,9 @@
     <Content Include="..\Algorithm.Python\ConfidenceWeightedFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ConfidenceWeightedFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\ConsolidateDifferentTickTypesRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ConsolidateDifferentTickTypesRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\ConsolidateRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ConsolidateRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -408,6 +454,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\ConstituentsUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ConstituentsUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ContinuousFutureModelsConsistencyRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ContinuousFutureModelsConsistencyRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\ContinuousFutureRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ContinuousFutureRegressionAlgorithm.py">
@@ -431,7 +480,13 @@
     <Content Include="..\Algorithm.Python\CustomBenchmarkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomBenchmarkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\CustomBenchmarkRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomBenchmarkRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\CustomBrokerageModelRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomBrokerageModelRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomBrokerageSideOrderHandlingRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomBrokerageSideOrderHandlingRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomBuyingPowerModelAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomBuyingPowerModelAlgorithm.py">
@@ -461,7 +516,13 @@
     <Content Include="..\Algorithm.Python\CustomDataLinkedIconicTypeAddDataOnSecuritiesChangedRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataLinkedIconicTypeAddDataOnSecuritiesChangedRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\CustomDataMultiFileObjectStoreRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataMultiFileObjectStoreRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\CustomDataNIFTYAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataNIFTYAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataObjectStoreRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataObjectStoreRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomDataPropertiesRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataPropertiesRegressionAlgorithm.py">
@@ -479,7 +540,13 @@
     <Content Include="..\Algorithm.Python\CustomDataUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataUniverseRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\CustomDataUniverseScheduledRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataUniverseScheduledRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\CustomDataUsingMapFileRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataUsingMapFileRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomDataZippedObjectStoreRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomDataZippedObjectStoreRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomIndicatorAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomIndicatorAlgorithm.py">
@@ -492,6 +559,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomModelsAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomModelsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomModelsPEP8Algorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomModelsPEP8Algorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomOptionAssignmentRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomOptionAssignmentRegressionAlgorithm.py">
@@ -510,6 +580,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomSecurityInitializerAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomSecurityInitializerAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\CustomSettlementModelRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomSettlementModelRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\CustomShortableProviderRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\CustomShortableProviderRegressionAlgorithm.py">
@@ -566,6 +639,9 @@
     <Content Include="..\Algorithm.Python\ETFConstituentsFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ETFConstituentsFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\ETFConstituentsFrameworkWithDifferentSelectionModelAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ETFConstituentsFrameworkWithDifferentSelectionModelAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\ETFConstituentUniverseCompositeDelistingRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ETFConstituentUniverseCompositeDelistingRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -609,6 +685,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\FractionalQuantityRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FractionalQuantityRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FuncRiskFreeRateInterestRateModelWithPythonLambda.py" Link="Content\ProgramData\Algorithm.Python\FuncRiskFreeRateInterestRateModelWithPythonLambda.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FundamentalCustomSelectionTimeRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FundamentalCustomSelectionTimeRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FundamentalRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FundamentalRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FundamentalUniverseSelectionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FundamentalUniverseSelectionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\FundamentalUniverseSelectionRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FundamentalUniverseSelectionRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\FutureContractsExtendedMarketHoursRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FutureContractsExtendedMarketHoursRegressionAlgorithm.py">
@@ -659,6 +750,9 @@
     <Content Include="..\Algorithm.Python\FuturesMomentumAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FuturesMomentumAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\FutureStopMarketOrderOnExtendedHoursRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\FutureStopMarketOrderOnExtendedHoursRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\G10CurrencySelectionModelFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\G10CurrencySelectionModelFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -669,6 +763,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\HistoryAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\HistoryAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\HistoryAuxiliaryDataRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\HistoryAuxiliaryDataRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\HistoryTickRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\HistoryTickRegressionAlgorithm.py">
@@ -728,6 +825,9 @@
     <Content Include="..\Algorithm.Python\IndexOptionIronCondorAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndexOptionIronCondorAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\IndexOptionModelsConsistencyRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndexOptionModelsConsistencyRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\IndexOptionPutButterflyAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndexOptionPutButterflyAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -755,16 +855,25 @@
     <Content Include="..\Algorithm.Python\IndiaDataRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndiaDataRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\IndicatorHistoryAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndicatorHistoryAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\IndicatorSuiteAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndicatorSuiteAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\IndicatorWarmupAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndicatorWarmupAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\IndicatorWithRenkoBarsRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndicatorWithRenkoBarsRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\IndustryStandardSecurityIdentifiersRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\IndustryStandardSecurityIdentifiersRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\InsightScoringRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\InsightScoringRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\InsightTagAlphaRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\InsightTagAlphaRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\InsightWeightingFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\InsightWeightingFrameworkAlgorithm.py">
@@ -818,7 +927,16 @@
     <Content Include="..\Algorithm.Python\main.py" Link="Content\ProgramData\Algorithm.Python\main.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\ManuallyRemovedConsolidatorsAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ManuallyRemovedConsolidatorsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\ManuallySetMarketHoursAndSymbolPropertiesDatabaseEntriesAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ManuallySetMarketHoursAndSymbolPropertiesDatabaseEntriesAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\MarginCallEventsAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\MarginCallEventsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\MarketImpactSlippageModelRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\MarketImpactSlippageModelRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\MarketOnCloseOrderBufferExtendedMarketHoursRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\MarketOnCloseOrderBufferExtendedMarketHoursRegressionAlgorithm.py">
@@ -866,6 +984,9 @@
     <Content Include="..\Algorithm.Python\NLTKSentimentTradingAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\NLTKSentimentTradingAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\NoUniverseSelectorRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\NoUniverseSelectorRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\NullBuyingPowerOptionBullCallSpreadAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\NullBuyingPowerOptionBullCallSpreadAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -896,6 +1017,9 @@
     <Content Include="..\Algorithm.Python\OptionChainConsistencyRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionChainConsistencyRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\OptionChainedUniverseSelectionModelRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionChainedUniverseSelectionModelRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\OptionChainProviderAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionChainProviderAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -903,6 +1027,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\OptionExerciseAssignRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionExerciseAssignRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionIndicatorsMirrorContractsRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionIndicatorsMirrorContractsRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionIndicatorsRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionIndicatorsRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\OptionModelsConsistencyRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionModelsConsistencyRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\OptionOpenInterestRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionOpenInterestRegressionAlgorithm.py">
@@ -944,6 +1077,9 @@
     <Content Include="..\Algorithm.Python\OptionStrategyFactoryMethodsBaseAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OptionStrategyFactoryMethodsBaseAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\OrderTicketAssignmentDemoAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OrderTicketAssignmentDemoAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\OrderTicketDemoAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\OrderTicketDemoAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -959,6 +1095,9 @@
     <Content Include="..\Algorithm.Python\PearsonCorrelationPairsTradingAlphaModelFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\PearsonCorrelationPairsTradingAlphaModelFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\PEP8StyleBasicAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\PEP8StyleBasicAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\PeriodBasedHistoryRequestNotAllowedWithTickResolutionRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\PeriodBasedHistoryRequestNotAllowedWithTickResolutionRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -966,6 +1105,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\PortfolioRebalanceOnDateRulesRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\PortfolioRebalanceOnDateRulesRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\PortfolioTargetTagsRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\PortfolioTargetTagsRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\PythonDictionaryFeatureRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\PythonDictionaryFeatureRegressionAlgorithm.py">
@@ -978,6 +1120,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\QuitInInitializationRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\QuitInInitializationRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RangeConsolidatorAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\RangeConsolidatorAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\RangeConsolidatorWithTickAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\RangeConsolidatorWithTickAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\RawDataRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\RawDataRegressionAlgorithm.py">
@@ -1013,6 +1161,9 @@
     <Content Include="..\Algorithm.Python\ScheduledQueuingAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ScheduledQueuingAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\ScheduledUniverseRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ScheduledUniverseRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\ScheduledUniverseSelectionModelRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\ScheduledUniverseSelectionModelRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1025,7 +1176,19 @@
     <Content Include="..\Algorithm.Python\SectorWeightingFrameworkAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\SectorWeightingFrameworkAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\SecurityCustomPropertiesAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\SecurityCustomPropertiesAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SecurityDynamicPropertyPythonClassAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\SecurityDynamicPropertyPythonClassAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\SecuritySeederRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\SecuritySeederRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SelectUniverseSymbolsFromIDRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\SelectUniverseSymbolsFromIDRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\SetCustomSettlementModelRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\SetCustomSettlementModelRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\SetEquityDataNormalizationModeOnAddEquity.py" Link="Content\ProgramData\Algorithm.Python\SetEquityDataNormalizationModeOnAddEquity.py">
@@ -1058,6 +1221,12 @@
     <Content Include="..\Algorithm.Python\StandardDeviationExecutionModelRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\StandardDeviationExecutionModelRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\StatisticsResultsAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\StatisticsResultsAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\StopLimitOrderRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\StopLimitOrderRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\StringToSymbolImplicitConversionRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\StringToSymbolImplicitConversionRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1079,6 +1248,9 @@
     <Content Include="..\Algorithm.Python\TimeInForceAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\TimeInForceAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Algorithm.Python\TrailingStopOrderRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\TrailingStopOrderRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Algorithm.Python\TrailingStopRiskFrameworkRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\TrailingStopRiskFrameworkRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -1089,6 +1261,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\TwoLegCurrencyConversionRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\TwoLegCurrencyConversionRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UniverseOnlyRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\UniverseOnlyRegressionAlgorithm.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Algorithm.Python\UniverseSelectedRegressionAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\UniverseSelectedRegressionAlgorithm.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Algorithm.Python\UniverseSelectionDefinitionsAlgorithm.py" Link="Content\ProgramData\Algorithm.Python\UniverseSelectionDefinitionsAlgorithm.py">

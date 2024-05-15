@@ -26,9 +26,9 @@ using QuantConnect.Logging;
 
 namespace Algoloop.Wpf.ViewModels.Internal.Provider
 {
-    internal class QuantConnect : ProviderBase
+    internal class Usa : ProviderBase
     {
-        private const string Version = "15859";
+        private const string Version = "16423";
         private const string Security = "Security";
         private const string Zip = ".zip";
 

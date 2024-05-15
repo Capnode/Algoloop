@@ -631,7 +631,7 @@ namespace Algoloop.Wpf.ViewModels
             var obsoleteLists = Lists.ToList();
             foreach (var list in lists)
             {
-                ListViewModel vm = Lists.FirstOrDefault(m => m.Model.Id.Equals(list.Id));
+                ListViewModel vm = Lists.FirstOrDefault(m => m.Model.Equals(list));
                 if (vm == default)
                 {
                     vm = new ListViewModel(this, list);
