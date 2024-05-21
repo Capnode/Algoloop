@@ -24,6 +24,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Algoloop.Wpf.ViewModels.Internal;
 using Algoloop.Wpf.Properties;
+using QuantConnect.Util;
+using QuantConnect.Interfaces;
 
 namespace Algoloop.Wpf.ViewModels
 {
@@ -32,6 +34,8 @@ namespace Algoloop.Wpf.ViewModels
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
+        private const string MapFileProviderTypeName = "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider";
+
         private bool _isBusy;
         private string _statusMessage;
         private bool _initialized;
@@ -203,12 +207,14 @@ namespace Algoloop.Wpf.ViewModels
                 {
                     Config.Set("job-user-id", apiUser);
                 }
+
                 Config.Set("api-access-token", SettingsViewModel.Model.ApiToken);
                 Config.Set("data-directory", SettingsViewModel.Model.DataFolder);
                 Config.Set("data-folder", SettingsViewModel.Model.DataFolder);
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
-                Config.Set("map-file-provider", "QuantConnect.Data.Auxiliary.LocalDiskMapFileProvider");
+                Config.Set("map-file-provider", MapFileProviderTypeName);
                 Config.Set("version-id", string.Empty);
+                Composer.Instance.GetExportedValueByTypeName<IMapFileProvider>(MapFileProviderTypeName);
                 Globals.Reset();
 
                 // Read configuration

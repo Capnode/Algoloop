@@ -50,14 +50,14 @@ namespace Algoloop.Wpf.Tests.Provider
         }
 
         [TestMethod()]
-        public void GetUpdate_no_symbols()
+        public void GetUpdate_all_symbols()
         {
             // Arrange
             var date = new DateTime(2019, 05, 01);
             var market = new ProviderModel
             {
                 Name = "QuantConnect",
-                Provider = "quantconnect",
+                Provider = "usa",
                 LastDate = date
             };
 
@@ -82,7 +82,7 @@ namespace Algoloop.Wpf.Tests.Provider
             var market = new ProviderModel
             {
                 Name = "QuantConnect",
-                Provider = "quantconnect",
+                Provider = "usa",
                 LastDate = date
             };
             market.Symbols.Add(new SymbolModel("aapl", "usa", SecurityType.Equity)

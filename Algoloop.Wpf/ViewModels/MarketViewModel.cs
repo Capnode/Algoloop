@@ -611,7 +611,7 @@ namespace Algoloop.Wpf.ViewModels
         {
             foreach (SymbolModel symbol in symbols)
             {
-                SymbolViewModel vm = Symbols.FirstOrDefault(m => m.Model.Id.Equals(symbol.Id));
+                SymbolViewModel vm = Symbols.FirstOrDefault(m => m.Model.Equals(symbol));
                 if (vm == default)
                 {
                     vm = new (this, symbol);
