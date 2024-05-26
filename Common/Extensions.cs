@@ -218,6 +218,10 @@ namespace QuantConnect
             List<string> result = new();
             try
             {
+                if (string.IsNullOrEmpty(jsonArray))
+                {
+                    return result;
+                }
                 result = JsonConvert.DeserializeObject<List<string>>(jsonArray);
             }
             catch(JsonReaderException)
@@ -2676,8 +2680,11 @@ namespace QuantConnect
                     }
 
                     // If the python type object is just a representation of the C# type, the conversion is direct,
-                    // The python object is an instance of the C# class.
-                    if (PyType.Get(csharpType).Equals(pythonType))
+                    // the python object is an instance of the C# class.
+                    // We can compare by reference because pythonnet caches the PyTypes and because the behavior of
+                    // PyObject.Equals is not exactly what we want:
+                    // e.g. type(class PyClass(CSharpClass)) == type(CSharpClass) is true in Python
+                    if (PythonReferenceComparer.Instance.Equals(PyType.Get(csharpType), pythonType))
                     {
                         return true;
                     }

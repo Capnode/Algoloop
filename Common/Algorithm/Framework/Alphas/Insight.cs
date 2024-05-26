@@ -176,7 +176,7 @@ namespace QuantConnect.Algorithm.Framework.Alphas
         /// <param name="direction">The predicted direction</param>
         /// <param name="tag">The insight's tag containing additional information</param>
         public Insight(Symbol symbol, TimeSpan period, InsightType type, InsightDirection direction, string tag = "")
-            : this(symbol, period, type, direction, null, null, tag)
+            : this(symbol, period, type, direction, null, null, null, null, tag)
         {
         }
 
@@ -221,7 +221,7 @@ namespace QuantConnect.Algorithm.Framework.Alphas
         /// <param name="direction">The predicted direction</param>
         /// <param name="tag">The insight's tag containing additional information</param>
         public Insight(Symbol symbol, Func<DateTime, DateTime> expiryFunc, InsightType type, InsightDirection direction, string tag = "")
-            : this(symbol, expiryFunc, type, direction, null, null, tag)
+            : this(symbol, expiryFunc, type, direction, null, null, null, null, tag)
         {
         }
 
@@ -457,9 +457,10 @@ namespace QuantConnect.Algorithm.Framework.Alphas
         /// <returns>A new insight containing the information specified</returns>
         public static Insight FromSerializedInsight(SerializedInsight serializedInsight)
         {
+            var sid = SecurityIdentifier.Parse(serializedInsight.Symbol);
             var insight = new Insight(
                 Time.UnixTimeStampToDateTime(serializedInsight.CreatedTime),
-                new Symbol(SecurityIdentifier.Parse(serializedInsight.Symbol), serializedInsight.Ticker),
+                new Symbol(sid, serializedInsight.Ticker ?? sid.Symbol),
                 TimeSpan.FromSeconds(serializedInsight.Period),
                 serializedInsight.Type,
                 serializedInsight.Direction,

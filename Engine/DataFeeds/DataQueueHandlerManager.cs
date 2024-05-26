@@ -20,6 +20,7 @@ using QuantConnect.Data;
 using QuantConnect.Packets;
 using QuantConnect.Logging;
 using QuantConnect.Interfaces;
+using QuantConnect.Securities;
 using QuantConnect.Data.Market;
 using System.Collections.Generic;
 using QuantConnect.Lean.Engine.DataFeeds.Enumerators;
@@ -32,13 +33,22 @@ namespace QuantConnect.Lean.Engine.DataFeeds
     public class DataQueueHandlerManager : IDataQueueHandler, IDataQueueUniverseProvider
     {
         private ITimeProvider _frontierTimeProvider;
+        private readonly IAlgorithmSettings _algorithmSettings;
         private readonly Dictionary<SubscriptionDataConfig, Queue<IDataQueueHandler>> _dataConfigAndDataHandler = new();
+
+        /// <summary>
+        /// Creates a new instance
+        /// </summary>
+        public DataQueueHandlerManager(IAlgorithmSettings settings)
+        {
+            _algorithmSettings = settings;
+        }
 
         /// <summary>
         /// Collection of data queue handles being used
         /// </summary>
         /// <remarks>Protected for testing purposes</remarks>
-        protected List<IDataQueueHandler> DataHandlers { get; } = new();
+        protected List<IDataQueueHandler> DataHandlers { get; set; } = new();
 
         /// <summary>
         /// True if the composite queue handler has any <see cref="IDataQueueUniverseProvider"/> instance
@@ -58,6 +68,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// <returns>The new enumerator for this subscription request</returns>
         public IEnumerator<BaseData> Subscribe(SubscriptionDataConfig dataConfig, EventHandler newDataAvailableHandler)
         {
+            Exception failureException = null;
+            var exchangeHours = MarketHoursDatabase.FromDataFolder().GetExchangeHours(dataConfig.Symbol.ID.Market, dataConfig.Symbol, dataConfig.Symbol.SecurityType);
             foreach (var dataHandler in DataHandlers)
             {
                 // Emit ticks & custom data as soon as we get them, they don't need any kind of batching behavior applied to them
@@ -65,21 +77,31 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 var immediateEmission = dataConfig.Resolution == Resolution.Tick || dataConfig.IsCustomData || _frontierTimeProvider == null;
                 var exchangeTimeZone = dataConfig.ExchangeTimeZone;
 
-                var enumerator = dataHandler.Subscribe(dataConfig, immediateEmission ? newDataAvailableHandler
-                    : (sender, eventArgs) => {
-                        // let's only wake up the main thread if the data point is allowed to be emitted, else we could fill forward previous bar and not let this one through
-                        var dataAvailable = eventArgs as NewDataAvailableEventArgs;
-                        if (dataAvailable == null || dataAvailable.DataPoint == null
-                            || dataAvailable.DataPoint.EndTime.ConvertToUtc(exchangeTimeZone) <= _frontierTimeProvider.GetUtcNow())
-                        {
-                            newDataAvailableHandler?.Invoke(sender, eventArgs);
-                        }
-                    });
+                IEnumerator<BaseData> enumerator;
+                try
+                {
+                    enumerator = dataHandler.Subscribe(dataConfig, immediateEmission ? newDataAvailableHandler
+                        : (sender, eventArgs) => {
+                            // let's only wake up the main thread if the data point is allowed to be emitted, else we could fill forward previous bar and not let this one through
+                            var dataAvailable = eventArgs as NewDataAvailableEventArgs;
+                            if (dataAvailable == null || dataAvailable.DataPoint == null
+                                || dataAvailable.DataPoint.EndTime.ConvertToUtc(exchangeTimeZone) <= _frontierTimeProvider.GetUtcNow())
+                            {
+                                newDataAvailableHandler?.Invoke(sender, eventArgs);
+                            }
+                        });
+                }
+                catch (Exception exception)
+                {
+                    // we will try the next DQH if any, if it handles the request correctly we ignore the error
+                    failureException = exception;
+                    continue;
+                }
 
                 // Check if the enumerator is not empty
                 if (enumerator != null)
                 {
-                    if(!_dataConfigAndDataHandler.TryGetValue(dataConfig, out var dataQueueHandlers))
+                    if (!_dataConfigAndDataHandler.TryGetValue(dataConfig, out var dataQueueHandlers))
                     {
                         // we can get the same subscription request multiple times, the aggregator manager handles updating each enumerator
                         // but we need to keep track so we can call unsubscribe later to the target data queue handler
@@ -92,10 +114,22 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                         return enumerator;
                     }
 
+                    if (LeanData.UseStrictEndTime(_algorithmSettings.DailyStrictEndTimeEnabled, dataConfig.Symbol, dataConfig.Increment, exchangeHours))
+                    {
+                        // before the first frontier enumerator we adjust the endtimes if required
+                        enumerator = new StrictDailyEndTimesEnumerator(enumerator, exchangeHours);
+                    }
+
                     return new FrontierAwareEnumerator(enumerator, _frontierTimeProvider,
                         new TimeZoneOffsetProvider(exchangeTimeZone, _frontierTimeProvider.GetUtcNow(), Time.EndOfTime)
                     );
                 }
+            }
+
+            if (failureException != null)
+            {
+                // we were not able to serve the request with any DQH and we got an exception, let's bubble it up
+                throw failureException;
             }
 
             // filter out warning for expected cases to reduce noise
@@ -142,7 +176,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 DataHandlers.Add(dataHandler);
             }
 
-            InitializeFrontierTimeProvider();
+            _frontierTimeProvider = InitializeFrontierTimeProvider();
         }
 
         /// <summary>
@@ -197,14 +231,15 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         /// Creates the frontier time provider instance
         /// </summary>
         /// <remarks>Protected for testing purposes</remarks>
-        protected void InitializeFrontierTimeProvider()
+        protected virtual ITimeProvider InitializeFrontierTimeProvider()
         {
             var timeProviders = DataHandlers.OfType<ITimeProvider>().ToList();
             if (timeProviders.Any())
             {
                 Log.Trace($"DataQueueHandlerManager.InitializeFrontierTimeProvider(): will use the following IDQH frontier time providers: [{string.Join(",", timeProviders.Select(x => x.GetType()))}]");
-                _frontierTimeProvider = new CompositeTimeProvider(timeProviders);
+                return new CompositeTimeProvider(timeProviders);
             }
+            return null;
         }
 
         private IEnumerable<IDataQueueUniverseProvider> GetUniverseProviders()

@@ -15,16 +15,15 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using QuantConnect.Configuration;
 using QuantConnect.Data;
+using QuantConnect.Util;
+using QuantConnect.Securities;
 using QuantConnect.Data.Market;
+using System.Collections.Generic;
 using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Lean.Engine.DataFeeds.Enumerators;
-using QuantConnect.Securities;
-using QuantConnect.Util;
 
 namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
 {
@@ -53,7 +52,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
             var timeProvider = new ManualTimeProvider(TimeZones.NewYork);
             timeProvider.SetCurrentTime(reference);
             var exchange = new SecurityExchange(SecurityExchangeHours.AlwaysOpen(TimeZones.NewYork));
-            var fillForward = new LiveFillForwardEnumerator(timeProvider, underlying.GetEnumerator(), exchange, Ref.Create(Time.OneSecond), false, Time.EndOfTime, Time.OneSecond, exchange.TimeZone);
+            var fillForward = new LiveFillForwardEnumerator(timeProvider, underlying.GetEnumerator(), exchange, Ref.Create(Time.OneSecond), false, Time.EndOfTime, Resolution.Second, exchange.TimeZone, false);
 
             // first point is always emitted
             Assert.IsTrue(fillForward.MoveNext());
@@ -65,7 +64,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
             Assert.IsTrue(fillForward.MoveNext());
             Assert.IsNull(fillForward.Current);
 
-            timeProvider.SetCurrentTime(reference.AddSeconds(1));
+            timeProvider.SetCurrentTime(reference.AddSeconds(2));
 
             // non-null next will fill forward in between
             Assert.IsTrue(fillForward.MoveNext());
@@ -79,31 +78,38 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
             Assert.AreEqual(underlying[2], fillForward.Current);
             Assert.AreEqual(1234560, ((TradeBar)fillForward.Current).Volume);
 
-            // step ahead into null data territory
+            // wont FF yet cause it will wait till the expected timeout
             timeProvider.SetCurrentTime(reference.AddSeconds(4));
+            Assert.IsTrue(fillForward.MoveNext());
+            Assert.IsNull(fillForward.Current);
+
+            var expectedTimeout = LiveFillForwardEnumerator.GetMaximumDataTimeout(Resolution.Second);
+
+            // step ahead into null data territory
+            timeProvider.SetCurrentTime(reference.AddSeconds(4) + expectedTimeout);
 
             Assert.IsTrue(fillForward.MoveNext());
             Assert.AreEqual(underlying[2].Value, fillForward.Current.Value);
-            Assert.AreEqual(timeProvider.GetUtcNow().ConvertFromUtc(TimeZones.NewYork), fillForward.Current.EndTime);
+            Assert.AreEqual(timeProvider.GetUtcNow().ConvertFromUtc(TimeZones.NewYork).RoundDown(Time.OneSecond), fillForward.Current.EndTime);
             Assert.IsTrue(fillForward.Current.IsFillForward);
             Assert.AreEqual(0, ((TradeBar)fillForward.Current).Volume);
 
             Assert.IsTrue(fillForward.MoveNext());
             Assert.IsNull(fillForward.Current);
 
-            timeProvider.SetCurrentTime(reference.AddSeconds(5));
+            timeProvider.SetCurrentTime(reference.AddSeconds(5) + expectedTimeout);
 
             Assert.IsTrue(fillForward.MoveNext());
             Assert.AreEqual(underlying[2].Value, fillForward.Current.Value);
-            Assert.AreEqual(timeProvider.GetUtcNow().ConvertFromUtc(TimeZones.NewYork), fillForward.Current.EndTime);
+            Assert.AreEqual(timeProvider.GetUtcNow().ConvertFromUtc(TimeZones.NewYork).RoundDown(Time.OneSecond), fillForward.Current.EndTime);
             Assert.IsTrue(fillForward.Current.IsFillForward);
             Assert.AreEqual(0, ((TradeBar)fillForward.Current).Volume);
 
-            timeProvider.SetCurrentTime(reference.AddSeconds(6));
+            timeProvider.SetCurrentTime(reference.AddSeconds(6) + expectedTimeout);
 
             Assert.IsTrue(fillForward.MoveNext());
             Assert.AreEqual(underlying[2].Value, fillForward.Current.Value);
-            Assert.AreEqual(timeProvider.GetUtcNow().ConvertFromUtc(TimeZones.NewYork), fillForward.Current.EndTime);
+            Assert.AreEqual(timeProvider.GetUtcNow().ConvertFromUtc(TimeZones.NewYork).RoundDown(Time.OneSecond), fillForward.Current.EndTime);
             Assert.IsTrue(fillForward.Current.IsFillForward);
             Assert.AreEqual(0, ((TradeBar)fillForward.Current).Volume);
 
@@ -113,13 +119,15 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
         [Test]
         public void HandlesDaylightSavingTimeChange()
         {
+            // In 2018, Daylight Saving Time (DST) began at 2 AM on Sunday, March 11
+            // This means that clocks were moved forward one hour on March 11
             var reference = new DateTime(2018, 3, 10);
             var period = Time.OneDay;
             var underlying = new List<TradeBar>
             {
                 new TradeBar(reference, Symbols.SPY, 10, 20, 5, 15, 123456, period),
-                // Daylight Saving Time change -> add 1 hour
-                new TradeBar(reference.AddDays(1).AddHours(1), Symbols.SPY, 100, 200, 50, 150, 1234560, period)
+                // Daylight Saving Time change, the data still goes from midnight to midnight
+                new TradeBar(reference.AddDays(1), Symbols.SPY, 100, 200, 50, 150, 1234560, period)
             };
 
             var timeProvider = new ManualTimeProvider(TimeZones.NewYork);
@@ -132,8 +140,8 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
                 Ref.Create(Time.OneDay),
                 false,
                 Time.EndOfTime,
-                Time.OneDay,
-                exchange.TimeZone);
+                Resolution.Daily,
+                exchange.TimeZone, false);
 
             // first point is always emitted
             Assert.IsTrue(fillForward.MoveNext());
@@ -164,24 +172,9 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
         [Test]
         public void LiveFillForwardEnumeratorDoesNotStall()
         {
-            var now = DateTime.UtcNow;
             var timeProvider = new ManualTimeProvider(new DateTime(2020, 5, 21, 9, 40, 0, 100), TimeZones.NewYork);
 
-            var enqueueableEnumerator = new EnqueueableEnumerator<BaseData>();
-            var fillForwardEnumerator = new LiveFillForwardEnumerator(
-                timeProvider,
-                enqueueableEnumerator,
-                new SecurityExchange(MarketHoursDatabase.FromDataFolder()
-                    .ExchangeHoursListing
-                    .First(kvp => kvp.Key.Market == Market.USA && kvp.Key.SecurityType == SecurityType.Equity)
-                    .Value
-                    .ExchangeHours),
-                Ref.CreateReadOnly(() => Resolution.Minute.ToTimeSpan()),
-                false,
-                now,
-                Resolution.Minute.ToTimeSpan(),
-                TimeZones.NewYork
-            );
+            using var fillForwardEnumerator = GetLiveFillForwardEnumerator(timeProvider, Resolution.Minute, out var enqueueableEnumerator, false);
             var openingBar = new TradeBar
             {
                 Open = 0.01m,
@@ -212,7 +205,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
             Assert.AreEqual(openingBar.EndTime, fillForwardEnumerator.Current.EndTime);
 
             // Advance the time, we expect a fill-forward bar.
-            timeProvider.SetCurrentTime(new DateTime(2020, 5, 21, 9, 41, 0, 100));
+            timeProvider.SetCurrentTime(new DateTime(2020, 5, 21, 9, 41, 0, 100) + LiveFillForwardEnumerator.GetMaximumDataTimeout(Resolution.Minute));
             Assert.IsTrue(fillForwardEnumerator.MoveNext());
             Assert.IsTrue(fillForwardEnumerator.Current.IsFillForward);
             Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
@@ -223,6 +216,247 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
             enqueueableEnumerator.Enqueue(secondBar);
             Assert.IsTrue(fillForwardEnumerator.MoveNext());
             Assert.IsFalse(fillForwardEnumerator.Current.IsFillForward);
+        }
+
+        [TestCase(Resolution.Hour, true)]
+        [TestCase(Resolution.Minute, true)]
+        [TestCase(Resolution.Second, true)]
+        [TestCase(Resolution.Hour, false)]
+        [TestCase(Resolution.Minute, false)]
+        [TestCase(Resolution.Second, false)]
+        public void TakesIntoAccountTimeOut(Resolution resolution, bool dataArrivedLate)
+        {
+            var timeProvider = new ManualTimeProvider(new DateTime(2020, 5, 21, 10, 0, 0, 0), TimeZones.NewYork);
+
+            using var fillForwardEnumerator = GetLiveFillForwardEnumerator(timeProvider, resolution, out var enqueueableEnumerator, dailyStrictEndTimeEnabled: false);
+            var openingBar = new TradeBar
+            {
+                Open = 0.01m,
+                High = 0.01m,
+                Low = 0.01m,
+                Close = 0.01m,
+                Volume = 1,
+                EndTime = new DateTime(2020, 5, 21, 10, 0, 0),
+                Symbol = Symbols.AAPL
+            };
+            var secondBar = new TradeBar
+            {
+                Open = 1m,
+                High = 2m,
+                Low = 1m,
+                Close = 2m,
+                Volume = 100,
+                EndTime = openingBar.EndTime + resolution.ToTimeSpan(),
+                Symbol = Symbols.AAPL
+            };
+
+            // Enqueue the first point, which will be emitted ASAP.
+            enqueueableEnumerator.Enqueue(openingBar);
+            Assert.IsTrue(fillForwardEnumerator.MoveNext());
+            Assert.NotNull(fillForwardEnumerator.Current);
+            Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+            Assert.AreEqual(openingBar.EndTime, fillForwardEnumerator.Current.EndTime);
+
+            // Advance the time, we don't expect a fill-forward bar because the timeout amount has not passed yet
+            timeProvider.Advance(resolution.ToTimeSpan());
+            if (dataArrivedLate)
+            {
+                Assert.IsTrue(fillForwardEnumerator.MoveNext());
+                Assert.IsNull(fillForwardEnumerator.Current);
+
+                // Advance the time, including the expected timout, we expect a fill-forward bar.
+                timeProvider.Advance(LiveFillForwardEnumerator.GetMaximumDataTimeout(resolution));
+                Assert.IsTrue(fillForwardEnumerator.MoveNext());
+                Assert.IsTrue(fillForwardEnumerator.Current.IsFillForward);
+                Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+                Assert.AreEqual(openingBar.EndTime.Add(resolution.ToTimeSpan()), fillForwardEnumerator.Current.EndTime);
+            }
+
+            // Now we expect data. The secondBar should be fill-forwarded from here on out after the MoveNext
+            enqueueableEnumerator.Enqueue(secondBar);
+            Assert.IsTrue(fillForwardEnumerator.MoveNext());
+            Assert.IsFalse(fillForwardEnumerator.Current.IsFillForward);
+        }
+
+        [TestCase(true, true)]
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(false, false)]
+        public void TakesIntoAccountTimeOutDaily(bool dailyStrictEndTimeEnabled, bool dataArrivedLate)
+        {
+            var resolution = Resolution.Daily;
+            var referenceOpenTime = new DateTime(2020, 5, 21, 9, 30, 0);
+            var referenceTime = new DateTime(2020, 5, 21, 16, 0, 0);
+            if (!dailyStrictEndTimeEnabled)
+            {
+                referenceOpenTime = referenceOpenTime.Date;
+                referenceTime = referenceTime.Date.AddDays(1);
+            }
+            var timeProvider = new ManualTimeProvider(referenceTime, TimeZones.NewYork);
+            using var fillForwardEnumerator = GetLiveFillForwardEnumerator(timeProvider, resolution, out var enqueueableEnumerator, dailyStrictEndTimeEnabled);
+            var openingBar = new TradeBar
+            {
+                Open = 0.01m,
+                High = 0.01m,
+                Low = 0.01m,
+                Close = 0.01m,
+                Volume = 1,
+                Time = referenceOpenTime,
+                EndTime = referenceTime,
+                Symbol = Symbols.AAPL
+            };
+            var secondBar = new TradeBar
+            {
+                Open = 1m,
+                High = 2m,
+                Low = 1m,
+                Close = 2m,
+                Volume = 100,
+                Time = referenceOpenTime.AddDays(1),
+                EndTime = referenceTime.AddDays(1),
+                Symbol = Symbols.AAPL
+            };
+
+            // Enqueue the first point, which will be emitted ASAP.
+            enqueueableEnumerator.Enqueue(openingBar);
+            Assert.IsTrue(fillForwardEnumerator.MoveNext());
+            Assert.NotNull(fillForwardEnumerator.Current);
+            Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+            Assert.AreEqual(openingBar.EndTime, fillForwardEnumerator.Current.EndTime);
+
+            // Advance the time, we don't expect a fill-forward bar because the timeout amount has not passed yet
+            timeProvider.SetCurrentTime(secondBar.EndTime);
+
+            if (dataArrivedLate)
+            {
+                Assert.IsTrue(fillForwardEnumerator.MoveNext());
+                Assert.IsNull(fillForwardEnumerator.Current);
+
+                // Advance the time, including the expected timout, we expect a fill-forward bar.
+                timeProvider.Advance(LiveFillForwardEnumerator.GetMaximumDataTimeout(resolution));
+                Assert.IsTrue(fillForwardEnumerator.MoveNext());
+                Assert.IsTrue(fillForwardEnumerator.Current.IsFillForward);
+                Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+                Assert.AreEqual(secondBar.EndTime, fillForwardEnumerator.Current.EndTime);
+            }
+
+            // Now we expect data. The secondBar should be fill-forwarded from here on out after the MoveNext
+            enqueueableEnumerator.Enqueue(secondBar);
+            Assert.IsTrue(fillForwardEnumerator.MoveNext());
+            Assert.IsFalse(fillForwardEnumerator.Current.IsFillForward);
+            Assert.AreEqual(secondBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+            Assert.AreEqual(secondBar.EndTime, fillForwardEnumerator.Current.EndTime);
+        }
+
+        [TestCase(Resolution.Minute)]
+        [TestCase(Resolution.Hour)]
+        public void MultiResolutionSmallerFillForwardResolution(Resolution resolution)
+        {
+            var ffResolution = Resolution.Second;
+            var referenceOpenTime = new DateTime(2020, 5, 21, 14, 0, 0);
+            if (resolution == Resolution.Minute)
+            {
+                referenceOpenTime = new DateTime(2020, 5, 21, 15, 59, 0);
+            }
+            var referenceTime = new DateTime(2020, 5, 21, 15, 0, 0);
+
+            var timeProvider = new ManualTimeProvider(referenceTime, TimeZones.NewYork);
+            using var fillForwardEnumerator = GetLiveFillForwardEnumerator(timeProvider, resolution, out var enqueueableEnumerator, true, ffResolution);
+            var openingBar = new TradeBar
+            {
+                Open = 0.01m,
+                High = 0.01m,
+                Low = 0.01m,
+                Close = 0.01m,
+                Volume = 1,
+                Time = referenceOpenTime,
+                EndTime = referenceTime,
+                Symbol = Symbols.AAPL
+            };
+
+            // Enqueue the first point, which will be emitted ASAP.
+            enqueueableEnumerator.Enqueue(openingBar);
+            Assert.IsTrue(fillForwardEnumerator.MoveNext());
+            Assert.NotNull(fillForwardEnumerator.Current);
+            Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+            Assert.AreEqual(openingBar.EndTime, fillForwardEnumerator.Current.EndTime);
+
+            // Advance the time, we expect a fill-forward bar
+
+            for (var i = 0; i < 60; i++)
+            {
+                timeProvider.Advance(Time.OneSecond);
+
+                Assert.IsTrue(fillForwardEnumerator.MoveNext());
+                Assert.NotNull(fillForwardEnumerator.Current);
+                Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+                Assert.AreEqual(timeProvider.GetUtcNow().ConvertFromUtc(TimeZones.NewYork), fillForwardEnumerator.Current.EndTime);
+            }
+        }
+
+        [TestCase(Resolution.Daily, Resolution.Minute)]
+        [TestCase(Resolution.Hour, Resolution.Minute)]
+        [TestCase(Resolution.Daily, Resolution.Second)]
+        [TestCase(Resolution.Hour, Resolution.Second)]
+        public void MultiResolutionMarketClose(Resolution resolution, Resolution ffResolution)
+        {
+            var referenceOpenTime = new DateTime(2020, 5, 21, 9, 30, 0);
+            if (resolution == Resolution.Hour)
+            {
+                referenceOpenTime = new DateTime(2020, 5, 21, 15, 0, 0);
+            }
+            var referenceTime = new DateTime(2020, 5, 21, 16, 0, 0);
+            var timeProvider = new ManualTimeProvider(referenceTime, TimeZones.NewYork);
+            using var fillForwardEnumerator = GetLiveFillForwardEnumerator(timeProvider, resolution, out var enqueueableEnumerator, true, ffResolution);
+            var openingBar = new TradeBar
+            {
+                Open = 0.01m,
+                High = 0.01m,
+                Low = 0.01m,
+                Close = 0.01m,
+                Volume = 1,
+                Time = referenceOpenTime,
+                EndTime = referenceTime,
+                Symbol = Symbols.AAPL
+            };
+
+            // Enqueue the first point, which will be emitted ASAP.
+            enqueueableEnumerator.Enqueue(openingBar);
+            Assert.IsTrue(fillForwardEnumerator.MoveNext());
+            Assert.NotNull(fillForwardEnumerator.Current);
+            Assert.AreEqual(openingBar.Open, ((TradeBar)fillForwardEnumerator.Current).Open);
+            Assert.AreEqual(openingBar.EndTime, fillForwardEnumerator.Current.EndTime);
+
+            for (var i = 0; i < 600; i++)
+            {
+                // Advance the time, we don't expect a fill-forward bar, we've emitted our daily bar already and market is closed
+                timeProvider.Advance(ffResolution.ToTimeSpan());
+                Assert.IsTrue(fillForwardEnumerator.MoveNext());
+                Assert.IsNull(fillForwardEnumerator.Current);
+            }
+        }
+
+        private static LiveFillForwardEnumerator GetLiveFillForwardEnumerator(ITimeProvider timeProvider, Resolution resolution,
+            out EnqueueableEnumerator<BaseData> enqueueableEnumerator, bool dailyStrictEndTimeEnabled, Resolution? ffResolution = null)
+        {
+            enqueueableEnumerator = new EnqueueableEnumerator<BaseData>();
+            var fillForwardEnumerator = new LiveFillForwardEnumerator(
+                timeProvider,
+                enqueueableEnumerator,
+                new SecurityExchange(MarketHoursDatabase.FromDataFolder()
+                    .ExchangeHoursListing
+                    .First(kvp => kvp.Key.Market == Market.USA && kvp.Key.SecurityType == SecurityType.Equity)
+                    .Value
+                    .ExchangeHours),
+                Ref.CreateReadOnly(() => (ffResolution ?? resolution).ToTimeSpan()),
+                false,
+                Time.EndOfTime,
+                resolution,
+                TimeZones.NewYork,
+                dailyStrictEndTimeEnabled: dailyStrictEndTimeEnabled
+            );
+
+            return fillForwardEnumerator;
         }
     }
 }

@@ -37,7 +37,10 @@ namespace QuantConnect.Algorithm.CSharp
     {
         private Symbol _spx;
         private Symbol _spxOption;
+        private int _optionOrders;
         private Symbol _expectedOptionContract;
+
+        protected virtual Resolution Resolution => Resolution.Minute;
 
         public override void Initialize()
         {
@@ -45,14 +48,14 @@ namespace QuantConnect.Algorithm.CSharp
             SetEndDate(2021, 1, 31);
             SetCash(100000);
 
-            _spx = AddIndex("SPX", Resolution.Minute).Symbol;
+            _spx = AddIndex("SPX", Resolution).Symbol;
 
             // Select an index option expiring ITM, and adds it to the algorithm.
             _spxOption = AddIndexOptionContract(OptionChainProvider.GetOptionContractList(_spx, Time)
                 .Where(x => x.ID.StrikePrice <= 3200m && x.ID.OptionRight == OptionRight.Call && x.ID.Date.Year == 2021 && x.ID.Date.Month == 1)
                 .OrderByDescending(x => x.ID.StrikePrice)
                 .Take(1)
-                .Single(), Resolution.Minute).Symbol;
+                .Single(), Resolution).Symbol;
 
             _expectedOptionContract = QuantConnect.Symbol.CreateOption(_spx, Market.USA, OptionStyle.European, OptionRight.Call, 3200m, new DateTime(2021, 1, 15));
             if (_spxOption != _expectedOptionContract)
@@ -105,7 +108,7 @@ namespace QuantConnect.Algorithm.CSharp
             var security = Securities[orderEvent.Symbol];
             if (security.Symbol == _spx)
             {
-                AssertIndexOptionOrderExercise(orderEvent, security, Securities[_expectedOptionContract]);
+                throw new Exception("Index options give cash, not the underlying");
             }
             else if (security.Symbol == _expectedOptionContract)
             {
@@ -117,26 +120,6 @@ namespace QuantConnect.Algorithm.CSharp
             }
 
             Log($"{Time:yyyy-MM-dd HH:mm:ss} -- {orderEvent.Symbol} :: Price: {Securities[orderEvent.Symbol].Holdings.Price} Qty: {Securities[orderEvent.Symbol].Holdings.Quantity} Direction: {orderEvent.Direction} Msg: {orderEvent.Message}");
-        }
-
-        private void AssertIndexOptionOrderExercise(OrderEvent orderEvent, Security index, Security optionContract)
-        {
-            var expectedLiquidationTimeUtc = new DateTime(2021, 1, 16, 3, 0, 0);
-
-            // No way to detect option exercise orders or any other kind of special orders
-            // other than matching strings, for now.
-            if (orderEvent.Message.Contains("Option Exercise"))
-            {
-                if (orderEvent.FillPrice != 3200m)
-                {
-                    throw new Exception("Option did not exercise at expected strike price (3200)");
-                }
-
-                if (optionContract.Holdings.Quantity != 0)
-                {
-                    throw new Exception($"Exercised option contract, but we have holdings for Option contract {optionContract.Symbol}");
-                }
-            }
         }
 
         private void AssertIndexOptionContractOrder(OrderEvent orderEvent, Security option)
@@ -153,6 +136,8 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 throw new Exception($"Holdings were found after exercising option contract {option.Symbol}");
             }
+
+            _optionOrders++;
         }
 
         /// <summary>
@@ -165,6 +150,11 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 throw new Exception($"Expected no holdings at end of algorithm, but are invested in: {string.Join(", ", Portfolio.Keys)}");
             }
+
+            if (_optionOrders != 2)
+            {
+                throw new Exception("Option orders were not as expected!");
+            }
         }
 
         /// <summary>
@@ -175,12 +165,12 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 19623;
+        public virtual long DataPoints => 19908;
 
         /// <summary>
         /// Data Points count of the algorithm history
@@ -190,35 +180,35 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm
         /// </summary>
-        public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
+        public virtual Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Orders", "2"},
             {"Average Win", "0%"},
             {"Average Loss", "-50.48%"},
-            {"Compounding Annual Return", "247.047%"},
+            {"Compounding Annual Return", "243.722%"},
             {"Drawdown", "2.500%"},
             {"Expectancy", "0"},
             {"Start Equity", "100000"},
-            {"End Equity", "109144"},
-            {"Net Profit", "9.144%"},
-            {"Sharpe Ratio", "4.932"},
-            {"Sortino Ratio", "425.442"},
-            {"Probabilistic Sharpe Ratio", "88.394%"},
+            {"End Equity", "109074"},
+            {"Net Profit", "9.074%"},
+            {"Sharpe Ratio", "4.877"},
+            {"Sortino Ratio", "139.754"},
+            {"Probabilistic Sharpe Ratio", "87.949%"},
             {"Loss Rate", "0%"},
             {"Win Rate", "100%"},
             {"Profit-Loss Ratio", "0"},
-            {"Alpha", "1.527"},
-            {"Beta", "-0.205"},
+            {"Alpha", "1.511"},
+            {"Beta", "-0.204"},
             {"Annual Standard Deviation", "0.308"},
             {"Annual Variance", "0.095"},
-            {"Information Ratio", "4.233"},
+            {"Information Ratio", "4.185"},
             {"Tracking Error", "0.349"},
-            {"Treynor Ratio", "-7.424"},
+            {"Treynor Ratio", "-7.347"},
             {"Total Fees", "$0.00"},
             {"Estimated Strategy Capacity", "$0"},
             {"Lowest Capacity Asset", "SPX XL80P3GHDZXQ|SPX 31"},
             {"Portfolio Turnover", "1.95%"},
-            {"OrderListHash", "4b4eced9e1bfb19e415e8e41172228ce"}
+            {"OrderListHash", "20262d435700651ba19602afb7040730"}
         };
     }
 }
