@@ -214,7 +214,6 @@ namespace Algoloop.Wpf.ViewModels
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
                 Config.Set("map-file-provider", MapFileProviderTypeName);
                 Config.Set("version-id", string.Empty);
-                Composer.Instance.GetExportedValueByTypeName<IMapFileProvider>(MapFileProviderTypeName);
                 Globals.Reset();
 
                 // Read configuration
