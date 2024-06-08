@@ -1,7 +1,6 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1717,10 +1716,10 @@ namespace QuantConnect.Algorithm
 
             //Validate:
             //2. Check Range:
-            var now = DateTime.UtcNow.ConvertFromUtc(TimeZone);
-            if (end > now)
+            var yesterdayInAlgorithmTimeZone = DateTime.UtcNow.ConvertFromUtc(TimeZone);
+            if (end > yesterdayInAlgorithmTimeZone)
             {
-                end = now;
+                end = yesterdayInAlgorithmTimeZone;
             }
 
             //3. Make this at the very end of the requested date

@@ -115,7 +115,7 @@ namespace QuantConnect
 
             //Convert to bytes
             memoryCap *= 1024 * 1024;
-            var spikeLimit = memoryCap * 2;
+            var spikeLimit = memoryCap*2;
 
             while (!task.IsCompleted && utcNow < end)
             {
@@ -123,7 +123,7 @@ namespace QuantConnect
                 var sample = Convert.ToDouble(GC.GetTotalMemory(memoryUsed > memoryCap * 0.8));
 
                 // find the EMA of the memory used to prevent spikes killing stategy
-                memoryUsed = Convert.ToInt64((emaPeriod - 1) / emaPeriod * memoryUsed + (1 / emaPeriod) * sample);
+                memoryUsed = Convert.ToInt64((emaPeriod-1)/emaPeriod * memoryUsed + (1/emaPeriod)*sample);
 
                 // if the rolling EMA > cap; or the spike is more than 2x the allocation.
                 if (memoryUsed > memoryCap || sample > spikeLimit)
@@ -203,7 +203,7 @@ namespace QuantConnect
         /// <returns></returns>
         private static string PrettyFormatRam(long ramInBytes)
         {
-            return Math.Round(Convert.ToDouble(ramInBytes / (1024 * 1024))).ToStringInvariant();
+            return Math.Round(Convert.ToDouble(ramInBytes/(1024*1024))).ToStringInvariant();
         }
     }
 }

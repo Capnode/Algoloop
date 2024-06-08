@@ -377,7 +377,7 @@ namespace QuantConnect.Tests.ToolBox
             // Create our writer and LocalHistory brokerage to "download" from
             var writer = new LeanDataWriter(_dataDirectory, resolution, securityType, tickType);
             var brokerage = new LocalHistoryBrokerage();
-            var symbols = new List<Symbol>() { symbol };
+            var symbols = new List<Symbol>() {symbol};
 
             // "Download" and write to file
             writer.DownloadAndSave(brokerage, symbols, startTimeUtc, endTimeUtc);
@@ -514,7 +514,7 @@ namespace QuantConnect.Tests.ToolBox
 
             public override IEnumerable<BaseData> GetHistory(HistoryRequest request)
             {
-                var requests = new List<HistoryRequest> { request };
+                var requests = new List<HistoryRequest> {request};
                 var slices = _historyProvider.GetHistory(requests, DateTimeZone.Utc);
 
                 // Grab all the bar values for this

@@ -1,7 +1,6 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
- * Modifications Copyright (C) 2022 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +19,6 @@ using System.Threading;
 using QuantConnect.Logging;
 using QuantConnect.Interfaces;
 using System.Collections.Concurrent;
-using QuantConnect.Util;
-using QuantConnect.Configuration;
 
 namespace QuantConnect.Data.Auxiliary
 {
@@ -41,8 +38,6 @@ namespace QuantConnect.Data.Auxiliary
         public LocalDiskMapFileProvider()
         {
             _cache = new ConcurrentDictionary<AuxiliaryDataKey, MapFileResolver>();
-            _dataProvider = Composer.Instance.GetExportedValueByTypeName<IDataProvider>(
-                Config.Get("data-provider", "DefaultDataProvider"));
         }
 
         /// <summary>
