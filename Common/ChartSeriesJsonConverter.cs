@@ -1,6 +1,7 @@
 /*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
+ * Modifications Copyright (C) 2024 Capnode AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +43,7 @@ namespace QuantConnect
 
             writer.WriteStartObject();
             // we sort the series in ascending count so that they are chart nicely, has value for stacked area series so they're continuous 
-            foreach (var kvp in series.OrderBy(x => x.Value.Index)
-                .ThenBy(x => x.Value.Values.Count)
-                .ThenBy(x => x.Value.Values.Select(x => (x as ChartPoint)?.Y ?? 0).Sum()))
+            foreach (var kvp in series.OrderBy(x => x.Value.Index))
             {
                 writer.WritePropertyName(kvp.Key);
                 writer.WriteRawValue(JsonConvert.SerializeObject(kvp.Value));
