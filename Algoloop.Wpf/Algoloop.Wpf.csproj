@@ -66,7 +66,7 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.1.2" />
     <PackageReference Include="QuantConnect.OandaBrokerage" Version="2.5.16468" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.164" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.188" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">

@@ -13,8 +13,8 @@
  */
 
 using Algoloop.Wpf.ViewModels;
-using Algoloop.Wpf.ViewModels.Internal.Lean;
 using Algoloop.Wpf.ViewModels.Views.Internal.Lean;
+using Algoloop.Wpf.Views.Internal;
 using QuantConnect;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;

@@ -189,13 +189,13 @@ namespace Algoloop.Wpf.Views
 
         private void SetVisibleCharts()
         {
-            bool visible = _chart.Areas.Count == 0; // Make first visible if no charts
+            bool visible = _chart.Areas.Count() == 0; // Make first visible if no charts
             foreach (ChartItemViewModel item in _combobox.Items)
             {
                 visible |= item.Chart.IsVisible;
-                for (int i = 0; !visible && i < _chart.Areas.Count; i++)
+                for (int i = 0; !visible && i < _chart.Areas.Count(); i++)
                 {
-                    string title = _chart.Areas[i].Title;
+                    string title = _chart.Areas.ToArray()[i].Title;
                     if (item.Chart.Title.Equals(title))
                     {
                         visible = true;
@@ -324,7 +324,7 @@ namespace Algoloop.Wpf.Views
         {
             _inRedraw = true;
             _chart.IsAutoRange = true;
-            _chart.Reset(_chart.Elements);
+            _chart.Reset(_chart.GetElements());
 
             // Collect time-value points of all Equity curves
             Dictionary<IChartLineElement, decimal> curves = new();
@@ -334,14 +334,14 @@ namespace Algoloop.Wpf.Views
             {
                 if (!item.IsVisible) continue;
                 IChartArea area;
-                if (areaId < _chart.Areas.Count)
+                if (areaId < _chart.Areas.Count())
                 {
-                    area = _chart.Areas[areaId];
+                    area = _chart.Areas.ToArray()[areaId];
                     while (HasIOnlyIndicatorElement(area))
                     {
-                        if (++areaId < _chart.Areas.Count)
+                        if (++areaId < _chart.Areas.Count())
                         {
-                            area = _chart.Areas[areaId];
+                            area = _chart.Areas.ToArray()[areaId];
                         }
                         else
                         {
@@ -369,12 +369,12 @@ namespace Algoloop.Wpf.Views
                         // Create new area for extra series
                         seriesAreaId += 1;
                         elementId = 0;
-                        if (_chart.Areas.Count <= areaId)
+                        if (_chart.Areas.Count() <= areaId)
                         {
                             _chart.AddArea(new ChartArea());
                         }
 
-                        area = _chart.Areas[areaId++];
+                        area = _chart.Areas.ToArray()[areaId++];
                         area.Title = item.Chart.Title + seriesAreaId.ToString();
                     }
 
@@ -423,9 +423,9 @@ namespace Algoloop.Wpf.Views
 
             // Remove unused areas if not containing indicators
             var unusedAreas = new List<IChartArea>();
-            while (areaId < _chart.Areas.Count)
+            while (areaId < _chart.Areas.Count())
             {
-                IChartArea area = _chart.Areas[areaId++];
+                IChartArea area = _chart.Areas.ToArray()[areaId++];
                 if (!HasIOnlyIndicatorElement(area))
                 {
                     unusedAreas.Add(area);
@@ -462,14 +462,14 @@ namespace Algoloop.Wpf.Views
             bool doIndicators = true;
             foreach (ChartItemViewModel item in _combobox.Items)
             {
-                if (areaId >= _chart.Areas.Count) break;
+                if (areaId >= _chart.Areas.Count()) break;
                 if (!item.IsVisible) continue;
                 if (item.Chart is not SymbolChartViewModel chart) continue;
-                IChartArea area = _chart.Areas[areaId++];
+                IChartArea area = _chart.Areas.ToArray()[areaId++];
                 while (HasIOnlyIndicatorElement(area))
                 {
-                    Debug.Assert(areaId < _chart.Areas.Count, "No area found");
-                    area = _chart.Areas[areaId++];
+                    Debug.Assert(areaId < _chart.Areas.Count(), "No area found");
+                    area = _chart.Areas.ToArray()[areaId++];
                 }
 
                 RedrawChart(area, chart.Symbol, doIndicators);

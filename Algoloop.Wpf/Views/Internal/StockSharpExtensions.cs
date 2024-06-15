@@ -13,6 +13,7 @@
  */
 
 using Algoloop.Wpf.Model;
+using Algoloop.Wpf.Views.Internal;
 using QuantConnect;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
@@ -20,7 +21,6 @@ using StockSharp.Algo.Candles;
 using StockSharp.BusinessEntities;
 using StockSharp.Charting;
 using StockSharp.Messages;
-using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
