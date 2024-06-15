@@ -48,7 +48,7 @@ namespace Algoloop.Wpf.Model
             Properties = (OrderProperties)order.Properties;
             SecurityType = order.SecurityType.ToString();
             Direction = order.Direction.ToString();
-            OrderValue = order.Value;
+            OrderValue = order.Quantity * order.Price;
             OrderSubmissionData = order.OrderSubmissionData;
             IsMarketable = order.IsMarketable;
         }

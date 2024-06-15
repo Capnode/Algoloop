@@ -89,5 +89,10 @@ namespace Algoloop.Wpf.Model
             if (obj is not ListModel other) return false;
             return (Id ?? Name) == (other.Id ?? other.Name);
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name, Auto, Symbols);
+        }
     }
 }

@@ -414,12 +414,10 @@ namespace Algoloop.Wpf.ViewModels
 
         private void LoadFundamentals(FineFundamental fine)
         {
+            if (fine == null || !fine.HasFundamentalData) return;
             string periodType = fine.FinancialStatements.PeriodType;
             DateTime date = fine.FinancialStatements.PeriodEndingDate;
-            if (date.Equals(DateTime.MinValue))
-            {
-                return;
-            }
+            if (date.Equals(DateTime.MinValue)) return;
 
             switch (Market.SelectedReportPeriod)
             {

@@ -32,7 +32,7 @@ namespace Algoloop.Wpf.ViewModels
             EntryTime = order.CreatedTime.ToLocalTime();
             EntryPrice = order.Price.SmartRounding();
             Quantity = order.Quantity;
-            EntryValue = order.Value;
+            EntryValue = order.Quantity * order.Price;
 
             Debug.Assert(IsUiThread(), "Not UI thread!");
         }

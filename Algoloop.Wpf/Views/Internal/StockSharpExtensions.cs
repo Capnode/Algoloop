@@ -30,7 +30,7 @@ namespace Algoloop.Wpf.ViewModels.Views.Internal.Lean
 {
     internal static class StockSharpExtensions
     {
-        public static Candle ToCandle(BaseData data, Security security = default)
+        public static ICandleMessage ToCandle(BaseData data, Security security = default)
         {
             if (security == default)
             {
@@ -112,7 +112,7 @@ namespace Algoloop.Wpf.ViewModels.Views.Internal.Lean
             throw new NotImplementedException($"Unknown BaseData subclass: {data.GetType()}");
         }
 
-        public static IEnumerable<Candle> ToCandles(this IEnumerable<BaseData> data)
+        public static IEnumerable<ICandleMessage> ToCandles(this IEnumerable<BaseData> data)
         {
             BaseData first = data.FirstOrDefault();
             if (first == default) return default;

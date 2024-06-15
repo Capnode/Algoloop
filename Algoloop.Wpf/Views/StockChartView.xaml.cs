@@ -23,6 +23,7 @@ using StockSharp.Algo.Candles;
 using StockSharp.Algo.Indicators;
 using StockSharp.Charting;
 using StockSharp.Configuration;
+using StockSharp.Messages;
 using StockSharp.Xaml.Charting;
 using System;
 using System.Collections.Generic;
@@ -521,8 +522,8 @@ namespace Algoloop.Wpf.Views
             }
 
             var chartData = new ChartDrawData();
-            IEnumerable<Candle> candles = symbol.History()?.ToCandles() ?? Enumerable.Empty<Candle>();
-            foreach (Candle candle in candles)
+            IEnumerable<ICandleMessage> candles = symbol.History()?.ToCandles() ?? Enumerable.Empty<ICandleMessage>();
+            foreach (ICandleMessage candle in candles)
             {
                 IChartDrawData.IChartDrawDataItem chartGroup = chartData.Group(candle.OpenTime);
                 chartGroup.Add(element, candle);
