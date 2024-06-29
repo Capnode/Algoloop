@@ -69,7 +69,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                     if (freeMargin >= freeMarginPostTrade)
                     {
-                        throw new Exception("We expect the margin used to actually be lower once we perform the second trade");
+                        throw new RegressionTestException("We expect the margin used to actually be lower once we perform the second trade");
                     }
                 }
             }
@@ -84,6 +84,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -67,12 +67,12 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (marginInterestRateModel == null)
             {
-                throw new Exception("CustomMarginInterestRateModel was not set");
+                throw new RegressionTestException("CustomMarginInterestRateModel was not set");
             }
 
             if (marginInterestRateModel.CallCount == 0)
             {
-                throw new Exception("CustomMarginInterestRateModel was not called");
+                throw new RegressionTestException("CustomMarginInterestRateModel was not called");
             }
 
             var expectedCash = _cashAfterOrder * (decimal)Math.Pow(1 + (double)marginInterestRateModel.InterestRate, marginInterestRateModel.CallCount);
@@ -80,7 +80,7 @@ namespace QuantConnect.Algorithm.CSharp
             // add a tolerance since using Math.Pow(double, double) given the lack of a decimal overload
             if (Math.Abs(Portfolio.Cash - expectedCash) > 1e-10m)
             {
-                throw new Exception($"Expected cash {expectedCash} but got {Portfolio.Cash}");
+                throw new RegressionTestException($"Expected cash {expectedCash} but got {Portfolio.Cash}");
             }
         }
 
@@ -111,7 +111,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -122,6 +122,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

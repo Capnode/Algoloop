@@ -1955,7 +1955,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
                     Volume = 200,
                     Symbol = symbol
                 },
-                new SymbolChangedEvent(symbol, reference.AddDays(3).Date, symbol, symbol),
+                new SymbolChangedEvent(symbol, reference.AddDays(3).Date, symbol.Value, symbol.Value),
                 new TradeBar {
                     Time = reference.AddDays(2),
                     Value = 3,
@@ -2280,7 +2280,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
             }
 
             public bool CanRunLocally { get; } = true;
-            public Language[] Languages { get; } = { Language.CSharp };
+            public List<Language> Languages { get; } = new() { Language.CSharp };
 
             /// <summary>
             /// Data Points count of all timeslices of algorithm
@@ -2291,6 +2291,11 @@ namespace QuantConnect.Tests.Engine.DataFeeds.Enumerators
             /// Data Points count of the algorithm history
             /// </summary>
             public int AlgorithmHistoryDataPoints => 0;
+
+            /// <summary>
+            /// Final status of the algorithm
+            /// </summary>
+            public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
             public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>();
         }

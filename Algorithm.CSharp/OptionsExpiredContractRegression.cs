@@ -53,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
                 {
                     if (contract.Expiry.Date < Time.Date)
                     {
-                        throw new Exception($"Received expired contract {contract} expired: {contract.Expiry} current time: {Time}");
+                        throw new RegressionTestException($"Received expired contract {contract} expired: {contract.Expiry} current time: {Time}");
                     }
                 }
             }
@@ -63,7 +63,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_receivedData)
             {
-                throw new Exception("No Options chains were received in this regression");
+                throw new RegressionTestException("No Options chains were received in this regression");
             }
         }
 
@@ -75,7 +75,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -86,6 +86,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

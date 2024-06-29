@@ -47,7 +47,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (!_beta.IsReady)
             {
-                throw new Exception("_beta indicator was expected to be ready");
+                throw new RegressionTestException("_beta indicator was expected to be ready");
             }
         }
 
@@ -63,7 +63,7 @@ namespace QuantConnect.Algorithm.CSharp
             
             if (_beta.Current.Value < 0m || _beta.Current.Value > 2.80m)
             {
-                throw new Exception($"_beta value was expected to be between 0 and 2.80 but was {_beta.Current.Value}");
+                throw new RegressionTestException($"_beta value was expected to be between 0 and 2.80 but was {_beta.Current.Value}");
             }
 
             Log($"Beta between IBM and SPY is: {_beta.Current.Value}");
@@ -97,7 +97,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp};
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -108,6 +108,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 11;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

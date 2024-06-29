@@ -95,7 +95,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var positionGroups = Portfolio.Positions.Groups;
                 if (positionGroups.Count != 2)
                 {
-                    throw new Exception($"Expected 2 position groups, one for each spread, but found {positionGroups.Count}");
+                    throw new RegressionTestException($"Expected 2 position groups, one for each spread, but found {positionGroups.Count}");
                 }
 
                 var positionGroupMatchesSpreadStrategy = (IPositionGroup positionGroup, OptionStrategy strategy) =>
@@ -110,7 +110,7 @@ namespace QuantConnect.Algorithm.CSharp
                 if (!positionGroups.All(group =>
                         positionGroupMatchesSpreadStrategy(group, _bullCallSpread) || positionGroupMatchesSpreadStrategy(group, _bearPutSpread)))
                 {
-                    throw new Exception("Expected both spreads to have a matching position group in the portfolio.");
+                    throw new RegressionTestException("Expected both spreads to have a matching position group in the portfolio.");
                 }
 
                 // Step 2: liquidate spreads
@@ -125,12 +125,12 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_done)
             {
-                throw new Exception("Expected the algorithm to have bought and sold a Bull Call Spread and a Bear Put Spread.");
+                throw new RegressionTestException("Expected the algorithm to have bought and sold a Bull Call Spread and a Bear Put Spread.");
             }
 
             if (Portfolio.Invested)
             {
-                throw new Exception("The spreads should have been liquidated by the end of the algorithm");
+                throw new RegressionTestException("The spreads should have been liquidated by the end of the algorithm");
             }
         }
 
@@ -142,7 +142,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -153,6 +153,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

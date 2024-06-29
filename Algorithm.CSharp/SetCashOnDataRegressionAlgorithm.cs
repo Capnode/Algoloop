@@ -62,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var cash = Portfolio.CashBook["EUR"];
                 if (cash.CurrencyConversion.GetType() == typeof(ConstantCurrencyConversion) || cash.ConversionRate == 0)
                 {
-                    throw new Exception("Expected 'EUR' Cash to be fully set");
+                    throw new RegressionTestException("Expected 'EUR' Cash to be fully set");
                 }
 
                 var eurUsdSubscription = SubscriptionManager.SubscriptionDataConfigService
@@ -71,7 +71,7 @@ namespace QuantConnect.Algorithm.CSharp
                     .Single();
                 if (!eurUsdSubscription.IsInternalFeed)
                 {
-                    throw new Exception("Unexpected not internal 'EURUSD' Subscription");
+                    throw new RegressionTestException("Unexpected not internal 'EURUSD' Subscription");
                 }
             }
 
@@ -90,7 +90,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -101,6 +101,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

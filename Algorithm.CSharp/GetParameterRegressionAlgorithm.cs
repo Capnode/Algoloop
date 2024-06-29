@@ -46,17 +46,17 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (expected == null && actual != null)
             {
-                throw new Exception($"{call} should have returned null but returned {actual} ({actual.GetType()})");
+                throw new RegressionTestException($"{call} should have returned null but returned {actual} ({actual.GetType()})");
             }
 
             if (expected != null && actual == null)
             {
-                throw new Exception($"{call} should have returned {expected} ({expected.GetType()}) but returned null");
+                throw new RegressionTestException($"{call} should have returned {expected} ({expected.GetType()}) but returned null");
             }
 
             if (expected != null && actual != null && (expected.GetType() != actual.GetType() || !expected.Equals(actual)))
             {
-                throw new Exception($"{call} should have returned {expected} ({expected.GetType()}) but returned {actual} ({actual.GetType()})");
+                throw new RegressionTestException($"{call} should have returned {expected} ({expected.GetType()}) but returned {actual} ({actual.GetType()})");
             }
         }
 
@@ -68,7 +68,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -79,6 +79,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

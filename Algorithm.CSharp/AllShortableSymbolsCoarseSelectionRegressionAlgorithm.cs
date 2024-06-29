@@ -112,7 +112,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var shortableQuantity = security.ShortableProvider.ShortableQuantity(symbol, Time);
                 if (shortableQuantity == null)
                 {
-                    throw new Exception($"Expected {symbol} to be shortable on {Time:yyyy-MM-dd}");
+                    throw new RegressionTestException($"Expected {symbol} to be shortable on {Time:yyyy-MM-dd}");
                 }
 
                 // Buy at least once into all Symbols. Since daily data will always use
@@ -137,11 +137,11 @@ namespace QuantConnect.Algorithm.CSharp
                 var gme = QuantConnect.Symbol.Create("GME", SecurityType.Equity, Market.USA);
                 if (!shortableSymbols.ContainsKey(gme))
                 {
-                    throw new Exception("Expected unmapped GME in shortable symbols list on 2014-03-27");
+                    throw new RegressionTestException("Expected unmapped GME in shortable symbols list on 2014-03-27");
                 }
                 if (!coarse.Select(x => x.Symbol.Value).Contains("GME"))
                 {
-                    throw new Exception("Expected mapped GME in coarse symbols on 2014-03-27");
+                    throw new RegressionTestException("Expected mapped GME in coarse symbols on 2014-03-27");
                 }
 
                 expectedMissing = 1;
@@ -150,7 +150,7 @@ namespace QuantConnect.Algorithm.CSharp
             var missing = _expectedSymbols[Time.Date].Except(selectedSymbols).ToList();
             if (missing.Count != expectedMissing)
             {
-                throw new Exception($"Expected Symbols selected on {Time.Date:yyyy-MM-dd} to match expected Symbols, but the following Symbols were missing: {string.Join(", ", missing.Select(s => s.ToString()))}");
+                throw new RegressionTestException($"Expected Symbols selected on {Time.Date:yyyy-MM-dd} to match expected Symbols, but the following Symbols were missing: {string.Join(", ", missing.Select(s => s.ToString()))}");
             }
 
             _coarseSelected[Time.Date] = true;
@@ -233,7 +233,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -244,6 +244,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

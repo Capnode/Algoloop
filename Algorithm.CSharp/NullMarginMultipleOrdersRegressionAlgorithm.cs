@@ -94,15 +94,15 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (ticket.Status != OrderStatus.Filled)
             {
-                throw new Exception($"Unexpected order status {ticket.Status} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
+                throw new RegressionTestException($"Unexpected order status {ticket.Status} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
             }
             if (Portfolio.Positions.Groups.Count != expectedGroupCount)
             {
-                throw new Exception($"Unexpected position group count {Portfolio.Positions.Groups.Count} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
+                throw new RegressionTestException($"Unexpected position group count {Portfolio.Positions.Groups.Count} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
             }
             if(Portfolio.TotalMarginUsed != expectedMarginUsed)
             {
-                throw new Exception($"Unexpected margin used {expectedMarginUsed}");
+                throw new RegressionTestException($"Unexpected margin used {expectedMarginUsed}");
             }
         }
 
@@ -114,7 +114,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -125,6 +125,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

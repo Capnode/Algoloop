@@ -55,22 +55,22 @@ namespace QuantConnect.Algorithm.CSharp
             var transactions = Transactions.OrdersCount;
             if (transactions != 1)
             {
-                throw new Exception($"Algorithm should have just 1 order, but was {transactions}");
+                throw new RegressionTestException($"Algorithm should have just 1 order, but was {transactions}");
             }
             var orderQuantity = Transactions.GetOrderById(_orderId).Quantity;
             if (orderQuantity != -1001)
             {
-                throw new Exception($"Quantity of order {_orderId} should be -1001, but was {orderQuantity}");
+                throw new RegressionTestException($"Quantity of order {_orderId} should be -1001, but was {orderQuantity}");
             }
             var feeRate = _spy.ShortableProvider.FeeRate(_spy.Symbol, Time);
             if (feeRate != 0.0025m)
             {
-                throw new Exception($"Fee rate should be 0.0025, but was {feeRate}");
+                throw new RegressionTestException($"Fee rate should be 0.0025, but was {feeRate}");
             }
             var rebateRate = _spy.ShortableProvider.RebateRate(_spy.Symbol, Time);
             if (rebateRate != 0.0507m)
             {
-                throw new Exception($"Fee rate should be 0.0507, but was {rebateRate}");
+                throw new RegressionTestException($"Fee rate should be 0.0507, but was {rebateRate}");
             }
         }
 
@@ -101,7 +101,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -112,6 +112,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

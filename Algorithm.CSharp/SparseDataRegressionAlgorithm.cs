@@ -49,7 +49,7 @@ namespace QuantConnect.Algorithm.CSharp
                 _gotDividend = true;
                 if (Time != dividend.Value.Time || Time.Day != 24)
                 {
-                    throw new Exception("Got a dividend at an unexpected point in time");
+                    throw new RegressionTestException("Got a dividend at an unexpected point in time");
                 }
             }
             foreach (var tradeBar in data.Bars)
@@ -62,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_gotDividend)
             {
-                throw new Exception("Never got a dividend!");
+                throw new RegressionTestException("Never got a dividend!");
             }
         }
 
@@ -74,7 +74,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -85,6 +85,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

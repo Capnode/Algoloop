@@ -54,7 +54,7 @@ namespace QuantConnect.Algorithm.CSharp
             var data = order.OrderSubmissionData;
             if (data == null || data.AskPrice == 0 || data.BidPrice == 0 || data.LastPrice == 0)
             {
-                throw new Exception("Invalid Order Submission data detected");
+                throw new RegressionTestException("Invalid Order Submission data detected");
             }
 
             if (_orderSubmissionData.ContainsKey(ticker))
@@ -62,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var previous = _orderSubmissionData[ticker];
                 if (previous.AskPrice == data.AskPrice || previous.BidPrice == data.BidPrice || previous.LastPrice == data.LastPrice)
                 {
-                    throw new Exception("Order Submission data didn't change");
+                    throw new RegressionTestException("Order Submission data didn't change");
                 }
             }
             _orderSubmissionData[ticker] = data;
@@ -76,7 +76,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -87,6 +87,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 60;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

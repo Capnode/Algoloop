@@ -60,7 +60,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (positionGroup.Positions.Count() != 2)
             {
-                throw new Exception($"Expected position group to have 2 positions. Actual: {positionGroup.Positions.Count()}");
+                throw new RegressionTestException($"Expected position group to have 2 positions. Actual: {positionGroup.Positions.Count()}");
             }
 
             var callPosition = positionGroup.Positions.Single(x => x.Symbol.ID.OptionRight == OptionRight.Call);
@@ -71,12 +71,12 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (callPosition.Quantity != expectedCallPositionQuantity)
             {
-                throw new Exception($@"Expected call position quantity to be {expectedCallPositionQuantity}. Actual: {callPosition.Quantity}");
+                throw new RegressionTestException($@"Expected call position quantity to be {expectedCallPositionQuantity}. Actual: {callPosition.Quantity}");
             }
 
             if (putPosition.Quantity != expectedPutPositionQuantity)
             {
-                throw new Exception($@"Expected put position quantity to be {expectedPutPositionQuantity}. Actual: {putPosition.Quantity}");
+                throw new RegressionTestException($@"Expected put position quantity to be {expectedPutPositionQuantity}. Actual: {putPosition.Quantity}");
             }
         }
 
@@ -94,7 +94,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public override List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -105,6 +105,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

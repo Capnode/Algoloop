@@ -55,7 +55,7 @@ namespace QuantConnect.Algorithm.CSharp
                 .Count(group => ((OptionStrategyPositionGroupBuyingPowerModel)@group.BuyingPowerModel).ToString() == name
                     && (!quantity.HasValue || Math.Abs(group.Quantity) == quantity)) != 1)
             {
-                throw new Exception($"Option strategy: '{name}' was not found!");
+                throw new RegressionTestException($"Option strategy: '{name}' was not found!");
             }
         }
 
@@ -64,7 +64,7 @@ namespace QuantConnect.Algorithm.CSharp
             if (Portfolio.Positions.Groups.Where(group => group.BuyingPowerModel is SecurityPositionGroupBuyingPowerModel)
                 .Count(group => group.Positions.Any(position => position.Symbol == symbol && position.Quantity == quantity)) != 1)
             {
-                throw new Exception($"Default groupd for symbol '{symbol}' and quantity '{quantity}' was not found!");
+                throw new RegressionTestException($"Default groupd for symbol '{symbol}' and quantity '{quantity}' was not found!");
             }
         }
 
@@ -122,7 +122,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -133,6 +133,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

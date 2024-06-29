@@ -87,7 +87,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var expectedQuantity = -Math.Sign(position.Quantity) * 1;
                 if (request.Quantity != expectedQuantity)
                 {
-                    throw new Exception($"Expected margin call order quantity to be {expectedQuantity} but was {request.Quantity}");
+                    throw new RegressionTestException($"Expected margin call order quantity to be {expectedQuantity} but was {request.Quantity}");
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp };
+        public override List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -111,6 +111,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public override AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

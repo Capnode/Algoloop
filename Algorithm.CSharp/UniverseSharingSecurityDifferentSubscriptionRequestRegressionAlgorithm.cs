@@ -74,7 +74,7 @@ namespace QuantConnect.Algorithm.CSharp
                     .GetSubscriptionDataConfigs(_aig);
                 if (config.Any())
                 {
-                    throw new Exception($"Unexpected SubscriptionDataConfig: {config}");
+                    throw new RegressionTestException($"Unexpected SubscriptionDataConfig: {config}");
                 }
             }
 
@@ -86,7 +86,7 @@ namespace QuantConnect.Algorithm.CSharp
                     .GetSubscriptionDataConfigs(_aig);
                 if (!config.Any())
                 {
-                    throw new Exception("Expecting to find a SubscriptionDataConfig for AIG");
+                    throw new RegressionTestException("Expecting to find a SubscriptionDataConfig for AIG");
                 }
                 RemoveSecurity(_aig);
             }
@@ -100,14 +100,14 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (!isExtendedMarketHours)
                 {
-                    throw new Exception($"Unexpected isExtendedMarketHours value: {false}");
+                    throw new RegressionTestException($"Unexpected isExtendedMarketHours value: {false}");
                 }
             }
             else
             {
                 if (isExtendedMarketHours)
                 {
-                    throw new Exception($"Unexpected isExtendedMarketHours value: {true}");
+                    throw new RegressionTestException($"Unexpected isExtendedMarketHours value: {true}");
                 }
 
             }
@@ -117,7 +117,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_onDataCalls == 0)
             {
-                throw new Exception($"Unexpected OnData() calls count {_onDataCalls}");
+                throw new RegressionTestException($"Unexpected OnData() calls count {_onDataCalls}");
             }
         }
 
@@ -129,7 +129,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -140,6 +140,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -45,7 +45,7 @@ namespace QuantConnect.Algorithm.CSharp
                 {
                     if (_delisted.Contains(d.Key))
                     {
-                        throw new Exception("We shouldn't be recieving data from an already delisted symbol");
+                        throw new RegressionTestException("We shouldn't be recieving data from an already delisted symbol");
                     }
                 }
             }
@@ -58,11 +58,11 @@ namespace QuantConnect.Algorithm.CSharp
                 Debug("CUSTOM OnEndOfAlgorithm");
                 if (_delisted.Count != 20)
                 {
-                    throw new Exception("Expecting exactly 20 delisted events");
+                    throw new RegressionTestException("Expecting exactly 20 delisted events");
                 }
                 if (_toBeDelisted.Count != 20)
                 {
-                    throw new Exception("Expecting exactly 20 to be delisted warning events");
+                    throw new RegressionTestException("Expecting exactly 20 to be delisted warning events");
                 }
             }
             base.OnEndOfAlgorithm();
@@ -95,7 +95,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -106,6 +106,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

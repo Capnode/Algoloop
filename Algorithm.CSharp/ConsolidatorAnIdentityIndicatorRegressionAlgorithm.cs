@@ -51,7 +51,7 @@ namespace QuantConnect.Algorithm.CSharp
                 _assertCount++;
                 if (_expectedValues[Time] != bar.Value)
                 {
-                    throw new Exception($"{Time} - Consolidate unexpected current value: {bar.Value}");
+                    throw new RegressionTestException($"{Time} - Consolidate unexpected current value: {bar.Value}");
                 }
             });
             _identity = Identity(symbol, Resolution.Daily);
@@ -65,7 +65,7 @@ namespace QuantConnect.Algorithm.CSharp
             _assertCount++;
             if (_expectedValues[Time] != _identity.Current.Value)
             {
-                throw new Exception($"{Time} - _identity_Updated unexpected current value: {_identity.Current.Value}");
+                throw new RegressionTestException($"{Time} - _identity_Updated unexpected current value: {_identity.Current.Value}");
             }
         }
 
@@ -74,7 +74,7 @@ namespace QuantConnect.Algorithm.CSharp
             _assertCount++;
             if (_expectedValues[Time] != _identity.Current.Value)
             {
-                throw new Exception($"{Time} - Min_Updated unexpected current value: {_identity.Current.Value}");
+                throw new RegressionTestException($"{Time} - Min_Updated unexpected current value: {_identity.Current.Value}");
             }
         }
 
@@ -82,7 +82,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_assertCount != 12)
             {
-                throw new Exception($"IUnexpected assertiong count: {_assertCount}");
+                throw new RegressionTestException($"IUnexpected assertiong count: {_assertCount}");
             }
         }
 
@@ -94,7 +94,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -105,6 +105,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -54,7 +54,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!delistings.ContainsKey("AAA.1"))
             {
-                throw new Exception("Unexpected OnDelistings call");
+                throw new RegressionTestException("Unexpected OnDelistings call");
             }
             _onDelistingsCalled = true;
         }
@@ -63,7 +63,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!symbolsChanged.ContainsKey("SPWR"))
             {
-                throw new Exception("Unexpected OnSymbolChangedEvents call");
+                throw new RegressionTestException("Unexpected OnSymbolChangedEvents call");
             }
             _onSymbolChangedEvents = true;
         }
@@ -72,7 +72,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!splits.ContainsKey("AAPL"))
             {
-                throw new Exception("Unexpected OnSplits call");
+                throw new RegressionTestException("Unexpected OnSplits call");
             }
             _onSplits = true;
         }
@@ -81,7 +81,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!dividends.ContainsKey("AAPL"))
             {
-                throw new Exception("Unexpected OnDividends call");
+                throw new RegressionTestException("Unexpected OnDividends call");
             }
             _onDividends = true;
         }
@@ -90,19 +90,19 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_onDelistingsCalled)
             {
-                throw new Exception("OnDelistings was not called!");
+                throw new RegressionTestException("OnDelistings was not called!");
             }
             if (!_onSymbolChangedEvents)
             {
-                throw new Exception("OnSymbolChangedEvents was not called!");
+                throw new RegressionTestException("OnSymbolChangedEvents was not called!");
             }
             if (!_onSplits)
             {
-                throw new Exception("OnSplits was not called!");
+                throw new RegressionTestException("OnSplits was not called!");
             }
             if (!_onDividends)
             {
-                throw new Exception("OnDividends was not called!");
+                throw new RegressionTestException("OnDividends was not called!");
             }
         }
 
@@ -114,7 +114,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -125,6 +125,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

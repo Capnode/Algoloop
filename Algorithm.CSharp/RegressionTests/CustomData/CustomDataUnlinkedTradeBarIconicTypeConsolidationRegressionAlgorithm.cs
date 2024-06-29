@@ -53,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_bb.Current.Value == 0)
             {
-                throw new Exception("Bollinger Band value is zero when we expect non-zero value.");
+                throw new RegressionTestException("Bollinger Band value is zero when we expect non-zero value.");
             }
 
             if (!_invested && _bb.Current.Value > 0.05m)
@@ -128,7 +128,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <remarks>
         /// Unable to be tested in Python, due to pythonnet not supporting overriding of methods from Python
         /// </remarks>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -139,6 +139,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

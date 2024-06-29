@@ -25,6 +25,11 @@ namespace QuantConnect.Interfaces
     public interface IRegressionAlgorithmDefinition
     {
         /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        AlgorithmStatus AlgorithmStatus { get; }
+
+        /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
         bool CanRunLocally { get; }
@@ -32,7 +37,7 @@ namespace QuantConnect.Interfaces
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        Language[] Languages { get; }
+        List<Language> Languages { get; }
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm

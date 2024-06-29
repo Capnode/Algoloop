@@ -73,7 +73,7 @@ namespace QuantConnect.Algorithm.CSharp
                     if(comboPrice < 734m)
                     {
                         // just to make sure the price makes sense
-                        throw new Exception($"Unexpected combo price {comboPrice}");
+                        throw new RegressionTestException($"Unexpected combo price {comboPrice}");
                     }
                     // place order slightly bellow price
                     ComboLimitOrder(legs, 6, comboPrice - 0.5m);
@@ -89,7 +89,7 @@ namespace QuantConnect.Algorithm.CSharp
             if (orderEvent.Status.IsFill() && (Time - _submittionTime) < TimeSpan.FromMinutes(10))
             {
                 // we want to make sure we fill because the price moved and hit our limit price
-                throw new Exception($"Unexpected fill time {Time} submittion time {_submittionTime}");
+                throw new RegressionTestException($"Unexpected fill time {Time} submittion time {_submittionTime}");
             }
         }
 
@@ -101,7 +101,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -112,6 +112,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

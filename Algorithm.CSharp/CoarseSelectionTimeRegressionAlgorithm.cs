@@ -66,16 +66,16 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (data.Count != 2)
             {
-                throw new Exception($"Unexpected data count: {data.Count}");
+                throw new RegressionTestException($"Unexpected data count: {data.Count}");
             }
             if (ActiveSecurities.Count != 2)
             {
-                throw new Exception($"Unexpected ActiveSecurities count: {ActiveSecurities.Count}");
+                throw new RegressionTestException($"Unexpected ActiveSecurities count: {ActiveSecurities.Count}");
             }
             // the price obtained by the previous coarse selection should be the same as the current price
             if (_historyCoarseSpyPrice != 0 && _historyCoarseSpyPrice != Securities[_spy].Price)
             {
-                throw new Exception($"Unexpected SPY price: {_historyCoarseSpyPrice}");
+                throw new RegressionTestException($"Unexpected SPY price: {_historyCoarseSpyPrice}");
             }
             _historyCoarseSpyPrice = 0;
             if (!Portfolio.Invested)
@@ -93,7 +93,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -104,6 +104,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 6;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

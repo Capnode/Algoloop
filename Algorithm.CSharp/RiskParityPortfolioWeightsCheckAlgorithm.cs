@@ -54,7 +54,7 @@ namespace QuantConnect.DataLibrary.Tests
                 var weights = kvp.Value;
                 if (weights.Count < 2)
                 {
-                    throw new Exception($"Expected multiple different weigths from the PCM for {kvp.Key}");
+                    throw new RegressionTestException($"Expected multiple different weigths from the PCM for {kvp.Key}");
                 }
             }
         }
@@ -89,7 +89,7 @@ namespace QuantConnect.DataLibrary.Tests
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -100,6 +100,11 @@ namespace QuantConnect.DataLibrary.Tests
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 514;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -66,17 +66,17 @@ namespace QuantConnect.Algorithm.CSharp
                 var orderType = Transactions.GetOrderById(orderEvent.OrderId).Type;
                 if (orderType == OrderType.ComboMarket && orderEvent.AbsoluteFillQuantity != 50)
                 {
-                    throw new Exception($"The absolute quantity filled for all combo market orders should be 50, but for order {orderEvent.OrderId} was {orderEvent.AbsoluteFillQuantity}");
+                    throw new RegressionTestException($"The absolute quantity filled for all combo market orders should be 50, but for order {orderEvent.OrderId} was {orderEvent.AbsoluteFillQuantity}");
                 }
 
                 if (orderType == OrderType.ComboLimit && orderEvent.AbsoluteFillQuantity != 20)
                 {
-                    throw new Exception($"The absolute quantity filled for all combo limit orders should be 20, but for order {orderEvent.OrderId} was {orderEvent.AbsoluteFillQuantity}");
+                    throw new RegressionTestException($"The absolute quantity filled for all combo limit orders should be 20, but for order {orderEvent.OrderId} was {orderEvent.AbsoluteFillQuantity}");
                 }
 
                 if (orderType == OrderType.ComboLegLimit && orderEvent.AbsoluteFillQuantity != 10)
                 {
-                    throw new Exception($"The absolute quantity filled for all combo leg limit orders should be 20, but for order {orderEvent.OrderId} was {orderEvent.AbsoluteFillQuantity}");
+                    throw new RegressionTestException($"The absolute quantity filled for all combo leg limit orders should be 20, but for order {orderEvent.OrderId} was {orderEvent.AbsoluteFillQuantity}");
                 }
 
                 _orderTypes[orderType] = 1;
@@ -87,22 +87,22 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_orderTypes.Keys.Count != 3)
             {
-                throw new Exception($"Just 3 different types of order were submitted in this algorithm, but the amount of order types was {_orderTypes.Count}");
+                throw new RegressionTestException($"Just 3 different types of order were submitted in this algorithm, but the amount of order types was {_orderTypes.Count}");
             }
 
             if (!_orderTypes.Keys.Contains(OrderType.ComboMarket))
             {
-                throw new Exception($"One Combo Market Order should have been submitted but it was not");
+                throw new RegressionTestException($"One Combo Market Order should have been submitted but it was not");
             }
 
             if (!_orderTypes.Keys.Contains(OrderType.ComboLimit))
             {
-                throw new Exception($"One Combo Limit Order should have been submitted but it was not");
+                throw new RegressionTestException($"One Combo Limit Order should have been submitted but it was not");
             }
 
             if (!_orderTypes.Keys.Contains(OrderType.ComboLegLimit))
             {
-                throw new Exception($"One Combo Leg Limit Order should have been submitted but it was not");
+                throw new RegressionTestException($"One Combo Leg Limit Order should have been submitted but it was not");
             }
         }
 
@@ -114,7 +114,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -125,6 +125,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

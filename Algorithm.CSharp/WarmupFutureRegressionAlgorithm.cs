@@ -59,7 +59,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (Securities[SP500].AskPrice == 0)
                 {
-                    throw new Exception("Continuous contract price is not set!");
+                    throw new RegressionTestException("Continuous contract price is not set!");
                 }
                 ContinuousWarmupTimes.Add(Time);
             }
@@ -80,7 +80,7 @@ namespace QuantConnect.Algorithm.CSharp
                     {
                         if (contract.AskPrice == 0)
                         {
-                            throw new Exception("Contract price is not set!");
+                            throw new RegressionTestException("Contract price is not set!");
                         }
                         ChainWarmupTimes.Add(Time);
                     }
@@ -107,7 +107,7 @@ namespace QuantConnect.Algorithm.CSharp
                 {
                     if (times[count] != start)
                     {
-                        throw new Exception($"Unexpected time {times[count]} expected {start}");
+                        throw new RegressionTestException($"Unexpected time {times[count]} expected {start}");
                     }
                     // if the market is closed there will be no data, so stop moving the index counter
                     count++;
@@ -132,7 +132,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -143,6 +143,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

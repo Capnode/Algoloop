@@ -56,13 +56,13 @@ namespace QuantConnect.Algorithm.CSharp
             //Verify our symbol properties were changed and loaded into this security
             if (_bitcoin.SymbolProperties != properties)
             {
-                throw new Exception("Failed to set and retrieve custom SymbolProperties for BTC");
+                throw new RegressionTestException("Failed to set and retrieve custom SymbolProperties for BTC");
             }
 
             //Verify our exchange hours were changed and loaded into this security
             if (_bitcoin.Exchange.Hours != exchangeHours)
             {
-                throw new Exception("Failed to set and retrieve custom ExchangeHours for BTC");
+                throw new RegressionTestException("Failed to set and retrieve custom ExchangeHours for BTC");
             }
 
             // For regression purposes on AddData overloads, this call is simply to ensure Lean can accept this
@@ -104,7 +104,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -115,6 +115,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

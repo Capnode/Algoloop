@@ -53,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var history = History(new[] { spy }, TimeSpan.FromDays(10));
                 if (!history.Any() || !history.All(slice => slice.Bars.All(pair => pair.Value.Period == TimeSpan.FromHours(1))))
                 {
-                    throw new Exception("Unexpected history result for internal subscription");
+                    throw new RegressionTestException("Unexpected history result for internal subscription");
                 }
 
                 // we add SPY using Daily > default benchmark using hourly
@@ -62,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
                 history = History(new[] { spy }, TimeSpan.FromDays(10));
                 if (!history.Any() || !history.All(slice => slice.Bars.All(pair => pair.Value.Period == TimeSpan.FromDays(1))))
                 {
-                    throw new Exception("Unexpected history result for user subscription");
+                    throw new RegressionTestException("Unexpected history result for user subscription");
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -86,6 +86,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 48;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -45,7 +45,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_firstDataConsolidated == null)
             {
-                throw new Exception("The consolidator should have consolidated at least one RangeBar, but it did not consolidated any one");
+                throw new RegressionTestException("The consolidator should have consolidated at least one RangeBar, but it did not consolidated any one");
             }
         }
 
@@ -59,7 +59,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (Math.Round(rangeBar.High - rangeBar.Low, 2) != (Range * 0.01m)) // The minimum price change for SPY is 0.01, therefore the range size of each bar equals Range * 0.01
             {
-                throw new Exception($"The difference between the High and Low for all RangeBar's should be {Range * 0.01m}, but for this RangeBar was {Math.Round(rangeBar.High - rangeBar.Low), 2}");
+                throw new RegressionTestException($"The difference between the High and Low for all RangeBar's should be {Range * 0.01m}, but for this RangeBar was {Math.Round(rangeBar.High - rangeBar.Low), 2}");
             }
         }
 
@@ -82,7 +82,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -93,6 +93,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

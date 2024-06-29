@@ -71,7 +71,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (!allOptionsWereChangedOnMarketOpen)
             {
-                throw new Exception("Expected options filter to be run only on market open");
+                throw new RegressionTestException("Expected options filter to be run only on market open");
             }
         }
 
@@ -83,7 +83,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all time slices of algorithm
@@ -94,6 +94,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

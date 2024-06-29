@@ -77,7 +77,7 @@ namespace QuantConnect.Algorithm.CSharp
                 // Only considers the buy orders, because holding value is zero otherwise
                 if (Math.Abs(_targets[symbol] - portfolioShare) > 0.01m && orderEvent.Direction == OrderDirection.Buy)
                 {
-                    throw new Exception($"Target for {symbol}: expected {_targets[symbol]}, actual: {portfolioShare}");
+                    throw new RegressionTestException($"Target for {symbol}: expected {_targets[symbol]}, actual: {portfolioShare}");
                 }
             }
         }
@@ -101,7 +101,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -112,6 +112,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

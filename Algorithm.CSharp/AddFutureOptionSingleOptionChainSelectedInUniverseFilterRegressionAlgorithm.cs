@@ -131,16 +131,16 @@ namespace QuantConnect.Algorithm.CSharp
                             || marginModel.MaintenanceIntradayMarginRequirement == 0
                             || marginModel.MaintenanceOvernightMarginRequirement == 0)
                         {
-                            throw new Exception("Unexpected margin requirements");
+                            throw new RegressionTestException("Unexpected margin requirements");
                         }
 
                         if (marginModel.GetInitialMarginRequirement(optionContract, 1) == 0)
                         {
-                            throw new Exception("Unexpected Initial Margin requirement");
+                            throw new RegressionTestException("Unexpected Initial Margin requirement");
                         }
                         if (marginModel.GetMaintenanceMargin(optionContract) != 0)
                         {
-                            throw new Exception("Unexpected Maintenance Margin requirement");
+                            throw new RegressionTestException("Unexpected Maintenance Margin requirement");
                         }
 
                         MarketOrder(option, 1);
@@ -149,7 +149,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                         if (marginModel.GetMaintenanceMargin(optionContract) == 0)
                         {
-                            throw new Exception("Unexpected Maintenance Margin requirement");
+                            throw new RegressionTestException("Unexpected Maintenance Margin requirement");
                         }
                     }
                     if (!futureInvested && data.ContainsKey(future))
@@ -170,7 +170,7 @@ namespace QuantConnect.Algorithm.CSharp
             }
             if (!_onDataReached)
             {
-                throw new Exception("OnData() was never called.");
+                throw new RegressionTestException("OnData() was never called.");
             }
             if (_symbolsReceived.Count != _expectedSymbolsReceived.Count)
             {
@@ -188,7 +188,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (missingSymbols.Count > 0)
             {
-                throw new Exception($"Symbols: \"{string.Join(", ", missingSymbols)}\" were not found in OnData");
+                throw new RegressionTestException($"Symbols: \"{string.Join(", ", missingSymbols)}\" were not found in OnData");
             }
 
             foreach (var expectedSymbol in _expectedSymbolsReceived)
@@ -202,7 +202,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (nonDupeDataCount < 1000)
                 {
-                    throw new Exception($"Received too few data points. Expected >=1000, found {nonDupeDataCount} for {expectedSymbol}");
+                    throw new RegressionTestException($"Received too few data points. Expected >=1000, found {nonDupeDataCount} for {expectedSymbol}");
                 }
             }
         }
@@ -215,7 +215,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -226,6 +226,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

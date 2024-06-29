@@ -80,7 +80,7 @@ namespace QuantConnect.Algorithm.CSharp
                     var greeks = contract.Greeks;
                     if (greeks.Delta == 0m && greeks.Gamma == 0m && greeks.Theta == 0m && greeks.Vega == 0m && greeks.Rho == 0m)
                     {
-                        throw new Exception($"Expected greeks to not be zero simultaneously for {contract.Symbol} at contract expiration date {contract.Expiry}");
+                        throw new RegressionTestException($"Expected greeks to not be zero simultaneously for {contract.Symbol} at contract expiration date {contract.Expiry}");
                     }
                 }
             }
@@ -90,7 +90,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_triedGreeksCalculation)
             {
-                throw new Exception("Expected to have tried greeks calculation");
+                throw new RegressionTestException("Expected to have tried greeks calculation");
             }
         }
 
@@ -102,7 +102,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -113,6 +113,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

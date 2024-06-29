@@ -76,11 +76,11 @@ namespace QuantConnect.Algorithm.CSharp
             var aaa = Securities["AAA.1"];
             if (aaa.IsDelisted && aaa.IsTradable)
             {
-                throw new Exception("Delisted security must NOT be tradable");
+                throw new RegressionTestException("Delisted security must NOT be tradable");
             }
             if (!aaa.IsDelisted && !aaa.IsTradable)
             {
-                throw new Exception("Securities must be marked as tradable until they're delisted or removed from the universe");
+                throw new RegressionTestException("Securities must be marked as tradable until they're delisted or removed from the universe");
             }
 
             foreach (var kvp in data.Delistings)
@@ -126,19 +126,19 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_receivedDelistedEvent)
             {
-                throw new Exception("Did not receive expected delisted event");
+                throw new RegressionTestException("Did not receive expected delisted event");
             }
             if (!_receivedDelistedWarningEvent)
             {
-                throw new Exception("Did not receive expected delisted warning event");
+                throw new RegressionTestException("Did not receive expected delisted warning event");
             }
             if (_dataCount != 13)
             {
-                throw new Exception($"Unexpected data count {_dataCount}. Expected 13");
+                throw new RegressionTestException($"Unexpected data count {_dataCount}. Expected 13");
             }
             if (_receivedSecurityChangesEvent != 1)
             {
-                throw new Exception($"Did not receive expected security changes removal! Got {_receivedSecurityChangesEvent}");
+                throw new RegressionTestException($"Did not receive expected security changes removal! Got {_receivedSecurityChangesEvent}");
             }
         }
 
@@ -150,7 +150,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -161,6 +161,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

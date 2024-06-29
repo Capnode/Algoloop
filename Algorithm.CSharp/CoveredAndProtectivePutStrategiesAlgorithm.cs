@@ -54,13 +54,13 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (positionGroup.Positions.Count() != 2)
             {
-                throw new Exception($"Expected position group to have 2 positions. Actual: {positionGroup.Positions.Count()}");
+                throw new RegressionTestException($"Expected position group to have 2 positions. Actual: {positionGroup.Positions.Count()}");
             }
 
             var optionPosition = positionGroup.Positions.Single(x => x.Symbol.SecurityType == SecurityType.Option);
             if (optionPosition.Symbol.ID.OptionRight != OptionRight.Put)
             {
-                throw new Exception($"Expected option position to be a put. Actual: {optionPosition.Symbol.ID.OptionRight}");
+                throw new RegressionTestException($"Expected option position to be a put. Actual: {optionPosition.Symbol.ID.OptionRight}");
             }
 
             var underlyingPosition = positionGroup.Positions.Single(x => x.Symbol.SecurityType == SecurityType.Equity);
@@ -69,12 +69,12 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (optionPosition.Quantity != expectedOptionPositionQuantity)
             {
-                throw new Exception($@"Expected option position quantity to be {expectedOptionPositionQuantity}. Actual: {optionPosition.Quantity}");
+                throw new RegressionTestException($@"Expected option position quantity to be {expectedOptionPositionQuantity}. Actual: {optionPosition.Quantity}");
             }
 
             if (underlyingPosition.Quantity != expectedUnderlyingPositionQuantity)
             {
-                throw new Exception($@"Expected underlying position quantity to be {expectedUnderlyingPositionQuantity}. Actual: {underlyingPosition.Quantity}");
+                throw new RegressionTestException($@"Expected underlying position quantity to be {expectedUnderlyingPositionQuantity}. Actual: {underlyingPosition.Quantity}");
             }
         }
 
@@ -92,7 +92,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public override List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -103,6 +103,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

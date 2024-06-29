@@ -60,7 +60,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var customData = slice.Get<ExampleCustomData>(_customSymbol);
                 if (customData.Price == 0)
                 {
-                    throw new Exception("Custom data price was not expected to be zero");
+                    throw new RegressionTestException("Custom data price was not expected to be zero");
                 }
 
                 _receivedData.Add(customData);
@@ -71,13 +71,13 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_receivedData.Count == 0)
             {
-                throw new Exception("Custom data was not fetched");
+                throw new RegressionTestException("Custom data was not fetched");
             }
 
             var customSecurity = Securities[_customSymbol];
             if (customSecurity == null || customSecurity.Price == 0)
             {
-                throw new Exception("Expected the custom security to be added to the algorithm securities and to have a price that is not zero");
+                throw new RegressionTestException("Expected the custom security to be added to the algorithm securities and to have a price that is not zero");
             }
 
             // Make sure history requests work as expected
@@ -85,14 +85,14 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (history.Count != _receivedData.Count)
             {
-                throw new Exception("History request returned different data than expected");
+                throw new RegressionTestException("History request returned different data than expected");
             }
 
             for (var i = 0; i < history.Count; i++)
             {
                 if (!history[i].Equals(_receivedData[i]))
                 {
-                    throw new Exception("History request returned different data than expected");
+                    throw new RegressionTestException("History request returned different data than expected");
                 }
             }
         }
@@ -154,7 +154,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -165,6 +165,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 69;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

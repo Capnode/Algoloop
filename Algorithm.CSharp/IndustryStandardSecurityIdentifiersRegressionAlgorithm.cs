@@ -63,7 +63,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (symbol.IsNullOrEmpty())
             {
-                throw new Exception($"{standard} symbol representation is null or empty");
+                throw new RegressionTestException($"{standard} symbol representation is null or empty");
             }
         }
 
@@ -71,7 +71,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (symbolApiSymbol != algorithmApiSymbol)
             {
-                throw new Exception($@"Symbol API {standard} symbol representation ({symbolApiSymbol}) does not match QCAlgorithm API {
+                throw new RegressionTestException($@"Symbol API {standard} symbol representation ({symbolApiSymbol}) does not match QCAlgorithm API {
                     standard} symbol representation ({algorithmApiSymbol})");
             }
         }
@@ -84,7 +84,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -95,6 +95,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

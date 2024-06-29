@@ -33,7 +33,7 @@ namespace QuantConnect.Algorithm.CSharp
         public override void Initialize()
         {
             UniverseSettings.DataNormalizationMode = DataNormalizationMode.Raw;
-            EnableAutomaticIndicatorWarmUp = true;
+            Settings.AutomaticIndicatorWarmUp = true;
             SetStartDate(2013, 10, 08);
             SetEndDate(2013, 10, 10);
 
@@ -82,7 +82,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (!sma11.Current.Equals(sma1.Current))
             {
-                throw new Exception("Expected SMAs warmed up before and after adding the Future to the algorithm to have the same current value. " +
+                throw new RegressionTestException("Expected SMAs warmed up before and after adding the Future to the algorithm to have the same current value. " +
                                     "The result of 'WarmUpIndicator' shouldn't change if the symbol is or isn't subscribed");
             }
 
@@ -94,7 +94,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (!smaSpy.Current.Equals(sma.Current))
             {
-                throw new Exception("Expected SMAs warmed up before and after adding the Equity to the algorithm to have the same current value. " +
+                throw new RegressionTestException("Expected SMAs warmed up before and after adding the Equity to the algorithm to have the same current value. " +
                                     "The result of 'WarmUpIndicator' shouldn't change if the symbol is or isn't subscribed");
             }
         }
@@ -103,7 +103,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (indicator.IsReady != isReady)
             {
-                throw new Exception($"Expected indicator state, expected {isReady} but was {indicator.IsReady}");
+                throw new RegressionTestException($"Expected indicator state, expected {isReady} but was {indicator.IsReady}");
             }
         }
 
@@ -141,7 +141,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -152,6 +152,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 84;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

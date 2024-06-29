@@ -61,14 +61,14 @@ namespace QuantConnect.Algorithm.CSharp
             var symbol = SymbolCache.GetSymbol("TWX");
             if (symbol == null)
             {
-                throw new Exception("Unexpected removal of symbol from cache!");
+                throw new RegressionTestException("Unexpected removal of symbol from cache!");
             }
 
             foreach (var dataDelisting in data.Delistings.Where(pair => pair.Value.Type == DelistingType.Delisted))
             {
                 if (dataDelisting.Key != _optionContract)
                 {
-                    throw new Exception("Unexpected delisting event!");
+                    throw new RegressionTestException("Unexpected delisting event!");
                 }
                 _optionWasRemoved = true;
             }
@@ -83,7 +83,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_optionWasRemoved)
             {
-                throw new Exception("Option contract was not removed!");
+                throw new RegressionTestException("Option contract was not removed!");
             }
         }
 
@@ -95,7 +95,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -106,6 +106,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

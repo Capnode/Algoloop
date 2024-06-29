@@ -56,7 +56,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var history = History(spy.Symbol, 5, Resolution.Minute).Count();
                 if (history != 5)
                 {
-                    throw new Exception($"Unexpected Minute data count: {history}");
+                    throw new RegressionTestException($"Unexpected Minute data count: {history}");
                 }
             }
             else
@@ -67,7 +67,7 @@ namespace QuantConnect.Algorithm.CSharp
                     var history = History(spy.Symbol, 5, Resolution.Hour).Count();
                     if (history != 5)
                     {
-                        throw new Exception($"Unexpected Hour data count {history}");
+                        throw new RegressionTestException($"Unexpected Hour data count {history}");
                     }
                 }
                 else
@@ -76,7 +76,7 @@ namespace QuantConnect.Algorithm.CSharp
                     var history = History(spy.Symbol, 5, Resolution.Daily).Count();
                     if (history != 5)
                     {
-                        throw new Exception($"Unexpected Daily data count {history}");
+                        throw new RegressionTestException($"Unexpected Daily data count {history}");
                     }
                 }
             }
@@ -98,17 +98,17 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_minuteHistoryCount != 3 * 6)
             {
-                throw new Exception($"Unexpected minute history requests count {_minuteHistoryCount}");
+                throw new RegressionTestException($"Unexpected minute history requests count {_minuteHistoryCount}");
             }
             // 6 pre market from 4am to 9am + 4 post market 4pm to 7pm
             if (_hourHistoryCount != 3 * 10)
             {
-                throw new Exception($"Unexpected hour history requests count {_hourHistoryCount}");
+                throw new RegressionTestException($"Unexpected hour history requests count {_hourHistoryCount}");
             }
             // 0am to 3am + 8pm to 11pm, last day ends at 8pm
             if (_dailyHistoryCount != (2 * 8 + 5))
             {
-                throw new Exception($"Unexpected Daily history requests count: {_dailyHistoryCount}");
+                throw new RegressionTestException($"Unexpected Daily history requests count: {_dailyHistoryCount}");
             }
         }
 
@@ -120,7 +120,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -131,6 +131,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 435;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

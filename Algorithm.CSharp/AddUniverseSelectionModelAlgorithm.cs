@@ -57,14 +57,14 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (UniverseManager.Count != 3)
             {
-                throw new Exception("Unexpected universe count");
+                throw new RegressionTestException("Unexpected universe count");
             }
             if (UniverseManager.ActiveSecurities.Count != 3
                 || UniverseManager.ActiveSecurities.Keys.All(symbol => symbol.Value != "SPY")
                 || UniverseManager.ActiveSecurities.Keys.All(symbol => symbol.Value != "AAPL")
                 || UniverseManager.ActiveSecurities.Keys.All(symbol => symbol.Value != "FB"))
             {
-                throw new Exception("Unexpected active securities");
+                throw new RegressionTestException("Unexpected active securities");
             }
         }
 
@@ -76,7 +76,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -87,6 +87,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -73,7 +73,7 @@ namespace QuantConnect.Algorithm.CSharp
                         try
                         {
                             SetHoldings(_contractSymbol, 1.1);
-                            throw new Exception("We expect invalid target for futures to throw an exception");
+                            throw new RegressionTestException("We expect invalid target for futures to throw an exception");
                         }
                         catch (InvalidOperationException)
                         {
@@ -83,7 +83,7 @@ namespace QuantConnect.Algorithm.CSharp
                         try
                         {
                             SetHoldings(_contractSymbol, -1.1);
-                            throw new Exception("We expect invalid target for futures to throw an exception");
+                            throw new RegressionTestException("We expect invalid target for futures to throw an exception");
                         }
                         catch (InvalidOperationException)
                         {
@@ -117,7 +117,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (Portfolio.TotalHoldingsValue / Portfolio.TotalPortfolioValue < 10)
                 {
-                    throw new Exception("Expected to be trading using the futures margin leverage");
+                    throw new RegressionTestException("Expected to be trading using the futures margin leverage");
                 }
 
                 var security = Securities[_contractSymbol];
@@ -126,14 +126,14 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if ((Portfolio.TotalMarginUsed - marginUsed) != 0)
                 {
-                    throw new Exception($"We expect TotalMarginUsed to be {marginUsed}, but was {Portfolio.TotalMarginUsed}");
+                    throw new RegressionTestException($"We expect TotalMarginUsed to be {marginUsed}, but was {Portfolio.TotalMarginUsed}");
                 }
 
                 var initialMarginRequired = model.InitialOvernightMarginRequirement * security.Holdings.AbsoluteQuantity;
 
                 if (Portfolio.TotalPortfolioValue - initialMarginRequired > model.InitialOvernightMarginRequirement * security.SymbolProperties.LotSize)
                 {
-                    throw new Exception("We expect to be trading using the biggest position we can, there seems to be room for another contract");
+                    throw new RegressionTestException("We expect to be trading using the biggest position we can, there seems to be room for another contract");
                 }
             }
         }
@@ -146,7 +146,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -157,6 +157,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

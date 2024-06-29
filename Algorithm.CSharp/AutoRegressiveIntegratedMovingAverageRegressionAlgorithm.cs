@@ -37,7 +37,7 @@ namespace QuantConnect.Algorithm.CSharp
             SetStartDate(2013, 1, 07);
             SetEndDate(2013, 12, 11);
 
-            EnableAutomaticIndicatorWarmUp = true;
+            Settings.AutomaticIndicatorWarmUp = true;
             AddEquity("SPY", Resolution.Daily);
             _arima = ARIMA("SPY", 1, 1, 1, 50);
             _ar = ARIMA("SPY", 1, 1, 0, 50);
@@ -71,7 +71,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -82,6 +82,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 100;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

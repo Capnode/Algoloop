@@ -72,7 +72,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (security.HasData && (security.Price < minExpectedPrice || security.Price > maxExpectedPrice))
                 {
-                    throw new Exception($"{security.Symbol}: Price {security.Price} is  out of expected range [{minExpectedPrice}, {maxExpectedPrice}]");
+                    throw new RegressionTestException($"{security.Symbol}: Price {security.Price} is  out of expected range [{minExpectedPrice}, {maxExpectedPrice}]");
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace QuantConnect.Algorithm.CSharp
             var subscriptions = SubscriptionManager.Subscriptions.Where(x => x.Symbol == security.Symbol);
             if (subscriptions.Any(x => x.DataNormalizationMode != expectedNormalizationMode))
             {
-                throw new Exception($"Expected {security.Symbol} to have data normalization mode {expectedNormalizationMode} but was {subscriptions.First().DataNormalizationMode}");
+                throw new RegressionTestException($"Expected {security.Symbol} to have data normalization mode {expectedNormalizationMode} but was {subscriptions.First().DataNormalizationMode}");
             }
         }
 
@@ -94,7 +94,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -105,6 +105,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

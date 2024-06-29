@@ -52,7 +52,7 @@ namespace QuantConnect.Algorithm.CSharp
                 expectedPeriod = TimeSpan.FromMinutes(1);
                 if (trade != null && trade.IsFillForward || quote != null && quote.IsFillForward)
                 {
-                    throw new Exception("Unexpected fill forwarded data!");
+                    throw new RegressionTestException("Unexpected fill forwarded data!");
                 }
             }
 
@@ -61,7 +61,7 @@ namespace QuantConnect.Algorithm.CSharp
                 _warmedUpTradeBars |= IsWarmingUp;
                 if (trade.Period != expectedPeriod)
                 {
-                    throw new Exception($"Unexpected period for trade data point {trade.Period} expected {expectedPeriod}. IsWarmingUp: {IsWarmingUp}");
+                    throw new RegressionTestException($"Unexpected period for trade data point {trade.Period} expected {expectedPeriod}. IsWarmingUp: {IsWarmingUp}");
                 }
             }
             if (quote != null)
@@ -69,7 +69,7 @@ namespace QuantConnect.Algorithm.CSharp
                 _warmedUpQuoteBars |= IsWarmingUp;
                 if (quote.Period != expectedPeriod)
                 {
-                    throw new Exception($"Unexpected period for quote data point {quote.Period} expected {expectedPeriod}. IsWarmingUp: {IsWarmingUp}");
+                    throw new RegressionTestException($"Unexpected period for quote data point {quote.Period} expected {expectedPeriod}. IsWarmingUp: {IsWarmingUp}");
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if(!_warmedUpTradeBars || !_warmedUpQuoteBars)
             {
-                throw new Exception("Did not assert data during warmup!");
+                throw new RegressionTestException("Did not assert data during warmup!");
             }
         }
 
@@ -90,7 +90,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -101,6 +101,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

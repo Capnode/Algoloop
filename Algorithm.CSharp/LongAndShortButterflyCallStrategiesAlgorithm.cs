@@ -69,7 +69,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (positionGroup.Positions.Count() != 3)
             {
-                throw new Exception($"Expected position group to have 3 positions. Actual: {positionGroup.Positions.Count()}");
+                throw new RegressionTestException($"Expected position group to have 3 positions. Actual: {positionGroup.Positions.Count()}");
             }
 
             var higherStrike = _butterflyCall.OptionLegs.Max(leg => leg.Strike);
@@ -78,7 +78,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (higherStrikePosition.Quantity != 2)
             {
-                throw new Exception($"Expected higher strike position quantity to be 2. Actual: {higherStrikePosition.Quantity}");
+                throw new RegressionTestException($"Expected higher strike position quantity to be 2. Actual: {higherStrikePosition.Quantity}");
             }
 
             var lowerStrike = _butterflyCall.OptionLegs.Min(leg => leg.Strike);
@@ -87,7 +87,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (lowerStrikePosition.Quantity != 2)
             {
-                throw new Exception($"Expected lower strike position quantity to be 2. Actual: {lowerStrikePosition.Quantity}");
+                throw new RegressionTestException($"Expected lower strike position quantity to be 2. Actual: {lowerStrikePosition.Quantity}");
             }
 
             var middleStrike = _butterflyCall.OptionLegs.Single(leg => leg.Strike < higherStrike && leg.Strike > lowerStrike).Strike;
@@ -96,7 +96,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (middleStrikePosition.Quantity != -4)
             {
-                throw new Exception($"Expected middle strike position quantity to be -4. Actual: {middleStrikePosition.Quantity}");
+                throw new RegressionTestException($"Expected middle strike position quantity to be -4. Actual: {middleStrikePosition.Quantity}");
             }
         }
 
@@ -114,7 +114,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public override List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -125,6 +125,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

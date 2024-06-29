@@ -60,7 +60,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (lastDataTime == data.Time)
             {
-                throw new Exception("Duplicate time for current data and last data slice");
+                throw new RegressionTestException("Duplicate time for current data and last data slice");
             }
 
             lastDataTime = data.Time;
@@ -69,7 +69,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (!Securities[_spy].IsTradable)
                 {
-                    throw new Exception($"{_spy} should be tradable");
+                    throw new RegressionTestException($"{_spy} should be tradable");
                 }
 
                 if (!Portfolio.Invested)
@@ -96,7 +96,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (!Securities[_spy].IsTradable)
                 {
-                    throw new Exception($"{_spy} should be tradable");
+                    throw new RegressionTestException($"{_spy} should be tradable");
                 }
             }
         }
@@ -109,7 +109,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -120,6 +120,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

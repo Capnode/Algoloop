@@ -69,7 +69,7 @@ namespace QuantConnect.Algorithm.CSharp
             var history = History(10, Resolution.Minute);
             if (history.Count() < 10)
             {
-                throw new Exception($"Empty history at {Time}");
+                throw new RegressionTestException($"Empty history at {Time}");
             }
             _successCount++;
         }
@@ -78,7 +78,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_successCount < ExpectedHistoryCallCount)
             {
-                throw new Exception($"Scheduled Event did not assert history call as many times as expected: {_successCount}/49");
+                throw new RegressionTestException($"Scheduled Event did not assert history call as many times as expected: {_successCount}/49");
             }
         }
 
@@ -135,7 +135,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -146,6 +146,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 5305;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -76,7 +76,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (open != bar.Time || close != bar.EndTime)
             {
-                throw new Exception($"Bar span was expected to be from {open} to {close}. " +
+                throw new RegressionTestException($"Bar span was expected to be from {open} to {close}. " +
                     $"\n But was from {bar.Time} to {bar.EndTime}.");
             }
 
@@ -88,7 +88,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -99,6 +99,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

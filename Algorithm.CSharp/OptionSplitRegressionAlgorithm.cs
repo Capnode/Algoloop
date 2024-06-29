@@ -92,11 +92,11 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (Time.Day == 6 && holdings != 1)
                 {
-                    throw new Exception($"Expected position quantity of 1 but was {holdings.ToStringInvariant()}");
+                    throw new RegressionTestException($"Expected position quantity of 1 but was {holdings.ToStringInvariant()}");
                 }
                 if (Time.Day == 9 && holdings != 7)
                 {
-                    throw new Exception($"Expected position quantity of 7 but was {holdings.ToStringInvariant()}");
+                    throw new RegressionTestException($"Expected position quantity of 7 but was {holdings.ToStringInvariant()}");
                 }
             }
         }
@@ -119,7 +119,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -130,6 +130,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

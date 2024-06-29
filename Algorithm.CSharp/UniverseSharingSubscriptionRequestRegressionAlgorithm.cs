@@ -62,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (data.Count != 1)
             {
-                throw new Exception($"Unexpected data count {data.Count}");
+                throw new RegressionTestException($"Unexpected data count {data.Count}");
             }
             Debug($"{data.Time}. Data count {data.Count}. Data {data.Bars.First().Value}");
             _onDataCalls++;
@@ -90,7 +90,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_onDataCalls != 23)
             {
-                throw new Exception($"Unexpected OnData() calls count {_onDataCalls}");
+                throw new RegressionTestException($"Unexpected OnData() calls count {_onDataCalls}");
             }
         }
 
@@ -102,7 +102,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -113,6 +113,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

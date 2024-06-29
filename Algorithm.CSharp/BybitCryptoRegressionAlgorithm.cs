@@ -67,7 +67,7 @@ namespace QuantConnect.Algorithm.CSharp
                 Log($"USDT conversion rate: {Portfolio.CashBook["USDT"].ConversionRate}");
                 Log($"BTC conversion rate: {Portfolio.CashBook["BTC"].ConversionRate}");
 
-                throw new Exception("Conversion rate is 0");
+                throw new RegressionTestException("Conversion rate is 0");
             }
 
             if (!_slow.IsReady)
@@ -113,7 +113,7 @@ namespace QuantConnect.Algorithm.CSharp
             var btcAmount = Portfolio.CashBook["BTC"].Amount;
             if (btcAmount > 0)
             {
-                throw new Exception($"BTC holdings should be zero at the end of the algorithm, but was {btcAmount}");
+                throw new RegressionTestException($"BTC holdings should be zero at the end of the algorithm, but was {btcAmount}");
             }
         }
 
@@ -125,7 +125,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -136,6 +136,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 60;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

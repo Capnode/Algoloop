@@ -45,7 +45,7 @@ namespace QuantConnect.Algorithm.CSharp
             AddIndex("SPX", Resolution.Daily);
             AddEquity("SPY", FillForwardResolution);
 
-            Settings.DailyStrictEndTimeEnabled = true;
+            Settings.DailyPreciseEndTime = true;
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace QuantConnect.Algorithm.CSharp
             var expected  = string.Join(';', Compression.ReadLines(ExpectedDataFile)).ReplaceLineEndings("");
             if (expected != data.ReplaceLineEndings(";").RemoveFromEnd(";"))
             {
-                throw new Exception($"Unexpected data: \"{data}\"{Environment.NewLine}Expected: \"{expected}\"");
+                throw new RegressionTestException($"Unexpected data: \"{data}\"{Environment.NewLine}Expected: \"{expected}\"");
             }
         }
 
@@ -86,7 +86,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -97,6 +97,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

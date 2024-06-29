@@ -73,17 +73,17 @@ namespace QuantConnect.Algorithm.CSharp
                     || filledEvent.FillQuantity != ticket.QuantityFilled
                     || (0.1m - filledEvent.OrderFee.Value.Amount) != ticket.QuantityFilled)
                 {
-                    throw new Exception($"Unexpected BaseCurrency portfolio status. Event {filledEvent}. CashBook: {Portfolio.CashBook}. ");
+                    throw new RegressionTestException($"Unexpected BaseCurrency portfolio status. Event {filledEvent}. CashBook: {Portfolio.CashBook}. ");
                 }
 
                 if (Portfolio.CashBook[quoteCurrency].Amount != (initialQuoteCurrency - 0.1m * filledEvent.FillPrice))
                 {
-                    throw new Exception($"Unexpected QuoteCurrency portfolio status. Event {filledEvent}. CashBook: {Portfolio.CashBook}. ");
+                    throw new RegressionTestException($"Unexpected QuoteCurrency portfolio status. Event {filledEvent}. CashBook: {Portfolio.CashBook}. ");
                 }
 
                 if (Securities[_symbol].Holdings.Quantity != (0.1m - filledEvent.OrderFee.Value.Amount))
                 {
-                    throw new Exception($"Unexpected Holdings: {Securities[_symbol].Holdings}. Event {filledEvent}");
+                    throw new RegressionTestException($"Unexpected Holdings: {Securities[_symbol].Holdings}. Event {filledEvent}");
                 }
             }
             else
@@ -100,7 +100,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -111,6 +111,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

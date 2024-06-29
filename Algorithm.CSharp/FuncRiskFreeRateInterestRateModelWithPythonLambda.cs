@@ -40,11 +40,11 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (Time.Date == (new DateTime(2020, 5, 28)) && _model.GetInterestRate(Time) != 0)
             {
-                throw new Exception($"Risk Free interest rate should be 0, but was {_model.GetInterestRate(Time)}");
+                throw new RegressionTestException($"Risk Free interest rate should be 0, but was {_model.GetInterestRate(Time)}");
             }
             else if (Time.Date != (new DateTime(2020, 5, 28)) && _model.GetInterestRate(Time) != 1)
             {
-                throw new Exception($"Risk Free interest rate should be 1, but was {_model.GetInterestRate(Time)}");
+                throw new RegressionTestException($"Risk Free interest rate should be 1, but was {_model.GetInterestRate(Time)}");
             }
         }
 
@@ -56,7 +56,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -67,6 +67,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

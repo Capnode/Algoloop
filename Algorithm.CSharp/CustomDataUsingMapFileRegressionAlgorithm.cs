@@ -53,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (config.Resolution != Resolution.Minute)
                 {
-                    throw new Exception("Expected resolution to be set to Minute");
+                    throw new RegressionTestException("Expected resolution to be set to Minute");
                 }
             }
         }
@@ -73,7 +73,7 @@ namespace QuantConnect.Algorithm.CSharp
                     if (mappingEvent.NewSymbol != "NWSA"
                         || mappingEvent.OldSymbol != "FOXA")
                     {
-                        throw new Exception($"Unexpected mapping event {mappingEvent}");
+                        throw new RegressionTestException($"Unexpected mapping event {mappingEvent}");
                     }
                     _initialMapping = true;
                 }
@@ -82,7 +82,7 @@ namespace QuantConnect.Algorithm.CSharp
                     if (mappingEvent.NewSymbol != "FOXA"
                         || mappingEvent.OldSymbol != "NWSA")
                     {
-                        throw new Exception($"Unexpected mapping event {mappingEvent}");
+                        throw new RegressionTestException($"Unexpected mapping event {mappingEvent}");
                     }
 
                     _executionMapping = true;
@@ -98,11 +98,11 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_initialMapping)
             {
-                throw new Exception("The ticker generated the initial rename event");
+                throw new RegressionTestException("The ticker generated the initial rename event");
             }
             if (!_executionMapping)
             {
-                throw new Exception("The ticker did not rename throughout the course of its life even though it should have");
+                throw new RegressionTestException("The ticker did not rename throughout the course of its life even though it should have");
             }
         }
 
@@ -114,7 +114,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -125,6 +125,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

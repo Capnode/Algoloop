@@ -60,13 +60,13 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (Time != StartDate.Add(-_warmupSpan))
                 {
-                    throw new Exception($"Month Start unexpected initial selection: {Time}");
+                    throw new RegressionTestException($"Month Start unexpected initial selection: {Time}");
                 }
             }
             else if (Time != new DateTime(2014, 3, 26)
                 && Time != new DateTime(2014, 5, 9))
             {
-                throw new Exception($"SelectionFunction_SpecificDate unexpected selection: {Time}");
+                throw new RegressionTestException($"SelectionFunction_SpecificDate unexpected selection: {Time}");
             }
             return new[] { _symbol };
         }
@@ -77,13 +77,13 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (Time != StartDate.Add(-_warmupSpan))
                 {
-                    throw new Exception($"Month Start unexpected initial selection: {Time}");
+                    throw new RegressionTestException($"Month Start unexpected initial selection: {Time}");
                 }
             }
             else if (Time != new DateTime(2014, 4, 1)
                 && Time != new DateTime(2014, 5, 1))
             {
-                throw new Exception($"Month Start unexpected selection: {Time}");
+                throw new RegressionTestException($"Month Start unexpected selection: {Time}");
             }
             return new[] { _symbol };
         }
@@ -105,11 +105,11 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_monthStartSelection != 3)
             {
-                throw new Exception($"Month start unexpected selection count: {_monthStartSelection}");
+                throw new RegressionTestException($"Month start unexpected selection count: {_monthStartSelection}");
             }
             if (_specificDateSelection != 3)
             {
-                throw new Exception($"Specific date unexpected selection count: {_specificDateSelection}");
+                throw new RegressionTestException($"Specific date unexpected selection count: {_specificDateSelection}");
             }
         }
 
@@ -124,6 +124,11 @@ namespace QuantConnect.Algorithm.CSharp
         public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
+
+        /// <summary>
         /// This is used by the regression test system to indicate if the open source Lean repository has the required data to run this algorithm.
         /// </summary>
         public bool CanRunLocally { get; } = true;
@@ -131,7 +136,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

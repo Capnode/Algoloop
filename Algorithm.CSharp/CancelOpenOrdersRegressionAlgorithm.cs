@@ -99,7 +99,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (orders.Count != expectedOrders)
             {
-                throw new Exception($"Expected orders: {expectedOrders}, actual orders: {orders.Count}");
+                throw new RegressionTestException($"Expected orders: {expectedOrders}, actual orders: {orders.Count}");
             }
 
             for (var i = 0; i < expectedOrders; i++)
@@ -107,7 +107,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var order = orders[i];
                 if (order.Status != expectedStatus[i])
                 {
-                    throw new Exception($"Invalid status for order {order.Id}, Expected: {expectedStatus[i]}, actual: {order.Status}");
+                    throw new RegressionTestException($"Invalid status for order {order.Id}, Expected: {expectedStatus[i]}, actual: {order.Status}");
                 }
             }
         }
@@ -120,7 +120,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -131,6 +131,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 120;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

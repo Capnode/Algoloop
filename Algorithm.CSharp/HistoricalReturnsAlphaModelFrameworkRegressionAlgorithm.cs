@@ -35,13 +35,18 @@ namespace QuantConnect.Algorithm.CSharp
             const int expected = 74;
             if (Insights.TotalCount != expected)
             {
-                throw new Exception($"The total number of insights should be {expected}. Actual: {Insights.TotalCount}");
+                throw new RegressionTestException($"The total number of insights should be {expected}. Actual: {Insights.TotalCount}");
             }
         }
 
         public override long DataPoints => 779;
 
         public override int AlgorithmHistoryDataPoints => 4;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

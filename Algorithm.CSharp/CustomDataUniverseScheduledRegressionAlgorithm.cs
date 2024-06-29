@@ -50,7 +50,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var expectedTime = _selectionTime.Dequeue();
                 if (expectedTime != Time)
                 {
-                    throw new Exception($"Unexpected selection time {Time} expected {expectedTime}");
+                    throw new RegressionTestException($"Unexpected selection time {Time} expected {expectedTime}");
                 }
                 return coarse.OfType<CoarseFundamental>().OrderByDescending(x => x.DollarVolume)
                     .SelectMany(x => new[] {
@@ -79,7 +79,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                     if (!customData.Any(custom => custom.Key.Underlying == symbol))
                     {
-                        throw new Exception($"Custom data was not found for underlying symbol {symbol}");
+                        throw new RegressionTestException($"Custom data was not found for underlying symbol {symbol}");
                     }
                 }
             }
@@ -89,7 +89,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_selectionTime.Count != 0)
             {
-                throw new Exception($"Unexpected selection times, missing {_selectionTime.Count}");
+                throw new RegressionTestException($"Unexpected selection times, missing {_selectionTime.Count}");
             }
         }
 
@@ -101,7 +101,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -112,6 +112,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

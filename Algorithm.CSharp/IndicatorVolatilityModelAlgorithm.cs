@@ -94,7 +94,7 @@ namespace QuantConnect.Algorithm.CSharp
             var volatility = Securities[_aapl].VolatilityModel.Volatility;
             if (volatility <= 0 || volatility > 0.05m)
             {
-                throw new Exception(
+                throw new RegressionTestException(
                     "Expected volatility to stay less than 0.05 (not big jumps due to price discontinuities on splits and dividends), " +
                     $"but got {volatility}");
             }
@@ -104,12 +104,12 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_splitsAndDividendsCount == 0)
             {
-                throw new Exception("Expected to get at least one split or dividend event");
+                throw new RegressionTestException("Expected to get at least one split or dividend event");
             }
 
             if (!_volatilityChecked)
             {
-                throw new Exception("Expected to check volatility at least once");
+                throw new RegressionTestException("Expected to check volatility at least once");
             }
         }
 
@@ -128,7 +128,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -139,6 +139,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 42;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

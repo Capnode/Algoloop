@@ -49,7 +49,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (Time != StartDate)
                 {
-                    throw new Exception($"CoarseSelectionFunction called at unexpected time. " +
+                    throw new RegressionTestException($"CoarseSelectionFunction called at unexpected time. " +
                         $"Expected it to be called on {StartDate} but was called on {Time}");
                 }
             }
@@ -80,19 +80,19 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (Time != StartDate)
                 {
-                    throw new Exception($"OnSecuritiesChanged called at unexpected time. " +
+                    throw new RegressionTestException($"OnSecuritiesChanged called at unexpected time. " +
                         $"Expected it to be called on {StartDate} but was called on {Time}");
                 }
 
                 if (changes.AddedSecurities.Count != NumberOfSymbols)
                 {
-                    throw new Exception($"Unexpected number of added securities. " +
+                    throw new RegressionTestException($"Unexpected number of added securities. " +
                         $"Expected {NumberOfSymbols} but was {changes.AddedSecurities.Count}");
                 }
 
                 if (changes.RemovedSecurities.Count != 0)
                 {
-                    throw new Exception($"Unexpected number of removed securities. " +
+                    throw new RegressionTestException($"Unexpected number of removed securities. " +
                         $"Expected 0 but was {changes.RemovedSecurities.Count}");
                 }
             }
@@ -106,7 +106,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -117,6 +117,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

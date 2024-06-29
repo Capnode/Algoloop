@@ -64,7 +64,7 @@ namespace QuantConnect.Algorithm.CSharp
                         _ticket.SubmitRequest.Response.ErrorCode != OrderResponseErrorCode.OptionOrderOnStockSplit ||
                         _ticket.SubmitRequest.Response.ErrorMessage != "Options orders are not allowed when a split occurred for its underlying stock")
                     {
-                        throw new Exception(
+                        throw new RegressionTestException(
                             $"Expected invalid order ticket with error code {nameof(OrderResponseErrorCode.OptionOrderOnStockSplit)}, " +
                             $"but received {_ticket.SubmitRequest.Response.ErrorCode} - {_ticket.SubmitRequest.Response.ErrorMessage}");
                     }
@@ -76,7 +76,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_ticket == null)
             {
-                throw new Exception("Expected invalid order ticket with error code OptionOrderOnStockSplit, but no order was submitted");
+                throw new RegressionTestException("Expected invalid order ticket with error code OptionOrderOnStockSplit, but no order was submitted");
             }
         }
 
@@ -88,7 +88,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -99,6 +99,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

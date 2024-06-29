@@ -56,7 +56,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (!_reAdded && slice.ContainsKey(_contract) && slice.ContainsKey(_contract.Underlying))
                 {
-                    throw new Exception("Getting data for removed option and underlying!");
+                    throw new RegressionTestException("Getting data for removed option and underlying!");
                 }
 
                 if (!Portfolio.Invested && _reAdded)
@@ -95,11 +95,11 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_hasRemoved)
             {
-                throw new Exception("We did not remove the option contract!");
+                throw new RegressionTestException("We did not remove the option contract!");
             }
             if (!_reAdded)
             {
-                throw new Exception("We did not re add the option contract!");
+                throw new RegressionTestException("We did not re add the option contract!");
             }
         }
 
@@ -111,7 +111,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -122,6 +122,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

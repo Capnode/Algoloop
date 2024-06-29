@@ -56,7 +56,7 @@ namespace QuantConnect.Algorithm.CSharp
             _expectedOptionContract = QuantConnect.Symbol.CreateOption(_spx, Market.USA, OptionStyle.European, OptionRight.Call, 3200m, new DateTime(2021, 1, 15));
             if (_spxOption.Symbol != _expectedOptionContract)
             {
-                throw new Exception($"Contract {_expectedOptionContract} was not found in the chain");
+                throw new RegressionTestException($"Contract {_expectedOptionContract} was not found in the chain");
             }
         }
 
@@ -79,7 +79,7 @@ namespace QuantConnect.Algorithm.CSharp
             }
             if (data.OptionChains.Values.First().Contracts.Count == 0)
             {
-                throw new Exception($"No contracts found in the option {data.OptionChains.Keys.First()}");
+                throw new RegressionTestException($"No contracts found in the option {data.OptionChains.Keys.First()}");
             }
 
             var deltas = data.OptionChains.Values.OrderByDescending(y => y.Contracts.Values.Sum(x => x.Volume)).First().Contracts.Values.Select(x => x.Greeks.Delta).ToList();
@@ -130,16 +130,16 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Ran at the end of the algorithm to ensure the algorithm has no holdings
         /// </summary>
-        /// <exception cref="Exception">The algorithm has holdings</exception>
+        /// <exception cref="RegressionTestException">The algorithm has holdings</exception>
         public override void OnEndOfAlgorithm()
         {
             if (Portfolio.Invested)
             {
-                throw new Exception($"Expected no holdings at end of algorithm, but are invested in: {string.Join(", ", Portfolio.Keys)}");
+                throw new RegressionTestException($"Expected no holdings at end of algorithm, but are invested in: {string.Join(", ", Portfolio.Keys)}");
             }
             if (!_invested)
             {
-                throw new Exception($"Never checked greeks, maybe we have no option data?");
+                throw new RegressionTestException($"Never checked greeks, maybe we have no option data?");
             }
         }
 
@@ -151,7 +151,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -162,6 +162,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

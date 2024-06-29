@@ -58,13 +58,13 @@ namespace QuantConnect.Algorithm.CSharp
             var historicalData = History(universe, 1).ToList();
             if (historicalData.Count != 1)
             {
-                throw new Exception($"Unexpected history count {historicalData.Count}! Expected 1");
+                throw new RegressionTestException($"Unexpected history count {historicalData.Count}! Expected 1");
             }
             foreach (var universeDataCollection in historicalData)
             {
                 if (universeDataCollection.Data.Count < 200)
                 {
-                    throw new Exception($"Unexpected universe DataCollection count {universeDataCollection.Data.Count}! Expected > 200");
+                    throw new RegressionTestException($"Unexpected universe DataCollection count {universeDataCollection.Data.Count}! Expected > 200");
                 }
             }
         }
@@ -213,7 +213,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -224,6 +224,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 1;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -73,16 +73,16 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_equityGotTradeBars || !_cryptoGotTradeBars)
             {
-                throw new Exception("Did not get any TradeBar during warmup");
+                throw new RegressionTestException("Did not get any TradeBar during warmup");
             }
             // we don't have quote bars for equity in daily/hour resolutions
             if (!_equityGotQuoteBars && !Settings.WarmupResolution.HasValue)
             {
-                throw new Exception("Did not get any QuoteBar during warmup");
+                throw new RegressionTestException("Did not get any QuoteBar during warmup");
             }
             if (Securities["AAPL"].Price == 0)
             {
-                throw new Exception("Security added after warmup didn't get any data!");
+                throw new RegressionTestException("Security added after warmup didn't get any data!");
             }
         }
 
@@ -94,7 +94,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -105,6 +105,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public virtual int AlgorithmHistoryDataPoints => 41;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

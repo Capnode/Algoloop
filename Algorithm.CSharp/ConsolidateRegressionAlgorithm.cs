@@ -74,7 +74,7 @@ namespace QuantConnect.Algorithm.CSharp
             try
             {
                 Consolidate<QuoteBar>(symbol, TimeSpan.FromDays(1), bar => { UpdateQuoteBar(bar, -1); });
-                throw new Exception($"Expected {nameof(ArgumentException)} to be thrown");
+                throw new RegressionTestException($"Expected {nameof(ArgumentException)} to be thrown");
             }
             catch (ArgumentException)
             {
@@ -98,7 +98,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!(tradeBar is TradeBar))
             {
-                throw new Exception("Expected a TradeBar");
+                throw new RegressionTestException("Expected a TradeBar");
             }
             _consolidationCounts[position]++;
             _smas[position].Update(tradeBar.EndTime, tradeBar.Value);
@@ -121,19 +121,19 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_consolidationCounts.Any(i => i != _expectedConsolidations) || _customDataConsolidator == 0)
             {
-                throw new Exception("Unexpected consolidation count");
+                throw new RegressionTestException("Unexpected consolidation count");
             }
 
             for (var i = 0; i < _smas.Count; i++)
             {
                 if (_smas[i].Samples != _expectedConsolidations)
                 {
-                    throw new Exception($"Expected {_expectedConsolidations} samples in each SMA but found {_smas[i].Samples} in SMA in index {i}");
+                    throw new RegressionTestException($"Expected {_expectedConsolidations} samples in each SMA but found {_smas[i].Samples} in SMA in index {i}");
                 }
 
                 if (_smas[i].Current.Time != _lastSmaUpdates[i])
                 {
-                    throw new Exception($"Expected SMA in index {i} to have been last updated at {_lastSmaUpdates[i]} but was {_smas[i].Current.Time}");
+                    throw new RegressionTestException($"Expected SMA in index {i} to have been last updated at {_lastSmaUpdates[i]} but was {_smas[i].Current.Time}");
                 }
             }
         }
@@ -158,7 +158,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -169,6 +169,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

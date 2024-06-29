@@ -37,13 +37,18 @@ namespace QuantConnect.Algorithm.CSharp
             var consolidatorCount = SubscriptionManager.Subscriptions.Sum(s => s.Consolidators.Count);
             if (consolidatorCount > 0)
             {
-                throw new Exception($"The number of consolidators should be zero. Actual: {consolidatorCount}");
+                throw new RegressionTestException($"The number of consolidators should be zero. Actual: {consolidatorCount}");
             }
         }
 
         public override long DataPoints => 772;
 
         public override int AlgorithmHistoryDataPoints => 56;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

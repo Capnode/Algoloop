@@ -47,7 +47,7 @@ namespace QuantConnect.Algorithm.CSharp
             SetHoldings("SPY", 0.2);
             if (_dataPoints > 5)
             {
-                throw new Exception($"There should not be more than 5 data points, but there were {_dataPoints}");
+                throw new RegressionTestException($"There should not be more than 5 data points, but there were {_dataPoints}");
             }
         }
 
@@ -75,7 +75,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python};
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -86,6 +86,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

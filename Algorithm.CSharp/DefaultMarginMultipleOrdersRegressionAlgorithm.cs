@@ -33,22 +33,22 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (ticket.Status != OrderStatus.Invalid)
             {
-                throw new Exception($"Unexpected order status {ticket.Status} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
+                throw new RegressionTestException($"Unexpected order status {ticket.Status} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
             }
             if (Portfolio.Positions.Groups.Count != 0)
             {
-                throw new Exception($"Unexpected position group count {Portfolio.Positions.Groups.Count} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
+                throw new RegressionTestException($"Unexpected position group count {Portfolio.Positions.Groups.Count} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
             }
             if (Portfolio.TotalMarginUsed != 0)
             {
-                throw new Exception($"Unexpected margin used {Portfolio.TotalMarginUsed} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
+                throw new RegressionTestException($"Unexpected margin used {Portfolio.TotalMarginUsed} for symbol {ticket.Symbol} and quantity {ticket.Quantity}");
             }
         }
 
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp };
+        public override List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

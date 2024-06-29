@@ -96,7 +96,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             _manualTimeProvider.SetCurrentTimeUtc(_startDate.ConvertToUtc(TimeZones.NewYork));
 
             var symbol = Symbols.SPY;
-            _algorithm.Settings.DailyStrictEndTimeEnabled = strictEndTimes;
+            _algorithm.Settings.DailyPreciseEndTime = strictEndTimes;
             _algorithm.SetBenchmark(x => 1);
 
             var dqh = new TestDataQueueHandler
@@ -138,7 +138,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
         public void EmitsLeanAggregatedDailyData(bool strictEndTimes, bool warmup)
         {
             _startDate = new DateTime(2014, 3, 27, 10, 0, 0);
-            _algorithm.Settings.DailyStrictEndTimeEnabled = strictEndTimes;
+            _algorithm.Settings.DailyPreciseEndTime = strictEndTimes;
             _algorithm.SetStartDate(_startDate);
             _manualTimeProvider.SetCurrentTimeUtc(_startDate.ConvertToUtc(TimeZones.NewYork));
             var endDate = _startDate.AddDays(1);
@@ -237,7 +237,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             var endDate = _startDate.AddDays(5);
 
             _algorithm.SetBenchmark(x => 1);
-            _algorithm.Settings.DailyStrictEndTimeEnabled = strictEndTimes;
+            _algorithm.Settings.DailyPreciseEndTime = strictEndTimes;
 
             var feed = RunDataFeed();
 
@@ -769,15 +769,16 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                     SecurityType.Equity,
                     Market.USA),
                 "constituents-universe-qctest");
-
-            var universe = _algorithm.AddUniverse(new ConstituentsUniverse(customUniverseSymbol, _algorithm.UniverseSettings, x =>
+            using var constituentsUniverse = new ConstituentsUniverse(customUniverseSymbol, _algorithm.UniverseSettings, x =>
             {
                 selectionTime = _algorithm.UtcTime;
                 constituents = x.Select(x => x.Symbol).ToList();
 
                 return constituents;
 
-            }));
+            });
+
+            var universe = _algorithm.AddUniverse(constituentsUniverse);
 
             _algorithm.PostInitialize();
 
@@ -827,7 +828,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             var endDate = _startDate.AddDays(2);
             _algorithm.SetBenchmark(x => 1);
 
-            _algorithm.Settings.DailyStrictEndTimeEnabled = strictEndTimes;
+            _algorithm.Settings.DailyPreciseEndTime = strictEndTimes;
             if (useWarmupResolution)
             {
                 _algorithm.SetWarmup(2, Resolution.Daily);
@@ -1778,19 +1779,19 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             {
                 if (dataNormalizationMode == DataNormalizationMode.ForwardPanamaCanal && price < 150)
                 {
-                    throw new Exception($"unexpected price {price} for {symbol} @{security.LocalTime}");
+                    throw new RegressionTestException($"unexpected price {price} for {symbol} @{security.LocalTime}");
                 }
                 else if (dataNormalizationMode == DataNormalizationMode.Raw && price == 2)
                 {
-                    throw new Exception($"unexpected price {price} for {symbol} @{security.LocalTime}");
+                    throw new RegressionTestException($"unexpected price {price} for {symbol} @{security.LocalTime}");
                 }
                 else if (dataNormalizationMode == DataNormalizationMode.BackwardsPanamaCanal && price < -150)
                 {
-                    throw new Exception($"unexpected price {price} for {symbol} @{security.LocalTime}");
+                    throw new RegressionTestException($"unexpected price {price} for {symbol} @{security.LocalTime}");
                 }
                 else if (dataNormalizationMode == DataNormalizationMode.BackwardsRatio && Math.Abs(price - 1.48m) > price * 0.1m)
                 {
-                    throw new Exception($"unexpected price {price} for {symbol} @{security.LocalTime}");
+                    throw new RegressionTestException($"unexpected price {price} for {symbol} @{security.LocalTime}");
                 }
             });
 
@@ -1910,7 +1911,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                 {
                     if (delistingEvent.Key != symbol)
                     {
-                        throw new Exception($"Unexpected delisting for symbol {delistingEvent.Key}");
+                        throw new RegressionTestException($"Unexpected delisting for symbol {delistingEvent.Key}");
                     }
 
                     if (delistingEvent.Value.Type == DelistingType.Warning)
@@ -1954,7 +1955,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                     {
                         if(delisting.Key != Symbols.SPY_C_192_Feb19_2016)
                         {
-                            throw new Exception($"Unexpected delisting for symbol {delisting.Key}");
+                            throw new RegressionTestException($"Unexpected delisting for symbol {delisting.Key}");
                         }
 
                         if (delisting.Value.Type == DelistingType.Warning)
@@ -2043,7 +2044,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                     SecurityType.Equity,
                     Market.USA),
                 "constituents-universe-qctest");
-            var customUniverse = new ConstituentsUniverse(customUniverseSymbol,
+            using var customUniverse = new ConstituentsUniverse(customUniverseSymbol,
                 new UniverseSettings(Resolution.Daily, 1, false, true, TimeSpan.Zero));
 
             var feed = RunDataFeed();
@@ -2235,7 +2236,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
         [TestCase(SecurityType.IndexOption, false)]
         public void AddChainUniverseCanNotAdvanceTime(SecurityType securityType, bool strictEndTimes)
         {
-            _algorithm.Settings.DailyStrictEndTimeEnabled = strictEndTimes;
+            _algorithm.Settings.DailyPreciseEndTime = strictEndTimes;
             _algorithm.UniverseSettings.Resolution = Resolution.Daily;
             _algorithm.Transactions.SetOrderProcessor(new FakeOrderProcessor());
             // this reproduces GH issue #5245 where time can not advance and will keep it's default value
@@ -2281,14 +2282,15 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             var yieldedNoneSymbol = false;
             var feed = RunDataFeed();
 
-            _algorithm.AddUniverse(new ConstituentsUniverse(
+            using var constituentsUniverse = new ConstituentsUniverse(
                 new Symbol(
                     SecurityIdentifier.GenerateConstituentIdentifier(
                         "constituents-universe-qctest",
                         SecurityType.Equity,
                         Market.USA),
                     "constituents-universe-qctest"),
-                _algorithm.UniverseSettings));
+                _algorithm.UniverseSettings);
+            _algorithm.AddUniverse(constituentsUniverse);
             // will add the universe
             _algorithm.OnEndOfTimeStep();
             // allow time for the base exchange to pick up the universe selection point
@@ -3038,10 +3040,10 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             var actualPricePointsEnqueued = 0;
             var actualAuxPointsEnqueued = 0;
             var lastTime = DateTime.MinValue;
-            var emittedData = new ManualResetEvent(false);
+            using var emittedData = new ManualResetEvent(false);
 
             var algorithm = new QCAlgorithm();
-            var dataQueueStarted = new ManualResetEvent(false);
+            using var dataQueueStarted = new ManualResetEvent(false);
             _dataQueueHandler = new FuncDataQueueHandler(fdqh =>
             {
                 dataQueueStarted.Set();
@@ -3495,8 +3497,8 @@ namespace QuantConnect.Tests.Engine.DataFeeds
 
             var lastTime = DateTime.MinValue;
             var timeAdvanceStep = TimeSpan.FromMinutes(120);
-            var timeAdvanced = new AutoResetEvent(true);
-            var started = new ManualResetEvent(false);
+            using var timeAdvanced = new AutoResetEvent(true);
+            using var started = new ManualResetEvent(false);
             var lookupCount = 0;
 
             var indexOptionSymbol1 = Symbol.CreateOption(Symbols.SPX, Market.USA, OptionStyle.American, OptionRight.Call, 192m, new DateTime(2019, 12, 19));
@@ -3608,7 +3610,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
 
                     if (!isValidTime)
                     {
-                        lookupSymbolsException = new Exception($"Invalid LookupSymbols call time: {time} ({algorithmTimeZone})");
+                        lookupSymbolsException = new RegressionTestException($"Invalid LookupSymbols call time: {time} ({algorithmTimeZone})");
                     }
 
                     time = utcTime.ConvertFromUtc(exchangeTimeZone);
@@ -3895,7 +3897,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             _dataQueueHandler.DisposeSafely();
             timeAdvanced.DisposeSafely();
             started.DisposeSafely();
-            timer.DisposeSafely();
+            timer.Dispose();
         }
 
         private class TestFundamentalDataProviderTrue : IFundamentalDataProvider
@@ -4052,7 +4054,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             Interlocked.Increment(ref ReaderCallsCount);
             if (ThrowException)
             {
-                throw new Exception("Custom data Reader threw exception");
+                throw new RegressionTestException("Custom data Reader threw exception");
             }
             else if (ReturnNull)
             {

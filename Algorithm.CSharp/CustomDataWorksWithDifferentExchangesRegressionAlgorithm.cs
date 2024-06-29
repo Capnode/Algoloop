@@ -35,14 +35,14 @@ namespace QuantConnect.Algorithm.CSharp
             var firstCustomSecurity = AddData<ExampleCustomData>(market1.Symbol, Resolution.Hour, TimeZones.Utc, false);
             if (firstCustomSecurity.Exchange.TimeZone != TimeZones.Utc)
             {
-                throw new Exception($"The time zone of security {firstCustomSecurity} should be {TimeZones.Utc}, but it was {firstCustomSecurity.Exchange.TimeZone}");
+                throw new RegressionTestException($"The time zone of security {firstCustomSecurity} should be {TimeZones.Utc}, but it was {firstCustomSecurity.Exchange.TimeZone}");
             }
 
             var market2 = AddForex("EURUSD", Resolution.Hour, Market.Oanda);
             var secondCustomSecurity = AddData<ExampleCustomData>(market2.Symbol, Resolution.Hour, TimeZones.Utc, false);
             if (secondCustomSecurity.Exchange.TimeZone != TimeZones.Utc)
             {
-                throw new Exception($"The time zone of security {secondCustomSecurity} should be {TimeZones.Utc}, but it was {secondCustomSecurity.Exchange.TimeZone}");
+                throw new RegressionTestException($"The time zone of security {secondCustomSecurity} should be {TimeZones.Utc}, but it was {secondCustomSecurity.Exchange.TimeZone}");
             }
             _noDataPointsReceived = true;
         }
@@ -53,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
             _noDataPointsReceived = false;
             if (slice.Count != ActiveSecurities.Count)
             {
-                throw new Exception($"{ActiveSecurities.Count.ToString().ToCamelCase()} data points were expected, but only {slice.Count} were received");
+                throw new RegressionTestException($"{ActiveSecurities.Count.ToString().ToCamelCase()} data points were expected, but only {slice.Count} were received");
             }
         }
 
@@ -61,7 +61,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_noDataPointsReceived)
             {
-                throw new Exception($"No points were received");
+                throw new RegressionTestException($"No points were received");
             }
         }
 
@@ -73,7 +73,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -84,6 +84,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 60;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

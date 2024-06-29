@@ -47,7 +47,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (historyResults.Any(x => x.Count == 0 || x.Count != historyResults[0].Count))
             {
-                throw new Exception("History results are empty or bar counts did not match");
+                throw new RegressionTestException("History results are empty or bar counts did not match");
             }
 
             // Check that all history results at least one mapping and that different contracts are used for each offset (which can be checked by
@@ -70,7 +70,7 @@ namespace QuantConnect.Algorithm.CSharp
                         {
                             if (currentExpiration != frontMonthExpiration.Date)
                             {
-                                throw new Exception($"Unexpected current mapped contract expiration {currentExpiration}" +
+                                throw new RegressionTestException($"Unexpected current mapped contract expiration {currentExpiration}" +
                                     $" @ {Time} it should be AT front month expiration {frontMonthExpiration}");
                             }
                         }
@@ -78,7 +78,7 @@ namespace QuantConnect.Algorithm.CSharp
                         {
                             if (currentExpiration <= frontMonthExpiration.Date)
                             {
-                                throw new Exception($"Unexpected current mapped contract expiration {currentExpiration}" +
+                                throw new RegressionTestException($"Unexpected current mapped contract expiration {currentExpiration}" +
                                     $" @ {Time} it should be AFTER front month expiration {frontMonthExpiration}");
                             }
                         }
@@ -87,7 +87,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (underlyings.Count == 0)
                 {
-                    throw new Exception($"History results for contractDepthOffset={contractDepthOffsets[i]} did not contain any mappings");
+                    throw new RegressionTestException($"History results for contractDepthOffset={contractDepthOffsets[i]} did not contain any mappings");
                 }
 
                 underlyingsPerHistory.Add(underlyings);
@@ -100,7 +100,7 @@ namespace QuantConnect.Algorithm.CSharp
                 {
                     if (underlyingsPerHistory[i].SetEquals(underlyingsPerHistory[j]))
                     {
-                        throw new Exception($"History results for contractDepthOffset={contractDepthOffsets[i]} and {contractDepthOffsets[j]} contain the same underlying");
+                        throw new RegressionTestException($"History results for contractDepthOffset={contractDepthOffsets[i]} and {contractDepthOffsets[j]} contain the same underlying");
                     }
                 }
             }
@@ -111,7 +111,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var closePrices = historyResults.Select(hr => hr[j].Bars.Values.SingleOrDefault(new TradeBar()).Close).ToHashSet();
                 if (closePrices.Count != contractDepthOffsets.Count)
                 {
-                    throw new Exception($"History results close prices should have been different for each contract depth offset at each time");
+                    throw new RegressionTestException($"History results close prices should have been different for each contract depth offset at each time");
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -135,6 +135,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 366;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -54,7 +54,7 @@ namespace QuantConnect.Algorithm.CSharp
         }
 
         public bool CanRunLocally => false;
-        public Language[] Languages => new[] {Language.CSharp};
+        public List<Language> Languages => new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -65,6 +65,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.RuntimeError;
 
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>();
     }

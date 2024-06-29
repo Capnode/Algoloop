@@ -78,7 +78,7 @@ namespace QuantConnect.Algorithm.CSharp
             positionGroup = Portfolio.Positions.Groups.Single();
             if (positionGroup.Positions.Single().Quantity != quantity)
             {
-                throw new Exception($@"Expected position group quantity to be {quantity} but was {positionGroup.Quantity}");
+                throw new RegressionTestException($@"Expected position group quantity to be {quantity} but was {positionGroup.Quantity}");
             }
 
             TestQuantityForDeltaBuyingPowerForPositionGroup(positionGroup, security);
@@ -124,7 +124,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (positionQuantityForDeltaWithPositionGroupBuyingPowerModel != expectedQuantity)
             {
-                throw new Exception($@"Expected position quantity for delta buying power to be {expectedQuantity} but was {
+                throw new RegressionTestException($@"Expected position quantity for delta buying power to be {expectedQuantity} but was {
                     positionQuantityForDeltaWithPositionGroupBuyingPowerModel}");
             }
 
@@ -144,7 +144,7 @@ namespace QuantConnect.Algorithm.CSharp
             if (positionQuantityForDeltaWithSecurityPositionGroupBuyingPowerModel != expectedSingleSecurityModelsQuantity ||
                 positionQuantityForDeltaWithSecurityBuyingPowerModel != expectedSingleSecurityModelsQuantity)
             {
-                throw new Exception($@"Expected order quantity for delta buying power calls from default buying power models to return {
+                throw new RegressionTestException($@"Expected order quantity for delta buying power calls from default buying power models to return {
                     expectedSingleSecurityModelsQuantity}. Results were:" +
                     $"    \nSecurityPositionGroupBuyingPowerModel: {positionQuantityForDeltaWithSecurityPositionGroupBuyingPowerModel}" +
                     $"    \nBuyingPowerModel: {positionQuantityForDeltaWithSecurityBuyingPowerModel}\n");
@@ -159,7 +159,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -170,6 +170,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

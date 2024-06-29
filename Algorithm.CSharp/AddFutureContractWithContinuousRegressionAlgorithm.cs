@@ -61,15 +61,15 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_ended)
             {
-                throw new Exception($"Algorithm should of ended!");
+                throw new RegressionTestException($"Algorithm should of ended!");
             }
             if (data.Keys.Count > 2)
             {
-                throw new Exception($"Getting data for more than 2 symbols! {string.Join(",", data.Keys.Select(symbol => symbol))}");
+                throw new RegressionTestException($"Getting data for more than 2 symbols! {string.Join(",", data.Keys.Select(symbol => symbol))}");
             }
             if (UniverseManager.Count != 3)
             {
-                throw new Exception($"Expecting 3 universes (chain, continuous and user defined) but have {UniverseManager.Count}");
+                throw new RegressionTestException($"Expecting 3 universes (chain, continuous and user defined) but have {UniverseManager.Count}");
             }
 
             if (!Portfolio.Invested)
@@ -99,7 +99,7 @@ namespace QuantConnect.Algorithm.CSharp
             if (changes.AddedSecurities.Any(security => security.Symbol != _continuousContract.Symbol && security.Symbol != _futureContract.Symbol)
                 || changes.RemovedSecurities.Any(security => security.Symbol != _continuousContract.Symbol && security.Symbol != _futureContract.Symbol))
             {
-                throw new Exception($"We got an unexpected security changes {changes}");
+                throw new RegressionTestException($"We got an unexpected security changes {changes}");
             }
         }
 
@@ -111,7 +111,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -122,6 +122,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -50,19 +50,19 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (orderEvent.Message != "")
                 {
-                    throw new Exception($"OrderEvent.Message should be empty, but is '{orderEvent.Message}'");
+                    throw new RegressionTestException($"OrderEvent.Message should be empty, but is '{orderEvent.Message}'");
                 }
 
                 var order = Transactions.GetOrderById(orderEvent.OrderId);
                 if (order.Tag != "")
                 {
-                    throw new Exception($"Order.Tag should be empty, but is '{order.Tag}'");
+                    throw new RegressionTestException($"Order.Tag should be empty, but is '{order.Tag}'");
                 }
 
                 var expectedFillPrice = orderEvent.UtcTime.Date == StartDate.Date ? 167.43m : 167.45m;
                 if (orderEvent.FillPrice != expectedFillPrice)
                 {
-                    throw new Exception(
+                    throw new RegressionTestException(
                         $"Expected {orderEvent.UtcTime.Date} order fill price to be {expectedFillPrice} but was {orderEvent.FillPrice}");
                 }
             }
@@ -76,12 +76,12 @@ namespace QuantConnect.Algorithm.CSharp
             var expectedOrdersCount = 2;
             if (orders.Count != expectedOrdersCount)
             {
-                throw new Exception($"Expected {expectedOrdersCount} orders, but found {orders.Count}");
+                throw new RegressionTestException($"Expected {expectedOrdersCount} orders, but found {orders.Count}");
             }
 
             if (orders.Any(x => x.Status != OrderStatus.Filled))
             {
-                throw new Exception(
+                throw new RegressionTestException(
                     $"Expected all orders to be filled, but found {orders.Count(x => x.Status != OrderStatus.Filled)} unfilled orders");
             }
         }
@@ -94,7 +94,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -105,6 +105,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

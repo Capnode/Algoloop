@@ -93,7 +93,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_options.Count != _contracts.Length)
             {
-                throw new Exception($"Options weren't setup properly. Expected: {_contracts.Length}");
+                throw new RegressionTestException($"Options weren't setup properly. Expected: {_contracts.Length}");
             }
 
             foreach (var option in _options)
@@ -103,7 +103,7 @@ namespace QuantConnect.Algorithm.CSharp
                     if (_exchange.Hours.IsDateOpen(date) &&
                         !option.Value.Contains(date))
                     {
-                        throw new Exception("Delisted security should be FF until expiry date");
+                        throw new RegressionTestException("Delisted security should be FF until expiry date");
                     }
                 }
             }
@@ -117,7 +117,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -128,6 +128,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

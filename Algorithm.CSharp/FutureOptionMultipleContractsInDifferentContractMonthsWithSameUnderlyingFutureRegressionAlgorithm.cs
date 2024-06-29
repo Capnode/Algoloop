@@ -72,11 +72,11 @@ namespace QuantConnect.Algorithm.CSharp
             var notEncountered = _expectedSymbols.Where(kvp => !kvp.Value).ToList();
             if (notEncountered.Any())
             {
-                throw new Exception($"Expected all Symbols encountered and invested in, but the following were not found: {string.Join(", ", notEncountered.Select(kvp => kvp.Value.ToStringInvariant()))}");
+                throw new RegressionTestException($"Expected all Symbols encountered and invested in, but the following were not found: {string.Join(", ", notEncountered.Select(kvp => kvp.Value.ToStringInvariant()))}");
             }
             if (!Portfolio.Invested)
             {
-                throw new Exception("Expected holdings at the end of algorithm, but none were found.");
+                throw new RegressionTestException("Expected holdings at the end of algorithm, but none were found.");
             }
         }
 
@@ -104,7 +104,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -115,6 +115,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

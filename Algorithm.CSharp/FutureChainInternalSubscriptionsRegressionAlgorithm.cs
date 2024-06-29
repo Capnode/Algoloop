@@ -69,13 +69,13 @@ namespace QuantConnect.Algorithm.CSharp
                     var subscriptions = SubscriptionManager.Subscriptions.Where(x => x.Symbol == contract.Symbol).ToList();
                     if (subscriptions.Count == 0)
                     {
-                        throw new Exception($"Failed to find valid subscription for {contract.Symbol} at {Time}");
+                        throw new RegressionTestException($"Failed to find valid subscription for {contract.Symbol} at {Time}");
                     }
 
                     var openInterest = Securities[contract.Symbol].OpenInterest;
                     if(openInterest == 0)
                     {
-                        throw new Exception($"Open interest is 0 for {contract.Symbol} at {Time}");
+                        throw new RegressionTestException($"Open interest is 0 for {contract.Symbol} at {Time}");
                     }
                 }
             }
@@ -89,7 +89,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -100,6 +100,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

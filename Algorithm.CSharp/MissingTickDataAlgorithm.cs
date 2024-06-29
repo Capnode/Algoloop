@@ -41,7 +41,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (tickCountInSliceHistoryCall != tickCountInTickHistoryCall)
             {
-                throw new Exception($@"Tick count mismatch in Slice and Tick history calls: History() returned {
+                throw new RegressionTestException($@"Tick count mismatch in Slice and Tick history calls: History() returned {
                     tickCountInSliceHistoryCall} ticks, while History<Tick>() returned {tickCountInTickHistoryCall} ticks");
             }
 
@@ -57,7 +57,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -68,6 +68,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 1610;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

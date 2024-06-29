@@ -68,24 +68,24 @@ namespace QuantConnect.Algorithm.CSharp
                   _delistings.Any(d => d.Type == DelistingType.Warning) &&
                   _delistings.Any(d => d.Type == DelistingType.Delisted)))
             {
-                throw new Exception($"Option contract {_optionContract.Symbol} was not correctly delisted.");
+                throw new RegressionTestException($"Option contract {_optionContract.Symbol} was not correctly delisted.");
             }
 
             if (_delistings.FirstOrDefault(d => d.Type == DelistingType.Warning).EndTime.Date !=
                 new DateTime(2014, 04, 16))
             {
-                throw new Exception($"Option contract {_optionContract.Symbol} delisting warning was not fired the right date.");
+                throw new RegressionTestException($"Option contract {_optionContract.Symbol} delisting warning was not fired the right date.");
             }
 
             if (_delistings.FirstOrDefault(d => d.Type == DelistingType.Delisted).EndTime.Date !=
                 new DateTime(2014, 04, 17))
             {
-                throw new Exception($"Option contract {_optionContract.Symbol} was not delisted the right date.");
+                throw new RegressionTestException($"Option contract {_optionContract.Symbol} was not delisted the right date.");
             }
 
             if (Portfolio[_optionContract.Symbol].Invested)
             {
-                throw new Exception($"Option contract {_optionContract.Symbol} was not wasn't liquidated as part of delisting.");
+                throw new RegressionTestException($"Option contract {_optionContract.Symbol} was not wasn't liquidated as part of delisting.");
             }
         }
 
@@ -97,7 +97,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -108,6 +108,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

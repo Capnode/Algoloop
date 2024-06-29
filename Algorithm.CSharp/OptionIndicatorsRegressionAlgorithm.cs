@@ -61,14 +61,14 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_impliedVolatility == 0m || _delta == 0m || _gamma == 0m || _vega == 0m || _theta == 0m || _rho == 0m)
             {
-                throw new Exception("Expected IV/greeks calculated");
+                throw new RegressionTestException("Expected IV/greeks calculated");
             }
             var result = @$"Implied Volatility: {_impliedVolatility},Delta: {_delta},Gamma: {_gamma},Vega: {_vega},Theta: {_theta},Rho: {_rho}";
 
             Debug(result);
             if (result != ExpectedGreeks)
             {
-                throw new Exception($"Unexpected greek values {result}. Expected {ExpectedGreeks}");
+                throw new RegressionTestException($"Unexpected greek values {result}. Expected {ExpectedGreeks}");
             }
         }
 
@@ -80,7 +80,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -91,6 +91,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

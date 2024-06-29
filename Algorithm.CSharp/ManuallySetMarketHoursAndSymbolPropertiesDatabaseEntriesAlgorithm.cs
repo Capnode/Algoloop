@@ -51,12 +51,12 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (!ReferenceEquals(spyCfd.Exchange.Hours, equityMarketHoursEntry.ExchangeHours))
             {
-                throw new Exception("Expected the SPY CFD market hours to be the same as the underlying equity market hours.");
+                throw new RegressionTestException("Expected the SPY CFD market hours to be the same as the underlying equity market hours.");
             }
 
             if (!ReferenceEquals(spyCfd.SymbolProperties, equitySymbolProperties))
             {
-                throw new Exception("Expected the SPY CFD symbol properties to be the same as the underlying equity symbol properties.");
+                throw new RegressionTestException("Expected the SPY CFD symbol properties to be the same as the underlying equity symbol properties.");
             }
 
             // We can also do it for a specific ticker:
@@ -71,12 +71,12 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (!ReferenceEquals(audUsdCfd.Exchange.Hours, audUsdForexMarketHoursEntry.ExchangeHours))
             {
-                throw new Exception("Expected the AUDUSD CFD market hours to be the same as the underlying forex market hours.");
+                throw new RegressionTestException("Expected the AUDUSD CFD market hours to be the same as the underlying forex market hours.");
             }
 
             if (!ReferenceEquals(audUsdCfd.SymbolProperties, audUsdForexSymbolProperties))
             {
-                throw new Exception("Expected the AUDUSD CFD symbol properties to be the same as the underlying forex symbol properties.");
+                throw new RegressionTestException("Expected the AUDUSD CFD symbol properties to be the same as the underlying forex symbol properties.");
             }
         }
 
@@ -88,7 +88,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -99,6 +99,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

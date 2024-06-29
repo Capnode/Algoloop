@@ -24,6 +24,11 @@ namespace QuantConnect.Interfaces
     public interface IAlgorithmSettings
     {
         /// <summary>
+        /// Gets whether or not WarmUpIndicator is allowed to warm up indicators
+        /// </summary>
+        bool AutomaticIndicatorWarmUp { get; set; }
+
+        /// <summary>
         /// True if should rebalance portfolio on security changes. True by default
         /// </summary>
         bool? RebalancePortfolioOnSecurityChanges { get; set; }
@@ -76,7 +81,7 @@ namespace QuantConnect.Interfaces
         /// <summary>
         /// True if daily strict end times are enabled
         /// </summary>
-        bool DailyStrictEndTimeEnabled { get; set; }
+        bool DailyPreciseEndTime { get; set; }
 
         /// <summary>
         /// Gets/sets the maximum number of concurrent market data subscriptions available

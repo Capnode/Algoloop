@@ -40,20 +40,20 @@ namespace QuantConnect.Algorithm.CSharp
             var spyHistory = History<Tick>(spy, TimeSpan.FromDays(1), Resolution.Tick);
             if (spyHistory.Count() == 0)
             {
-                throw new Exception("SPY tick history is empty");
+                throw new RegressionTestException("SPY tick history is empty");
             }
 
             var ibmHistory = History<Tick>(ibm, TimeSpan.FromDays(1), Resolution.Tick);
             if (ibmHistory.Count() == 0)
             {
-                throw new Exception("IBM tick history is empty");
+                throw new RegressionTestException("IBM tick history is empty");
             }
 
             // Requesting history for SPY and IBM (together) with tick resolution
             var spyIbmHistory = History<Tick>(new [] { spy, ibm }, TimeSpan.FromDays(1), Resolution.Tick);
             if (spyIbmHistory.Count() == 0)
             {
-                throw new Exception("Compound SPY and IBM tick history is empty");
+                throw new RegressionTestException("Compound SPY and IBM tick history is empty");
             }
 
             Quit();
@@ -67,7 +67,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -78,6 +78,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 5978528;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -144,7 +144,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (tickers == null && changes.AddedSecurities.Count > 0)
             {
-                throw new Exception($"{Time}: Expected no additions: {Time.DayOfWeek}");
+                throw new RegressionTestException($"{Time}: Expected no additions: {Time.DayOfWeek}");
             }
             if (tickers == null)
             {
@@ -155,7 +155,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (changes.AddedSecurities.All(s => s.Symbol.Value != ticker))
                 {
-                    throw new Exception($"{Time}: Expected {ticker} to be added: {Time.DayOfWeek}");
+                    throw new RegressionTestException($"{Time}: Expected {ticker} to be added: {Time.DayOfWeek}");
                 }
             }
         }
@@ -164,7 +164,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (tickers == null && changes.RemovedSecurities.Count > 0)
             {
-                throw new Exception($"{Time}: Expected no removals: {Time.DayOfWeek}");
+                throw new RegressionTestException($"{Time}: Expected no removals: {Time.DayOfWeek}");
             }
 
             if (tickers == null)
@@ -176,7 +176,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (changes.RemovedSecurities.All(s => s.Symbol.Value != ticker))
                 {
-                    throw new Exception($"{Time}: Expected {ticker} to be removed: {Time.DayOfWeek}");
+                    throw new RegressionTestException($"{Time}: Expected {ticker} to be removed: {Time.DayOfWeek}");
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -200,6 +200,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -41,7 +41,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (symbol != _spy)
             {
-                throw new Exception($"Unexpected 'OnEndOfDay(Symbol symbol)' symbol {symbol}");
+                throw new RegressionTestException($"Unexpected 'OnEndOfDay(Symbol symbol)' symbol {symbol}");
             }
             _count++;
         }
@@ -51,7 +51,7 @@ namespace QuantConnect.Algorithm.CSharp
             // Monday to Friday
             if (_count != 5)
             {
-                throw new Exception($"Unexpected 'OnEndOfDay(Symbol symbol)' calls {_count}");
+                throw new RegressionTestException($"Unexpected 'OnEndOfDay(Symbol symbol)' calls {_count}");
             }
         }
 
@@ -63,7 +63,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -74,6 +74,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

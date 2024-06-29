@@ -46,7 +46,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var invalidOrder = MarketOrder("BTCUSD", 0.00002);
                 if (invalidOrder.Status != OrderStatus.Invalid)
                 {
-                    throw new Exception("Invalid order expected, order size is less than allowed");
+                    throw new RegressionTestException("Invalid order expected, order size is less than allowed");
                 }
 
                 // Update an order that fails because of the size
@@ -74,13 +74,13 @@ namespace QuantConnect.Algorithm.CSharp
             // Update of validOrderOne is expected to fail
             if( (order.Id == 2) && (order.LastUpdateTime != null) && (order.Tag == "Updated"))
             {
-                throw new Exception("Order update expected to fail");
+                throw new RegressionTestException("Order update expected to fail");
             }
 
             // Update of validOrdertwo is expected to succeed
             if ((order.Id == 3) && (order.LastUpdateTime != null) && (order.Tag == "NotUpdated"))
             {
-                throw new Exception("Order update expected to succeed");
+                throw new RegressionTestException("Order update expected to succeed");
             }
         }
 
@@ -92,7 +92,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -103,6 +103,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 4;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

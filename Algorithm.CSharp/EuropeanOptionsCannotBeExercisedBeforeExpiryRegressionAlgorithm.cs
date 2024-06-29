@@ -79,7 +79,7 @@ namespace QuantConnect.Algorithm.CSharp
                 {
                     if (MarketOrder(_contract.Symbol, 1).Status != OrderStatus.Filled)
                     {
-                        throw new Exception("Expected market order to fill immediately");
+                        throw new RegressionTestException("Expected market order to fill immediately");
                     }
 
                     _marketOrderDone = true;
@@ -87,7 +87,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (ExerciseOption(_contract.Symbol, 1).Status == OrderStatus.Filled)
                 {
-                    throw new Exception($"Expected European option to not be exercisable before its expiration date. " +
+                    throw new RegressionTestException($"Expected European option to not be exercisable before its expiration date. " +
                                         $"Time: {UtcTime}. Expiry: {_contract.Expiry.ConvertToUtc(_option.Exchange.TimeZone)}");
                 }
 
@@ -100,7 +100,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (ExerciseOption(_contract.Symbol, 1).Status != OrderStatus.Filled)
                 {
-                    throw new Exception($"Expected European option to be exercisable on its expiration date. " +
+                    throw new RegressionTestException($"Expected European option to be exercisable on its expiration date. " +
                                         $"Time: {UtcTime}. Expiry: {_contract.Expiry.ConvertToUtc(_option.Exchange.TimeZone)}");
                 }
 
@@ -115,7 +115,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_exerciseBeforeExpiryDone || !_exerciseOnExpiryDone)
             {
-                throw new Exception("Expected to try to exercise option before and on expiry");
+                throw new RegressionTestException("Expected to try to exercise option before and on expiry");
             }
         }
 
@@ -127,7 +127,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all time slices of algorithm
@@ -138,6 +138,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

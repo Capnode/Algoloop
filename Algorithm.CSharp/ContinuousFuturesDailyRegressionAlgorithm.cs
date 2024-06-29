@@ -80,7 +80,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if(_previousFactor == priceFactor)
                 {
-                    throw new Exception($"Price factor did not change after symbol changed! {Time} {priceFactor}");
+                    throw new RegressionTestException($"Price factor did not change after symbol changed! {Time} {priceFactor}");
                 }
 
                 Quit("We asserted what we wanted");
@@ -92,7 +92,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_symbolChangedEvent == null)
             {
-                throw new Exception("Unexpected a symbol changed event but got none!");
+                throw new RegressionTestException("Unexpected a symbol changed event but got none!");
             }
         }
 
@@ -104,7 +104,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -115,6 +115,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -64,19 +64,19 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (conversionSymbols.Count != 2)
             {
-                throw new Exception(
+                throw new RegressionTestException(
                     $"Expected two conversion rate securities for LTC to ETH, is {conversionSymbols.Count}");
             }
 
             if (conversionSymbols[0] != _ltcUsdSymbol)
             {
-                throw new Exception(
+                throw new RegressionTestException(
                     $"Expected first conversion rate security from LTC to ETH to be {_ltcUsdSymbol}, is {conversionSymbols[0]}");
             }
 
             if (conversionSymbols[1] != _ethUsdSymbol)
             {
-                throw new Exception(
+                throw new RegressionTestException(
                     $"Expected second conversion rate security from LTC to ETH to be {_ethUsdSymbol}, is {conversionSymbols[1]}");
             }
 
@@ -88,7 +88,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (actualConversionRate != expectedConversionRate)
             {
-                throw new Exception(
+                throw new RegressionTestException(
                     $"Expected conversion rate from LTC to ETH to be {expectedConversionRate}, is {actualConversionRate}");
             }
         }
@@ -101,7 +101,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -112,6 +112,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 120;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -47,7 +47,7 @@ namespace QuantConnect.Algorithm.CSharp
             // Because of issues with Delisting data we have to let Auxiliary data pass through GH #5207
             if (Time.Ticks - _lastSliceTime.Ticks < 1000 && data.Values.Any(x => x.DataType != MarketDataType.Auxiliary))
             {
-                throw new Exception($"Emitted two slices within 1000 ticks of each other.");
+                throw new RegressionTestException($"Emitted two slices within 1000 ticks of each other.");
             }
 
             // Store our slice time
@@ -69,7 +69,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_optionSymbol == null)
             {
-                throw new Exception("No option symbol was added!");
+                throw new RegressionTestException("No option symbol was added!");
             }
         }
 
@@ -81,7 +81,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -92,6 +92,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

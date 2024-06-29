@@ -95,7 +95,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (orderEvent.Quantity == _quantityOverMargin && orderEvent.Status != OrderStatus.Invalid)
             {
-                throw new Exception($"Orders with quantity {_quantityOverMargin} should be invalid");
+                throw new RegressionTestException($"Orders with quantity {_quantityOverMargin} should be invalid");
             }
         }
 
@@ -107,14 +107,14 @@ namespace QuantConnect.Algorithm.CSharp
             var expectedFilledOrdersCount = 2 * _optionStrategy.OptionLegs.Count;
             if (filledOrdersCount != expectedFilledOrdersCount)
             {
-                throw new Exception($"Expected {expectedFilledOrdersCount} filled orders, found {filledOrdersCount}");
+                throw new RegressionTestException($"Expected {expectedFilledOrdersCount} filled orders, found {filledOrdersCount}");
             }
 
             var expectedQuantity = Math.Abs(_quantity - _quantityToLiquidate);
             var positionGroup = Portfolio.Positions.Groups.Single();
             if (positionGroup.Quantity != expectedQuantity)
             {
-                throw new Exception($"Expected position quantity to be {expectedQuantity} but was {positionGroup.Quantity}");
+                throw new RegressionTestException($"Expected position quantity to be {expectedQuantity} but was {positionGroup.Quantity}");
             }
         }
 
@@ -126,7 +126,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -137,6 +137,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

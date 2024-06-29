@@ -64,7 +64,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_expectedCloseValues.Count > 0)
             {
-                throw new Exception($"Not all expected data points were received.");
+                throw new RegressionTestException($"Not all expected data points were received.");
             }
         }
 
@@ -75,7 +75,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (data.Bars.FirstOrDefault().Value?.Close.SmartRounding() != value)
                 {
-                    throw new Exception($"Expected tradebar price, expected {value} but was {data.Bars.First().Value.Close.SmartRounding()}");
+                    throw new RegressionTestException($"Expected tradebar price, expected {value} but was {data.Bars.First().Value.Close.SmartRounding()}");
                 }
 
                 _expectedCloseValues.Remove(data.Time);
@@ -90,7 +90,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -101,6 +101,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

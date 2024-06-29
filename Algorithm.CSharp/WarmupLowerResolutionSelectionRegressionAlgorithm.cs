@@ -62,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
             var expected = _selection.Dequeue();
             if (expected != Time && !LiveMode)
             {
-                throw new Exception($"Unexpected selection time: {Time}. Expected {expected}");
+                throw new RegressionTestException($"Unexpected selection time: {Time}. Expected {expected}");
             }
 
             Debug($"Coarse selection happening at {Time} {IsWarmingUp}");
@@ -82,7 +82,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var dataSpan = data.EndTime - data.Time;
                 if (dataSpan != expectedDataSpan)
                 {
-                    throw new Exception($"Unexpected bar span! {data}: {dataSpan} Expected {expectedDataSpan}");
+                    throw new RegressionTestException($"Unexpected bar span! {data}: {dataSpan} Expected {expectedDataSpan}");
                 }
             }
 
@@ -102,7 +102,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -113,6 +113,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

@@ -51,7 +51,7 @@ namespace QuantConnect.Algorithm.CSharp
                     {
 
                         history = History<QuoteBar>(symbol, 10, Resolution.Daily).Select(bar => bar as BaseData);
-                        throw new Exception("We were expecting an argument exception to be thrown. Equity does not have daily QuoteBars!");
+                        throw new RegressionTestException("We were expecting an argument exception to be thrown. Equity does not have daily QuoteBars!");
                     }
                     catch (ArgumentException)
                     {
@@ -71,7 +71,7 @@ namespace QuantConnect.Algorithm.CSharp
                 if (duplications.Any())
                 {
                     var time = duplications.First().Key;
-                    throw new Exception($"Duplicated bars were issued for time {time}");
+                    throw new RegressionTestException($"Duplicated bars were issued for time {time}");
                 }
             }
         }
@@ -84,7 +84,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -95,6 +95,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 20;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

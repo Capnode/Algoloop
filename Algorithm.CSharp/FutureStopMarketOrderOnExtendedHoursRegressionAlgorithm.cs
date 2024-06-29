@@ -85,7 +85,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                 if (!time.IsOpen(orderEvent.UtcTime, _SP500EMini.IsExtendedMarketHours))
                 {
-                    throw new Exception($"The Exchange hours was closed, verify 'extendedMarketHours' flag in {nameof(Initialize)} when added new security(ies).");
+                    throw new RegressionTestException($"The Exchange hours was closed, verify 'extendedMarketHours' flag in {nameof(Initialize)} when added new security(ies).");
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (stopMarketOrders.Any(x => x.Status != OrderStatus.Filled))
             {
-                throw new Exception("The Algorithms was not handled any StopMarketOrders");
+                throw new RegressionTestException("The Algorithms was not handled any StopMarketOrders");
             }
         }
 
@@ -108,7 +108,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all time slices of algorithm
@@ -119,6 +119,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

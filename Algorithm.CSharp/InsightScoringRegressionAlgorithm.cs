@@ -56,17 +56,17 @@ namespace QuantConnect.Algorithm.CSharp
 
             if(allInsights.Count != 100 || Insights.GetInsights().Count != 100)
             {
-                throw new Exception($"Unexpected insight count found {allInsights.Count}");
+                throw new RegressionTestException($"Unexpected insight count found {allInsights.Count}");
             }
 
             if(allInsights.Count(insight => insight.Score.Magnitude == 0 || insight.Score.Direction == 0) < 5)
             {
-                throw new Exception($"Insights not scored!");
+                throw new RegressionTestException($"Insights not scored!");
             }
 
             if (allInsights.Count(insight => insight.Score.IsFinalScore) < 99)
             {
-                throw new Exception($"Insights not finalized!");
+                throw new RegressionTestException($"Insights not finalized!");
             }
         }
 
@@ -125,7 +125,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -136,6 +136,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

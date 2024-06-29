@@ -79,15 +79,15 @@ namespace QuantConnect.Algorithm.CSharp
                 var history = History(symbol, 10).ToList();
                 if (history.Count != 10)
                 {
-                    throw new Exception($"Unexpected history count: {history.Count}");
+                    throw new RegressionTestException($"Unexpected history count: {history.Count}");
                 }
                 if (history.Any(x => x.Time.TimeOfDay != new TimeSpan(8, 30, 0)))
                 {
-                    throw new Exception($"Unexpected history data start time");
+                    throw new RegressionTestException($"Unexpected history data start time");
                 }
                 if (history.Any(x => x.EndTime.TimeOfDay != new TimeSpan(15, 15, 0)))
                 {
-                    throw new Exception($"Unexpected history data end time");
+                    throw new RegressionTestException($"Unexpected history data end time");
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public override List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -111,6 +111,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 30;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

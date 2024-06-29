@@ -91,12 +91,12 @@ namespace QuantConnect.Algorithm.CSharp
 
                     if (_liquidatedQuantity != totalComboQuantity)
                     {
-                        throw new Exception($"Liquidated quantity {_liquidatedQuantity} does not match combo quantity {totalComboQuantity}");
+                        throw new RegressionTestException($"Liquidated quantity {_liquidatedQuantity} does not match combo quantity {totalComboQuantity}");
                     }
 
                     if (Portfolio.TotalHoldingsValue != 0)
                     {
-                        throw new Exception($"Portfolio value {Portfolio.TotalPortfolioValue} is not zero");
+                        throw new RegressionTestException($"Portfolio value {Portfolio.TotalPortfolioValue} is not zero");
                     }
                 }
             }
@@ -108,18 +108,18 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (_limitPrice == null)
             {
-                throw new Exception("Limit price was not set");
+                throw new RegressionTestException("Limit price was not set");
             }
 
             var fillPricesSum = FillOrderEvents.Take(OrderLegs.Count).Select(x => x.FillPrice * x.FillQuantity / _comboQuantity).Sum();
             if (_limitPrice < fillPricesSum)
             {
-                throw new Exception($"Limit price expected to be greater that the sum of the fill prices ({fillPricesSum}), but was {_limitPrice}");
+                throw new RegressionTestException($"Limit price expected to be greater that the sum of the fill prices ({fillPricesSum}), but was {_limitPrice}");
             }
 
             if (!_liquidated)
             {
-                throw new Exception("Combo order was not liquidated");
+                throw new RegressionTestException("Combo order was not liquidated");
             }
         }
 
@@ -131,7 +131,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp };
+        public override List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -142,6 +142,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public override AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

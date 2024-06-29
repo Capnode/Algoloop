@@ -60,7 +60,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (dividend.ReferencePrice != 32.6m || dividend.Distribution != 3.82m)
                 {
-                    throw new Exception($"{Time} - Invalid dividend {dividend}");
+                    throw new RegressionTestException($"{Time} - Invalid dividend {dividend}");
                 }
             }
             if (!Portfolio.Invested)
@@ -87,7 +87,7 @@ namespace QuantConnect.Algorithm.CSharp
                             // checks
                             if (contract.AskPrice != 1.1m)
                             {
-                                throw new Exception("Regression test failed: current ask price was not loaded from NWSA backtest file and is not $1.1");
+                                throw new RegressionTestException("Regression test failed: current ask price was not loaded from NWSA backtest file and is not $1.1");
                             }
                         }
                     }
@@ -111,7 +111,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                         if (contract.BidPrice != 0.05m)
                         {
-                            throw new Exception("Regression test failed: current bid price was not loaded from FOXA file and is not $0.05");
+                            throw new RegressionTestException("Regression test failed: current bid price was not loaded from FOXA file and is not $0.05");
                         }
                     }
                 }
@@ -136,7 +136,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -147,6 +147,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

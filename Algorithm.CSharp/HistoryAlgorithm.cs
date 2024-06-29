@@ -198,7 +198,7 @@ namespace QuantConnect.Algorithm.CSharp
             var universeSecurityHistory = History(UniverseManager.Keys, TimeSpan.FromDays(10)).ToList();
             if (universeSecurityHistory.Count != 0)
             {
-                throw new Exception("History request for universe symbols incorrectly returned data. "
+                throw new RegressionTestException("History request for universe symbols incorrectly returned data. "
                     + "These requests are intended to be filtered out and never sent to the history provider.");
             }
         }
@@ -213,7 +213,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (_count > 5)
             {
-                throw new Exception($"Invalid number of bars arrived. Expected exactly 5, but received {_count}");
+                throw new RegressionTestException($"Invalid number of bars arrived. Expected exactly 5, but received {_count}");
             }
 
             if (!Portfolio.Invested)
@@ -229,7 +229,7 @@ namespace QuantConnect.Algorithm.CSharp
             var count = history.Count();
             if (count != expected)
             {
-                throw new Exception(methodCall + " expected " + expected + ", but received " + count);
+                throw new RegressionTestException(methodCall + " expected " + expected + ", but received " + count);
             }
 
             IEnumerable<Symbol> unexpectedSymbols = null;
@@ -270,13 +270,13 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (unexpectedSymbols == null)
             {
-                throw new Exception("Unhandled case: " + typeof(T).GetBetterTypeName());
+                throw new RegressionTestException("Unhandled case: " + typeof(T).GetBetterTypeName());
             }
 
             var unexpectedSymbolsString = string.Join(" | ", unexpectedSymbols);
             if (!string.IsNullOrWhiteSpace(unexpectedSymbolsString))
             {
-                throw new Exception($"{methodCall} contains unexpected symbols: {unexpectedSymbolsString}");
+                throw new RegressionTestException($"{methodCall} contains unexpected symbols: {unexpectedSymbolsString}");
             }
         }
 
@@ -288,7 +288,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -299,6 +299,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => -1;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

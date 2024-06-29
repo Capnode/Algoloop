@@ -62,7 +62,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var delistedSecurity = investedSymbols.Where(symbol => symbol.ID.Date.AddDays(1) < Time).ToList();
                 if (delistedSecurity.Count > 0)
                 {
-                    throw new Exception($"[{UtcTime}] We hold a delisted securities: {string.Join(",", delistedSecurity)}");
+                    throw new RegressionTestException($"[{UtcTime}] We hold a delisted securities: {string.Join(",", delistedSecurity)}");
                 }
                 Log($"Holdings({Time}): {string.Join(",", investedSymbols)}");
             }
@@ -86,11 +86,11 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_traded)
             {
-                throw new Exception("We expected some FOP trading to happen");
+                throw new RegressionTestException("We expected some FOP trading to happen");
             }
             if (Portfolio.Invested)
             {
-                throw new Exception("We shouldn't be invested anymore");
+                throw new RegressionTestException("We shouldn't be invested anymore");
             }
         }
 
@@ -102,7 +102,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -113,6 +113,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

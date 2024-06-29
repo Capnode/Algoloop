@@ -49,7 +49,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (!_targetsTagChecked)
             {
-                throw new Exception("The portfolio targets tag were not checked");
+                throw new RegressionTestException("The portfolio targets tag were not checked");
             }
         }
 
@@ -112,7 +112,7 @@ namespace QuantConnect.Algorithm.CSharp
                     var expectedTag = CustomPortfolioConstructionModel.GeneratePortfolioTargetTag(target);
                     if (target.Tag != expectedTag)
                     {
-                        throw new Exception($"Unexpected portfolio target tag: {target.Tag} - Expected: {expectedTag}");
+                        throw new RegressionTestException($"Unexpected portfolio target tag: {target.Tag} - Expected: {expectedTag}");
                     }
                 }
 
@@ -128,7 +128,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public virtual Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public virtual List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -139,6 +139,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

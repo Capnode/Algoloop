@@ -63,14 +63,14 @@ namespace QuantConnect.Algorithm.CSharp
                     var expectedMarginUsage = Math.Max((middleCall.Strike - lowerCall.Strike) * Securities[lowerCall.Symbol].SymbolProperties.ContractMultiplier * 10, 0);
                     if (expectedMarginUsage != Portfolio.TotalMarginUsed)
                     {
-                        throw new Exception("Unexpect margin used!");
+                        throw new RegressionTestException("Unexpect margin used!");
                     }
 
                     // we payed the ask and value using the assets price
                     var priceSpreadDifference = GetPriceSpreadDifference(middleCall.Symbol, lowerCall.Symbol, highestCall.Symbol);
                     if (initialMargin != (freeMarginPostTrade + expectedMarginUsage + _paidFees - priceSpreadDifference))
                     {
-                        throw new Exception("Unexpect margin remaining!");
+                        throw new RegressionTestException("Unexpect margin remaining!");
                     }
                 }
             }
@@ -85,6 +85,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

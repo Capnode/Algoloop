@@ -15,6 +15,7 @@
 */
 
 using System;
+using System.Collections.Generic;
 
 namespace QuantConnect.Algorithm.CSharp
 {
@@ -39,7 +40,7 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 if (OptionWarmupTimes[count] != start)
                 {
-                    throw new Exception($"Unexpected time {OptionWarmupTimes[count]} expected {start}");
+                    throw new RegressionTestException($"Unexpected time {OptionWarmupTimes[count]} expected {start}");
                 }
                 count++;
                 start = start.AddDays(1);

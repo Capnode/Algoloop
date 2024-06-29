@@ -53,7 +53,7 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (FillOrderEvents.Zip(OrderLegs).Any(x => x.Second.OrderPrice < x.First.FillPrice))
             {
-                throw new Exception($"Limit price expected to be greater that the fill price for each order. Limit prices: {string.Join(",", OrderLegs.Select(x => x.OrderPrice))} Fill prices: {string.Join(",", FillOrderEvents.Select(x => x.FillPrice))}");
+                throw new RegressionTestException($"Limit price expected to be greater that the fill price for each order. Limit prices: {string.Join(",", OrderLegs.Select(x => x.OrderPrice))} Fill prices: {string.Join(",", FillOrderEvents.Select(x => x.FillPrice))}");
             }
         }
 
@@ -65,7 +65,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public override Language[] Languages { get; } = { Language.CSharp };
+        public override List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -76,6 +76,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public override int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public override AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

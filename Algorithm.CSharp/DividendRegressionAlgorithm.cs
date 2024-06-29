@@ -76,18 +76,18 @@ namespace QuantConnect.Algorithm.CSharp
             // The expected value refers to sum of dividend payments
             if (Portfolio.TotalProfit != _sumOfDividends)
             {
-                throw new Exception($"Total Profit: Expected {_sumOfDividends}. Actual {Portfolio.TotalProfit}");
+                throw new RegressionTestException($"Total Profit: Expected {_sumOfDividends}. Actual {Portfolio.TotalProfit}");
             }
 
             var expectNetProfit = _sumOfDividends - Portfolio.TotalFees;
             if (Portfolio.TotalNetProfit != expectNetProfit)
             {
-                throw new Exception($"Total Net Profit: Expected {expectNetProfit}. Actual {Portfolio.TotalNetProfit}");
+                throw new RegressionTestException($"Total Net Profit: Expected {expectNetProfit}. Actual {Portfolio.TotalNetProfit}");
             }
 
             if (Portfolio[_symbol].TotalDividends != _sumOfDividends)
             {
-                throw new Exception($"{_symbol} Total Dividends: Expected {_sumOfDividends}. Actual {Portfolio[_symbol].TotalDividends}");
+                throw new RegressionTestException($"{_symbol} Total Dividends: Expected {_sumOfDividends}. Actual {Portfolio[_symbol].TotalDividends}");
             }
         }
 
@@ -99,7 +99,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -110,6 +110,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

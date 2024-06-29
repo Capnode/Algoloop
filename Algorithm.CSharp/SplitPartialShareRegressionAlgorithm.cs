@@ -49,7 +49,7 @@ namespace QuantConnect.Algorithm.CSharp
 
                     if (_splitType == SplitType.Warning && _cash != Portfolio.CashBook[Currencies.USD].Amount)
                     {
-                        throw new Exception("Unexpected cash amount change before split");
+                        throw new RegressionTestException("Unexpected cash amount change before split");
                     }
 
                     if (_splitType == SplitType.SplitOccurred)
@@ -57,13 +57,13 @@ namespace QuantConnect.Algorithm.CSharp
                         var newCash = Portfolio.CashBook[Currencies.USD].Amount;
                         if (_cash == newCash || newCash - _cash >= dataSplit.Value.SplitFactor * dataSplit.Value.ReferencePrice)
                         {
-                            throw new Exception("Unexpected cash amount change after split");
+                            throw new RegressionTestException("Unexpected cash amount change after split");
                         }
                     }
                 }
                 else
                 {
-                    throw new Exception($"Unexpected split event {dataSplit.Value.Type}");
+                    throw new RegressionTestException($"Unexpected split event {dataSplit.Value.Type}");
                 }
             }
 
@@ -78,7 +78,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_splitType == null)
             {
-                throw new Exception("No split was emitted!");
+                throw new RegressionTestException("No split was emitted!");
             }
         }
 
@@ -90,7 +90,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -101,6 +101,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

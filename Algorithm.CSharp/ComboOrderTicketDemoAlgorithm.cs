@@ -115,7 +115,7 @@ namespace QuantConnect.Algorithm.CSharp
                 var response = ticket.Cancel("Attempt to cancel combo market order");
                 if (response.IsSuccess)
                 {
-                    throw new Exception("Combo market orders should fill instantly, they should not be cancelable in backtest mode: " + response.OrderId);
+                    throw new RegressionTestException("Combo market orders should fill instantly, they should not be cancelable in backtest mode: " + response.OrderId);
                 }
             }
         }
@@ -239,16 +239,16 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (orderEvent.Quantity == 0)
             {
-                throw new Exception("OrderEvent quantity is Not expected to be 0, it should hold the current order Quantity");
+                throw new RegressionTestException("OrderEvent quantity is Not expected to be 0, it should hold the current order Quantity");
             }
             if (orderEvent.Quantity != order.Quantity)
             {
-                throw new Exception($@"OrderEvent quantity should hold the current order Quantity. Got {orderEvent.Quantity
+                throw new RegressionTestException($@"OrderEvent quantity should hold the current order Quantity. Got {orderEvent.Quantity
                     }, expected {order.Quantity}");
             }
             if (order is ComboLegLimitOrder && orderEvent.LimitPrice == 0)
             {
-                throw new Exception("OrderEvent.LimitPrice is not expected to be 0 for ComboLegLimitOrder");
+                throw new RegressionTestException("OrderEvent.LimitPrice is not expected to be 0 for ComboLegLimitOrder");
             }
         }
 
@@ -293,7 +293,7 @@ namespace QuantConnect.Algorithm.CSharp
             var expectedFillsCount = 15;
             if (filledOrders.Count != expectedFillsCount || orderTickets.Count != expectedOrdersCount)
             {
-                throw new Exception($"There were expected {expectedFillsCount} filled orders and {expectedOrdersCount} order tickets, but there were {filledOrders.Count} filled orders and {orderTickets.Count} order tickets");
+                throw new RegressionTestException($"There were expected {expectedFillsCount} filled orders and {expectedOrdersCount} order tickets, but there were {filledOrders.Count} filled orders and {orderTickets.Count} order tickets");
             }
 
             var filledComboMarketOrders = filledOrders.Where(x => x.Type == OrderType.ComboMarket).ToList();
@@ -301,7 +301,7 @@ namespace QuantConnect.Algorithm.CSharp
             var filledComboLegLimitOrders = filledOrders.Where(x => x.Type == OrderType.ComboLegLimit).ToList();
             if (filledComboMarketOrders.Count != 6 || filledComboLimitOrders.Count != 3 || filledComboLegLimitOrders.Count != 6)
             {
-                throw new Exception(
+                throw new RegressionTestException(
                     "There were expected 6 filled market orders, 3 filled combo limit orders and 6 filled combo leg limit orders, " +
                     $@"but there were {filledComboMarketOrders.Count} filled market orders, {filledComboLimitOrders.Count
                     } filled combo limit orders and {filledComboLegLimitOrders.Count} filled combo leg limit orders");
@@ -309,12 +309,12 @@ namespace QuantConnect.Algorithm.CSharp
 
             if (openOrders.Count != 0 || openOrderTickets.Count != 0)
             {
-                throw new Exception($"No open orders or tickets were expected");
+                throw new RegressionTestException($"No open orders or tickets were expected");
             }
 
             if (remainingOpenOrders != 0m)
             {
-                throw new Exception($"No remaining quantity to be filled from open orders was expected");
+                throw new RegressionTestException($"No remaining quantity to be filled from open orders was expected");
             }
         }
 
@@ -326,7 +326,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp, Language.Python };
+        public List<Language> Languages { get; } = new() { Language.CSharp, Language.Python };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -337,6 +337,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

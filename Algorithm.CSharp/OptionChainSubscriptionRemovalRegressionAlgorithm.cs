@@ -52,7 +52,7 @@ namespace QuantConnect.Algorithm.CSharp
         {
             if (_optionCount != 45)
             {
-                throw new Exception($"Unexpected option count {_optionCount}, expected 45");
+                throw new RegressionTestException($"Unexpected option count {_optionCount}, expected 45");
             }
         }
 
@@ -79,7 +79,7 @@ namespace QuantConnect.Algorithm.CSharp
             // why 50? we select 15 option contracts, which add trade/quote/openInterest = 45 + SPY & underlying trade/quote + universe subscription => 50
             if (SubscriptionManager.Subscriptions.Count() > 50)
             {
-                throw new Exception("Subscriptions aren't getting removed as expected!");
+                throw new RegressionTestException("Subscriptions aren't getting removed as expected!");
             }
 
             return $"{Time} | UniverseCount {UniverseManager.Count}. " +
@@ -108,7 +108,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// This is used by the regression test system to indicate which languages this algorithm is written in.
         /// </summary>
-        public Language[] Languages { get; } = { Language.CSharp };
+        public List<Language> Languages { get; } = new() { Language.CSharp };
 
         /// <summary>
         /// Data Points count of all timeslices of algorithm
@@ -119,6 +119,11 @@ namespace QuantConnect.Algorithm.CSharp
         /// Data Points count of the algorithm history
         /// </summary>
         public int AlgorithmHistoryDataPoints => 0;
+
+        /// <summary>
+        /// Final status of the algorithm
+        /// </summary>
+        public AlgorithmStatus AlgorithmStatus => AlgorithmStatus.Completed;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

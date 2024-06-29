@@ -28,10 +28,20 @@ namespace QuantConnect.Algorithm
     public partial class QCAlgorithm
     {
         /// <summary>
-        /// Gets whether or not WarmUpIndicator is allowed to warm up indicators/>
+        /// Gets whether or not WarmUpIndicator is allowed to warm up indicators
         /// </summary>
-        [DocumentationAttribute(Indicators)]
-        public bool EnableAutomaticIndicatorWarmUp { get; set; } = false;
+        [Obsolete("Please use Settings.AutomaticIndicatorWarmUp")]
+        public bool EnableAutomaticIndicatorWarmUp
+        {
+            get
+            {
+                return Settings.AutomaticIndicatorWarmUp;
+            }
+            set
+            {
+                Settings.AutomaticIndicatorWarmUp = value;
+            }
+        }
 
         /// <summary>
         /// Creates a new Acceleration Bands indicator.
@@ -171,7 +181,7 @@ namespace QuantConnect.Algorithm
         /// <param name="type">The type of moving average used when computing the fast and slow term. Defaults to simple moving average.</param>
         /// <param name="selector">Selects a value from the BaseData to send into the indicator, if null defaults to casting the input value to a TradeBar</param>
         [DocumentationAttribute(Indicators)]
-        public AwesomeOscillator AO(Symbol symbol, int slowPeriod, int fastPeriod, MovingAverageType type, Resolution? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
+        public AwesomeOscillator AO(Symbol symbol, int fastPeriod, int slowPeriod, MovingAverageType type, Resolution? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
         {
             var name = CreateIndicatorName(symbol, $"AO({fastPeriod},{slowPeriod},{type})", resolution);
             var awesomeOscillator = new AwesomeOscillator(name, fastPeriod, slowPeriod, type);
@@ -1246,7 +1256,7 @@ namespace QuantConnect.Algorithm
 
             RegisterIndicator(symbol, maximum, ResolveConsolidator(symbol, resolution), selector);
 
-            if (EnableAutomaticIndicatorWarmUp)
+            if (Settings.AutomaticIndicatorWarmUp)
             {
                 WarmUpIndicator(symbol, maximum, resolution, selector);
             }
@@ -1357,7 +1367,7 @@ namespace QuantConnect.Algorithm
 
             RegisterIndicator(symbol, minimum, ResolveConsolidator(symbol, resolution), selector);
 
-            if (EnableAutomaticIndicatorWarmUp)
+            if (Settings.AutomaticIndicatorWarmUp)
             {
                 WarmUpIndicator(symbol, minimum, resolution, selector);
             }
@@ -3347,7 +3357,7 @@ namespace QuantConnect.Algorithm
         {
             RegisterIndicator(symbol, indicator, resolution, selector);
 
-            if (EnableAutomaticIndicatorWarmUp)
+            if (Settings.AutomaticIndicatorWarmUp)
             {
                 WarmUpIndicator(symbol, indicator, resolution, selector);
             }
@@ -3359,7 +3369,7 @@ namespace QuantConnect.Algorithm
         {
             RegisterIndicator(symbol, indicator, resolution, selector);
 
-            if (EnableAutomaticIndicatorWarmUp)
+            if (Settings.AutomaticIndicatorWarmUp)
             {
                 WarmUpIndicator(symbol, indicator, resolution, selector);
             }
