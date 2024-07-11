@@ -49,6 +49,7 @@ namespace QuantConnect.Brokerages
         /// </summary>
         public event EventHandler<BrokerageOrderIdChangedEvent> OrderIdChanged;
 
+        /// <summary>
         /// Event that fires each time the status for a list of orders change
         /// </summary>
         public event EventHandler<List<OrderEvent>> OrdersStatusChanged;
@@ -663,8 +664,17 @@ namespace QuantConnect.Brokerages
 
                 _leanOrderByBrokerageCrossingOrders.AddOrUpdate(order.Id, secondOrderPartRequest);
 
-                // issue the first order to close the position
-                var response = PlaceCrossZeroOrder(firstOrderPartRequest);
+                CrossZeroOrderResponse response;
+                lock (_lockCrossZeroObject)
+                {
+                    // issue the first order to close the position
+                    response = PlaceCrossZeroOrder(firstOrderPartRequest);
+                    if (response.IsOrderPlacedSuccessfully)
+                    {
+                        order.BrokerId.Add(response.BrokerageOrderId.ToStringInvariant());
+                    }
+                }
+
                 if (!response.IsOrderPlacedSuccessfully)
                 {
                     OnOrderEvent(new OrderEvent(order, DateTime.UtcNow, OrderFee.Zero, $"{nameof(Brokerage)}: {response.Message}")
@@ -676,9 +686,6 @@ namespace QuantConnect.Brokerages
                     _leanOrderByBrokerageCrossingOrders.TryRemove(order.Id, out _);
                     return false;
                 }
-
-                order.BrokerId.Add(response.BrokerageOrderId.ToStringInvariant());
-
                 return true;
             }
 

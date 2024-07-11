@@ -34,16 +34,16 @@ namespace QuantConnect.Data.UniverseSelection
         /// <typeparam name="T">The expected data type</typeparam>
         /// <param name="time">The time to request this data for</param>
         /// <param name="securityIdentifier">The security identifier</param>
-        /// <param name="enumName">The name of the fundamental property</param>
+        /// <param name="name">The name of the fundamental property</param>
         /// <returns>The fundamental information</returns>
-        public override T Get<T>(DateTime time, SecurityIdentifier securityIdentifier, FundamentalProperty enumName)
+        public override T Get<T>(DateTime time, SecurityIdentifier securityIdentifier, FundamentalProperty name)
         {
-            var name = Enum.GetName(enumName);
+            var enumName = Enum.GetName(name);
             lock (_coarseFundamental)
             {
                 if (time == _date)
                 {
-                    return GetProperty<T>(securityIdentifier, name);
+                    return GetProperty<T>(securityIdentifier, enumName);
                 }
                 _date = time;
 
@@ -68,10 +68,13 @@ namespace QuantConnect.Data.UniverseSelection
                     }
                 }
 
-                return GetProperty<T>(securityIdentifier, name);
+                return GetProperty<T>(securityIdentifier, enumName);
             }
         }
 
+        /// <summary>
+        /// Reads the given line and returns a CoarseFundamentalSource with the information within it
+        /// </summary>
         public static CoarseFundamentalSource Read(string line, DateTime date)
         {
             try
@@ -141,11 +144,30 @@ namespace QuantConnect.Data.UniverseSelection
         /// </summary>
         public class CoarseFundamentalSource : CoarseFundamental
         {
-            public long VolumeSetter;
-            public double DollarVolumeSetter;
-            public decimal PriceFactorSetter = 1;
-            public decimal SplitFactorSetter = 1;
-            public bool HasFundamentalDataSetter;
+            /// <summary>
+            /// Property to set the volume of the Coarse Fundamental
+            /// </summary>
+            public long VolumeSetter { get; init; }
+
+            /// <summary>
+            /// Property to set the dollar volume of the Coarse Fundamental
+            /// </summary>
+            public double DollarVolumeSetter { get; init; }
+
+            /// <summary>
+            /// Property to set the price factor of the Coarse Fundamental
+            /// </summary>
+            public decimal PriceFactorSetter { get; set; } = 1;
+
+            /// <summary>
+            /// Property to set the split factor of the Coarse Fundamental
+            /// </summary>
+            public decimal SplitFactorSetter { get; set; } = 1;
+
+            /// <summary>
+            /// Property to indicate if the Coarse Fundamental has fundamental data
+            /// </summary>
+            public bool HasFundamentalDataSetter { get; set; }
 
             /// <summary>
             /// Gets the day's dollar volume for this symbol

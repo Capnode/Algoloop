@@ -55,7 +55,6 @@ namespace QuantConnect.Tests.Common.Securities.Futures
         private const string TwoThirtyPM = "14:30:00";
         private const string OneFortyFivePM = "13:45:00";
         private const string ThreeThirtyPM = "15:30:00";
-        private const string FourPM = "16:00:00";
         private const string FourFifteenPM = "16:15:00";
         private readonly SymbolPropertiesDatabase _symbolPropertiesDatabase = SymbolPropertiesDatabase.FromDataFolder();
 
@@ -484,8 +483,8 @@ namespace QuantConnect.Tests.Common.Securities.Futures
         /// </summary>
         public class Dates
         {
-            public DateTime ContractMonth;
-            public DateTime LastTrade;
+            public DateTime ContractMonth { get; set; }
+            public DateTime LastTrade { get; set; }
             public Dates() { }
             public Dates(DateTime c, DateTime l)
             {
@@ -500,8 +499,8 @@ namespace QuantConnect.Tests.Common.Securities.Futures
         public class Item
         {
             [XmlAttribute]
-            public String Symbol;
-            public List<Dates> SymbolDates;
+            public String Symbol { get; set; }
+            public List<Dates> SymbolDates { get; set; }
         }
 
         private Symbol GetFutureSymbol(string symbol, DateTime? date =null)

@@ -54,13 +54,13 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// OnData event is the primary entry point for your algorithm. Each new data point will be pumped in here.
         /// </summary>
-        /// <param name="data">Slice object keyed by symbol containing the stock data</param>
-        public override void OnData(Slice data)
+        /// <param name="slice">Slice object keyed by symbol containing the stock data</param>
+        public override void OnData(Slice slice)
         {
             // we subtract a minute cause we can get data on the market close, from the previous minute
             if (!_continuousContract.Exchange.DateTimeIsOpen(Time.AddMinutes(-1)))
             {
-                if (data.Bars.Count > 0 || data.QuoteBars.Count > 0)
+                if (slice.Bars.Count > 0 || slice.QuoteBars.Count > 0)
                 {
                     throw new RegressionTestException($"We are getting data during closed market!");
                 }
@@ -68,12 +68,12 @@ namespace QuantConnect.Algorithm.CSharp
 
             var currentlyMappedSecurity = Securities[_continuousContract.Mapped];
 
-            if (data.Keys.Count != 1)
+            if (slice.Keys.Count != 1)
             {
-                throw new RegressionTestException($"We are getting data for more than one symbols! {string.Join(",", data.Keys.Select(symbol => symbol))}");
+                throw new RegressionTestException($"We are getting data for more than one symbols! {string.Join(",", slice.Keys.Select(symbol => symbol))}");
             }
 
-            foreach (var changedEvent in data.SymbolChangedEvents.Values)
+            foreach (var changedEvent in slice.SymbolChangedEvents.Values)
             {
                 if (changedEvent.Symbol == _continuousContract.Symbol)
                 {
@@ -169,7 +169,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 713395;
+        public long DataPoints => 713369;
 
         /// <summary>
         /// Data Points count of the algorithm history

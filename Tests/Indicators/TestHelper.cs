@@ -76,22 +76,20 @@ namespace QuantConnect.Tests.Indicators
                 if (!(parts.ContainsKey("Close") && parts.ContainsKey(targetColumn)))
                 {
                     Assert.Fail("Didn't find one of 'Close' or '{0}' in the header.", targetColumn);
-                    
                     break;
                 }
 
-                decimal close = parts.GetCsvValue("close").ToDecimal();
-                DateTime date = Time.ParseDate(parts.GetCsvValue("date", "time"));
+                var close = parts.GetCsvValue("close").ToDecimal();
+                var date = Time.ParseDate(parts.GetCsvValue("date", "time"));
 
-                var data = new IndicatorDataPoint(date, close);
-                indicator.Update(data);
+                indicator.Update(date, close);
 
-                if (!indicator.IsReady || parts.GetCsvValue(targetColumn).Trim() == string.Empty)
+                if (!indicator.IsReady || string.IsNullOrEmpty(parts.GetCsvValue(targetColumn).Trim()))
                 {
                     continue;
                 }
 
-                double expected = Parse.Double(parts.GetCsvValue(targetColumn));
+                var expected = Parse.Double(parts.GetCsvValue(targetColumn));
                 customAssertion.Invoke(indicator, expected);
             }
         }
@@ -166,12 +164,12 @@ namespace QuantConnect.Tests.Indicators
 
                 indicator.Update(tradebar);
 
-                if (!indicator.IsReady || parts.GetCsvValue(targetColumn).Trim() == string.Empty)
+                if (!indicator.IsReady || string.IsNullOrEmpty(parts.GetCsvValue(targetColumn).Trim()))
                 {
                     continue;
                 }
 
-                double expected = Parse.Double(parts.GetCsvValue(targetColumn));
+                var expected = Parse.Double(parts.GetCsvValue(targetColumn));
                 customAssertion.Invoke(indicator, expected);
             }
         }
@@ -192,7 +190,7 @@ namespace QuantConnect.Tests.Indicators
 
                 indicator.Update(tradebar);
 
-                if (!indicator.IsReady || parts.GetCsvValue(targetColumn).Trim() == string.Empty)
+                if (!indicator.IsReady || string.IsNullOrEmpty(parts.GetCsvValue(targetColumn).Trim()))
                 {
                     continue;
                 }
@@ -351,29 +349,6 @@ namespace QuantConnect.Tests.Indicators
                     AssertIndicatorIsInDefaultState(subIndicator as IndicatorBase<IndicatorDataPoint>);
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets a customAssertion action which will gaurantee that the delta between the expected and the
-        /// actual continues to decrease with a lower bound as specified by the epsilon parameter.  This is useful
-        /// for testing indicators which retain theoretically infinite information via methods such as exponential smoothing
-        /// </summary>
-        /// <param name="epsilon">The largest increase in the delta permitted</param>
-        /// <returns></returns>
-        public static Action<IndicatorBase<IndicatorDataPoint>, double> AssertDeltaDecreases(double epsilon)
-        {
-            double delta = double.MaxValue;
-            return (indicator, expected) =>
-            {
-                // the delta should be forever decreasing
-                var currentDelta = Math.Abs((double) indicator.Current.Value - expected);
-                if (currentDelta - delta > epsilon)
-                {
-                    Assert.Fail("The delta increased!");
-                    //Console.WriteLine(indicator.Value.Time.Date.ToShortDateString() + " - " + indicator.Value.Data.ToString("000.000") + " \t " + expected.ToString("000.000") + " \t " + currentDelta.ToString("0.000"));
-                }
-                delta = currentDelta;
-            };
         }
 
         /// <summary>

@@ -37,7 +37,11 @@ namespace QuantConnect.Algorithm.Framework.Alphas
         private readonly Resolution _resolution;
         private const decimal BounceThresholdPercent = 0.01m;
         private InsightCollection _insightCollection = new();
-        protected readonly Dictionary<Symbol, SymbolData> _symbolData;
+
+        /// <summary>
+        /// Dictionary containing basic information for each symbol present as key
+        /// </summary>
+        protected Dictionary<Symbol, SymbolData> _symbolData { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MacdAlphaModel"/> class
@@ -155,14 +159,34 @@ namespace QuantConnect.Algorithm.Framework.Alphas
             }
         }
 
+        /// <summary>
+        /// Class representing basic data of a symbol
+        /// </summary>
         public class SymbolData
         {
+            /// <summary>
+            /// Previous direction property
+            /// </summary>
             public InsightDirection? PreviousDirection { get; set; }
 
-            public readonly Security Security;
-            public readonly IDataConsolidator Consolidator;
-            public readonly MovingAverageConvergenceDivergence MACD;
+            /// <summary>
+            /// Security of the Symbol Data
+            /// </summary>
+            public Security Security { get; init; }
 
+            /// <summary>
+            /// Consolidator property
+            /// </summary>
+            public IDataConsolidator Consolidator { get; init; }
+
+            /// <summary>
+            /// Moving Average Convergence Divergence indicator
+            /// </summary>
+            public MovingAverageConvergenceDivergence MACD { get; init; }
+
+            /// <summary>
+            /// Initializes an instance of the SymbolData class with the given arguments
+            /// </summary>
             public SymbolData(QCAlgorithm algorithm, Security security, int fastPeriod, int slowPeriod, int signalPeriod, MovingAverageType movingAverageType, Resolution resolution)
             {
                 Security = security;

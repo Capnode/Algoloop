@@ -28,7 +28,7 @@ namespace QuantConnect.Indicators
         /// <summary>
         /// Cache of the current value of the greek
         /// </summary>
-        protected decimal _greekValue;
+        protected decimal _greekValue { get; set; }
 
         /// <summary>
         /// Gets the implied volatility of the option
@@ -141,7 +141,7 @@ namespace QuantConnect.Indicators
             var time = input.EndTime;
             var inputSymbol = input.Symbol;
 
-            if (inputSymbol == _optionSymbol)
+            if (inputSymbol == OptionSymbol)
             {
                 ImpliedVolatility.Update(input);
                 Price.Update(time, input.Price);
@@ -158,7 +158,7 @@ namespace QuantConnect.Indicators
             }
             else
             {
-                throw new ArgumentException("The given symbol was not target or reference symbol");
+                throw new ArgumentException($"The given symbol was not target, reference or underlying symbol: {inputSymbol}");
             }
 
             if (Price.Current.Time == UnderlyingPrice.Current.Time)

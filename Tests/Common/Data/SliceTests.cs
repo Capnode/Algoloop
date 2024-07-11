@@ -786,7 +786,9 @@ def Test(slice):
                 new Tick{Time = DateTime.Now, Symbol = Symbols.AAPL, Value = 1.1m, Quantity = 2.1m}
             }, DateTime.Now);
 
+            #pragma warning disable CA1829
             Assert.AreEqual(4, slice.Count());
+            #pragma warning restore CA1829
         }
 
         [Test]
@@ -1378,7 +1380,7 @@ def Test(slice, symbol):
 
     public class PublicArrayTest
     {
-        public int[] items;
+        public int[] items { get; set; }
 
         public PublicArrayTest()
         {

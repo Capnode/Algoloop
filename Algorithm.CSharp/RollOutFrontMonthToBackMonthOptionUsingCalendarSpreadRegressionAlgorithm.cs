@@ -52,9 +52,9 @@ namespace QuantConnect.Algorithm.CSharp
             _symbol = option.Symbol;
         }
 
-        public override void OnData(Slice data)
+        public override void OnData(Slice slice)
         {
-            if (_done || !data.OptionChains.TryGetValue(_symbol, out var chain) || !chain.Any())
+            if (_done || !slice.OptionChains.TryGetValue(_symbol, out var chain) || !chain.Any())
             {
                 return;
             }
@@ -113,7 +113,7 @@ namespace QuantConnect.Algorithm.CSharp
             var positions = Portfolio.Positions.Groups.Single().Positions.ToList();
             if (positions.Count != 1)
             {
-                throw new RegressionTestException($"Expected 1 position in the position group, found {positions.Count()}");
+                throw new RegressionTestException($"Expected 1 position in the position group, found {positions.Count}");
             }
 
             // The position should correspond to the far expiry contract

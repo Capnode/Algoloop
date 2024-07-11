@@ -44,9 +44,9 @@ namespace QuantConnect.Algorithm.CSharp
             future.SetFilter(TimeSpan.FromDays(0), TimeSpan.FromDays(90));
         }
 
-        public override void OnData(Slice data)
+        public override void OnData(Slice slice)
         {
-            foreach (var point in data)
+            foreach (var point in slice)
             {
                 if (point.Value.IsFillForward)
                 {
@@ -54,7 +54,7 @@ namespace QuantConnect.Algorithm.CSharp
                 }
             }
 
-            foreach (var chain in data.FutureChains)
+            foreach (var chain in slice.FutureChains)
             {
                 _receivedData = true;
 
@@ -89,7 +89,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 268285;
+        public long DataPoints => 268273;
 
         /// <summary>
         /// Data Points count of the algorithm history

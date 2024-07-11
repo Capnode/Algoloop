@@ -63,7 +63,7 @@ namespace QuantConnect.Algorithm.CSharp
             _slowIbmEma = EMA(_spy, 30, Resolution.Minute);
         }
 
-        public override void OnData(Slice data)
+        public override void OnData(Slice slice)
         {
             if (!_slowSpyEma.IsReady) return;
 
@@ -229,8 +229,8 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$1100000.00"},
             {"Lowest Capacity Asset", "IBM R735QTJ8XC9X"},
             {"Portfolio Turnover", "549.26%"},
-            {"Most Traded Security Trade Count", "63"},
             {"Most Traded Security", "IBM"},
+            {"Most Traded Security Trade Count", "63"},
             {"OrderListHash", "8dd77e35338a81410a5b68dc8345f402"}
         };
     }

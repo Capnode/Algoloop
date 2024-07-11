@@ -49,9 +49,9 @@ namespace QuantConnect.Algorithm.CSharp
             AddFutureOption(goldFutures.Symbol);
         }
 
-        public override void OnData(Slice data)
+        public override void OnData(Slice slice)
         {
-            foreach (var symbol in data.QuoteBars.Keys)
+            foreach (var symbol in slice.QuoteBars.Keys)
             {
                 // Check that we are in regular hours, we can place a market order (on extended hours, limit orders should be used)
                 if (_expectedSymbols.ContainsKey(symbol) && IsInRegularHours(symbol))
@@ -109,7 +109,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 24379;
+        public long DataPoints => 24378;
 
         /// <summary>
         /// Data Points count of the algorithm history

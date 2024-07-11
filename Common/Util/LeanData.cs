@@ -1088,7 +1088,7 @@ namespace QuantConnect.Util
 
                 tickType = GetCommonTickType(symbol.SecurityType);
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
-                if (fileName.Contains("_"))
+                if (fileName.Contains('_', StringComparison.InvariantCulture))
                 {
                     // example: 20140606_openinterest_american.zip
                     var tickTypePosition = 1;

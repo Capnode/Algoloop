@@ -32,7 +32,7 @@ namespace QuantConnect.Data.Auxiliary
         /// <summary>
         /// Keeping a reversed version is more performant that reversing it each time we need it
         /// </summary>
-        protected readonly List<DateTime> _reversedFactorFileDates;
+        protected List<DateTime> ReversedFactorFileDates { get; }
 
         /// <summary>
         /// The factor file data rows sorted by date
@@ -54,7 +54,7 @@ namespace QuantConnect.Data.Auxiliary
         /// <summary>
         /// Gets the most recent factor change in the factor file
         /// </summary>
-        public DateTime MostRecentFactorChange => _reversedFactorFileDates
+        public DateTime MostRecentFactorChange => ReversedFactorFileDates
             .FirstOrDefault(time => time != Time.EndOfTime);
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace QuantConnect.Data.Auxiliary
         public string Permtick { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FactorFile"/> class.
+        /// Initializes a new instance of the <see cref="FactorFile{T}"/> class.
         /// </summary>
         protected FactorFile(string permtick, IEnumerable<T> data, DateTime? factorFileMinimumDate = null)
         {
@@ -80,10 +80,10 @@ namespace QuantConnect.Data.Auxiliary
                 factorFileRows.Add(row);
             }
 
-            _reversedFactorFileDates = new List<DateTime>(SortedFactorFileData.Count);
+            ReversedFactorFileDates = new List<DateTime>(SortedFactorFileData.Count);
             foreach (var time in SortedFactorFileData.Keys.Reverse())
             {
-                _reversedFactorFileDates.Add(time);
+                ReversedFactorFileDates.Add(time);
             }
 
             FactorFileMinimumDate = factorFileMinimumDate;

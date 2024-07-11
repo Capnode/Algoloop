@@ -55,12 +55,39 @@ namespace QuantConnect.Lean.Engine.Results
 
         private Bar _currentAlgorithmEquity;
 
+        /// <summary>
+        /// String message saying: Strategy Equity
+        /// </summary>
         public const string StrategyEquityKey = "Strategy Equity";
+
+        /// <summary>
+        /// String message saying: Equity
+        /// </summary>
         public const string EquityKey = "Equity";
+
+        /// <summary>
+        /// String message saying: Return
+        /// </summary>
         public const string ReturnKey = "Return";
+
+        /// <summary>
+        /// String message saying: Benchmark
+        /// </summary>
         public const string BenchmarkKey = "Benchmark";
+
+        /// <summary>
+        /// String message saying: Drawdown
+        /// </summary>
         public const string DrawdownKey = "Drawdown";
+
+        /// <summary>
+        /// String message saying: PortfolioTurnover
+        /// </summary>
         public const string PortfolioTurnoverKey = "Portfolio Turnover";
+
+        /// <summary>
+        /// String message saying: Portfolio Margin
+        /// </summary>
         public const string PortfolioMarginKey = "Portfolio Margin";
 
         /// <summary>
@@ -71,17 +98,17 @@ namespace QuantConnect.Lean.Engine.Results
         /// <summary>
         /// The chart update interval
         /// </summary>
-        protected TimeSpan ChartUpdateInterval = TimeSpan.FromMinutes(1);
+        protected TimeSpan ChartUpdateInterval { get; set; } = TimeSpan.FromMinutes(1);
 
         /// <summary>
         /// The last position consumed from the <see cref="ITransactionHandler.OrderEvents"/> by <see cref="GetDeltaOrders"/>
         /// </summary>
-        protected int LastDeltaOrderPosition;
+        protected int LastDeltaOrderPosition { get; set; }
 
         /// <summary>
         /// The last position consumed from the <see cref="ITransactionHandler.OrderEvents"/> while determining delta order events
         /// </summary>
-        protected int LastDeltaOrderEventsPosition;
+        protected int LastDeltaOrderEventsPosition { get; set; }
 
         /// <summary>
         /// Serializer settings to use
@@ -204,12 +231,12 @@ namespace QuantConnect.Lean.Engine.Results
         /// <summary>
         /// The handler responsible for communicating messages to listeners
         /// </summary>
-        protected IMessagingHandler MessagingHandler;
+        protected IMessagingHandler MessagingHandler { get; set; }
 
         /// <summary>
         /// The transaction handler used to get the algorithms Orders information
         /// </summary>
-        protected ITransactionHandler TransactionHandler;
+        protected ITransactionHandler TransactionHandler { get; set; }
 
         /// <summary>
         /// The algorithms starting portfolio value.
@@ -230,12 +257,12 @@ namespace QuantConnect.Lean.Engine.Results
         /// <summary>
         /// Closing portfolio value. Used to calculate daily performance.
         /// </summary>
-        protected decimal DailyPortfolioValue;
+        protected decimal DailyPortfolioValue { get; set; }
 
         /// <summary>
         /// Cumulative max portfolio value. Used to calculate drawdown underwater.
         /// </summary>
-        protected decimal CumulativeMaxPortfolioValue;
+        protected decimal CumulativeMaxPortfolioValue { get; set; }
 
         /// <summary>
         /// Sampling period for timespans between resamples of the charting equity.
@@ -252,7 +279,7 @@ namespace QuantConnect.Lean.Engine.Results
         /// <summary>
         /// Directory location to store results
         /// </summary>
-        protected string ResultsDestinationFolder;
+        protected string ResultsDestinationFolder { get; set; }
 
         /// <summary>
         /// The map file provider instance to use
