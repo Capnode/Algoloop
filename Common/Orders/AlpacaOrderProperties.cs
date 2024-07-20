@@ -11,25 +11,15 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
 */
-
-using System.Collections.Generic;
 
 namespace QuantConnect.Orders
 {
     /// <summary>
-    /// Event used when the brokerage order id has changed
+    /// Provides an implementation of the <see cref="OrderProperties"/> specific to Alpaca order.
     /// </summary>
-    public class BrokerageOrderIdChangedEvent
+    public class AlpacaOrderProperties : OrderProperties
     {
-        /// <summary>
-        /// The lean order ID.
-        /// </summary>
-        public int OrderId { get; set; }
-
-        /// <summary>
-        /// Brokerage Id for this order
-        /// </summary>
-        public List<string> BrokerId { get; set; }
     }
 }
