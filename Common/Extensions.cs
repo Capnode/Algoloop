@@ -634,8 +634,6 @@ namespace QuantConnect
                     return method;
                 }
 
-
-
                 return null;
             }
         }
@@ -2716,6 +2714,12 @@ namespace QuantConnect
         {
             var type = typeof(T);
 
+            // The PyObject is a C# object wrapped
+            if (TryConvert<T>(pyObject, out result))
+            {
+                return true;
+            }
+
             if (!typeof(MulticastDelegate).IsAssignableFrom(type))
             {
                 throw new ArgumentException(Messages.Extensions.ConvertToDelegateCannotConverPyObjectToType("TryConvertToDelegate", type));
@@ -4227,6 +4231,31 @@ namespace QuantConnect
             {
                 return failValue;
             }
+        }
+
+        public static Type GetCustomDataTypeFromSymbols(Symbol[] symbols)
+        {
+            if (symbols.Any())
+            {
+                if (!SecurityIdentifier.TryGetCustomDataTypeInstance(symbols[0].ID.Symbol, out var dataType)
+                    || symbols.Any(x => !SecurityIdentifier.TryGetCustomDataTypeInstance(x.ID.Symbol, out var customDataType) || customDataType != dataType))
+                {
+                    return null;
+                }
+                return dataType;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Determines if certain data type is custom
+        /// </summary>
+        /// <param name="symbol">Symbol associated with the data type</param>
+        /// <param name="type">Data type to determine if it's custom</param>
+        public static bool IsCustomDataType(Symbol symbol, Type type)
+        {
+            return type.Namespace != typeof(Bar).Namespace || Extensions.GetCustomDataTypeFromSymbols(new Symbol[] { symbol }) != null;
         }
 
         private static Symbol ConvertToSymbol(PyObject item, bool dispose)
