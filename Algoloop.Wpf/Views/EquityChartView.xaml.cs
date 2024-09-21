@@ -15,6 +15,7 @@
 using Algoloop.Wpf.ViewModels;
 using Algoloop.Wpf.ViewModels.Views.Internal.Lean;
 using Algoloop.Wpf.Views.Internal;
+using Ecng.Drawing;
 using QuantConnect;
 using StockSharp.Charting;
 using StockSharp.Xaml.Charting;
@@ -134,7 +135,7 @@ namespace Algoloop.Wpf.Views
                 if (iChart is not ChartViewModel chart) continue;
                 foreach (BaseSeries series in chart.Chart.Series.Values)
                 {
-                    IChartBandElement curveElement = _chart.CreateCurve(series.Name, System.Windows.Media.Colors.Black, ChartIndicatorDrawStyles.Line);
+                    IChartBandElement curveElement = _chart.CreateCurve(series.Name, System.Windows.Media.Colors.Black, DrawStyles.Line);
                     foreach (EquityData equityData in series.ToEquityData())
                     {
                         decimal value = equityData.Value;

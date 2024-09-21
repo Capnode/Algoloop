@@ -14,6 +14,7 @@
 
 using Algoloop.Wpf.Model;
 using Algoloop.Wpf.Views.Internal;
+using Ecng.Drawing;
 using QuantConnect;
 using QuantConnect.Data;
 using QuantConnect.Data.Market;
@@ -235,19 +236,19 @@ namespace Algoloop.Wpf.ViewModels.Views.Internal.Lean
             };
         }
 
-        private static ChartIndicatorDrawStyles ToStyle(SeriesType seriesType)
+        private static DrawStyles ToStyle(SeriesType seriesType)
         {
             switch (seriesType)
             {
-                case SeriesType.Line: return ChartIndicatorDrawStyles.Line;
-                case SeriesType.Pie: return ChartIndicatorDrawStyles.Bubble;
-                case SeriesType.Scatter: return ChartIndicatorDrawStyles.Dot;
-                case SeriesType.Bar: return ChartIndicatorDrawStyles.Histogram;
-                case SeriesType.Flag: return ChartIndicatorDrawStyles.Dot;
-                case SeriesType.StackedArea: return ChartIndicatorDrawStyles.StackedBar;
-                case SeriesType.Treemap: return ChartIndicatorDrawStyles.Dot;
-                case SeriesType.Candle: return ChartIndicatorDrawStyles.Area;
-                default: return ChartIndicatorDrawStyles.Line;
+                case SeriesType.Line: return DrawStyles.Line;
+                case SeriesType.Pie: return DrawStyles.Bubble;
+                case SeriesType.Scatter: return DrawStyles.Dot;
+                case SeriesType.Bar: return DrawStyles.Histogram;
+                case SeriesType.Flag: return DrawStyles.Dot;
+                case SeriesType.StackedArea: return DrawStyles.StackedBar;
+                case SeriesType.Treemap: return DrawStyles.Dot;
+                case SeriesType.Candle: return DrawStyles.Area;
+                default: return DrawStyles.Line;
             }
         }
 
