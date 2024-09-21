@@ -55,6 +55,8 @@ using QuantConnect.Securities.CryptoFuture;
 using QuantConnect.Algorithm.Framework.Alphas.Analysis;
 using QuantConnect.Algorithm.Framework.Portfolio.SignalExports;
 using Python.Runtime;
+using QuantConnect.Commands;
+using Newtonsoft.Json;
 
 namespace QuantConnect.Algorithm
 {
@@ -115,6 +117,9 @@ namespace QuantConnect.Algorithm
         private ConcurrentQueue<string> _errorMessages = new ConcurrentQueue<string>();
         private IStatisticsService _statisticsService;
         private IBrokerageModel _brokerageModel;
+
+        private readonly HashSet<string> _oneTimeCommandErrors = new();
+        private readonly Dictionary<string, Func<CallbackCommand, bool?>> _registeredCommands = new(StringComparer.InvariantCultureIgnoreCase);
 
         //Error tracking to avoid message flooding:
         private string _previousDebugMessage = "";
@@ -1940,6 +1945,15 @@ namespace QuantConnect.Algorithm
                 return AddOptionContract(symbol, resolution, fillForward, leverage, extendedMarketHours);
             }
 
+            var securityResolution = resolution;
+            var securityFillForward = fillForward;
+            if (isCanonical && symbol.SecurityType.IsOption() && symbol.SecurityType != SecurityType.FutureOption)
+            {
+                // option is daily only, for now exclude FOPs
+                securityResolution = Resolution.Daily;
+                securityFillForward = false;
+            }
+
             var isFilteredSubscription = !isCanonical;
             List<SubscriptionDataConfig> configs;
             // we pass dataNormalizationMode to SubscriptionManager.SubscriptionDataConfigService.Add conditionally,
@@ -1947,8 +1961,8 @@ namespace QuantConnect.Algorithm
             if (dataNormalizationMode.HasValue)
             {
                 configs = SubscriptionManager.SubscriptionDataConfigService.Add(symbol,
-                    resolution,
-                    fillForward,
+                    securityResolution,
+                    securityFillForward,
                     extendedMarketHours,
                     isFilteredSubscription,
                     dataNormalizationMode: dataNormalizationMode.Value,
@@ -1957,8 +1971,8 @@ namespace QuantConnect.Algorithm
             else
             {
                 configs = SubscriptionManager.SubscriptionDataConfigService.Add(symbol,
-                   resolution,
-                   fillForward,
+                   securityResolution,
+                   securityFillForward,
                    extendedMarketHours,
                    isFilteredSubscription,
                    contractDepthOffset: (uint)contractDepthOffset);
@@ -1976,10 +1990,16 @@ namespace QuantConnect.Algorithm
                 if (!UniverseManager.ContainsKey(symbol))
                 {
                     var canonicalConfig = configs.First();
-                    var settings = new UniverseSettings(canonicalConfig.Resolution, leverage, fillForward, extendedMarketHours, UniverseSettings.MinimumTimeInUniverse)
+                    var universeSettingsResolution = canonicalConfig.Resolution;
+                    if (symbol.SecurityType.IsOption())
+                    {
+                        universeSettingsResolution = resolution ?? UniverseSettings.Resolution;
+                    }
+                    var settings = new UniverseSettings(universeSettingsResolution, leverage, fillForward, extendedMarketHours, UniverseSettings.MinimumTimeInUniverse)
                     {
                         Asynchronous = UniverseSettings.Asynchronous
                     };
+
                     if (symbol.SecurityType.IsOption())
                     {
                         universe = new OptionChainUniverse((Option)security, settings);
@@ -3355,9 +3375,7 @@ namespace QuantConnect.Algorithm
             // TODO: Until future options are supported by OptionUniverse, we need to fall back to the OptionChainProvider for them
             if (canonicalSymbol.SecurityType != SecurityType.FutureOption)
             {
-                // TODO: History<OptionUniverse>(canonicalSymbol, 1) should be enough,
-                // the universe resolution should always be daily. Change this when this is fixed in #8317
-                var history = History<OptionUniverse>(canonicalSymbol, 1, Resolution.Daily);
+                var history = History<OptionUniverse>(canonicalSymbol, 1);
                 optionChain = history?.SingleOrDefault()?.Data?.Cast<OptionUniverse>() ?? Enumerable.Empty<OptionUniverse>();
             }
             else
@@ -3371,6 +3389,62 @@ namespace QuantConnect.Algorithm
             }
 
             return new DataHistory<OptionUniverse>(optionChain, new Lazy<PyObject>(() => PandasConverter.GetDataFrame(optionChain)));
+        }
+
+        /// <summary>
+        /// Register a command type to be used
+        /// </summary>
+        /// <typeparam name="T">The command type</typeparam>
+        public void AddCommand<T>() where T : Command
+        {
+            _registeredCommands[typeof(T).Name] = (CallbackCommand command) =>
+            {
+                var commandInstance = JsonConvert.DeserializeObject<T>(command.Payload);
+                return commandInstance.Run(this);
+            };
+        }
+
+        /// <summary>
+        /// Run a callback command instance
+        /// </summary>
+        /// <param name="command">The callback command instance</param>
+        /// <returns>The command result</returns>
+        public CommandResultPacket RunCommand(CallbackCommand command)
+        {
+            bool? result = null;
+            if (_registeredCommands.TryGetValue(command.Type, out var target))
+            {
+                try
+                {
+                    result = target.Invoke(command);
+                }
+                catch (Exception ex)
+                {
+                    QuantConnect.Logging.Log.Error(ex);
+                    if (_oneTimeCommandErrors.Add(command.Type))
+                    {
+                        Log($"Unexpected error running command '{command.Type}' error: '{ex.Message}'");
+                    }
+                }
+            }
+            else
+            {
+                if (_oneTimeCommandErrors.Add(command.Type))
+                {
+                    Log($"Detected unregistered command type '{command.Type}', will be ignored");
+                }
+            }
+            return new CommandResultPacket(command, result) { CommandName = command.Type };
+        }
+
+        /// <summary>
+        /// Generic untyped command call handler
+        /// </summary>
+        /// <param name="data">The associated data</param>
+        /// <returns>True if success, false otherwise. Returning null will disable command feedback</returns>
+        public virtual bool? OnCommand(dynamic data)
+        {
+            return true;
         }
 
         private static Symbol GetCanonicalOptionSymbol(Symbol symbol)
