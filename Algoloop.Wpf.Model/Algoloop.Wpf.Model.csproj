@@ -14,7 +14,7 @@
     <ProjectReference Include="..\Common\QuantConnect.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="Extended.Wpf.Toolkit">
       <Version>4.6.1</Version>
     </PackageReference>
