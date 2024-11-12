@@ -34,8 +34,7 @@
                         ShowTitle="False" />
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}"
-                     Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
+            <TabItem Header="{Binding Symbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Symbols ({0}), FallbackValue=Symbols}" Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <ListBox
                     DockPanel.Dock="Bottom"
                     ItemsSource="{Binding Symbols}"
@@ -50,8 +49,7 @@
                     </ListBox.Resources>
                 </ListBox>
             </TabItem>
-            <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}"
-                     Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
+            <TabItem Header="{Binding Model.Parameters.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Parameters ({0}), FallbackValue=Parameters}" Visibility="{Binding Model.IsDataValid, Converter={viewsupport:BooleanToVisibilityConverter}}">
                 <wpf:ExDataGrid
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
@@ -94,12 +92,8 @@
                             Binding="{Binding EntryTime, StringFormat=G}"
                             ElementStyle="{StaticResource RightCell}"
                             Header="Entry time" />
-                        <DataGridTextColumn
-                            Binding="{Binding Symbol.Value}"
-                            Header="Symbol" />
-                        <DataGridTextColumn
-                            Binding="{Binding Symbol.SecurityType}"
-                            Header="Type" />
+                        <DataGridTextColumn Binding="{Binding Symbol.Value}" Header="Symbol" />
+                        <DataGridTextColumn Binding="{Binding Symbol.SecurityType}" Header="Type" />
                         <DataGridTextColumn
                             Binding="{Binding EntryPrice}"
                             ElementStyle="{StaticResource RightCell}"
@@ -192,13 +186,17 @@
                             ElementStyle="{StaticResource RightCell}"
                             Header="Quantity" />
                         <DataGridTextColumn
+                            Binding="{Binding Price}"
+                            ElementStyle="{StaticResource RightCell}"
+                            Header="Price" />
+                        <DataGridTextColumn
                             Binding="{Binding LimitPrice}"
                             ElementStyle="{StaticResource RightCell}"
                             Header="Limit" />
                         <DataGridTextColumn
-                            Binding="{Binding Price}"
+                            Binding="{Binding StopPrice}"
                             ElementStyle="{StaticResource RightCell}"
-                            Header="Price" />
+                            Header="Stop" />
                         <DataGridTextColumn
                             Binding="{Binding PriceCurrency}"
                             ElementStyle="{StaticResource RightCell}"
@@ -236,14 +234,10 @@
                 </wpf:ExDataGrid>
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Chart ({0}), FallbackValue=Chart}">
-                <view:StockChartView
-                    ItemsSource="{Binding Charts}"
-                    Settings="{Binding Source={StaticResource settings}, Path=BacktestViewChartSettings}"/>
+                <view:StockChartView ItemsSource="{Binding Charts}" Settings="{Binding Source={StaticResource settings}, Path=BacktestViewChartSettings}" />
             </TabItem>
             <TabItem Header="{Binding Charts.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Plot ({0}), FallbackValue=Plot}">
-                <view:PlotView
-                    ItemsSource="{Binding Charts}"
-                    Settings="{Binding Source={StaticResource settings}, Path=BacktestViewPlotSettings}"/>
+                <view:PlotView ItemsSource="{Binding Charts}" Settings="{Binding Source={StaticResource settings}, Path=BacktestViewPlotSettings}" />
             </TabItem>
             <TabItem Header="{Binding BacktestSymbols.Count, Converter={viewsupport:StringFormatConverter}, ConverterParameter=Details ({0}), FallbackValue=Details}">
                 <wpf:ExDataGrid

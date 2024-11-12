@@ -31,6 +31,7 @@ namespace Algoloop.Wpf.ViewModels
         private string _symbol;
         private decimal _price;
         private decimal? _limitPrice;
+        private decimal? _stopPrice;
         private string _priceCurrency;
         private DateTime _time;
         private DateTime? _lastFillTime;
@@ -116,6 +117,15 @@ namespace Algoloop.Wpf.ViewModels
         {
             get => _limitPrice;
             set => SetProperty(ref _limitPrice, value);
+        }
+
+        /// <summary>
+        /// Stop price of the Order.
+        /// </summary>
+        public decimal? StopPrice
+        {
+            get => _stopPrice;
+            set => SetProperty(ref _stopPrice, value);
         }
 
         /// <summary>
@@ -271,7 +281,8 @@ namespace Algoloop.Wpf.ViewModels
             BrokerId = new Collection<string>(order.BrokerId);
             Symbol = order.Symbol.Value;
             Price = order.Price;
-            LimitPrice = (order as LimitOrder)?.LimitPrice;
+            LimitPrice = null;
+            StopPrice = null;
             PriceCurrency = order.PriceCurrency;
             Time = order.Time.ToLocalTime();
             LastFillTime = order.LastFillTime?.ToLocalTime();
@@ -288,6 +299,28 @@ namespace Algoloop.Wpf.ViewModels
             OrderValue = order.Quantity * order.Price;
             OrderSubmissionData = order.OrderSubmissionData;
             IsMarketable = order.IsMarketable;
+
+            if (order is LimitOrder limitOrder)
+            {
+                LimitPrice = limitOrder.LimitPrice;
+            }
+            else if (order is LimitIfTouchedOrder limitIfTouchedOrder)
+            {
+                LimitPrice = limitIfTouchedOrder.LimitPrice;
+            }
+            else if (order is StopLimitOrder stopLimitOrder)
+            {
+                LimitPrice = stopLimitOrder.LimitPrice;
+                StopPrice = stopLimitOrder.StopPrice;
+            }
+            else if (order is TrailingStopOrder trailingStopOrder)
+            {
+                StopPrice = trailingStopOrder.StopPrice;
+            }
+            else if (order is StopMarketOrder stopMarketOrder)
+            {
+                StopPrice = stopMarketOrder.StopPrice;
+            }
         }
 
         internal void Update(OrderModel order)
