@@ -65,8 +65,8 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2849.39" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
-    <PackageReference Include="QuantConnect.OandaBrokerage" Version="2.5.16704" />
-    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.209" />
+    <PackageReference Include="QuantConnect.OandaBrokerage" Version="2.5.16726" />
+    <PackageReference Include="StockSharp.Xaml.Charting" Version="5.0.210" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
