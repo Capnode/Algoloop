@@ -146,6 +146,23 @@ namespace QuantConnect.Algorithm
         }
 
         /// <summary>
+        /// Creates a new Average Range (AR) indicator.
+        /// </summary>
+        /// <param name="symbol">The symbol whose Average Range we want to calculate</param>
+        /// <param name="period">The period over which to compute the Average Range</param>
+        /// <param name="resolution">The resolution</param>
+        /// <param name="selector">Selects a value from the BaseData to send into the indicator. If null, defaults to the Value property of BaseData (x => x.Value).</param>
+        /// <returns>The Average Range indicator for the requested symbol over the specified period</returns>
+        [DocumentationAttribute(Indicators)]
+        public AverageRange AR(Symbol symbol, int period, Resolution? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
+        {
+            var name = CreateIndicatorName(symbol, $"AR({period})", resolution);
+            var averageRange = new AverageRange(name, period);
+            InitializeIndicator(averageRange, resolution, selector, symbol);
+            return averageRange;
+        }
+
+        /// <summary>
         /// Creates a new ARIMA indicator.
         /// </summary>
         /// <param name="symbol">The symbol whose ARIMA indicator we want</param>
@@ -491,7 +508,7 @@ namespace QuantConnect.Algorithm
         /// <param name="selector">Selects a value from the BaseData to send into the indicator, if null defaults to casting the input value to a TradeBar</param>
         /// <returns>The Chande Kroll Stop indicator for the requested symbol.</returns>
         [DocumentationAttribute(Indicators)]
-        public ChandeKrollStop CKS(Symbol symbol, int atrPeriod, decimal atrMult, int period, MovingAverageType movingAverageType = MovingAverageType.Wilders, Resolution ? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
+        public ChandeKrollStop CKS(Symbol symbol, int atrPeriod, decimal atrMult, int period, MovingAverageType movingAverageType = MovingAverageType.Wilders, Resolution? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
         {
             var name = CreateIndicatorName(symbol, $"CKS({atrPeriod},{atrMult},{period})", resolution);
             var indicator = new ChandeKrollStop(name, atrPeriod, atrMult, period, movingAverageType);
@@ -1894,6 +1911,7 @@ namespace QuantConnect.Algorithm
             return simpleMovingAverage;
         }
 
+
         /// <summary>
         /// Creates a new Schaff Trend Cycle indicator
         /// </summary>
@@ -2005,6 +2023,24 @@ namespace QuantConnect.Algorithm
         public Stochastic STO(Symbol symbol, int period, Resolution? resolution = null, Func<IBaseData, TradeBar> selector = null)
         {
             return STO(symbol, period, period, 3, resolution, selector);
+        }
+
+        /// <summary>
+        /// Creates a new instance of the Premier Stochastic Oscillator for the specified symbol.
+        /// </summary>
+        /// <param name="symbol">The symbol for which the stochastic indicator is being calculated.</param>
+        /// <param name="period">The period for calculating the Stochastic K value.</param>
+        /// <param name="emaPeriod">The period for the Exponential Moving Average (EMA) used to smooth the Stochastic K.</param>
+        /// <param name="resolution">The data resolution (e.g., daily, hourly) for the indicator</param>
+        /// <param name="selector">Optional function to select a value from the BaseData. Defaults to casting the input to a TradeBar.</param>
+        /// <returns>A PremierStochasticOscillator instance for the specified symbol.</returns>
+        [DocumentationAttribute(Indicators)]
+        public PremierStochasticOscillator PSO(Symbol symbol, int period, int emaPeriod, Resolution? resolution = null, Func<IBaseData, TradeBar> selector = null)
+        {
+            var name = CreateIndicatorName(symbol, $"PSO({period},{emaPeriod})", resolution);
+            var premierStochasticOscillator = new PremierStochasticOscillator(name, period, emaPeriod);
+            InitializeIndicator(premierStochasticOscillator, resolution, selector, symbol);
+            return premierStochasticOscillator;
         }
 
         /// <summary>
@@ -2378,7 +2414,7 @@ namespace QuantConnect.Algorithm
         public Vortex VTX(Symbol symbol, int period, Resolution? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
         {
             var name = CreateIndicatorName(symbol, $"VTX({period})", resolution);
-            var indicator = new Vortex(name,period);
+            var indicator = new Vortex(name, period);
             InitializeIndicator(indicator, resolution, selector, symbol);
             return indicator;
         }

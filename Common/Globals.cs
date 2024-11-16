@@ -34,7 +34,7 @@ namespace QuantConnect
         /// <summary>
         /// The base api url address to use
         /// </summary>
-        public static string Api { get; } = "https://www.quantconnect.com/api/v2/";
+        public static string Api { get; set; }
 
         /// <summary>
         /// The user Id
@@ -97,6 +97,7 @@ namespace QuantConnect
             ProjectId = Config.GetInt("project-id");
             UserToken = Config.Get("api-access-token");
             OrganizationID = Config.Get("job-organization-id");
+            Api = Config.Get("api-url", "https://www.quantconnect.com/api/v2/");
             ResultsDestinationFolder = Config.Get("results-destination-folder", Directory.GetCurrentDirectory());
         }
 
