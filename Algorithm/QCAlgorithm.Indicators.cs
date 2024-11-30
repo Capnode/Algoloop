@@ -451,7 +451,7 @@ namespace QuantConnect.Algorithm
         public Correlation C(Symbol target, Symbol reference, int period, CorrelationType correlationType = CorrelationType.Pearson, Resolution? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
         {
             var name = CreateIndicatorName(QuantConnect.Symbol.None, $"C({period})", resolution);
-            var correlation = new Correlation(name, target, reference, period);
+            var correlation = new Correlation(name, target, reference, period, correlationType);
             InitializeIndicator(correlation, resolution, selector, target, reference);
 
             return correlation;
@@ -551,6 +551,27 @@ namespace QuantConnect.Algorithm
             InitializeIndicator(chandeMomentumOscillator, resolution, selector, symbol);
 
             return chandeMomentumOscillator;
+        }
+
+        /// <summary>
+        /// Creates a new Connors Relative Strength Index (CRSI) indicator, which combines the traditional Relative Strength Index (RSI),
+        /// Streak RSI (SRSI), and Percent Rank to provide a more robust measure of market strength.
+        /// This indicator oscillates based on momentum, streak behavior, and price change over the specified periods.
+        /// </summary>
+        /// <param name="symbol">The symbol whose CRSI is to be calculated.</param>
+        /// <param name="rsiPeriod">The period for the traditional RSI calculation.</param>
+        /// <param name="rsiPeriodStreak">The period for the Streak RSI calculation (SRSI).</param>
+        /// <param name="lookBackPeriod">The look-back period for calculating the Percent Rank.</param>
+        /// <param name="resolution">The resolution of the data (optional).</param>
+        /// <param name="selector">Function to select a value from the BaseData to input into the indicator. Defaults to using the 'Value' property of BaseData if null.</param>
+        /// <returns>The Connors Relative Strength Index (CRSI) for the specified symbol and periods.</returns>
+        [DocumentationAttribute(Indicators)]
+        public ConnorsRelativeStrengthIndex CRSI(Symbol symbol, int rsiPeriod, int rsiPeriodStreak, int lookBackPeriod, Resolution? resolution = null, Func<IBaseData, decimal> selector = null)
+        {
+            var name = CreateIndicatorName(symbol, $"CRSI({rsiPeriod},{rsiPeriodStreak},{lookBackPeriod})", resolution);
+            var connorsRelativeStrengthIndex = new ConnorsRelativeStrengthIndex(name, rsiPeriod, rsiPeriodStreak, lookBackPeriod);
+            InitializeIndicator(connorsRelativeStrengthIndex, resolution, selector, symbol);
+            return connorsRelativeStrengthIndex;
         }
 
         ///<summary>
@@ -1258,6 +1279,25 @@ namespace QuantConnect.Algorithm
             InitializeIndicator(meanAbsoluteDeviation, resolution, selector, symbol);
 
             return meanAbsoluteDeviation;
+        }
+
+        /// <summary>
+        /// Creates a new Mesa Adaptive Moving Average (MAMA) indicator.
+        /// The MAMA adjusts its smoothing factor based on the market's volatility, making it more adaptive than a simple moving average.
+        /// </summary>
+        /// <param name="symbol">The symbol for which the MAMA indicator is being created.</param>
+        /// <param name="fastLimit">The fast limit for the adaptive moving average.</param>
+        /// <param name="slowLimit">The slow limit for the adaptive moving average.</param>
+        /// <param name="resolution">The resolution</param>
+        /// <param name="selector">Optional function to select a value from the BaseData. Defaults to casting the input to a TradeBar.</param>
+        /// <returns>The Mesa Adaptive Moving Average (MAMA) indicator for the requested symbol with the specified limits.</returns>
+        [DocumentationAttribute(Indicators)]
+        public MesaAdaptiveMovingAverage MAMA(Symbol symbol, decimal fastLimit = 0.5m, decimal slowLimit = 0.05m, Resolution? resolution = null, Func<IBaseData, IBaseDataBar> selector = null)
+        {
+            var name = CreateIndicatorName(symbol, $"MAMA({fastLimit},{slowLimit})", resolution);
+            var mesaAdaptiveMovingAverage = new MesaAdaptiveMovingAverage(name, fastLimit, slowLimit);
+            InitializeIndicator(mesaAdaptiveMovingAverage, resolution, selector, symbol);
+            return mesaAdaptiveMovingAverage;
         }
 
         /// <summary>
@@ -3227,7 +3267,18 @@ namespace QuantConnect.Algorithm
             // Scan for time after we've pumped all the data through for this consolidator
             if (lastBar != null)
             {
-                consolidator.Scan(lastBar.EndTime);
+                DateTime currentTime;
+                if (Securities.TryGetValue(symbol, out var security))
+                {
+                    currentTime = security.LocalTime;
+                }
+                else
+                {
+                    var exchangeHours = MarketHoursDatabase.GetExchangeHours(symbol.ID.Market, symbol, symbol.SecurityType);
+                    currentTime = UtcTime.ConvertFromUtc(exchangeHours.TimeZone);
+                }
+
+                consolidator.Scan(currentTime);
             }
 
             SubscriptionManager.RemoveConsolidator(symbol, consolidator);
