@@ -41,7 +41,7 @@ namespace Algoloop.Wpf.Tests.Provider
             Config.Set("data-folder", dataFolder);
             Config.Set("cache-location", dataFolder);
             Config.Set("version-id", string.Empty);
-            Globals.Reset();
+            QuantConnect.Globals.Reset();
 
             if (Directory.Exists(dataFolder))
             {

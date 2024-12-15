@@ -214,7 +214,7 @@ namespace Algoloop.Wpf.ViewModels
                 Config.Set("cache-location", SettingsViewModel.Model.DataFolder);
                 Config.Set("map-file-provider", MapFileProviderTypeName);
                 Config.Set("version-id", string.Empty);
-                Globals.Reset();
+                QuantConnect.Globals.Reset();
 
                 // Read configuration
                 MarketsViewModel.Read(programDataFolder);
@@ -224,11 +224,11 @@ namespace Algoloop.Wpf.ViewModels
                 // Update Data folder
                 MainService.CopyDirectory(
                     Path.Combine(programFolder, "Content/ProgramData/market-hours"),
-                    Path.Combine(Globals.DataFolder, "market-hours"),
+                    Path.Combine(QuantConnect.Globals.DataFolder, "market-hours"),
                     true);
                 MainService.CopyDirectory(
                     Path.Combine(programFolder, "Content/ProgramData/symbol-properties"),
-                    Path.Combine(Globals.DataFolder, "symbol-properties"),
+                    Path.Combine(QuantConnect.Globals.DataFolder, "symbol-properties"),
                     true);
 
                 // Initialize Research page

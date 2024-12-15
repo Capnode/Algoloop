@@ -48,7 +48,7 @@ namespace Algoloop.Wpf.ViewModels.Internal.Provider
 
             Log.Trace($"Unpack {uri}");
             IList<SymbolModel> symbols = new List<SymbolModel>();
-            string dest = Globals.DataFolder;
+            string dest = QuantConnect.Globals.DataFolder;
             using (var archive = new ZipArchive(File.OpenRead(filename)))
             {
                 foreach (ZipArchiveEntry file in archive.Entries)

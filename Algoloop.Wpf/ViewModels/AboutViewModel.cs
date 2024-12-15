@@ -54,7 +54,7 @@ namespace Algoloop.Wpf.ViewModels
             if (attributes.Length > 0)
             {
                 string copyright = ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
-                Credit = "Lean " + Globals.Version + ", " + copyright;
+                Credit = "Lean " + QuantConnect.Globals.Version + ", " + copyright;
             }
 
             Debug.Assert(IsUiThread(), "Not UI thread!");

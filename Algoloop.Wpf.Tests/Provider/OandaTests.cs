@@ -53,7 +53,7 @@ namespace Algoloop.Wpf.Tests.Provider
             Config.Set("data-folder", dataFolder);
             Config.Set("cache-location", dataFolder);
             Config.Set("version-id", string.Empty);
-            Globals.Reset();
+            QuantConnect.Globals.Reset();
 
             // Remove temp dirs
             foreach (string dir in Directory.EnumerateDirectories(".", "temp*", SearchOption.TopDirectoryOnly))
