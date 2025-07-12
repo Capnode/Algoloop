@@ -34,7 +34,7 @@ namespace QuantConnect
     public static class SymbolRepresentation
     {
         // Define the regex as a private readonly static field and compile it
-        private static readonly Regex _optionTickerRegex = new Regex(@"^([A-Z]+)\s*(\d{6})([CP])(\d{8})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _optionTickerRegex = new Regex(@"^([A-Z0-9]+)\s*(\d{6})([CP])(\d{8})$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// Class contains future ticker properties returned by ParseFutureTicker()
@@ -44,7 +44,7 @@ namespace QuantConnect
             /// <summary>
             /// Underlying name
             /// </summary>
-            public string Underlying { get; set;  }
+            public string Underlying { get; set; }
 
             /// <summary>
             /// Short expiration year
@@ -167,8 +167,7 @@ namespace QuantConnect
 
             if (!SymbolPropertiesDatabase.FromDataFolder().TryGetMarket(underlying, SecurityType.Future, out var market))
             {
-                Log.Debug($@"SymbolRepresentation.ParseFutureSymbol(): {
-                    Messages.SymbolRepresentation.FailedToGetMarketForTickerAndUnderlying(ticker, underlying)}");
+                Log.Debug($@"SymbolRepresentation.ParseFutureSymbol(): {Messages.SymbolRepresentation.FailedToGetMarketForTickerAndUnderlying(ticker, underlying)}");
                 return null;
             }
 
@@ -269,7 +268,8 @@ namespace QuantConnect
                 month = expirationMonth.Month;
                 year = doubleDigitsYear ? expirationMonth.Year % 100 : expirationMonth.Year % 10;
             }
-            else {
+            else
+            {
                 // These futures expire in the month before or in the contract month
                 month += contractMonthDelta;
 
@@ -389,9 +389,15 @@ namespace QuantConnect
                 // let it fallback to it's default handling, which include mapping
                 optionTicker = null;
             }
-            else if(securityType == SecurityType.IndexOption)
+            else if (securityType == SecurityType.IndexOption)
             {
                 underlyingSid = SecurityIdentifier.GenerateIndex(OptionSymbol.MapToUnderlying(optionTicker, securityType), market);
+                underlyingSymbolValue = underlyingSid.Symbol;
+            }
+            else if (securityType == SecurityType.FutureOption)
+            {
+                var futureTickerInfo = ParseFutureTicker(optionTicker);
+                underlyingSid = SecurityIdentifier.GenerateFuture(expiry, futureTickerInfo.Underlying, market);
                 underlyingSymbolValue = underlyingSid.Symbol;
             }
             else
@@ -478,9 +484,10 @@ namespace QuantConnect
         /// <returns>The option ticker</returns>
         public static string GenerateOptionTicker(Symbol symbol)
         {
-            var letter = _optionSymbology.Where(x => x.Value.Item2 == symbol.ID.OptionRight && x.Value.Item1 == symbol.ID.Date.Month).Select(x => x.Key).Single();
+            var symbolTicker = symbol.SecurityType == SecurityType.IndexOption ? symbol.Canonical.Value.Replace("?", string.Empty) : SecurityIdentifier.Ticker(symbol.Underlying, symbol.ID.Date);
+            var letter = OptionCodeLookup.Where(x => x.Value.Item2 == symbol.ID.OptionRight && x.Value.Item1 == symbol.ID.Date.Month).Select(x => x.Key).Single();
             var twoYearDigit = symbol.ID.Date.ToString("yy");
-            return $"{SecurityIdentifier.Ticker(symbol.Underlying, symbol.ID.Date)}{twoYearDigit}{symbol.ID.Date.Day:00}{letter}{symbol.ID.StrikePrice.ToStringInvariant()}";
+            return $"{symbolTicker}{twoYearDigit}{symbol.ID.Date.Day:00}{letter}{symbol.ID.StrikePrice.ToStringInvariant()}";
         }
 
         /// <summary>
@@ -491,13 +498,13 @@ namespace QuantConnect
         /// <returns>Results containing 1) underlying name, 2) option right, 3) option strike 4) expiration date</returns>
         public static OptionTickerProperties ParseOptionTickerIQFeed(string ticker)
         {
-            var letterRange = _optionSymbology.Keys
+            var letterRange = OptionCodeLookup.Keys
                             .Select(x => x[0])
                             .ToArray();
             var optionTypeDelimiter = ticker.LastIndexOfAny(letterRange);
             var strikePriceString = ticker.Substring(optionTypeDelimiter + 1, ticker.Length - optionTypeDelimiter - 1);
 
-            var lookupResult = _optionSymbology[ticker[optionTypeDelimiter].ToStringInvariant()];
+            var lookupResult = OptionCodeLookup[ticker[optionTypeDelimiter].ToStringInvariant()];
             var month = lookupResult.Item1;
             var optionRight = lookupResult.Item2;
 
@@ -538,23 +545,30 @@ namespace QuantConnect
         }
 
 
-        // This table describes IQFeed option symbology
-        private static Dictionary<string, Tuple<int, OptionRight>> _optionSymbology = new Dictionary<string, Tuple<int, OptionRight>>
-                        {
-                            { "A", Tuple.Create(1, OptionRight.Call) }, { "M", Tuple.Create(1, OptionRight.Put) },
-                            { "B", Tuple.Create(2, OptionRight.Call) }, { "N", Tuple.Create(2, OptionRight.Put) },
-                            { "C", Tuple.Create(3, OptionRight.Call) }, { "O", Tuple.Create(3, OptionRight.Put) },
-                            { "D", Tuple.Create(4, OptionRight.Call) }, { "P", Tuple.Create(4, OptionRight.Put) },
-                            { "E", Tuple.Create(5, OptionRight.Call) }, { "Q", Tuple.Create(5, OptionRight.Put) },
-                            { "F", Tuple.Create(6, OptionRight.Call) }, { "R", Tuple.Create(6, OptionRight.Put) },
-                            { "G", Tuple.Create(7, OptionRight.Call) }, { "S", Tuple.Create(7, OptionRight.Put) },
-                            { "H", Tuple.Create(8, OptionRight.Call) }, { "T", Tuple.Create(8, OptionRight.Put) },
-                            { "I", Tuple.Create(9, OptionRight.Call) }, { "U", Tuple.Create(9, OptionRight.Put) },
-                            { "J", Tuple.Create(10, OptionRight.Call) }, { "V", Tuple.Create(10, OptionRight.Put) },
-                            { "K", Tuple.Create(11, OptionRight.Call) }, { "W", Tuple.Create(11, OptionRight.Put) },
-                            { "L", Tuple.Create(12, OptionRight.Call) }, { "X", Tuple.Create(12, OptionRight.Put) },
-
-                        };
+        /// <summary>
+        /// A dictionary that maps option symbols to a tuple containing the option series number and the option right (Call or Put).
+        /// The key represents a single character option symbol, and the value contains the series number and the associated option right.
+        /// </summary>
+        /// <remarks>
+        /// The dictionary is designed to map each option symbol (e.g., "A", "M", "B", etc.) to an option series number and 
+        /// the corresponding option right (either a Call or Put). The series number determines the group of options the symbol belongs to,
+        /// and the option right indicates whether the option is a Call (buyer has the right to buy) or Put (buyer has the right to sell).
+        /// </remarks>
+        public static IReadOnlyDictionary<string, Tuple<int, OptionRight>> OptionCodeLookup { get; } = new Dictionary<string, Tuple<int, OptionRight>>
+        {
+            { "A", Tuple.Create(1, OptionRight.Call) }, { "M", Tuple.Create(1, OptionRight.Put) },
+            { "B", Tuple.Create(2, OptionRight.Call) }, { "N", Tuple.Create(2, OptionRight.Put) },
+            { "C", Tuple.Create(3, OptionRight.Call) }, { "O", Tuple.Create(3, OptionRight.Put) },
+            { "D", Tuple.Create(4, OptionRight.Call) }, { "P", Tuple.Create(4, OptionRight.Put) },
+            { "E", Tuple.Create(5, OptionRight.Call) }, { "Q", Tuple.Create(5, OptionRight.Put) },
+            { "F", Tuple.Create(6, OptionRight.Call) }, { "R", Tuple.Create(6, OptionRight.Put) },
+            { "G", Tuple.Create(7, OptionRight.Call) }, { "S", Tuple.Create(7, OptionRight.Put) },
+            { "H", Tuple.Create(8, OptionRight.Call) }, { "T", Tuple.Create(8, OptionRight.Put) },
+            { "I", Tuple.Create(9, OptionRight.Call) }, { "U", Tuple.Create(9, OptionRight.Put) },
+            { "J", Tuple.Create(10, OptionRight.Call) }, { "V", Tuple.Create(10, OptionRight.Put) },
+            { "K", Tuple.Create(11, OptionRight.Call) }, { "W", Tuple.Create(11, OptionRight.Put) },
+            { "L", Tuple.Create(12, OptionRight.Call) }, { "X", Tuple.Create(12, OptionRight.Put) },
+        };
 
 
         /// <summary>
@@ -590,10 +604,10 @@ namespace QuantConnect
         /// <remarks>Tickers from live trading may not provide the four-digit year.</remarks>
         private static int GetExpirationYear(int? futureYear, FutureTickerProperties parsed)
         {
-            if(futureYear.HasValue)
+            if (futureYear.HasValue)
             {
                 var referenceYear = 1900 + parsed.ExpirationYearShort;
-                while(referenceYear < futureYear.Value)
+                while (referenceYear < futureYear.Value)
                 {
                     referenceYear += 10;
                 }

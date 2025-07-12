@@ -24,14 +24,17 @@ namespace QuantConnect.Tests.Indicators
     [TestFixture, Parallelizable(ParallelScope.Fixtures)]
     public class RhoTests : OptionBaseIndicatorTests<Rho>
     {
-        protected override IndicatorBase<IndicatorDataPoint> CreateIndicator()
+        protected override IndicatorBase<IBaseData> CreateIndicator()
             => new Rho("testRhoIndicator", _symbol, 0.0403m, 0.0m);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel)
             => new Rho("testRhoIndicator", _symbol, riskFreeRateModel);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel, IDividendYieldModel dividendYieldModel)
-            => new Rho("testRhoIndicator", _symbol, riskFreeRateModel, dividendYieldModel);
+        {
+            var symbol = (SymbolList.Count > 0) ? SymbolList[0] : _symbol;
+            return new Rho("testRhoIndicator", symbol, riskFreeRateModel, dividendYieldModel);
+        }
 
         protected override OptionIndicatorBase CreateIndicator(QCAlgorithm algorithm)
             => algorithm.R(_symbol);

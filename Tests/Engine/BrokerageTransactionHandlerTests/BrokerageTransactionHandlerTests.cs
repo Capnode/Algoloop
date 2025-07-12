@@ -1624,7 +1624,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             var algorithm = new QCAlgorithm();
             var marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
             var symbolPropertiesDataBase = SymbolPropertiesDatabase.FromDataFolder();
-            var securityService = new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm, RegisteredSecurityDataTypesProvider.Null, new SecurityCacheProvider(algorithm.Portfolio));
+            var securityService = new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm, RegisteredSecurityDataTypesProvider.Null, new SecurityCacheProvider(algorithm.Portfolio), algorithm: algorithm);
             algorithm.Securities.SetSecurityService(securityService);
             algorithm.SetLiveMode(true);
             algorithm.SetFinishedWarmingUp();
@@ -1672,7 +1672,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             var algorithm = new QCAlgorithm();
             var marketHoursDatabase = MarketHoursDatabase.FromDataFolder();
             var symbolPropertiesDataBase = SymbolPropertiesDatabase.FromDataFolder();
-            var securityService = new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm, RegisteredSecurityDataTypesProvider.Null, new SecurityCacheProvider(algorithm.Portfolio));
+            var securityService = new SecurityService(algorithm.Portfolio.CashBook, marketHoursDatabase, symbolPropertiesDataBase, algorithm, RegisteredSecurityDataTypesProvider.Null, new SecurityCacheProvider(algorithm.Portfolio), algorithm: algorithm);
             algorithm.Securities.SetSecurityService(securityService);
             algorithm.SetLiveMode(true);
             algorithm.SetFinishedWarmingUp();
@@ -1732,39 +1732,6 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             Assert.IsTrue(ticket.HasOrder);
         }
 
-        [Test]
-        public void FillMessageIsAddedToOrderTag()
-        {
-            // Initializes the transaction handler
-            var transactionHandler = new TestBrokerageTransactionHandler();
-            using var brokerage = new BacktestingBrokerage(_algorithm);
-            transactionHandler.Initialize(_algorithm, brokerage, new BacktestingResultHandler());
-
-            // Creates a market order
-            var security = _algorithm.Securities[_symbol];
-            var price = 1.12m;
-            security.SetMarketPrice(new Tick(DateTime.UtcNow.AddDays(-1), security.Symbol, price, price, price));
-            var orderRequest = new SubmitOrderRequest(OrderType.Market, security.Type, security.Symbol, 1000, 0, 0, DateTime.UtcNow, "TestTag");
-
-            // Mock the order processor
-            var orderProcessorMock = new Mock<IOrderProcessor>();
-            orderProcessorMock.Setup(m => m.GetOrderTicket(It.IsAny<int>())).Returns(new OrderTicket(_algorithm.Transactions, orderRequest));
-            _algorithm.Transactions.SetOrderProcessor(orderProcessorMock.Object);
-
-            Assert.AreEqual(transactionHandler.GetOpenOrders().Count, 0);
-            // Submit and process the market order
-            var orderTicket = transactionHandler.Process(orderRequest);
-            transactionHandler.HandleOrderRequest(orderRequest);
-            Assert.IsTrue(orderTicket.Status == OrderStatus.Submitted);
-
-            brokerage.Scan();
-            Assert.IsTrue(orderTicket.Status == OrderStatus.Filled);
-
-            var order = transactionHandler.GetOrderById(orderTicket.OrderId);
-            Assert.IsTrue(order.Tag.Contains("TestTag"));
-            Assert.IsTrue(order.Tag.Contains("Warning: fill at stale price"));
-        }
-
         [Test, Parallelizable(ParallelScope.None)]
         public void IncrementalOrderId()
         {
@@ -1817,9 +1784,9 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
         // Long Put --> OTM (expired worthless)
         [TestCase(1, OptionRight.Put, 455, 100, 460, 1, 0, 100, "OTM")]
         // Short Call --> ITM (assigned)
-        [TestCase(-1, OptionRight.Call, 450, 100, 455, 2, 0, 0, "Automatic Assignment")]
+        [TestCase(-1, OptionRight.Call, 450, 100, 455, 2, 0, 0, null)]
         // Short Put --> ITM (assigned)
-        [TestCase(-1, OptionRight.Put, 455, 100, 450, 2, 0, 200, "Automatic Assignment")]
+        [TestCase(-1, OptionRight.Put, 455, 100, 450, 2, 0, 200, null)]
         // Long Call --> ITM (auto-exercised)
         [TestCase(1, OptionRight.Call, 450, 100, 455, 2, 0, 200, "Automatic Exercise")]
         // Long Put --> ITM (auto-exercised)
@@ -1865,7 +1832,10 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             Assert.IsTrue(ticket.HasOrder);
 
             Assert.AreEqual(expectedOrderEvents, ticket.OrderEvents.Count);
-            Assert.AreEqual(1, ticket.OrderEvents.Count(x => x.Message.Contains(expectedMessage, StringComparison.InvariantCulture)));
+            if (expectedMessage != null)
+            {
+                Assert.AreEqual(1, ticket.OrderEvents.Count(x => x.Message.Contains(expectedMessage, StringComparison.InvariantCulture)));
+            }
 
             Assert.AreEqual(expectedUnderlyingPosition, algorithm.Portfolio[equity.Symbol].Quantity);
             Assert.AreEqual(expectedOptionPosition, algorithm.Portfolio[optionSymbol].Quantity);
@@ -2018,13 +1988,13 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
         }
 
         // Short Call --> ITM (assigned early - full)
-        [TestCase(-1, OptionRight.Call, 450, 100, 455, 2, 0, 0, "Automatic Assignment")]
+        [TestCase(-1, OptionRight.Call, 450, 100, 455, 2, 0, 0)]
         // Short Put --> ITM (assigned early - full)
-        [TestCase(-1, OptionRight.Put, 455, 100, 450, 2, 0, 200, "Automatic Assignment")]
+        [TestCase(-1, OptionRight.Put, 455, 100, 450, 2, 0, 200)]
         // Short Call --> ITM (assigned early - partial)
-        [TestCase(-3, OptionRight.Call, 450, 300, 455, 2, -1, 100, "Automatic Assignment")]
+        [TestCase(-3, OptionRight.Call, 450, 300, 455, 2, -1, 100)]
         // Short Put --> ITM (assigned early - partial)
-        [TestCase(-3, OptionRight.Put, 455, 100, 450, 2, -1, 300, "Automatic Assignment")]
+        [TestCase(-3, OptionRight.Put, 455, 100, 450, 2, -1, 300)]
         public void EarlyAssignmentEmitsOrderEvents(
             int initialOptionPosition,
             OptionRight optionRight,
@@ -2033,8 +2003,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             decimal underlyingPrice,
             int expectedOrderEvents,
             int expectedOptionPosition,
-            int expectedUnderlyingPosition,
-            string expectedMessage
+            int expectedUnderlyingPosition
             )
         {
             var algorithm = new TestAlgorithm();
@@ -2066,7 +2035,6 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             Assert.IsTrue(ticket.HasOrder);
 
             Assert.AreEqual(expectedOrderEvents, ticket.OrderEvents.Count);
-            Assert.AreEqual(1, ticket.OrderEvents.Count(x => x.Message.Contains(expectedMessage, StringComparison.InvariantCulture)));
 
             Assert.AreEqual(expectedUnderlyingPosition, algorithm.Portfolio[equity.Symbol].Quantity);
             Assert.AreEqual(expectedOptionPosition, algorithm.Portfolio[optionSymbol].Quantity);
@@ -2081,13 +2049,13 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
         }
 
         // Short Call --> ITM (assigned early - full)
-        [TestCase(-2, OptionRight.Call, 450, 100, 455, 2, 0, 0, "Automatic Assignment")]
+        [TestCase(-2, OptionRight.Call, 450, 100, 455, 2, 0, 0)]
         // Short Put --> ITM (assigned early - full)
-        [TestCase(-2, OptionRight.Put, 455, 100, 450, 2, 0, 200, "Automatic Assignment")]
+        [TestCase(-2, OptionRight.Put, 455, 100, 450, 2, 0, 200)]
         // Short Call --> ITM (assigned early - partial)
-        [TestCase(-3, OptionRight.Call, 450, 300, 455, 2, -1, 200, "Automatic Assignment")]
+        [TestCase(-3, OptionRight.Call, 450, 300, 455, 2, -1, 200)]
         // Short Put --> ITM (assigned early - partial)
-        [TestCase(-3, OptionRight.Put, 455, 100, 450, 2, -1, 200, "Automatic Assignment")]
+        [TestCase(-3, OptionRight.Put, 455, 100, 450, 2, -1, 200)]
         public void EarlyAssignmentEmitsOrderEventsEvenIfOldBuyOrderPresent(
             int initialOptionPosition,
             OptionRight optionRight,
@@ -2096,8 +2064,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             decimal underlyingPrice,
             int expectedOrderEvents,
             int expectedOptionPosition,
-            int expectedUnderlyingPosition,
-            string expectedMessage
+            int expectedUnderlyingPosition
             )
         {
             var algorithm = new TestAlgorithm();
@@ -2125,14 +2092,14 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             var orderTicket = transactionHandler.Process(orderRequest);
             transactionHandler.HandleOrderRequest(orderRequest);
 
-            Assert.AreEqual(1,  algorithm.Transactions.GetOrderTickets().Count());
+            Assert.AreEqual(1, algorithm.Transactions.GetOrderTickets().Count());
 
             // Fill the order, 1 second later, but ~10 minutes away form current time
             brokerage.PublishOrderEvent(new OrderEvent(orderTicket.OrderId, option.Symbol, orderTime.AddSeconds(1),
                 OrderStatus.Filled, OrderDirection.Buy, 10, orderRequest.Quantity, OrderFee.Zero));
 
             Assert.IsTrue(orderTicket.Status.IsClosed());
-            Assert.AreEqual(1,  algorithm.Transactions.GetOrderTickets().Count());
+            Assert.AreEqual(1, algorithm.Transactions.GetOrderTickets().Count());
 
             var parameters = new object[] { new OptionNotificationEventArgs(optionSymbol, expectedOptionPosition) };
             _handleOptionNotification.Invoke(transactionHandler, parameters);
@@ -2144,7 +2111,6 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             Assert.IsTrue(ticket.HasOrder);
 
             Assert.AreEqual(expectedOrderEvents, ticket.OrderEvents.Count);
-            Assert.AreEqual(1, ticket.OrderEvents.Count(x => x.Message.Contains(expectedMessage, StringComparison.InvariantCulture)));
 
             Assert.AreEqual(expectedUnderlyingPosition, algorithm.Portfolio[equity.Symbol].Quantity);
             Assert.AreEqual(expectedOptionPosition, algorithm.Portfolio[optionSymbol].Quantity);
@@ -2201,7 +2167,7 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             var orderTicket = transactionHandler.Process(orderRequest);
             transactionHandler.HandleOrderRequest(orderRequest);
 
-            Assert.AreEqual(1,  algorithm.Transactions.GetOrderTickets().Count());
+            Assert.AreEqual(1, algorithm.Transactions.GetOrderTickets().Count());
 
             _handleOptionNotification.Invoke(transactionHandler, new object[] { new OptionNotificationEventArgs(optionSymbol, expectedOptionPosition) });
 
@@ -2393,6 +2359,41 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
 
             Assert.IsTrue(_algorithm.Securities.TryGetValue(symbol, out var security));
             Assert.AreEqual(symbol, security.Symbol);
+        }
+
+        [Test]
+        public void ProcessesOrdersConcurrently()
+        {
+            var algorithm = new TestAlgorithm();
+            using var brokerage = new TestingBrokerage();
+            brokerage.ConcurrencyEnabled = true;
+
+            const int expectedOrdersCount = 10;
+            using var finishedEvent = new ManualResetEventSlim(false);
+            var transactionHandler = new TestableConcurrentBrokerageTransactionHandler(expectedOrdersCount, finishedEvent);
+            transactionHandler.Initialize(algorithm, brokerage, new BacktestingResultHandler());
+            algorithm.Transactions.SetOrderProcessor(transactionHandler);
+
+            var security = (Security)algorithm.AddEquity("SPY");
+            algorithm.SetFinishedWarmingUp();
+
+            // Set up security
+            var reference = new DateTime(2025, 07, 03, 10, 0, 0);
+            security.SetMarketPrice(new Tick(reference, security.Symbol, 300, 300));
+
+            // Creates the order
+            var orderRequests = Enumerable.Range(0, expectedOrdersCount).Select(_ => MakeOrderRequest(security, OrderType.Market, reference));
+
+            // Act
+            foreach (var orderRequest in orderRequests)
+            {
+                var orderTicket = transactionHandler.Process(orderRequest);
+                Assert.IsTrue(orderTicket.Status == OrderStatus.New);
+            }
+
+            // Wait for all orders to be processed
+            Assert.IsTrue(finishedEvent.Wait(10000));
+            Assert.Greater(transactionHandler.ProcessingThreadNames.Count, 1);
         }
 
         internal class TestIncrementalOrderIdAlgorithm : OrderTicketDemoAlgorithm
@@ -2629,6 +2630,38 @@ namespace QuantConnect.Tests.Engine.BrokerageTransactionHandlerTests
             public void OnNewBrokerageOrder(NewBrokerageOrderNotificationEventArgs e)
             {
                 OnNewBrokerageOrderNotification(e);
+            }
+        }
+
+        private class TestableConcurrentBrokerageTransactionHandler : BrokerageTransactionHandler
+        {
+            private readonly int _expectedOrdersCount;
+            private readonly ManualResetEventSlim _finishedEvent;
+            private int _currentOrdersCount;
+
+            public HashSet<string> ProcessingThreadNames = new();
+
+            public TestableConcurrentBrokerageTransactionHandler(int expectedOrdersCount, ManualResetEventSlim finishedEvent)
+            {
+                _expectedOrdersCount = expectedOrdersCount;
+                _finishedEvent = finishedEvent;
+            }
+
+            public override void HandleOrderRequest(OrderRequest request)
+            {
+                base.HandleOrderRequest(request);
+
+                // Capture the thread name for debugging purposes
+                lock (ProcessingThreadNames)
+                {
+                    ProcessingThreadNames.Add(Thread.CurrentThread.Name ?? Environment.CurrentManagedThreadId.ToString());
+                }
+
+                if (Interlocked.Increment(ref _currentOrdersCount) >= _expectedOrdersCount)
+                {
+                    // Signal that we have processed the expected number of orders
+                    _finishedEvent.Set();
+                }
             }
         }
     }

@@ -31,7 +31,6 @@ using QuantConnect.Data.Market;
 using QuantConnect.Python;
 using Python.Runtime;
 using QuantConnect.Data.Fundamental;
-using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
 using QuantConnect.Data.Shortable;
 
@@ -46,6 +45,7 @@ namespace QuantConnect.Securities
     /// </remarks>
     public class Security : DynamicObject, ISecurityPrice
     {
+        private SecurityExchange _exchange;
         private LocalTimeKeeper _localTimeKeeper;
 
         /// <summary>
@@ -53,7 +53,12 @@ namespace QuantConnect.Securities
         /// Uses concurrent bag to avoid list enumeration threading issues
         /// </summary>
         /// <remarks>Just use a list + lock, not concurrent bag, avoid garbage it creates for features we don't need here. See https://github.com/dotnet/runtime/issues/23103</remarks>
-        private readonly List<SubscriptionDataConfig> _subscriptionsBag;
+        private readonly HashSet<SubscriptionDataConfig> _subscriptionsBag;
+
+        /// <summary>
+        /// Flag to keep track of initialized securities, to avoid double initialization.
+        /// </summary>
+        internal bool IsInitialized { get; set; }
 
         /// <summary>
         /// This securities <see cref="IShortableProvider"/>
@@ -197,8 +202,15 @@ namespace QuantConnect.Securities
         /// <seealso cref="ForexExchange"/>
         public SecurityExchange Exchange
         {
-            get;
-            set;
+            get => _exchange;
+            set
+            {
+                _exchange = value;
+                if (_localTimeKeeper != null)
+                {
+                    _exchange.SetLocalDateTimeFrontierProvider(_localTimeKeeper);
+                }
+            }
         }
 
         /// <summary>
@@ -413,10 +425,15 @@ namespace QuantConnect.Securities
             }
 
             Symbol = symbol;
-            _subscriptionsBag = new ();
+            _subscriptionsBag = new();
             QuoteCurrency = quoteCurrency;
             SymbolProperties = symbolProperties;
-            IsTradable = true;
+
+            if (Symbol.SecurityType != SecurityType.Index)
+            {
+                IsTradable = true;
+            }
+
             Cache = cache;
             Exchange = exchange;
             DataFilter = dataFilter;
@@ -939,6 +956,17 @@ namespace QuantConnect.Securities
         /// <param name="value">The property value</param>
         public void Add(string key, object value)
         {
+            Set(key, value);
+        }
+
+        /// <summary>
+        /// Sets the specified custom property.
+        /// This allows us to use the security object as a dynamic object for quick storage.
+        /// </summary>
+        /// <param name="key">The property key</param>
+        /// <param name="value">The property value</param>
+        public void Set(string key, object value)
+        {
             Cache.Properties[key] = value;
         }
 
@@ -1074,7 +1102,7 @@ namespace QuantConnect.Securities
                     }
                     if (!subscription.ExchangeTimeZone.Equals(Exchange.TimeZone))
                     {
-                         throw new ArgumentException(Messages.Security.UnmatchingExchangeTimeZones, $"{nameof(subscription)}.{nameof(subscription.ExchangeTimeZone)}");
+                        throw new ArgumentException(Messages.Security.UnmatchingExchangeTimeZones, $"{nameof(subscription)}.{nameof(subscription.ExchangeTimeZone)}");
                     }
                     _subscriptionsBag.Add(subscription);
                 }
@@ -1155,6 +1183,23 @@ namespace QuantConnect.Securities
             if (symbolProperties != null)
             {
                 SymbolProperties = symbolProperties;
+            }
+        }
+
+        /// <summary>
+        /// Resets the security to its initial state by marking it as uninitialized and non-tradable
+        /// and clearing the subscriptions.
+        /// </summary>
+        public virtual void Reset()
+        {
+            IsInitialized = false;
+            IsTradable = false;
+
+            // Reset the subscriptions
+            lock (_subscriptionsBag)
+            {
+                _subscriptionsBag.Clear();
+                UpdateSubscriptionProperties();
             }
         }
     }

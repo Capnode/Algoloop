@@ -29,6 +29,12 @@ namespace QuantConnect
         private static TimeSpan _defaultDatabasesRefreshPeriod =
             TimeSpan.TryParse(Config.Get("databases-refresh-period", "1.00:00:00"), out var refreshPeriod) ? refreshPeriod : Time.OneDay;
 
+        // We default this to true so that we don't terminate live algorithms when the
+        // brokerage account has existing holdings for an asset that is not supported by Lean.
+        // Users can override this on initialization so that the algorithm is not terminated when
+        // placing orders for assets without a correct definition or mapping.
+        private static bool _defaultIgnoreUnknownAssetHoldings = Config.GetBool("ignore-unknown-asset-holdings", true);
+
         /// <summary>
         /// Gets whether or not WarmUpIndicator is allowed to warm up indicators
         /// </summary>
@@ -147,9 +153,20 @@ namespace QuantConnect
         public bool DailyPreciseEndTime { get; set; }
 
         /// <summary>
+        /// True if extended market hours should be used for daily consolidation, when extended market hours is enabled
+        /// </summary>
+        public bool DailyConsolidationUseExtendedMarketHours { get; set; }
+
+        /// <summary>
         /// Gets the time span used to refresh the market hours and symbol properties databases
         /// </summary>
         public TimeSpan DatabasesRefreshPeriod { get; set; }
+
+        /// <summary>
+        /// Determines whether to terminate the algorithm when an asset holding is not supported by Lean or the brokerage.
+        /// Defaults to true, meaning that the algorithm will not be terminated if an asset holding is not supported.
+        /// </summary>
+        public bool IgnoreUnknownAssetHoldings { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AlgorithmSettings"/> class
@@ -166,6 +183,7 @@ namespace QuantConnect
             MaxAbsolutePortfolioTargetPercentage = 1000000000;
             MinAbsolutePortfolioTargetPercentage = 0.0000000001m;
             DatabasesRefreshPeriod = _defaultDatabasesRefreshPeriod;
+            IgnoreUnknownAssetHoldings = _defaultIgnoreUnknownAssetHoldings;
         }
     }
 }

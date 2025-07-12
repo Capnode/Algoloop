@@ -540,5 +540,14 @@ namespace QuantConnect.Interfaces
         /// Gets a list of LEAN versions with their corresponding basic descriptions
         /// </summary>
         public VersionsResponse ReadLeanVersions();
+
+        /// <summary>
+        /// Broadcast a live command
+        /// </summary>
+        /// <param name="organizationId">Organization ID of the projects we would like to broadcast the command to</param>
+        /// <param name="excludeProjectId">Project for the live instance we want to exclude from the broadcast list</param>
+        /// <param name="command">The command to run</param>
+        /// <returns><see cref="RestResponse"/></returns>
+        public RestResponse BroadcastLiveCommand(string organizationId, int? excludeProjectId, object command);
     }
 }

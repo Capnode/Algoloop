@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir clr-loader==0.1.6
 
 # Install .NET Interactive to support C# in Jupyter notebooks
 ENV PATH="${PATH}:/root/.dotnet/tools"
-RUN dotnet tool install -g --no-cache --version 1.0.340501 --add-source "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" Microsoft.dotnet-interactive && \
+RUN dotnet tool install -g --no-cache --version 1.0.607001 --add-source "https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" Microsoft.dotnet-interactive && \
     dotnet interactive jupyter install
 
 # Setting some environment variables
@@ -36,9 +36,6 @@ ENV PYTHONPATH=${WORK}:${PYTHONPATH}
 # Link Python startup file to profile
 RUN mkdir -p /root/.ipython/profile_default/startup/ && \
     ln -s /Lean/Launcher/bin/Debug/start.py /root/.ipython/profile_default/startup/start.py
-
-# conda libc is old and causes issues in research we want to use the hosts version which is updated
-RUN mkdir -p /opt/miniconda3/lib/ && ln -vsf /lib/x86_64-linux-gnu/libstdc++.so.6 /opt/miniconda3/lib/libstdc++.so.6
 
 RUN find ${WORK} -type f -not -name '*.py*' -not -name '*.xml' -not -name '*.exe.config' -not -name '*.exe' -not -name '*.so' -not -name '*.dll' -not -name '*.ipynb' -not -name '*.csx' -not -name 'QuantConnect.Lean.Launcher.runtimeconfig.json' -not -name 'decimal.py' -delete
 

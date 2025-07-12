@@ -14,7 +14,6 @@
  *
 */
 
-using System;
 using QuantConnect.Orders;
 using QuantConnect.Securities;
 using QuantConnect.Orders.Fees;
@@ -52,7 +51,8 @@ namespace QuantConnect.Brokerages
                 OrderType.ComboMarket,
                 OrderType.ComboLimit,
                 OrderType.MarketOnOpen,
-                OrderType.MarketOnClose
+                OrderType.MarketOnClose,
+                OrderType.TrailingStop
             });
 
         /// <summary>
@@ -88,6 +88,14 @@ namespace QuantConnect.Brokerages
         public override bool CanSubmitOrder(Security security, Order order, out BrokerageMessageEvent message)
         {
             message = default;
+
+            var supportsOutsideTradingHours = (order.Properties as TradeStationOrderProperties)?.OutsideRegularTradingHours ?? false;
+            if (supportsOutsideTradingHours && (order.Type != OrderType.Limit || order.SecurityType != SecurityType.Equity))
+            {
+                message = new BrokerageMessageEvent(BrokerageMessageType.Warning, "NotSupportedOutsideRegularMarketHours",
+                    "To place an order outside regular trading hours, please use a limit order and ensure the security is an equity.");
+                return false;
+            }
 
             if (!_supportSecurityTypes.Contains(security.Type))
             {

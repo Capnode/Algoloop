@@ -220,60 +220,25 @@ namespace QuantConnect.Indicators
             SmoothingFunction = PythonUtil.ToFunc<decimal, decimal, decimal>(function);
         }
 
-        private bool _isReady => Price.Current.Time == UnderlyingPrice.Current.Time && Price.IsReady && UnderlyingPrice.IsReady;
-
-        /// <summary>
-        /// Gets a flag indicating when this indicator is ready and fully initialized
-        /// </summary>
-        public override bool IsReady => UseMirrorContract ? _isReady && Price.Current.Time == OppositePrice.Current.Time && OppositePrice.IsReady : _isReady;
-
         /// <summary>
         /// Computes the next value
         /// </summary>
-        /// <param name="input">The input given to the indicator</param>
         /// <returns>The input is returned unmodified.</returns>
-        protected override decimal Calculate(IndicatorDataPoint input)
+        protected override decimal ComputeIndicator()
         {
-            if (input.Symbol == OptionSymbol)
-            {
-                Price.Update(input.EndTime, input.Price);
-            }
-            else if (input.Symbol == _oppositeOptionSymbol)
-            {
-                OppositePrice.Update(input.EndTime, input.Price);
-            }
-            else if (input.Symbol == _underlyingSymbol)
-            {
-                UnderlyingPrice.Update(input.EndTime, input.Price);
-            }
-            else
-            {
-                throw new ArgumentException("The given symbol was not target or reference symbol");
-            }
+            var time = Price.Current.EndTime;
 
-            var time = Price.Current.Time;
-            if (_isReady)
-            {
-                if (UseMirrorContract)
-                {
-                    if (time != OppositePrice.Current.Time)
-                    {
-                        return _impliedVolatility;
-                    }
-                }
+            RiskFreeRate.Update(time, _riskFreeInterestRateModel.GetInterestRate(time));
+            DividendYield.Update(time, _dividendYieldModel.GetDividendYield(time, UnderlyingPrice.Current.Value));
 
-                RiskFreeRate.Update(time, _riskFreeInterestRateModel.GetInterestRate(time));
-                DividendYield.Update(time, _dividendYieldModel.GetDividendYield(time, UnderlyingPrice.Current.Value));
-
-                var timeTillExpiry = Convert.ToDecimal(OptionGreekIndicatorsHelper.TimeTillExpiry(Expiry, time));
-                _impliedVolatility = CalculateIV(timeTillExpiry);
-            }
+            var timeTillExpiry = Convert.ToDecimal(OptionGreekIndicatorsHelper.TimeTillExpiry(Expiry, time));
+            _impliedVolatility = CalculateIV(timeTillExpiry);
 
             return _impliedVolatility;
         }
 
         // Calculate the theoretical option price
-        private double TheoreticalPrice(double volatility, double spotPrice, double strikePrice, double timeTillExpiry, double riskFreeRate,
+        private static double TheoreticalPrice(double volatility, double spotPrice, double strikePrice, double timeTillExpiry, double riskFreeRate,
             double dividendYield, OptionRight optionType, OptionPricingModelType? optionModel = null)
         {
             if (timeTillExpiry <= 0)
@@ -349,7 +314,7 @@ namespace QuantConnect.Indicators
         }
 
         private void GetRootFindingMethodParameters(Symbol optionSymbol, double strike, double timeTillExpiry, double optionPrice,
-            double underlyingPrice, double riskFreeRate,  double dividendYield, OptionPricingModelType optionModel,
+            double underlyingPrice, double riskFreeRate, double dividendYield, OptionPricingModelType optionModel,
             out double accuracy, out double lowerBound, out double upperBound)
         {
             // Set the accuracy as a factor of the option price when possible

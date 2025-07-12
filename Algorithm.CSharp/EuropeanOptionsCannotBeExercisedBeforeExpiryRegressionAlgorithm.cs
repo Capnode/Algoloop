@@ -117,6 +117,16 @@ namespace QuantConnect.Algorithm.CSharp
             {
                 throw new RegressionTestException("Expected to try to exercise option before and on expiry");
             }
+
+            var optionHoldings = Securities[_contract.Symbol].Holdings;
+            if (optionHoldings.NetProfit != Portfolio.TotalNetProfit)
+            {
+                throw new RegressionTestException($"Unexpected holdings profit result {optionHoldings.Profit}");
+            }
+            if (Portfolio.Cash != (Portfolio.TotalNetProfit + 200000))
+            {
+                throw new RegressionTestException($"Unexpected portfolio cash {Portfolio.Cash}");
+            }
         }
 
         /// <summary>
@@ -150,8 +160,8 @@ namespace QuantConnect.Algorithm.CSharp
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Orders", "2"},
-            {"Average Win", "0%"},
-            {"Average Loss", "-4.10%"},
+            {"Average Win", "0.68%"},
+            {"Average Loss", "0%"},
             {"Compounding Annual Return", "24.075%"},
             {"Drawdown", "1.900%"},
             {"Expectancy", "0"},
@@ -175,7 +185,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$1700000.00"},
             {"Lowest Capacity Asset", "SPX XL80P3HB5O6M|SPX 31"},
             {"Portfolio Turnover", "0.35%"},
-            {"OrderListHash", "2917a6c396e5ea4f4eea1220ad422d54"}
+            {"OrderListHash", "c511179c15aa167365cc1acb91b20bf3"}
         };
     }
 }

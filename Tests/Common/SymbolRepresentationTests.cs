@@ -49,6 +49,8 @@ namespace QuantConnect.Tests.Common
         [TestCase("CSCO  230501P00045000", SecurityType.Option, OptionStyle.American, "CSCO", "CSCO", "CSCO", 45.00, "2023-05-01")]
         [TestCase("DAX   250715C01000000", SecurityType.IndexOption, OptionStyle.European, "DAX", "DAX", "DAX", 1000.00, "2025-07-15")]
         [TestCase("FTSE  230122C00750000", SecurityType.IndexOption, OptionStyle.European, "FTSE", "FTSE", "FTSE", 750.00, "2023-01-22")]
+        [TestCase("DC01H12  120401C00015500", SecurityType.FutureOption, OptionStyle.American, "DC01H12", "DC", "DC01H12", 15.5, "2012-04-01")]
+        [TestCase("ES20H20  200320P03290000", SecurityType.FutureOption, OptionStyle.American, "ES20H20", "ES", "ES20H20", 3290.00, "2020-03-20")]
         public void ParseOptionTickerOSI(string optionStr, SecurityType securityType, OptionStyle optionStyle,
             string expectedTargetOptionTicker, string expectedUnderlyingTicker, string expectedUnderlyingMappedTicker,
             decimal expectedStrikePrice, string expectedDate)
@@ -153,6 +155,30 @@ namespace QuantConnect.Tests.Common
         {
             var result = SymbolRepresentation.ParseFutureTicker("invalid");
             Assert.AreEqual(result, null);
+        }
+
+        [Test]
+        public void GenerateOptionTickerWithIndexOptionReturnsCorrectTicker()
+        {
+            // Expected ticker for the option contract
+            var expected = "SPXW2104A3800";
+
+            var underlying = Symbols.SPX;
+
+            // Create the option contract (IndexOption) with specific parameters
+            var option = Symbol.CreateOption(
+                underlying,
+                "SPXW",
+                Market.USA,
+                OptionStyle.European,
+                OptionRight.Call,
+                3800m,
+                new DateTime(2021, 1, 04));
+
+            var result = SymbolRepresentation.GenerateOptionTicker(option);
+
+            // Assert that the result matches the expected ticker
+            Assert.AreEqual(expected, result);
         }
 
         [TestCase(Futures.Energy.ArgusLLSvsWTIArgusTradeMonth, 2017, 1, 29, "AE529G7", false)] // Previous month
@@ -287,7 +313,7 @@ namespace QuantConnect.Tests.Common
         [TestCase("PROPANE_NON_LDH_MONT_BELVIEU", QuantConnect.Securities.Futures.Energy.PropaneNonLDHMontBelvieu)]
         [TestCase("ARGUS_PROPANE_FAR_EAST_INDEX_BALMO", QuantConnect.Securities.Futures.Energy.ArgusPropaneFarEastIndexBALMO)]
         [TestCase("GASOLINE", QuantConnect.Securities.Futures.Energy.Gasoline)]
-        [TestCase("NATURAL_GAS",QuantConnect.Securities.Futures.Energy.NaturalGas)]
+        [TestCase("NATURAL_GAS", QuantConnect.Securities.Futures.Energy.NaturalGas)]
         public void FutureEnergySymbolsWorkInPythonWithPEP8(string FutureEnergyName, string expectedFutureEnergyValue)
         {
             using (Py.GIL())

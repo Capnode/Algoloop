@@ -56,7 +56,7 @@ namespace QuantConnect.Algorithm.CSharp
             _continuousContract.SetFilter(TimeSpan.Zero, TimeSpan.FromDays(180));
             _mappedSymbol = _continuousContract.Mapped;
 
-            var benchmark = AddIndex("SX5E", market: Market.EUREX);
+            var benchmark = AddIndex("SX5E");
             SetBenchmark(benchmark.Symbol);
 
             var seeder = new FuncSecuritySeeder(GetLastKnownPrices);
@@ -190,12 +190,12 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public long DataPoints => 133947;
+        public long DataPoints => 94326;
 
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 26;
+        public int AlgorithmHistoryDataPoints => 0;
 
         /// <summary>
         /// Final status of the algorithm
@@ -233,7 +233,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "€2300000000.00"},
             {"Lowest Capacity Asset", "FESX YJHOAMPYKRS5"},
             {"Portfolio Turnover", "0.40%"},
-            {"OrderListHash", "54040d29a467becaedcf59d79323321b"}
+            {"OrderListHash", "ac9acc478ba1afe53993cdbb92f8ec6e"}
         };
     }
 }

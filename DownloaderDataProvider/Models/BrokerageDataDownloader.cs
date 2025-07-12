@@ -42,7 +42,16 @@ namespace QuantConnect.DownloaderDataProvider.Launcher.Models
         /// </summary>
         public BrokerageDataDownloader()
         {
-            var liveNodeConfiguration = new LiveNodePacket() { Brokerage = Config.Get("data-downloader-brokerage") };
+            var liveNodeConfiguration = new LiveNodePacket()
+            {
+                Brokerage = Config.Get("data-downloader-brokerage"),
+                UserToken = Globals.UserToken,
+                UserId = Globals.UserId,
+                ProjectId = Globals.ProjectId,
+                OrganizationId = Globals.OrganizationID,
+                Version = Globals.Version,
+                DeploymentTarget = DeploymentTarget.LocalPlatform
+            };
 
             try
             {

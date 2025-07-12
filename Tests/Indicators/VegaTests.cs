@@ -26,14 +26,17 @@ namespace QuantConnect.Tests.Indicators
     [TestFixture, Parallelizable(ParallelScope.Fixtures)]
     public class VegaTests : OptionBaseIndicatorTests<Vega>
     {
-        protected override IndicatorBase<IndicatorDataPoint> CreateIndicator()
+        protected override IndicatorBase<IBaseData> CreateIndicator()
             => new Vega("testVegaIndicator", _symbol, 0.0403m, 0.0m);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel)
             => new Vega("testVegaIndicator", _symbol, riskFreeRateModel);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel, IDividendYieldModel dividendYieldModel)
-            => new Vega("testVegaIndicator", _symbol, riskFreeRateModel, dividendYieldModel);
+        {
+            var symbol = (SymbolList.Count > 0) ? SymbolList[0] : _symbol;
+            return new Vega("testVegaIndicator", symbol, riskFreeRateModel, dividendYieldModel);
+        }
 
         protected override OptionIndicatorBase CreateIndicator(QCAlgorithm algorithm)
             => algorithm.V(_symbol);

@@ -243,7 +243,7 @@ namespace QuantConnect.Indicators
         /// <param name="name">The name of this indicator</param>
         protected IndicatorBase(string name)
             : base(name)
-        {}
+        { }
 
         /// <summary>
         /// Updates the state of this indicator with the given value and returns true
@@ -271,14 +271,21 @@ namespace QuantConnect.Indicators
 
                 if (!(input is T))
                 {
-                    throw new ArgumentException($"IndicatorBase.Update() 'input' expected to be of type {typeof(T)} but is of type {input.GetType()}");
+                    if (typeof(T) == typeof(IndicatorDataPoint))
+                    {
+                        input = new IndicatorDataPoint(input.Symbol, input.EndTime, input.Value);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"IndicatorBase.Update() 'input' expected to be of type {typeof(T)} but is of type {input.GetType()}");
+                    }
                 }
                 _previousInput[input.Symbol.ID] = (T)input;
 
                 var nextResult = ValidateAndComputeNextValue((T)input);
                 if (nextResult.Status == IndicatorStatus.Success)
                 {
-                    Current = new IndicatorDataPoint(input.EndTime, nextResult.Value);
+                    Current = new IndicatorDataPoint(input.Symbol, input.EndTime, nextResult.Value);
 
                     // let others know we've produced a new data point
                     OnUpdated(Current);

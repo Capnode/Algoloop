@@ -65,13 +65,13 @@ namespace QuantConnect.Tests.Indicators
         }
 
         [Test]
-        public void ThrowsOnDifferentDataType()
+        public void ShouldNotThrowOnDifferentDataType()
         {
             var target = new TestIndicator();
-            Assert.Throws<ArgumentException>(() =>
+            Assert.DoesNotThrow(() =>
             {
                 target.Update(new Tick());
-            }, "expected to be of type");
+            });
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace QuantConnect.Tests.Indicators
             {
                 try
                 {
-                    instantiatedIndicator = Activator.CreateInstance(indicator, new object[] {10});
+                    instantiatedIndicator = Activator.CreateInstance(indicator, new object[] { 10 });
                     counter++;
                 }
                 catch (Exception)
@@ -332,6 +332,15 @@ namespace QuantConnect.Tests.Indicators
             Assert.AreEqual(defaultValue, indicator.Previous);
         }
 
+        [Test]
+        public void IndicatorShouldRetainSymbolWhenUpdatedWithDifferentDataType()
+        {
+            var target = new TestIndicator();
+            var date = new DateTime(2020, 1, 1);
+            target.Update(new Tick(date, Symbols.SPY, 1, 1));
+            Assert.AreEqual(Symbols.SPY, target.Current.Symbol);
+        }
+
         private static void TestComparisonOperators<TValue>()
         {
             var indicator = new TestIndicator();
@@ -364,7 +373,7 @@ namespace QuantConnect.Tests.Indicators
         {
             var methodName = "op_" + @operator;
             var method =
-                typeof (IndicatorBase).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                typeof(IndicatorBase).GetMethods(BindingFlags.Static | BindingFlags.Public)
                 .SingleOrDefault(x => x.Name == methodName && x.GetParameters()[argIndex].ParameterType == typeof(T));
 
             if (method == null)

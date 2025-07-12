@@ -322,6 +322,18 @@ namespace QuantConnect.Securities
             /// </summary>
             /// <returns>The symbol</returns>
             public const string MicroBTC = "MBT";
+
+            /// <summary>
+            /// BTIC on Micro Ether Futures
+            /// </summary>
+            /// <returns>The symbol</returns>
+            public const string BTICMicroEther = "MRB";
+
+            /// <summary>
+            /// BTIC on Micro Bitcoin Futures
+            /// </summary>
+            /// <returns>The symbol</returns>
+            public const string BTICMicroBTC = "MIB";
         }
 
         /// <summary>
@@ -1544,6 +1556,12 @@ namespace QuantConnect.Securities
             public const string BseSensex = "SENSEX";
 
             /// <summary>
+            /// Hang Seng Index
+            /// </summary>
+            /// <returns>The symbol</returns>
+            public const string HangSeng = "HSI";
+
+            /// <summary>
             /// Micro E-mini S&amp;P 500 Index Futures
             /// </summary>
             /// <returns>The symbol</returns>
@@ -1602,6 +1620,41 @@ namespace QuantConnect.Securities
             /// </summary>
             /// <returns>The symbol</returns>
             public const string EuroStoxx50 = "FESX";
+
+            /// <summary>
+            /// DAX Futures
+            /// </summary>
+            public const string DAX = "FDAX";
+
+            /// <summary>
+            /// DAX50 Futures
+            /// </summary>
+            public const string DAX50 = "FSDX";
+
+            /// <summary>
+            /// Div DAX futureFutures
+            /// </summary>
+            public const string DivDAX = "FDIV";
+
+            /// <summary>
+            /// Micro DAX Futures
+            /// </summary>
+            public const string DAXMicro = "FDXS";
+
+            /// <summary>
+            /// Mini DAX Futures
+            /// </summary>
+            public const string DAXMini = "FDXM";
+
+            /// <summary>
+            /// Mini MDAX Futures
+            /// </summary>
+            public const string MDAXMini = "FSMX";
+
+            /// <summary>
+            /// TecDAX Futures
+            /// </summary>
+            public const string TecDAX = "FTDX";
         }
 
         /// <summary>

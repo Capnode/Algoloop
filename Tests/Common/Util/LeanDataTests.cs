@@ -46,14 +46,28 @@ namespace QuantConnect.Tests.Common.Util
             SymbolCache.Clear();
         }
 
-        [TestCase(16, false, "20240506 09:30", "06:30")]
-        [TestCase(10, false, "20240506 09:30", "06:30")]
-        [TestCase(10, true, "20240506 04:00", "16:00")]
-        [TestCase(5, true, "20240506 04:00", "16:00")]
-        [TestCase(19, true, "20240506 04:00", "16:00")]
-        public void DailyCalendarInfo(int hours, bool extendedMarketHours, string startTime, string timeSpan)
+        [TestCase(16, false, "20240506 09:30", "06:30", false)]
+        [TestCase(10, false, "20240506 09:30", "06:30", false)]
+        [TestCase(10, true, "20240506 04:00", "16:00", false)]
+        [TestCase(5, true, "20240506 04:00", "16:00", false)]
+        [TestCase(19, true, "20240506 04:00", "16:00", false)]
+
+        [TestCase(16, false, "20240506 09:15", "07:15", true)]
+        [TestCase(10, false, "20240506 09:15", "07:15", true)]
+        [TestCase(10, true, "20240506 08:45", "15:15", true)]
+        [TestCase(9, true, "20240506 08:45", "15:15", true)]
+        [TestCase(19, true, "20240506 08:45", "15:15", true)]
+        public void DailyCalendarInfo(int hours, bool extendedMarketHours, string startTime, string timeSpan, bool multipleMarketClosureSymbol)
         {
-            var symbol = Symbols.SPY;
+            Symbol symbol;
+            if (multipleMarketClosureSymbol)
+            {
+                symbol = Symbols.CreateFutureSymbol("HSI", new DateTime(2025, 01, 27));
+            }
+            else
+            {
+                symbol = Symbols.SPY;
+            }
             var targetTime = new DateTime(2024, 5, 6).AddHours(hours);
             var exchangeHours = MarketHoursDatabase.FromDataFolder().GetExchangeHours(symbol.ID.Market, symbol, symbol.ID.SecurityType);
             var result = LeanData.GetDailyCalendar(targetTime, exchangeHours, extendedMarketHours);
@@ -64,16 +78,46 @@ namespace QuantConnect.Tests.Common.Util
             Assert.AreEqual(expected, result);
         }
 
-        [TestCase(1, "20240506 16:00")] // market closed
-        [TestCase(5, "20240506 16:00")] // pre market
-        [TestCase(10, "20240506 16:00")] // market hours
-        [TestCase(16, "20240507 16:00")] // at the close
-        [TestCase(18, "20240507 16:00")] // post market hours
-        [TestCase(20, "20240507 16:00")] // market closed
-        [TestCase(24 * 5, "20240513 16:00")] // saturday
-        public void GetNextDailyEndTime(int hours, string expectedTime)
+        [TestCase(true, "20131219 00:00", "1.00:00")]
+        [TestCase(false, "20131219 09:30", "07:30")]
+        public void DailyCalendarInfoFuture(bool extendedMarketHours, string startTime, string timeSpan)
         {
-            var symbol = Symbols.SPY;
+            var symbol = Symbols.Future_ESZ18_Dec2018;
+            var targetTime = new DateTime(2013, 12, 19, 18, 0, 0);
+            var exchangeHours = MarketHoursDatabase.FromDataFolder().GetExchangeHours(symbol.ID.Market, symbol, symbol.ID.SecurityType);
+            var result = LeanData.GetDailyCalendar(targetTime, exchangeHours, extendedMarketHours);
+
+            var expected = new CalendarInfo(DateTime.ParseExact(startTime, DateFormat.TwelveCharacter, CultureInfo.InvariantCulture),
+                TimeSpan.Parse(timeSpan, CultureInfo.InvariantCulture));
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestCase(1, "20240506 16:00", false)] // market closed
+        [TestCase(5, "20240506 16:00", false)] // pre market
+        [TestCase(10, "20240506 16:00", false)] // market hours
+        [TestCase(16, "20240507 16:00", false)] // at the close
+        [TestCase(18, "20240507 16:00", false)] // post market hours
+        [TestCase(20, "20240507 16:00", false)] // market closed
+
+        [TestCase(1, "20240506 16:30", true)] // market closed
+        [TestCase(9, "20240506 16:30", true)] // pre market
+        [TestCase(10, "20240506 16:30", true)] // market hours
+        [TestCase(12, "20240506 16:30", true)] // pre market
+        [TestCase(14, "20240506 16:30", true)] // market hours
+        [TestCase(18, "20240507 16:30", true)] // post market hours
+        [TestCase(20, "20240507 16:30", true)] // post market hours
+        public void GetNextDailyEndTime(int hours, string expectedTime, bool multipleMarketClosureSymbol)
+        {
+            Symbol symbol;
+            if (multipleMarketClosureSymbol)
+            {
+                symbol = Symbols.CreateFutureSymbol("HSI", new DateTime(2025, 01, 27));
+            }
+            else
+            {
+                symbol = Symbols.SPY;
+            }
             var targetTime = new DateTime(2024, 5, 6).AddHours(hours);
             var exchangeHours = MarketHoursDatabase.FromDataFolder().GetExchangeHours(symbol.ID.Market, symbol, symbol.ID.SecurityType);
             var result = LeanData.GetNextDailyEndTime(symbol, targetTime, exchangeHours);
@@ -256,19 +300,32 @@ namespace QuantConnect.Tests.Common.Util
             Assert.AreEqual(market, parsedMarket);
         }
 
-        [Test]
-        public void UniversesDataPath()
+        [TestCase("Data/equity/usa/universes/etf/spy/20200102.csv", SecurityType.Base, Market.USA, Resolution.Daily, "SPY.ETFConstituentUniverse", "2020/1/2", true)]
+        [TestCase("Data/equity/usa/universes/daily/qctest/20131007.csv", SecurityType.Base, Market.USA, Resolution.Daily, "qctest", "2013/10/07", false)]
+        [TestCase("Data/option/usa/universes/aapl/20241112.csv", SecurityType.Option, Market.USA, Resolution.Daily, "AAPL", "2024/11/12", false)]
+        [TestCase("Data/indexoption/usa/universes/spx/20250110.csv", SecurityType.IndexOption, Market.USA, Resolution.Daily, "SPX", "2025/1/10", false)]
+        [TestCase("Data/future/cme/universes/es/20111230.csv", SecurityType.Future, Market.CME, Resolution.Daily, "ES", "2011/12/30", false)]
+        [TestCase("Data/futureoption/cme/universes/es/20200320/20111230.csv", SecurityType.FutureOption, Market.CME, Resolution.Daily, "ES", "2011/12/30", false)]
+        public void UniversesDataPath(string path, SecurityType expectedSecurityType, string expectedMarket, Resolution expectedResolution, string expectedIDSymbol, DateTime expectedDate, bool isCustomDataType)
         {
-            var path = "equity/usa/universes/etf/spy/20200102.csv";
             Assert.IsTrue(LeanData.TryParsePath(path, out var symbol, out var date, out var resolution));
 
-            Assert.AreEqual(SecurityType.Base, symbol.SecurityType);
-            Assert.AreEqual(Market.USA, symbol.ID.Market);
-            Assert.AreEqual(Resolution.Daily, resolution);
-            Assert.AreEqual("SPY.ETFConstituentUniverse", symbol.ID.Symbol);
-            Assert.AreEqual(new DateTime(2020, 1, 2), date);
-            Assert.IsTrue(SecurityIdentifier.TryGetCustomDataType(symbol.ID.Symbol, out var dataType));
-            Assert.AreEqual(typeof(ETFConstituentUniverse).Name, dataType);
+            Assert.AreEqual(expectedSecurityType, symbol.SecurityType);
+            Assert.AreEqual(expectedMarket, symbol.ID.Market);
+            Assert.AreEqual(expectedResolution, resolution);
+            Assert.AreEqual(expectedIDSymbol, symbol.ID.Symbol);
+            Assert.AreEqual(expectedDate, date);
+
+            var hasCustomDataType = SecurityIdentifier.TryGetCustomDataType(symbol.ID.Symbol, out var dataType);
+            if (isCustomDataType)
+            {
+                Assert.IsTrue(hasCustomDataType);
+                Assert.AreEqual(typeof(ETFConstituentUniverse).Name, dataType);
+            }
+            else
+            {
+                Assert.IsFalse(hasCustomDataType);
+            }
         }
 
         [Test]

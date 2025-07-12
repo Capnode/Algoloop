@@ -26,14 +26,17 @@ namespace QuantConnect.Tests.Indicators
     [TestFixture, Parallelizable(ParallelScope.Fixtures)]
     public class ThetaTests : OptionBaseIndicatorTests<Theta>
     {
-        protected override IndicatorBase<IndicatorDataPoint> CreateIndicator()
+        protected override IndicatorBase<IBaseData> CreateIndicator()
             => new Theta("testThetaIndicator", _symbol, 0.0403m, 0.0m);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel)
             => new Theta("testThetaIndicator", _symbol, riskFreeRateModel);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel, IDividendYieldModel dividendYieldModel)
-            => new Theta("testThetaIndicator", _symbol, riskFreeRateModel, dividendYieldModel);
+        {
+            var symbol = (SymbolList.Count > 0) ? SymbolList[0] : _symbol;
+            return new Theta("testThetaIndicator", symbol, riskFreeRateModel, dividendYieldModel);
+        }
 
         protected override OptionIndicatorBase CreateIndicator(QCAlgorithm algorithm)
             => algorithm.T(_symbol);

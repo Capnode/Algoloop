@@ -128,6 +128,39 @@ namespace QuantConnect.Tests.Common.Orders.Fees
             Assert.AreEqual(expectedFee, fee.Value.Amount);
         }
 
+        [TestCase(false)]
+        [TestCase(true)]
+        public void HongKongFutureFee(bool canonical)
+        {
+            var symbol = Symbols.CreateFutureSymbol(Futures.Indices.HangSeng, SecurityIdentifier.DefaultDate);
+            if (!canonical)
+            {
+                symbol = Symbols.CreateFutureSymbol(Futures.Indices.HangSeng,
+                    FuturesExpiryFunctions.FuturesExpiryFunction(symbol)(new DateTime(2021, 12, 1)));
+            }
+            var entry = MarketHoursDatabase.FromDataFolder().GetEntry(symbol.ID.Market, symbol, symbol.SecurityType);
+            var properties = SymbolPropertiesDatabase.FromDataFolder()
+                .GetSymbolProperties(symbol.ID.Market, symbol, symbol.SecurityType, null);
+            var security = new Future(symbol, entry.ExchangeHours,
+                new Cash(properties.QuoteCurrency, 0, 0),
+                properties,
+                ErrorCurrencyConverter.Instance,
+                RegisteredSecurityDataTypesProvider.Null,
+                new SecurityCache()
+            );
+            security.SetMarketPrice(new Tick(new DateTime(2021, 12, 1), security.Symbol, 100, 100));
+
+            var fee = _feeModel.GetOrderFee(
+                new OrderFeeParameters(
+                    security,
+                    new MarketOrder(security.Symbol, 1000, new DateTime(2021, 12, 1))
+                )
+            );
+
+            Assert.AreEqual(Currencies.HKD, fee.Value.Currency);
+            Assert.AreEqual(1000 * 40m, fee.Value.Amount);
+        }
+
         [TestCase(OrderType.ComboMarket, 0.01, 250)]
         [TestCase(OrderType.ComboLimit, 0.01, 250)]
         [TestCase(OrderType.ComboLegLimit, 0.01, 250)]
@@ -348,12 +381,16 @@ namespace QuantConnect.Tests.Common.Orders.Fees
                 new { Symbol = Futures.Currencies.BTC, Type = SecurityType.Future, ExpectedFee = 11.02m },
                 new { Symbol = Futures.Currencies.ETH, Type = SecurityType.Future, ExpectedFee = 7.02m },
                 new { Symbol = Futures.Currencies.MicroBTC, Type = SecurityType.Future, ExpectedFee = 4.77m },
+                new { Symbol = Futures.Currencies.BTICMicroBTC, Type = SecurityType.Future, ExpectedFee = 4.77m },
                 new { Symbol = Futures.Currencies.MicroEther, Type = SecurityType.Future, ExpectedFee = 0.42m },
+                new { Symbol = Futures.Currencies.BTICMicroEther, Type = SecurityType.Future, ExpectedFee = 0.42m },
                 // Cryptocurrency future options
                 new { Symbol = Futures.Currencies.BTC, Type = SecurityType.FutureOption, ExpectedFee = 10.02m },
                 new { Symbol = Futures.Currencies.ETH, Type = SecurityType.FutureOption, ExpectedFee = 7.02m },
                 new { Symbol = Futures.Currencies.MicroBTC, Type = SecurityType.FutureOption, ExpectedFee = 3.77m },
+                new { Symbol = Futures.Currencies.BTICMicroBTC, Type = SecurityType.FutureOption, ExpectedFee = 3.77m },
                 new { Symbol = Futures.Currencies.MicroEther, Type = SecurityType.FutureOption, ExpectedFee = 0.32m },
+                new { Symbol = Futures.Currencies.BTICMicroEther, Type = SecurityType.FutureOption, ExpectedFee = 0.32m },
                 // E-mini FX (currencies) Futures
                 new { Symbol = Futures.Currencies.EuroFXEmini, Type = SecurityType.Future, ExpectedFee = 1.37m },
                 new { Symbol = Futures.Currencies.JapaneseYenEmini, Type = SecurityType.Future, ExpectedFee = 1.37m },

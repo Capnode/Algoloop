@@ -224,28 +224,6 @@ namespace QuantConnect.Lean.Engine
                 // Update the current slice before firing scheduled events or any other task
                 algorithm.SetCurrentSlice(timeSlice.Slice);
 
-                if (timeSlice.Slice.SymbolChangedEvents.Count != 0)
-                {
-                    try
-                    {
-                        algorithm.OnSymbolChangedEvents(timeSlice.Slice.SymbolChangedEvents);
-                    }
-                    catch (Exception err)
-                    {
-                        algorithm.SetRuntimeError(err, "OnSymbolChangedEvents");
-                        return;
-                    }
-
-                    foreach (var symbol in timeSlice.Slice.SymbolChangedEvents.Keys)
-                    {
-                        // cancel all orders for the old symbol
-                        foreach (var ticket in transactions.GetOpenOrderTickets(x => x.Symbol == symbol))
-                        {
-                            ticket.Cancel("Open order cancelled on symbol changed event");
-                        }
-                    }
-                }
-
                 if (timeSlice.SecurityChanges != SecurityChanges.None)
                 {
                     algorithm.ProcessSecurityChanges(timeSlice.SecurityChanges);
@@ -305,6 +283,28 @@ namespace QuantConnect.Lean.Engine
                 // security prices got updated
                 algorithm.Portfolio.InvalidateTotalPortfolioValue();
 
+                if (timeSlice.Slice.SymbolChangedEvents.Count != 0)
+                {
+                    try
+                    {
+                        algorithm.OnSymbolChangedEvents(timeSlice.Slice.SymbolChangedEvents);
+                    }
+                    catch (Exception err)
+                    {
+                        algorithm.SetRuntimeError(err, "OnSymbolChangedEvents");
+                        return;
+                    }
+
+                    foreach (var symbol in timeSlice.Slice.SymbolChangedEvents.Keys)
+                    {
+                        // cancel all orders for the old symbol
+                        foreach (var ticket in transactions.GetOpenOrderTickets(x => x.Symbol == symbol))
+                        {
+                            ticket.Cancel("Open order cancelled on symbol changed event");
+                        }
+                    }
+                }
+
                 // process fill models on the updated data before entering algorithm, applies to all non-market orders
                 transactions.ProcessSynchronousEvents();
 
@@ -332,23 +332,28 @@ namespace QuantConnect.Lean.Engine
                     // determine if there are possible margin call orders to be executed
                     bool issueMarginCallWarning;
                     var marginCallOrders = algorithm.Portfolio.MarginCallModel.GetMarginCallOrders(out issueMarginCallWarning);
+                    var executedTicketsCount = 0;
                     if (marginCallOrders.Count != 0)
                     {
                         var executingMarginCall = false;
                         try
                         {
-                            // tell the algorithm we're about to issue the margin call
-                            algorithm.OnMarginCall(marginCallOrders);
 
-                            executingMarginCall = true;
-
-                            // execute the margin call orders
-                            var executedTickets = algorithm.Portfolio.MarginCallModel.ExecuteMarginCall(marginCallOrders);
-                            foreach (var ticket in executedTickets)
+                            if (marginCallOrders.All(order => algorithm.Portfolio.Securities[order.Symbol].Exchange.ExchangeOpen))
                             {
-                                algorithm.Error($"{algorithm.Time.ToStringInvariant()} - Executed MarginCallOrder: {ticket.Symbol} - " +
-                                    $"Quantity: {ticket.Quantity.ToStringInvariant()} @ {ticket.AverageFillPrice.ToStringInvariant()}"
-                                );
+                                // tell the algorithm we're about to issue the margin call
+                                algorithm.OnMarginCall(marginCallOrders);
+
+                                // execute the margin call orders
+                                var executedTickets = algorithm.Portfolio.MarginCallModel.ExecuteMarginCall(marginCallOrders);
+                                executedTicketsCount = executedTickets.Count;
+
+                                foreach (var ticket in executedTickets)
+                                {
+                                    algorithm.Error($"{algorithm.Time.ToStringInvariant()} - Executed MarginCallOrder: {ticket.Symbol} - " +
+                                        $"Quantity: {ticket.Quantity.ToStringInvariant()} @ {ticket.AverageFillPrice.ToStringInvariant()}"
+                                    );
+                                }
                             }
                         }
                         catch (Exception err)
@@ -358,7 +363,7 @@ namespace QuantConnect.Lean.Engine
                         }
                     }
                     // we didn't perform a margin call, but got the warning flag back, so issue the warning to the algorithm
-                    else if (issueMarginCallWarning)
+                    if (executedTicketsCount == 0 && issueMarginCallWarning)
                     {
                         try
                         {

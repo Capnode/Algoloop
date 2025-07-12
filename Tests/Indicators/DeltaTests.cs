@@ -26,14 +26,17 @@ namespace QuantConnect.Tests.Indicators
     [TestFixture, Parallelizable(ParallelScope.Fixtures)]
     public class DeltaTests : OptionBaseIndicatorTests<Delta>
     {
-        protected override IndicatorBase<IndicatorDataPoint> CreateIndicator()
+        protected override IndicatorBase<IBaseData> CreateIndicator()
             => new Delta("testDeltaIndicator", _symbol, 0.0403m, 0.0m);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel)
             => new Delta("testDeltaIndicator", _symbol, riskFreeRateModel);
 
         protected override OptionIndicatorBase CreateIndicator(IRiskFreeInterestRateModel riskFreeRateModel, IDividendYieldModel dividendYieldModel)
-            => new Delta("testDeltaIndicator", _symbol, riskFreeRateModel, dividendYieldModel);
+        {
+            var symbol = (SymbolList.Count > 0) ? SymbolList[0] : _symbol;
+            return new Delta("testDeltaIndicator", symbol, riskFreeRateModel, dividendYieldModel);
+        }
 
         protected override OptionIndicatorBase CreateIndicator(QCAlgorithm algorithm)
             => algorithm.D(_symbol);

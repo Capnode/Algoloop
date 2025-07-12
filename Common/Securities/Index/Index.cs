@@ -26,6 +26,25 @@ namespace QuantConnect.Securities.Index
     /// <seealso cref="Security"/>
     public class Index : Security
     {
+        private bool _isTradable;
+
+        /// <summary>
+        /// Gets or sets whether or not this security should be considered tradable
+        /// </summary>
+        public override bool IsTradable {
+            get => _isTradable;
+            set
+            {
+                if (value) ManualSetIsTradable = true;
+                _isTradable = value;
+            }
+        }
+
+        /// <summary>
+        /// Field to check if the user has manually set IsTradable field to true
+        /// </summary>
+        internal bool ManualSetIsTradable { get; set; }
+
         /// <summary>
         /// Constructor for the INDEX security
         /// </summary>
@@ -104,6 +123,16 @@ namespace QuantConnect.Securities.Index
         {
             IsTradable = false;   //Index are non tradable by default
             Holdings = new IndexHolding(this, currencyConverter);
+        }
+
+        /// <summary>
+        /// Resets the security to its initial state by marking it as uninitialized and non-tradable
+        /// and clearing the subscriptions.
+        /// </summary>
+        public override void Reset()
+        {
+            base.Reset();
+            ManualSetIsTradable = false;
         }
     }
 }

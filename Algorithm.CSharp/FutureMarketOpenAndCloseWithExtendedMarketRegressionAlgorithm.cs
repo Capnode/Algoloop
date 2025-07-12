@@ -25,21 +25,25 @@ namespace QuantConnect.Algorithm.CSharp
     {
         protected override bool ExtendedMarketHours => true;
         protected override List<DateTime> AfterMarketOpen => new List<DateTime>() {
-            new DateTime(2020, 02, 04, 18, 0, 0), // Tuesday
-            new DateTime(2020, 02, 05, 18, 0, 0),
-            new DateTime(2020, 02, 06, 18, 0, 0),
-            new DateTime(2020, 02, 09, 18, 0, 0),
-            new DateTime(2020, 02, 10, 18, 0, 0),
-            new DateTime(2020, 02, 11, 18, 0, 0)
+            new DateTime(2020, 02, 04, 0, 0, 0), // Tuesday
+            new DateTime(2020, 02, 05, 0, 0, 0),
+            new DateTime(2020, 02, 06, 0, 0, 0),
+            new DateTime(2020, 02, 07, 0, 0, 0),
+            new DateTime(2020, 02, 09, 18, 0, 0), // sunday
+            new DateTime(2020, 02, 10, 0, 0, 0),
+            new DateTime(2020, 02, 11, 0, 0, 0),
+            new DateTime(2020, 02, 12, 0, 0, 0)
         };
         protected override List<DateTime> BeforeMarketClose => new List<DateTime>()
         {
-            new DateTime(2020, 02, 04, 17, 0, 0),
-            new DateTime(2020, 02, 05, 17, 0, 0),
-            new DateTime(2020, 02, 06, 17, 0, 0),
-            new DateTime(2020, 02, 07, 17, 0, 0),
-            new DateTime(2020, 02, 10, 17, 0, 0),
-            new DateTime(2020, 02, 11, 17, 0, 0)
+            new DateTime(2020, 02, 04, 0, 0, 0),
+            new DateTime(2020, 02, 05, 0, 0, 0),
+            new DateTime(2020, 02, 06, 0, 0, 0),
+            new DateTime(2020, 02, 07, 0, 0, 0),
+            new DateTime(2020, 02, 07, 17, 0, 0), // friday
+            new DateTime(2020, 02, 10, 0, 0, 0),
+            new DateTime(2020, 02, 11, 0, 0, 0),
+            new DateTime(2020, 02, 12, 0, 0, 0)
         };
 
         /// <summary>
@@ -50,7 +54,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public override long DataPoints => 41467;
+        public override long DataPoints => 92;
 
         /// <summary>
         /// This is used by the regression test system to indicate what the expected statistics are from running the algorithm

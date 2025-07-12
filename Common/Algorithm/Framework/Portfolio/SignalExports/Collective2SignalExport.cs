@@ -15,6 +15,7 @@
 
 using Newtonsoft.Json;
 using QuantConnect.Interfaces;
+using QuantConnect.Securities;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,17 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
     public class Collective2SignalExport : BaseSignalExport
     {
         /// <summary>
+        /// Hashset of symbols whose market is unknown but have already been seen by
+        /// this signal export manager
+        /// </summary>
+        private HashSet<string> _unknownMarketSymbols;
+
+        /// <summary>
+        /// Hashset of security types seen that are unsupported by C2 API
+        /// </summary>
+        private HashSet<SecurityType> _unknownSecurityTypes;
+
+        /// <summary>
         /// API key provided by Collective2
         /// </summary>
         private readonly string _apiKey;
@@ -42,19 +54,45 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
         private readonly int _systemId;
 
         /// <summary>
-        /// Collective2 API endpoint
-        /// </summary>
-        private readonly Uri _destination;
-
-        /// <summary>
         /// Algorithm being ran
         /// </summary>
         private IAlgorithm _algorithm;
 
         /// <summary>
+        /// C2 accepts only standard minilots (10,000 currency units).
+        /// The smallest quantity C2 trades is "1" which is a mini-lot. 
+        /// Thus, the smallest trade a strategy manager can type into C2 is, for example,
+        /// MarketOrder("EURUSD", 1m)
+        /// which will trade 10,000 Euros.
+        /// No fractions nor numbers smaller than 1 are accepted by C2.
+        /// https://support.collective2.com/hc/en-us/articles/360038042774-Forex-minilots
+        /// </summary>
+        private const int _forexMinilots = 10000;
+
+        /// <summary>
+        /// Flag to track if the minilot warning has already been printed.
+        /// </summary>
+        private bool _isForexMinilotsWarningPrinted;
+
+        /// <summary>
+        /// Flag to track if the warning has already been printed.
+        /// </summary>
+        private bool _isZeroPriceWarningPrinted;
+
+        /// <summary>
+        /// Collective2 API endpoint
+        /// </summary>
+        public Uri Destination { get; set; }
+
+        /// <summary>
         /// The name of this signal export
         /// </summary>
         protected override string Name { get; } = "Collective2";
+
+        /// <summary>
+        /// Lazy initialization of Symbol Properties Database
+        /// </summary>
+        private static Lazy<SymbolPropertiesDatabase> _symbolPropertiesDatabase = new (() => SymbolPropertiesDatabase.FromDataFolder());
 
         /// <summary>
         /// Lazy initialization of ten seconds rate limiter
@@ -71,25 +109,32 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
         /// </summary>
         private static Lazy<RateGate> _dailyRateLimiter = new Lazy<RateGate>(() => new RateGate(20000, TimeSpan.FromDays(1)));
 
-
         /// <summary>
         /// Collective2SignalExport constructor. It obtains the entry information for Collective2 API requests.
         /// See API documentation at https://trade.collective2.com/c2-api
         /// </summary>
         /// <param name="apiKey">API key provided by Collective2</param>
         /// <param name="systemId">Trading system's ID number</param>
-        public Collective2SignalExport(string apiKey, int systemId)
+        /// <param name="useWhiteLabelApi">Whether to use the white-label API instead of the general one</param>
+        public Collective2SignalExport(string apiKey, int systemId, bool useWhiteLabelApi = false)
         {
+            _unknownMarketSymbols = new HashSet<string>();
+            _unknownSecurityTypes = new HashSet<SecurityType>();
             _apiKey = apiKey;
             _systemId = systemId;
-            _destination = new Uri("https://api4-general.collective2.com/Strategies/SetDesiredPositions");
+
+            // SetDesiredPositions: The list of positions that must exist in the strategy. 
+            // https://api-docs.collective2.com/apis/general/swagger/strategies/c2_api_strategies/setdesiredpositions_post#strategies/c2_api_strategies/setdesiredpositions_post/t=request&path=positions
+            Destination = new Uri(useWhiteLabelApi
+                ? "https://api4-wl.collective2.com/Strategies/SetDesiredPositions"
+                : "https://api4-general.collective2.com/Strategies/SetDesiredPositions");
         }
 
         /// <summary>
         /// Creates a JSON message with the desired positions using the expected
         /// Collective2 API format and then sends it
         /// </summary>
-        /// <param name="parameters">A list of holdings from the portfolio 
+        /// <param name="parameters">A list of holdings from the portfolio
         /// expected to be sent to Collective2 API and the algorithm being ran</param>
         /// <returns>True if the positions were sent correctly and Collective2 sent no errors, false otherwise</returns>
         public override bool Send(SignalExportTargetParameters parameters)
@@ -115,7 +160,7 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
         /// <summary>
         /// Converts a list of targets to a list of Collective2 positions
         /// </summary>
-        /// <param name="parameters">A list of targets from the portfolio 
+        /// <param name="parameters">A list of targets from the portfolio
         /// expected to be sent to Collective2 API and the algorithm being ran</param>
         /// <param name="positions">A list of Collective2 positions</param>
         /// <returns>True if the given targets could be converted to a Collective2Position list, false otherwise</returns>
@@ -123,7 +168,7 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
         {
             _algorithm = parameters.Algorithm;
             var targets = parameters.Targets;
-            positions = new List<Collective2Position>();
+            positions = [];
             foreach (var target in targets)
             {
                 if (target == null)
@@ -132,67 +177,38 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
                     return false;
                 }
 
-                if (!ConvertTypeOfSymbol(target.Symbol, out string typeOfSymbol))
+                var securityType = GetSecurityTypeAcronym(target.Symbol.SecurityType);
+                if (securityType == null)
                 {
-                    return false;
+                    continue;
                 }
 
-                var symbol = _algorithm.Ticker(target.Symbol);
-                if (target.Symbol.SecurityType == SecurityType.Future)
+                var maturityMonthYear = GetMaturityMonthYear(target.Symbol);
+                if (maturityMonthYear?.Length == 0)
                 {
-                    symbol = $"@{SymbolRepresentation.GenerateFutureTicker(target.Symbol.ID.Symbol, target.Symbol.ID.Date, doubleDigitsYear: false, includeExpirationDate: false)}";
-                }
-                else if (target.Symbol.SecurityType.IsOption())
-                {
-                    symbol = SymbolRepresentation.GenerateOptionTicker(target.Symbol);
+                    continue;
                 }
 
-                positions.Add(new Collective2Position
+                var exchangeSymbol = new C2ExchangeSymbol
                 {
-                    C2Symbol = new C2Symbol
-                    {
-                        FullSymbol = symbol,
-                        SymbolType = typeOfSymbol,
-                    },
-                    Quantity = ConvertPercentageToQuantity(_algorithm, target),
-                });
-            }
+                    Symbol = GetSymbol(target.Symbol),
+                    Currency = GetCurrency(_algorithm, target.Symbol),
+                    SecurityExchange = GetMICExchangeCode(target.Symbol),
+                    SecurityType = securityType,
+                    MaturityMonthYear = maturityMonthYear,
+                    PutOrCall = GetPutOrCallValue(target.Symbol),
+                    StrikePrice = GetStrikePrice(target.Symbol)
+                };
 
-            return true;
-        }
+                // Quantity must be non-zero.
+                // To close a position, simply omit it from the Positions array.
+                var quantity = ConvertPercentageToQuantity(_algorithm, target);
+                if (quantity == 0)
+                {
+                    continue;
+                }
 
-        /// <summary>
-        /// Classifies a symbol type into the possible symbol types values defined
-        /// by Collective2 API.
-        /// </summary>
-        /// <param name="targetSymbol">Symbol of the desired position</param>
-        /// <param name="typeOfSymbol">The type of the symbol according to Collective2 API</param>
-        /// <returns>True if the symbol's type is supported by Collective2, false otherwise</returns>
-        private bool ConvertTypeOfSymbol(Symbol targetSymbol, out string typeOfSymbol)
-        {
-            switch (targetSymbol.SecurityType)
-            {
-                case SecurityType.Equity:
-                    typeOfSymbol = "stock";
-                    break;
-                case SecurityType.Option:
-                    typeOfSymbol = "option";
-                    break;
-                case SecurityType.Future:
-                    typeOfSymbol = "future";
-                    break;
-                case SecurityType.Forex:
-                    typeOfSymbol = "forex";
-                    break;
-                default:
-                    typeOfSymbol = "NotImplemented";
-                    break;
-            }
-
-            if (typeOfSymbol == "NotImplemented")
-            {
-                _algorithm.Error($"{targetSymbol.SecurityType} security type is not supported by Collective2.");
-                return false;
+                positions.Add(new() { ExchangeSymbol = exchangeSymbol, Quantity = quantity });
             }
 
             return true;
@@ -209,10 +225,31 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
             var numberShares = PortfolioTarget.Percent(algorithm, target.Symbol, target.Quantity);
             if (numberShares == null)
             {
+                if (algorithm.Securities.TryGetValue(target.Symbol, out var security) && security.Price == 0 && target.Quantity == 0)
+                {
+                    if (!_isZeroPriceWarningPrinted)
+                    {
+                        _isZeroPriceWarningPrinted = true;
+                        algorithm.Debug($"Warning: Collective2 failed to calculate target quantity for {target}. The price for {target.Symbol} is 0, and the target quantity is 0. Will return 0 for all similar cases.");
+                    }
+                    return 0;
+                }
                 throw new InvalidOperationException($"Collective2 failed to calculate target quantity for {target}");
             }
 
-            return (int)numberShares.Quantity;
+            var quantity = (int)numberShares.Quantity;
+
+            if (target.Symbol.ID.SecurityType == SecurityType.Forex)
+            {
+                quantity /= _forexMinilots;
+                if (!_isForexMinilotsWarningPrinted && quantity == 0)
+                {
+                    _isForexMinilotsWarningPrinted = true;
+                    algorithm.Debug($"Warning: Collective2 failed to calculate target quantity for {target}. The smallest quantity C2 trades is \"1\" which is a mini-lot (10,000 currency units), and the target quantity is {numberShares.Quantity}. Will return 0 for all similar cases.");
+                }
+            }
+
+            return quantity;
         }
 
         /// <summary>
@@ -228,7 +265,8 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
                 Positions = positions,
             };
 
-            var jsonMessage = JsonConvert.SerializeObject(payload);
+            var settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+            var jsonMessage = JsonConvert.SerializeObject(payload, settings);
             return jsonMessage;
         }
 
@@ -249,21 +287,24 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
             HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
 
             //Send the message
-            using HttpResponseMessage response = HttpClient.PostAsync(_destination, httpMessage).Result;
+            using HttpResponseMessage response = HttpClient.PostAsync(Destination, httpMessage).Result;
 
             //Parse it
             var responseObject = response.Content.ReadFromJsonAsync<C2Response>().Result;
 
+            //For debugging purposes, append the message sent to Collective2 to the algorithms log
+            var debuggingMessage = Logging.Log.DebuggingEnabled ? $" | Message={message}" : string.Empty;
+
             if (!response.IsSuccessStatusCode)
             {
-                _algorithm.Error($"Collective2 API returned the following errors: {string.Join(",", PrintErrors(responseObject.ResponseStatus.Errors))}");
+                _algorithm.Error($"Collective2 API returned the following errors: {string.Join(",", PrintErrors(responseObject.ResponseStatus.Errors))}{debuggingMessage}");
                 return false;
             }
             else if (responseObject.Results.Count > 0)
             {
-                _algorithm.Debug($"Collective2: NewSignals={string.Join(',', responseObject.Results[0].NewSignals)} | CanceledSignals={string.Join(',', responseObject.Results[0].CanceledSignals)}");
+                _algorithm.Debug($"Collective2: NewSignals={string.Join(',', responseObject.Results[0].NewSignals)} | CanceledSignals={string.Join(',', responseObject.Results[0].CanceledSignals)}{debuggingMessage}");
             }
-            
+
             return true;
         }
 
@@ -310,13 +351,170 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
         }
 
         /// <summary>
+        /// Returns the given symbol in the expected C2 format
+        /// </summary>
+        private string GetSymbol(Symbol symbol)
+        {
+            if (CurrencyPairUtil.TryDecomposeCurrencyPair(symbol, out var baseCurrency, out var quoteCurrency))
+            {
+                return $"{baseCurrency}/{quoteCurrency}";
+            }
+            else if (symbol.SecurityType.IsOption())
+            {
+                return symbol.Underlying.Value;
+            }
+            else
+            {
+                return symbol.ID.Symbol;
+            }
+        }
+
+        /// <summary>
+        /// Returns the Symbol currency. USD for Forex.
+        /// </summary>
+        private string GetCurrency(IAlgorithm algorithm, Symbol symbol)
+        {
+            if (symbol.ID.SecurityType == SecurityType.Forex)
+            {
+                return "USD";
+            }
+
+            if (algorithm.Securities.TryGetValue(symbol, out var security))
+            {
+                return security.QuoteCurrency.Symbol;
+            }
+
+            var properties = _symbolPropertiesDatabase.Value.GetSymbolProperties(symbol.ID.Market, symbol, symbol.ID.SecurityType, algorithm.AccountCurrency);
+            return properties.QuoteCurrency;
+        }
+
+        private string GetMICExchangeCode(Symbol symbol)
+        {
+            if (symbol.SecurityType == SecurityType.Equity || symbol.SecurityType.IsOption())
+            {
+                return "DEFAULT";
+            }
+
+            switch (symbol.ID.Market)
+            {
+                case Market.India:
+                    return "XNSE";
+                case Market.HKFE:
+                    return "XHKF";
+                case Market.NYSELIFFE:
+                    return "XNLI";
+                case Market.EUREX:
+                    return "XEUR";
+                case Market.ICE:
+                    return "IEPA";
+                case Market.CBOE:
+                    return "XCBO";
+                case Market.CFE:
+                    return "XCBF";
+                case Market.CBOT:
+                    return "XCBT";
+                case Market.COMEX:
+                    return "XCEC";
+                case Market.NYMEX:
+                    return "XNYM";
+                case Market.SGX:
+                    return "XSES";
+                case Market.FXCM:
+                    return symbol.ID.Market.ToUpper();
+                case Market.OSE:
+                case Market.CME:
+                    return $"X{symbol.ID.Market.ToUpper()}";
+                default:
+                    if (_unknownMarketSymbols.Add(symbol.Value))
+                    {
+                        _algorithm.Debug($"The market of the symbol {symbol.Value} was unexpected: {symbol.ID.Market}. Using 'DEFAULT' as market");
+                    }
+
+                    return "DEFAULT";
+            }
+        }
+
+        /// <summary>
+        /// Returns the given security type in the format C2 expects
+        /// </summary>
+        private string GetSecurityTypeAcronym(SecurityType securityType)
+        {
+            switch (securityType)
+            {
+                case SecurityType.Equity:
+                    return "CS";
+                case SecurityType.Future:
+                    return "FUT";
+                case SecurityType.Option:
+                case SecurityType.IndexOption:
+                    return "OPT";
+                case SecurityType.Forex:
+                    return "FOR";
+                default:
+                    if (_unknownSecurityTypes.Add(securityType))
+                    {
+                        _algorithm.Debug($"Unexpected security type found: {securityType}. Collective2 just accepts: Equity, Future, Option, Index Option and Stock");
+                    }
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns the expiration date in the format C2 expects
+        /// </summary>
+        private string GetMaturityMonthYear(Symbol symbol)
+        {
+            var delistingDate = symbol.GetDelistingDate();
+            if (delistingDate == Time.EndOfTime) // The given symbol is equity or forex
+            {
+                return null;
+            }
+
+            if (delistingDate < _algorithm.Securities[symbol].LocalTime.Date) // The given symbol has already expired
+            {
+                _algorithm.Error($"Instrument {symbol} has already expired. Its delisting date was: {delistingDate}. This signal won't be sent to Collective2.");
+                return string.Empty;
+            }
+
+            return $"{delistingDate:yyyyMMdd}";
+        }
+
+        private int? GetPutOrCallValue(Symbol symbol)
+        {
+            if (symbol.SecurityType.IsOption())
+            {
+                switch (symbol.ID.OptionRight)
+                {
+                    case OptionRight.Put:
+                        return 0;
+                    case OptionRight.Call:
+                        return 1;
+                }
+            }
+
+            return null;
+        }
+
+        private decimal? GetStrikePrice(Symbol symbol)
+        {
+            if (symbol.SecurityType.IsOption())
+            {
+                return symbol.ID.StrikePrice;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// The C2 ResponseStatus object
         /// </summary>
         private class ResponseStatus
         {
             /* Example:
 
-                    "ResponseStatus": 
+                    "ResponseStatus":
                     {
                       "ErrorCode": ""401",
                       "Message": ""Unauthorized",
@@ -370,34 +568,66 @@ namespace QuantConnect.Algorithm.Framework.Portfolio.SignalExports
             /// <summary>
             /// Position symbol
             /// </summary>
-            [JsonProperty(PropertyName = "C2Symbol")]
-            public C2Symbol C2Symbol { get; set; }
+            [JsonProperty(PropertyName = "exchangeSymbol")]
+            public C2ExchangeSymbol ExchangeSymbol { get; set; }
 
             /// <summary>
             /// Number of shares/contracts of the given symbol. Positive quantites are long positions
             /// and negative short positions.
             /// </summary>
-            [JsonProperty(PropertyName = "Quantity")]
+            [JsonProperty(PropertyName = "quantity")]
             public decimal Quantity { get; set; } // number of shares, not % of the portfolio
         }
 
         /// <summary>
         /// The Collective2 symbol
         /// </summary>
-        protected class C2Symbol
+        protected class C2ExchangeSymbol
         {
             /// <summary>
-            /// The The full native C2 symbol e.g. BSRR2121Q22.5
+            /// The exchange root symbol e.g. AAPL
             /// </summary>
-            [JsonProperty(PropertyName = "FullSymbol")]
-            public string FullSymbol { get; set; }
+            [JsonProperty(PropertyName = "symbol")]
+            public string Symbol { get; set; }
+
+            /// <summary>
+            /// The 3-character ISO instrument currency. E.g. 'USD'
+            /// </summary>
+            [JsonProperty(PropertyName = "currency")]
+            public string Currency { get; set; }
+
+            /// <summary>
+            /// The MIC Exchange code e.g. DEFAULT (for stocks & options),
+            /// XCME, XEUR, XICE, XLIF, XNYB, XNYM, XASX, XCBF, XCBT, XCEC,
+            /// XKBT, XSES. See details at http://www.iso15022.org/MIC/homepageMIC.htm
+            /// </summary>
+            [JsonProperty(PropertyName = "securityExchange")]
+            public string SecurityExchange { get; set; }
 
 
             /// <summary>
-            /// The type of instrument. e.g. 'stock', 'option', 'future', 'forex'
+            /// The SecurityType e.g. 'CS'(Common Stock), 'FUT' (Future), 'OPT' (Option), 'FOR' (Forex)
             /// </summary>
-            [JsonProperty(PropertyName = "SymbolType")]
-            public string SymbolType { get; set; }
+            [JsonProperty(PropertyName = "securityType")]
+            public string SecurityType { get; set; }
+
+            /// <summary>
+            /// The MaturityMonthYear e.g. '202103' (March 2021), or if the contract requires a day: '20210521' (May 21, 2021)
+            /// </summary>
+            [JsonProperty(PropertyName = "maturityMonthYear")]
+            public string MaturityMonthYear { get; set; }
+
+            /// <summary>
+            /// The Option PutOrCall e.g. 0 = Put, 1 = Call
+            /// </summary>
+            [JsonProperty(PropertyName = "putOrCall")]
+            public int? PutOrCall { get; set; }
+
+            /// <summary>
+            /// The ISO Option Strike Price. Zero means none
+            /// </summary>
+            [JsonProperty(PropertyName = "strikePrice")]
+            public decimal? StrikePrice { get; set; }
         }
     }
 }
