@@ -7,7 +7,7 @@
     <AssemblyName>QuantConnect.Lean.Launcher</AssemblyName>
     <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
     <Platforms>x64</Platforms>
-    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <UseWPF>true</UseWPF>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
