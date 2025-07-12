@@ -26,14 +26,9 @@ namespace QuantConnect.Data.Consolidators
     public class IdentityDataConsolidator<T> : DataConsolidator<T>
         where T : IBaseData
     {
-        private static readonly bool IsTick = typeof(T) == typeof(Tick);
+        private static readonly bool IsTick = typeof (T) == typeof (Tick);
 
         private T _last;
-
-        /// <summary>
-        /// Stores the timestamp of the last processed data item.
-        /// </summary>
-        private DateTime _lastTime;
 
         /// <summary>
         /// Gets a clone of the data being currently consolidated
@@ -48,7 +43,7 @@ namespace QuantConnect.Data.Consolidators
         /// </summary>
         public override Type OutputType
         {
-            get { return typeof(T); }
+            get { return typeof (T); }
         }
 
         /// <summary>
@@ -57,11 +52,10 @@ namespace QuantConnect.Data.Consolidators
         /// <param name="data">The new data for the consolidator</param>
         public override void Update(T data)
         {
-            if (IsTick || _last == null || data.EndTime != _lastTime)
+            if (IsTick || _last == null || _last.EndTime != data.EndTime)
             {
                 OnDataConsolidated(data);
                 _last = data;
-                _lastTime = data.EndTime;
             }
         }
 

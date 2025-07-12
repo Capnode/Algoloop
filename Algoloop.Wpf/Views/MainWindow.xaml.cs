@@ -20,6 +20,7 @@ using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using DevExpress.Xpf.Core;
 using System.Windows.Interop;
 using System.Windows.Input;
 using Algoloop.Wpf.Views.Internal;
@@ -29,7 +30,7 @@ namespace Algoloop.Wpf.Views
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : ThemedWindow
     {
         public MainWindow()
         {
@@ -38,6 +39,7 @@ namespace Algoloop.Wpf.Views
             string exeFolder = MainService.GetProgramFolder();
             Config.Set("plugin-directory", exeFolder);
             Config.Set("composer-dll-directory", exeFolder);
+            SetTheme(Settings.Default.Theme);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -123,6 +125,47 @@ namespace Algoloop.Wpf.Views
             {
                 // check this: https://github.com/dotnet/corefx/issues/10361
                 Debug.WriteLine($"{ex.GetType()}: {ex.Message}");
+            }
+        }
+
+        private void OnTheme(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is MenuItem item)
+            {
+                Mouse.OverrideCursor = Cursors.Wait;
+                SetTheme(item.DataContext.ToString());
+                Mouse.OverrideCursor = null;
+            }
+        }
+
+        private void SetTheme(string actualTheme)
+        {
+            _themeMenu.Items.Clear();
+            foreach (Theme theme in Theme.Themes)
+            {
+                try
+                {
+                    var asm = theme.Assembly;
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (theme.Name == actualTheme)
+                {
+                    ApplicationThemeHelper.ApplicationThemeName = theme.Name;
+                    Settings.Default.Theme = theme.Name;
+                }
+
+                var menuItem = new MenuItem
+                {
+                    Header = theme.FullName,
+                    DataContext = theme.Name,
+                    IsChecked = theme.Name == actualTheme
+                };
+
+                _themeMenu.Items.Add(menuItem);
             }
         }
     }

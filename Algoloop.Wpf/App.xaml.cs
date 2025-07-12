@@ -42,6 +42,10 @@ namespace Algoloop.Wpf
 
         public App()
         {
+            // Workaround for
+            // InvalidCastException is thrown when an application with DevExpress controls is used with .NET 6
+            DevExpress.Xpf.Core.ClearAutomationEventsHelper.IsEnabled = false;
+
             // Set working directory to exe directory
             string unc = Assembly.GetExecutingAssembly().Location;
             string folder = Path.GetDirectoryName(unc);

@@ -34,16 +34,6 @@ namespace QuantConnect.Lean.Engine.Setup
     public class BacktestingSetupHandler : ISetupHandler
     {
         /// <summary>
-        /// Get the maximum time that the initialization of an algorithm can take
-        /// </summary>
-        protected TimeSpan InitializationTimeOut { get; set; } = TimeSpan.FromMinutes(5);
-
-        /// <summary>
-        /// Get the maximum time that the creation of an algorithm can take
-        /// </summary>
-        protected TimeSpan AlgorithmCreationTimeout { get; set; } = BaseSetupHandler.AlgorithmCreationTimeout;
-
-        /// <summary>
         /// The worker thread instance the setup handler should use
         /// </summary>
         public WorkerThread WorkerThread { get; set; }
@@ -108,7 +98,7 @@ namespace QuantConnect.Lean.Engine.Setup
             }
 
             // Limit load times to 90 seconds and force the assembly to have exactly one derived type
-            var loader = new Loader(debugging, algorithmNodePacket.Language, AlgorithmCreationTimeout, names => names.SingleOrAlgorithmTypeName(Config.Get("algorithm-type-name", algorithmNodePacket.AlgorithmId)), WorkerThread);
+            var loader = new Loader(debugging, algorithmNodePacket.Language, BaseSetupHandler.AlgorithmCreationTimeout, names => names.SingleOrAlgorithmTypeName(Config.Get("algorithm-type-name", algorithmNodePacket.AlgorithmId)), WorkerThread);
             var complete = loader.TryCreateAlgorithmInstanceWithIsolator(assemblyPath, algorithmNodePacket.RamAllocation, out algorithm, out error);
             if (!complete) throw new AlgorithmSetupException($"During the algorithm initialization, the following exception has occurred: {error}");
 
@@ -133,7 +123,7 @@ namespace QuantConnect.Lean.Engine.Setup
         /// </summary>
         /// <param name="parameters">The parameters object to use</param>
         /// <returns>Boolean true on successfully initializing the algorithm</returns>
-        public virtual bool Setup(SetupHandlerParameters parameters)
+        public bool Setup(SetupHandlerParameters parameters)
         {
             var algorithm = parameters.Algorithm;
             var job = parameters.AlgorithmNodePacket as BacktestNodePacket;
@@ -161,7 +151,7 @@ namespace QuantConnect.Lean.Engine.Setup
 
             var controls = job.Controls;
             var isolator = new Isolator();
-            var initializeComplete = isolator.ExecuteWithTimeLimit(InitializationTimeOut, () =>
+            var initializeComplete = isolator.ExecuteWithTimeLimit(TimeSpan.FromMinutes(5), () =>
             {
                 try
                 {
@@ -177,15 +167,10 @@ namespace QuantConnect.Lean.Engine.Setup
                     algorithm.Schedule.SetEventSchedule(parameters.RealTimeHandler);
 
                     // set the option chain provider
-                    var optionChainProvider = new BacktestingOptionChainProvider();
-                    var initParameters = new ChainProviderInitializeParameters(parameters.MapFileProvider, algorithm.HistoryProvider);
-                    optionChainProvider.Initialize(initParameters);
-                    algorithm.SetOptionChainProvider(new CachingOptionChainProvider(optionChainProvider));
+                    algorithm.SetOptionChainProvider(new CachingOptionChainProvider(new BacktestingOptionChainProvider(parameters.DataCacheProvider, parameters.MapFileProvider)));
 
                     // set the future chain provider
-                    var futureChainProvider = new BacktestingFutureChainProvider();
-                    futureChainProvider.Initialize(initParameters);
-                    algorithm.SetFutureChainProvider(new CachingFutureChainProvider(futureChainProvider));
+                    algorithm.SetFutureChainProvider(new CachingFutureChainProvider(new BacktestingFutureChainProvider(parameters.DataCacheProvider)));
 
                     // before we call initialize
                     BaseSetupHandler.LoadBacktestJobAccountCurrency(algorithm, job);

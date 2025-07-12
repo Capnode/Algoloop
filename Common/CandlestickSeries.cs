@@ -72,8 +72,9 @@ namespace QuantConnect
         /// <param name="name">Name of the chart series</param>
         /// <param name="unit">Unit of the series</param>
         public CandlestickSeries(string name, string unit)
-            : base(name, SeriesType.Candle, unit)
+            : base(name, 0, unit)
         {
+            SeriesType = SeriesType.Candle;
         }
 
         /// <summary>

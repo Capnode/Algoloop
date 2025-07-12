@@ -20,7 +20,7 @@ namespace QuantConnect.Securities
     /// Filters a set of derivative symbols using the underlying price data.
     /// </summary>
     public interface IDerivativeSecurityFilter<T>
-         where T : IChainUniverseData
+         where T : ISymbol
     {
         /// <summary>
         /// Filters the input set of symbols represented by the universe

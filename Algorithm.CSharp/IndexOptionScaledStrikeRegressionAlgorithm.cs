@@ -15,7 +15,6 @@
 
 using QuantConnect.Data;
 using QuantConnect.Interfaces;
-using QuantConnect.Orders;
 using QuantConnect.Util;
 using System;
 using System.Collections.Generic;
@@ -32,8 +31,6 @@ namespace QuantConnect.Algorithm.CSharp
         private HashSet<int> _orderIds = new HashSet<int>();
         private DateTime _expiration = new DateTime(2021, 3, 19);
         private const decimal _initialCash = 100000m;
-        private bool _orderExercisedOTM;
-        private bool _orderExercisedITM;
 
         public override void Initialize()
         {
@@ -63,29 +60,15 @@ namespace QuantConnect.Algorithm.CSharp
             }
         }
 
-        public override void OnOrderEvent(OrderEvent orderEvent)
-        {
-            if (_orderIds.Contains(orderEvent.Id) && orderEvent.Status == OrderStatus.Filled)
-            {
-                if (orderEvent.Message.Contains("OTM", StringComparison.InvariantCulture))
-                {
-                    _orderExercisedOTM = true;
-                }
-                else
-                {
-                    _orderExercisedITM = true;
-                }
-            }
-        }
-
         public override void OnEndOfAlgorithm()
         {
-            if (!_orderExercisedOTM)
+            var exerciseOrders = Transactions.GetOrders().Where(x => !_orderIds.Contains(x.Id));
+            if (!exerciseOrders.Where(x => x.Tag.Contains("OTM")).Any())
             {
                 throw new RegressionTestException($"At least one order should have been exercised OTM");
             }
 
-            if (!_orderExercisedITM)
+            if (!exerciseOrders.Where(x => !x.Tag.Contains("OTM")).Any())
             {
                 throw new RegressionTestException($"At least one order should have been exercised ITM");
             }
@@ -127,11 +110,11 @@ namespace QuantConnect.Algorithm.CSharp
         public Dictionary<string, string> ExpectedStatistics => new Dictionary<string, string>
         {
             {"Total Orders", "4"},
-            {"Average Win", "174.10%"},
-            {"Average Loss", "-0.03%"},
+            {"Average Win", "0%"},
+            {"Average Loss", "-20.04%"},
             {"Compounding Annual Return", "79228162514264337593543950335%"},
             {"Drawdown", "2.100%"},
-            {"Expectancy", "2901.176"},
+            {"Expectancy", "-0.5"},
             {"Start Equity", "100000"},
             {"End Equity", "274018.3"},
             {"Net Profit", "174.018%"},
@@ -140,7 +123,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Probabilistic Sharpe Ratio", "95.428%"},
             {"Loss Rate", "50%"},
             {"Win Rate", "50%"},
-            {"Profit-Loss Ratio", "5803.35"},
+            {"Profit-Loss Ratio", "0"},
             {"Alpha", "7.922816251426434E+28"},
             {"Beta", "4.566"},
             {"Annual Standard Deviation", "11.741"},
@@ -152,7 +135,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$7000.00"},
             {"Lowest Capacity Asset", "NQX 31M220FF62ZSE|NDX 31"},
             {"Portfolio Turnover", "6.40%"},
-            {"OrderListHash", "0de4f8d2fcbb87307e5fe01c060dd44a"}
+            {"OrderListHash", "ec6881b180c68e6c7a48f6596c73e83d"}
         };
     }
 }

@@ -80,14 +80,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds.Enumerators
             }
 
             var result = _underlyingEnumerator.MoveNext();
-            if (result)
-            {
-                _current = _underlyingEnumerator.Current;
-            }
-            else
-            {
-                _current = null;
-            }
+            _current = _underlyingEnumerator.Current;
 
             if (_current != null && _current.Symbol != _requestedSymbol)
             {

@@ -84,11 +84,6 @@ namespace QuantConnect.Interfaces
         bool DailyPreciseEndTime { get; set; }
 
         /// <summary>
-        /// True if extended market hours should be used for daily consolidation, when extended market hours is enabled
-        /// </summary>
-        bool DailyConsolidationUseExtendedMarketHours { get; set; }
-
-        /// <summary>
         /// Gets/sets the maximum number of concurrent market data subscriptions available
         /// </summary>
         /// <remarks>
@@ -133,10 +128,5 @@ namespace QuantConnect.Interfaces
         /// Gets the time span used to refresh the market hours and symbol properties databases
         /// </summary>
         TimeSpan DatabasesRefreshPeriod { get; set; }
-
-        /// <summary>
-        /// Determines whether to terminate the algorithm when an asset is not supported by Lean or the brokerage
-        /// </summary>
-        bool IgnoreUnknownAssetHoldings { get; set; }
     }
 }

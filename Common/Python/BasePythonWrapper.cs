@@ -13,9 +13,8 @@
  * limitations under the License.
 */
 
-using System;
 using Python.Runtime;
-using QuantConnect.Util;
+using System;
 using System.Collections.Generic;
 
 namespace QuantConnect.Python
@@ -23,7 +22,7 @@ namespace QuantConnect.Python
     /// <summary>
     /// Base class for Python wrapper classes
     /// </summary>
-    public class BasePythonWrapper<TInterface> : IEquatable<BasePythonWrapper<TInterface>>, IDisposable
+    public class BasePythonWrapper<TInterface> : IEquatable<BasePythonWrapper<TInterface>>
     {
         private PyObject _instance;
         private object _underlyingClrObject;
@@ -329,23 +328,6 @@ namespace QuantConnect.Python
             using var _ = Py.GIL();
             // We only care about the Python object reference, not the underlying C# object reference for comparison
             return PythonReferenceComparer.Instance.Equals(_instance, other);
-        }
-
-        /// <summary>
-        /// Dispose of this instance
-        /// </summary>
-        public virtual void Dispose()
-        {
-            using var _ = Py.GIL();
-            if (_pythonMethods != null)
-            {
-                foreach (var methods in _pythonMethods.Values)
-                {
-                    methods.Dispose();
-                }
-                _pythonMethods.Clear();
-            }
-            _instance?.Dispose();
         }
 
         /// <summary>

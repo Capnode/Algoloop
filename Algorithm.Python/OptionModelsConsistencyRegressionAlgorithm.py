@@ -13,6 +13,10 @@
 
 from AlgorithmImports import *
 
+from System import Action
+
+from QuantConnect.Logging import *
+
 ### <summary>
 ### Algorithm asserting that when setting custom models for canonical securities, a one-time warning is sent
 ### informing the user that the contracts models are different (not the custom ones).
@@ -48,7 +52,7 @@ class OptionModelsConsistencyRegressionAlgorithm(QCAlgorithm):
         security.set_volatility_model(CustomVolatilityModel())
 
 class CustomSecurityInitializer(BrokerageModelSecurityInitializer):
-    def __init__(self, brokerage_model: IBrokerageModel, security_seeder: ISecuritySeeder):
+    def __init__(self, brokerage_model: BrokerageModel, security_seeder: SecuritySeeder):
         super().__init__(brokerage_model, security_seeder)
 
 class CustomFillModel(FillModel):

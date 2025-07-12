@@ -14,8 +14,9 @@
 */
 
 using System;
-using QuantConnect.Orders;
 using QuantConnect.Interfaces;
+using QuantConnect.Orders;
+using QuantConnect.Securities;
 
 namespace QuantConnect.Tests.Brokerages
 {
@@ -23,52 +24,47 @@ namespace QuantConnect.Tests.Brokerages
     {
         private readonly decimal _highLimit;
         private readonly decimal _lowLimit;
-        private readonly decimal _priceModificationFactor;
 
-        public LimitOrderTestParameters(Symbol symbol, decimal highLimit, decimal lowLimit, IOrderProperties properties = null,
-            OrderSubmissionData orderSubmissionData = null, decimal priceModificationFactor = 1.02m)
+        public LimitOrderTestParameters(Symbol symbol, decimal highLimit, decimal lowLimit, IOrderProperties properties = null, OrderSubmissionData orderSubmissionData = null)
             : base(symbol, properties, orderSubmissionData)
         {
             _highLimit = highLimit;
             _lowLimit = lowLimit;
-            _priceModificationFactor = priceModificationFactor;
         }
 
         public override Order CreateShortOrder(decimal quantity)
         {
-            return new LimitOrder(Symbol, -Math.Abs(quantity), _highLimit, DateTime.UtcNow, properties: Properties)
+            return new LimitOrder(Symbol, -Math.Abs(quantity), _highLimit, DateTime.Now, properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
         public override Order CreateLongOrder(decimal quantity)
         {
-            return new LimitOrder(Symbol, Math.Abs(quantity), _lowLimit, DateTime.UtcNow, properties: Properties)
+            return new LimitOrder(Symbol, Math.Abs(quantity), _lowLimit, DateTime.Now, properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
         public override bool ModifyOrderToFill(IBrokerage brokerage, Order order, decimal lastMarketPrice)
         {
             // limit orders will process even if they go beyond the market price
+
+            var symbolProperties = SPDB.GetSymbolProperties(order.Symbol.ID.Market, order.Symbol, order.SecurityType, order.PriceCurrency);
+            var roundOffPlaces = symbolProperties.MinimumPriceVariation.GetDecimalPlaces();
             var limit = (LimitOrder) order;
             if (order.Quantity > 0)
             {
                 // for limit buys we need to increase the limit price
-                limit.LimitPrice = Math.Max(limit.LimitPrice * _priceModificationFactor, lastMarketPrice * _priceModificationFactor);
+                limit.LimitPrice = Math.Round(lastMarketPrice *1.02m, roundOffPlaces);
             }
             else
             {
                 // for limit sells we need to decrease the limit price
-                limit.LimitPrice = Math.Min(limit.LimitPrice / _priceModificationFactor, lastMarketPrice / _priceModificationFactor);
+                limit.LimitPrice = Math.Round(lastMarketPrice / 1.02m, roundOffPlaces);
             }
-            limit.LimitPrice = RoundPrice(order, limit.LimitPrice);
             return true;
         }
 

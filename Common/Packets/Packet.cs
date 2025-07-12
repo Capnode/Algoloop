@@ -197,14 +197,5 @@ namespace QuantConnect.Packets
 
         /// Organization update
         OrganizationUpdate,
-
-        /// Compiler -> User Build Warnings
-        BuildWarning,
-
-        /// Language model function call related packet
-        LanguageModelFunctionCall,
-
-        /// Language model agent message
-        LanguageModelAgentMessage,
     }
 }

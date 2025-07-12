@@ -22,8 +22,6 @@ using System.Runtime.CompilerServices;
 using QuantConnect.Data.Fundamental;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Util;
-using Python.Runtime;
-using QuantConnect.Python;
 
 namespace QuantConnect.Securities
 {
@@ -317,38 +315,12 @@ namespace QuantConnect.Securities
         public T GetData<T>()
             where T : BaseData
         {
-            return GetData(typeof(T)) as T;
-        }
-
-        /// <summary>
-        /// Retrieves the last data packet of the specified Python type.
-        /// </summary>
-        /// <param name="pyType">The Python type to convert and match</param>
-        /// <returns>The last data packet as a PyObject, or null if not found</returns>
-        public PyObject GetData(PyObject pyType)
-        {
-            using var _ = Py.GIL();
-            if (!pyType.TryCreateType(out var type))
-            {
-                return null;
-            }
-            type = typeof(PythonData).IsAssignableFrom(type) ? typeof(PythonData) : type;
-            return GetData(type).ToPython();
-        }
-
-        /// <summary>
-        /// Get the last data packet of the specified type
-        /// </summary>
-        /// <param name="type">The type of data to retrieve</param>
-        /// <returns>The last data packet of the specified type, or null if none found</returns>
-        private BaseData GetData(Type type)
-        {
             IReadOnlyList<BaseData> list;
-            if (!TryGetValue(type, out list) || list.Count == 0)
+            if (!TryGetValue(typeof(T), out list) || list.Count == 0)
             {
-                return null;
+                return default(T);
             }
-            return list[list.Count - 1];
+            return list[list.Count - 1] as T;
         }
 
         /// <summary>
@@ -393,13 +365,9 @@ namespace QuantConnect.Securities
             Volume = 0;
             OpenInterest = 0;
 
-            _lastData = null;
             _dataByType = null;
             _lastTickQuotes = _empty;
             _lastTickTrades = _empty;
-
-            _lastOHLCUpdate = default;
-            _lastQuoteBarUpdate = default;
         }
 
         /// <summary>

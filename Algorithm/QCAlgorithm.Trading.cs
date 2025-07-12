@@ -257,7 +257,7 @@ namespace QuantConnect.Algorithm
             // For futures and FOPs, market orders can be submitted on extended hours, so we let them through.
             if ((security.Type != SecurityType.Future && security.Type != SecurityType.FutureOption) && !security.Exchange.ExchangeOpen)
             {
-                var mooTicket = MarketOnOpenOrder(security.Symbol, quantity, tag, orderProperties);
+                var mooTicket = MarketOnOpenOrder(security.Symbol, quantity, tag);
                 if (!_isMarketOnOpenOrderWarningSent)
                 {
                     var anyNonDailySubscriptions = security.Subscriptions.Any(x => x.Resolution != Resolution.Daily);
@@ -712,7 +712,7 @@ namespace QuantConnect.Algorithm
         [DocumentationAttribute(TradingAndOrders)]
         public OrderTicket ExerciseOption(Symbol optionSymbol, int quantity, bool asynchronous = false, string tag = "", IOrderProperties orderProperties = null)
         {
-            var option = (Option)Securities[optionSymbol];
+            var option = (Option) Securities[optionSymbol];
 
             // SubmitOrderRequest.Quantity indicates the change in holdings quantity, therefore manual exercise quantities must be negative
             // PreOrderChecksImpl confirms that we don't hold a short position, so we're lenient here and accept +/- quantity values
@@ -749,7 +749,7 @@ namespace QuantConnect.Algorithm
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
         /// <returns>Sequence of order tickets</returns>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> Buy(OptionStrategy strategy, int quantity, bool asynchronous = false, string tag = "", IOrderProperties orderProperties = null)
+        public IEnumerable<OrderTicket> Buy(OptionStrategy strategy, int quantity, bool asynchronous = false, string tag = "", IOrderProperties orderProperties = null)
         {
             return Order(strategy, Math.Abs(quantity), asynchronous, tag, orderProperties);
         }
@@ -764,7 +764,7 @@ namespace QuantConnect.Algorithm
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
         /// <returns>Sequence of order tickets</returns>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> Sell(OptionStrategy strategy, int quantity, bool asynchronous = false, string tag = "", IOrderProperties orderProperties = null)
+        public IEnumerable<OrderTicket> Sell(OptionStrategy strategy, int quantity, bool asynchronous = false, string tag = "", IOrderProperties orderProperties = null)
         {
             return Order(strategy, Math.Abs(quantity) * -1, asynchronous, tag, orderProperties);
         }
@@ -779,7 +779,7 @@ namespace QuantConnect.Algorithm
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
         /// <returns>Sequence of order tickets</returns>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> Order(OptionStrategy strategy, int quantity, bool asynchronous = false, string tag = "", IOrderProperties orderProperties = null)
+        public IEnumerable<OrderTicket> Order(OptionStrategy strategy, int quantity, bool asynchronous = false, string tag = "", IOrderProperties orderProperties = null)
         {
             return GenerateOptionStrategyOrders(strategy, quantity, asynchronous, tag, orderProperties);
         }
@@ -846,7 +846,7 @@ namespace QuantConnect.Algorithm
             return SubmitComboOrder(legs, quantity, limitPrice, asynchronous: true, tag, orderProperties);
         }
 
-        private List<OrderTicket> GenerateOptionStrategyOrders(OptionStrategy strategy, int strategyQuantity, bool asynchronous, string tag, IOrderProperties orderProperties)
+        private IEnumerable<OrderTicket> GenerateOptionStrategyOrders(OptionStrategy strategy, int strategyQuantity, bool asynchronous, string tag, IOrderProperties orderProperties)
         {
             // if the option strategy canonical is set let's use it to make sure we target the right option, for example SPXW for SPX underlying,
             // it could be null if the user created the option strategy manually and just set the underlying, in which case we use the default option target by using 'null'
@@ -873,7 +873,7 @@ namespace QuantConnect.Algorithm
                     }
                 }
 
-                if (leg == null)
+                if(leg == null)
                 {
                     throw new InvalidOperationException("Couldn't find the option contract in algorithm securities list. " +
                         Invariant($"Underlying: {strategy.Underlying}, option {optionLeg.Right}, strike {optionLeg.Strike}, ") +
@@ -891,7 +891,7 @@ namespace QuantConnect.Algorithm
             CheckComboOrderSizing(legs, quantity);
 
             var orderType = OrderType.ComboMarket;
-            if (limitPrice != 0)
+            if(limitPrice != 0)
             {
                 orderType = OrderType.ComboLimit;
             }
@@ -1144,11 +1144,6 @@ namespace QuantConnect.Algorithm
                 {
                     throw new InvalidOperationException($"Market never closes for this symbol {security.Symbol}, can no submit a {nameof(OrderType.MarketOnOpen)} order.");
                 }
-
-                if (security.Exchange.Hours.IsOpen(security.LocalTime, false))
-                {
-                    return OrderResponse.Error(request, OrderResponseErrorCode.MarketOnOpenNotAllowedDuringRegularHours, $"Cannot submit a {nameof(OrderType.MarketOnOpen)} order while the market is open.");
-                }
             }
             else if (request.OrderType == OrderType.MarketOnClose)
             {
@@ -1210,7 +1205,7 @@ namespace QuantConnect.Algorithm
         /// <param name="tag">Custom tag to know who is calling this</param>
         /// <param name="orderProperties">Order properties to use</param>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> Liquidate(Symbol symbol = null, bool asynchronous = false, string tag = null, IOrderProperties orderProperties = null)
+        public List<OrderTicket> Liquidate(Symbol symbol = null, bool asynchronous = false, string tag = "Liquidated", IOrderProperties orderProperties = null)
         {
             IEnumerable<Symbol> toLiquidate;
             if (symbol != null)
@@ -1234,7 +1229,7 @@ namespace QuantConnect.Algorithm
         /// <param name="tag">Custom tag to know who is calling this</param>
         /// <param name="orderProperties">Order properties to use</param>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> Liquidate(IEnumerable<Symbol> symbols, bool asynchronous = false, string tag = null, IOrderProperties orderProperties = null)
+        public List<OrderTicket> Liquidate(IEnumerable<Symbol> symbols, bool asynchronous = false, string tag = "Liquidated", IOrderProperties orderProperties = null)
         {
             var orderTickets = new List<OrderTicket>();
             if (!Settings.LiquidateEnabled)
@@ -1242,8 +1237,7 @@ namespace QuantConnect.Algorithm
                 Debug("Liquidate() is currently disabled by settings. To re-enable please set 'Settings.LiquidateEnabled' to true");
                 return orderTickets;
             }
-
-            tag ??= "Liquidated";
+            
             foreach (var symbolToLiquidate in symbols)
             {
                 // get open orders
@@ -1306,7 +1300,7 @@ namespace QuantConnect.Algorithm
         [Obsolete($"This method is obsolete, please use Liquidate(symbol: symbolToLiquidate, tag: tag) method")]
         public List<int> Liquidate(Symbol symbolToLiquidate, string tag)
         {
-            return Liquidate(symbol: symbolToLiquidate, tag: tag).Select(x => x.OrderId).ToList();
+            return Liquidate(symbol: symbolToLiquidate, tag:tag).Select(x => x.OrderId).ToList();
         }
 
         /// <summary>
@@ -1331,28 +1325,23 @@ namespace QuantConnect.Algorithm
         /// <param name="liquidateExistingHoldings">True will liquidate existing holdings</param>
         /// <param name="tag">Tag the order with a short string.</param>
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
-        /// <returns>A list of order tickets.</returns>
         /// <seealso cref="MarketOrder(QuantConnect.Symbol, decimal, bool, string, IOrderProperties)"/>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> SetHoldings(List<PortfolioTarget> targets, bool liquidateExistingHoldings = false, string tag = null, IOrderProperties orderProperties = null)
+        public void SetHoldings(List<PortfolioTarget> targets, bool liquidateExistingHoldings = false, string tag = "", IOrderProperties orderProperties = null)
         {
-            List<OrderTicket> orderTickets = null;
             //If they triggered a liquidate
             if (liquidateExistingHoldings)
             {
-                orderTickets = Liquidate(GetSymbolsToLiquidate(targets.Select(t => t.Symbol)), tag: tag, orderProperties: orderProperties);
+                LiquidateExistingHoldings(targets.Select(x => x.Symbol).ToHashSet(), tag, orderProperties);
             }
-            orderTickets ??= new List<OrderTicket>();
 
             foreach (var portfolioTarget in targets
                 // we need to create targets with quantities for OrderTargetsByMarginImpact
                 .Select(target => new PortfolioTarget(target.Symbol, CalculateOrderQuantity(target.Symbol, target.Quantity)))
-                .OrderTargetsByMarginImpact(this, targetIsDelta: true))
+                .OrderTargetsByMarginImpact(this, targetIsDelta:true))
             {
-                var tickets = SetHoldingsImpl(portfolioTarget.Symbol, portfolioTarget.Quantity, false, tag, orderProperties);
-                orderTickets.AddRange(tickets);
+                SetHoldingsImpl(portfolioTarget.Symbol, portfolioTarget.Quantity, false, tag, orderProperties);
             }
-            return orderTickets;
         }
 
         /// <summary>
@@ -1363,12 +1352,11 @@ namespace QuantConnect.Algorithm
         /// <param name="liquidateExistingHoldings">liquidate existing holdings if necessary to hold this stock</param>
         /// <param name="tag">Tag the order with a short string.</param>
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
-        /// <returns>A list of order tickets.</returns>
         /// <seealso cref="MarketOrder(QuantConnect.Symbol, decimal, bool, string, IOrderProperties)"/>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> SetHoldings(Symbol symbol, double percentage, bool liquidateExistingHoldings = false, string tag = null, IOrderProperties orderProperties = null)
+        public void SetHoldings(Symbol symbol, double percentage, bool liquidateExistingHoldings = false, string tag = "", IOrderProperties orderProperties = null)
         {
-            return SetHoldings(symbol, percentage.SafeDecimalCast(), liquidateExistingHoldings, tag, orderProperties);
+            SetHoldings(symbol, percentage.SafeDecimalCast(), liquidateExistingHoldings, tag, orderProperties);
         }
 
         /// <summary>
@@ -1379,12 +1367,11 @@ namespace QuantConnect.Algorithm
         /// <param name="liquidateExistingHoldings">bool liquidate existing holdings if necessary to hold this stock</param>
         /// <param name="tag">Tag the order with a short string.</param>
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
-        /// <returns>A list of order tickets.</returns>
         /// <seealso cref="MarketOrder(QuantConnect.Symbol, decimal, bool, string, IOrderProperties)"/>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> SetHoldings(Symbol symbol, float percentage, bool liquidateExistingHoldings = false, string tag = null, IOrderProperties orderProperties = null)
+        public void SetHoldings(Symbol symbol, float percentage, bool liquidateExistingHoldings = false, string tag = "", IOrderProperties orderProperties = null)
         {
-            return SetHoldings(symbol, (decimal)percentage, liquidateExistingHoldings, tag, orderProperties);
+            SetHoldings(symbol, (decimal)percentage, liquidateExistingHoldings, tag, orderProperties);
         }
 
         /// <summary>
@@ -1395,12 +1382,11 @@ namespace QuantConnect.Algorithm
         /// <param name="liquidateExistingHoldings">bool liquidate existing holdings if necessary to hold this stock</param>
         /// <param name="tag">Tag the order with a short string.</param>
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
-        /// <returns>A list of order tickets.</returns>
         /// <seealso cref="MarketOrder(QuantConnect.Symbol, decimal, bool, string, IOrderProperties)"/>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> SetHoldings(Symbol symbol, int percentage, bool liquidateExistingHoldings = false, string tag = null, IOrderProperties orderProperties = null)
+        public void SetHoldings(Symbol symbol, int percentage, bool liquidateExistingHoldings = false, string tag = "", IOrderProperties orderProperties = null)
         {
-            return SetHoldings(symbol, (decimal)percentage, liquidateExistingHoldings, tag, orderProperties);
+            SetHoldings(symbol, (decimal)percentage, liquidateExistingHoldings, tag, orderProperties);
         }
 
         /// <summary>
@@ -1414,28 +1400,24 @@ namespace QuantConnect.Algorithm
         /// <param name="liquidateExistingHoldings">bool flag to clean all existing holdings before setting new faction.</param>
         /// <param name="tag">Tag the order with a short string.</param>
         /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
-        /// <returns>A list of order tickets.</returns>
         /// <seealso cref="MarketOrder(QuantConnect.Symbol, decimal, bool, string, IOrderProperties)"/>
         [DocumentationAttribute(TradingAndOrders)]
-        public List<OrderTicket> SetHoldings(Symbol symbol, decimal percentage, bool liquidateExistingHoldings = false, string tag = null, IOrderProperties orderProperties = null)
+        public void SetHoldings(Symbol symbol, decimal percentage, bool liquidateExistingHoldings = false, string tag = "", IOrderProperties orderProperties = null)
         {
-            return SetHoldingsImpl(symbol, CalculateOrderQuantity(symbol, percentage), liquidateExistingHoldings, tag, orderProperties);
+            SetHoldingsImpl(symbol, CalculateOrderQuantity(symbol, percentage), liquidateExistingHoldings, tag, orderProperties);
         }
 
         /// <summary>
         /// Set holdings implementation, which uses order quantities (delta) not percentage nor target final quantity
         /// </summary>
-        private List<OrderTicket> SetHoldingsImpl(Symbol symbol, decimal orderQuantity, bool liquidateExistingHoldings = false, string tag = null, IOrderProperties orderProperties = null)
+        private void SetHoldingsImpl(Symbol symbol, decimal orderQuantity, bool liquidateExistingHoldings = false, string tag = "", IOrderProperties orderProperties = null)
         {
-            List<OrderTicket> orderTickets = null;
             //If they triggered a liquidate
             if (liquidateExistingHoldings)
             {
-                orderTickets = Liquidate(GetSymbolsToLiquidate([symbol]), tag: tag, orderProperties: orderProperties);
+                LiquidateExistingHoldings(new HashSet<Symbol> { symbol }, tag, orderProperties);
             }
 
-            orderTickets ??= new List<OrderTicket>();
-            tag ??= "";
             //Calculate total unfilled quantity for open market orders
             var marketOrdersQuantity = Transactions.GetOpenOrderTickets(
                     ticket => ticket.Symbol == symbol
@@ -1451,37 +1433,40 @@ namespace QuantConnect.Algorithm
                 if (!Securities.TryGetValue(symbol, out security))
                 {
                     Error($"{symbol} not found in portfolio. Request this data when initializing the algorithm.");
-                    return orderTickets;
+                    return;
                 }
 
                 //Check whether the exchange is open to send a market order. If not, send a market on open order instead
-                OrderTicket ticket;
                 if (security.Exchange.ExchangeOpen)
                 {
-                    ticket = MarketOrder(symbol, quantity, false, tag, orderProperties);
+                    MarketOrder(symbol, quantity, false, tag, orderProperties);
                 }
                 else
                 {
-                    ticket = MarketOnOpenOrder(symbol, quantity, tag, orderProperties);
+                    MarketOnOpenOrder(symbol, quantity, tag, orderProperties);
                 }
-                orderTickets.Add(ticket);
             }
-            return orderTickets;
         }
 
         /// <summary>
-        /// Returns the symbols in the portfolio to be liquidated, excluding the provided symbols.
+        /// Liquidate existing holdings, except for the target list of Symbol.
         /// </summary>
-        /// <param name="symbols">The list of symbols to exclude from liquidation.</param>
-        /// <returns>A list of symbols to liquidate.</returns>
-        private List<Symbol> GetSymbolsToLiquidate(IEnumerable<Symbol> symbols)
+        /// <param name="symbols">List of Symbol indexer</param>
+        /// <param name="tag">Tag the order with a short string.</param>
+        /// <param name="orderProperties">The order properties to use. Defaults to <see cref="DefaultOrderProperties"/></param>
+        private void LiquidateExistingHoldings(HashSet<Symbol> symbols, string tag = "", IOrderProperties orderProperties = null)
         {
-            var targetSymbols = new HashSet<Symbol>(symbols);
-            var symbolsToLiquidate = Portfolio.Keys
-                .Where(symbol => !targetSymbols.Contains(symbol))
-                .OrderBy(symbol => symbol.Value)
-                .ToList();
-            return symbolsToLiquidate;
+            foreach (var kvp in Portfolio)
+            {
+                var holdingSymbol = kvp.Key;
+                var holdings = kvp.Value;
+                if (!symbols.Contains(holdingSymbol) && holdings.AbsoluteQuantity > 0)
+                {
+                    //Go through all existing holdings [synchronously], market order the inverse quantity:
+                    var liquidationQuantity = CalculateOrderQuantity(holdingSymbol, 0m);
+                    Order(holdingSymbol, liquidationQuantity, false, tag, orderProperties);
+                }
+            }
         }
 
         /// <summary>

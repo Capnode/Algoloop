@@ -678,7 +678,6 @@ namespace QuantConnect.Tests.Algorithm
             }
             else
             {
-                algo.SetDateTime(new DateTime(2025, 04, 26, 18, 30, 0).ConvertToUtc(algo.TimeZone));
                 algo.MarketOnOpenOrder(symbol, 1);
                 algo.MarketOnOpenOrder(symbol, 1.0);
                 algo.MarketOnOpenOrder(symbol, 1.0m);

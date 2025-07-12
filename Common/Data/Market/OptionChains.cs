@@ -13,19 +13,29 @@
  * limitations under the License.
 */
 
+using Python.Runtime;
+using QuantConnect.Python;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace QuantConnect.Data.Market
 {
     /// <summary>
     /// Collection of <see cref="OptionChain"/> keyed by canonical option symbol
     /// </summary>
-    public class OptionChains : BaseChains<OptionChain, OptionContract, OptionContracts>
+    public class OptionChains : DataDictionary<OptionChain>
     {
+        private static readonly IEnumerable<string> _flattenedDfIndexNames = new[] { "canonical", "symbol" };
+
+        private readonly Lazy<PyObject> _dataframe;
+        private readonly bool _flatten;
+
         /// <summary>
         /// Creates a new instance of the <see cref="OptionChains"/> dictionary
         /// </summary>
-        public OptionChains() : base()
+        public OptionChains()
+            : this(default, true)
         {
         }
 
@@ -33,7 +43,7 @@ namespace QuantConnect.Data.Market
         /// Creates a new instance of the <see cref="OptionChains"/> dictionary
         /// </summary>
         public OptionChains(bool flatten)
-            : base(flatten)
+            : this(default, flatten)
         {
         }
 
@@ -41,8 +51,53 @@ namespace QuantConnect.Data.Market
         /// Creates a new instance of the <see cref="OptionChains"/> dictionary
         /// </summary>
         public OptionChains(DateTime time, bool flatten = true)
-            : base(time, flatten)
+            : base(time)
         {
+            _flatten = flatten;
+            _dataframe = new Lazy<PyObject>(InitializeDataFrame, isThreadSafe: false);
+        }
+
+        /// <summary>
+        /// The data frame representation of the option chains
+        /// </summary>
+        public PyObject DataFrame => _dataframe.Value;
+
+        /// <summary>
+        /// Gets or sets the OptionChain with the specified ticker.
+        /// </summary>
+        /// <returns>
+        /// The OptionChain with the specified ticker.
+        /// </returns>
+        /// <param name="ticker">The ticker of the element to get or set.</param>
+        /// <remarks>Wraps the base implementation to enable indexing in python algorithms due to pythonnet limitations</remarks>
+        public new OptionChain this[string ticker] { get { return base[ticker]; } set { base[ticker] = value; } }
+
+        /// <summary>
+        /// Gets or sets the OptionChain with the specified Symbol.
+        /// </summary>
+        /// <returns>
+        /// The OptionChain with the specified Symbol.
+        /// </returns>
+        /// <param name="symbol">The Symbol of the element to get or set.</param>
+        /// <remarks>Wraps the base implementation to enable indexing in python algorithms due to pythonnet limitations</remarks>
+        public new OptionChain this[Symbol symbol] { get { return base[symbol]; } set { base[symbol] = value; } }
+
+        private PyObject InitializeDataFrame()
+        {
+            if (!PythonEngine.IsInitialized)
+            {
+                return null;
+            }
+
+            var dataFrames = this.Select(kvp => kvp.Value.DataFrame).ToList();
+
+            if (_flatten)
+            {
+                var canonicalSymbols = this.Select(kvp => kvp.Key);
+                return PandasConverter.ConcatDataFrames(dataFrames, keys: canonicalSymbols, names: _flattenedDfIndexNames, sort: false);
+            }
+
+            return PandasConverter.ConcatDataFrames(dataFrames, sort: false);
         }
     }
 }

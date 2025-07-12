@@ -99,7 +99,7 @@ namespace QuantConnect.Util
 
                 default:
                     writer.WritePropertyName("values");
-                    serializer.Serialize(writer, baseSeries.Values);
+                    serializer.Serialize(writer, (value as BaseSeries).Values);
                     break;
             }
 

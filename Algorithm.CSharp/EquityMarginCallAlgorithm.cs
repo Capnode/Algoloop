@@ -56,16 +56,6 @@ namespace QuantConnect.Algorithm.CSharp
         {
             Debug($"OnMarginCall at {Time}");
             _onMarginCallWasCalled = true;
-            foreach (var request in requests)
-            {
-                var security = Portfolio.Securities[request.Symbol];
-
-                // Ensure margin call orders only happen when the exchange is open
-                if (!security.Exchange.ExchangeOpen)
-                {
-                    throw new RegressionTestException("Margin calls should not occur outside regular market hours!");
-                }
-            }
         }
 
         public override void OnMarginCallWarning()
@@ -149,7 +139,7 @@ namespace QuantConnect.Algorithm.CSharp
             {"Estimated Strategy Capacity", "$8000.00"},
             {"Lowest Capacity Asset", "GOOCV VP83T1ZUHROL"},
             {"Portfolio Turnover", "2904.79%"},
-            {"OrderListHash", "80d456f6613030d3ff67b6c59dba5707"}
+            {"OrderListHash", "fd4d435c47fe44b4b2b867eee3bd5f69"}
         };
     }
 }

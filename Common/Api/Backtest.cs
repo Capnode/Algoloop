@@ -128,7 +128,7 @@ namespace QuantConnect.Api
         /// <summary>
         /// Organization ID
         /// </summary>
-        public string OrganizationId { get; set; }
+        public int OrganizationId { get; set; }
 
         /// <summary>
         /// Rolling window detailed statistics.

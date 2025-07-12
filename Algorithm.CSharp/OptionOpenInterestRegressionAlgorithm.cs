@@ -90,12 +90,6 @@ namespace QuantConnect.Algorithm.CSharp
                             }
                         }
                     }
-
-                    // We should be able to access the open interest of the contract
-                    if (chain.Value.All(contract => contract.OpenInterest == 0))
-                    {
-                        throw new RegressionTestException("Regression test failed: open interest is zero for all contracts");
-                    }
                 }
             }
         }
@@ -128,7 +122,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of the algorithm history
         /// </summary>
-        public int AlgorithmHistoryDataPoints => 77028;
+        public int AlgorithmHistoryDataPoints => 146806;
 
         /// <summary>
         /// Final status of the algorithm

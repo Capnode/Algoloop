@@ -51,13 +51,5 @@ namespace QuantConnect.Securities
         {
             return convertibleCashAmount.InAccountCurrency;
         }
-
-        /// <summary>
-        /// The amount in account currency
-        /// </summary>
-        public static implicit operator CashAmount(ConvertibleCashAmount convertibleCashAmount)
-        {
-            return new CashAmount(convertibleCashAmount.Amount, convertibleCashAmount.Cash.Symbol);
-        }
     }
 }

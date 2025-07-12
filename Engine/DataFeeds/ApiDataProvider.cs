@@ -163,10 +163,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
             }
 
             // Some security types can't be downloaded, lets attempt to extract that information
-            if (LeanData.TryParseSecurityType(filePath, out SecurityType securityType, out var market) &&
-                _unsupportedSecurityType.Contains(securityType) &&
-                // We do support universe data for some security types (options and futures)
-                !IsUniverseData(securityType, filePath))
+            if (LeanData.TryParseSecurityType(filePath, out SecurityType securityType, out var market) && _unsupportedSecurityType.Contains(securityType))
             {
                 // we do support future auxiliary data (map and factor files)
                 if (securityType != SecurityType.Future || !IsAuxiliaryData(filePath))
@@ -254,15 +251,6 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                 || filepath.Contains("factor_files", StringComparison.InvariantCulture)
                 || filepath.Contains("fundamental", StringComparison.InvariantCulture)
                 || filepath.Contains("shortable", StringComparison.InvariantCulture);
-        }
-
-        /// <summary>
-        /// Helper method to determine if this file path if for a universe file
-        /// </summary>
-        private static bool IsUniverseData(SecurityType securityType, string filepath)
-        {
-            return (securityType.IsOption() || securityType == SecurityType.Future) &&
-                filepath.Contains("universes", StringComparison.InvariantCulture);
         }
     }
 }

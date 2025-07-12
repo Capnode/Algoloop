@@ -183,15 +183,5 @@ namespace QuantConnect.Brokerages
         /// Transaction and submit/execution rules will use Charles Schwab models
         /// </summary>
         CharlesSchwab,
-
-        /// <summary>
-        /// Transaction and submit/execution rules will use Tastytrade models
-        /// </summary>
-        Tastytrade,
-
-        /// <summary>
-        /// Transaction and submit/execution rules will use interactive brokers Fix models
-        /// </summary>
-        InteractiveBrokersFix
     }
 }

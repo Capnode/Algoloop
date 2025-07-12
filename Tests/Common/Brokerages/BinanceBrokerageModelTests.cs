@@ -29,9 +29,16 @@ namespace QuantConnect.Tests.Common.Brokerages
     [TestFixture, Parallelizable(ParallelScope.All)]
     public class BinanceBrokerageModelTests
     {
-        private static readonly Symbol _btceur = Symbol.Create("BTCEUR", SecurityType.Crypto, Market.Binance);
+        private readonly Symbol _btceur = Symbol.Create("BTCEUR", SecurityType.Crypto, Market.Binance);
+        private Security _security;
 
         protected virtual BinanceBrokerageModel BinanceBrokerageModel => new();
+
+        [SetUp]
+        public void Init()
+        {
+            _security = TestsHelpers.GetSecurity(symbol: _btceur.Value, market: _btceur.ID.Market, quoteCurrency: "EUR");
+        }
 
         [TestCase(0.01, true)]
         [TestCase(0.000009, false)]
@@ -40,8 +47,7 @@ namespace QuantConnect.Tests.Common.Brokerages
             var order = new Mock<MarketOrder>();
             order.Setup(mock => mock.Quantity).Returns(orderQuantity);
 
-            var security = GetSecurity();
-            security.Cache.AddData(new Tick
+            _security.Cache.AddData(new Tick
             {
                 AskPrice = 50001,
                 BidPrice = 49999,
@@ -52,12 +58,12 @@ namespace QuantConnect.Tests.Common.Brokerages
                 BidSize = 1
             });
 
-            Assert.AreEqual(isValidOrderQuantity, BinanceBrokerageModel.CanSubmitOrder(security, order.Object, out var message));
+            Assert.AreEqual(isValidOrderQuantity, BinanceBrokerageModel.CanSubmitOrder(_security, order.Object, out var message));
             Assert.AreEqual(isValidOrderQuantity, message == null);
             if (!isValidOrderQuantity)
             {
-                var price = order.Object.Direction == OrderDirection.Buy ? security.AskPrice : security.BidPrice;
-                Assert.AreEqual(Messages.DefaultBrokerageModel.InvalidOrderSize(security, order.Object.Quantity, price), message.Message);
+                var price = order.Object.Direction == OrderDirection.Buy ? _security.AskPrice : _security.BidPrice;
+                Assert.AreEqual(Messages.DefaultBrokerageModel.InvalidOrderSize(_security, order.Object.Quantity, price), message.Message);
             }
         }
 
@@ -70,12 +76,11 @@ namespace QuantConnect.Tests.Common.Brokerages
             order.Setup(mock => mock.Quantity).Returns(orderQuantity);
             order.Object.LimitPrice = limitPrice;
 
-            var security = GetSecurity();
-            Assert.AreEqual(isValidOrderQuantity, BinanceBrokerageModel.CanSubmitOrder(security, order.Object, out var message));
+            Assert.AreEqual(isValidOrderQuantity, BinanceBrokerageModel.CanSubmitOrder(_security, order.Object, out var message));
             Assert.AreEqual(isValidOrderQuantity, message == null);
             if (!isValidOrderQuantity)
             {
-                Assert.AreEqual(Messages.DefaultBrokerageModel.InvalidOrderSize(security, order.Object.Quantity, order.Object.LimitPrice), message.Message);
+                Assert.AreEqual(Messages.DefaultBrokerageModel.InvalidOrderSize(_security, order.Object.Quantity, order.Object.LimitPrice), message.Message);
             }
         }
 
@@ -91,12 +96,11 @@ namespace QuantConnect.Tests.Common.Brokerages
             order.Object.StopPrice = stopPrice;
             order.Object.LimitPrice = limitPrice;
 
-            var security = GetSecurity();
-            Assert.AreEqual(isValidOrderQuantity, BinanceBrokerageModel.CanSubmitOrder(security, order.Object, out var message));
+            Assert.AreEqual(isValidOrderQuantity, BinanceBrokerageModel.CanSubmitOrder(_security, order.Object, out var message));
             Assert.AreEqual(isValidOrderQuantity, message == null);
             if (!isValidOrderQuantity)
             {
-                Assert.AreEqual(Messages.DefaultBrokerageModel.InvalidOrderSize(security, order.Object.Quantity, Math.Min(order.Object.LimitPrice, order.Object.StopPrice)), message.Message);
+                Assert.AreEqual(Messages.DefaultBrokerageModel.InvalidOrderSize(_security, order.Object.Quantity, Math.Min(order.Object.LimitPrice, order.Object.StopPrice)), message.Message);
             }
         }
 
@@ -111,7 +115,7 @@ namespace QuantConnect.Tests.Common.Brokerages
                 }
             };
 
-            var security = GetSecurity();
+            var security = TestsHelpers.GetSecurity(symbol: _btceur.Value, market: _btceur.ID.Market, quoteCurrency: "EUR");
 
             Assert.AreEqual(false, BinanceBrokerageModel.CanSubmitOrder(security, order.Object, out var message));
             Assert.NotNull(message);
@@ -160,22 +164,19 @@ namespace QuantConnect.Tests.Common.Brokerages
         [Test]
         public void Returns1m_IfCashAccount()
         {
-            var security = GetSecurity();
-            Assert.AreEqual(1m, new BinanceBrokerageModel(AccountType.Cash).GetLeverage(security));
+            Assert.AreEqual(1m, new BinanceBrokerageModel(AccountType.Cash).GetLeverage(_security));
         }
 
         [Test]
         public void ReturnsCashBuyinPowerModel_ForCashAccount()
         {
-            var security = GetSecurity();
-            Assert.IsInstanceOf<CashBuyingPowerModel>(new BinanceBrokerageModel(AccountType.Cash).GetBuyingPowerModel(security));
+            Assert.IsInstanceOf<CashBuyingPowerModel>(new BinanceBrokerageModel(AccountType.Cash).GetBuyingPowerModel(_security));
         }
 
         [Test]
         public void ReturnBinanceFeeModel()
         {
-            var security = GetSecurity();
-            Assert.IsInstanceOf<BinanceFeeModel>(BinanceBrokerageModel.GetFeeModel(security));
+            Assert.IsInstanceOf<BinanceFeeModel>(BinanceBrokerageModel.GetFeeModel(_security));
         }
 
         [Test]
@@ -210,11 +211,6 @@ namespace QuantConnect.Tests.Common.Brokerages
             {
                 Assert.AreEqual(3m, _binanceBrokerageModel.GetLeverage(_security));
             }
-        }
-
-        private static Security GetSecurity()
-        {
-            return TestsHelpers.GetSecurity(symbol: _btceur.Value, market: _btceur.ID.Market, quoteCurrency: "EUR");
         }
     }
 }

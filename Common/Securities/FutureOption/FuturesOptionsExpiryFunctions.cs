@@ -46,7 +46,9 @@ namespace QuantConnect.Securities.FutureOption
             // Trading terminates 7 business days before the 26th calendar of the month prior to the contract month. https://www.cmegroup.com/trading/energy/crude-oil/light-sweet-crude_contractSpecs_options.html#optionProductId=190
             {_lo, expiryMonth => {
                 var twentySixthDayOfPreviousMonthFromContractMonth = expiryMonth.AddMonths(-1).AddDays(-(expiryMonth.Day - 1)).AddDays(25);
-                var holidays = FuturesExpiryUtilityFunctions.GetExpirationHolidays(_lo.ID.Market, _lo.Underlying.ID.Symbol);
+                var holidays = _mhdb.GetEntry(_lo.ID.Market, _lo.Underlying, SecurityType.Future)
+                    .ExchangeHours
+                    .Holidays;
 
                 return FuturesExpiryUtilityFunctions.AddBusinessDays(twentySixthDayOfPreviousMonthFromContractMonth, -7, holidays);
             }},
@@ -132,13 +134,15 @@ namespace QuantConnect.Securities.FutureOption
         /// <returns>Expiry DateTime of the Future Option</returns>
         private static DateTime FridayBeforeTwoBusinessDaysBeforeEndOfMonth(Symbol underlyingFuture, DateTime expiryMonth)
         {
-            var holidays = FuturesExpiryUtilityFunctions.GetExpirationHolidays(underlyingFuture.ID.Market, underlyingFuture.ID.Symbol);
+            var holidays = _mhdb.GetEntry(underlyingFuture.ID.Market, underlyingFuture, SecurityType.Future)
+                .ExchangeHours
+                .Holidays;
 
             var expiryMonthPreceding = expiryMonth.AddMonths(-1).AddDays(-(expiryMonth.Day - 1));
             var fridayBeforeSecondLastBusinessDay = FuturesExpiryUtilityFunctions.NthLastBusinessDay(
                 expiryMonthPreceding,
                 2,
-                holidays).AddDays(-1);
+                holidayList: holidays).AddDays(-1);
 
             while (fridayBeforeSecondLastBusinessDay.DayOfWeek != DayOfWeek.Friday)
             {
@@ -161,10 +165,12 @@ namespace QuantConnect.Securities.FutureOption
         /// <returns>Expiry DateTime of the Future Option</returns>
         private static DateTime FourthLastBusinessDayInPrecedingMonthFromContractMonth(Symbol underlyingFuture, DateTime expiryMonth, int hour, int minutes, bool noFridays = true)
         {
-            var holidays = FuturesExpiryUtilityFunctions.GetExpirationHolidays(underlyingFuture.ID.Market, underlyingFuture.ID.Symbol);
+            var holidays = _mhdb.GetEntry(underlyingFuture.ID.Market, underlyingFuture, SecurityType.Future)
+                .ExchangeHours
+                .Holidays;
 
             var expiryMonthPreceding = expiryMonth.AddMonths(-1);
-            var fourthLastBusinessDay = FuturesExpiryUtilityFunctions.NthLastBusinessDay(expiryMonthPreceding, 4, holidays);
+            var fourthLastBusinessDay = FuturesExpiryUtilityFunctions.NthLastBusinessDay(expiryMonthPreceding, 4, holidayList: holidays);
 
             if (noFridays)
             {

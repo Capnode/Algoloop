@@ -75,8 +75,7 @@ namespace QuantConnect.Algorithm.Framework.Selection
         protected override FutureFilterUniverse Filter(FutureFilterUniverse filter)
         {
             // Remove duplicated keys
-            return filter.Contracts(FilterByOpenInterest(
-                filter.DistinctBy(x => x).ToDictionary(x => x.Symbol, x => _marketHoursDatabase.GetEntry(x.ID.Market, x, x.ID.SecurityType))));
+            return filter.Contracts(FilterByOpenInterest(filter.DistinctBy(x => x).ToDictionary(x => x, x => _marketHoursDatabase.GetEntry(x.ID.Market, x, x.ID.SecurityType))));
         }
 
         /// <summary>

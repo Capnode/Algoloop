@@ -40,12 +40,12 @@ class CustomMarginInterestRateModelAlgorithm(QCAlgorithm):
 
     def on_end_of_algorithm(self):
         if self._margin_interest_rate_model.call_count == 0:
-            raise AssertionError("CustomMarginInterestRateModel was not called")
+            raise Exception("CustomMarginInterestRateModel was not called")
 
         expected_cash = self._cash_after_order * pow(1 + self._margin_interest_rate_model.interest_rate, self._margin_interest_rate_model.call_count)
 
         if abs(self.portfolio.cash - expected_cash) > 1e-10:
-            raise AssertionError(f"Expected cash {expected_cash} but got {self.portfolio.cash}")
+            raise Exception(f"Expected cash {expected_cash} but got {self.portfolio.cash}")
 
 
 class CustomMarginInterestRateModel:

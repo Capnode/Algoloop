@@ -25,18 +25,16 @@ namespace QuantConnect.Orders
         /// <summary>
         /// The linked account for which to submit the order (only used by Financial Advisors)
         /// </summary>
-        /// <remarks>Mutually exclusive with FaProfile and FaGroup</remarks>
         public string Account { get; set; }
 
         /// <summary>
         /// The account group for the order (only used by Financial Advisors)
         /// </summary>
-        /// <remarks>Mutually exclusive with FaProfile and Account</remarks>
         public string FaGroup { get; set; }
 
         /// <summary>
         /// The allocation method for the account group order (only used by Financial Advisors)
-        /// Supported allocation methods are: Equal, NetLiq, AvailableEquity, PctChange
+        /// Supported allocation methods are: EqualQuantity, NetLiq, AvailableEquity, PctChange
         /// </summary>
         public string FaMethod { get; set; }
 
@@ -48,7 +46,6 @@ namespace QuantConnect.Orders
         /// <summary>
         /// The allocation profile to be used for the order (only used by Financial Advisors)
         /// </summary>
-        /// <remarks>Mutually exclusive with FaGroup and Account</remarks>
         public string FaProfile { get; set; }
 
         /// <summary>

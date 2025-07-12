@@ -80,10 +80,8 @@ namespace QuantConnect.Algorithm.CSharp
             // Initialize this flag, to check when the ema indicators crosses between themselves
             _emaFastIsNotSet = true;
 
-            // Disable automatic exports as we manually set them
-            SignalExport.AutomaticExportTimeSpan = null;
             // Set Collective2 signal export provider
-            SignalExport.AddSignalExportProvider(new Collective2SignalExport(_collective2ApiKey, _collective2SystemId));
+            SignalExport.AddSignalExportProviders(new Collective2SignalExport(_collective2ApiKey, _collective2SystemId));
 
             SetWarmUp(100);
         }

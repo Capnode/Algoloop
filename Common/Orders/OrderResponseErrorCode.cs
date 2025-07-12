@@ -193,12 +193,6 @@ namespace QuantConnect.Orders
         /// <summary>
         /// Option order is invalid due to underlying stock split (-34)
         /// </summary>
-        OptionOrderOnStockSplit = -34,
-
-        /// <summary>
-        /// The Market On Open order was submitted during regular market hours, 
-        /// which is not allowed. This order type must be submitted before the market opens.
-        /// </summary>
-        MarketOnOpenNotAllowedDuringRegularHours = -35
+        OptionOrderOnStockSplit = -34
     }
 }

@@ -18,7 +18,6 @@ using QuantConnect.Util;
 using System;
 using System.IO;
 using System.Net.WebSockets;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -121,8 +120,6 @@ namespace QuantConnect.Brokerages
             {
                 try
                 {
-                    _cts?.Cancel();
-
                     try
                     {
                         _client?.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", _cts.Token).SynchronouslyAwaitTask();
@@ -131,6 +128,8 @@ namespace QuantConnect.Brokerages
                     {
                         // ignored
                     }
+
+                    _cts?.Cancel();
 
                     _taskConnect?.Wait(TimeSpan.FromSeconds(5));
 
@@ -254,39 +253,28 @@ namespace QuantConnect.Brokerages
                         }
                     }
                     catch (OperationCanceledException) { }
-                    catch (ObjectDisposedException) { }
                     catch (WebSocketException ex)
                     {
-                        if (!connectionCts.IsCancellationRequested)
-                        {
-                            OnError(new WebSocketError(ex.Message, ex));
-                            connectionCts.Token.WaitHandle.WaitOne(waitTimeOnError);
+                        OnError(new WebSocketError(ex.Message, ex));
+                        connectionCts.Token.WaitHandle.WaitOne(waitTimeOnError);
 
-                            // increase wait time until a maximum value. This is useful during brokerage down times
-                            waitTimeOnError += Math.Min(maximumWaitTimeOnError, waitTimeOnError);
-                        }
+                        // increase wait time until a maximum value. This is useful during brokerage down times
+                        waitTimeOnError += Math.Min(maximumWaitTimeOnError, waitTimeOnError);
                     }
                     catch (Exception ex)
                     {
-                        if (!connectionCts.IsCancellationRequested)
-                        {
-                            OnError(new WebSocketError(ex.Message, ex));
-                        }
+                        OnError(new WebSocketError(ex.Message, ex));
                     }
-
-                    if (!connectionCts.IsCancellationRequested)
-                    {
-                        connectionCts.Cancel();
-                    }
+                    connectionCts.Cancel();
                 }
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private MessageData ReceiveMessage(
-            ClientWebSocket webSocket,
+            WebSocket webSocket,
             CancellationToken ct,
-            byte[] receiveBuffer)
+            byte[] receiveBuffer,
+            long maxSize = long.MaxValue)
         {
             var buffer = new ArraySegment<byte>(receiveBuffer);
 
@@ -298,6 +286,10 @@ namespace QuantConnect.Brokerages
                 {
                     result = webSocket.ReceiveAsync(buffer, ct).SynchronouslyAwaitTask();
                     ms.Write(buffer.Array, buffer.Offset, result.Count);
+                    if (ms.Length > maxSize)
+                    {
+                        throw new InvalidOperationException($"Maximum size of the message was exceeded: {_url}");
+                    }
                 }
                 while (!result.EndOfMessage);
 

@@ -135,7 +135,11 @@ class BasicTemplateCryptoAlgorithm(QCAlgorithm):
                     self.buy("LTCUSD", 10)
             else:
                 if self.portfolio.cash_book["LTC"].amount > 0:
+                    # The following two statements currently behave differently if we have initial holdings:
+                    # https://github.com/QuantConnect/Lean/issues/1860
+
                     self.liquidate("LTCUSD")
+                    # self.set_holdings("LTCUSD", 0)
 
     def on_order_event(self, order_event):
         self.debug("{} {}".format(self.time, order_event.to_string()))

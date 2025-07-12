@@ -16,7 +16,6 @@
 
 using NUnit.Framework;
 using QuantConnect.Algorithm;
-using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Securities;
 using QuantConnect.Securities.Cfd;
@@ -27,6 +26,7 @@ using QuantConnect.Securities.Forex;
 using QuantConnect.Securities.Future;
 using QuantConnect.Securities.IndexOption;
 using QuantConnect.Securities.Option;
+using QuantConnect.Securities.Positions;
 using QuantConnect.Tests.Engine.DataFeeds;
 using System;
 using System.Collections.Generic;
@@ -124,16 +124,7 @@ namespace QuantConnect.Tests.Algorithm
             [ValueSource(nameof(FuturesTestCases))] Func<QCAlgorithm, Security> getFuture)
         {
             var future = _algo.AddFuture(Futures.Indices.VIX, Resolution.Minute, extendedMarketHours: extendedMarketHours);
-            var subscriptions = _algo.SubscriptionManager.Subscriptions.Where(x => x.Symbol == future.Symbol).ToList();
-
-            var universeSubscriptions = subscriptions.Where(x => x.Type == typeof(FutureUniverse)).ToList();
-            Assert.AreEqual(1, universeSubscriptions.Count);
-            // Universe does not support extended market hours
-            Assert.IsFalse(universeSubscriptions[0].ExtendedMarketHours);
-
-            var nonUniverseSubscriptions = subscriptions.Where(x => x.Type != typeof(FutureUniverse)).ToList();
-            Assert.Greater(nonUniverseSubscriptions.Count, 0);
-            Assert.That(nonUniverseSubscriptions.Select(x => x.ExtendedMarketHours),
+            Assert.That(_algo.SubscriptionManager.Subscriptions.Where(x => x.Symbol == future.Symbol).Select(x => x.ExtendedMarketHours),
                 Has.All.EqualTo(extendedMarketHours));
         }
 
@@ -148,8 +139,7 @@ namespace QuantConnect.Tests.Algorithm
                 SymbolPropertiesDatabase.FromDataFolder(),
                 _algo,
                 RegisteredSecurityDataTypesProvider.Null,
-                new SecurityCacheProvider(_algo.Portfolio),
-                algorithm: _algo);
+                new SecurityCacheProvider(_algo.Portfolio));
             _algo.Securities.SetSecurityService(securityService);
 
             var future = getFuture(_algo);

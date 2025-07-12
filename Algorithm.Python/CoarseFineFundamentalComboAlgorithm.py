@@ -12,6 +12,7 @@
 # limitations under the License.
 
 from AlgorithmImports import *
+from System.Collections.Generic import List
 
 ### <summary>
 ### Demonstration of using coarse and fine universe selection together to filter down a smaller universe of stocks.

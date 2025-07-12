@@ -53,4 +53,4 @@ class SelectUniverseSymbolsFromIDRegressionAlgorithm(QCAlgorithm):
 
     def on_end_of_algorithm(self):
         if not self._securities:
-            raise AssertionError("No securities were selected")
+            raise Exception("No securities were selected")

@@ -33,10 +33,10 @@ class GetParameterRegressionAlgorithm(QCAlgorithm):
 
     def check_parameter(self, expected, actual, call):
         if expected == None and actual != None:
-            raise AssertionError(f"{call} should have returned null but returned {actual} ({type(actual)})")
+            raise Exception(f"{call} should have returned null but returned {actual} ({type(actual)})")
 
         if expected != None and actual == None:
-            raise AssertionError(f"{call} should have returned {expected} ({type(expected)}) but returned null")
+            raise Exception(f"{call} should have returned {expected} ({type(expected)}) but returned null")
 
         if expected != None and actual != None and type(expected) != type(actual) or expected != actual:
-            raise AssertionError(f"{call} should have returned {expected} ({type(expected)}) but returned {actual} ({type(actual)})")
+            raise Exception(f"{call} should have returned {expected} ({type(expected)}) but returned {actual} ({type(actual)})")

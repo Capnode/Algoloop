@@ -254,9 +254,7 @@ namespace QuantConnect.Lean.Engine.Setup
                         var optionChainProvider = Composer.Instance.GetPart<IOptionChainProvider>();
                         if (optionChainProvider == null)
                         {
-                            var baseOptionChainProvider = new LiveOptionChainProvider();
-                            baseOptionChainProvider.Initialize(new(parameters.MapFileProvider, algorithm.HistoryProvider));
-                            optionChainProvider = new CachingOptionChainProvider(baseOptionChainProvider);
+                            optionChainProvider = new CachingOptionChainProvider(new LiveOptionChainProvider(parameters.DataCacheProvider, parameters.MapFileProvider));
                             Composer.Instance.AddPart(optionChainProvider);
                         }
                         // set the option chain provider
@@ -265,9 +263,7 @@ namespace QuantConnect.Lean.Engine.Setup
                         var futureChainProvider = Composer.Instance.GetPart<IFutureChainProvider>();
                         if (futureChainProvider == null)
                         {
-                            var baseFutureChainProvider = new LiveFutureChainProvider();
-                            baseFutureChainProvider.Initialize(new(parameters.MapFileProvider, algorithm.HistoryProvider));
-                            futureChainProvider = new CachingFutureChainProvider(baseFutureChainProvider);
+                            futureChainProvider = new CachingFutureChainProvider(new LiveFutureChainProvider(parameters.DataCacheProvider));
                             Composer.Instance.AddPart(futureChainProvider);
                         }
                         // set the future chain provider

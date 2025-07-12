@@ -33,27 +33,24 @@ namespace QuantConnect.Tests.Brokerages
 
         public override Order CreateShortOrder(decimal quantity)
         {
-            return new StopLimitOrder(Symbol, -Math.Abs(quantity), _lowLimit, _highLimit, DateTime.UtcNow, properties: Properties)
+            return new StopLimitOrder(Symbol, -Math.Abs(quantity), _lowLimit, _highLimit, DateTime.Now, properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
         public override Order CreateLongOrder(decimal quantity)
         {
-            return new StopLimitOrder(Symbol, Math.Abs(quantity), _highLimit, _lowLimit, DateTime.UtcNow, properties: Properties)
+            return new StopLimitOrder(Symbol, Math.Abs(quantity), _highLimit, _lowLimit, DateTime.Now, properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
         public override bool ModifyOrderToFill(IBrokerage brokerage, Order order, decimal lastMarketPrice)
         {
-            var roundOffPlaces = GetSymbolProperties(order.Symbol).MinimumPriceVariation.GetDecimalPlaces();
+            var symbolProperties = SPDB.GetSymbolProperties(order.Symbol.ID.Market, order.Symbol, order.SecurityType, order.PriceCurrency);
+            var roundOffPlaces = symbolProperties.MinimumPriceVariation.GetDecimalPlaces();
             var stop = (StopLimitOrder)order;
             var previousStop = stop.StopPrice;
             if (order.Quantity > 0)

@@ -44,7 +44,7 @@ class CapmAlphaRankingUniverseSelectionModel(UniverseSelectionModel):
     benchmark = "SPY"
 
     # Symbols of Dow 30 companies.
-    _symbols = [Symbol.create(x, SecurityType.EQUITY, Market.USA)
+    symbols = [Symbol.create(x, SecurityType.EQUITY, Market.USA)
                for x in ["AAPL", "AXP", "BA", "CAT", "CSCO", "CVX", "DD", "DIS", "GE", "GS",
                          "HD", "IBM", "INTC", "JPM", "KO", "MCD", "MMM", "MRK", "MSFT",
                          "NKE","PFE", "PG", "TRV", "UNH", "UTX", "V", "VZ", "WMT", "XOM"]]
@@ -60,7 +60,8 @@ class CapmAlphaRankingUniverseSelectionModel(UniverseSelectionModel):
             algorithm.date_rules.month_start(self.benchmark),
             algorithm.time_rules.after_market_open(self.benchmark),
             lambda datetime: self.select_pair(algorithm, datetime),
-            algorithm.universe_settings)]
+            algorithm.universe_settings,
+            algorithm.security_initializer)]
 
     def select_pair(self, algorithm, date):
         '''Selects the pair (two stocks) with the highest alpha'''
@@ -86,7 +87,7 @@ class CapmAlphaRankingUniverseSelectionModel(UniverseSelectionModel):
         history = algorithm.history([symbol], self.period, Resolution.DAILY)
         if history.empty: return None
 
-        window = RollingWindow(self.period)
+        window = RollingWindow[float](self.period)
         rate_of_change = RateOfChange(1)
 
         def roc_updated(s, item):
@@ -94,7 +95,7 @@ class CapmAlphaRankingUniverseSelectionModel(UniverseSelectionModel):
 
         rate_of_change.updated += roc_updated
 
-        history = history.close.reset_index(level=0, drop=True).items()
+        history = history.close.reset_index(level=0, drop=True).iteritems()
 
         for time, value in history:
             rate_of_change.update(time, value)

@@ -29,6 +29,11 @@ namespace QuantConnect.Indicators
         private bool _userProvidedIv;
 
         /// <summary>
+        /// Cache of the current value of the greek
+        /// </summary>
+        protected decimal _greekValue { get; set; }
+
+        /// <summary>
         /// Gets the implied volatility of the option
         /// </summary>
         public ImpliedVolatility ImpliedVolatility
@@ -56,9 +61,10 @@ namespace QuantConnect.Indicators
         /// <param name="ivModel">The option pricing model used to estimate IV</param>
         protected OptionGreeksIndicatorBase(string name, Symbol option, IRiskFreeInterestRateModel riskFreeRateModel, IDividendYieldModel dividendYieldModel,
             Symbol mirrorOption = null, OptionPricingModelType? optionModel = null, OptionPricingModelType? ivModel = null)
-            : base(name, option, riskFreeRateModel, dividendYieldModel, mirrorOption, optionModel, period: 1)
+            : base(name, option, riskFreeRateModel, dividendYieldModel, mirrorOption, optionModel)
         {
             ivModel = GetOptionModel(ivModel, option.ID.OptionStyle);
+            WarmUpPeriod = 1;
             _iv = new ImpliedVolatility(name + "_IV", option, riskFreeRateModel, dividendYieldModel, mirrorOption, ivModel.Value);
         }
 
@@ -137,35 +143,58 @@ namespace QuantConnect.Indicators
         /// <summary>
         /// Computes the next value of the option greek indicator
         /// </summary>
+        /// <param name="input">The input given to the indicator</param>
         /// <returns>The input is returned unmodified.</returns>
-        protected override decimal ComputeIndicator()
+        protected override decimal Calculate(IndicatorDataPoint input)
         {
-            var time = Price.Current.EndTime;
+            var time = input.EndTime;
+            var inputSymbol = input.Symbol;
 
-            if (!_userProvidedIv)
+            if (inputSymbol == OptionSymbol)
             {
-                ImpliedVolatility.Update(DataBySymbol[OptionSymbol].CurrentInput);
-                ImpliedVolatility.Update(DataBySymbol[_underlyingSymbol].CurrentInput);
+                if (!_userProvidedIv) ImpliedVolatility.Update(input);
+                Price.Update(time, input.Price);
+            }
+            else if (inputSymbol == _oppositeOptionSymbol)
+            {
+                if (!_userProvidedIv) ImpliedVolatility.Update(input);
+                OppositePrice.Update(time, input.Price);
+            }
+            else if (inputSymbol == _underlyingSymbol)
+            {
+                if (!_userProvidedIv) ImpliedVolatility.Update(input);
+                UnderlyingPrice.Update(time, input.Price);
+            }
+            else
+            {
+                throw new ArgumentException($"The given symbol was not target, reference or underlying symbol: {inputSymbol}");
+            }
+
+            if (Price.Current.Time == UnderlyingPrice.Current.Time)
+            {
                 if (UseMirrorContract)
                 {
-                    ImpliedVolatility.Update(DataBySymbol[_oppositeOptionSymbol].CurrentInput);
+                    if (Price.Current.Time != OppositePrice.Current.Time)
+                    {
+                        return _greekValue;
+                    }
+                }
+
+                RiskFreeRate.Update(time, _riskFreeInterestRateModel.GetInterestRate(time));
+                DividendYield.Update(time, _dividendYieldModel.GetDividendYield(time, UnderlyingPrice.Current.Value));
+
+                var timeTillExpiry = Convert.ToDecimal(OptionGreekIndicatorsHelper.TimeTillExpiry(Expiry, time));
+                try
+                {
+                    _greekValue = timeTillExpiry < 0 ? 0 : CalculateGreek(timeTillExpiry);
+                }
+                catch (OverflowException)
+                {
+                    //Log.Error($"OptionGreeksIndicatorBase.Calculate: Decimal overflow detected. The previous greek value will be used.");
                 }
             }
 
-            RiskFreeRate.Update(time, _riskFreeInterestRateModel.GetInterestRate(time));
-            DividendYield.Update(time, _dividendYieldModel.GetDividendYield(time, UnderlyingPrice.Current.Value));
-
-            var timeTillExpiry = Convert.ToDecimal(OptionGreekIndicatorsHelper.TimeTillExpiry(Expiry, time));
-            try
-            {
-                IndicatorValue = timeTillExpiry < 0 ? 0 : CalculateGreek(timeTillExpiry);
-            }
-            catch (OverflowException)
-            {
-                //Log.Error($"OptionGreeksIndicatorBase.Calculate: Decimal overflow detected. The previous greek value will be used.");
-            }
-
-            return IndicatorValue;
+            return _greekValue;
         }
 
         /// <summary>

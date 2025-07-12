@@ -12,6 +12,7 @@
 # limitations under the License.
 
 from AlgorithmImports import *
+from System.Globalization import *
 
 ### <summary>
 ### Live Trading Functionality Demonstration algorithm including SMS, Email and Web hook notifications.
@@ -46,7 +47,7 @@ class LiveTradingFeaturesAlgorithm(QCAlgorithm):
 
 
     ### New Bitcoin Data Event
-    def on_data(self, Bitcoin, data):
+    def on_data(Bitcoin, data):
         if self.live_mode:
             self.set_runtime_statistic('BTC', str(data.close))
 
@@ -93,7 +94,7 @@ class Bitcoin(PythonData):
         if is_live_mode:
             return SubscriptionDataSource("https://www.bitstamp.net/api/ticker/", SubscriptionTransportMedium.REST)
 
-        return SubscriptionDataSource("https://www.quandl.com/api/v3/datasets/BCHARTS/BITSTAMPUSD.csv?order=asc", SubscriptionTransportMedium.REMOTE_FILE)
+        return  SubscriptionDataSource("https://www.quandl.com/api/v3/datasets/BCHARTS/BITSTAMPUSD.csv?order=asc", SubscriptionTransportMedium.REMOTE_FILE)
 
 
     def reader(self, config, line, date, is_live_mode):

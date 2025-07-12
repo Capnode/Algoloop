@@ -113,6 +113,10 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                             // so universe selection always happens right away at the start of the algorithm.
                             var universeType = universe.GetType();
                             if (
+                                // We exclude the OptionChainUniverse because their selection in live trading is based on having a full bar
+                                // of the underlying. In the future, option chain universe file-based selection will be improved
+                                // in order to avoid this.
+                                (universeType != typeof(OptionChainUniverse) || config.Symbol.SecurityType != SecurityType.FutureOption) &&
                                 // We exclude the UserDefinedUniverse because their selection already happens at the algorithm start time.
                                 // For instance, ETFs universe selection depends its first trigger time to be before the equity universe
                                 // (the UserDefinedUniverse), because the ETFs are EndTime-indexed and that would make their first selection
@@ -226,9 +230,7 @@ namespace QuantConnect.Lean.Engine.DataFeeds
                             {
                                 startUtc = request.StartTimeUtc;
                             }
-                            AddSubscription(new SubscriptionRequest(request,
-                                startTimeUtc: startUtc.AddTicks(1),
-                                configuration: new SubscriptionDataConfig(request.Configuration)));
+                            AddSubscription(new SubscriptionRequest(request, startTimeUtc: startUtc.AddTicks(1)));
                         }
 
                         DataFeedSubscriptions.FreezeFillForwardResolution(false);
@@ -685,12 +687,12 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         {
             if (isCanonical)
             {
-                if (symbolSecurityType.IsOption())
+                if (symbolSecurityType != SecurityType.FutureOption && symbolSecurityType.IsOption())
                 {
                     return new List<Tuple<Type, TickType>> { new Tuple<Type, TickType>(typeof(OptionUniverse), TickType.Quote) };
                 }
 
-                return new List<Tuple<Type, TickType>> { new Tuple<Type, TickType>(typeof(FutureUniverse), TickType.Quote) };
+                return new List<Tuple<Type, TickType>> { new Tuple<Type, TickType>(typeof(ZipEntryName), TickType.Quote) };
             }
 
             IEnumerable<TickType> availableDataType = AvailableDataTypes[symbolSecurityType]
@@ -715,10 +717,8 @@ namespace QuantConnect.Lean.Engine.DataFeeds
         {
             lock (_subscriptionManagerSubscriptions)
             {
-                return _subscriptionManagerSubscriptions.Keys
-                    .Where(config => (includeInternalConfigs || !config.IsInternalFeed) && (symbol == null || config.Symbol.ID == symbol.ID))
-                    .OrderBy(config => config.IsInternalFeed)
-                    .ToList();
+                return _subscriptionManagerSubscriptions.Keys.Where(config => (includeInternalConfigs || !config.IsInternalFeed)
+                                                                && (symbol == null || config.Symbol.ID == symbol.ID)).ToList();
             }
         }
 

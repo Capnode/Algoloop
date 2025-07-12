@@ -77,8 +77,7 @@ namespace QuantConnect.Brokerages
             _subscribeFunc = subscribeFunc;
             _unsubscribeFunc = unsubscribeFunc;
             _messageHandler = messageHandler;
-            // let's use a reasonable default, no API will like to get DOS on reconnections. 50 WS will take 120s
-            _connectionRateLimiter = connectionRateLimiter ?? new RateGate(5, TimeSpan.FromSeconds(12));
+            _connectionRateLimiter = connectionRateLimiter;
 
             if (_maximumWebSocketConnections > 0)
             {
@@ -100,26 +99,25 @@ namespace QuantConnect.Brokerages
                 };
                 _reconnectTimer.Elapsed += (_, _) =>
                 {
-                    List<BrokerageMultiWebSocketEntry> webSocketEntries;
+                    Log.Trace("BrokerageMultiWebSocketSubscriptionManager(): Restarting websocket connections");
+
                     lock (_locker)
                     {
-                        // let's make a copy so we don't hold the lock
-                        webSocketEntries = _webSocketEntries.ToList();
-                    }
-
-                    Log.Trace($"BrokerageMultiWebSocketSubscriptionManager(): Restarting {webSocketEntries.Count} websocket connections");
-
-                    Parallel.ForEach(webSocketEntries, new ParallelOptions { MaxDegreeOfParallelism = 4 }, entry =>
-                    {
-                        if (entry.WebSocket.IsOpen)
+                        foreach (var entry in _webSocketEntries)
                         {
-                            Log.Trace($"BrokerageMultiWebSocketSubscriptionManager(): Websocket restart - disconnect: ({entry.WebSocket.GetHashCode()})");
-                            Disconnect(entry.WebSocket);
+                            if (entry.WebSocket.IsOpen)
+                            {
+                                Task.Factory.StartNew(() =>
+                                {
+                                    Log.Trace($"BrokerageMultiWebSocketSubscriptionManager(): Websocket restart - disconnect: ({entry.WebSocket.GetHashCode()})");
+                                    Disconnect(entry.WebSocket);
 
-                            Log.Trace($"BrokerageMultiWebSocketSubscriptionManager(): Websocket restart - connect: ({entry.WebSocket.GetHashCode()})");
-                            Connect(entry.WebSocket);
+                                    Log.Trace($"BrokerageMultiWebSocketSubscriptionManager(): Websocket restart - connect: ({entry.WebSocket.GetHashCode()})");
+                                    Connect(entry.WebSocket);
+                                });
+                            }
                         }
-                    });
+                    }
                 };
                 _reconnectTimer.Start();
 
@@ -287,7 +285,10 @@ namespace QuantConnect.Brokerages
 
             webSocket.Open += onOpenAction;
 
-            _connectionRateLimiter.WaitToProceed();
+            if (_connectionRateLimiter is { IsRateLimited: false })
+            {
+                _connectionRateLimiter.WaitToProceed();
+            }
 
             try
             {
@@ -330,7 +331,6 @@ namespace QuantConnect.Brokerages
                                 _subscribeFunc(webSocket, symbol);
                             }
                         });
-                        break;
                     }
                 }
             }

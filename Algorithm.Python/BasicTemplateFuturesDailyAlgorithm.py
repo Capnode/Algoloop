@@ -54,12 +54,6 @@ class BasicTemplateFuturesDailyAlgorithm(QCAlgorithm):
         elif all(x.exchange.hours.is_open(self.time, True) for x in self.securities.values() if x.invested):
             self.liquidate()
 
-    def on_securities_changed(self, changes: SecurityChanges) -> None:
-        if len(changes.removed_securities) > 0 and \
-            self.portfolio.invested and \
-            all(x.exchange.hours.is_open(self.time, True) for x in self.securities.values() if x.invested):
-            self.liquidate()
-
     def get_resolution(self):
         return Resolution.DAILY
 

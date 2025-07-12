@@ -218,6 +218,7 @@ namespace QuantConnect.Lean.Engine.Results
                     Log.Debug("LiveTradingResultHandler.Update(): End build delta charts");
 
                     //Profit loss changes, get the banner statistics, summary information on the performance for the headers.
+                    var deltaStatistics = new Dictionary<string, string>();
                     var serverStatistics = GetServerStatistics(utcNow);
                     var holdings = GetHoldings(Algorithm.Securities.Values, Algorithm.SubscriptionManager.SubscriptionDataConfigService);
 
@@ -231,7 +232,7 @@ namespace QuantConnect.Lean.Engine.Results
 
                     // since we're sending multiple packets, let's do it async and forget about it
                     // chart data can get big so let's break them up into groups
-                    var splitPackets = SplitPackets(deltaCharts, deltaOrders, holdings, Algorithm.Portfolio.CashBook, runtimeStatistics, serverStatistics, deltaOrderEvents);
+                    var splitPackets = SplitPackets(deltaCharts, deltaOrders, holdings, Algorithm.Portfolio.CashBook, deltaStatistics, runtimeStatistics, serverStatistics, deltaOrderEvents);
 
                     foreach (var liveResultPacket in splitPackets)
                     {
@@ -255,7 +256,6 @@ namespace QuantConnect.Lean.Engine.Results
 
                         var orderEvents = GetOrderEventsToStore();
 
-                        var deltaStatistics = new Dictionary<string, string>();
                         var orders = new Dictionary<int, Order>(TransactionHandler.Orders);
                         var complete = new LiveResultPacket(_job, new LiveResult(new LiveResultParameters(chartComplete, orders, Algorithm.Transactions.TransactionRecord, holdings, Algorithm.Portfolio.CashBook, deltaStatistics, runtimeStatistics, orderEvents, serverStatistics, state: GetAlgorithmState())));
                         StoreResult(complete);
@@ -469,6 +469,7 @@ namespace QuantConnect.Lean.Engine.Results
             Dictionary<int, Order> deltaOrders,
             Dictionary<string, Holding> holdings,
             CashBook cashbook,
+            Dictionary<string, string> deltaStatistics,
             SortedDictionary<string, string> runtimeStatistics,
             Dictionary<string, string> serverStatistics,
             List<OrderEvent> deltaOrderEvents)
@@ -513,6 +514,7 @@ namespace QuantConnect.Lean.Engine.Results
                 new LiveResultPacket(_job, new LiveResult { Holdings = holdings, CashBook = cashbook}),
                 new LiveResultPacket(_job, new LiveResult
                 {
+                    Statistics = deltaStatistics,
                     RuntimeStatistics = runtimeStatistics,
                     ServerStatistics = serverStatistics
                 })
@@ -822,6 +824,7 @@ namespace QuantConnect.Lean.Engine.Results
                     result = LiveResultPacket.CreateEmpty(_job);
                     result.Results.State = endState;
                 }
+                result.ProcessingTime = (endTime - StartTime).TotalSeconds;
 
                 StoreInsights();
 

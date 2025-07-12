@@ -204,9 +204,6 @@ namespace QuantConnect.Brokerages
                 case BrokerageName.InteractiveBrokersBrokerage:
                     return new InteractiveBrokersBrokerageModel(accountType);
 
-                case BrokerageName.InteractiveBrokersFix:
-                    return new InteractiveBrokersFixModel(accountType);
-
                 case BrokerageName.TradierBrokerage:
                     return new TradierBrokerageModel(accountType);
 
@@ -284,9 +281,6 @@ namespace QuantConnect.Brokerages
 
                 case BrokerageName.CharlesSchwab:
                     return new CharlesSchwabBrokerageModel(accountType);
-
-                case BrokerageName.Tastytrade:
-                    return new TastytradeBrokerageModel(accountType);
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(brokerage), brokerage, null);
@@ -387,9 +381,6 @@ namespace QuantConnect.Brokerages
 
                 case CharlesSchwabBrokerageModel:
                     return BrokerageName.CharlesSchwab;
-
-                case TastytradeBrokerageModel:
-                    return BrokerageName.Tastytrade;
 
                 case DefaultBrokerageModel _:
                     return BrokerageName.Default;

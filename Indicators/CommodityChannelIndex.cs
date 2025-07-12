@@ -95,8 +95,8 @@ namespace QuantConnect.Indicators
         {
             var typicalPrice = (input.High + input.Low + input.Close) / 3.0m;
 
-            TypicalPriceAverage.Update(input.EndTime, typicalPrice);
-            TypicalPriceMeanDeviation.Update(input.EndTime, typicalPrice);
+            TypicalPriceAverage.Update(input.Time, typicalPrice);
+            TypicalPriceMeanDeviation.Update(input.Time, typicalPrice);
 
             // compare this to zero, since if the mean deviation is very small we can get
             // precision errors due to non-floating point math

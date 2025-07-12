@@ -44,7 +44,7 @@ class CustomVolatilityModel():
         self.last_price = 0
         self.needs_update = False
         self.period_span = timedelta(1)
-        self.window = RollingWindow(periods)
+        self.window = RollingWindow[float](periods)
 
         # Volatility is a mandatory attribute
         self.volatility = 0

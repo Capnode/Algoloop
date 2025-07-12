@@ -19,7 +19,7 @@ from AlgorithmImports import *
 ### </summary>
 class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
 
-    def initialize(self) -> None:
+    def initialize(self):
         self.set_start_date(2015, 12, 24)
         self.set_end_date(2015, 12, 24)
         self.set_cash(100000)
@@ -36,15 +36,15 @@ class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
 
         self._order_legs = None
 
-    def on_data(self, data: Slice) -> None:
+    def on_data(self, data: Slice):
         if self._order_legs is None:
             if self.is_market_open(self._option_symbol):
-                chain = data.option_chains.get(self._option_symbol)
-                if chain:
+                chain = data.option_chains.get_value(self._option_symbol)
+                if chain is not None:
                     call_contracts = [contract for contract in chain if contract.right == OptionRight.CALL]
-                    call_contracts_by_expiry = [(key, list(group)) for key, group in itertools.groupby(call_contracts, key=lambda x: x.expiry)]
-                    call_contracts_by_expiry.sort(key=lambda x: x[0])
-                    call_contracts = call_contracts_by_expiry[0][1]
+                    call_contracts = [(key, list(group)) for key, group in itertools.groupby(call_contracts, key=lambda x: x.expiry)]
+                    call_contracts.sort(key=lambda x: x[0])
+                    call_contracts = call_contracts[0][1]
                     call_contracts.sort(key=lambda x: x.strike)
 
                     if len(call_contracts) < 3:
@@ -57,13 +57,18 @@ class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
                         self._order_legs.append(leg)
         else:
             # COMBO MARKET ORDERS
+
             self.combo_market_orders()
+
             # COMBO LIMIT ORDERS
+
             self.combo_limit_orders()
+
             # COMBO LEG LIMIT ORDERS
+
             self.combo_leg_limit_orders()
 
-    def combo_market_orders(self) -> None:
+    def combo_market_orders(self):
         if len(self._open_market_orders) != 0 or self._order_legs is None:
             return
 
@@ -78,9 +83,9 @@ class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
         for ticket in tickets:
             response = ticket.cancel("Attempt to cancel combo market order")
             if response.is_success:
-                raise AssertionError("Combo market orders should fill instantly, they should not be cancelable in backtest mode: " + response.order_id)
+                raise Exception("Combo market orders should fill instantly, they should not be cancelable in backtest mode: " + response.order_id)
 
-    def combo_limit_orders(self) -> None:
+    def combo_limit_orders(self):
         if len(self._open_limit_orders) == 0:
             self.log("Submitting ComboLimitOrder")
 
@@ -117,7 +122,7 @@ class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
             fields.tag = f"Update #{len(ticket.update_requests) + 1}"
             ticket.update(fields)
 
-    def combo_leg_limit_orders(self) -> None:
+    def combo_leg_limit_orders(self):
         if len(self._open_leg_limit_orders) == 0:
             self.log("Submitting ComboLegLimitOrder")
 
@@ -161,20 +166,20 @@ class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
                 fields.tag = f"Update #{len(ticket.update_requests) + 1}"
                 ticket.update(fields)
 
-    def on_order_event(self, order_event: OrderEvent) -> None:
+    def on_order_event(self, order_event):
         order = self.transactions.get_order_by_id(order_event.order_id)
 
         if order_event.quantity == 0:
-            raise AssertionError("OrderEvent quantity is Not expected to be 0, it should hold the current order Quantity")
+            raise Exception("OrderEvent quantity is Not expected to be 0, it should hold the current order Quantity")
 
         if order_event.quantity != order.quantity:
-            raise AssertionError("OrderEvent quantity should hold the current order Quantity. "
+            raise Exception("OrderEvent quantity should hold the current order Quantity. "
                             f"Got {order_event.quantity}, expected {order.quantity}")
 
         if order.type == OrderType.COMBO_LEG_LIMIT and order_event.limit_price == 0:
-            raise AssertionError("OrderEvent.LIMIT_PRICE is not expected to be 0 for ComboLegLimitOrder")
+            raise Exception("OrderEvent.LIMIT_PRICE is not expected to be 0 for ComboLegLimitOrder")
 
-    def check_group_orders_for_fills(self, combo1: list[OrderTicket], combo2: list[OrderTicket]) -> bool:
+    def check_group_orders_for_fills(self, combo1, combo2):
         if all(x.status == OrderStatus.FILLED for x in combo1):
             self.log(f"{combo1[0].order_type}: Canceling combo #2, combo #1 is filled.")
             if any(OrderExtensions.is_open(x.status) for x in combo2):
@@ -191,11 +196,11 @@ class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
 
         return False
 
-    def on_end_of_algorithm(self) -> None:
-        filled_orders = list(self.transactions.get_orders(lambda x: x.status == OrderStatus.FILLED))
-        order_tickets = list(self.transactions.get_order_tickets())
+    def on_end_of_algorithm(self):
+        filled_orders = self.transactions.get_orders(lambda x: x.status == OrderStatus.FILLED).to_list()
+        order_tickets = self.transactions.get_order_tickets().to_list()
         open_orders = self.transactions.get_open_orders()
-        open_order_tickets = list(self.transactions.get_open_order_tickets())
+        open_order_tickets = self.transactions.get_open_order_tickets().to_list()
         remaining_open_orders = self.transactions.get_open_orders_remaining_quantity()
 
         # 6 market, 6 limit, 6 leg limit.
@@ -203,18 +208,18 @@ class ComboOrderTicketDemoAlgorithm(QCAlgorithm):
         expected_orders_count = 18
         expected_fills_count = 15
         if len(filled_orders) != expected_fills_count or len(order_tickets) != expected_orders_count:
-            raise AssertionError(f"There were expected {expected_fills_count} filled orders and {expected_orders_count} order tickets, but there were {len(filled_orders)} filled orders and {len(order_tickets)} order tickets")
+            raise Exception(f"There were expected {expected_fills_count} filled orders and {expected_orders_count} order tickets, but there were {len(filled_orders)} filled orders and {len(order_tickets)} order tickets")
 
         filled_combo_market_orders = [x for x in filled_orders if x.type == OrderType.COMBO_MARKET]
         filled_combo_limit_orders = [x for x in filled_orders if x.type == OrderType.COMBO_LIMIT]
         filled_combo_leg_limit_orders = [x for x in filled_orders if x.type == OrderType.COMBO_LEG_LIMIT]
         if len(filled_combo_market_orders) != 6 or len(filled_combo_limit_orders) != 3 or len(filled_combo_leg_limit_orders) != 6:
-            raise AssertionError("There were expected 6 filled market orders, 3 filled combo limit orders and 6 filled combo leg limit orders, "
+            raise Exception("There were expected 6 filled market orders, 3 filled combo limit orders and 6 filled combo leg limit orders, "
                             f"but there were {len(filled_combo_market_orders)} filled market orders, {len(filled_combo_limit_orders)} filled "
                             f"combo limit orders and {len(filled_combo_leg_limit_orders)} filled combo leg limit orders")
 
         if len(open_orders) != 0 or len(open_order_tickets) != 0:
-            raise AssertionError("No open orders or tickets were expected")
+            raise Exception("No open orders or tickets were expected")
 
         if remaining_open_orders != 0:
-            raise AssertionError("No remaining quantity to be filled from open orders was expected")
+            raise Exception("No remaining quantity to be filled from open orders was expected")

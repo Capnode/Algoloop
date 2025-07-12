@@ -16,7 +16,7 @@
 
 using NUnit.Framework;
 using QuantConnect.Configuration;
-using QuantConnect.DownloaderDataProvider.Launcher.Models;
+using QuantConnect.DownloaderDataProvider.Launcher;
 
 namespace QuantConnect.Tests.DownloaderDataProvider
 {

@@ -19,7 +19,6 @@ using QuantConnect.Configuration;
 using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Tests.Common.Data.Fundamental;
-using QuantConnect.Data;
 
 namespace QuantConnect.Tests
 {
@@ -38,8 +37,6 @@ namespace QuantConnect.Tests
             = Composer.Instance.GetExportedValueByTypeName<IFactorFileProvider>(Config.Get("factor-file-provider", "LocalDiskFactorFileProvider"));
 
         public static IDataCacheProvider DataCacheProvider = new ZipDataCacheProvider(DataProvider);
-        public static IHistoryProvider HistoryProvider
-            = Composer.Instance.GetExportedValueByTypeName<IHistoryProvider>("SubscriptionDataReaderHistoryProvider");
 
         /// <summary>
         /// Initialize our providers, called by AssemblyInitialize.cs so all tests
@@ -55,16 +52,6 @@ namespace QuantConnect.Tests
                 }
                 _initialized = true;
 
-                var initializeParameters = new HistoryProviderInitializeParameters(null, null, DataProvider, DataCacheProvider,
-                    MapFileProvider, FactorFileProvider, (_) => { }, true, new DataPermissionManager(), null, new AlgorithmSettings());
-                try
-                {
-                    HistoryProvider.Initialize(initializeParameters);
-                }
-                catch
-                {
-                    // Already initialized
-                }
                 MapFileProvider.Initialize(DataProvider);
                 FactorFileProvider.Initialize(MapFileProvider, DataProvider);
                 FundamentalService.Initialize(DataProvider, new NullFundamentalDataProvider(), false);

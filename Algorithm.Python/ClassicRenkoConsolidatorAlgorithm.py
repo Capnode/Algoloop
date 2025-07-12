@@ -23,7 +23,8 @@ from AlgorithmImports import *
 class ClassicRenkoConsolidatorAlgorithm(QCAlgorithm):
     '''Demonstration of how to initialize and use the RenkoConsolidator'''
 
-    def initialize(self) -> None:
+    def initialize(self):
+
         self.set_start_date(2012, 1, 1)
         self.set_end_date(2013, 1, 1)
 
@@ -47,11 +48,11 @@ class ClassicRenkoConsolidatorAlgorithm(QCAlgorithm):
 
 
     # We're doing our analysis in the on_renko_bar method, but the framework verifies that this method exists, so we define it.
-    def on_data(self, data: Slice) -> None:
+    def on_data(self, data):
         pass
 
 
-    def handle_renko_close(self, sender: object, data: RenkoBar) -> None:
+    def handle_renko_close(self, sender, data):
         '''This function is called by our renko_close consolidator defined in Initialize()
         Args:
             data: The new renko bar produced by the consolidator'''
@@ -61,7 +62,7 @@ class ClassicRenkoConsolidatorAlgorithm(QCAlgorithm):
         self.log(f"CLOSE - {data.time} - {data.open} {data.close}")
 
 
-    def handle_renko7_bar(self, sender: object, data: RenkoBar) -> None:
+    def handle_renko7_bar(self, sender, data):
         '''This function is called by our renko7bar consolidator defined in Initialize()
         Args:
             data: The new renko bar produced by the consolidator'''

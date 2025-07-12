@@ -655,8 +655,7 @@ namespace QuantConnect.Tests.Common.Securities
 
             var orderProcessor = new FakeOrderProcessor();
             var quantity = orderDirection == OrderDirection.Buy ? 10 : -10;
-            var request = new SubmitOrderRequest(OrderType.Market, option.Type, option.Symbol, quantity, 0, 0, reference, "");
-            var order = Order.CreateOrder(request);
+            var order = Order.CreateOrder(new SubmitOrderRequest(OrderType.Market, option.Type, option.Symbol, quantity, 0, 0, reference, ""));
             order.Id = 1;
             orderProcessor.AddOrder(order);
             portfolio.Transactions.SetOrderProcessor(orderProcessor);
@@ -664,7 +663,7 @@ namespace QuantConnect.Tests.Common.Securities
             var fillPrice = 100m;
             var fillQuantity = quantity;
             var orderFee = new OrderFee(new CashAmount(1m, Currencies.USD));
-            var fill = new OrderEvent(1, option.Symbol, reference, OrderStatus.Filled, orderDirection, fillPrice, fillQuantity, orderFee) { Ticket = new OrderTicket(portfolio.Transactions, request) };
+            var fill = new OrderEvent(1, option.Symbol, reference, OrderStatus.Filled, orderDirection, fillPrice, fillQuantity, orderFee);
             fill.IsInTheMoney = true;
             portfolio.ProcessFills(new List<OrderEvent> { fill });
 
@@ -701,8 +700,7 @@ namespace QuantConnect.Tests.Common.Securities
 
             var orderProcessor = new FakeOrderProcessor();
             var quantity = orderDirection == OrderDirection.Buy ? 10 : -10;
-            var request = new SubmitOrderRequest(OrderType.Market, option.Type, option.Symbol, quantity, 0, 0, reference, "");
-            var order = Order.CreateOrder(request);
+            var order = Order.CreateOrder(new SubmitOrderRequest(OrderType.Market, option.Type, option.Symbol, quantity, 0, 0, reference, ""));
             order.Id = 1;
             orderProcessor.AddOrder(order);
             portfolio.Transactions.SetOrderProcessor(orderProcessor);
@@ -712,7 +710,6 @@ namespace QuantConnect.Tests.Common.Securities
             var orderFee = new OrderFee(new CashAmount(1m, Currencies.USD));
             var fill = new OrderEvent(1, option.Symbol, reference, OrderStatus.Filled, orderDirection, fillPrice, fillQuantity, orderFee);
             fill.IsInTheMoney = true;
-            fill.Ticket = new OrderTicket(portfolio.Transactions, request);
             portfolio.ProcessFills(new List<OrderEvent> { fill });
 
             Assert.AreEqual(0, portfolio.Transactions.WinCount);
@@ -751,8 +748,7 @@ namespace QuantConnect.Tests.Common.Securities
 
             var orderProcessor = new FakeOrderProcessor();
             var quantity = orderDirection == OrderDirection.Buy ? 10 : -10;
-            var request = new SubmitOrderRequest(OrderType.Market, option.Type, option.Symbol, quantity, 0, 0, reference, "");
-            var order = Order.CreateOrder(request);
+            var order = Order.CreateOrder(new SubmitOrderRequest(OrderType.Market, option.Type, option.Symbol, quantity, 0, 0, reference, ""));
             order.Id = 1;
             orderProcessor.AddOrder(order);
             portfolio.Transactions.SetOrderProcessor(orderProcessor);
@@ -760,7 +756,7 @@ namespace QuantConnect.Tests.Common.Securities
             var fillPrice = 100m;
             var fillQuantity = quantity;
             var orderFee = new OrderFee(new CashAmount(1m, Currencies.USD));
-            var fill = new OrderEvent(1, option.Symbol, reference, OrderStatus.Filled, orderDirection, fillPrice, fillQuantity, orderFee) { Ticket = new OrderTicket(portfolio.Transactions, request) };
+            var fill = new OrderEvent(1, option.Symbol, reference, OrderStatus.Filled, orderDirection, fillPrice, fillQuantity, orderFee);
             fill.IsInTheMoney = true;
             portfolio.ProcessFills(new List<OrderEvent> { fill });
 

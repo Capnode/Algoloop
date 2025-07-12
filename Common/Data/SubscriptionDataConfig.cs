@@ -222,7 +222,7 @@ namespace QuantConnect.Data
             Resolution = resolution;
             _sid = symbol.ID;
             Symbol = symbol;
-            ExtendedMarketHours = extendedHours && LeanData.SupportsExtendedMarketHours(Type);
+            ExtendedMarketHours = extendedHours;
             PriceScaleFactor = 1;
             IsInternalFeed = isInternalFeed;
             IsCustomData = isCustom;

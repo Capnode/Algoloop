@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
+import datetime
 from AlgorithmImports import *
 
 class BasicTemplateIndexDailyAlgorithm(QCAlgorithm):
@@ -44,14 +45,14 @@ class BasicTemplateIndexDailyAlgorithm(QCAlgorithm):
         self.settings.daily_precise_end_time = True
 
     def on_data(self, data: Slice):
-        if not self.portfolio.invested:
+        if not self.Portfolio.Invested:
             # SPX Index is not tradable, but we can trade an option
-            self.market_order(self.spx_option, 1)
+            self.MarketOrder(self.spx_option, 1)
         else:
-            self.liquidate()
+            self.Liquidate()
 
         # Count how many slices we receive with SPX data in it to assert later
-        if data.contains_key(self.spx):
+        if data.ContainsKey(self.spx):
             self.BarCounter = self.BarCounter + 1
 
     def OnEndOfAlgorithm(self):
@@ -59,8 +60,8 @@ class BasicTemplateIndexDailyAlgorithm(QCAlgorithm):
             raise ValueError(f"Bar Count {self.BarCounter} is not expected count of {self.ExpectedBarCount}")
 
         for symbol in [ self.spx_option, self.spx ]:
-            history = self.history(symbol, 10)
+            history = self.History(symbol, 10)
             if len(history) != 10:
-                raise ValueError(f"Unexpected history count: {len(history)}")
+                raise ValueError(f"Unexpected history count: {history.Count}")
             if any(x for x in history.index.get_level_values('time') if x.time() != time(15, 15, 0)):
                 raise ValueError(f"Unexpected history data time")

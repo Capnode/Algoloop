@@ -167,7 +167,11 @@ namespace QuantConnect.Algorithm.CSharp
                 {
                     if (Portfolio.CashBook["LTC"].Amount > 0)
                     {
+                        // The following two statements currently behave differently if we have initial holdings:
+                        // https://github.com/QuantConnect/Lean/issues/1860
+
                         Liquidate("LTCUSD");
+                        // SetHoldings("LTCUSD", 0);
                     }
                 }
             }

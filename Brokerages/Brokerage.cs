@@ -103,11 +103,6 @@ namespace QuantConnect.Brokerages
         public abstract bool IsConnected { get; }
 
         /// <summary>
-        /// Enables or disables concurrent processing of messages to and from the brokerage.
-        /// </summary>
-        public bool ConcurrencyEnabled { get; set; }
-
-        /// <summary>
         /// Creates a new Brokerage instance with the specified name
         /// </summary>
         /// <param name="name">The name of the brokerage</param>
@@ -341,11 +336,6 @@ namespace QuantConnect.Brokerages
 
             if (brokerageData != null && brokerageData.Remove("live-holdings", out var value) && !string.IsNullOrEmpty(value))
             {
-                if (Log.DebuggingEnabled)
-                {
-                    Log.Debug($"Brokerage.GetAccountHoldings(): raw value: {value}");
-                }
-
                 // remove the key, we really only want to return the cached value on the first request
                 var result = JsonConvert.DeserializeObject<List<Holding>>(value);
                 if (result == null)
@@ -446,7 +436,12 @@ namespace QuantConnect.Brokerages
         /// <returns>The order position</returns>
         protected static OrderPosition GetOrderPosition(OrderDirection orderDirection, decimal holdingsQuantity)
         {
-            return BrokerageExtensions.GetOrderPosition(orderDirection, holdingsQuantity);
+            return orderDirection switch
+            {
+                OrderDirection.Buy => holdingsQuantity >= 0 ? OrderPosition.BuyToOpen : OrderPosition.BuyToClose,
+                OrderDirection.Sell => holdingsQuantity <= 0 ? OrderPosition.SellToOpen : OrderPosition.SellToClose,
+                _ => throw new ArgumentOutOfRangeException(nameof(orderDirection), orderDirection, "Invalid order direction")
+            };
         }
 
         #region IBrokerageCashSynchronizer implementation
@@ -537,7 +532,7 @@ namespace QuantConnect.Brokerages
                     {
                         // compare in account currency
                         var delta = cash.Amount - balanceCash.Amount;
-                        if (cash.ConversionRate == 0 || Math.Abs(algorithm.Portfolio.CashBook.ConvertToAccountCurrency(delta, cash.Symbol)) > totalPorfolioValueThreshold)
+                        if (Math.Abs(algorithm.Portfolio.CashBook.ConvertToAccountCurrency(delta, cash.Symbol)) > totalPorfolioValueThreshold)
                         {
                             // log the delta between
                             Log.Trace($"Brokerage.PerformCashSync(): {balanceCash.Currency} Delta: {delta:0.00}", true);

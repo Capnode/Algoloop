@@ -403,8 +403,7 @@ namespace QuantConnect.Report
                 // calculate on stale data.
                 Algorithm.Portfolio.InvalidateTotalPortfolioValue();
 
-                var ticket = order.ToOrderTicket(Algorithm.Transactions);
-                var orderEvent = new OrderEvent(order, order.Time, Orders.Fees.OrderFee.Zero) { FillPrice = order.Price, FillQuantity = order.Quantity, Ticket = ticket };
+                var orderEvent = new OrderEvent(order, order.Time, Orders.Fees.OrderFee.Zero) { FillPrice = order.Price, FillQuantity = order.Quantity };
 
                 // Process the order
                 Algorithm.Portfolio.ProcessFills(new List<OrderEvent> { orderEvent });

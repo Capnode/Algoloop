@@ -42,9 +42,7 @@ namespace QuantConnect.Tests.Brokerages
             return new LimitIfTouchedOrder(Symbol, -Math.Abs(quantity), _lowLimit, _highLimit, DateTime.UtcNow,
                 properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
@@ -53,15 +51,14 @@ namespace QuantConnect.Tests.Brokerages
             return new LimitIfTouchedOrder(Symbol, Math.Abs(quantity), _highLimit, _lowLimit, DateTime.UtcNow,
                 properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
         public override bool ModifyOrderToFill(IBrokerage brokerage, Order order, decimal lastMarketPrice)
         {
-            var roundOffPlaces = GetSymbolProperties(order.Symbol).MinimumPriceVariation.GetDecimalPlaces();
+            var symbolProperties = SPDB.GetSymbolProperties(order.Symbol.ID.Market, order.Symbol, order.SecurityType, order.PriceCurrency);
+            var roundOffPlaces = symbolProperties.MinimumPriceVariation.GetDecimalPlaces();
             var stop = (LimitIfTouchedOrder) order;
             var previousStop = stop.TriggerPrice;
             if (order.Quantity > 0)

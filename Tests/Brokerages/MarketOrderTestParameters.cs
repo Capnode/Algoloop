@@ -28,21 +28,17 @@ namespace QuantConnect.Tests.Brokerages
 
         public override Order CreateShortOrder(decimal quantity)
         {
-            return new MarketOrder(Symbol, -Math.Abs(quantity), DateTime.UtcNow, properties: Properties)
+            return new MarketOrder(Symbol, -Math.Abs(quantity), DateTime.Now, properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
         public override Order CreateLongOrder(decimal quantity)
         {
-            return new MarketOrder(Symbol, Math.Abs(quantity), DateTime.UtcNow, properties: Properties)
+            return new MarketOrder(Symbol, Math.Abs(quantity), DateTime.Now, properties: Properties)
             {
-                Status = OrderStatus.New,
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 

@@ -222,17 +222,23 @@ namespace QuantConnect.Lean.Engine.RealTime
             DateTime end,
             DateTime? currentUtcTime = null)
         {
-            // add end of trading day events for each security
-            foreach (var security in securities)
+            if (_implementsOnEndOfDaySymbol)
             {
-                var scheduledEvent = ScheduledEventFactory.EverySecurityEndOfDay(
-                    Algorithm, ResultHandler, security, start, end, ScheduledEvent.SecurityEndOfDayDelta, currentUtcTime);
+                // add end of trading day events for each security
+                foreach (var security in securities)
+                {
+                    if (!security.IsInternalFeed())
+                    {
+                        var scheduledEvent = ScheduledEventFactory.EverySecurityEndOfDay(
+                            Algorithm, ResultHandler, security, start, end, ScheduledEvent.SecurityEndOfDayDelta, currentUtcTime);
 
-                // we keep separate track so we can remove it later
-                _securityOnEndOfDay[security.Symbol] = scheduledEvent;
+                        // we keep separate track so we can remove it later
+                        _securityOnEndOfDay[security.Symbol] = scheduledEvent;
 
-                // assumes security.Exchange has been updated with today's hours via RefreshMarketHoursToday
-                Add(scheduledEvent);
+                        // assumes security.Exchange has been updated with today's hours via RefreshMarketHoursToday
+                        Add(scheduledEvent);
+                    }
+                }
             }
         }
 
@@ -245,8 +251,6 @@ namespace QuantConnect.Lean.Engine.RealTime
             {
                 if (_implementsOnEndOfDaySymbol)
                 {
-                    // we only add and remove on end of day for non internal securities
-                    changes = new SecurityChanges(changes) { FilterInternalSecurities = true };
                     AddSecurityDependentEndOfDayEvents(changes.AddedSecurities,
                         Algorithm.UtcTime,
                         Algorithm.EndDate,

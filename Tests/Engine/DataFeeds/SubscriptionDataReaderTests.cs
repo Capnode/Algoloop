@@ -17,10 +17,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using NodaTime;
 using NUnit.Framework;
 using QuantConnect.Data;
+using QuantConnect.Data.Auxiliary;
 using QuantConnect.Data.Market;
+using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
 using QuantConnect.Lean.Engine.DataFeeds;
 using QuantConnect.Securities;
@@ -70,58 +72,6 @@ namespace QuantConnect.Tests.Engine.DataFeeds
             Assert.IsTrue(dataReader.MoveNext());
             Assert.AreEqual(shouldEmitSecondDataPoint, dataReader.MoveNext());
 
-        }
-
-        [TestCase(typeof(TradeBar))]
-        [TestCase(typeof(QuoteBar))]
-        [TestCase(typeof(OpenInterest))]
-        public void EmitsNewTradableDateWhenDateAfterDelistingIsNonTradable(Type dataType)
-        {
-            var start = new DateTime(2023, 06, 30);
-            var end = new DateTime(2023, 08, 01);
-
-            var symbol = Symbol.CreateOption(
-                Symbols.SPX,
-                "SPXW",
-                Market.USA,
-                OptionStyle.European,
-                OptionRight.Call,
-                4445m,
-                // Next day is a holiday
-                new DateTime(2023, 7, 3));
-
-            var entry = MarketHoursDatabase.FromDataFolder().GetEntry(symbol.ID.Market, symbol, symbol.SecurityType);
-            var config = new SubscriptionDataConfig(dataType,
-                symbol,
-                Resolution.Minute,
-                entry.DataTimeZone,
-                entry.ExchangeHours.TimeZone,
-                false,
-                false,
-                false);
-            using var testDataCacheProvider = new TestDataCacheProvider();
-            var request = new HistoryRequest(config, entry.ExchangeHours, start, end);
-            using var dataReader = new SubscriptionDataReader(config,
-                request,
-                TestGlobals.MapFileProvider,
-                TestGlobals.FactorFileProvider,
-                testDataCacheProvider,
-                TestGlobals.DataProvider,
-                null);
-
-            var expectedLastTradableDate = new DateTime(2023, 07, 05);
-            var lastTradableDate = default(DateTime);
-
-            dataReader.NewTradableDate += (sender, args) =>
-            {
-                lastTradableDate = args.Date;
-            };
-
-            while (dataReader.MoveNext())
-            {
-            }
-
-            Assert.AreEqual(expectedLastTradableDate, lastTradableDate);
         }
 
         private class TestDataCacheProvider : IDataCacheProvider

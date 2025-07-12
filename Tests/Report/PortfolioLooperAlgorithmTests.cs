@@ -44,8 +44,7 @@ namespace QuantConnect.Tests.Report
                         symbolPropertiesDataBase,
                         algorithm,
                         RegisteredSecurityDataTypesProvider.Null,
-                        new SecurityCacheProvider(algorithm.Portfolio),
-                        algorithm: algorithm),
+                        new SecurityCacheProvider(algorithm.Portfolio)),
                     dataPermissionManager,
                     TestGlobals.DataProvider),
                 algorithm,
@@ -60,8 +59,7 @@ namespace QuantConnect.Tests.Report
                 symbolPropertiesDataBase,
                 algorithm,
                 RegisteredSecurityDataTypesProvider.Null,
-                new SecurityCacheProvider(algorithm.Portfolio),
-                algorithm: algorithm);
+                new SecurityCacheProvider(algorithm.Portfolio));
 
             // Initialize security services and other properties so that we
             // don't get null reference exceptions during our re-calculation

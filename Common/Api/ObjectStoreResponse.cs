@@ -130,7 +130,7 @@ namespace QuantConnect.Api
         /// Size of all objects stored in bytes
         /// </summary>
         [JsonProperty(PropertyName = "objectStorageUsed")]
-        public long ObjectStorageUsed { get; set; }
+        public int ObjectStorageUsed { get; set; }
 
         /// <summary>
         /// Size of all the objects stored in human-readable format

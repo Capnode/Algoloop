@@ -15,21 +15,19 @@
 
 using System;
 using QuantConnect.Data;
-using QuantConnect.Python;
 
 namespace QuantConnect.Indicators
 {
     /// <summary>
     /// To provide a base class for option indicator
     /// </summary>
-    public abstract class OptionIndicatorBase : MultiSymbolIndicator<IBaseData>
+    public abstract class OptionIndicatorBase : IndicatorBase<IndicatorDataPoint>, IIndicatorWarmUpPeriodProvider
     {
         private DateTime _expiry;
 
         /// <summary>
         /// Option's symbol object
         /// </summary>
-        [PandasIgnore]
         public Symbol OptionSymbol { get; init; }
 
         /// <summary>
@@ -60,7 +58,6 @@ namespace QuantConnect.Indicators
         /// <summary>
         /// Gets the expiration time of the option
         /// </summary>
-        [PandasIgnore]
         public DateTime Expiry
         {
             get
@@ -76,31 +73,26 @@ namespace QuantConnect.Indicators
         /// <summary>
         /// Gets the option right (call/put) of the option
         /// </summary>
-        [PandasIgnore]
         public OptionRight Right => OptionSymbol.ID.OptionRight;
 
         /// <summary>
         /// Gets the strike price of the option
         /// </summary>
-        [PandasIgnore]
         public decimal Strike => OptionSymbol.ID.StrikePrice;
 
         /// <summary>
         /// Gets the option style (European/American) of the option
         /// </summary>
-        [PandasIgnore]
         public OptionStyle Style => OptionSymbol.ID.OptionStyle;
 
         /// <summary>
         /// Risk Free Rate
         /// </summary>
-        [PandasIgnore]
         public Identity RiskFreeRate { get; set; }
 
         /// <summary>
         /// Dividend Yield
         /// </summary>
-        [PandasIgnore]
         public Identity DividendYield { get; set; }
 
         /// <summary>
@@ -121,7 +113,6 @@ namespace QuantConnect.Indicators
         /// <summary>
         /// Flag if mirror option is implemented for parity type calculation
         /// </summary>
-        [PandasIgnore]
         public bool UseMirrorContract => _oppositeOptionSymbol != null;
 
         /// <summary>
@@ -135,8 +126,8 @@ namespace QuantConnect.Indicators
         /// <param name="period">The lookback period of volatility</param>
         /// <param name="optionModel">The option pricing model used to estimate the Greek/IV</param>
         protected OptionIndicatorBase(string name, Symbol option, IRiskFreeInterestRateModel riskFreeRateModel, IDividendYieldModel dividendYieldModel,
-            Symbol mirrorOption = null, OptionPricingModelType? optionModel = null, int period = 1)
-            : base(name, mirrorOption == null ? [option, option.Underlying] : [option, option.Underlying, mirrorOption], period)
+            Symbol mirrorOption = null, OptionPricingModelType? optionModel = null, int period = 2)
+            : base(name)
         {
             var sid = option.ID;
             if (!sid.SecurityType.IsOption())
@@ -154,16 +145,19 @@ namespace QuantConnect.Indicators
             Price = new Identity(name + "_Close");
             UnderlyingPrice = new Identity(name + "_UnderlyingClose");
 
-            DataBySymbol[OptionSymbol].NewInput += (sender, input) => Price.Update(input);
-            DataBySymbol[_underlyingSymbol].NewInput += (sender, input) => UnderlyingPrice.Update(input);
-
             if (mirrorOption != null)
             {
                 _oppositeOptionSymbol = mirrorOption;
                 OppositePrice = new Identity(Name + "_OppositeClose");
-                DataBySymbol[_oppositeOptionSymbol].NewInput += (sender, input) => OppositePrice.Update(input);
             }
+
+            WarmUpPeriod = period;
         }
+
+        /// <summary>
+        /// Required period, in data points, for the indicator to be ready and fully initialized.
+        /// </summary>
+        public int WarmUpPeriod { get; set; }
 
         /// <summary>
         /// Computes the next value of this indicator from the given state.
@@ -171,10 +165,17 @@ namespace QuantConnect.Indicators
         /// </summary>
         /// <param name="input">The input given to the indicator</param>
         /// <returns>A new value for this indicator</returns>
-        protected override decimal ComputeNextValue(IBaseData input)
+        protected override decimal ComputeNextValue(IndicatorDataPoint input)
         {
-            return Math.Round(base.ComputeNextValue(input), 7);
+            return Math.Round(Calculate(input), 7);
         }
+
+        /// <summary>
+        /// Computes the next value of this indicator from the given state.
+        /// </summary>
+        /// <param name="input">The input given to the indicator</param>
+        /// <returns>A new value for this indicator</returns>
+        protected abstract decimal Calculate(IndicatorDataPoint input);
 
         /// <summary>
         /// Resets this indicator and all sub-indicators

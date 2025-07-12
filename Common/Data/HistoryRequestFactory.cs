@@ -15,7 +15,6 @@
 
 using System;
 using NodaTime;
-using QuantConnect.Data.UniverseSelection;
 using QuantConnect.Interfaces;
 using QuantConnect.Securities;
 using QuantConnect.Util;
@@ -167,8 +166,8 @@ namespace QuantConnect.Data
             bool? extendedMarketHours = null)
         {
             var isExtendedMarketHours = false;
-            // hour resolution does no have extended market hours data. Same for chain universes
-            if (resolution != Resolution.Hour && LeanData.SupportsExtendedMarketHours(dataType))
+            // hour resolution does no have extended market hours data
+            if (resolution != Resolution.Hour)
             {
                 if (extendedMarketHours.HasValue)
                 {

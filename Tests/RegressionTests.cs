@@ -27,7 +27,7 @@ namespace QuantConnect.Tests
     [TestFixture, Category("TravisExclude"), Category("RegressionTests")]
     public class RegressionTests
     {
-        [Test, TestCaseSource(nameof(GetLocalRegressionTestParameters))]
+        [Test, TestCaseSource(nameof(GetRegressionTestParameters))]
         public void AlgorithmStatisticsRegression(AlgorithmStatisticsTestParameters parameters)
         {
             // ensure we start with a fresh config every time when running multiple tests
@@ -78,17 +78,7 @@ namespace QuantConnect.Tests
             }
         }
 
-        public static TestCaseData[] GetLocalRegressionTestParameters()
-        {
-            return GetRegressionTestParameters<IRegressionAlgorithmDefinition, AlgorithmStatisticsTestParameters, BasicTemplateAlgorithm>(canRunLocally: true,
-                (instance, language) => new AlgorithmStatisticsTestParameters(instance.GetType().Name, instance.ExpectedStatistics, language,
-                instance.AlgorithmStatus, instance.DataPoints, instance.AlgorithmHistoryDataPoints));
-        }
-
-        public static TestCaseData[] GetRegressionTestParameters<T, K, J>(bool canRunLocally, Func<T, Language, K> factory)
-            where T : IRegressionAlgorithmDefinition
-            where K : AlgorithmStatisticsTestParameters
-            where J : class
+        private static TestCaseData[] GetRegressionTestParameters()
         {
             TestGlobals.Initialize();
 
@@ -101,14 +91,14 @@ namespace QuantConnect.Tests
 
             // find all regression algorithms in Algorithm.CSharp
             return (
-                from type in typeof(J).Assembly.GetTypes()
-                where typeof(T).IsAssignableFrom(type)
+                from type in typeof(BasicTemplateAlgorithm).Assembly.GetTypes()
+                where typeof(IRegressionAlgorithmDefinition).IsAssignableFrom(type)
                 where !type.IsAbstract                          // non-abstract
                 where type.GetConstructor(Array.Empty<Type>()) != null  // has default ctor
-                let instance = (T)Activator.CreateInstance(type)
-                where instance.CanRunLocally == canRunLocally                 // open source has data to run this algorithm
+                let instance = (IRegressionAlgorithmDefinition)Activator.CreateInstance(type)
+                where instance.CanRunLocally                   // open source has data to run this algorithm
                 from language in instance.Languages.Where(languages.Contains)
-                select factory(instance, language)
+                select new AlgorithmStatisticsTestParameters(type.Name, instance.ExpectedStatistics, language, instance.AlgorithmStatus, instance.DataPoints, instance.AlgorithmHistoryDataPoints)
             )
             .OrderBy(x => x.Language).ThenBy(x => x.Algorithm)
             // generate test cases from test parameters

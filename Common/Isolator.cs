@@ -102,8 +102,8 @@ namespace QuantConnect
 
             if (memoryCap <= 0)
             {
-                memoryCap = long.MaxValue;
-                spikeLimit = long.MaxValue;
+                memoryCap = int.MaxValue;
+                spikeLimit = int.MaxValue;
             }
 
             while (!task.IsCompleted && !CancellationTokenSource.IsCancellationRequested && utcNow < end)

@@ -14,8 +14,8 @@
 */
 
 using System;
-using QuantConnect.Orders;
 using QuantConnect.Interfaces;
+using QuantConnect.Orders;
 using QuantConnect.Securities;
 
 namespace QuantConnect.Tests.Brokerages
@@ -44,16 +44,14 @@ namespace QuantConnect.Tests.Brokerages
         {
             return new MarketOrder(Symbol, Math.Abs(quantity), DateTime.Now, properties: Properties)
             {
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
         public MarketOrder CreateShortMarketOrder(decimal quantity)
         {
             return new MarketOrder(Symbol, -Math.Abs(quantity), DateTime.Now, properties: Properties)
             {
-                OrderSubmissionData = OrderSubmissionData,
-                PriceCurrency = GetSymbolProperties(Symbol).QuoteCurrency
+                OrderSubmissionData = OrderSubmissionData
             };
         }
 
@@ -83,16 +81,5 @@ namespace QuantConnect.Tests.Brokerages
         /// True to continue modifying the order until it is filled, false otherwise
         /// </summary>
         public virtual bool ModifyUntilFilled => true;
-
-        protected SymbolProperties GetSymbolProperties(Symbol symbol)
-        {
-            return SPDB.GetSymbolProperties(symbol.ID.Market, symbol, SecurityType, Currencies.USD);
-        }
-
-        protected decimal RoundPrice(Order order, decimal price)
-        {
-            var roundOffPlaces = GetSymbolProperties(order.Symbol).MinimumPriceVariation.GetDecimalPlaces();
-            return Math.Round(price / roundOffPlaces) * roundOffPlaces;
-        }
     }
 }

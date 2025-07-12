@@ -15,18 +15,17 @@ from AlgorithmImports import *
 
 from keras.models import *
 from tensorflow import keras
-from keras import Sequential
 from keras.layers import Dense, Activation
 from keras.optimizers import SGD
 
 class KerasNeuralNetworkAlgorithm(QCAlgorithm):
 
-    def initialize(self) -> None:
+    def initialize(self):
         self.set_start_date(2019, 1, 1)   # Set Start Date
         self.set_end_date(2020, 4, 1)     # Set End Date
         self.set_cash(100000)            # Set Strategy Cash
 
-        self._model_by_symbol = {}
+        self.model_by_symbol = {}
 
         for ticker in ["SPY", "QQQ", "TLT"]:
             symbol = self.add_equity(ticker).symbol
@@ -34,14 +33,14 @@ class KerasNeuralNetworkAlgorithm(QCAlgorithm):
             # Read the model saved in the ObjectStore
             for kvp in self.object_store:
                 key = f'{symbol}_model'
-                if not (key == kvp.key and kvp.value):
+                if not key == kvp.key or kvp.value is None:
                     continue
                 file_path = self.object_store.get_file_path(kvp.key)
-                self._model_by_symbol[symbol] = keras.models.load_model(file_path)
-                self.debug(f'Model for {symbol} sucessfully retrieved. File {file_path}. Size {len(kvp.value)}. Weights {self._model_by_symbol[symbol].get_weights()}')
+                self.model_by_symbol[symbol] = keras.models.load_model(file_path)
+                self.debug(f'Model for {symbol} sucessfully retrieved. File {file_path}. Size {kvp.value.length}. Weights {self.model_by_symbol[symbol].get_weights()}')
 
         # Look-back period for training set
-        self._lookback = 30
+        self.lookback = 30
 
         # Train Neural Network every monday
         self.train(
@@ -55,21 +54,23 @@ class KerasNeuralNetworkAlgorithm(QCAlgorithm):
             self.time_rules.after_market_open("SPY", 30),
             self.trade)
 
-    def on_end_of_algorithm(self) -> None:
+
+    def on_end_of_algorithm(self):
         ''' Save the data and the mode using the ObjectStore '''
-        for symbol, model in self._model_by_symbol.items():
-            key = f'{symbol}_model.keras'
+        for symbol, model in self.model_by_symbol.items():
+            key = f'{symbol}_model'
             file = self.object_store.get_file_path(key)
             model.save(file)
             self.object_store.save(key)
             self.debug(f'Model for {symbol} sucessfully saved in the ObjectStore')
 
-    def neural_network_training(self) -> None:
+
+    def neural_network_training(self):
         '''Train the Neural Network and save the model in the ObjectStore'''
         symbols = self.securities.keys()
 
         # Daily historical data is used to train the machine learning model
-        history = self.history(symbols, self._lookback + 1, Resolution.DAILY)
+        history = self.history(symbols, self.lookback + 1, Resolution.DAILY)
         history = history.open.unstack(0)
 
         for symbol in symbols:
@@ -96,9 +97,9 @@ class KerasNeuralNetworkAlgorithm(QCAlgorithm):
                 # training the model
                 cost = model.train_on_batch(predictor, predictand)
 
-            self._model_by_symbol[symbol] = model
+            self.model_by_symbol[symbol] = model
 
-    def trade(self) -> None:
+    def trade(self):
         '''
         Predict the price using the trained model and out-of-sample data
         Enter or exit positions based on relationship of the open price of the current bar and the prices defined by the machine learning model.
@@ -106,12 +107,10 @@ class KerasNeuralNetworkAlgorithm(QCAlgorithm):
         '''
         target = 1 / len(self.securities)
 
-        for symbol, model in self._model_by_symbol.items():
-            if symbol not in self.current_slice.bars:
-                continue
-            
+        for symbol, model in self.model_by_symbol.items():
+
             # Get the out-of-sample history
-            history = self.history(symbol, self._lookback, Resolution.DAILY)
+            history = self.history(symbol, self.lookback, Resolution.DAILY)
             history = history.open.unstack(0)[symbol]
 
             # Get the final predicted price
@@ -119,7 +118,7 @@ class KerasNeuralNetworkAlgorithm(QCAlgorithm):
             history_std = np.std(history)
 
             holding = self.portfolio[symbol]
-            open_price = self.current_slice.bars[symbol].open
+            open_price = self.current_slice[symbol].open
 
             # Follow the trend
             if holding.invested:

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * QUANTCONNECT.COM - Democratizing Finance, Empowering Individuals.
  * Lean Algorithmic Trading Engine v2.0. Copyright 2014 QuantConnect Corporation.
  *
@@ -13,216 +13,117 @@
  * limitations under the License.
 */
 
-using QuantConnect.Data.UniverseSelection;
+using System;
 
 namespace QuantConnect.Data.Market
 {
     /// <summary>
     /// Defines a single futures contract at a specific expiration
     /// </summary>
-    public class FuturesContract : BaseContract
+    public class FuturesContract
     {
-        private FutureUniverse _universeData;
-        private TradeBar _tradeBar;
-        private QuoteBar _quoteBar;
-        private Tick _tradeTick;
-        private Tick _quoteTick;
-        private Tick _openInterest;
+        /// <summary>
+        /// Gets the futures contract's symbol
+        /// </summary>
+        public Symbol Symbol
+        {
+            get; private set;
+        }
+
+        /// <summary>
+        /// Gets the underlying security's symbol
+        /// </summary>
+        public Symbol UnderlyingSymbol
+        {
+            get; private set;
+        }
+
+        /// <summary>
+        /// Gets the expiration date
+        /// </summary>
+        public DateTime Expiry => Symbol.ID.Date;
+
+        /// <summary>
+        /// Gets the local date time this contract's data was last updated
+        /// </summary>
+        public DateTime Time
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Gets the open interest
         /// </summary>
-        public override decimal OpenInterest
+        public decimal OpenInterest
         {
-            get
-            {
-                // Contract universe data is prioritized
-                if (_universeData != null)
-                {
-                    return _universeData.OpenInterest;
-                }
-                return _openInterest?.Value ?? decimal.Zero;
-            }
+            get; set;
         }
 
         /// <summary>
         /// Gets the last price this contract traded at
         /// </summary>
-        public override decimal LastPrice
+        public decimal LastPrice
         {
-            get
-            {
-                if (_universeData != null)
-                {
-                    return _universeData.Close;
-                }
-
-                if (_tradeBar == null && _tradeTick == null)
-                {
-                    return decimal.Zero;
-                }
-                if (_tradeBar != null)
-                {
-                    return _tradeTick != null && _tradeTick.EndTime > _tradeBar.EndTime ? _tradeTick.Price : _tradeBar.Close;
-                }
-                return _tradeTick.Price;
-            }
+            get; set;
         }
 
         /// <summary>
         /// Gets the last volume this contract traded at
         /// </summary>
-        public override long Volume
+        public long Volume
         {
-            get
-            {
-                if (_universeData != null)
-                {
-                    return (long)_universeData.Volume;
-                }
-                return (long)(_tradeBar?.Volume ?? 0);
-            }
+            get; set;
         }
 
         /// <summary>
-        /// Get the current bid price
+        /// Gets the current bid price
         /// </summary>
-        public override decimal BidPrice
+        public decimal BidPrice
         {
-            get
-            {
-                if (_universeData != null)
-                {
-                    return _universeData.Close;
-                }
-                if (_quoteBar == null && _quoteTick == null)
-                {
-                    return decimal.Zero;
-                }
-                if (_quoteBar != null)
-                {
-                    return _quoteTick != null && _quoteTick.EndTime > _quoteBar.EndTime ? _quoteTick.BidPrice : _quoteBar.Bid.Close;
-                }
-                return _quoteTick.BidPrice;
-            }
+            get; set;
         }
 
         /// <summary>
         /// Get the current bid size
         /// </summary>
-        public override long BidSize
+        public long BidSize
         {
-            get
-            {
-                if (_quoteBar == null && _quoteTick == null)
-                {
-                    return 0;
-                }
-                if (_quoteBar != null)
-                {
-                    return (long)(_quoteTick != null && _quoteTick.EndTime > _quoteBar.EndTime ? _quoteTick.BidSize : _quoteBar.LastBidSize);
-                }
-                return (long)_quoteTick.BidSize;
-            }
+            get; set;
         }
 
         /// <summary>
-        /// Gets the current ask price
+        /// Gets the ask price
         /// </summary>
-        public override decimal AskPrice
+        public decimal AskPrice
         {
-            get
-            {
-                if (_universeData != null)
-                {
-                    return _universeData.Close;
-                }
-                if (_quoteBar == null && _quoteTick == null)
-                {
-                    return decimal.Zero;
-                }
-                if (_quoteBar != null)
-                {
-                    return _quoteTick != null && _quoteTick.EndTime > _quoteBar.EndTime ? _quoteTick.AskPrice : _quoteBar.Ask.Close;
-                }
-                return _quoteTick.AskPrice;
-            }
+            get; set;
         }
 
         /// <summary>
-        /// Get the current ask size
+        /// Gets the current ask size
         /// </summary>
-        public override long AskSize
+        public long AskSize
         {
-            get
-            {
-                if (_quoteBar == null && _quoteTick == null)
-                {
-                    return 0;
-                }
-                if (_quoteBar != null)
-                {
-                    return (long)(_quoteTick != null && _quoteTick.EndTime > _quoteBar.EndTime ? _quoteTick.AskSize : _quoteBar.LastAskSize);
-                }
-                return (long)_quoteTick.AskSize;
-            }
+            get; set;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FuturesContract"/> class
         /// </summary>
         /// <param name="symbol">The futures contract symbol</param>
-        public FuturesContract(Symbol symbol)
-            : base(symbol)
+        /// <param name="underlyingSymbol">The symbol of the underlying security</param>
+        public FuturesContract(Symbol symbol, Symbol underlyingSymbol)
         {
+            Symbol = symbol;
+            UnderlyingSymbol = underlyingSymbol;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FuturesContract"/> class
+        /// Returns a string that represents the current object.
         /// </summary>
-        /// <param name="contractData">The contract universe data</param>
-        public FuturesContract(FutureUniverse contractData)
-            : base(contractData.Symbol)
-        {
-            _universeData = contractData;
-        }
-
-        /// <summary>
-        /// Implicit conversion into <see cref="Symbol"/>
-        /// </summary>
-        /// <param name="contract">The option contract to be converted</param>
-        public static implicit operator Symbol(FuturesContract contract)
-        {
-            return contract.Symbol;
-        }
-
-        /// <summary>
-        /// Updates the future contract with the new data, which can be a <see cref="Tick"/> or <see cref="TradeBar"/> or <see cref="QuoteBar"/>
-        /// </summary>
-        internal override void Update(BaseData data)
-        {
-            switch (data)
-            {
-                case TradeBar tradeBar:
-                    _tradeBar = tradeBar;
-                    break;
-
-                case QuoteBar quoteBar:
-                    _quoteBar = quoteBar;
-                    break;
-
-                case Tick tick when tick.TickType == TickType.Trade:
-                    _tradeTick = tick;
-                    break;
-
-                case Tick tick when tick.TickType == TickType.Quote:
-                    _quoteTick = tick;
-                    break;
-
-                case Tick tick when tick.TickType == TickType.OpenInterest:
-                    _openInterest = tick;
-                    break;
-            }
-        }
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
+        public override string ToString() => Symbol.Value;
     }
 }

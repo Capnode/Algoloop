@@ -57,7 +57,6 @@ namespace QuantConnect.Algorithm.CSharp
             SetStartDate(2013, 10, 06);
             SetEndDate(2013, 10, 14);
 
-            Settings.DailyConsolidationUseExtendedMarketHours = true;
             var es = AddSecurity(SecurityType.Future, "ES", extendedMarketHours: ExtendedMarketHours);
 
             _expectedOpensQueue = new Queue<DateTime>(ExpectedOpens);
@@ -94,7 +93,7 @@ namespace QuantConnect.Algorithm.CSharp
         /// <summary>
         /// Data Points count of all timeslices of algorithm
         /// </summary>
-        public virtual long DataPoints => 16313;
+        public virtual long DataPoints => 32073;
 
         /// </summary>
         /// Data Points count of the algorithm history

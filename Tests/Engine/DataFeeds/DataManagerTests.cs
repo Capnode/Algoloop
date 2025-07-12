@@ -48,8 +48,7 @@ namespace QuantConnect.Tests.Engine.DataFeeds
                 SymbolPropertiesDatabase.FromDataFolder(),
                 _algorithm,
                 new RegisteredSecurityDataTypesProvider(),
-                new SecurityCacheProvider(_algorithm.Portfolio),
-                algorithm: _algorithm);
+                new SecurityCacheProvider(_algorithm.Portfolio));
         }
 
         [Test]

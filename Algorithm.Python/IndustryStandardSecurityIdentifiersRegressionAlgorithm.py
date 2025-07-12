@@ -51,9 +51,9 @@ class IndustryStandardSecurityIdentifiersRegressionAlgorithm(QCAlgorithm):
 
     def check_symbol_representation(self, symbol: str, standard: str) -> None:
         if not symbol:
-            raise AssertionError(f"{standard} symbol representation is null or empty")
+            raise Exception(f"{standard} symbol representation is null or empty")
 
     def check_ap_is_symbol_representations(self, symbol_api_symbol: str, algorithm_api_symbol: str, standard: str) -> None:
         if symbol_api_symbol != algorithm_api_symbol:
-            raise AssertionError(f"Symbol API {standard} symbol representation ({symbol_api_symbol}) does not match "
+            raise Exception(f"Symbol API {standard} symbol representation ({symbol_api_symbol}) does not match "
                             f"QCAlgorithm API {standard} symbol representation ({algorithm_api_symbol})")

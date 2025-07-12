@@ -21,9 +21,5 @@ namespace QuantConnect.Orders
     /// </summary>
     public class AlpacaOrderProperties : OrderProperties
     {
-        /// <summary>
-        /// Flag to allow orders to also trigger or fill outside of regular trading hours.
-        /// </summary>
-        public bool OutsideRegularTradingHours { get; set; }
     }
 }
