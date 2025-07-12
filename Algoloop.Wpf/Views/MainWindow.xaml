@@ -1,10 +1,9 @@
-<dx:ThemedWindow
+<Window
     x:Class="Algoloop.Wpf.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     xmlns:view="clr-namespace:Algoloop.Wpf.Views"
     xmlns:viewsupport="clr-namespace:Algoloop.Wpf.Views.Internal"
@@ -43,14 +42,6 @@
                             Width="16"
                             Height="16"
                             Source="/Resources/Tools.png" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem x:Name="_themeMenu" Click="OnTheme" Header="Theme">
-                    <MenuItem.Icon>
-                        <Image
-                            Width="16"
-                            Height="16"
-                            Source="/Resources/Palette.png" />
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem
@@ -125,4 +116,4 @@
             </TabItem>
         </TabControl>
     </DockPanel>
-</dx:ThemedWindow>
+</Window>

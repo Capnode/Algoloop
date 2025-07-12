@@ -4,11 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:internal="clr-namespace:Algoloop.Wpf.Views.Internal"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:Algoloop.Wpf.Model;assembly=Algoloop.Wpf.Model"
     xmlns:properties="clr-namespace:Algoloop.Wpf.Properties"
     xmlns:view="clr-namespace:Algoloop.Wpf.Views"
-    xmlns:internal="clr-namespace:Algoloop.Wpf.Views.Internal"
-    xmlns:model="clr-namespace:Algoloop.Wpf.Model;assembly=Algoloop.Wpf.Model"
     xmlns:vm="clr-namespace:Algoloop.Wpf.ViewModels"
     xmlns:wpf="clr-namespace:Capnode.Wpf.DataGrid;assembly=Capnode.Wpf"
     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
@@ -69,15 +69,15 @@
                 </Button>
             </ToolBar>
             <TreeView
-                BorderThickness="0"
                 AllowDrop="False"
+                BorderThickness="0"
                 DragOver="TreeView_DragOver"
                 Drop="TreeView_Drop"
-                PreviewMouseLeftButtonDown="TreeView_PreviewMouseLeftButtonDown"
+                ItemsSource="{Binding Markets}"
                 MouseLeftButtonUp="TreeView_MouseLeftButtonUp"
-                SelectedItemChanged="TreeView_SelectedItemChanged"
                 MouseMove="TreeView_MouseMove"
-                ItemsSource="{Binding Markets}">
+                PreviewMouseLeftButtonDown="TreeView_PreviewMouseLeftButtonDown"
+                SelectedItemChanged="TreeView_SelectedItemChanged">
                 <TreeView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Command="{Binding AddCommand}" Header="Add Market">
@@ -93,7 +93,10 @@
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type vm:MarketViewModel}" ItemsSource="{Binding Lists}">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox IsTabStop="False" Command="{Binding ActiveCommand}" IsChecked="{Binding Active}"/>
+                            <CheckBox
+                                Command="{Binding ActiveCommand}"
+                                IsChecked="{Binding Active}"
+                                IsTabStop="False" />
                             <TextBlock>
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{} {0} ({1})">
@@ -212,9 +215,7 @@
                                             Height="16"
                                             Source="/Resources\Delete.png" />
                                     </Button>
-                                    <Button
-                                        Command="{Binding ImportSymbolsCommand}"
-                                        ToolTip="Import symbols ...">
+                                    <Button Command="{Binding ImportSymbolsCommand}" ToolTip="Import symbols ...">
                                         <Image
                                             Width="16"
                                             Height="16"
@@ -253,8 +254,7 @@
                                     ExSelectedItems="{Binding SelectedItems}"
                                     FrozenColumnCount="1"
                                     GridLinesVisibility="None"
-                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}">
-                                </wpf:ExDataGrid>
+                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}" />
                             </DockPanel>
                         </TabItem>
                         <TabItem Header="{Binding Balances.Count, Converter={internal:StringFormatConverter}, ConverterParameter=Balance ({0}), FallbackValue=Balance}" Visibility="{Binding Accounts.Count, Converter={internal:BooleanToVisibilityConverter}}">
@@ -283,7 +283,7 @@
                                     GridLinesVisibility="None"
                                     IsReadOnly="False">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Binding="{Binding Equity, NotifyOnTargetUpdated=True}" Header="Equity"/>
+                                        <DataGridTextColumn Binding="{Binding Equity, NotifyOnTargetUpdated=True}" Header="Equity" />
                                         <DataGridTextColumn Binding="{Binding Cash, NotifyOnTargetUpdated=True}" Header="Cash" />
                                         <DataGridTextColumn Binding="{Binding Profit, NotifyOnTargetUpdated=True}" Header="Profit" />
                                         <DataGridTextColumn Binding="{Binding DayProfit, NotifyOnTargetUpdated=True}" Header="Profit today" />
@@ -510,7 +510,6 @@
                                     </Button>
                                 </ToolBar>
                                 <wpf:ExDataGrid
-                                    TargetUpdated="TargetUpdatedBlinkCell"
                                     x:Name="marketListDataGrid"
                                     AutoGenerateColumns="False"
                                     CanUserFilter="False"
@@ -523,11 +522,12 @@
                                     ExSelectedItems="{Binding SelectedItems}"
                                     FrozenColumnCount="1"
                                     GridLinesVisibility="None"
-                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}">
+                                    SelectedValue="{Binding SelectedSymbol, Mode=TwoWay}"
+                                    TargetUpdated="TargetUpdatedBlinkCell">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Binding="{Binding Model.Name}" Header="Name" />
-                                        <DataGridTextColumn Binding="{Binding Ask, NotifyOnTargetUpdated=True}" Header="Ask"/>
-                                        <DataGridTextColumn Binding="{Binding Bid, NotifyOnTargetUpdated=True}" Header="Bid"/>
+                                        <DataGridTextColumn Binding="{Binding Ask, NotifyOnTargetUpdated=True}" Header="Ask" />
+                                        <DataGridTextColumn Binding="{Binding Bid, NotifyOnTargetUpdated=True}" Header="Bid" />
                                     </DataGrid.Columns>
                                 </wpf:ExDataGrid>
                             </DockPanel>
@@ -576,28 +576,27 @@
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </xctk:DateTimePicker>
-                                    <Separator/>
+                                    <Separator />
                                     <ComboBox
                                         MinWidth="100"
-                                        ToolTip="Operation on reference symbol"
+                                        ItemsSource="{Binding Source={internal:EnumBindingSource {x:Type model:Operator}}}"
                                         SelectedItem="{Binding SelectedReferenceSymbol.Model.Operation}"
-                                        ItemsSource="{Binding Source={internal:EnumBindingSource {x:Type model:Operator}}}">
+                                        ToolTip="Operation on reference symbol">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="SelectionChanged">
                                                 <i:InvokeCommandAction Command="{Binding UpdateCommand}" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </ComboBox>
-                                    <Separator Width="8" Visibility="Hidden"/>
+                                    <Separator Width="8" Visibility="Hidden" />
                                     <ComboBox
                                         MinWidth="180"
-                                        DisplayMemberPath="DisplayName"
-                                        ToolTip="Reference symbols: Drag symbol from list to add symbol"
                                         AllowDrop="True"
+                                        DisplayMemberPath="DisplayName"
                                         Drop="Reference_Drop"
+                                        ItemsSource="{Binding ReferenceSymbols}"
                                         SelectedItem="{Binding SelectedReferenceSymbol}"
-                                        ItemsSource="{Binding ReferenceSymbols}">
-                                    </ComboBox>
+                                        ToolTip="Reference symbols: Drag symbol from list to add symbol" />
                                     <Button Command="{Binding SelectedItem.DeleteCommand}" ToolTip="Delete reference symbol">
                                         <Image
                                             Width="16"
@@ -605,9 +604,7 @@
                                             Source="/Resources/Delete.png" />
                                     </Button>
                                 </ToolBar>
-                                <view:StockChartView
-                                    ItemsSource="{Binding Charts}"
-                                    Settings="{Binding Source={StaticResource settings}, Path=MarketViewChartSettings}"/>
+                                <view:StockChartView ItemsSource="{Binding Charts}" Settings="{Binding Source={StaticResource settings}, Path=MarketViewChartSettings}" />
                             </DockPanel>
                         </TabItem>
                         <TabItem Header="Fundamentals">
@@ -631,8 +628,8 @@
                                     CanUserGroup="False"
                                     CanUserReorderColumns="False"
                                     CanUserSelectDistinct="False"
-                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=FundamentalsColumnsInfo}"
                                     ExColumns="{Binding PeriodColumns}"
+                                    ExColumnsInfo="{Binding Source={StaticResource settings}, Path=FundamentalsColumnsInfo}"
                                     ExItemsSource="{Binding FundamentalRows}"
                                     FrozenColumnCount="1"
                                     GridLinesVisibility="None" />
