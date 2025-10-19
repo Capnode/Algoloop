@@ -1,0 +1,20 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Algoloop.Avalonia.App"
+             xmlns:local="clr-namespace:Algoloop.Avalonia"
+             RequestedThemeVariant="Default">
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <local:ViewModelLocator x:Key="Locator" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

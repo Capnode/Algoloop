@@ -279,4 +279,6 @@ QuantConnect.Lean.sln.DotSettings*
 Research/Notebooks
 
 #Docker result files
-Results/
+Results/# Avalonia build artifacts
+Algoloop.Avalonia/bin/
+Algoloop.Avalonia/obj/
