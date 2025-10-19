@@ -1,0 +1,92 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Algoloop.Wpf.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="600"
+        x:Class="Algoloop.Avalonia.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        x:CompileBindings="False"
+        Title="{Binding Title}"
+        Width="1200"
+        Height="600">
+
+    <Window.DataContext>
+        <Binding Source="{StaticResource Locator}" Path="MainViewModel" />
+    </Window.DataContext>
+
+    <DockPanel>
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="Save" Command="{Binding SaveCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Save.png" Width="16" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Settings..." Click="OnFileSettings">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Tools.png" Width="16" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" CommandParameter="{Binding $parent[Window]}">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Exit.png" Width="16" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="Documentation" Click="OnHelpDocumentation">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Help.png" Width="16" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Technical support" Click="OnHelpTechnicalSupport">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Help.png" Width="16" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Privacy policy" Click="OnHelpPrivacyPolicy">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Info.png" Width="16" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_About" Click="OnHelpAbout">
+                    <MenuItem.Icon>
+                        <Image Source="/Resources/Info.png" Width="16" Height="16" />
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!-- StatusBar -->
+        <Border DockPanel.Dock="Bottom" BorderBrush="Gray" BorderThickness="1" Height="24">
+            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Margin="5,0" />
+        </Border>
+
+        <!-- TabControl -->
+        <TabControl>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{Binding MarketsViewModel.Markets.Count, StringFormat='Markets ({0})', FallbackValue='Markets'}" />
+                </TabItem.Header>
+                <TextBlock Text="Markets View - Not yet implemented" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{Binding StrategiesViewModel.Strategies.Count, StringFormat='Strategies ({0})', FallbackValue='Strategies'}" />
+                </TabItem.Header>
+                <TextBlock Text="Strategies View - Not yet implemented" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </TabItem>
+            <TabItem Header="Research">
+                <TextBlock Text="Research View - WebView2 replacement needed" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <TextBlock Text="{Binding LogViewModel.Logs.Count, StringFormat='Logs ({0})', FallbackValue='Logs'}" />
+                </TabItem.Header>
+                <TextBlock Text="Log View - Not yet implemented" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
