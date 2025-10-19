@@ -1,0 +1,13 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add preview content here for the designer -->
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- Add custom styles here -->
+    <Style Selector="Window">
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+    </Style>
+</Styles>
