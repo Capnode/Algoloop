@@ -1,14 +1,9 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Algoloop.Avalonia.App"
-             xmlns:local="using:Algoloop.Avalonia"
-             xmlns:vm="using:Algoloop.Wpf.ViewModels"
              RequestedThemeVariant="Default">
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://Algoloop.Avalonia/Styles.axaml"/>
     </Application.Styles>
-    
-    <Application.Resources>
-        <vm:ViewModelLocator x:Key="Locator" />
-    </Application.Resources>
 </Application>

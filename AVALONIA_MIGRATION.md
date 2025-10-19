@@ -1,203 +1,200 @@
-# Avalonia UI Migration
-
-This document describes the conversion of the Algoloop WPF UI to Avalonia UI.
+# Avalonia UI Migration Documentation
 
 ## Overview
 
-The Algoloop application has been migrated from Windows Presentation Foundation (WPF) to Avalonia UI, enabling cross-platform support while maintaining the familiar MVVM architecture.
+This document describes the migration from WPF to Avalonia UI for the Algoloop application. The Avalonia UI project provides a cross-platform alternative to the existing WPF application.
 
-## What Was Changed
+## What Changed
 
-### New Project Added
-- **Algoloop.UI.Avalonia**: New cross-platform UI project targeting .NET 8.0
+### New Project: Algoloop.Avalonia
+
+A new Avalonia UI project has been added to the solution targeting .NET 8.0. This project:
+- Uses Avalonia 11.2.2 for cross-platform UI
+- Implements a minimal main window with menu and tabbed interface
+- Provides standalone ViewModels without WPF dependencies
+- Includes the FluentTheme for modern UI styling
 
 ### Project Structure
+
 ```
-Algoloop.UI.Avalonia/
-├── Algoloop.UI.Avalonia.csproj  # Project file with Avalonia packages
-├── Program.cs                    # Application entry point
-├── App.axaml / App.axaml.cs     # Avalonia application definition
-├── Styles.axaml                  # Application-wide styles
-├── MainWindow.axaml / .cs        # Main application window
+Algoloop.Avalonia/
+├── Algoloop.Avalonia.csproj  # Project file
+├── Program.cs                  # Application entry point
+├── App.axaml                   # Application definition
+├── App.axaml.cs                # Application code-behind
+├── MainWindow.axaml            # Main window XAML
+├── MainWindow.axaml.cs         # Main window code-behind
+├── Styles.axaml                # Application styles
 ├── ViewModels/
-│   └── MainViewModel.cs          # Main view model
-└── app.manifest                  # Windows application manifest
+│   └── MainViewModel.cs        # Main view model
+└── Resources/
+    └── AlgoloopIcon.ico       # Application icon
 ```
+
+### Key Components
+
+#### Program.cs
+The entry point that configures and starts the Avalonia application with classic desktop lifetime.
+
+#### App.axaml / App.axaml.cs
+The main application class that:
+- Loads the FluentTheme
+- Initializes the application styles
+- Creates and shows the main window
+
+#### MainWindow.axaml / MainWindow.axaml.cs
+The main application window featuring:
+- File menu with Save and Exit commands
+- Help menu
+- Status bar
+- Tabbed interface with:
+  - Markets (placeholder)
+  - Strategies (placeholder)
+  - Research (placeholder)
+  - Log (DataGrid with sample data)
+
+#### ViewModels
+Simplified ViewModels created specifically for Avalonia:
+- **MainViewModel**: Main application view model with Save and Exit commands
+- **LogViewModel**: Log view model with sample log entries
 
 ### Dependencies
-The Avalonia UI project uses the following NuGet packages:
-- **Avalonia** (11.0.10): Core Avalonia framework
-- **Avalonia.Desktop** (11.0.10): Desktop platform support
-- **Avalonia.Themes.Fluent** (11.0.10): Modern Fluent theme
-- **Avalonia.Controls.DataGrid** (11.0.10): DataGrid control
-- **Avalonia.Diagnostics** (11.0.10): Development diagnostics (Debug only)
-- **CommunityToolkit.Mvvm** (8.4.0): MVVM helpers
 
-### Modified Files
-- **Algoloop.sln**: Updated to include the new Avalonia project
-- **Algoloop.Wpf.Model/Algoloop.Wpf.Model.csproj**: Added `EnableWindowsTargeting` property to support building on Linux
+The Avalonia project uses the following NuGet packages:
+- Avalonia 11.2.2
+- Avalonia.Desktop 11.2.2
+- Avalonia.Controls.DataGrid 11.2.2
+- Avalonia.Themes.Fluent 11.2.2
+- Avalonia.Diagnostics 11.2.2 (Debug only)
+- CommunityToolkit.Mvvm 8.4.0
 
 ## How to Build and Run
 
 ### Prerequisites
 - .NET 8.0 SDK or later
-- For development: Visual Studio 2022, Rider, or VS Code with C# extension
+- Platform-specific requirements:
+  - Windows: No additional requirements
+  - Linux: See [Avalonia Linux setup](https://docs.avaloniaui.net/docs/get-started/set-up-an-editor/linux)
+  - macOS: See [Avalonia macOS setup](https://docs.avaloniaui.net/docs/get-started/set-up-an-editor/macos)
 
-### Building the Avalonia UI
+### Build Instructions
 
+#### Build the Avalonia project:
 ```bash
-# Navigate to the Avalonia project directory
-cd Algoloop.UI.Avalonia
+dotnet build Algoloop.Avalonia/Algoloop.Avalonia.csproj
+```
 
-# Restore dependencies and build
-dotnet build
-
-# Or build the entire solution
-cd ..
+#### Build the entire solution:
+```bash
 dotnet build Algoloop.sln
 ```
 
-### Running the Avalonia UI
+### Run Instructions
 
+#### Run the Avalonia UI application:
 ```bash
-# From the Avalonia project directory
-cd Algoloop.UI.Avalonia
-dotnet run
+dotnet run --project Algoloop.Avalonia
 ```
 
-Or on Windows, you can run the compiled executable:
+#### On Windows, you can also run the executable directly:
 ```bash
-.\bin\Debug\net8.0\Algoloop.UI.Avalonia.exe
+.\Algoloop.Avalonia\bin\Debug\net8.0\Algoloop.Avalonia.exe
 ```
 
-## Current Implementation Status
+## Known Limitations
 
-### ✅ Completed
-- [x] Project structure created with proper Avalonia configuration
-- [x] Application entry point (Program.cs) with classic desktop lifetime
-- [x] App.axaml with Fluent theme integration
-- [x] Styles.axaml for custom styling
-- [x] MainWindow with menu and placeholder UI
-- [x] Basic MainViewModel with sample commands
-- [x] Project successfully builds without errors
-- [x] Solution file updated to include new project
+### Current Implementation Status
 
-### 🚧 Current Limitations and Known Issues
+1. **Minimal UI Implementation**
+   - The current implementation provides a basic window structure
+   - Only the Log tab has a functional DataGrid with sample data
+   - Markets, Strategies, and Research tabs show placeholders
 
-1. **Minimal ViewModel Implementation**: 
-   - Current MainViewModel is a minimal placeholder
-   - Does not integrate with existing WPF ViewModels from Algoloop.Wpf.ViewModels
-   - Real-world functionality would require adapting or sharing ViewModels
+2. **ViewModels**
+   - Simplified ViewModels created specifically for Avalonia
+   - No integration with existing WPF ViewModels (which have WPF dependencies)
+   - Business logic from Algoloop core projects needs to be integrated
 
-2. **UI Controls Placeholder**:
-   - Main window has basic menu and tabs
-   - No DataGrid implementation yet (package is referenced but not used)
-   - Tabs contain simple placeholder text blocks
-   - Missing advanced controls like charts (OxyPlot, StockSharp equivalents needed)
+3. **Missing Features**
+   - No integration with QuantConnect Lean engine
+   - No data loading or persistence
+   - No charts or visualizations
+   - No strategy/market management
+   - No settings or configuration UI
 
-3. **Missing Features**:
-   - No settings dialog
-   - No theme switching implementation
-   - No About dialog
-   - No integration with backend services
-   - No data loading or display
+4. **Platform-Specific Limitations**
+   - The original WPF ViewModels use System.Windows which is Windows-specific
+   - Some features may require platform-specific implementations
 
-4. **WPF-Specific Controls Not Yet Replaced**:
-   - DevExpress ThemedWindow → Standard Avalonia Window (done)
-   - Extended WPF Toolkit controls → Need Avalonia equivalents
-   - OxyPlot.Wpf charts → Need Avalonia.OxyPlot or alternative
-   - StockSharp charting → Need cross-platform charting solution
+### WPF Project Status
 
-5. **Dependency Isolation**:
-   - Currently references only Algoloop (core library)
-   - Does not reference Algoloop.Wpf.Model to avoid Windows-specific dependencies
-   - Would need to refactor shared models for cross-platform use
+- The WPF project (Algoloop.Wpf) remains unchanged and fully functional
+- Both WPF and Avalonia projects can coexist in the solution
+- WPF is still the primary/recommended UI for production use
 
 ## Next Steps for Full Migration
 
-### Short Term (Essential for MVP)
-1. Implement DataGrid with sample data bindings
-2. Add navigation between different views (Strategies, Markets, Research, etc.)
-3. Integrate with existing core business logic from Algoloop library
-4. Add basic error handling and logging display
+To achieve feature parity with the WPF version, the following work is needed:
 
-### Medium Term (Feature Parity)
-1. Port or adapt all ViewModels from Algoloop.Wpf.ViewModels
-2. Implement all dialogs (Settings, About, etc.)
-3. Add charting support using Avalonia-compatible libraries
-4. Implement theme switching (Light/Dark modes)
-5. Add all menu commands and functionality
+1. **Refactor ViewModels**
+   - Extract business logic from WPF-specific ViewModels
+   - Create platform-agnostic ViewModels or shared view model library
+   - Implement proper MVVM patterns without WPF dependencies
 
-### Long Term (Enhancements)
-1. Optimize for cross-platform operation (Linux, macOS)
-2. Improve UI/UX with Avalonia-specific enhancements
-3. Add touch and mobile support if needed
-4. Performance optimization for large datasets
-5. Comprehensive testing on all platforms
+2. **Implement Core Features**
+   - Markets management UI
+   - Strategies management UI
+   - Research/Jupyter notebook integration
+   - Settings and configuration
+   - Chart visualizations (using OxyPlot.Avalonia or similar)
+
+3. **Integrate Business Logic**
+   - Connect to QuantConnect Lean engine
+   - Implement data loading and persistence
+   - Add backtesting capabilities
+   - Integrate market data providers
+
+4. **Testing and Validation**
+   - Cross-platform testing (Windows, Linux, macOS)
+   - UI/UX refinement
+   - Performance optimization
+
+5. **Documentation**
+   - User guide for Avalonia version
+   - Developer documentation
+   - Migration guide for contributors
 
 ## Architecture Notes
 
-### MVVM Pattern
-The application follows the MVVM (Model-View-ViewModel) pattern:
-- **Models**: Business logic in Algoloop core library
-- **ViewModels**: Located in `ViewModels/` folder, using CommunityToolkit.Mvvm
-- **Views**: AXAML files in the root and potential Views folder
+### Separation of Concerns
 
-### Data Binding
-- Uses Avalonia's data binding system
-- Compiled bindings disabled by default for flexibility
-- Commands use RelayCommand from CommunityToolkit.Mvvm
+The Avalonia implementation intentionally avoids direct references to WPF projects to maintain cross-platform compatibility. Future development should:
+- Keep UI code platform-agnostic where possible
+- Use dependency injection for platform-specific services
+- Share business logic through non-UI projects
 
-### Styling
-- Uses Fluent theme for modern look and feel
-- Custom styles in Styles.axaml
-- Theme-aware resource dictionaries
+### Recommended Approach
 
-## Building for Different Platforms
+For a production-ready Avalonia migration:
+1. Create shared ViewModel library (no WPF/Avalonia dependencies)
+2. Use interfaces for platform-specific services
+3. Implement proper dependency injection
+4. Use platform-specific view implementations (WPF/Avalonia)
 
-### Windows
-```bash
-dotnet publish -c Release -r win-x64 --self-contained
-```
-
-### Linux
-```bash
-dotnet publish -c Release -r linux-x64 --self-contained
-```
-
-### macOS
-```bash
-dotnet publish -c Release -r osx-x64 --self-contained
-```
-
-## Troubleshooting
-
-### Build Issues
-- **Error: Project not compatible**: Ensure all referenced projects target compatible frameworks
-- **Missing types**: Run `dotnet restore` to restore NuGet packages
-- **EnableWindowsTargeting errors on Linux**: This is expected for WPF projects in the solution. To build only the Avalonia project on Linux:
-  ```bash
-  dotnet build Algoloop.UI.Avalonia/Algoloop.UI.Avalonia.csproj
-  ```
-  The full solution build requires Windows or `EnableWindowsTargeting=true` for all WPF projects.
-
-### Runtime Issues
-- **Window doesn't open**: Check that MainWindow is properly registered in App.axaml.cs
-- **Bindings don't work**: Verify DataContext is set and properties are public
-- **XOpenDisplay failed** (on headless Linux): This is expected when running on a system without a display. The application will work fine on systems with a GUI.
-
-## Resources
+## References
 
 - [Avalonia Documentation](https://docs.avaloniaui.net/)
 - [Avalonia Samples](https://github.com/AvaloniaUI/Avalonia.Samples)
-- [Migrating from WPF](https://docs.avaloniaui.net/docs/next/get-started/wpf-migration)
-- [CommunityToolkit.Mvvm](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/)
+- [MVVM Toolkit](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/)
+- [WPF to Avalonia Migration Guide](https://docs.avaloniaui.net/docs/guides/platforms/wpf-migration)
 
-## Contributing
+## Support
 
-When contributing to the Avalonia UI migration:
-1. Follow the existing MVVM pattern
-2. Use CommunityToolkit.Mvvm for ViewModels
-3. Place reusable styles in Styles.axaml
-4. Test on multiple platforms when possible
-5. Update this document with significant changes
+For questions or issues related to the Avalonia migration:
+1. Check existing documentation
+2. Review Avalonia samples and documentation
+3. Create an issue in the repository with "Avalonia" label
+
+## License
+
+The Avalonia project follows the same license as the main Algoloop project.
