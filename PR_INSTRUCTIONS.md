@@ -23,17 +23,17 @@ Since the automated tools cannot create pull requests directly, please follow th
 ### Option 2: Using GitHub CLI
 
 ```bash
-# If Avalonia branch doesn't exist, create it first
+# If Avalonia branch doesn't exist, create it first from current base
 gh api repos/Capnode/Algoloop/git/refs \
   -f ref="refs/heads/Avalonia" \
-  -f sha="$(git rev-parse copilot/convert-wpf-ui-to-avalonia-again^)"
+  -f sha="$(git rev-parse copilot/convert-wpf-ui-to-avalonia-again)"
 
-# Then create the PR
+# Then create the PR (the body will be entered interactively or paste from below)
 gh pr create \
   --base Avalonia \
   --head copilot/convert-wpf-ui-to-avalonia-again \
   --title "Convert WPF UI to Avalonia (complete migration)" \
-  --body-file PR_BODY.md
+  --body "See PR body template below"
 ```
 
 ### Creating the Avalonia Branch (if needed)
@@ -225,12 +225,14 @@ grep -i "Algoloop.UI.Avalonia" Algoloop.sln
 
 ## Files in This Migration
 
-All changes are in these commits:
-- `498eea3` - Initial plan
-- `82bbd24` - Add Avalonia UI project with basic structure and documentation
-- `b8446bb` - Add DataGrid demo and update documentation
+All migration changes are included in the feature branch `copilot/convert-wpf-ui-to-avalonia-again`.
 
-Total: 12 files added/modified
+You can view the commits with:
+```bash
+git log --oneline copilot/convert-wpf-ui-to-avalonia-again
+```
+
+Total changes: 12 files added/modified across 4 commits
 
 ## Questions or Issues?
 
