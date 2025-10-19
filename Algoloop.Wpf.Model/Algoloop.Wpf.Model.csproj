@@ -8,6 +8,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <OutputType>Library</OutputType>
     <NoWarn>NU1701;CA1416</NoWarn>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AlgorithmFactory\QuantConnect.AlgorithmFactory.csproj" />

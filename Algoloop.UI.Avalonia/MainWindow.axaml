@@ -1,0 +1,116 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="600"
+        x:Class="Algoloop.UI.Avalonia.MainWindow"
+        Title="{Binding Title}"
+        Width="1200" Height="600">
+
+    <DockPanel>
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="Save" Command="{Binding SaveCommand}">
+                    <MenuItem.Icon>
+                        <TextBlock>💾</TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="Settings...">
+                    <MenuItem.Icon>
+                        <TextBlock>⚙️</TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Theme">
+                    <MenuItem.Icon>
+                        <TextBlock>🎨</TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}">
+                    <MenuItem.Icon>
+                        <TextBlock>🚪</TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="Documentation">
+                    <MenuItem.Icon>
+                        <TextBlock>📖</TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Technical support">
+                    <MenuItem.Icon>
+                        <TextBlock>🔧</TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="About...">
+                    <MenuItem.Icon>
+                        <TextBlock>ℹ️</TextBlock>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+
+        <!-- Status Bar -->
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource SystemControlBackgroundAltMediumBrush}" 
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}" 
+                BorderThickness="0,1,0,0" 
+                Padding="8,4">
+            <TextBlock Text="{Binding StatusMessage, FallbackValue='Ready'}" />
+        </Border>
+
+        <!-- Main Content Area -->
+        <TabControl>
+            <TabItem Header="Strategies">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Margin="8" Text="Strategies - Demo DataGrid" FontWeight="Bold" />
+                    
+                    <!-- Demo DataGrid -->
+                    <DataGrid Grid.Row="1" Margin="8" 
+                              AutoGenerateColumns="True"
+                              IsReadOnly="True"
+                              GridLinesVisibility="All"
+                              BorderThickness="1"
+                              BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}">
+                        <!-- Placeholder: In real implementation, this would bind to ItemsSource="{Binding Strategies}" -->
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Markets">
+                <Grid>
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+                               Text="Markets View - Placeholder" 
+                               FontSize="16" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Research">
+                <Grid>
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+                               Text="Research View - Placeholder" 
+                               FontSize="16" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Settings">
+                <Grid>
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+                               Text="Settings View - Placeholder" 
+                               FontSize="16" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Log">
+                <Grid>
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
+                               Text="Log View - Placeholder" 
+                               FontSize="16" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
