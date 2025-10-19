@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="Algoloop.Avalonia.MainWindow"
+        Title="{Binding Title}"
+        Width="1200" Height="800"
+        Icon="/Resources/AlgoloopIcon.ico">
+
+    <DockPanel LastChildFill="True">
+        <!-- Menu at the top -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Save" Command="{Binding SaveCommand}" />
+                <Separator />
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" CommandParameter="{Binding $parent[Window]}" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Status bar at the bottom -->
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" Padding="5">
+            <TextBlock Text="{Binding StatusMessage}" />
+        </Border>
+
+        <!-- Main content area with TabControl -->
+        <TabControl>
+            <TabItem Header="Markets">
+                <Grid>
+                    <TextBlock Text="Markets View (To be implemented)" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Strategies">
+                <Grid>
+                    <TextBlock Text="Strategies View (To be implemented)" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Research">
+                <Grid>
+                    <TextBlock Text="Research View (To be implemented)" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Log">
+                <DataGrid ItemsSource="{Binding LogViewModel.Logs}" 
+                          IsReadOnly="True"
+                          AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="150" />
+                        <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="80" />
+                        <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>
