@@ -65,9 +65,22 @@
         <TabControl>
             <TabItem Header="Strategies">
                 <Grid>
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" 
-                               Text="Strategies View - Placeholder" 
-                               FontSize="16" />
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Margin="8" Text="Strategies - Demo DataGrid" FontWeight="Bold" />
+                    
+                    <!-- Demo DataGrid -->
+                    <DataGrid Grid.Row="1" Margin="8" 
+                              AutoGenerateColumns="True"
+                              IsReadOnly="True"
+                              GridLinesVisibility="All"
+                              BorderThickness="1"
+                              BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}">
+                        <!-- Placeholder: In real implementation, this would bind to ItemsSource="{Binding Strategies}" -->
+                    </DataGrid>
                 </Grid>
             </TabItem>
             <TabItem Header="Markets">

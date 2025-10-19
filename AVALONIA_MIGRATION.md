@@ -175,10 +175,16 @@ dotnet publish -c Release -r osx-x64 --self-contained
 ### Build Issues
 - **Error: Project not compatible**: Ensure all referenced projects target compatible frameworks
 - **Missing types**: Run `dotnet restore` to restore NuGet packages
+- **EnableWindowsTargeting errors on Linux**: This is expected for WPF projects in the solution. To build only the Avalonia project on Linux:
+  ```bash
+  dotnet build Algoloop.UI.Avalonia/Algoloop.UI.Avalonia.csproj
+  ```
+  The full solution build requires Windows or `EnableWindowsTargeting=true` for all WPF projects.
 
 ### Runtime Issues
 - **Window doesn't open**: Check that MainWindow is properly registered in App.axaml.cs
 - **Bindings don't work**: Verify DataContext is set and properties are public
+- **XOpenDisplay failed** (on headless Linux): This is expected when running on a system without a display. The application will work fine on systems with a GUI.
 
 ## Resources
 
